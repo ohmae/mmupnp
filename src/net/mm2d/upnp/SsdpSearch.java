@@ -14,7 +14,7 @@ public class SsdpSearch extends SsdpServer {
     public static final String ST_ROOTDEVICE = "upnp:rootdevice";
 
     public interface ResponseListener {
-        void onReceiveResponse(SsdpPacket packet);
+        void onReceiveResponse(SsdpMessage packet);
     }
 
     private ResponseListener mListener;
@@ -44,8 +44,8 @@ public class SsdpSearch extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(SsdpPacket packet) {
-        if (packet.getMethod() == SsdpPacket.Method.M_SEARCH) {
+    protected void onReceive(SsdpMessage packet) {
+        if (packet.getMethod() == SsdpMessage.Method.M_SEARCH) {
             return;
         }
         if (mListener != null) {

@@ -11,7 +11,7 @@ import java.net.NetworkInterface;
  */
 public class SsdpNotify extends SsdpServer {
     public interface NotifyListener {
-        void onReceiveNotify(SsdpPacket packet);
+        void onReceiveNotify(SsdpMessage packet);
     }
 
     private NotifyListener mListener;
@@ -25,8 +25,8 @@ public class SsdpNotify extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(SsdpPacket packet) {
-        if (packet.getMethod() == SsdpPacket.Method.M_SEARCH) {
+    protected void onReceive(SsdpMessage packet) {
+        if (packet.getMethod() == SsdpMessage.Method.M_SEARCH) {
             return;
         }
         if (mListener != null) {

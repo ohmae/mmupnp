@@ -27,7 +27,7 @@ public abstract class HttpMessage {
     private int mPort;
     private final HttpHeader mHeaders;
     private String mVersion = Http.DEFAULT_HTTP_VERSION;
-    private byte[] mBodyBin;
+    private byte[] mBodyBinary;
     private String mBody;
 
     public HttpMessage() {
@@ -114,15 +114,15 @@ public abstract class HttpMessage {
     public void setBody(String body, boolean withContentLength) {
         setBody(body);
         if (withContentLength) {
-            final int length = mBodyBin == null ? 0 : mBodyBin.length;
+            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
             setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
         }
     }
 
-    public void setBodyBin(byte[] body, boolean withContentLength) {
-        setBodyBin(body);
+    public void setBodyBinary(byte[] body, boolean withContentLength) {
+        setBodyBinary(body);
         if (withContentLength) {
-            final int length = mBodyBin == null ? 0 : mBodyBin.length;
+            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
             setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
         }
     }
@@ -130,10 +130,10 @@ public abstract class HttpMessage {
     public void setBody(String body) {
         mBody = body;
         if (body == null || body.isEmpty()) {
-            mBodyBin = null;
+            mBodyBinary = null;
         } else {
             try {
-                mBodyBin = body.getBytes(CHARSET);
+                mBodyBinary = body.getBytes(CHARSET);
             } catch (final UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -141,9 +141,9 @@ public abstract class HttpMessage {
     }
 
     public String getBody() {
-        if (mBody == null && mBodyBin != null) {
+        if (mBody == null && mBodyBinary != null) {
             try {
-                mBody = new String(mBodyBin, CHARSET);
+                mBody = new String(mBodyBinary, CHARSET);
             } catch (final UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -151,13 +151,13 @@ public abstract class HttpMessage {
         return mBody;
     }
 
-    public void setBodyBin(byte[] body) {
-        mBodyBin = body;
+    public void setBodyBinary(byte[] body) {
+        mBodyBinary = body;
         mBody = null;
     }
 
-    public byte[] getBodyBin() {
-        return mBodyBin;
+    public byte[] getBodyBinary() {
+        return mBodyBinary;
     }
 
     @Override
@@ -199,8 +199,8 @@ public abstract class HttpMessage {
 
     public void writeData(OutputStream os) throws IOException {
         os.write(getHeaderString().getBytes(CHARSET));
-        if (mBodyBin != null) {
-            os.write(mBodyBin);
+        if (mBodyBinary != null) {
+            os.write(mBodyBinary);
         }
         os.flush();
     }
@@ -248,7 +248,7 @@ public abstract class HttpMessage {
                 length -= size;
             }
         }
-        setBodyBin(baos.toByteArray());
+        setBodyBinary(baos.toByteArray());
         return true;
     }
 

@@ -31,7 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class Device {
     private final ControlPoint mControlPoint;
-    private SsdpPacket mSsdp;
+    private SsdpMessage mSsdp;
     private String mDeviceXml;
     private String mUdn;
     private String mDeviceType;
@@ -60,11 +60,11 @@ public class Device {
         return mControlPoint;
     }
 
-    public void setSsdpPacket(SsdpPacket packet) {
+    public void setSsdpPacket(SsdpMessage packet) {
         mSsdp = packet;
     }
 
-    public SsdpPacket getSsdpPacket() {
+    public SsdpMessage getSsdpPacket() {
         return mSsdp;
     }
 

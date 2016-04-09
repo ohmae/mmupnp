@@ -71,7 +71,7 @@ public class Icon {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
-        mBinary = response.getBodyBin();
+        mBinary = response.getBodyBinary();
     }
 
     public byte[] getBinary() {

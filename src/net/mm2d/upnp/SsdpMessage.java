@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpPacket {
+public class SsdpMessage {
     public enum Method {
         RESPONSE("HTTP"),
         M_SEARCH("M-SEARCH"),
@@ -81,7 +81,7 @@ public class SsdpPacket {
     private final InetSocketAddress mSourceAddress;
     private final boolean mValidSegment;
 
-    public SsdpPacket(InterfaceAddress addr, DatagramPacket dp) {
+    public SsdpMessage(InterfaceAddress addr, DatagramPacket dp) {
         mInterfaceAddress = addr;
         mSourceAddress = (InetSocketAddress) dp.getSocketAddress();
         mValidSegment = isSameSegment(mInterfaceAddress, mSourceAddress);

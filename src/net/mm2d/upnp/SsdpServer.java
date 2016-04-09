@@ -97,7 +97,7 @@ public abstract class SsdpServer {
         }
     }
 
-    protected abstract void onReceive(SsdpPacket packet);
+    protected abstract void onReceive(SsdpMessage packet);
 
     private class ReceiveThread extends Thread {
         private volatile boolean mShutdownRequest;
@@ -117,7 +117,7 @@ public abstract class SsdpServer {
                     final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                     try {
                         mSocket.receive(dp);
-                        onReceive(new SsdpPacket(mInterfaceAddress, dp));
+                        onReceive(new SsdpMessage(mInterfaceAddress, dp));
                     } catch (final SocketTimeoutException e) {
                     }
                 }

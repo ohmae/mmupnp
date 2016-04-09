@@ -64,7 +64,7 @@ public class ControlPoint {
     private final ExecutorService mNotifyExecutor;
     private final ResponseListener mResponseListener = new ResponseListener() {
         @Override
-        public void onReceiveResponse(final SsdpPacket packet) {
+        public void onReceiveResponse(final SsdpMessage packet) {
             mNetworkExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
@@ -75,7 +75,7 @@ public class ControlPoint {
     };
     private final NotifyListener mNotifyListener = new NotifyListener() {
         @Override
-        public void onReceiveNotify(SsdpPacket packet) {
+        public void onReceiveNotify(SsdpMessage packet) {
             mNetworkExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
@@ -155,12 +155,12 @@ public class ControlPoint {
         }
     }
 
-    private void onReceiveSsdp(SsdpPacket packet) {
+    private void onReceiveSsdp(SsdpMessage packet) {
         final String uuid = packet.getUuid();
         synchronized (mDeviceMap) {
             Device device = mDeviceMap.get(uuid);
             if (device == null) {
-                if (packet.getNts() == SsdpPacket.Nts.BYEBYE) {
+                if (packet.getNts() == SsdpMessage.Nts.BYEBYE) {
                     if (mPendingDeviceMap.get(uuid) != null) {
                         mPendingDeviceMap.remove(uuid);
                     }
@@ -176,7 +176,7 @@ public class ControlPoint {
                     mNetworkExecutor.submit(new DeviceLoader(device));
                 }
             } else {
-                if (packet.getNts() == SsdpPacket.Nts.BYEBYE) {
+                if (packet.getNts() == SsdpMessage.Nts.BYEBYE) {
                     lostDevice(device);
                 } else {
                     device.setSsdpPacket(packet);
