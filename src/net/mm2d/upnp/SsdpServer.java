@@ -79,6 +79,10 @@ public abstract class SsdpServer {
     public void stop() {
         if (mThread != null) {
             mThread.shutdownRequest();
+            try {
+                mThread.join(1000);
+            } catch (final InterruptedException e) {
+            }
             mThread = null;
         }
     }
@@ -106,6 +110,18 @@ public abstract class SsdpServer {
 
     protected abstract void onReceive(InterfaceAddress addr, DatagramPacket dp);
 
+    private void joinGroup() throws IOException {
+        if (mBindPort != 0) {
+            mSocket.joinGroup(mMulticastAddress);
+        }
+    }
+
+    private void leaveGroup() throws IOException {
+        if (mBindPort != 0) {
+            mSocket.leaveGroup(mMulticastAddress);
+        }
+    }
+
     private class ReceiveThread extends Thread {
         private volatile boolean mShutdownRequest;
 
@@ -117,7 +133,7 @@ public abstract class SsdpServer {
         @Override
         public void run() {
             try {
-                mSocket.joinGroup(mMulticastAddress);
+                joinGroup();
                 while (!mShutdownRequest) {
                     final byte[] buf = new byte[1024];
                     final DatagramPacket dp = new DatagramPacket(buf, buf.length);
@@ -127,7 +143,7 @@ public abstract class SsdpServer {
                     } catch (final SocketTimeoutException e) {
                     }
                 }
-                mSocket.leaveGroup(mMulticastAddress);
+                leaveGroup();
             } catch (final UnknownHostException e) {
             } catch (final SocketException e) {
             } catch (final IOException e) {
