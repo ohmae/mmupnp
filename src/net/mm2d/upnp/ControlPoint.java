@@ -4,7 +4,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.upnp.EventServer.EventPacketListener;
+import net.mm2d.upnp.EventReceiver.EventPacketListener;
 import net.mm2d.upnp.SsdpNotify.NotifyListener;
 import net.mm2d.upnp.SsdpSearch.ResponseListener;
 
@@ -59,7 +59,7 @@ public class ControlPoint {
     private final Map<String, Device> mPendingDeviceMap;
     private final Map<String, Service> mSubscribeServiceMap;
     private final DeviceExpire mDeviceExpire;
-    private final EventServer mEventServer;
+    private final EventReceiver mEventServer;
     private final ExecutorService mNetworkExecutor;
     private final ExecutorService mNotifyExecutor;
     private final ResponseListener mResponseListener = new ResponseListener() {
@@ -387,7 +387,7 @@ public class ControlPoint {
         }
         mDeviceExpire = new DeviceExpire(this);
         mDeviceExpire.start();
-        mEventServer = new EventServer();
+        mEventServer = new EventReceiver();
         mEventServer.setEventPacketListener(mEventPacketListener);
     }
 
