@@ -5,8 +5,8 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.EventReceiver.EventPacketListener;
-import net.mm2d.upnp.SsdpNotify.NotifyListener;
-import net.mm2d.upnp.SsdpSearch.ResponseListener;
+import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
+import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -53,8 +53,8 @@ public class ControlPoint {
 
     private final List<DiscoveryListener> mDiscoveryListeners;
     private final List<NotifyEventListener> mNotifyEventListeners;
-    private final Collection<SsdpSearch> mSearchList;
-    private final Collection<SsdpNotify> mNotifyList;
+    private final Collection<SsdpSearchServer> mSearchList;
+    private final Collection<SsdpNotifyReceiver> mNotifyList;
     private final Map<String, Device> mDeviceMap;
     private final Map<String, Device> mPendingDeviceMap;
     private final Map<String, Service> mSubscribeServiceMap;
@@ -64,26 +64,58 @@ public class ControlPoint {
     private final ExecutorService mNotifyExecutor;
     private final ResponseListener mResponseListener = new ResponseListener() {
         @Override
-        public void onReceiveResponse(final SsdpMessage packet) {
+        public void onReceiveResponse(final SsdpResponseMessage message) {
             mNetworkExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    onReceiveSsdp(packet);
+                    onReceiveSsdp(message);
                 }
             });
         }
     };
     private final NotifyListener mNotifyListener = new NotifyListener() {
         @Override
-        public void onReceiveNotify(SsdpMessage packet) {
+        public void onReceiveNotify(SsdpRequestMessage message) {
             mNetworkExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    onReceiveSsdp(packet);
+                    onReceiveSsdp(message);
                 }
             });
         }
     };
+
+    private void onReceiveSsdp(SsdpMessage message) {
+        final String uuid = message.getUuid();
+        synchronized (mDeviceMap) {
+            Device device = mDeviceMap.get(uuid);
+            if (device == null) {
+                if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
+                    if (mPendingDeviceMap.get(uuid) != null) {
+                        mPendingDeviceMap.remove(uuid);
+                    }
+                    return;
+                }
+                device = mPendingDeviceMap.get(uuid);
+                if (device != null) {
+                    device.setSsdpPacket(message);
+                } else {
+                    device = new Device(ControlPoint.this);
+                    device.setSsdpPacket(message);
+                    mPendingDeviceMap.put(message.getUuid(), device);
+                    mNetworkExecutor.submit(new DeviceLoader(device));
+                }
+            } else {
+                if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
+                    lostDevice(device);
+                } else {
+                    device.setSsdpPacket(message);
+                    mDeviceExpire.update();
+                }
+            }
+        }
+    }
+
     private final EventPacketListener mEventPacketListener = new EventPacketListener() {
         @Override
         public boolean onEventReceived(HttpRequest request) {
@@ -155,37 +187,6 @@ public class ControlPoint {
         }
     }
 
-    private void onReceiveSsdp(SsdpMessage packet) {
-        final String uuid = packet.getUuid();
-        synchronized (mDeviceMap) {
-            Device device = mDeviceMap.get(uuid);
-            if (device == null) {
-                if (packet.getNts() == SsdpMessage.Nts.BYEBYE) {
-                    if (mPendingDeviceMap.get(uuid) != null) {
-                        mPendingDeviceMap.remove(uuid);
-                    }
-                    return;
-                }
-                device = mPendingDeviceMap.get(uuid);
-                if (device != null) {
-                    device.setSsdpPacket(packet);
-                } else {
-                    device = new Device(ControlPoint.this);
-                    device.setSsdpPacket(packet);
-                    mPendingDeviceMap.put(packet.getUuid(), device);
-                    mNetworkExecutor.submit(new DeviceLoader(device));
-                }
-            } else {
-                if (packet.getNts() == SsdpMessage.Nts.BYEBYE) {
-                    lostDevice(device);
-                } else {
-                    device.setSsdpPacket(packet);
-                    mDeviceExpire.update();
-                }
-            }
-        }
-    }
-
     public void addDiscoveryListener(DiscoveryListener listener) {
         synchronized (mDiscoveryListeners) {
             if (!mDiscoveryListeners.contains(listener)) {
@@ -240,13 +241,8 @@ public class ControlPoint {
 
     public void discoverDevice(final Device device) {
         synchronized (mDeviceMap) {
-            System.out.println("\ndevice list:");
             mDeviceMap.put(device.getUuid(), device);
             mDeviceExpire.add(device);
-            for (final Map.Entry<String, Device> entry : mDeviceMap.entrySet()) {
-                System.out.println(entry.getValue().getFriendlyName());
-            }
-            System.out.println();
         }
         mNotifyExecutor.submit(new Runnable() {
             @Override
@@ -266,7 +262,6 @@ public class ControlPoint {
 
     private void lostDevice(final Device device, boolean expire) {
         synchronized (mDeviceMap) {
-            System.out.println("remove:" + device.getFriendlyName());
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
                 s.getSubscriptionId();
@@ -378,10 +373,10 @@ public class ControlPoint {
         mNotifyExecutor = Executors.newSingleThreadExecutor();
         mNetworkExecutor = Executors.newCachedThreadPool();
         for (final NetworkInterface nif : interfaces) {
-            final SsdpSearch search = new SsdpSearch(nif);
+            final SsdpSearchServer search = new SsdpSearchServer(nif);
             search.setResponseListener(mResponseListener);
             mSearchList.add(search);
-            final SsdpNotify notify = new SsdpNotify(nif);
+            final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);
             notify.setNotifyListener(mNotifyListener);
             mNotifyList.add(notify);
         }
@@ -495,7 +490,7 @@ public class ControlPoint {
     }
 
     public void search() {
-        for (final SsdpSearch socket : mSearchList) {
+        for (final SsdpSearchServer socket : mSearchList) {
             socket.search();
         }
     }

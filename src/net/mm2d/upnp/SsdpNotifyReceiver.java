@@ -4,19 +4,21 @@
 
 package net.mm2d.upnp;
 
+import java.net.DatagramPacket;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpNotify extends SsdpServer {
+public class SsdpNotifyReceiver extends SsdpServer {
     public interface NotifyListener {
-        void onReceiveNotify(SsdpMessage packet);
+        void onReceiveNotify(SsdpRequestMessage message);
     }
 
     private NotifyListener mListener;
 
-    public SsdpNotify(NetworkInterface ni) {
+    public SsdpNotifyReceiver(NetworkInterface ni) {
         super(ni, SsdpServer.PORT);
     }
 
@@ -25,12 +27,10 @@ public class SsdpNotify extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(SsdpMessage packet) {
-        if (packet.getMethod() == SsdpMessage.Method.M_SEARCH) {
-            return;
-        }
+    protected void onReceive(InterfaceAddress addr, DatagramPacket dp) {
+        final SsdpRequestMessage message = new SsdpRequestMessage(addr, dp);
         if (mListener != null) {
-            mListener.onReceiveNotify(packet);
+            mListener.onReceiveNotify(message);
         }
     }
 }

@@ -4,6 +4,7 @@
 
 package net.mm2d.upnp;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
@@ -82,8 +83,14 @@ public abstract class SsdpServer {
         }
     }
 
-    public void send(String message) {
-        send(message.getBytes());
+    public void send(SsdpMessage message) {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            message.getMessage().writeData(baos);
+            send(baos.toByteArray());
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void send(byte[] message) {
@@ -97,7 +104,7 @@ public abstract class SsdpServer {
         }
     }
 
-    protected abstract void onReceive(SsdpMessage packet);
+    protected abstract void onReceive(InterfaceAddress addr, DatagramPacket dp);
 
     private class ReceiveThread extends Thread {
         private volatile boolean mShutdownRequest;
@@ -109,7 +116,6 @@ public abstract class SsdpServer {
 
         @Override
         public void run() {
-            System.out.println("run");
             try {
                 mSocket.joinGroup(mMulticastAddress);
                 while (!mShutdownRequest) {
@@ -117,7 +123,7 @@ public abstract class SsdpServer {
                     final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                     try {
                         mSocket.receive(dp);
-                        onReceive(new SsdpMessage(mInterfaceAddress, dp));
+                        onReceive(mInterfaceAddress, dp);
                     } catch (final SocketTimeoutException e) {
                     }
                 }
@@ -126,7 +132,6 @@ public abstract class SsdpServer {
             } catch (final SocketException e) {
             } catch (final IOException e) {
             }
-            System.out.println("end");
         }
     }
 }

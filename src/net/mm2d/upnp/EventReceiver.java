@@ -183,7 +183,6 @@ public class EventReceiver {
                 } catch (final IOException e) {
                 }
                 mServer.notifyClientFinish(this);
-                System.out.println("close:" + mSocket.getInetAddress());
             }
         }
     }

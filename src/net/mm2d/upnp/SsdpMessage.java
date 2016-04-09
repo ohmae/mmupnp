@@ -4,117 +4,59 @@
 
 package net.mm2d.upnp;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpMessage {
-    public enum Method {
-        RESPONSE("HTTP"),
-        M_SEARCH("M-SEARCH"),
-        NOTIFY("NOTIFY");
-        private String mName;
-
-        private Method(String name) {
-            mName = name;
-        }
-
-        private boolean match(String line) {
-            final String name = line.substring(0, mName.length());
-            return mName.equalsIgnoreCase(name);
-        }
-
-        public static Method getType(String line) {
-            for (final Method t : values()) {
-                if (t.match(line)) {
-                    return t;
-                }
-            }
-            return null;
-        }
-    }
-
-    /**
-     * Notification Type Sub
-     */
-    public enum Nts {
-        ALIVE("ssdp:alive"),
-        BYEBYE("ssdp:byebye"),
-        UPDATE("ssdp:update"),
-        PROPCHANGE("upnp:propchange");
-        private static Map<String, Nts> mMap;
-        private String mMessage;
-
-        private Nts(String message) {
-            mMessage = message;
-        }
-
-        static {
-            mMap = new HashMap<>();
-            for (final Nts nts : Nts.values()) {
-                mMap.put(nts.mMessage, nts);
-            }
-        }
-
-        public static Nts fromMessage(String message) {
-            return mMap.get(message);
-        }
-    }
-
+public abstract class SsdpMessage {
+    public static final String M_SEARCH = "M-SEARCH";
+    public static final String NOTIFY = "NOTIFY";
+    public static final String SSDP_ALIVE = "ssdp:alive";
+    public static final String SSDP_BYEBYE = "ssdp:byebye";
+    public static final String SSDP_UPDATE = "ssdp:update";
+    public static final String SSDP_DISCOVER = "\"ssdp:discover\"";
+    private final HttpMessage mMessage;
     private static final int DEFAULT_MAX_AGE = 1800;
-
-    private final Method mMethod;
-    private Nts mNts;
     private int mMaxAge;
-    private final long mExpireTime;
+    private long mExpireTime;
     private String mUuid;
     private String mType;
-    private final String mLocation;
-    private final Map<String, String> mHeaders = new HashMap<>();
-    private final String mRequestHeader; // Responseと同じクラスで表現するのがまずいか？
-    private final InterfaceAddress mInterfaceAddress;
-    private final InetSocketAddress mSourceAddress;
-    private final boolean mValidSegment;
+    private String mNts;
+    private String mLocation;
+    private InterfaceAddress mInterfaceAddress;
+    private InetSocketAddress mSourceAddress;
+    private boolean mValidSegment;
+
+    protected abstract HttpMessage newMessage();
+
+    protected HttpMessage getMessage() {
+        return mMessage;
+    }
+
+    public SsdpMessage() {
+        mMessage = newMessage();
+    }
 
     public SsdpMessage(InterfaceAddress addr, DatagramPacket dp) {
+        mMessage = newMessage();
         mInterfaceAddress = addr;
         mSourceAddress = (InetSocketAddress) dp.getSocketAddress();
         mValidSegment = isSameSegment(mInterfaceAddress, mSourceAddress);
-        final String message = new String(dp.getData(), 0, dp.getLength());
-        final String[] lines = message.split("\r\n");
-        if (lines.length < 1) {
-            throw new IllegalArgumentException();
-        }
-        mRequestHeader = lines[0];
-        mMethod = Method.getType(mRequestHeader);
-        if (mMethod == null) {
-            throw new IllegalArgumentException();
-        }
-        for (int i = 1; i < lines.length; i++) {
-            final String line = lines[i];
-            final int index = line.indexOf(':');
-            if (index < 0) {
-                continue;
-            }
-            final String key = line.substring(0, index).trim();
-            String value;
-            if (index + 1 == line.length()) {
-                value = "";
-            } else {
-                value = line.substring(index + 1).trim();
-            }
-            mHeaders.put(key.toUpperCase(), value);
+        try {
+            mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
+        } catch (final IOException e) {
+            e.printStackTrace();
         }
         parseCacheControl();
-        mExpireTime = mMaxAge * 1000 + System.currentTimeMillis();
         parseUsn();
-        parseNts();
-        mLocation = mHeaders.get(Http.LOCATION);
+        mExpireTime = mMaxAge * 1000 + System.currentTimeMillis();
+        mLocation = mMessage.getHeader(Http.LOCATION);
+        mNts = mMessage.getHeader(Http.NTS);
     }
 
     private boolean isSameSegment(InterfaceAddress ifa, InetSocketAddress sa) {
@@ -143,7 +85,7 @@ public class SsdpMessage {
 
     private void parseCacheControl() {
         mMaxAge = DEFAULT_MAX_AGE;
-        final String age = mHeaders.get(Http.CACHE_CONTROL);
+        final String age = mMessage.getHeader(Http.CACHE_CONTROL);
         if (age == null || !age.toLowerCase().startsWith("max-age")) {
             return;
         }
@@ -159,7 +101,7 @@ public class SsdpMessage {
     }
 
     private void parseUsn() {
-        final String usn = mHeaders.get(Http.USN);
+        final String usn = mMessage.getHeader(Http.USN);
         if (usn == null || !usn.startsWith("uuid")) {
             return;
         }
@@ -174,23 +116,16 @@ public class SsdpMessage {
         }
     }
 
-    private void parseNts() {
-        if (mMethod != Method.NOTIFY) {
-            return;
-        }
-        mNts = Nts.fromMessage(mHeaders.get(Http.NTS));
-    }
-
     public boolean isValidSegment() {
         return mValidSegment;
     }
 
-    public Method getMethod() {
-        return mMethod;
+    public String getHeader(String name) {
+        return mMessage.getHeader(name);
     }
 
-    public String getHeaderValue(String key) {
-        return mHeaders.get(key);
+    public void setHeader(String name, String value) {
+        mMessage.setHeader(name, value);
     }
 
     public String getUuid() {
@@ -201,7 +136,7 @@ public class SsdpMessage {
         return mType;
     }
 
-    public Nts getNts() {
+    public String getNts() {
         return mNts;
     }
 
@@ -215,5 +150,10 @@ public class SsdpMessage {
 
     public String getLocation() {
         return mLocation;
+    }
+
+    @Override
+    public String toString() {
+        return mMessage.toString();
     }
 }

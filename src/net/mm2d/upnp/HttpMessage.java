@@ -179,6 +179,15 @@ public abstract class HttpMessage {
         return sb.toString();
     }
 
+    private byte[] getHeaderBytes() {
+        try {
+            return getHeaderString().getBytes(CHARSET);
+        } catch (final UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return new byte[0];
+    }
+
     public String getMessageString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
@@ -198,7 +207,7 @@ public abstract class HttpMessage {
     }
 
     public void writeData(OutputStream os) throws IOException {
-        os.write(getHeaderString().getBytes(CHARSET));
+        os.write(getHeaderBytes());
         if (mBodyBinary != null) {
             os.write(mBodyBinary);
         }
