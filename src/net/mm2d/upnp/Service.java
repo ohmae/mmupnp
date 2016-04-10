@@ -37,11 +37,13 @@ public class Service {
     private final String mScpdUrl;
     private final String mControlUrl;
     private final String mEventSubUrl;
-    private String mSubscriptionId;
     private List<Action> mActionList;
     private final Map<String, Action> mActionMap;
     private List<StateVariable> mStateVariableList;
     private final Map<String, StateVariable> mStateVariableMap;
+    private long mSubscriptionStart;
+    private long mSubscriptionTimeout;
+    private String mSubscriptionId;
 
     public static class Builder {
         private Device mDevice;
@@ -303,7 +305,31 @@ public class Service {
         return sb.toString();
     }
 
+    private long getTimeout(HttpResponse response) {
+        final String timeout = response.getHeader(Http.TIMEOUT).toLowerCase();
+        if (timeout.contains("infinite")) {
+            return -1;
+        }
+        final String prefix = "second-";
+        final int pos = timeout.indexOf(prefix);
+        if (pos < 0) {
+            return 0;
+        }
+        final String secondSection = timeout.substring(pos + prefix.length());
+        try {
+            final int second = Integer.parseInt(secondSection);
+            return second * 1000L;
+        } catch (final NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public boolean subscribe() throws IOException {
+        return subscribe(false);
+    }
+
+    public boolean subscribe(boolean keep) throws IOException {
         if (mEventSubUrl == null) {
             return false;
         }
@@ -320,12 +346,27 @@ public class Service {
         if (response.getStatus() != Http.Status.HTTP_OK) {
             return false;
         }
-        mSubscriptionId = response.getHeader(Http.SID);
+        final String sid = response.getHeader(Http.SID);
+        final long timeout = getTimeout(response);
+        if (sid == null || sid.isEmpty() || timeout == 0) {
+            return false;
+        }
+        mSubscriptionId = sid;
+        mSubscriptionStart = System.currentTimeMillis();
+        mSubscriptionTimeout = timeout;
         mDevice.getControlPoint().registerSubscribeService(this);
+        if (keep) {
+            mDevice.getControlPoint().addSubscribeKeeper(this);
+        }
         return true;
     }
 
     public boolean renewSubscribe() throws IOException {
+        return renewSubscribe(true);
+    }
+
+    boolean renewSubscribe(boolean notify) throws IOException {
+        System.out.println("renewSubscribe");
         if (mEventSubUrl == null || mSubscriptionId == null) {
             return false;
         }
@@ -338,7 +379,21 @@ public class Service {
         request.setHeader(Http.CONTENT_LENGTH, "0");
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
-        return response.getStatus() == Http.Status.HTTP_OK;
+        if (response.getStatus() != Http.Status.HTTP_OK) {
+            return false;
+        }
+        final String sid = response.getHeader(Http.SID);
+        final long timeout = getTimeout(response);
+        if (sid == null || sid.isEmpty()
+                || !sid.equals(mSubscriptionId) || timeout == 0) {
+            return false;
+        }
+        mSubscriptionStart = System.currentTimeMillis();
+        mSubscriptionTimeout = timeout;
+        if (notify) {
+            mDevice.getControlPoint().renewSubscribeService();
+        }
+        return true;
     }
 
     public boolean unsubscribe() throws IOException {
@@ -358,10 +413,20 @@ public class Service {
         }
         mDevice.getControlPoint().unregisterSubscribeService(this);
         mSubscriptionId = null;
+        mSubscriptionStart = 0;
+        mSubscriptionTimeout = 0;
         return true;
     }
 
     public String getSubscriptionId() {
         return mSubscriptionId;
+    }
+
+    public long getSubscriptionStart() {
+        return mSubscriptionStart;
+    }
+
+    public long getSubscriptionTimeout() {
+        return mSubscriptionTimeout;
     }
 }

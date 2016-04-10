@@ -121,7 +121,7 @@ public class MainWindow extends JFrame {
             } else if (node.getUserObject() instanceof Service) {
                 final Service service = (Service) node.getUserObject();
                 try {
-                    service.subscribe();
+                    service.subscribe(true);
                 } catch (final IOException e1) {
                     e1.printStackTrace();
                 }

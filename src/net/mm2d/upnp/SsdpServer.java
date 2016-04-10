@@ -62,6 +62,7 @@ abstract class SsdpServer {
     }
 
     public void close() {
+        stop(true);
         if (mSocket != null) {
             mSocket.close();
             mSocket = null;
@@ -70,15 +71,22 @@ abstract class SsdpServer {
 
     public void start() {
         if (mThread != null) {
-            stop();
+            stop(true);
         }
         mThread = new ReceiveThread();
         mThread.start();
     }
 
     public void stop() {
-        if (mThread != null) {
-            mThread.shutdownRequest();
+        stop(false);
+    }
+
+    public void stop(boolean join) {
+        if (mThread == null) {
+            return;
+        }
+        mThread.shutdownRequest();
+        if (join) {
             try {
                 mThread.join(1000);
             } catch (final InterruptedException e) {

@@ -78,8 +78,8 @@ public final class Http {
     }
 
     public enum Status {
-        HTTP_100(100, "Continue"),
-        HTTP_101(101, "Switching Protocols"),
+        HTTP_CONTINUE(100, "Continue"),
+        HTTP_SWITCH_PROTOCOL(101, "Switching Protocols"),
         HTTP_OK(200, "OK"),
         HTTP_CREATED(201, "Created"),
         HTTP_ACCEPTED(202, "Accepted"),
