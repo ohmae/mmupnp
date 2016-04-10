@@ -39,37 +39,66 @@ import javax.xml.transform.stream.StreamResult;
  */
 public class Action {
     private final Service mService;
-    private String mName;
-    private final List<Argument> mArgumentList;
+    private final String mName;
+    private List<Argument> mArgumentList;
     private final Map<String, Argument> mArgumentMap;
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
 
-    public Action(Service service) {
-        mService = service;
-        mArgumentList = new ArrayList<>();
+    public static class Builder {
+        private Service mService;
+        private String mName;
+        private final List<Argument.Builder> mArgumentList;
+
+        public Builder() {
+            mArgumentList = new ArrayList<>();
+        }
+
+        public void serService(Service service) {
+            mService = service;
+        }
+
+        public void setName(String name) {
+            mName = name;
+        }
+
+        public void addArugmentBuilder(Argument.Builder argument) {
+            mArgumentList.add(argument);
+        }
+
+        public List<Argument.Builder> getArgumentBuilderList() {
+            return mArgumentList;
+        }
+
+        public Action build() {
+            return new Action(this);
+        }
+    }
+
+    private Action(Builder builder) {
+        mService = builder.mService;
+        mName = builder.mName;
         mArgumentMap = new LinkedHashMap<>();
+        for (final Argument.Builder b : builder.mArgumentList) {
+            b.setAction(this);
+            final Argument argument = b.build();
+            mArgumentMap.put(argument.getName(), argument);
+        }
+    }
+
+    public Service getService() {
+        return mService;
     }
 
     public String getName() {
         return mName;
     }
 
-    public void setName(String name) {
-        mName = name;
-    }
-
     public List<Argument> getArgumentList() {
+        if (mArgumentList == null) {
+            mArgumentList = new ArrayList<>(mArgumentMap.values());
+        }
         return Collections.unmodifiableList(mArgumentList);
-    }
-
-    public void addArugment(Argument argument) {
-        mArgumentList.add(argument);
-        mArgumentMap.put(argument.getName(), argument);
-    }
-
-    public Service getService() {
-        return mService;
     }
 
     private String getSoapActionName() {
@@ -102,7 +131,7 @@ public class Action {
         return null;
     }
 
-    public String makeSoap(Map<String, String> arguments) {
+    private String makeSoap(Map<String, String> arguments) {
         try {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -158,7 +187,7 @@ public class Action {
         return null;
     }
 
-    public Map<String, String> parseResponse(String xml)
+    private Map<String, String> parseResponse(String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final String responseTag = mName + "Response";
         final Map<String, String> result = new HashMap<>();

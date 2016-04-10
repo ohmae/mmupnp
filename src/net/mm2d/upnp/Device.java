@@ -32,7 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class Device {
     private final ControlPoint mControlPoint;
     private SsdpMessage mSsdp;
-    private String mDeviceXml;
+    private String mDescription;
     private String mUdn;
     private String mDeviceType;
     private String mFriendlyName;
@@ -60,11 +60,11 @@ public class Device {
         return mControlPoint;
     }
 
-    public void setSsdpPacket(SsdpMessage packet) {
-        mSsdp = packet;
+    public void setSsdpMessage(SsdpMessage message) {
+        mSsdp = message;
     }
 
-    public SsdpMessage getSsdpPacket() {
+    public SsdpMessage getSsdpMessage() {
         return mSsdp;
     }
 
@@ -89,7 +89,7 @@ public class Device {
         return new URL(baseUrl + url);
     }
 
-    void getXml() throws IOException {
+    void loadDescription() throws IOException, SAXException, ParserConfigurationException {
         final HttpClient client = new HttpClient(true);
         final URL url = new URL(mSsdp.getLocation());
         final HttpRequest request = new HttpRequest();
@@ -98,25 +98,19 @@ public class Device {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
-        mDeviceXml = response.getBody();
-        try {
-            parseDeviceXml(mDeviceXml);
-        } catch (final SAXException e) {
-            e.printStackTrace();
-        } catch (final ParserConfigurationException e) {
-            e.printStackTrace();
-        }
+        mDescription = response.getBody();
+        parseDescription(mDescription);
         for (final Icon icon : mIconList) {
-            icon.getIcon(client);
+            icon.loadBinary(client);
         }
         for (final Service service : mServiceList) {
-            service.getXml(client);
+            service.loadDescription(client);
         }
         client.close();
     }
 
-    public String getDeviceXml() {
-        return mDeviceXml;
+    public String getDescription() {
+        return mDescription;
     }
 
     private void parseIconList(Node listNode) {
@@ -132,7 +126,8 @@ public class Device {
     }
 
     private Icon parseIcon(Element element) {
-        final Icon icon = new Icon(this);
+        final Icon.Builder icon = new Icon.Builder();
+        icon.setDevice(this);
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -151,7 +146,7 @@ public class Device {
                 icon.setUrl(node.getTextContent());
             }
         }
-        return icon;
+        return icon.build();
     }
 
     private void parseServiceList(Node listNode) {
@@ -167,7 +162,8 @@ public class Device {
     }
 
     private Service parseService(Element element) {
-        final Service service = new Service(this);
+        final Service.Builder service = new Service.Builder();
+        service.setDevice(this);
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -186,10 +182,10 @@ public class Device {
                 service.setControlUrl(node.getTextContent());
             }
         }
-        return service;
+        return service.build();
     }
 
-    private void parseDeviceXml(String xml)
+    private void parseDescription(String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);

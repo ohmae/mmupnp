@@ -11,7 +11,7 @@ import java.net.NetworkInterface;
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpNotifyReceiver extends SsdpServer {
+class SsdpNotifyReceiver extends SsdpServer {
     public interface NotifyListener {
         void onReceiveNotify(SsdpRequestMessage message);
     }

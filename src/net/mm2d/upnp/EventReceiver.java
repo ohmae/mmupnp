@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class EventReceiver {
+class EventReceiver {
     private ServerSocket mServerSocket;
     private ServerThread mServerThread;
     private EventPacketListener mListener;

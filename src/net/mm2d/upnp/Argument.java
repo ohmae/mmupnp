@@ -9,48 +9,69 @@ package net.mm2d.upnp;
  */
 public class Argument {
     private final Action mAction;
-    private String mName;
-    private boolean mInputDirection;
-    private String mRelatedStateVariableName;
-    private StateVariable mRelatedStateVariable;
+    private final String mName;
+    private final boolean mInputDirection;
+    private final StateVariable mRelatedStateVariable;
 
-    public Argument(Action action) {
-        mAction = action;
+    public static class Builder {
+        private Action mAction;
+        private String mName;
+        private boolean mInputDirection;
+        private String mRelatedStateVariableName;
+        private StateVariable mRelatedStateVariable;
+
+        public Builder() {
+        }
+
+        public void setAction(Action action) {
+            mAction = action;
+        }
+
+        public void setName(String name) {
+            mName = name;
+        }
+
+        public void setDirection(String direction) {
+            mInputDirection = "in".equalsIgnoreCase(direction);
+        }
+
+        public void setRelatedStateVariableName(String name) {
+            mRelatedStateVariableName = name;
+        }
+
+        public void setRelatedStateVariable(StateVariable variable) {
+            mRelatedStateVariable = variable;
+        }
+
+        public String getRelatedStateVariableName() {
+            return mRelatedStateVariableName;
+        }
+
+        public Argument build() {
+            return new Argument(this);
+        }
+    }
+
+    private Argument(Builder builder) {
+        mAction = builder.mAction;
+        mName = builder.mName;
+        mInputDirection = builder.mInputDirection;
+        mRelatedStateVariable = builder.mRelatedStateVariable;
+    }
+
+    public Action getAction() {
+        return mAction;
     }
 
     public String getName() {
         return mName;
     }
 
-    public void setName(String name) {
-        mName = name;
-    }
-
     public boolean isInputDirection() {
         return mInputDirection;
     }
 
-    public void setDirection(String direction) {
-        mInputDirection = "in".equalsIgnoreCase(direction);
-    }
-
-    public String getRelatedStateVariableName() {
-        return mRelatedStateVariableName;
-    }
-
-    public void setRelatedStateVariableName(String relatedStateVariableName) {
-        mRelatedStateVariableName = relatedStateVariableName;
-    }
-
     public StateVariable getRelatedStateVariable() {
         return mRelatedStateVariable;
-    }
-
-    public void setRelatedStateVariable(StateVariable relatedStateVariable) {
-        mRelatedStateVariable = relatedStateVariable;
-    }
-
-    public Action getAction() {
-        return mAction;
     }
 }

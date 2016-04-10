@@ -13,8 +13,7 @@ import java.util.Set;
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class HttpHeader {
-
+class HttpHeader {
     public static class Entry {
         private String mName;
         private String mValue;

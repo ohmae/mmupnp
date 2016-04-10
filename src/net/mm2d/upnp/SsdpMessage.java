@@ -52,6 +52,10 @@ public abstract class SsdpMessage {
         } catch (final IOException e) {
             e.printStackTrace();
         }
+        parseMessage();
+    }
+
+    public void parseMessage() {
         parseCacheControl();
         parseUsn();
         mExpireTime = mMaxAge * 1000 + System.currentTimeMillis();

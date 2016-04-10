@@ -72,6 +72,6 @@ public class DeviceNode extends UpnpNode {
     @Override
     public String getDetailXml() {
         final Device device = (Device) getUserObject();
-        return formatXml(device.getDeviceXml());
+        return formatXml(device.getDescription());
     }
 }

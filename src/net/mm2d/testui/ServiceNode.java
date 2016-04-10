@@ -52,7 +52,7 @@ public class ServiceNode extends UpnpNode {
     @Override
     public String getDetailXml() {
         final Service service = (Service) getUserObject();
-        return formatXml(service.getServiceXml());
+        return formatXml(service.getDescription());
     }
 
     @Override

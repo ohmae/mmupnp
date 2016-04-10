@@ -11,18 +11,9 @@ import java.net.NetworkInterface;
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpSearchServer extends SsdpServer {
+class SsdpSearchServer extends SsdpServer {
     public static final String ST_ALL = "ssdp:all";
     public static final String ST_ROOTDEVICE = "upnp:rootdevice";
-    private static final SsdpRequestMessage M_SEARCH = new SsdpRequestMessage();
-    static {
-        M_SEARCH.setMethod(SsdpMessage.M_SEARCH);
-        M_SEARCH.setUri("*");
-        M_SEARCH.setHeader(Http.HOST, "239.255.255.250:1900");
-        M_SEARCH.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER);
-        M_SEARCH.setHeader(Http.MX, "1");
-        M_SEARCH.setHeader(Http.ST, ST_ALL);
-    }
 
     public interface ResponseListener {
         void onReceiveResponse(SsdpResponseMessage message);
@@ -46,8 +37,14 @@ public class SsdpSearchServer extends SsdpServer {
         if (st == null) {
             st = ST_ALL;
         }
-        M_SEARCH.setHeader(Http.ST, st);
-        send(M_SEARCH);
+        final SsdpRequestMessage message = new SsdpRequestMessage();
+        message.setMethod(SsdpMessage.M_SEARCH);
+        message.setUri("*");
+        message.setHeader(Http.HOST, "239.255.255.250:1900");
+        message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER);
+        message.setHeader(Http.MX, "1");
+        message.setHeader(Http.ST, st);
+        send(message);
     }
 
     @Override

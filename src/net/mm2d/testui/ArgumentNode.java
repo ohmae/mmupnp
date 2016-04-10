@@ -29,7 +29,7 @@ public class ArgumentNode extends UpnpNode {
         sb.append(arg.isInputDirection() ? "in" : "out");
         sb.append('\n');
         sb.append("RelatedStateVariable: ");
-        sb.append(arg.getRelatedStateVariableName());
+        sb.append(arg.getRelatedStateVariable().getName());
         sb.append('\n');
         sb.append('\n');
         final StateVariable o = arg.getRelatedStateVariable();

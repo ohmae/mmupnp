@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public abstract class SsdpServer {
+abstract class SsdpServer {
     protected static final String MCAST_ADDR = "239.255.255.250";
     protected static final int PORT = 1900;
     private final NetworkInterface mInterface;
@@ -101,7 +101,6 @@ public abstract class SsdpServer {
         final DatagramPacket dp = new DatagramPacket(message, message.length,
                 mMulticastAddress, PORT);
         try {
-            mSocket.send(dp);
             mSocket.send(dp);
         } catch (final IOException e) {
             e.printStackTrace();

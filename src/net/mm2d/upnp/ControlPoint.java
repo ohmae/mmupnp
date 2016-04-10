@@ -98,10 +98,10 @@ public class ControlPoint {
                 }
                 device = mPendingDeviceMap.get(uuid);
                 if (device != null) {
-                    device.setSsdpPacket(message);
+                    device.setSsdpMessage(message);
                 } else {
                     device = new Device(ControlPoint.this);
-                    device.setSsdpPacket(message);
+                    device.setSsdpMessage(message);
                     mPendingDeviceMap.put(message.getUuid(), device);
                     mNetworkExecutor.submit(new DeviceLoader(device));
                 }
@@ -109,7 +109,7 @@ public class ControlPoint {
                 if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
                     lostDevice(device);
                 } else {
-                    device.setSsdpPacket(message);
+                    device.setSsdpMessage(message);
                     mDeviceExpire.update();
                 }
             }
@@ -226,20 +226,20 @@ public class ControlPoint {
         public void run() {
             final String uuid = mDevice.getUuid();
             try {
-                mDevice.getXml();
+                mDevice.loadDescription();
                 synchronized (mDeviceMap) {
                     if (mPendingDeviceMap.get(uuid) != null) {
                         mPendingDeviceMap.remove(uuid);
                         discoverDevice(mDevice);
                     }
                 }
-            } catch (final IOException e) {
+            } catch (final IOException | SAXException | ParserConfigurationException e) {
                 mPendingDeviceMap.remove(uuid);
             }
         }
     }
 
-    public void discoverDevice(final Device device) {
+    private void discoverDevice(final Device device) {
         synchronized (mDeviceMap) {
             mDeviceMap.put(device.getUuid(), device);
             mDeviceExpire.add(device);
@@ -256,7 +256,7 @@ public class ControlPoint {
         });
     }
 
-    public void lostDevice(Device device) {
+    private void lostDevice(Device device) {
         lostDevice(device, false);
     }
 
