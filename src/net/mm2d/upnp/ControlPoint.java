@@ -58,10 +58,10 @@ public class ControlPoint {
     private final Map<String, Device> mDeviceMap;
     private final Map<String, Device> mPendingDeviceMap;
     private final Map<String, Service> mSubscribeServiceMap;
-    private final DeviceExpire mDeviceExpire;
     private final EventReceiver mEventServer;
     private final ExecutorService mNetworkExecutor;
     private final ExecutorService mNotifyExecutor;
+    private DeviceExpire mDeviceExpire;
     private final ResponseListener mResponseListener = new ResponseListener() {
         @Override
         public void onReceiveResponse(final SsdpResponseMessage message) {
@@ -264,7 +264,7 @@ public class ControlPoint {
         synchronized (mDeviceMap) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
-                s.getSubscriptionId();
+                unregisterSubscribeService(s);
             }
             mDeviceMap.remove(device.getUuid());
             if (!expire) {
@@ -281,6 +281,16 @@ public class ControlPoint {
                 }
             }
         });
+    }
+
+    public List<Device> getDeviceList() {
+        synchronized (mDeviceMap) {
+            return new ArrayList<Device>(mDeviceMap.values());
+        }
+    }
+
+    public Device getDevice(String udn) {
+        return mDeviceMap.get(udn);
     }
 
     private static class DeviceExpire extends Thread {
@@ -380,8 +390,6 @@ public class ControlPoint {
             notify.setNotifyListener(mNotifyListener);
             mNotifyList.add(notify);
         }
-        mDeviceExpire = new DeviceExpire(this);
-        mDeviceExpire.start();
         mEventServer = new EventReceiver();
         mEventServer.setEventPacketListener(mEventPacketListener);
     }
@@ -411,6 +419,11 @@ public class ControlPoint {
         return list;
     }
 
+    public void initialize() {
+        mDeviceExpire = new DeviceExpire(this);
+        mDeviceExpire.start();
+    }
+
     public void start() {
         try {
             mEventServer.open();
@@ -433,16 +446,6 @@ public class ControlPoint {
                 e.printStackTrace();
             }
         }
-    }
-
-    public List<Device> getDeviceList() {
-        synchronized (mDeviceMap) {
-            return new ArrayList<Device>(mDeviceMap.values());
-        }
-    }
-
-    public Device getDevice(String udn) {
-        return mDeviceMap.get(udn);
     }
 
     public void stop() {
@@ -475,7 +478,7 @@ public class ControlPoint {
         mDeviceMap.clear();
     }
 
-    public void destroy() {
+    public void terminate() {
         mDeviceExpire.shutdownRequest();
         mNotifyExecutor.shutdownNow();
         mNetworkExecutor.shutdown();

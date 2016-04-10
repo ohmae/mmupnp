@@ -145,7 +145,7 @@ public final class Http {
         }
     }
 
-    public static Date parseDate(String string) {
+    public synchronized static Date parseDate(String string) {
         try {
             return sRfc1123Format.parse(string);
         } catch (final ParseException e) {
@@ -161,15 +161,15 @@ public final class Http {
         return null;
     }
 
-    public static String formatDate(long date) {
+    public synchronized static String formatDate(long date) {
         return formatDate(new Date(date));
     }
 
-    public static String formatDate(Date date) {
+    public synchronized static String formatDate(Date date) {
         return sRfc1123Format.format(date);
     }
 
-    public static String getCurrentData() {
+    public synchronized static String getCurrentData() {
         return formatDate(System.currentTimeMillis());
     }
 }

@@ -168,6 +168,7 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         super();
         mControlPoint = new ControlPoint();
+        mControlPoint.initialize();
         mControlPoint.addDiscoveryListener(mListener);
         mControlPoint.addNotifyEventListener(mEventListener);
         setTitle("UPnP");
