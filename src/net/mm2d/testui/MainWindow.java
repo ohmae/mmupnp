@@ -103,7 +103,7 @@ public class MainWindow extends JFrame {
                     return;
                 }
                 final Map<String, String> arg = new HashMap<>();
-                arg.put("ObjectID", "V01");
+                arg.put("ObjectID", "0");
                 arg.put("BrowseFlag", "BrowseDirectChildren");
                 arg.put("Filter", "*");
                 arg.put("StartingIndex", "0");
@@ -141,7 +141,8 @@ public class MainWindow extends JFrame {
             if (n.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            if ("item".equals(n.getLocalName())) {
+            if ("item".equals(n.getLocalName())
+                    || "container".equals(n.getLocalName())) {
                 Node i = n.getFirstChild();
                 for (; i != null; i = i.getNextSibling()) {
                     if (i.getNodeType() != Node.ELEMENT_NODE) {

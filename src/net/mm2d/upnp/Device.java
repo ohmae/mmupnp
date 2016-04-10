@@ -316,10 +316,6 @@ public class Device {
         return mPresentationUrl;
     }
 
-    public void setPresentationUrl(String presentationUrl) {
-        mPresentationUrl = presentationUrl;
-    }
-
     public List<Icon> getIconList() {
         return Collections.unmodifiableList(mIconList);
     }
