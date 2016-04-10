@@ -74,6 +74,10 @@ public class Icon {
         mBinary = builder.mBinary;
     }
 
+    public Device getDevice() {
+        return mDevice;
+    }
+
     public String getMimeType() {
         return mMimeType;
     }

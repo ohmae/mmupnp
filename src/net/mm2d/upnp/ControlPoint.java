@@ -508,6 +508,12 @@ public class ControlPoint {
         mDeviceExpire = null;
     }
 
+    public void search(String st) {
+        for (final SsdpSearchServer socket : mSearchList) {
+            socket.search(st);
+        }
+    }
+
     public void search() {
         for (final SsdpSearchServer socket : mSearchList) {
             socket.search();

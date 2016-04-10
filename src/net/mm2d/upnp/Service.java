@@ -96,6 +96,10 @@ public class Service {
         mStateVariableMap = new LinkedHashMap<>();
     }
 
+    public Device getDevice() {
+        return mDevice;
+    }
+
     URL getAbsoluteUrl(String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
