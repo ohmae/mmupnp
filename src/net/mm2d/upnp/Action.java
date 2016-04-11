@@ -123,6 +123,10 @@ public class Action {
         request.setBody(soap, true);
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
+        if (response.getStatus() != Http.Status.HTTP_OK) {
+            System.out.println(response.toString());
+            throw new IOException();
+        }
         try {
             return parseResponse(response.getBody());
         } catch (SAXException | ParserConfigurationException e) {

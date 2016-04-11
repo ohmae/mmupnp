@@ -77,15 +77,24 @@ public class Device {
     }
 
     URL getAbsoluteUrl(String url) throws MalformedURLException {
-        final String baseUrl = getLocation();
         if (url.startsWith("http://")) {
             return new URL(url);
         }
+        String baseUrl = getLocation();
         if (url.startsWith("/")) {
             int pos = baseUrl.indexOf("://");
             pos = baseUrl.indexOf("/", pos + 3);
             return new URL(baseUrl.substring(0, pos) + url);
         }
+        int pos = baseUrl.indexOf("?");
+        if (pos > 0) {
+            baseUrl = baseUrl.substring(0, pos);
+        }
+        if (baseUrl.endsWith("/")) {
+            return new URL(baseUrl + url);
+        }
+        pos = baseUrl.lastIndexOf("/");
+        baseUrl = baseUrl.substring(0, pos + 1);
         return new URL(baseUrl + url);
     }
 
@@ -98,6 +107,11 @@ public class Device {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
+        if (response.getStatus() != Http.Status.HTTP_OK) {
+            System.out.println(response.toString());
+            client.close();
+            throw new IOException();
+        }
         mDescription = response.getBody();
         parseDescription(mDescription);
         for (final Icon icon : mIconList) {

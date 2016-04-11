@@ -565,7 +565,6 @@ public class ControlPoint {
         public synchronized void add(Service service) {
             mServiceList.add(service);
             mServiceList.sort(mComparator);
-            System.out.println("add:" + mServiceList.size());
             notifyAll();
         }
 

@@ -106,6 +106,10 @@ public class Icon {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
+        if (response.getStatus() != Http.Status.HTTP_OK) {
+            System.out.println(response.toString());
+            throw new IOException();
+        }
         mBinary = response.getBodyBinary();
     }
 

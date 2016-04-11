@@ -55,7 +55,7 @@ public class HttpRequest extends HttpMessage {
         }
         setAddress(InetAddress.getByName(url.getHost()));
         setPort(url.getPort());
-        setUri(url.getPath());
+        setUri(url.getFile());
         if (withHostHeader) {
             setHeader(Http.HOST, getAddressString());
         }

@@ -161,6 +161,10 @@ public class Service {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
+        if (response.getStatus() != Http.Status.HTTP_OK) {
+            System.out.println(response.toString());
+            throw new IOException();
+        }
         mDescription = response.getBody();
         parseDescription(mDescription);
     }
@@ -348,11 +352,13 @@ public class Service {
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
+            System.out.println(response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = getTimeout(response);
         if (sid == null || sid.isEmpty() || timeout == 0) {
+            System.out.println(response.toString());
             return false;
         }
         mSubscriptionId = sid;
@@ -370,7 +376,6 @@ public class Service {
     }
 
     boolean renewSubscribe(boolean notify) throws IOException {
-        System.out.println("renewSubscribe");
         if (mEventSubUrl == null || mSubscriptionId == null) {
             return false;
         }
@@ -384,12 +389,14 @@ public class Service {
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
+            System.out.println(response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = getTimeout(response);
         if (sid == null || sid.isEmpty()
                 || !sid.equals(mSubscriptionId) || timeout == 0) {
+            System.out.println(response.toString());
             return false;
         }
         mSubscriptionStart = System.currentTimeMillis();
@@ -413,6 +420,7 @@ public class Service {
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
+            System.out.println(response.toString());
             return false;
         }
         mDevice.getControlPoint().unregisterSubscribeService(this);
