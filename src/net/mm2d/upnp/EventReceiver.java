@@ -4,6 +4,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.List;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class EventReceiver {
+    private static final String TAG = "EventReceiver";
     private ServerSocket mServerSocket;
     private ServerThread mServerThread;
     private EventPacketListener mListener;
@@ -44,7 +47,7 @@ class EventReceiver {
             try {
                 mServerSocket.close();
             } catch (final IOException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
             synchronized (mClientList) {
                 for (final ClientThread client : mClientList) {
@@ -122,7 +125,7 @@ class EventReceiver {
             try {
                 mSocket.close();
             } catch (final IOException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
         }
 
@@ -164,7 +167,7 @@ class EventReceiver {
                     return;
                 }
             } catch (final IOException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             } finally {
                 if (is != null) {
                     try {

@@ -4,6 +4,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -21,8 +23,9 @@ import java.util.List;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 abstract class SsdpServer {
-    protected static final String MCAST_ADDR = "239.255.255.250";
-    protected static final int PORT = 1900;
+    private static final String TAG = "SsdpServer";
+    public static final String MCAST_ADDR = "239.255.255.250";
+    public static final int PORT = 1900;
     private final NetworkInterface mInterface;
     private InterfaceAddress mInterfaceAddress;
     private final int mBindPort;
@@ -47,7 +50,7 @@ abstract class SsdpServer {
         try {
             mMulticastAddress = InetAddress.getByName(MCAST_ADDR);
         } catch (final UnknownHostException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
     }
 
@@ -101,7 +104,7 @@ abstract class SsdpServer {
             message.getMessage().writeData(baos);
             send(baos.toByteArray());
         } catch (final IOException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
     }
 
@@ -111,7 +114,7 @@ abstract class SsdpServer {
         try {
             mSocket.send(dp);
         } catch (final IOException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
     }
 

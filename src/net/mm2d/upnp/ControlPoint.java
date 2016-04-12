@@ -7,6 +7,7 @@ package net.mm2d.upnp;
 import net.mm2d.upnp.EventReceiver.EventPacketListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
+import net.mm2d.util.Log;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -40,6 +41,8 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ControlPoint {
+    private static final String TAG = "ControlPoint";
+
     public interface DiscoveryListener {
         void onDiscover(Device device);
 
@@ -176,7 +179,7 @@ public class ControlPoint {
         private void notify(String name, String value) {
             final StateVariable variable = mService.findStateVariable(name);
             if (variable == null || !variable.isSendEvents()) {
-                System.out.println("illegal notify:" + name);
+                Log.w(TAG, "illegal notify argument:" + name);
                 return;
             }
             synchronized (mNotifyEventListeners) {
@@ -362,7 +365,7 @@ public class ControlPoint {
                     }
                 }
             } catch (final InterruptedException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
         }
     }
@@ -435,14 +438,14 @@ public class ControlPoint {
         try {
             mEventServer.open();
         } catch (final IOException e1) {
-            e1.printStackTrace();
+            Log.w(TAG, e1);
         }
         for (final SsdpServer socket : mSearchList) {
             try {
                 socket.open();
                 socket.start();
             } catch (final IOException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
         }
         for (final SsdpServer socket : mNotifyList) {
@@ -450,7 +453,7 @@ public class ControlPoint {
                 socket.open();
                 socket.start();
             } catch (final IOException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
         }
     }
@@ -467,7 +470,7 @@ public class ControlPoint {
                         try {
                             e.getValue().unsubscribe();
                         } catch (final IOException e) {
-                            e.printStackTrace();
+                            Log.w(TAG, e);
                         }
                     }
                 });
@@ -500,7 +503,7 @@ public class ControlPoint {
                 mNetworkExecutor.shutdownNow();
             }
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
         mSubscribeKeeper.shutdownRequest();
         mSubscribeKeeper = null;
@@ -591,7 +594,7 @@ public class ControlPoint {
                             try {
                                 service.renewSubscribe(false);
                             } catch (final IOException e) {
-                                e.printStackTrace();
+                                Log.w(TAG, e);
                             }
                         } else {
                             break;
@@ -617,7 +620,7 @@ public class ControlPoint {
                     }
                 }
             } catch (final InterruptedException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
         }
     }

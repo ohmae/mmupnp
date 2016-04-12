@@ -59,7 +59,6 @@ public class HttpClient {
             closeSocket();
             throw e;
         }
-
     }
 
     private void openSocket(HttpRequest request) throws IOException {

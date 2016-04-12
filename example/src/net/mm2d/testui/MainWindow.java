@@ -10,6 +10,7 @@ import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.Service;
+import net.mm2d.util.Log;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -49,17 +50,14 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class MainWindow extends JFrame {
+    private static final String TAG = "MainWindow";
+
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (final ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (final InstantiationException e) {
-            e.printStackTrace();
-        } catch (final IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (final UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException e) {
+            Log.w(TAG, e);
         }
         new MainWindow();
     }
@@ -93,7 +91,7 @@ public class MainWindow extends JFrame {
     };
     private final TreeSelectionListener mSelectionListener = new TreeSelectionListener() {
         @Override
-        public void valueChanged(TreeSelectionEvent e) {
+        public void valueChanged(TreeSelectionEvent event) {
             final UpnpNode node = (UpnpNode) mTree.getLastSelectedPathComponent();
             mDetail1.setText(node.getDetailText());
             mDetail2.setText(node.getDetailXml());
@@ -115,15 +113,15 @@ public class MainWindow extends JFrame {
                         return;
                     }
                     perseResult(result.get("Result"));
-                } catch (IOException | SAXException | ParserConfigurationException e1) {
-                    e1.printStackTrace();
+                } catch (IOException | SAXException | ParserConfigurationException e) {
+                    Log.w(TAG, e);
                 }
             } else if (node.getUserObject() instanceof Service) {
                 final Service service = (Service) node.getUserObject();
                 try {
                     service.subscribe(true);
-                } catch (final IOException e1) {
-                    e1.printStackTrace();
+                } catch (final IOException e) {
+                    Log.w(TAG, e);
                 }
             }
         }

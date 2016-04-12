@@ -4,6 +4,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -14,6 +16,7 @@ import java.net.InterfaceAddress;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public abstract class SsdpMessage {
+    private static final String TAG = "SsdpMessage";
     public static final String M_SEARCH = "M-SEARCH";
     public static final String NOTIFY = "NOTIFY";
     public static final String SSDP_ALIVE = "ssdp:alive";
@@ -50,7 +53,7 @@ public abstract class SsdpMessage {
         try {
             mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
         } catch (final IOException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
         parseMessage();
     }

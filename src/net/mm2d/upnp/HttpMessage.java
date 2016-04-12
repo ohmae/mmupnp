@@ -4,6 +4,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,7 @@ import java.net.SocketAddress;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public abstract class HttpMessage {
+    private static final String TAG = "HttpMessage";
     private static final int BUFFER_SIZE = 1500;
     private static final int CR = 0x0d;
     private static final int LF = 0x0a;
@@ -105,7 +108,7 @@ public abstract class HttpMessage {
             try {
                 return Integer.parseInt(len);
             } catch (final NumberFormatException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
         }
         return 0;
@@ -135,7 +138,7 @@ public abstract class HttpMessage {
             try {
                 mBodyBinary = body.getBytes(CHARSET);
             } catch (final UnsupportedEncodingException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
         }
     }
@@ -145,7 +148,7 @@ public abstract class HttpMessage {
             try {
                 mBody = new String(mBodyBinary, CHARSET);
             } catch (final UnsupportedEncodingException e) {
-                e.printStackTrace();
+                Log.w(TAG, e);
             }
         }
         return mBody;
@@ -183,7 +186,7 @@ public abstract class HttpMessage {
         try {
             return getHeaderString().getBytes(CHARSET);
         } catch (final UnsupportedEncodingException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
         return new byte[0];
     }

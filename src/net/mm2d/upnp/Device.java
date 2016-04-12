@@ -4,6 +4,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Device {
+    private static final String TAG = "Device";
     private final ControlPoint mControlPoint;
     private SsdpMessage mSsdp;
     private String mDescription;
@@ -108,7 +111,7 @@ public class Device {
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            System.out.println(response.toString());
+            Log.i(TAG, response.toString());
             client.close();
             throw new IOException();
         }

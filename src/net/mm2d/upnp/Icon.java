@@ -4,6 +4,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -11,6 +13,7 @@ import java.net.URL;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Icon {
+    private static final String TAG = "Icon";
     private final Device mDevice;
     private final String mMimeType;
     private final int mHeight;
@@ -107,7 +110,7 @@ public class Icon {
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            System.out.println(response.toString());
+            Log.i(TAG, response.toString());
             throw new IOException();
         }
         mBinary = response.getBodyBinary();

@@ -4,6 +4,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Service {
+    private static final String TAG = "Service";
     private final Device mDevice;
     private String mDescription;
     private final String mServiceType;
@@ -162,7 +165,7 @@ public class Service {
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            System.out.println(response.toString());
+            Log.i(TAG, response.toString());
             throw new IOException();
         }
         mDescription = response.getBody();
@@ -328,7 +331,7 @@ public class Service {
             final int second = Integer.parseInt(secondSection);
             return second * 1000L;
         } catch (final NumberFormatException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
         return 0;
     }

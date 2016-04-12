@@ -4,6 +4,8 @@
 
 package net.mm2d.testui;
 
+import net.mm2d.util.Log;
+
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -17,7 +19,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -28,6 +29,8 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class UpnpNode extends DefaultMutableTreeNode {
+    private static final String TAG = "UpnpNode";
+
     public UpnpNode() {
         super();
     }
@@ -49,8 +52,7 @@ public class UpnpNode extends DefaultMutableTreeNode {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             final DocumentBuilder db = dbf.newDocumentBuilder();
-            final Document doc = db
-                    .parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
+            final Document doc = db.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
             final TransformerFactory tf = TransformerFactory.newInstance();
             final Transformer t = tf.newTransformer();
             t.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -58,18 +60,9 @@ public class UpnpNode extends DefaultMutableTreeNode {
             final StringWriter sw = new StringWriter();
             t.transform(new DOMSource(doc), new StreamResult(sw));
             return sw.toString();
-        } catch (final TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (final ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (final SAXException e) {
-            e.printStackTrace();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        } catch (final TransformerFactoryConfigurationError e) {
-            e.printStackTrace();
-        } catch (final TransformerException e) {
-            e.printStackTrace();
+        } catch (IllegalArgumentException | ParserConfigurationException | SAXException
+                | IOException | TransformerFactoryConfigurationError | TransformerException e) {
+            Log.w(TAG, e);
         }
         return "";
     }

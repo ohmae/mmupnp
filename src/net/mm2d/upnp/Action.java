@@ -4,6 +4,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -38,6 +40,7 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Action {
+    private static final String TAG = "Action";
     private final Service mService;
     private final String mName;
     private List<Argument> mArgumentList;
@@ -124,13 +127,13 @@ public class Action {
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            System.out.println(response.toString());
+            Log.w(TAG, response.toString());
             throw new IOException();
         }
         try {
             return parseResponse(response.getBody());
         } catch (SAXException | ParserConfigurationException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
         return null;
     }
@@ -141,39 +144,39 @@ public class Action {
             dbf.setNamespaceAware(true);
             final DocumentBuilder db = dbf.newDocumentBuilder();
             final Document doc = db.newDocument();
-            final Element e = doc.createElementNS(SOAP_NS, "s:Envelope");
-            doc.appendChild(e);
-            final Attr a = doc.createAttributeNS(SOAP_NS, "s:encodingStyle");
-            a.setNodeValue(SOAP_STYLE);
-            e.setAttributeNode(a);
-            final Element b = doc.createElementNS(SOAP_NS, "s:Body");
-            e.appendChild(b);
+            final Element envelope = doc.createElementNS(SOAP_NS, "s:Envelope");
+            doc.appendChild(envelope);
+            final Attr style = doc.createAttributeNS(SOAP_NS, "s:encodingStyle");
+            style.setNodeValue(SOAP_STYLE);
+            envelope.setAttributeNode(style);
+            final Element body = doc.createElementNS(SOAP_NS, "s:Body");
+            envelope.appendChild(body);
             final Element action = doc.createElementNS(mService.getServiceType(), "u:" + mName);
-            b.appendChild(action);
+            body.appendChild(action);
             for (final Entry<String, Argument> entry : mArgumentMap.entrySet()) {
                 final Argument arg = entry.getValue();
                 if (arg.isInputDirection()) {
-                    final Element p = doc.createElement(arg.getName());
+                    final Element param = doc.createElement(arg.getName());
                     String value = arguments.get(arg.getName());
                     if (value == null) {
                         value = arg.getRelatedStateVariable().getDefaultValue();
                     }
                     if (value != null) {
-                        p.setTextContent(value);
+                        param.setTextContent(value);
                     }
-                    action.appendChild(p);
+                    action.appendChild(param);
                 }
             }
             final TransformerFactory tf = TransformerFactory.newInstance();
-            final Transformer t = tf.newTransformer();
+            final Transformer transformer = tf.newTransformer();
             final StringWriter sw = new StringWriter();
-            t.transform(new DOMSource(doc), new StreamResult(sw));
+            transformer.transform(new DOMSource(doc), new StreamResult(sw));
             return sw.toString();
         } catch (DOMException
                 | ParserConfigurationException
                 | TransformerFactoryConfigurationError
                 | TransformerException e) {
-            e.printStackTrace();
+            Log.w(TAG, e);
         }
         return null;
     }
@@ -202,12 +205,12 @@ public class Action {
         final Element envelope = doc.getDocumentElement();
         final Element body = findChildElementByName(envelope, "Body");
         if (body == null) {
-            System.out.println("body null");
+            Log.w(TAG, "no body tag");
             return result;
         }
         final Element response = findChildElementByName(body, responseTag);
         if (response == null) {
-            System.out.println("response null");
+            Log.w(TAG, "no response tag");
             return result;
         }
         Node node = response.getFirstChild();
@@ -219,6 +222,7 @@ public class Action {
             final String text = node.getTextContent();
             final Argument arg = mArgumentMap.get(tag);
             if (arg == null) {
+                Log.d(TAG, "invalid argument:" + tag + "->" + text);
                 continue;
             }
             result.put(tag, text);
