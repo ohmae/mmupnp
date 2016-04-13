@@ -14,7 +14,6 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -159,9 +158,8 @@ abstract class SsdpServer {
                     }
                 }
                 leaveGroup();
-            } catch (final UnknownHostException e) {
-            } catch (final SocketException e) {
             } catch (final IOException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -61,6 +61,9 @@ public class ControlPoint {
     private final EventReceiver mEventServer;
     private final ExecutorService mNetworkExecutor;
     private final ExecutorService mNotifyExecutor;
+    private boolean mInitialized = false;
+    private boolean mStarted = false;
+    private boolean mTerminated = false;
     private DeviceExpirer mDeviceExpirer;
     private SubscribeKeeper mSubscribeKeeper;
     private final ResponseListener mResponseListener = new ResponseListener() {
@@ -352,13 +355,51 @@ public class ControlPoint {
     }
 
     public void initialize() {
+        if (mInitialized) {
+            return;
+        }
+        if (mTerminated) {
+            throw new IllegalStateException();
+        }
         mDeviceExpirer = new DeviceExpirer(this);
         mDeviceExpirer.start();
         mSubscribeKeeper = new SubscribeKeeper(this);
         mSubscribeKeeper.start();
+        mInitialized = true;
+    }
+
+    public void terminate() {
+        if (mStarted) {
+            stop();
+        }
+        if (!mInitialized || mTerminated) {
+            return;
+        }
+        mTerminated = true;
+        mNotifyExecutor.shutdownNow();
+        mNetworkExecutor.shutdown();
+        try {
+            if (!mNetworkExecutor.awaitTermination(
+                    Property.DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)) {
+                mNetworkExecutor.shutdownNow();
+            }
+        } catch (final InterruptedException e) {
+            Log.w(TAG, e);
+        }
+        mSubscribeKeeper.shutdownRequest();
+        mSubscribeKeeper = null;
+        mDeviceExpirer.shutdownRequest();
+        mDeviceExpirer = null;
     }
 
     public void start() {
+        if (!mInitialized) {
+            throw new IllegalStateException();
+        }
+        if (mStarted) {
+            return;
+        }
+        mStarted = true;
         try {
             mEventServer.open();
         } catch (final IOException e1) {
@@ -383,6 +424,10 @@ public class ControlPoint {
     }
 
     public void stop() {
+        if (!mStarted) {
+            return;
+        }
+        mStarted = false;
         synchronized (mSubscribeServiceMap) {
             final Set<Entry<String, Service>> entrySet = mSubscribeServiceMap.entrySet();
             for (final Iterator<Entry<String, Service>> i = entrySet.iterator(); i.hasNext();) {
@@ -418,30 +463,19 @@ public class ControlPoint {
         mDeviceExpirer.clear();
     }
 
-    public void terminate() {
-        mNotifyExecutor.shutdownNow();
-        mNetworkExecutor.shutdown();
-        try {
-            if (!mNetworkExecutor.awaitTermination(
-                    Property.DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                mNetworkExecutor.shutdownNow();
-            }
-        } catch (final InterruptedException e) {
-            Log.w(TAG, e);
-        }
-        mSubscribeKeeper.shutdownRequest();
-        mSubscribeKeeper = null;
-        mDeviceExpirer.shutdownRequest();
-        mDeviceExpirer = null;
-    }
-
     public void search(String st) {
+        if (!mStarted) {
+            throw new IllegalStateException();
+        }
         for (final SsdpSearchServer socket : mSearchList) {
             socket.search(st);
         }
     }
 
     public void search() {
+        if (!mStarted) {
+            throw new IllegalStateException();
+        }
         for (final SsdpSearchServer socket : mSearchList) {
             socket.search();
         }

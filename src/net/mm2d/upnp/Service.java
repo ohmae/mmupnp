@@ -73,6 +73,7 @@ public class Service {
     }
 
     private static final String TAG = "Service";
+    private final ControlPoint mControlPoint;
     private final Device mDevice;
     private String mDescription;
     private final String mServiceType;
@@ -90,6 +91,7 @@ public class Service {
 
     private Service(Builder builder) {
         mDevice = builder.mDevice;
+        mControlPoint = mDevice.getControlPoint();
         mServiceType = builder.mServiceType;
         mServiceId = builder.mServiceId;
         mScpdUrl = builder.mScpdUrl;
@@ -303,10 +305,11 @@ public class Service {
         final StringBuilder sb = new StringBuilder();
         sb.append('<');
         sb.append("http://");
-        final InterfaceAddress ifa = mDevice.getSsdpMessage().getInterfaceAddress();
+        final SsdpMessage ssdp = mDevice.getSsdpMessage();
+        final InterfaceAddress ifa = ssdp.getInterfaceAddress();
         sb.append(ifa.getAddress().getHostAddress());
         sb.append(':');
-        final int port = mDevice.getControlPoint().getEventPort();
+        final int port = mControlPoint.getEventPort();
         sb.append(String.valueOf(port));
         sb.append('/');
         sb.append(mDevice.getUdn());
@@ -367,9 +370,9 @@ public class Service {
         mSubscriptionId = sid;
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
-        mDevice.getControlPoint().registerSubscribeService(this);
+        mControlPoint.registerSubscribeService(this);
         if (keep) {
-            mDevice.getControlPoint().addSubscribeKeeper(this);
+            mControlPoint.addSubscribeKeeper(this);
         }
         return true;
     }
@@ -405,7 +408,7 @@ public class Service {
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
         if (notify) {
-            mDevice.getControlPoint().renewSubscribeService();
+            mControlPoint.renewSubscribeService();
         }
         return true;
     }
@@ -426,7 +429,7 @@ public class Service {
             System.out.println(response.toString());
             return false;
         }
-        mDevice.getControlPoint().unregisterSubscribeService(this);
+        mControlPoint.unregisterSubscribeService(this);
         mSubscriptionId = null;
         mSubscriptionStart = 0;
         mSubscriptionTimeout = 0;
