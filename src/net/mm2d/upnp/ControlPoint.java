@@ -63,7 +63,7 @@ public class ControlPoint {
     private final EventReceiver mEventServer;
     private final ExecutorService mNetworkExecutor;
     private final ExecutorService mNotifyExecutor;
-    private DeviceExpire mDeviceExpire;
+    private DeviceExpirer mDeviceExpirer;
     private SubscribeKeeper mSubscribeKeeper;
     private final ResponseListener mResponseListener = new ResponseListener() {
         @Override
@@ -113,7 +113,7 @@ public class ControlPoint {
                     lostDevice(device);
                 } else {
                     device.setSsdpMessage(message);
-                    mDeviceExpire.update();
+                    mDeviceExpirer.update();
                 }
             }
         }
@@ -245,7 +245,7 @@ public class ControlPoint {
     private void discoverDevice(final Device device) {
         synchronized (mDeviceMap) {
             mDeviceMap.put(device.getUuid(), device);
-            mDeviceExpire.add(device);
+            mDeviceExpirer.add(device);
         }
         mNotifyExecutor.submit(new Runnable() {
             @Override
@@ -271,7 +271,7 @@ public class ControlPoint {
             }
             mDeviceMap.remove(device.getUuid());
             if (!expire) {
-                mDeviceExpire.remove(device);
+                mDeviceExpirer.remove(device);
             }
         }
         mNotifyExecutor.submit(new Runnable() {
@@ -296,7 +296,7 @@ public class ControlPoint {
         return mDeviceMap.get(udn);
     }
 
-    private static class DeviceExpire extends Thread {
+    private static class DeviceExpirer extends Thread {
         private static final long MARGIN_TIME = 10000;
         private final ControlPoint mControlPoint;
         private volatile boolean mShutdownRequest = false;
@@ -308,7 +308,7 @@ public class ControlPoint {
             }
         };
 
-        public DeviceExpire(ControlPoint cp) {
+        public DeviceExpirer(ControlPoint cp) {
             mDeviceList = new ArrayList<>();
             mControlPoint = cp;
         }
@@ -428,8 +428,8 @@ public class ControlPoint {
     }
 
     public void initialize() {
-        mDeviceExpire = new DeviceExpire(this);
-        mDeviceExpire.start();
+        mDeviceExpirer = new DeviceExpirer(this);
+        mDeviceExpirer.start();
         mSubscribeKeeper = new SubscribeKeeper(this);
         mSubscribeKeeper.start();
     }
@@ -491,7 +491,7 @@ public class ControlPoint {
         mEventServer.close();
         mSubscribeKeeper.clear();
         mDeviceMap.clear();
-        mDeviceExpire.clear();
+        mDeviceExpirer.clear();
     }
 
     public void terminate() {
@@ -507,8 +507,8 @@ public class ControlPoint {
         }
         mSubscribeKeeper.shutdownRequest();
         mSubscribeKeeper = null;
-        mDeviceExpire.shutdownRequest();
-        mDeviceExpire = null;
+        mDeviceExpirer.shutdownRequest();
+        mDeviceExpirer = null;
     }
 
     public void search(String st) {
