@@ -21,14 +21,14 @@ import java.util.List;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class EventReceiver {
+    public interface EventPacketListener {
+        boolean onEventReceived(HttpRequest request);
+    }
+
     private static final String TAG = "EventReceiver";
     private ServerSocket mServerSocket;
     private ServerThread mServerThread;
     private EventPacketListener mListener;
-
-    public interface EventPacketListener {
-        boolean onEventReceived(HttpRequest request);
-    }
 
     private static class ServerThread extends Thread {
         private volatile boolean mShutdownRequest = false;

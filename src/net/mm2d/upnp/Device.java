@@ -79,6 +79,10 @@ public class Device {
         return mSsdp.getExpireTime();
     }
 
+    public String getDescription() {
+        return mDescription;
+    }
+
     URL getAbsoluteUrl(String url) throws MalformedURLException {
         if (url.startsWith("http://")) {
             return new URL(url);
@@ -124,10 +128,6 @@ public class Device {
             service.loadDescription(client);
         }
         client.close();
-    }
-
-    public String getDescription() {
-        return mDescription;
     }
 
     private void parseIconList(Node listNode) {

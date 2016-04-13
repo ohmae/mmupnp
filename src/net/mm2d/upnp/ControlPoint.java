@@ -40,8 +40,6 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ControlPoint {
-    private static final String TAG = "ControlPoint";
-
     public interface DiscoveryListener {
         void onDiscover(Device device);
 
@@ -52,6 +50,7 @@ public class ControlPoint {
         void onNotifyEvent(Service service, long seq, String variable, String value);
     }
 
+    private static final String TAG = "ControlPoint";
     private final List<DiscoveryListener> mDiscoveryListeners;
     private final List<NotifyEventListener> mNotifyEventListeners;
     private final Collection<SsdpSearchServer> mSearchList;
@@ -114,6 +113,30 @@ public class ControlPoint {
                     device.setSsdpMessage(message);
                     mDeviceExpirer.update();
                 }
+            }
+        }
+    }
+
+    private class DeviceLoader implements Runnable {
+        private final Device mDevice;
+
+        public DeviceLoader(Device device) {
+            mDevice = device;
+        }
+
+        @Override
+        public void run() {
+            final String uuid = mDevice.getUuid();
+            try {
+                mDevice.loadDescription();
+                synchronized (mDeviceMap) {
+                    if (mPendingDeviceMap.get(uuid) != null) {
+                        mPendingDeviceMap.remove(uuid);
+                        discoverDevice(mDevice);
+                    }
+                }
+            } catch (final IOException | SAXException | ParserConfigurationException e) {
+                mPendingDeviceMap.remove(uuid);
             }
         }
     }
@@ -214,30 +237,6 @@ public class ControlPoint {
     public void removeNotifyEventListener(NotifyEventListener listener) {
         synchronized (mNotifyEventListeners) {
             mNotifyEventListeners.remove(listener);
-        }
-    }
-
-    private class DeviceLoader implements Runnable {
-        private final Device mDevice;
-
-        public DeviceLoader(Device device) {
-            mDevice = device;
-        }
-
-        @Override
-        public void run() {
-            final String uuid = mDevice.getUuid();
-            try {
-                mDevice.loadDescription();
-                synchronized (mDeviceMap) {
-                    if (mPendingDeviceMap.get(uuid) != null) {
-                        mPendingDeviceMap.remove(uuid);
-                        discoverDevice(mDevice);
-                    }
-                }
-            } catch (final IOException | SAXException | ParserConfigurationException e) {
-                mPendingDeviceMap.remove(uuid);
-            }
         }
     }
 

@@ -8,11 +8,6 @@ package net.mm2d.upnp;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Argument {
-    private final Action mAction;
-    private final String mName;
-    private final boolean mInputDirection;
-    private final StateVariable mRelatedStateVariable;
-
     public static class Builder {
         private Action mAction;
         private String mName;
@@ -51,6 +46,11 @@ public class Argument {
             return new Argument(this);
         }
     }
+
+    private final Action mAction;
+    private final String mName;
+    private final boolean mInputDirection;
+    private final StateVariable mRelatedStateVariable;
 
     private Argument(Builder builder) {
         mAction = builder.mAction;

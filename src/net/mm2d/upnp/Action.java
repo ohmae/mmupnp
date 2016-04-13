@@ -40,14 +40,6 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Action {
-    private static final String TAG = "Action";
-    private final Service mService;
-    private final String mName;
-    private List<Argument> mArgumentList;
-    private final Map<String, Argument> mArgumentMap;
-    private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
-    private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
-
     public static class Builder {
         private Service mService;
         private String mName;
@@ -77,6 +69,14 @@ public class Action {
             return new Action(this);
         }
     }
+
+    private static final String TAG = "Action";
+    private final Service mService;
+    private final String mName;
+    private List<Argument> mArgumentList;
+    private final Map<String, Argument> mArgumentMap;
+    private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
+    private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
 
     private Action(Builder builder) {
         mService = builder.mService;
@@ -206,12 +206,12 @@ public class Action {
         final Element body = findChildElementByName(envelope, "Body");
         if (body == null) {
             Log.w(TAG, "no body tag");
-            return result;
+            throw new IOException("no body tag");
         }
         final Element response = findChildElementByName(body, responseTag);
         if (response == null) {
             Log.w(TAG, "no response tag");
-            return result;
+            throw new IOException("no response tag");
         }
         Node node = response.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {

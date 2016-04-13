@@ -32,22 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Service {
-    private static final String TAG = "Service";
-    private final Device mDevice;
-    private String mDescription;
-    private final String mServiceType;
-    private final String mServiceId;
-    private final String mScpdUrl;
-    private final String mControlUrl;
-    private final String mEventSubUrl;
-    private List<Action> mActionList;
-    private final Map<String, Action> mActionMap;
-    private List<StateVariable> mStateVariableList;
-    private final Map<String, StateVariable> mStateVariableMap;
-    private long mSubscriptionStart;
-    private long mSubscriptionTimeout;
-    private String mSubscriptionId;
-
     public static class Builder {
         private Device mDevice;
         private String mServiceType;
@@ -87,6 +71,22 @@ public class Service {
             return new Service(this);
         }
     }
+
+    private static final String TAG = "Service";
+    private final Device mDevice;
+    private String mDescription;
+    private final String mServiceType;
+    private final String mServiceId;
+    private final String mScpdUrl;
+    private final String mControlUrl;
+    private final String mEventSubUrl;
+    private List<Action> mActionList;
+    private final Map<String, Action> mActionMap;
+    private List<StateVariable> mStateVariableList;
+    private final Map<String, StateVariable> mStateVariableMap;
+    private long mSubscriptionStart;
+    private long mSubscriptionTimeout;
+    private String mSubscriptionId;
 
     private Service(Builder builder) {
         mDevice = builder.mDevice;

@@ -23,9 +23,10 @@ import java.util.List;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 abstract class SsdpServer {
-    private static final String TAG = "SsdpServer";
     public static final String MCAST_ADDR = "239.255.255.250";
     public static final int PORT = 1900;
+
+    private static final String TAG = "SsdpServer";
     private final NetworkInterface mInterface;
     private InterfaceAddress mInterfaceAddress;
     private final int mBindPort;

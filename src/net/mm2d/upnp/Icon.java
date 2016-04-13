@@ -13,15 +13,6 @@ import java.net.URL;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Icon {
-    private static final String TAG = "Icon";
-    private final Device mDevice;
-    private final String mMimeType;
-    private final int mHeight;
-    private final int mWidth;
-    private final int mDepth;
-    private final String mUrl;
-    private byte[] mBinary;
-
     public static class Builder {
         private Device mDevice;
         private String mMimeType;
@@ -66,6 +57,15 @@ public class Icon {
             return new Icon(this);
         }
     }
+
+    private static final String TAG = "Icon";
+    private final Device mDevice;
+    private final String mMimeType;
+    private final int mHeight;
+    private final int mWidth;
+    private final int mDepth;
+    private final String mUrl;
+    private byte[] mBinary;
 
     private Icon(Builder builder) {
         mDevice = builder.mDevice;

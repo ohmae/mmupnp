@@ -12,17 +12,6 @@ import java.util.List;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class StateVariable {
-    private final Service mService;
-    private final boolean mSendEvents;
-    private final boolean mMulticast;
-    private final String mName;
-    private final String mDataType;
-    private final List<String> mAllowedValueList;
-    private final String mDefaultValue;
-    private final String mMinimum;
-    private final String mMaximum;
-    private final String mStep;
-
     public static class Builder {
         private Service mService;
         private boolean mSendEvents = true;
@@ -83,6 +72,17 @@ public class StateVariable {
             return new StateVariable(this);
         }
     }
+
+    private final Service mService;
+    private final boolean mSendEvents;
+    private final boolean mMulticast;
+    private final String mName;
+    private final String mDataType;
+    private final List<String> mAllowedValueList;
+    private final String mDefaultValue;
+    private final String mMinimum;
+    private final String mMaximum;
+    private final String mStep;
 
     public StateVariable(Builder builder) {
         mService = builder.mService;

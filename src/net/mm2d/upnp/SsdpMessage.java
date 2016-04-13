@@ -16,13 +16,14 @@ import java.net.InterfaceAddress;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public abstract class SsdpMessage {
-    private static final String TAG = "SsdpMessage";
     public static final String M_SEARCH = "M-SEARCH";
     public static final String NOTIFY = "NOTIFY";
     public static final String SSDP_ALIVE = "ssdp:alive";
     public static final String SSDP_BYEBYE = "ssdp:byebye";
     public static final String SSDP_UPDATE = "ssdp:update";
     public static final String SSDP_DISCOVER = "\"ssdp:discover\"";
+
+    private static final String TAG = "SsdpMessage";
     private final HttpMessage mMessage;
     private static final int DEFAULT_MAX_AGE = 1800;
     private int mMaxAge;

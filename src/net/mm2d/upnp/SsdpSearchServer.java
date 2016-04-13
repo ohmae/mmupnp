@@ -12,12 +12,12 @@ import java.net.NetworkInterface;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpSearchServer extends SsdpServer {
-    public static final String ST_ALL = "ssdp:all";
-    public static final String ST_ROOTDEVICE = "upnp:rootdevice";
-
     public interface ResponseListener {
         void onReceiveResponse(SsdpResponseMessage message);
     }
+
+    public static final String ST_ALL = "ssdp:all";
+    public static final String ST_ROOTDEVICE = "upnp:rootdevice";
 
     private ResponseListener mListener;
 
