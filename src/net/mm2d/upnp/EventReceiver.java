@@ -37,6 +37,7 @@ class EventReceiver {
         private EventPacketListener mListener;
 
         public ServerThread(ServerSocket sock) {
+            super("EventReceiver::ServerThread");
             mServerSocket = sock;
             mClientList = Collections.synchronizedList(new LinkedList<>());
         }
@@ -115,6 +116,7 @@ class EventReceiver {
         }
 
         public ClientThread(ServerThread server, Socket sock) {
+            super("EventReceiver::ClientThread");
             mServer = server;
             mSocket = sock;
         }

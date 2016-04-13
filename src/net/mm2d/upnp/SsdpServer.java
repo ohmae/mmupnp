@@ -135,6 +135,10 @@ abstract class SsdpServer {
     private class ReceiveThread extends Thread {
         private volatile boolean mShutdownRequest;
 
+        public ReceiveThread() {
+            super("ReceiveThread");
+        }
+
         public void shutdownRequest() {
             mShutdownRequest = true;
             interrupt();
