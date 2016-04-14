@@ -59,15 +59,15 @@ public class Device {
         mTagMap.put("", new HashMap<>());
     }
 
-    ControlPoint getControlPoint() {
+    public ControlPoint getControlPoint() {
         return mControlPoint;
     }
 
-    public void setSsdpMessage(SsdpMessage message) {
+    void setSsdpMessage(SsdpMessage message) {
         mSsdp = message;
     }
 
-    public SsdpMessage getSsdpMessage() {
+    SsdpMessage getSsdpMessage() {
         return mSsdp;
     }
 

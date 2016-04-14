@@ -459,6 +459,10 @@ public class ControlPoint {
         }
         mEventServer.close();
         mSubscribeKeeper.clear();
+        final List<Device> list = new ArrayList<>(mDeviceMap.values());
+        for (final Device device : list) {
+            lostDevice(device);
+        }
         mDeviceMap.clear();
         mDeviceExpirer.clear();
     }
@@ -516,5 +520,9 @@ public class ControlPoint {
 
     void renewSubscribeService() {
         mSubscribeKeeper.update();
+    }
+
+    public void submit(Runnable task) {
+        mNetworkExecutor.submit(task);
     }
 }

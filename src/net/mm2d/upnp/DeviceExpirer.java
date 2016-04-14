@@ -4,8 +4,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -29,7 +27,7 @@ class DeviceExpirer extends Thread {
     };
 
     public DeviceExpirer(ControlPoint cp) {
-        super("DeviceExpirer");
+        super(TAG);
         mDeviceList = new ArrayList<>();
         mControlPoint = cp;
     }
@@ -86,7 +84,6 @@ class DeviceExpirer extends Thread {
                 }
             }
         } catch (final InterruptedException e) {
-            Log.w(TAG, e);
         }
     }
 }

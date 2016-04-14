@@ -40,7 +40,7 @@ class SubscribeKeeper extends Thread {
     }
 
     public SubscribeKeeper(ControlPoint controlPoint) {
-        super("SubscribeKeeper");
+        super(TAG);
         mControlPoint = controlPoint;
         mServiceList = new ArrayList<>();
     }
@@ -110,7 +110,6 @@ class SubscribeKeeper extends Thread {
                 }
             }
         } catch (final InterruptedException e) {
-            Log.w(TAG, e);
         }
     }
 }
