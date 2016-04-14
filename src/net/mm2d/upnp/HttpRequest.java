@@ -51,7 +51,7 @@ public class HttpRequest extends HttpMessage {
 
     public void setUrl(URL url, boolean withHostHeader) throws IOException {
         if (!"http".equals(url.getProtocol())) {
-            throw new IOException();
+            throw new IOException("unsupported protocol." + url.getProtocol());
         }
         setAddress(InetAddress.getByName(url.getHost()));
         setPort(url.getPort());

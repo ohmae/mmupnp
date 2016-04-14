@@ -50,6 +50,8 @@ public final class Http {
     public static final String SEARCHPORT_UPNP_ORG = "SEARCHPORT.UPNP.ORG";
     public static final String SECURELOCATION_UPNP_ORG = "SECURELOCATION.UPNP.ORG";
     public static final String SOAPACTION = "SOAPACTION";
+    public static final String UPNP_EVENT = "upnp:event";
+    public static final String UPNP_PROPCHANGE = "upnp:propchange";
 
     public static final String SUBSCRIBE = "SUBSCRIBE";
     public static final String UNSUBSCRIBE = "UNSUBSCRIBE";

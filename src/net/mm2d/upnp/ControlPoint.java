@@ -359,7 +359,8 @@ public class ControlPoint {
             return;
         }
         if (mTerminated) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(
+                    "ControlPoint is already terminated, cannot re-initialize.");
         }
         mDeviceExpirer = new DeviceExpirer(this);
         mDeviceExpirer.start();
@@ -394,7 +395,7 @@ public class ControlPoint {
 
     public void start() {
         if (!mInitialized) {
-            throw new IllegalStateException();
+            initialize();
         }
         if (mStarted) {
             return;
@@ -467,21 +468,16 @@ public class ControlPoint {
         mDeviceExpirer.clear();
     }
 
+    public void search() {
+        search(null);
+    }
+
     public void search(String st) {
         if (!mStarted) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("ControlPoint is not started.");
         }
         for (final SsdpSearchServer socket : mSearchList) {
             socket.search(st);
-        }
-    }
-
-    public void search() {
-        if (!mStarted) {
-            throw new IllegalStateException();
-        }
-        for (final SsdpSearchServer socket : mSearchList) {
-            socket.search();
         }
     }
 

@@ -168,7 +168,7 @@ public class Service {
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.i(TAG, response.toString());
-            throw new IOException();
+            throw new IOException(response.getStartLine());
         }
         mDescription = response.getBody();
         parseDescription(mDescription);
@@ -351,7 +351,7 @@ public class Service {
         request.setMethod(Http.SUBSCRIBE);
         final URL url = getAbsoluteUrl(mEventSubUrl);
         request.setUrl(url, true);
-        request.setHeader(Http.NT, "upnp:event");
+        request.setHeader(Http.NT, Http.UPNP_EVENT);
         request.setHeader(Http.CALLBACK, getCallback());
         request.setHeader(Http.TIMEOUT, "Second-300");
         request.setHeader(Http.CONTENT_LENGTH, "0");

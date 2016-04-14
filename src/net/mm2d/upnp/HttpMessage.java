@@ -222,7 +222,11 @@ public abstract class HttpMessage {
         if (startLine == null || startLine.length() == 0) {
             return false;
         }
-        setStartLine(startLine);
+        try {
+            setStartLine(startLine);
+        } catch (final IllegalArgumentException e) {
+            throw new IOException("Illegal start line:" + startLine);
+        }
         while (true) {
             final String line = readLine(is);
             if (line == null) {

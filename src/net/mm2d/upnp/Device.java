@@ -117,7 +117,7 @@ public class Device {
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.i(TAG, response.toString());
             client.close();
-            throw new IOException();
+            throw new IOException(response.getStartLine());
         }
         mDescription = response.getBody();
         parseDescription(mDescription);

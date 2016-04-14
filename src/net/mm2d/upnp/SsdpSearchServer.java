@@ -40,7 +40,7 @@ class SsdpSearchServer extends SsdpServer {
         final SsdpRequestMessage message = new SsdpRequestMessage();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
-        message.setHeader(Http.HOST, "239.255.255.250:1900");
+        message.setHeader(Http.HOST, MCAST_ADDR + ":" + String.valueOf(PORT));
         message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER);
         message.setHeader(Http.MX, "1");
         message.setHeader(Http.ST, st);

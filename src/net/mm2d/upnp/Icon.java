@@ -111,7 +111,7 @@ public class Icon {
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.i(TAG, response.toString());
-            throw new IOException();
+            throw new IOException(response.getStartLine());
         }
         mBinary = response.getBodyBinary();
     }

@@ -156,8 +156,8 @@ class EventReceiver {
                             || nts == null || nts.length() == 0) {
                         RESPONSE_BAD.writeData(os);
                     } else if (sid == null || sid.length() == 0
-                            || !nt.equals("upnp:event")
-                            || !nts.equals("upnp:propchange")) {
+                            || !nt.equals(Http.UPNP_EVENT)
+                            || !nts.equals(Http.UPNP_PROPCHANGE)) {
                         RESPONSE_FAIL.writeData(os);
                     } else {
                         if (notifyEvent(request)) {

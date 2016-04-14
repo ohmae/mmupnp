@@ -128,7 +128,7 @@ public class Action {
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, response.toString());
-            throw new IOException();
+            throw new IOException(response.getStartLine());
         }
         try {
             return parseResponse(response.getBody());

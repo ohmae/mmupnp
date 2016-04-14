@@ -149,7 +149,7 @@ abstract class SsdpServer {
             try {
                 joinGroup();
                 while (!mShutdownRequest) {
-                    final byte[] buf = new byte[1024];
+                    final byte[] buf = new byte[1500];
                     final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                     try {
                         mSocket.receive(dp);
