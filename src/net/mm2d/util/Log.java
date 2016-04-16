@@ -89,10 +89,30 @@ public class Log {
         if (level < sLogLevel) {
             return;
         }
+//        for Android Logcat
+//        switch(level) {
+//            default:
+//            case VERBOSE:
+//                android.util.Log.v(tag, message);
+//                break;
+//            case DEBUG:
+//                android.util.Log.d(tag, message);
+//                break;
+//            case INFO:
+//                android.util.Log.i(tag, message);
+//                break;
+//            case WARN:
+//                android.util.Log.w(tag, message);
+//                break;
+//            case ERROR:
+//                android.util.Log.e(tag, message);
+//                break;
+//        }
         synchronized (FORMAT) {
             final StringBuilder sb = new StringBuilder();
             sb.append(FORMAT.format(new Date(System.currentTimeMillis())));
             switch (level) {
+                default:
                 case VERBOSE:
                     sb.append(" V ");
                     break;

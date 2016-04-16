@@ -16,6 +16,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.Inet4Address;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -79,7 +81,7 @@ public class ControlPoint {
     };
     private final NotifyListener mNotifyListener = new NotifyListener() {
         @Override
-        public void onReceiveNotify(SsdpRequestMessage message) {
+        public void onReceiveNotify(final SsdpRequestMessage message) {
             mCachedThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -228,7 +230,7 @@ public class ControlPoint {
         }
         mSearchList = new ArrayList<>();
         mNotifyList = new ArrayList<>();
-        mDeviceMap = Collections.synchronizedMap(new HashMap<>());
+        mDeviceMap = Collections.synchronizedMap(new HashMap<String, Device>());
         mPendingDeviceMap = new HashMap<>();
         mSubscribeServiceMap = new HashMap<>();
         mDiscoveryListeners = new ArrayList<>();
@@ -264,7 +266,13 @@ public class ControlPoint {
                         || !ni.isUp()) {
                     continue;
                 }
-                list.add(ni);
+                final List<InterfaceAddress> ifas = ni.getInterfaceAddresses();
+                for (InterfaceAddress a : ifas) {
+                    if (a.getAddress() instanceof Inet4Address) {
+                        list.add(ni);
+                        break;
+                    }
+                }
             } catch (final SocketException e) {
                 continue;
             }

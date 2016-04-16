@@ -39,7 +39,7 @@ class EventReceiver {
         public ServerThread(ServerSocket sock) {
             super("EventReceiver::ServerThread");
             mServerSocket = sock;
-            mClientList = Collections.synchronizedList(new LinkedList<>());
+            mClientList = Collections.synchronizedList(new LinkedList<ClientThread>());
         }
 
         public void shutdownRequest() {

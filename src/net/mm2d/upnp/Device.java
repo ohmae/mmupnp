@@ -56,7 +56,7 @@ public class Device {
         mIconList = new ArrayList<>();
         mServiceList = new ArrayList<>();
         mTagMap = new LinkedHashMap<>();
-        mTagMap.put("", new HashMap<>());
+        mTagMap.put("", new HashMap<String, String>());
     }
 
     public ControlPoint getControlPoint() {
@@ -107,7 +107,7 @@ public class Device {
 
     void loadDescription() throws IOException, SAXException, ParserConfigurationException {
         final HttpClient client = new HttpClient(true);
-        final URL url = new URL(mSsdp.getLocation());
+        final URL url = new URL(getLocation());
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
         request.setUrl(url, true);
@@ -287,6 +287,15 @@ public class Device {
 
     public String getLocation() {
         return mSsdp.getLocation();
+    }
+
+    public String getIpAddress() {
+        try {
+            URL url = new URL(getLocation());
+            return url.getHost();
+        } catch (MalformedURLException e) {
+            return "";
+        }
     }
 
     public String getUdn() {

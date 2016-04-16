@@ -5,6 +5,7 @@
 package net.mm2d.upnp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -21,8 +22,8 @@ class DeviceExpirer extends Thread {
     private final List<Device> mDeviceList;
     private final Comparator<Device> mComparator = new Comparator<Device>() {
         @Override
-        public int compare(Device o1, Device o2) {
-            return (int) (o1.getExpireTime() - o2.getExpireTime());
+        public int compare(Device d1, Device d2) {
+            return (int) (d1.getExpireTime() - d2.getExpireTime());
         }
     };
 
@@ -38,12 +39,12 @@ class DeviceExpirer extends Thread {
     }
 
     public synchronized void update() {
-        mDeviceList.sort(mComparator);
+        Collections.sort(mDeviceList, mComparator);
     }
 
     public synchronized void add(Device device) {
         mDeviceList.add(device);
-        mDeviceList.sort(mComparator);
+        Collections.sort(mDeviceList, mComparator);
         notifyAll();
     }
 

@@ -8,6 +8,7 @@ import net.mm2d.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -24,8 +25,8 @@ class SubscribeKeeper extends Thread {
     private final List<Service> mServiceList;
     private final Comparator<Service> mComparator = new Comparator<Service>() {
         @Override
-        public int compare(Service o1, Service o2) {
-            return (int) (getRenewTime(o1) - getRenewTime(o2));
+        public int compare(Service s1, Service s2) {
+            return (int) (getRenewTime(s1) - getRenewTime(s2));
         }
     };
 
@@ -51,12 +52,12 @@ class SubscribeKeeper extends Thread {
     }
 
     public synchronized void update() {
-        mServiceList.sort(mComparator);
+        Collections.sort(mServiceList, mComparator);
     }
 
     public synchronized void add(Service service) {
         mServiceList.add(service);
-        mServiceList.sort(mComparator);
+        Collections.sort(mServiceList, mComparator);
         notifyAll();
     }
 
@@ -92,7 +93,7 @@ class SubscribeKeeper extends Thread {
                     }
                 }
                 synchronized (this) {
-                    mServiceList.sort(mComparator);
+                    Collections.sort(mServiceList, mComparator);
                     final Iterator<Service> i = mServiceList.iterator();
                     while (i.hasNext()) {
                         final Service service = i.next();
