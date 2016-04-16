@@ -39,7 +39,6 @@ class DeviceExpirer extends Thread {
 
     public synchronized void update() {
         mDeviceList.sort(mComparator);
-        notifyAll();
     }
 
     public synchronized void add(Device device) {
@@ -49,14 +48,11 @@ class DeviceExpirer extends Thread {
     }
 
     public synchronized void remove(Device device) {
-        if (mDeviceList.remove(device)) {
-            notifyAll();
-        }
+        mDeviceList.remove(device);
     }
 
     public synchronized void clear() {
         mDeviceList.clear();
-        notifyAll();
     }
 
     @Override

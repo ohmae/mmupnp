@@ -52,7 +52,6 @@ class SubscribeKeeper extends Thread {
 
     public synchronized void update() {
         mServiceList.sort(mComparator);
-        notifyAll();
     }
 
     public synchronized void add(Service service) {
@@ -62,9 +61,7 @@ class SubscribeKeeper extends Thread {
     }
 
     public synchronized void remove(Service service) {
-        if (mServiceList.remove(service)) {
-            notifyAll();
-        }
+        mServiceList.remove(service);
     }
 
     public synchronized void clear() {
@@ -72,14 +69,18 @@ class SubscribeKeeper extends Thread {
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
         try {
             while (!mShutdownRequest) {
-                while (mServiceList.size() == 0) {
-                    wait();
+                List<Service> work;
+                synchronized (this) {
+                    while (mServiceList.size() == 0) {
+                        wait();
+                    }
+                    work = new ArrayList<>(mServiceList);
                 }
                 final long current = System.currentTimeMillis();
-                for (final Service service : mServiceList) {
+                for (final Service service : work) {
                     if (getRenewTime(service) < current) {
                         try {
                             service.renewSubscribe(false);
@@ -90,23 +91,25 @@ class SubscribeKeeper extends Thread {
                         break;
                     }
                 }
-                mServiceList.sort(mComparator);
-                final Iterator<Service> i = mServiceList.iterator();
-                while (i.hasNext()) {
-                    final Service service = i.next();
-                    if (service.getSubscriptionStart()
-                            + service.getSubscriptionTimeout() < current) {
-                        mControlPoint.unregisterSubscribeService(service, true);
-                        i.remove();
+                synchronized (this) {
+                    mServiceList.sort(mComparator);
+                    final Iterator<Service> i = mServiceList.iterator();
+                    while (i.hasNext()) {
+                        final Service service = i.next();
+                        if (service.getSubscriptionStart()
+                                + service.getSubscriptionTimeout() < current) {
+                            mControlPoint.unregisterSubscribeService(service, true);
+                            i.remove();
+                        }
                     }
-                }
-                if (mServiceList.size() != 0) {
-                    final Service service = mServiceList.get(0);
-                    long sleep = getRenewTime(service) - System.currentTimeMillis();
-                    if (sleep < MIN_INTERVAL) {
-                        sleep = MIN_INTERVAL;
+                    if (mServiceList.size() != 0) {
+                        final Service service = mServiceList.get(0);
+                        long sleep = getRenewTime(service) - System.currentTimeMillis();
+                        if (sleep < MIN_INTERVAL) {
+                            sleep = MIN_INTERVAL;
+                        }
+                        wait(sleep);
                     }
-                    wait(sleep);
                 }
             }
         } catch (final InterruptedException e) {

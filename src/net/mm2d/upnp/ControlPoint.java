@@ -59,7 +59,7 @@ public class ControlPoint {
     private final Map<String, Device> mPendingDeviceMap;
     private final Map<String, Service> mSubscribeServiceMap;
     private final EventReceiver mEventServer;
-    private final ExecutorService mNetworkExecutor;
+    private final ExecutorService mCachedThreadPool;
     private final ExecutorService mNotifyExecutor;
     private boolean mInitialized = false;
     private boolean mStarted = false;
@@ -69,7 +69,7 @@ public class ControlPoint {
     private final ResponseListener mResponseListener = new ResponseListener() {
         @Override
         public void onReceiveResponse(final SsdpResponseMessage message) {
-            mNetworkExecutor.submit(new Runnable() {
+            mCachedThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
                     onReceiveSsdp(message);
@@ -80,7 +80,7 @@ public class ControlPoint {
     private final NotifyListener mNotifyListener = new NotifyListener() {
         @Override
         public void onReceiveNotify(SsdpRequestMessage message) {
-            mNetworkExecutor.submit(new Runnable() {
+            mCachedThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
                     onReceiveSsdp(message);
@@ -107,7 +107,7 @@ public class ControlPoint {
                     device = new Device(ControlPoint.this);
                     device.setSsdpMessage(message);
                     mPendingDeviceMap.put(message.getUuid(), device);
-                    mNetworkExecutor.submit(new DeviceLoader(device));
+                    mCachedThreadPool.execute(new DeviceLoader(device));
                 }
             } else {
                 if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
@@ -152,7 +152,7 @@ public class ControlPoint {
             if (service == null) {
                 return false;
             }
-            mNotifyExecutor.submit(new EventNotifyTask(request, service));
+            mNotifyExecutor.execute(new EventNotifyTask(request, service));
             return true;
         }
     };
@@ -215,88 +215,6 @@ public class ControlPoint {
         }
     }
 
-    public void addDiscoveryListener(DiscoveryListener listener) {
-        synchronized (mDiscoveryListeners) {
-            if (!mDiscoveryListeners.contains(listener)) {
-                mDiscoveryListeners.add(listener);
-            }
-        }
-    }
-
-    public void removeDiscoveryListener(DiscoveryListener listener) {
-        synchronized (mDiscoveryListeners) {
-            mDiscoveryListeners.remove(listener);
-        }
-    }
-
-    public void addNotifyEventListener(NotifyEventListener listener) {
-        synchronized (mNotifyEventListeners) {
-            if (!mNotifyEventListeners.contains(listener)) {
-                mNotifyEventListeners.add(listener);
-            }
-        }
-    }
-
-    public void removeNotifyEventListener(NotifyEventListener listener) {
-        synchronized (mNotifyEventListeners) {
-            mNotifyEventListeners.remove(listener);
-        }
-    }
-
-    void discoverDevice(final Device device) {
-        synchronized (mDeviceMap) {
-            mDeviceMap.put(device.getUuid(), device);
-            mDeviceExpirer.add(device);
-        }
-        mNotifyExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (mDiscoveryListeners) {
-                    for (final DiscoveryListener l : mDiscoveryListeners) {
-                        l.onDiscover(device);
-                    }
-                }
-            }
-        });
-    }
-
-    void lostDevice(Device device) {
-        lostDevice(device, false);
-    }
-
-    void lostDevice(final Device device, boolean fromExpirer) {
-        synchronized (mDeviceMap) {
-            final List<Service> list = device.getServiceList();
-            for (final Service s : list) {
-                unregisterSubscribeService(s);
-            }
-            mDeviceMap.remove(device.getUuid());
-            if (!fromExpirer) {
-                mDeviceExpirer.remove(device);
-            }
-        }
-        mNotifyExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (mDiscoveryListeners) {
-                    for (final DiscoveryListener l : mDiscoveryListeners) {
-                        l.onLost(device);
-                    }
-                }
-            }
-        });
-    }
-
-    public List<Device> getDeviceList() {
-        synchronized (mDeviceMap) {
-            return new ArrayList<Device>(mDeviceMap.values());
-        }
-    }
-
-    public Device getDevice(String udn) {
-        return mDeviceMap.get(udn);
-    }
-
     public ControlPoint() throws IllegalStateException {
         this(null);
     }
@@ -316,7 +234,7 @@ public class ControlPoint {
         mDiscoveryListeners = new ArrayList<>();
         mNotifyEventListeners = new ArrayList<>();
         mNotifyExecutor = Executors.newSingleThreadExecutor();
-        mNetworkExecutor = Executors.newCachedThreadPool();
+        mCachedThreadPool = Executors.newCachedThreadPool();
         for (final NetworkInterface nif : interfaces) {
             final SsdpSearchServer search = new SsdpSearchServer(nif);
             search.setResponseListener(mResponseListener);
@@ -378,11 +296,11 @@ public class ControlPoint {
         }
         mTerminated = true;
         mNotifyExecutor.shutdownNow();
-        mNetworkExecutor.shutdown();
+        mCachedThreadPool.shutdown();
         try {
-            if (!mNetworkExecutor.awaitTermination(
+            if (!mCachedThreadPool.awaitTermination(
                     Property.DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                mNetworkExecutor.shutdownNow();
+                mCachedThreadPool.shutdownNow();
             }
         } catch (final InterruptedException e) {
             Log.w(TAG, e);
@@ -434,7 +352,7 @@ public class ControlPoint {
             for (final Iterator<Entry<String, Service>> i = entrySet.iterator(); i.hasNext();) {
                 final Entry<String, Service> e = i.next();
                 i.remove();
-                mNetworkExecutor.submit(new Runnable() {
+                mCachedThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -481,6 +399,88 @@ public class ControlPoint {
         }
     }
 
+    public void addDiscoveryListener(DiscoveryListener listener) {
+        synchronized (mDiscoveryListeners) {
+            if (!mDiscoveryListeners.contains(listener)) {
+                mDiscoveryListeners.add(listener);
+            }
+        }
+    }
+
+    public void removeDiscoveryListener(DiscoveryListener listener) {
+        synchronized (mDiscoveryListeners) {
+            mDiscoveryListeners.remove(listener);
+        }
+    }
+
+    public void addNotifyEventListener(NotifyEventListener listener) {
+        synchronized (mNotifyEventListeners) {
+            if (!mNotifyEventListeners.contains(listener)) {
+                mNotifyEventListeners.add(listener);
+            }
+        }
+    }
+
+    public void removeNotifyEventListener(NotifyEventListener listener) {
+        synchronized (mNotifyEventListeners) {
+            mNotifyEventListeners.remove(listener);
+        }
+    }
+
+    void discoverDevice(final Device device) {
+        synchronized (mDeviceMap) {
+            mDeviceMap.put(device.getUuid(), device);
+            mDeviceExpirer.add(device);
+        }
+        mNotifyExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (mDiscoveryListeners) {
+                    for (final DiscoveryListener l : mDiscoveryListeners) {
+                        l.onDiscover(device);
+                    }
+                }
+            }
+        });
+    }
+
+    void lostDevice(Device device) {
+        lostDevice(device, false);
+    }
+
+    void lostDevice(final Device device, boolean fromExpirer) {
+        synchronized (mDeviceMap) {
+            final List<Service> list = device.getServiceList();
+            for (final Service s : list) {
+                unregisterSubscribeService(s);
+            }
+            mDeviceMap.remove(device.getUuid());
+            if (!fromExpirer) {
+                mDeviceExpirer.remove(device);
+            }
+        }
+        mNotifyExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (mDiscoveryListeners) {
+                    for (final DiscoveryListener l : mDiscoveryListeners) {
+                        l.onLost(device);
+                    }
+                }
+            }
+        });
+    }
+
+    public List<Device> getDeviceList() {
+        synchronized (mDeviceMap) {
+            return new ArrayList<Device>(mDeviceMap.values());
+        }
+    }
+
+    public Device getDevice(String udn) {
+        return mDeviceMap.get(udn);
+    }
+
     int getEventPort() {
         return mEventServer.getLocalPort();
     }
@@ -516,9 +516,5 @@ public class ControlPoint {
 
     void renewSubscribeService() {
         mSubscribeKeeper.update();
-    }
-
-    public void submit(Runnable task) {
-        mNetworkExecutor.submit(task);
     }
 }
