@@ -20,8 +20,77 @@ public class Log {
     public static final int WARN = 5;
     public static final int ERROR = 6;
     public static final int ASSERT = 7;
+
+    public interface Print {
+        void println(int level, String tag, String message);
+    }
+
+    private static class DefaultPrint implements Print {
+        private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        @Override
+        public void println(int level, String tag, String message) {
+            synchronized (FORMAT) {
+                final StringBuilder sb = new StringBuilder();
+                sb.append(FORMAT.format(new Date(System.currentTimeMillis())));
+                switch (level) {
+                    default:
+                    case VERBOSE:
+                        sb.append(" V ");
+                        break;
+                    case DEBUG:
+                        sb.append(" D ");
+                        break;
+                    case INFO:
+                        sb.append(" I ");
+                        break;
+                    case WARN:
+                        sb.append(" W ");
+                        break;
+                    case ERROR:
+                        sb.append(" E ");
+                        break;
+                }
+                sb.append("[");
+                sb.append(tag);
+                sb.append("] ");
+                sb.append(message);
+                System.out.println(sb.toString());
+            }
+        }
+    }
+
+// for Android Logcat
+//    private static class AndroidPrint implements Print {
+//        @Override
+//        public void println(int level, String tag, String message) {
+//          switch(level) {
+//              default:
+//              case VERBOSE:
+//                  android.util.Log.v(tag, message);
+//                  break;
+//              case DEBUG:
+//                  android.util.Log.d(tag, message);
+//                  break;
+//              case INFO:
+//                  android.util.Log.i(tag, message);
+//                  break;
+//              case WARN:
+//                  android.util.Log.w(tag, message);
+//                  break;
+//              case ERROR:
+//                  android.util.Log.e(tag, message);
+//                  break;
+//          }
+//        }
+//    }
+
+    private static Print sPrint = new DefaultPrint();
     private static int sLogLevel = VERBOSE;
-    private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    public static void setPrint(Print print) {
+        sPrint = print;
+    }
 
     public static void setLogLevel(int level) {
         sLogLevel = level;
@@ -89,52 +158,7 @@ public class Log {
         if (level < sLogLevel) {
             return;
         }
-//        for Android Logcat
-//        switch(level) {
-//            default:
-//            case VERBOSE:
-//                android.util.Log.v(tag, message);
-//                break;
-//            case DEBUG:
-//                android.util.Log.d(tag, message);
-//                break;
-//            case INFO:
-//                android.util.Log.i(tag, message);
-//                break;
-//            case WARN:
-//                android.util.Log.w(tag, message);
-//                break;
-//            case ERROR:
-//                android.util.Log.e(tag, message);
-//                break;
-//        }
-        synchronized (FORMAT) {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(FORMAT.format(new Date(System.currentTimeMillis())));
-            switch (level) {
-                default:
-                case VERBOSE:
-                    sb.append(" V ");
-                    break;
-                case DEBUG:
-                    sb.append(" D ");
-                    break;
-                case INFO:
-                    sb.append(" I ");
-                    break;
-                case WARN:
-                    sb.append(" W ");
-                    break;
-                case ERROR:
-                    sb.append(" E ");
-                    break;
-            }
-            sb.append("[");
-            sb.append(tag);
-            sb.append("] ");
-            sb.append(message);
-            System.out.println(sb.toString());
-        }
+        sPrint.println(level, tag, message);
     }
 
     private static String getStackTraceString(Throwable tr) {
