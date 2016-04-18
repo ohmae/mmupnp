@@ -121,9 +121,9 @@ public class Device {
         }
         mDescription = response.getBody();
         parseDescription(mDescription);
-        for (final Icon icon : mIconList) {
-            icon.loadBinary(client);
-        }
+        // for (final Icon icon : mIconList) {
+        // icon.loadBinary(client);
+        // }
         for (final Service service : mServiceList) {
             service.loadDescription(client);
         }
@@ -291,9 +291,9 @@ public class Device {
 
     public String getIpAddress() {
         try {
-            URL url = new URL(getLocation());
+            final URL url = new URL(getLocation());
             return url.getHost();
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             return "";
         }
     }
