@@ -226,7 +226,7 @@ public class Service {
                         continue;
                     }
                     if ("argument".equals(c.getLocalName())) {
-                        builder.addArugmentBuilder(parseArgument((Element) c));
+                        builder.addArgumentBuilder(parseArgument((Element) c));
                     }
                 }
             }

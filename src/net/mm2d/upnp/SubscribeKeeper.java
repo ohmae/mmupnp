@@ -73,7 +73,7 @@ class SubscribeKeeper extends Thread {
     public void run() {
         try {
             while (!mShutdownRequest) {
-                List<Service> work;
+                final List<Service> work;
                 synchronized (this) {
                     while (mServiceList.size() == 0) {
                         wait();
@@ -113,7 +113,7 @@ class SubscribeKeeper extends Thread {
                     }
                 }
             }
-        } catch (final InterruptedException e) {
+        } catch (final InterruptedException ignored) {
         }
     }
 }

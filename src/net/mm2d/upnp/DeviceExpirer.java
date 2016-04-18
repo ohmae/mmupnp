@@ -80,7 +80,7 @@ class DeviceExpirer extends Thread {
                     wait(sleep);
                 }
             }
-        } catch (final InterruptedException e) {
+        } catch (final InterruptedException ignored) {
         }
     }
 }

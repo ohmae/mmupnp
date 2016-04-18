@@ -103,8 +103,7 @@ public abstract class SsdpMessage {
         }
         try {
             mMaxAge = Integer.parseInt(age.substring(pos + 1));
-        } catch (final NumberFormatException e) {
-            return;
+        } catch (final NumberFormatException ignored) {
         }
     }
 

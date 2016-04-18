@@ -67,10 +67,7 @@ class EventReceiver {
         }
 
         private boolean notifyEvent(HttpRequest request) {
-            if (mListener != null) {
-                return mListener.onEventReceived(request);
-            }
-            return false;
+            return mListener != null && mListener.onEventReceived(request);
         }
 
         @Override
@@ -83,23 +80,23 @@ class EventReceiver {
                     mClientList.add(client);
                     client.start();
                 }
-            } catch (final IOException e) {
+            } catch (final IOException ignored) {
             } finally {
                 try {
                     mServerSocket.close();
-                } catch (final IOException e) {
+                } catch (final IOException ignored) {
                 }
             }
         }
     }
 
     private static class ClientThread extends Thread {
-        private volatile boolean mShutdownRequest = false;
         private final ServerThread mServer;
         private final Socket mSocket;
         private static final HttpResponse RESPONSE_OK = new HttpResponse();
         private static final HttpResponse RESPONSE_BAD = new HttpResponse();
         private static final HttpResponse RESPONSE_FAIL = new HttpResponse();
+
         static {
             RESPONSE_OK.setStatus(Http.Status.HTTP_OK);
             RESPONSE_OK.setHeader(Http.SERVER, Http.SERVER_VALUE);
@@ -122,7 +119,6 @@ class EventReceiver {
         }
 
         public void shutdownRequest() {
-            mShutdownRequest = true;
             interrupt();
             try {
                 mSocket.close();
@@ -142,31 +138,28 @@ class EventReceiver {
             try {
                 is = new BufferedInputStream(mSocket.getInputStream());
                 os = new BufferedOutputStream(mSocket.getOutputStream());
-                while (!mShutdownRequest) {
-                    final HttpRequest request = new HttpRequest();
-                    request.setAddress(mSocket.getInetAddress());
-                    request.setPort(mSocket.getPort());
-                    if (!request.readData(is)) {
-                        break;
-                    }
-                    final String nt = request.getHeader(Http.NT);
-                    final String nts = request.getHeader(Http.NTS);
-                    final String sid = request.getHeader(Http.SID);
-                    if (nt == null || nt.length() == 0
-                            || nts == null || nts.length() == 0) {
-                        RESPONSE_BAD.writeData(os);
-                    } else if (sid == null || sid.length() == 0
-                            || !nt.equals(Http.UPNP_EVENT)
-                            || !nts.equals(Http.UPNP_PROPCHANGE)) {
-                        RESPONSE_FAIL.writeData(os);
-                    } else {
-                        if (notifyEvent(request)) {
-                            RESPONSE_OK.writeData(os);
-                        } else {
-                            RESPONSE_FAIL.writeData(os);
-                        }
-                    }
+                final HttpRequest request = new HttpRequest();
+                request.setAddress(mSocket.getInetAddress());
+                request.setPort(mSocket.getPort());
+                if (!request.readData(is)) {
                     return;
+                }
+                final String nt = request.getHeader(Http.NT);
+                final String nts = request.getHeader(Http.NTS);
+                final String sid = request.getHeader(Http.SID);
+                if (nt == null || nt.length() == 0
+                        || nts == null || nts.length() == 0) {
+                    RESPONSE_BAD.writeData(os);
+                } else if (sid == null || sid.length() == 0
+                        || !nt.equals(Http.UPNP_EVENT)
+                        || !nts.equals(Http.UPNP_PROPCHANGE)) {
+                    RESPONSE_FAIL.writeData(os);
+                } else {
+                    if (notifyEvent(request)) {
+                        RESPONSE_OK.writeData(os);
+                    } else {
+                        RESPONSE_FAIL.writeData(os);
+                    }
                 }
             } catch (final IOException e) {
                 Log.w(TAG, e);
@@ -174,18 +167,18 @@ class EventReceiver {
                 if (is != null) {
                     try {
                         is.close();
-                    } catch (final IOException e) {
+                    } catch (final IOException ignored) {
                     }
                 }
                 if (os != null) {
                     try {
                         os.close();
-                    } catch (final IOException e) {
+                    } catch (final IOException ignored) {
                     }
                 }
                 try {
                     mSocket.close();
-                } catch (final IOException e) {
+                } catch (final IOException ignored) {
                 }
                 mServer.notifyClientFinish(this);
             }

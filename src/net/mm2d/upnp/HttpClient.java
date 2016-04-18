@@ -73,21 +73,21 @@ public class HttpClient {
         if (mInputStream != null) {
             try {
                 mInputStream.close();
-            } catch (final IOException e) {
+            } catch (final IOException ignored) {
             }
             mInputStream = null;
         }
         if (mOutputStream != null) {
             try {
                 mOutputStream.close();
-            } catch (final IOException e) {
+            } catch (final IOException ignored) {
             }
             mOutputStream = null;
         }
         if (mSocket != null) {
             try {
                 mSocket.close();
-            } catch (final IOException e) {
+            } catch (final IOException ignored) {
             }
             mSocket = null;
         }

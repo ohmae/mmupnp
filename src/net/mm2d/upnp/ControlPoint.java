@@ -199,7 +199,7 @@ public class ControlPoint {
                         }
                     }
                 }
-            } catch (IOException | SAXException | ParserConfigurationException e) {
+            } catch (IOException | SAXException | ParserConfigurationException ignored) {
             }
         }
 
@@ -251,7 +251,7 @@ public class ControlPoint {
 
     private Collection<NetworkInterface> getValidNetworkInterfaces() {
         final Collection<NetworkInterface> list = new ArrayList<>();
-        Enumeration<NetworkInterface> nis;
+        final Enumeration<NetworkInterface> nis;
         try {
             nis = NetworkInterface.getNetworkInterfaces();
         } catch (final SocketException e) {
@@ -267,14 +267,13 @@ public class ControlPoint {
                     continue;
                 }
                 final List<InterfaceAddress> ifas = ni.getInterfaceAddresses();
-                for (InterfaceAddress a : ifas) {
+                for (final InterfaceAddress a : ifas) {
                     if (a.getAddress() instanceof Inet4Address) {
                         list.add(ni);
                         break;
                     }
                 }
-            } catch (final SocketException e) {
-                continue;
+            } catch (final SocketException ignored) {
             }
         }
         return list;
@@ -481,7 +480,7 @@ public class ControlPoint {
 
     public List<Device> getDeviceList() {
         synchronized (mDeviceMap) {
-            return new ArrayList<Device>(mDeviceMap.values());
+            return new ArrayList<>(mDeviceMap.values());
         }
     }
 

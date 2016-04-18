@@ -58,7 +58,7 @@ public class Action {
             mName = name;
         }
 
-        public void addArugmentBuilder(Argument.Builder argument) {
+        public void addArgumentBuilder(Argument.Builder argument) {
             mArgumentList.add(argument);
         }
 

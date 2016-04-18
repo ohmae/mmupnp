@@ -121,9 +121,9 @@ public class Device {
         }
         mDescription = response.getBody();
         parseDescription(mDescription);
-        // for (final Icon icon : mIconList) {
-        // icon.loadBinary(client);
-        // }
+//        for (final Icon icon : mIconList) {
+//            icon.loadBinary(client);
+//        }
         for (final Service service : mServiceList) {
             service.loadDescription(client);
         }

@@ -150,15 +150,15 @@ public final class Http {
     public synchronized static Date parseDate(String string) {
         try {
             return sRfc1123Format.parse(string);
-        } catch (final ParseException e) {
+        } catch (final ParseException ignored) {
         }
         try {
             return sRfc1036Format.parse(string);
-        } catch (final ParseException e) {
+        } catch (final ParseException ignored) {
         }
         try {
             return sAsctimeFormat.parse(string);
-        } catch (final ParseException e) {
+        } catch (final ParseException ignored) {
         }
         return null;
     }
