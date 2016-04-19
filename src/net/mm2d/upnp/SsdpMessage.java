@@ -34,7 +34,6 @@ public abstract class SsdpMessage {
     private String mLocation;
     private InterfaceAddress mInterfaceAddress;
     private InetSocketAddress mSourceAddress;
-    private boolean mValidSegment;
 
     protected abstract HttpMessage newMessage();
 
@@ -50,7 +49,6 @@ public abstract class SsdpMessage {
         mMessage = newMessage();
         mInterfaceAddress = addr;
         mSourceAddress = (InetSocketAddress) dp.getSocketAddress();
-        mValidSegment = isSameSegment(mInterfaceAddress, mSourceAddress);
         try {
             mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
         } catch (final IOException e) {
@@ -65,26 +63,6 @@ public abstract class SsdpMessage {
         mExpireTime = mMaxAge * 1000 + System.currentTimeMillis();
         mLocation = mMessage.getHeader(Http.LOCATION);
         mNts = mMessage.getHeader(Http.NTS);
-    }
-
-    private boolean isSameSegment(InterfaceAddress ifa, InetSocketAddress sa) {
-        final byte[] a = ifa.getAddress().getAddress();
-        final byte[] b = sa.getAddress().getAddress();
-        final int pref = ifa.getNetworkPrefixLength();
-        final int bytes = pref / 8;
-        final int bits = pref % 8;
-        for (int i = 0; i < bytes; i++) {
-            if (a[i] != b[i]) {
-                return false;
-            }
-        }
-        if (bits != 0) {
-            final byte mask = (byte) (0xff << (8 - bits));
-            if ((a[bytes] & mask) != (b[bytes] & mask)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public InterfaceAddress getInterfaceAddress() {
@@ -121,10 +99,6 @@ public abstract class SsdpMessage {
         if (pos + 2 < usn.length()) {
             mType = usn.substring(pos + 2);
         }
-    }
-
-    public boolean isValidSegment() {
-        return mValidSegment;
     }
 
     public String getHeader(String name) {
