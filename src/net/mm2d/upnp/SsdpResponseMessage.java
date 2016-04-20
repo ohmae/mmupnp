@@ -4,6 +4,7 @@
 
 package net.mm2d.upnp;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
 
@@ -11,7 +12,7 @@ import java.net.InterfaceAddress;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class SsdpResponseMessage extends SsdpMessage {
-    public SsdpResponseMessage(InterfaceAddress addr, DatagramPacket dp) {
+    public SsdpResponseMessage(InterfaceAddress addr, DatagramPacket dp) throws IOException {
         super(addr, dp);
     }
 

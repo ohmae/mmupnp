@@ -4,13 +4,11 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
+import java.net.URL;
 
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
@@ -23,7 +21,6 @@ public abstract class SsdpMessage {
     public static final String SSDP_UPDATE = "ssdp:update";
     public static final String SSDP_DISCOVER = "\"ssdp:discover\"";
 
-    private static final String TAG = "SsdpMessage";
     private final HttpMessage mMessage;
     private static final int DEFAULT_MAX_AGE = 1800;
     private int mMaxAge;
@@ -33,7 +30,6 @@ public abstract class SsdpMessage {
     private String mNts;
     private String mLocation;
     private InterfaceAddress mInterfaceAddress;
-    private InetSocketAddress mSourceAddress;
 
     protected abstract HttpMessage newMessage();
 
@@ -45,16 +41,19 @@ public abstract class SsdpMessage {
         mMessage = newMessage();
     }
 
-    public SsdpMessage(InterfaceAddress addr, DatagramPacket dp) {
+    public SsdpMessage(InterfaceAddress addr, DatagramPacket dp) throws IOException {
         mMessage = newMessage();
         mInterfaceAddress = addr;
-        mSourceAddress = (InetSocketAddress) dp.getSocketAddress();
-        try {
-            mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
-        } catch (final IOException e) {
-            Log.w(TAG, e);
-        }
+        mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
         parseMessage();
+        if (mLocation == null) {
+            throw new IOException("There is no Location: in header.");
+        }
+        final String packetAddress = dp.getAddress().getHostAddress();
+        final String locationAddress = new URL(mLocation).getHost();
+        if (!packetAddress.equals(locationAddress)) {
+            throw new IOException("Location: does not match address of UDP packet.");
+        }
     }
 
     public void parseMessage() {

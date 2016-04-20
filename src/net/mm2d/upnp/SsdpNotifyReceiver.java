@@ -6,6 +6,7 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
@@ -36,9 +37,12 @@ class SsdpNotifyReceiver extends SsdpServer {
             Log.w(TAG, "Invalid segment packet received:" + dp.getAddress().toString());
             return;
         }
-        final SsdpRequestMessage message = new SsdpRequestMessage(addr, dp);
-        if (mListener != null) {
-            mListener.onReceiveNotify(message);
+        try {
+            final SsdpRequestMessage message = new SsdpRequestMessage(addr, dp);
+            if (mListener != null) {
+                mListener.onReceiveNotify(message);
+            }
+        } catch (final IOException ignored) {
         }
     }
 
