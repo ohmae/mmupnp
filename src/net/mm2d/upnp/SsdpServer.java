@@ -11,26 +11,27 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.List;
 
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 abstract class SsdpServer {
-    public static final String MCAST_ADDR = "239.255.255.250";
-    public static final int PORT = 1900;
-
+    public static final String SSDP_ADDR = "239.255.255.250";
+    public static final int SSDP_PORT = 1900;
+    private static final InetSocketAddress SSDP_SO_ADDR =
+            new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
+    private static final InetAddress SSDP_INET_ADDR = SSDP_SO_ADDR.getAddress();
     private static final String TAG = "SsdpServer";
     private final NetworkInterface mInterface;
     private InterfaceAddress mInterfaceAddress;
     private final int mBindPort;
     private MulticastSocket mSocket;
-    private InetAddress mMulticastAddress;
     private ReceiveThread mThread;
 
     public SsdpServer(NetworkInterface ni) {
@@ -47,10 +48,8 @@ abstract class SsdpServer {
                 break;
             }
         }
-        try {
-            mMulticastAddress = InetAddress.getByName(MCAST_ADDR);
-        } catch (final UnknownHostException e) {
-            Log.w(TAG, e);
+        if (mInterfaceAddress == null) {
+            throw new IllegalArgumentException("ni does not have IPv4 address.");
         }
     }
 
@@ -109,8 +108,7 @@ abstract class SsdpServer {
     }
 
     public void send(byte[] message) {
-        final DatagramPacket dp = new DatagramPacket(message, message.length,
-                mMulticastAddress, PORT);
+        final DatagramPacket dp = new DatagramPacket(message, message.length, SSDP_SO_ADDR);
         try {
             mSocket.send(dp);
         } catch (final IOException e) {
@@ -122,13 +120,13 @@ abstract class SsdpServer {
 
     private void joinGroup() throws IOException {
         if (mBindPort != 0) {
-            mSocket.joinGroup(mMulticastAddress);
+            mSocket.joinGroup(SSDP_INET_ADDR);
         }
     }
 
     private void leaveGroup() throws IOException {
         if (mBindPort != 0) {
-            mSocket.leaveGroup(mMulticastAddress);
+            mSocket.leaveGroup(SSDP_INET_ADDR);
         }
     }
 

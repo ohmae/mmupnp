@@ -24,7 +24,7 @@ class SsdpNotifyReceiver extends SsdpServer {
     private NotifyListener mListener;
 
     public SsdpNotifyReceiver(NetworkInterface ni) {
-        super(ni, SsdpServer.PORT);
+        super(ni, SSDP_PORT);
     }
 
     public void setNotifyListener(NotifyListener listener) {
