@@ -58,13 +58,12 @@ abstract class SsdpServer {
             close();
         }
         mSocket = new MulticastSocket(mBindPort);
-        mSocket.setSoTimeout(1000);
         mSocket.setNetworkInterface(mInterface);
         mSocket.setTimeToLive(4);
     }
 
     public void close() {
-        stop(true);
+        stop(false);
         if (mSocket != null) {
             mSocket.close();
             mSocket = null;
@@ -73,7 +72,7 @@ abstract class SsdpServer {
 
     public void start() {
         if (mThread != null) {
-            stop(true);
+            stop(false);
         }
         mThread = new ReceiveThread();
         mThread.start();
@@ -156,8 +155,7 @@ abstract class SsdpServer {
                     }
                 }
                 leaveGroup();
-            } catch (final IOException e) {
-                e.printStackTrace();
+            } catch (final IOException ignored) {
             }
         }
     }
