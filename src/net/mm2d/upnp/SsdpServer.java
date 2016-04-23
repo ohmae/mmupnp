@@ -97,8 +97,8 @@ abstract class SsdpServer {
     }
 
     public void send(SsdpMessage message) {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.getMessage().writeData(baos);
             send(baos.toByteArray());
         } catch (final IOException e) {
@@ -107,8 +107,8 @@ abstract class SsdpServer {
     }
 
     public void send(byte[] message) {
-        final DatagramPacket dp = new DatagramPacket(message, message.length, SSDP_SO_ADDR);
         try {
+            final DatagramPacket dp = new DatagramPacket(message, message.length, SSDP_SO_ADDR);
             mSocket.send(dp);
         } catch (final IOException e) {
             Log.w(TAG, e);
