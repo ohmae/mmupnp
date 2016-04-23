@@ -150,6 +150,9 @@ abstract class SsdpServer {
                     final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                     try {
                         mSocket.receive(dp);
+                        if (mShutdownRequest) {
+                            break;
+                        }
                         onReceive(mInterfaceAddress, dp);
                     } catch (final SocketTimeoutException e) {
                     }

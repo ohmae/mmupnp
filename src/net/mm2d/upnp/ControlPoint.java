@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -71,7 +72,7 @@ public class ControlPoint {
     private final ResponseListener mResponseListener = new ResponseListener() {
         @Override
         public void onReceiveResponse(final SsdpResponseMessage message) {
-            mCachedThreadPool.execute(new Runnable() {
+            executeParallel(new Runnable() {
                 @Override
                 public void run() {
                     onReceiveSsdp(message);
@@ -82,7 +83,7 @@ public class ControlPoint {
     private final NotifyListener mNotifyListener = new NotifyListener() {
         @Override
         public void onReceiveNotify(final SsdpRequestMessage message) {
-            mCachedThreadPool.execute(new Runnable() {
+            executeParallel(new Runnable() {
                 @Override
                 public void run() {
                     onReceiveSsdp(message);
@@ -109,7 +110,9 @@ public class ControlPoint {
                     device = new Device(ControlPoint.this);
                     device.setSsdpMessage(message);
                     mPendingDeviceMap.put(message.getUuid(), device);
-                    mCachedThreadPool.execute(new DeviceLoader(device));
+                    if (!executeParallel(new DeviceLoader(device))) {
+                        mPendingDeviceMap.remove(message.getUuid());
+                    }
                 }
             } else {
                 if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
@@ -154,8 +157,7 @@ public class ControlPoint {
             if (service == null) {
                 return false;
             }
-            mNotifyExecutor.execute(new EventNotifyTask(request, service));
-            return true;
+            return executeSequential(new EventNotifyTask(request, service));
         }
     };
 
@@ -279,6 +281,30 @@ public class ControlPoint {
         return list;
     }
 
+    private boolean executeParallel(Runnable command) {
+        if (mCachedThreadPool.isShutdown()) {
+            return false;
+        }
+        try {
+            mCachedThreadPool.execute(command);
+        } catch (final RejectedExecutionException ignored) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean executeSequential(Runnable command) {
+        if (mNotifyExecutor.isShutdown()) {
+            return false;
+        }
+        try {
+            mNotifyExecutor.execute(command);
+        } catch (final RejectedExecutionException ignored) {
+            return false;
+        }
+        return true;
+    }
+
     public void initialize() {
         if (mInitialized) {
             return;
@@ -331,18 +357,18 @@ public class ControlPoint {
         } catch (final IOException e1) {
             Log.w(TAG, e1);
         }
-        for (final SsdpServer socket : mSearchList) {
+        for (final SsdpServer server : mSearchList) {
             try {
-                socket.open();
-                socket.start();
+                server.open();
+                server.start();
             } catch (final IOException e) {
                 Log.w(TAG, e);
             }
         }
-        for (final SsdpServer socket : mNotifyList) {
+        for (final SsdpServer server : mNotifyList) {
             try {
-                socket.open();
-                socket.start();
+                server.open();
+                server.start();
             } catch (final IOException e) {
                 Log.w(TAG, e);
             }
@@ -357,13 +383,13 @@ public class ControlPoint {
         synchronized (mSubscribeServiceMap) {
             final Set<Entry<String, Service>> entrySet = mSubscribeServiceMap.entrySet();
             for (final Iterator<Entry<String, Service>> i = entrySet.iterator(); i.hasNext();) {
-                final Entry<String, Service> e = i.next();
+                final Entry<String, Service> entry = i.next();
                 i.remove();
-                mCachedThreadPool.execute(new Runnable() {
+                executeParallel(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            e.getValue().unsubscribe();
+                            entry.getValue().unsubscribe();
                         } catch (final IOException e) {
                             Log.w(TAG, e);
                         }
@@ -371,17 +397,17 @@ public class ControlPoint {
                 });
             }
         }
-        for (final SsdpServer socket : mSearchList) {
-            socket.stop();
+        for (final SsdpServer server : mSearchList) {
+            server.stop();
         }
-        for (final SsdpServer socket : mNotifyList) {
-            socket.stop();
+        for (final SsdpServer server : mNotifyList) {
+            server.stop();
         }
-        for (final SsdpServer socket : mSearchList) {
-            socket.close();
+        for (final SsdpServer server : mSearchList) {
+            server.close();
         }
-        for (final SsdpServer socket : mNotifyList) {
-            socket.close();
+        for (final SsdpServer server : mNotifyList) {
+            server.close();
         }
         mEventServer.close();
         mSubscribeKeeper.clear();
@@ -401,8 +427,8 @@ public class ControlPoint {
         if (!mStarted) {
             throw new IllegalStateException("ControlPoint is not started.");
         }
-        for (final SsdpSearchServer socket : mSearchList) {
-            socket.search(st);
+        for (final SsdpSearchServer server : mSearchList) {
+            server.search(st);
         }
     }
 
@@ -439,7 +465,7 @@ public class ControlPoint {
             mDeviceMap.put(device.getUuid(), device);
             mDeviceExpirer.add(device);
         }
-        mNotifyExecutor.execute(new Runnable() {
+        executeSequential(new Runnable() {
             @Override
             public void run() {
                 synchronized (mDiscoveryListeners) {
@@ -466,7 +492,7 @@ public class ControlPoint {
                 mDeviceExpirer.remove(device);
             }
         }
-        mNotifyExecutor.execute(new Runnable() {
+        executeSequential(new Runnable() {
             @Override
             public void run() {
                 synchronized (mDiscoveryListeners) {
