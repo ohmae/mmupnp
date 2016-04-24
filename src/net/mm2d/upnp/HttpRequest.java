@@ -54,7 +54,11 @@ public class HttpRequest extends HttpMessage {
             throw new IOException("unsupported protocol." + url.getProtocol());
         }
         setAddress(InetAddress.getByName(url.getHost()));
-        setPort(url.getPort());
+        int port = url.getPort();
+        if (port < 0) {
+            port = 80;
+        }
+        setPort(port);
         setUri(url.getFile());
         if (withHostHeader) {
             setHeader(Http.HOST, getAddressString());
