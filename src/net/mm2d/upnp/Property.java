@@ -19,4 +19,13 @@ public final class Property {
         final String ver = System.getProperty("os.version");
         OS_VERSION = os + "/" + ver;
     }
+    private static boolean sGetIconOnLoadDescription = false;
+
+    static boolean isGetIconOnLoadDescription() {
+        return sGetIconOnLoadDescription;
+    }
+
+    static void setGetIconOnLoadDescription(boolean getIcon) {
+        sGetIconOnLoadDescription = getIcon;
+    }
 }
