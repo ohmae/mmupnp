@@ -39,6 +39,13 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
         try {
             final SsdpRequestMessage message = new SsdpRequestMessage(addr, dp);
+            if (SsdpMessage.M_SEARCH.equals(message.getMethod())) {
+                return;
+            }
+            if (!SsdpMessage.SSDP_BYEBYE.equals(message.getNts())
+                    && !message.hasValidLocation()) {
+                return;
+            }
             if (mListener != null) {
                 mListener.onReceiveNotify(message);
             }

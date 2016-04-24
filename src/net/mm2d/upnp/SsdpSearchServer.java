@@ -52,6 +52,9 @@ class SsdpSearchServer extends SsdpServer {
     protected void onReceive(InterfaceAddress addr, DatagramPacket dp) {
         try {
             final SsdpResponseMessage message = new SsdpResponseMessage(addr, dp);
+            if (!message.hasValidLocation()) {
+                return;
+            }
             if (mListener != null) {
                 mListener.onReceiveResponse(message);
             }

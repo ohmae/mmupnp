@@ -7,7 +7,9 @@ package net.mm2d.upnp;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -29,6 +31,7 @@ public abstract class SsdpMessage {
     private String mType;
     private String mNts;
     private String mLocation;
+    private InetAddress mPacketAddress;
     private InterfaceAddress mInterfaceAddress;
 
     protected abstract HttpMessage newMessage();
@@ -46,17 +49,23 @@ public abstract class SsdpMessage {
         mInterfaceAddress = addr;
         mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
         parseMessage();
-        if (mNts != null && mNts.equals(SSDP_BYEBYE)) {
-            return;
-        }
+        mPacketAddress = dp.getAddress();
+    }
+
+    public boolean hasValidLocation() {
         if (mLocation == null) {
-            throw new IOException("There is no Location: in header.");
+            return false;
         }
-        final String packetAddress = dp.getAddress().getHostAddress();
-        final String locationAddress = new URL(mLocation).getHost();
-        if (!packetAddress.equals(locationAddress)) {
-            throw new IOException("Location: does not match address of UDP packet.");
+        final String packetAddress = mPacketAddress.getHostAddress();
+        try {
+            final String locationAddress = new URL(mLocation).getHost();
+            if (!packetAddress.equals(locationAddress)) {
+                return false;
+            }
+        } catch (final MalformedURLException e) {
+            return false;
         }
+        return true;
     }
 
     public void parseMessage() {
