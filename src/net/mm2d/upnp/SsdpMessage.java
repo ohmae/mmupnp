@@ -46,6 +46,9 @@ public abstract class SsdpMessage {
         mInterfaceAddress = addr;
         mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
         parseMessage();
+        if (mNts != null && mNts.equals(SSDP_BYEBYE)) {
+            return;
+        }
         if (mLocation == null) {
             throw new IOException("There is no Location: in header.");
         }
