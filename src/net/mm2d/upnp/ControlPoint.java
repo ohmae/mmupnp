@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -232,7 +233,7 @@ public class ControlPoint {
         }
         mSearchList = new ArrayList<>();
         mNotifyList = new ArrayList<>();
-        mDeviceMap = Collections.synchronizedMap(new HashMap<String, Device>());
+        mDeviceMap = Collections.synchronizedMap(new LinkedHashMap<String, Device>());
         mPendingDeviceMap = new HashMap<>();
         mSubscribeServiceMap = new HashMap<>();
         mDiscoveryListeners = new ArrayList<>();
