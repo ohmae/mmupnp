@@ -383,7 +383,7 @@ public class ControlPoint {
         mStarted = false;
         synchronized (mSubscribeServiceMap) {
             final Set<Entry<String, Service>> entrySet = mSubscribeServiceMap.entrySet();
-            for (final Iterator<Entry<String, Service>> i = entrySet.iterator(); i.hasNext();) {
+            for (final Iterator<Entry<String, Service>> i = entrySet.iterator(); i.hasNext(); ) {
                 final Entry<String, Service> entry = i.next();
                 i.remove();
                 executeParallel(new Runnable() {
@@ -503,6 +503,10 @@ public class ControlPoint {
                 }
             }
         });
+    }
+
+    public int getDeviceListSize() {
+        return mDeviceMap.size();
     }
 
     public List<Device> getDeviceList() {

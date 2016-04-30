@@ -34,7 +34,8 @@ class SsdpNotifyReceiver extends SsdpServer {
     @Override
     protected void onReceive(InterfaceAddress addr, DatagramPacket dp) {
         if (!isSameSegment(addr, dp)) {
-            Log.w(TAG, "Invalid segment packet received:" + dp.getAddress().toString());
+            Log.w(TAG, "Invalid segment packet received:" + dp.getAddress().toString()
+                    + " " + addr.toString());
             return;
         }
         try {

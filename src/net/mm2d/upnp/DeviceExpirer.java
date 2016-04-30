@@ -12,7 +12,6 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
- *
  */
 class DeviceExpirer extends Thread {
     private static final String TAG = "DeviceExpirer";

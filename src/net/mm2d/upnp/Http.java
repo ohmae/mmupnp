@@ -68,6 +68,7 @@ public final class Http {
     private static final DateFormat sRfc1123Format;
     private static final DateFormat sRfc1036Format;
     private static final DateFormat sAsctimeFormat;
+
     static {
         final Locale locale = Locale.US;
         final TimeZone tz = TimeZone.getTimeZone("GMT");
@@ -119,8 +120,7 @@ public final class Http {
         HTTP_BAD_GATEWAY(502, "Bad Gateway"),
         HTTP_UNAVAILABLE(503, "Service Unavailable"),
         HTTP_GATEWAY_TIMEOUT(504, "Gateway Time-out"),
-        HTTP_VERSION(505, "HTTP Version not supported"),
-        ;
+        HTTP_VERSION(505, "HTTP Version not supported"),;
         private final int mCode;
         private final String mPhrase;
 
