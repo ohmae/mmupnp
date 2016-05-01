@@ -12,6 +12,8 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## How to use
 
+I describe Javadoc comments. Please refer to it for more information.
+
 ### Initialize and Start
 ```
 ControlPoint cp = new ControlPoint();
@@ -28,24 +30,24 @@ cp.search();
 ```
 
 ### Invoke Action
-example of invoke "Browse" (ContentDirectory)
+Example of invoke "Browse" (ContentDirectory)
 ```
-Device mediaServer = cp.getDevice(UDN);          // get device by UDN
-Action browse = mediaServer.getAction("Browse"); // get Browse action
-Map<String, String> arg = new HashMap<>();       // setup arguments
+Device mediaServer = cp.getDevice(UDN);           // get device by UDN
+Action browse = mediaServer.findAction("Browse"); // find "Browse" action
+Map<String, String> arg = new HashMap<>();        // setup arguments
 arg.put("ObjectID", "0");
 arg.put("BrowseFlag", "BrowseDirectChildren");
 arg.put("Filter", "*");
 arg.put("StartingIndex", "0");
 arg.put("RequestedCount", "0");
 arg.put("SortCriteria", "");
-Map<String, String> result = action.invoke(arg); // action invoke
-String resultXml = result.get("Result");         // get result
+Map<String, String> result = action.invoke(arg);  // action invoke
+String resultXml = result.get("Result");          // get result
 ...
 ```
 
 ### Event Subscription
-example of subscribe CDS events.
+Example of subscribe CDS events.
 ```
 // add listener to receive event
 cp.addNotifyEventListener(new NotifyEventListener(){
@@ -61,14 +63,12 @@ cds.subscribe(); // Start subscribe
 cds.unsubscribe(); // End subscribe
 ```
 
-
-### stop and terminate
+### Stop and Terminate
 ```
 cp.stop();
 cp.removeDiscoveryListener(...);
 cp.removeNotifyEventListener(...);
 cp.terminate();
-
 ```
 
 ## Author
