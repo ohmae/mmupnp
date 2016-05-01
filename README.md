@@ -12,7 +12,7 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## How to use
 
-### initialize and start
+### Initialize and Start
 ```
 ControlPoint cp = new ControlPoint();
 cp.initialize();
@@ -22,12 +22,13 @@ cp.addNotifyEventListener(...);
 cp.start();
 ```
 
-### send M-SEARCH
+### M-SEARCH
 ```
 cp.search();
 ```
 
-### example of invoke "Browse" (ContentDirectory)
+### Invoke Action
+example of invoke "Browse" (ContentDirectory)
 ```
 Device mediaServer = cp.getDevice(UDN);          // get device by UDN
 Action browse = mediaServer.getAction("Browse"); // get Browse action
@@ -43,7 +44,8 @@ String resultXml = result.get("Result");         // get result
 ...
 ```
 
-### Subscription
+### Event Subscription
+example of subscribe CDS events.
 ```
 // add listener to receive event
 cp.addNotifyEventListener(new NotifyEventListener(){
