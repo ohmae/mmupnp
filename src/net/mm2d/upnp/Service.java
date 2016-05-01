@@ -32,9 +32,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
+ * Serviceを表すクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Service {
+    /**
+     * DeviceDescriptionのパース時に使用するビルダー
+     *
+     * @see Device#loadDescription()
+     */
     public static class Builder {
         private Device mDevice;
         private String mServiceType;
@@ -43,29 +50,62 @@ public class Service {
         private String mControlUrl;
         private String mEventSubUrl;
 
+        /**
+         * インスタンス作成
+         */
         public Builder() {
         }
 
+        /**
+         * このServiceを保持するDeviceを登録する。
+         *
+         * @param device このServiceを保持するDevice
+         */
         public void setDevice(Device device) {
             mDevice = device;
         }
 
+        /**
+         * serviceTypeを登録する。
+         *
+         * @param serviceType serviceTytpe
+         */
         public void setServiceType(String serviceType) {
             mServiceType = serviceType;
         }
 
+        /**
+         * serviceIdを登録する
+         *
+         * @param serviceId serviceId
+         */
         public void setServiceId(String serviceId) {
             mServiceId = serviceId;
         }
 
+        /**
+         * SCPDURLを登録する
+         *
+         * @param scpdUrl ScpdURL
+         */
         public void setScpdUrl(String scpdUrl) {
             mScpdUrl = scpdUrl;
         }
 
+        /**
+         * conrolURLを登録する。
+         *
+         * @param controlUrl controlURL
+         */
         public void setControlUrl(String controlUrl) {
             mControlUrl = controlUrl;
         }
 
+        /**
+         * eventSubURLを登録する。
+         *
+         * @param eventSubUrl eventSubURL
+         */
         public void setEventSubUrl(String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
         }
@@ -104,38 +144,88 @@ public class Service {
         mStateVariableMap = new LinkedHashMap<>();
     }
 
+    /**
+     * このServiceを保持するDeviceを返す。
+     *
+     * @return このServiceを保持するDevice
+     */
     public Device getDevice() {
         return mDevice;
     }
 
+    /**
+     * URL関連プロパティの値からURLに変換する。
+     *
+     * @param url
+     * @return
+     * @throws MalformedURLException
+     * @see Device#getAbsoluteUrl(String)
+     */
     URL getAbsoluteUrl(String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
 
+    /**
+     * serviceTypeを返す。
+     *
+     * @return serviceType
+     */
     public String getServiceType() {
         return mServiceType;
     }
 
+    /**
+     * serviceIdを返す。
+     *
+     * @return serviceId
+     */
     public String getServiceId() {
         return mServiceId;
     }
 
+    /**
+     * SCPDURLを返す。
+     *
+     * @return SCPDURL
+     */
     public String getScpdUrl() {
         return mScpdUrl;
     }
 
+    /**
+     * controlURLを返す。
+     *
+     * @return controlURL
+     */
     public String getControlUrl() {
         return mControlUrl;
     }
 
+    /**
+     * eventSubURLを返す。
+     *
+     * @return eventSubURL
+     */
     public String getEventSubUrl() {
         return mEventSubUrl;
     }
 
+    /**
+     * ServiceDiscriptionのXMLを返す。
+     *
+     * @return ServiceDescription
+     */
     public String getDescription() {
         return mDescription;
     }
 
+    /**
+     * このサービスが保持する全Actionのリストを返す。
+     *
+     * リストは変更不可。
+     *
+     * @return 全Actionのリスト
+     */
     public List<Action> getActionList() {
         if (mActionList == null) {
             final List<Action> list = new ArrayList<>(mActionMap.values());
@@ -144,10 +234,23 @@ public class Service {
         return mActionList;
     }
 
+    /**
+     * 名前から該当するActionを探す。
+     *
+     * 見つからない場合はnullが返る。
+     *
+     * @param name Action名
+     * @return 該当するAction
+     */
     public Action findAction(String name) {
         return mActionMap.get(name);
     }
 
+    /**
+     * 全StateVariableのリストを返す。
+     *
+     * @return 全StateVariableのリスト
+     */
     public List<StateVariable> getStateVariableList() {
         if (mStateVariableList == null) {
             final List<StateVariable> list = new ArrayList<>(mStateVariableMap.values());
@@ -156,10 +259,28 @@ public class Service {
         return mStateVariableList;
     }
 
+    /**
+     * 名前から該当するStateVariableを探す。
+     *
+     * 見つからない場合はnullが返る。
+     *
+     * @param name StateVariable名
+     * @return 該当するStateVariable
+     */
     public StateVariable findStateVariable(String name) {
         return mStateVariableMap.get(name);
     }
 
+    /**
+     * SCPDURLからDescriptionを取得し、パースする。
+     *
+     * 可能であればKeepAliveを行う。
+     *
+     * @param client 通信に使用するHttpClient
+     * @throws IOException 通信エラー
+     * @throws SAXException XMLパースエラー
+     * @throws ParserConfigurationException XMLパーサーエラー
+     */
     void loadDescription(HttpClient client)
             throws IOException, SAXException, ParserConfigurationException {
         final URL url = getAbsoluteUrl(mScpdUrl);
@@ -177,7 +298,7 @@ public class Service {
         parseDescription(mDescription);
     }
 
-    void parseDescription(String xml)
+    private void parseDescription(String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -342,10 +463,23 @@ public class Service {
         return 0;
     }
 
+    /**
+     * Subscribeの実行
+     *
+     * @return 成功時true
+     * @throws IOException 通信エラー
+     */
     public boolean subscribe() throws IOException {
         return subscribe(false);
     }
 
+    /**
+     * Subscribeの実行
+     *
+     * @param keep trueを指定すると成功後、Expire前に定期的にrenewを行う。
+     * @return 成功時true
+     * @throws IOException 通信エラー
+     */
     public boolean subscribe(boolean keep) throws IOException {
         if (mEventSubUrl == null) {
             return false;
@@ -380,10 +514,23 @@ public class Service {
         return true;
     }
 
+    /**
+     * RenewSubscribeを実行する
+     *
+     * @return 成功時true
+     * @throws IOException 通信エラー
+     */
     public boolean renewSubscribe() throws IOException {
         return renewSubscribe(true);
     }
 
+    /**
+     * RenewSubscribeを実行する
+     *
+     * @param notify trueの場合期限が変化したことをSubscribeKeeperに通知する
+     * @return 成功時true
+     * @throws IOException 通信エラー
+     */
     boolean renewSubscribe(boolean notify) throws IOException {
         if (mEventSubUrl == null || mSubscriptionId == null) {
             return false;
@@ -416,6 +563,12 @@ public class Service {
         return true;
     }
 
+    /**
+     * Unsubscribeを実行する
+     *
+     * @return 成功時true
+     * @throws IOException 通信エラー
+     */
     public boolean unsubscribe() throws IOException {
         if (mEventSubUrl == null || mSubscriptionId == null) {
             return false;
@@ -439,14 +592,38 @@ public class Service {
         return true;
     }
 
+    /**
+     * Subscribeの期限切れ通知
+     */
+    void expired() {
+        mSubscriptionId = null;
+        mSubscriptionStart = 0;
+        mSubscriptionTimeout = 0;
+    }
+
+    /**
+     * SID(SubscriptionID)を返す。
+     *
+     * @return SubscriptonID
+     */
     public String getSubscriptionId() {
         return mSubscriptionId;
     }
 
+    /**
+     * Subscriptionの開始時刻
+     *
+     * @return Subscriptionの開始時刻
+     */
     public long getSubscriptionStart() {
         return mSubscriptionStart;
     }
 
+    /**
+     * Subscriptionの有効期間
+     * 
+     * @return Subscriptionの有効期間
+     */
     public long getSubscriptionTimeout() {
         return mSubscriptionTimeout;
     }

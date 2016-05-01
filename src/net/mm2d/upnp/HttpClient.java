@@ -15,6 +15,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
+ * HTTP通信を行うクライアントソケット。
+ *
+ * UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
+ * 長大なデータのやり取りは想定していない。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpClient {
@@ -23,21 +28,46 @@ public class HttpClient {
     private InputStream mInputStream;
     private OutputStream mOutputStream;
 
+    /**
+     * インスタンス作成
+     */
     public HttpClient() {
     }
 
+    /**
+     * インスタンス作成
+     *
+     * @param keepAlive keep-alive通信を行う場合
+     */
     public HttpClient(boolean keepAlive) {
         setKeepAlive(keepAlive);
     }
 
+    /**
+     * keep-alive設定がなされているか否かを返す。
+     *
+     * @return keep-alive設定がなされている場合true
+     */
     public boolean isKeepAlive() {
         return mKeepAlive;
     }
 
+    /**
+     * keep-alive設定を行う。
+     *
+     * @param keepAlive keep-aliveを行う場合true
+     */
     public void setKeepAlive(boolean keepAlive) {
         mKeepAlive = keepAlive;
     }
 
+    /**
+     * リクエストを送信し、レスポンスを受信する
+     *
+     * @param request 送信するリクエスト
+     * @return 受信したレスポンス
+     * @throws IOException 通信エラー
+     */
     public HttpResponse post(HttpRequest request) throws IOException {
         if (mSocket != null) {
             if (!mSocket.getInetAddress().equals(request.getAddress())
@@ -96,6 +126,9 @@ public class HttpClient {
         }
     }
 
+    /**
+     * ソケットのクローズを行う。
+     */
     public void close() {
         closeSocket();
     }

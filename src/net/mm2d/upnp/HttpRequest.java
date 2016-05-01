@@ -12,12 +12,17 @@ import java.net.InetAddress;
 import java.net.URL;
 
 /**
+ * HTTPリクエストメッセージを表現するクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpRequest extends HttpMessage {
     private String mMethod;
     private String mUri;
 
+    /**
+     * インスタンス作成。
+     */
     public HttpRequest() {
         super();
     }
@@ -27,6 +32,14 @@ public class HttpRequest extends HttpMessage {
         setRequestLine(line);
     }
 
+    /**
+     * リクエストラインを設定する。
+     *
+     * {@link #setStartLine(String)}のエイリアス。
+     *
+     * @param line リクエストライン
+     * @see #setStartLine(String)
+     */
     public void setRequestLine(String line) {
         final String[] params = line.split(" ");
         if (params.length < 3) {
@@ -48,10 +61,23 @@ public class HttpRequest extends HttpMessage {
         return sb.toString();
     }
 
+    /**
+     * 送信先URLを設定する。
+     *
+     * @param url 接続先URL
+     * @throws IOException http以外を指定した場合、URLのパースエラー
+     */
     public void setUrl(URL url) throws IOException {
         setUrl(url, false);
     }
 
+    /**
+     * 接続先URLを設定する。
+     *
+     * @param url 接続先URL
+     * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
+     * @throws IOException http以外を指定した場合、URLのパースエラー
+     */
     public void setUrl(URL url, boolean withHostHeader) throws IOException {
         if (!"http".equals(url.getProtocol())) {
             throw new IOException("unsupported protocol." + url.getProtocol());
@@ -68,18 +94,38 @@ public class HttpRequest extends HttpMessage {
         }
     }
 
+    /**
+     * リクエストメソッドを返す。
+     *
+     * @return リクエストメソッド
+     */
     public String getMethod() {
         return mMethod;
     }
 
+    /**
+     * リクエストメソッドを設定する。
+     *
+     * @param method リクエストメソッド
+     */
     public void setMethod(String method) {
         mMethod = method;
     }
 
+    /**
+     * URI（リクエストパス）を返す。
+     *
+     * @return URI
+     */
     public String getUri() {
         return mUri;
     }
 
+    /**
+     * URI（リクエストパス）を設定する。
+     *
+     * @param uri URI
+     */
     public void setUri(String uri) {
         mUri = uri;
     }

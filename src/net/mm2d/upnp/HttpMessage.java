@@ -19,7 +19,17 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 /**
+ * HTTPのメッセージを表現するクラスの親クラス。
+ *
+ * ResponceとRequestでStart Lineのフォーマットが異なるため
+ * その部分の実装は小クラスに任せている。
+ *
+ * UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
+ * 長大なデータのやり取りは想定していない。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @see HttpResponse
+ * @see HttpRequest
  */
 public abstract class HttpMessage {
     private static final String TAG = "HttpMessage";
@@ -36,50 +46,117 @@ public abstract class HttpMessage {
     private byte[] mBodyBinary;
     private String mBody;
 
+    /**
+     * インスタンス作成
+     */
     public HttpMessage() {
         mHeaders = new HttpHeader();
     }
 
+    /**
+     * 宛先アドレス情報を返す。
+     *
+     * @return 宛先アドレス情報。
+     */
     public InetAddress getAddress() {
         return mAddress;
     }
 
+    /**
+     * 宛先アドレスを登録する。
+     *
+     * @param address 宛先アドレス。
+     */
     public void setAddress(InetAddress address) {
         mAddress = address;
     }
 
+    /**
+     * 宛先ポート番号を返す。
+     *
+     * @return 宛先ポート番号
+     */
     public int getPort() {
         return mPort;
     }
 
+    /**
+     * 宛先ポート番号を設定する。
+     *
+     * @param port 宛先ポート番号
+     */
     public void setPort(int port) {
         mPort = port;
     }
 
+    /**
+     * アドレスとポート番号の組み合わせ文字列を返す。
+     *
+     * @return アドレスとポート番号の組み合わせ文字列
+     */
     public String getAddressString() {
+        if (mPort == 80 || mPort <= 0) {
+            return mAddress.getHostAddress();
+        }
         return mAddress.getHostAddress() + ":" + String.valueOf(mPort);
     }
 
+    /**
+     * 宛先SocketAddressを返す
+     *
+     * @return 宛先SocketAddress
+     */
     public SocketAddress getSocketAddress() {
         return new InetSocketAddress(mAddress, mPort);
     }
 
+    /**
+     * Start Lineを返す。
+     *
+     * @return Start Line
+     */
     public abstract String getStartLine();
 
+    /**
+     * Start Lineを設定する。
+     *
+     * @param line Start Line
+     */
     public abstract void setStartLine(String line);
 
+    /**
+     * HTTPバージョンの値を返す。
+     *
+     * @return HTTPバージョン
+     */
     public String getVersion() {
         return mVersion;
     }
 
+    /**
+     * HTTPバージョンを設定する。
+     *
+     * @param version HTTPバージョン
+     */
     public void setVersion(String version) {
         mVersion = version;
     }
 
+    /**
+     * ヘッダを設定する。
+     *
+     * @param name ヘッダ名
+     * @param value 値
+     */
     public void setHeader(String name, String value) {
         mHeaders.put(name, value);
     }
 
+    /**
+     * ヘッダの各行からヘッダの設定を行う
+     *
+     * @param line ヘッダの1行
+     */
     public void setHeaderLine(String line) {
         final int pos = line.indexOf(':');
         if (pos < 0) {
@@ -90,14 +167,34 @@ public abstract class HttpMessage {
         setHeader(name, value);
     }
 
+    /**
+     * ヘッダの値を返す。
+     *
+     * @param name ヘッダ名
+     * @return ヘッダの値
+     */
     public String getHeader(String name) {
         return mHeaders.get(name);
     }
 
+    /**
+     * ヘッダの値からチャンク伝送か否かを返す。
+     *
+     * @return チャンク伝送の場合true
+     */
     public boolean isChunked() {
         return mHeaders.containsValue(Http.TRANSFER_ENCODING, Http.CHUNKED);
     }
 
+    /**
+     * ヘッダの値からKeepAliveか否かを返す。
+     *
+     * HTTP/1.0の場合、Connection: keep-aliveの場合に
+     * HTTP/1.1の場合、Connection: closeでない場合に
+     * KeepAliveと判定する。
+     *
+     * @return KeepAliveの場合true
+     */
     public boolean isKeepAlive() {
         if (mVersion.equals(Http.HTTP_1_0)) {
             return mHeaders.containsValue(Http.CONNECTION, Http.KEEP_ALIVE);
@@ -105,6 +202,13 @@ public abstract class HttpMessage {
         return !mHeaders.containsValue(Http.CONNECTION, Http.CLOSE);
     }
 
+    /**
+     * Content-Lengthの値を返す。
+     *
+     * 不明な場合0
+     *
+     * @return Content-Lengthの値
+     */
     public int getContentLength() {
         final String len = mHeaders.get(Http.CONTENT_LENGTH);
         if (len != null) {
@@ -117,6 +221,12 @@ public abstract class HttpMessage {
         return 0;
     }
 
+    /**
+     * メッセージボディを設定する。
+     *
+     * @param body メッセージボディ
+     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     */
     public void setBody(String body, boolean withContentLength) {
         setBody(body);
         if (withContentLength) {
@@ -125,6 +235,12 @@ public abstract class HttpMessage {
         }
     }
 
+    /**
+     * メッセージボディを設定する。
+     *
+     * @param body メッセージボディ
+     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     */
     public void setBodyBinary(byte[] body, boolean withContentLength) {
         setBodyBinary(body);
         if (withContentLength) {
@@ -133,6 +249,11 @@ public abstract class HttpMessage {
         }
     }
 
+    /**
+     * メッセージボディを設定する。
+     *
+     * @param body メッセージボディ
+     */
     public void setBody(String body) {
         mBody = body;
         if (body == null || body.isEmpty()) {
@@ -146,6 +267,11 @@ public abstract class HttpMessage {
         }
     }
 
+    /**
+     * メッセージボディを返す。
+     *
+     * @return メッセージボディ
+     */
     public String getBody() {
         if (mBody == null && mBodyBinary != null) {
             try {
@@ -157,11 +283,21 @@ public abstract class HttpMessage {
         return mBody;
     }
 
+    /**
+     * メッセージボディを設定する。
+     *
+     * @param body メッセージボディ
+     */
     public void setBodyBinary(byte[] body) {
         mBodyBinary = body;
         mBody = null;
     }
 
+    /**
+     * メッセージボディを返す。
+     *
+     * @return メッセージボディ
+     */
     public byte[] getBodyBinary() {
         return mBodyBinary;
     }
@@ -171,6 +307,11 @@ public abstract class HttpMessage {
         return getMessageString();
     }
 
+    /**
+     * ヘッダ部分を文字列として返す。
+     *
+     * @return ヘッダ文字列
+     */
     public String getHeaderString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
@@ -185,6 +326,11 @@ public abstract class HttpMessage {
         return sb.toString();
     }
 
+    /**
+     * ヘッダ部分をbyte配列として返す。
+     *
+     * @return ヘッダバイナリ
+     */
     private byte[] getHeaderBytes() {
         try {
             return getHeaderString().getBytes(CHARSET);
@@ -194,6 +340,11 @@ public abstract class HttpMessage {
         return new byte[0];
     }
 
+    /**
+     * メッセージを文字列として返す。
+     *
+     * @return メッセージ文字列
+     */
     public String getMessageString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
@@ -212,6 +363,12 @@ public abstract class HttpMessage {
         return sb.toString();
     }
 
+    /**
+     * 指定されたOutputStreamにメッセージの内容を書き出す。
+     *
+     * @param os 出力先
+     * @throws IOException 入出力エラー
+     */
     public void writeData(OutputStream os) throws IOException {
         os.write(getHeaderBytes());
         if (mBodyBinary != null) {
@@ -220,6 +377,13 @@ public abstract class HttpMessage {
         os.flush();
     }
 
+    /**
+     * 指定されたInputStreamからデータの読み出しを行う。
+     *
+     * @param is 入力元
+     * @return 成功した場合true
+     * @throws IOException 入出力エラー
+     */
     public boolean readData(InputStream is) throws IOException {
         final String startLine = readLine(is);
         if (startLine == null || startLine.length() == 0) {

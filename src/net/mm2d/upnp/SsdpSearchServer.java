@@ -13,30 +13,66 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 
 /**
+ * SSDP M-SEARCHとそのレスポンス受信を行うクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpSearchServer extends SsdpServer {
+    /**
+     * M-SEARCHによるレスポンス受信を受け取るリスナー。
+     */
     public interface ResponseListener {
+        /**
+         * M-SEARCHレスポンス受信時にコール。
+         *
+         * @param message 受信したレスポンスメッセージ
+         */
         void onReceiveResponse(SsdpResponseMessage message);
     }
 
+    /**
+     * ST(SearchType) 全機器。
+     */
     public static final String ST_ALL = "ssdp:all";
+    /**
+     * ST(SearchType) rootdevice。
+     */
     public static final String ST_ROOTDEVICE = "upnp:rootdevice";
 
     private ResponseListener mListener;
 
+    /**
+     * インスタンス作成。
+     *
+     * @param ni 使用するインターフェース
+     */
     public SsdpSearchServer(NetworkInterface ni) {
         super(ni);
     }
 
+    /**
+     * レスポンス受信リスナーを登録する。
+     *
+     * @param listener リスナー
+     */
     public void setResponseListener(ResponseListener listener) {
         mListener = listener;
     }
 
+    /**
+     * M-SEARCHを実行する。
+     *
+     * STはssdp:allで実行する。
+     */
     public void search() {
         search(null);
     }
 
+    /**
+     * M-SEARCHを実行する。
+     *
+     * @param st STの値
+     */
     public void search(String st) {
         if (st == null) {
             st = ST_ALL;

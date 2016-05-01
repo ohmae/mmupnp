@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Deviceの有効期限を確認し、有効期限が切れたDeviceをLost扱いするクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class DeviceExpirer extends Thread {
@@ -29,31 +31,55 @@ class DeviceExpirer extends Thread {
         }
     };
 
+    /**
+     * インスタンス作成。
+     *
+     * @param cp ControlPoint
+     */
     public DeviceExpirer(ControlPoint cp) {
         super(TAG);
         mDeviceList = new ArrayList<>();
         mControlPoint = cp;
     }
 
+    /**
+     * スレッドに割り込みをかけ終了させる。
+     */
     public void shutdownRequest() {
         mShutdownRequest = true;
         interrupt();
     }
 
+    /**
+     * Deviceの有効期限変化時にコールする。
+     */
     public synchronized void update() {
         Collections.sort(mDeviceList, mComparator);
     }
 
+    /**
+     * Device追加。
+     *
+     * @param device 追加されるDevice
+     */
     public synchronized void add(Device device) {
         mDeviceList.add(device);
         Collections.sort(mDeviceList, mComparator);
         notifyAll();
     }
 
+    /**
+     * Device削除。
+     *
+     * @param device 削除されるDevice。
+     */
     public synchronized void remove(Device device) {
         mDeviceList.remove(device);
     }
 
+    /**
+     * 登録されたDeviceをクリア。
+     */
     public synchronized void clear() {
         mDeviceList.clear();
     }

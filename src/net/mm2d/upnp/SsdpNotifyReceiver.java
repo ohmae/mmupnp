@@ -16,26 +16,49 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 
 /**
+ * SSDP NOTIFYを受信するクラス
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpNotifyReceiver extends SsdpServer {
+    /**
+     * NOTIFY受信を受け取るリスナー。
+     */
     public interface NotifyListener {
+        /**
+         * NOTIFY受信時にコール。
+         *
+         * @param message 受信したNOTFYメッセージ
+         */
         void onReceiveNotify(SsdpRequestMessage message);
     }
 
     private static final String TAG = "SsdpNotifyReceiver";
     private NotifyListener mListener;
 
+    /**
+     * インスタンス作成。
+     *
+     * @param ni 使用するインターフェース
+     */
     public SsdpNotifyReceiver(NetworkInterface ni) {
         super(ni, SSDP_PORT);
     }
 
+    /**
+     * NOTIFY受信リスナーを登録する。
+     *
+     * @param listener リスナー
+     */
     public void setNotifyListener(NotifyListener listener) {
         mListener = listener;
     }
 
     @Override
     protected void onReceive(InterfaceAddress addr, DatagramPacket dp) {
+        // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
+        // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
+        // 受け取っても無駄なので破棄する。
         if (!isSameSegment(addr, dp)) {
             Log.w(TAG, "Invalid segment packet received:" + dp.getAddress().toString()
                     + " " + addr.toString());
@@ -43,6 +66,7 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
         try {
             final SsdpRequestMessage message = new SsdpRequestMessage(addr, dp);
+            // M-SEARCHパケットは無視する
             if (SsdpMessage.M_SEARCH.equals(message.getMethod())) {
                 return;
             }

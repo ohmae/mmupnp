@@ -8,6 +8,8 @@
 package net.mm2d.upnp;
 
 /**
+ * HTTPレスポンスメッセージを表現するクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpResponse extends HttpMessage {
@@ -20,6 +22,14 @@ public class HttpResponse extends HttpMessage {
         setStatusLine(line);
     }
 
+    /**
+     * ステータスラインを設定する。
+     *
+     * {@link #setStartLine(String)}のエイリアス。
+     *
+     * @param line ステータスライン
+     * @see #setStartLine(String)
+     */
     public void setStatusLine(String line) {
         final String[] params = line.split(" ");
         if (params.length < 3) {
@@ -47,10 +57,22 @@ public class HttpResponse extends HttpMessage {
         return sb.toString();
     }
 
+    /**
+     * ステータスコードを返す
+     *
+     * @return ステータスコード
+     * @see #getStatus()
+     */
     public int getStatusCode() {
         return mStatusCode;
     }
 
+    /**
+     * ステータスコードを設定する。
+     *
+     * @param code ステータスコード
+     * @see #setStatus(net.mm2d.upnp.Http.Status)
+     */
     public void setStatusCode(int code) {
         mStatusCode = code;
         mStatus = Http.Status.valueOf(code);
@@ -59,20 +81,42 @@ public class HttpResponse extends HttpMessage {
         }
     }
 
+    /**
+     * レスポンスフレーズを取得する
+     *
+     * @return レスポンスフレーズ
+     * @see #getStatus()
+     */
     public String getReasonPhrase() {
         return mReasonPhrase;
     }
 
+    /**
+     * レスポンスフレーズを設定する。
+     *
+     * @param reasonPhrase レスポンスフレーズ
+     * @see #setStatus(net.mm2d.upnp.Http.Status)
+     */
     public void setReasonPhrase(String reasonPhrase) {
         mReasonPhrase = reasonPhrase;
     }
 
+    /**
+     * ステータスを設定する。
+     *
+     * @param status ステータス
+     */
     public void setStatus(Http.Status status) {
         mStatus = status;
         mStatusCode = status.getCode();
         mReasonPhrase = status.getPhrase();
     }
 
+    /**
+     * ステータスを取得する。
+     *
+     * @return ステータス
+     */
     public Http.Status getStatus() {
         return mStatus;
     }

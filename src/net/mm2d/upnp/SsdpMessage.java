@@ -16,14 +16,34 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
+ * SSDPメッセージを表現するクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public abstract class SsdpMessage {
+    /**
+     * M-SEARCHのリスエストメソッド
+     */
     public static final String M_SEARCH = "M-SEARCH";
+    /**
+     * NOTIFYのリクエストメソッド
+     */
     public static final String NOTIFY = "NOTIFY";
+    /**
+     * NTSの値：ssdp:alive
+     */
     public static final String SSDP_ALIVE = "ssdp:alive";
+    /**
+     * NTSの値：ssdp:byebye
+     */
     public static final String SSDP_BYEBYE = "ssdp:byebye";
+    /**
+     * NTSの値：ssdp:update
+     */
     public static final String SSDP_UPDATE = "ssdp:update";
+    /**
+     * MANの値：ssdp:discover
+     */
     public static final String SSDP_DISCOVER = "\"ssdp:discover\"";
 
     private final HttpMessage mMessage;
@@ -37,24 +57,51 @@ public abstract class SsdpMessage {
     private InetAddress mPacketAddress;
     private InterfaceAddress mInterfaceAddress;
 
+    /**
+     * 内部表現としての{@link HttpMessage}のインスタンスを作成する。
+     *
+     * {@link HttpRequest}か{@link HttpResponse}のインスタンスを返すように小クラスで実装する。
+     *
+     * @return {@link HttpMessage}のインスタンス
+     */
     protected abstract HttpMessage newMessage();
 
+    /**
+     * 内部表現としての{@link HttpMessage}を返す。
+     * 
+     * @return 内部表現としての{@link HttpMessage}
+     */
     protected HttpMessage getMessage() {
         return mMessage;
     }
 
+    /**
+     * インスタンス作成。
+     */
     public SsdpMessage() {
         mMessage = newMessage();
     }
 
-    public SsdpMessage(InterfaceAddress addr, DatagramPacket dp) throws IOException {
+    /**
+     * 受信した情報からインスタンス作成
+     *
+     * @param ifa 受信したInterfaceAddress
+     * @param dp 受信したDatagramPacket
+     * @throws IOException 入出力エラー
+     */
+    public SsdpMessage(InterfaceAddress ifa, DatagramPacket dp) throws IOException {
         mMessage = newMessage();
-        mInterfaceAddress = addr;
+        mInterfaceAddress = ifa;
         mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
         parseMessage();
         mPacketAddress = dp.getAddress();
     }
 
+    /**
+     * Locationに記述のアドレスとパケットの送信元アドレスが一致しているかを返す。
+     *
+     * @return 一致している場合true
+     */
     public boolean hasValidLocation() {
         if (mLocation == null) {
             return false;
@@ -71,7 +118,7 @@ public abstract class SsdpMessage {
         return true;
     }
 
-    public void parseMessage() {
+    private void parseMessage() {
         parseCacheControl();
         parseUsn();
         mExpireTime = mMaxAge * 1000 + System.currentTimeMillis();
@@ -79,6 +126,11 @@ public abstract class SsdpMessage {
         mNts = mMessage.getHeader(Http.NTS);
     }
 
+    /**
+     * このパケットを受信したInterfaceAddressを返す。
+     * 
+     * @return このパケットを受信したInterfaceAddress
+     */
     public InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
     }
@@ -115,34 +167,78 @@ public abstract class SsdpMessage {
         }
     }
 
+    /**
+     * ヘッダの値を返す。
+     *
+     * @param name ヘッダ名
+     * @return 値
+     */
     public String getHeader(String name) {
         return mMessage.getHeader(name);
     }
 
+    /**
+     * ヘッダの値を設定する。
+     *
+     * @param name ヘッダ名
+     * @param value 値
+     */
     public void setHeader(String name, String value) {
         mMessage.setHeader(name, value);
     }
 
+    /**
+     * USNに記述されたUUIDを返す。
+     *
+     * @return UUID
+     */
     public String getUuid() {
         return mUuid;
     }
 
+    /**
+     * USNに記述されたTypeを返す。
+     *
+     * @return Type
+     */
     public String getType() {
         return mType;
     }
 
+    /**
+     * NTSフィールドの値を返す。
+     *
+     * @return NSTフィールドの値
+     */
     public String getNts() {
         return mNts;
     }
 
+    /**
+     * max-ageの値を返す。
+     *
+     * @return max-ageの値
+     */
     public int getMaxAge() {
         return mMaxAge;
     }
 
+    /**
+     * 有効期限が切れる時刻を返す。
+     *
+     * 受信時刻からmax-ageを加算した時刻
+     *
+     * @return 有効期限が切れる時刻
+     */
     public long getExpireTime() {
         return mExpireTime;
     }
 
+    /**
+     * Locationの値を返す。
+     *
+     * @return Locationの値
+     */
     public String getLocation() {
         return mLocation;
     }

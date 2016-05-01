@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -83,9 +82,9 @@ class SubscribeKeeper extends Thread {
                     }
                     work = new ArrayList<>(mServiceList);
                 }
-                final long current = System.currentTimeMillis();
+                final long now = System.currentTimeMillis();
                 for (final Service service : work) {
-                    if (getRenewTime(service) < current) {
+                    if (getRenewTime(service) < now) {
                         try {
                             service.renewSubscribe(false);
                         } catch (final IOException e) {
@@ -95,17 +94,9 @@ class SubscribeKeeper extends Thread {
                         break;
                     }
                 }
+                mControlPoint.removeExpiredSubscribeService();
                 synchronized (this) {
                     Collections.sort(mServiceList, mComparator);
-                    final Iterator<Service> i = mServiceList.iterator();
-                    while (i.hasNext()) {
-                        final Service service = i.next();
-                        if (service.getSubscriptionStart()
-                                + service.getSubscriptionTimeout() < current) {
-                            mControlPoint.unregisterSubscribeService(service, true);
-                            i.remove();
-                        }
-                    }
                     if (mServiceList.size() != 0) {
                         final Service service = mServiceList.get(0);
                         long sleep = getRenewTime(service) - System.currentTimeMillis();

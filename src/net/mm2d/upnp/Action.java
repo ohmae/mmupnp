@@ -41,34 +41,72 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 /**
+ * Actionを表現するクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Action {
+    /**
+     * ServiceDescriptionのパース時に使用するビルダー
+     *
+     * @see Device#loadDescription()
+     * @see Service#loadDescription(HttpClient)
+     */
     public static class Builder {
         private Service mService;
         private String mName;
         private final List<Argument.Builder> mArgumentList;
 
+        /**
+         * インスタンス作成。
+         */
         public Builder() {
             mArgumentList = new ArrayList<>();
         }
 
+        /**
+         * このActionを保持するServiceへの参照を登録。
+         *
+         * @param service このActionを保持するService
+         */
         public void serService(Service service) {
             mService = service;
         }
 
+        /**
+         * Action名を登録する。
+         *
+         * @param name Action名
+         */
         public void setName(String name) {
             mName = name;
         }
 
+        /**
+         * Argumentのビルダーを登録する。
+         *
+         * Actionのインスタンス作成後にArgumentを登録することはできない
+         *
+         * @param argument Argumentのビルダー
+         */
         public void addArgumentBuilder(Argument.Builder argument) {
             mArgumentList.add(argument);
         }
 
+        /**
+         * Argumentのビルダーリストを返す。
+         *
+         * @return Argumentのビルダーリスト
+         */
         public List<Argument.Builder> getArgumentBuilderList() {
             return mArgumentList;
         }
 
+        /**
+         * Actionのインスタンスを作成する。
+         *
+         * @return Actionのインスタンス
+         */
         public Action build() {
             return new Action(this);
         }
@@ -85,7 +123,7 @@ public class Action {
     private Action(Builder builder) {
         mService = builder.mService;
         mName = builder.mName;
-        mArgumentMap = new LinkedHashMap<>();
+        mArgumentMap = new LinkedHashMap<>(builder.mArgumentList.size());
         for (final Argument.Builder b : builder.mArgumentList) {
             b.setAction(this);
             final Argument argument = b.build();
@@ -93,19 +131,37 @@ public class Action {
         }
     }
 
+    /**
+     * このActionを保持するServiceを返す。
+     *
+     * @return このActionを保持するService
+     */
     public Service getService() {
         return mService;
     }
 
+    /**
+     * Action名を返す。
+     *
+     * @return Action名
+     */
     public String getName() {
         return mName;
     }
 
+    /**
+     * Argumentリストを返す。
+     *
+     * リストは変更不可であり、
+     * 変更しようとするとUnsupportedOperationExceptionが発生する。
+     *
+     * @return Argumentリスト
+     */
     public List<Argument> getArgumentList() {
         if (mArgumentList == null) {
-            mArgumentList = new ArrayList<>(mArgumentMap.values());
+            mArgumentList = Collections.unmodifiableList(new ArrayList<>(mArgumentMap.values()));
         }
-        return Collections.unmodifiableList(mArgumentList);
+        return mArgumentList;
     }
 
     private String getSoapActionName() {
@@ -113,6 +169,20 @@ public class Action {
                 + '#' + mName + '"';
     }
 
+    /**
+     * Actionを実行する。
+     *
+     * 実行引数及び実行結果はArgument名をkeyとし、値をvalueとしたMapでやり取りする。
+     * 値はすべてStringで表現する。
+     * Argument(StateVariable)のDataTypeに応じた値チェックは行われない。
+     * 引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が反映される。
+     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     * 実行後エラー応答があった場合のパースには未対応であり、IOExceptionが発生するのみ。
+     *
+     * @param arguments 引数
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     */
     public Map<String, String> invoke(Map<String, String> arguments)
             throws IOException {
         final String soap = makeSoap(arguments);

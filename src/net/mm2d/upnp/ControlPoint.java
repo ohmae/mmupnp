@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.upnp.EventReceiver.EventPacketListener;
+import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.Log;
@@ -44,16 +44,47 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
+ * UPnP ControlPointのクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ControlPoint {
+    /**
+     * 機器発見イベント通知用リスナー。
+     */
     public interface DiscoveryListener {
+        /**
+         * 機器発見時にコールされる。
+         *
+         * @param device 発見したDevice
+         * @see Device
+         */
         void onDiscover(Device device);
 
+        /**
+         * 機器喪失時にコールされる。
+         *
+         * 有効期限切れ、SSDP byebye受信、ControlPointの停止によって発生する
+         *
+         * @param device 喪失したDevice
+         * @see Device
+         */
         void onLost(Device device);
     }
 
+    /**
+     * NotifyEvent通知を受け取るリスナー。
+     */
     public interface NotifyEventListener {
+        /**
+         * NofiyEvnet受信時にコールされる。
+         *
+         * @param service 対応するService
+         * @param seq シーケンス番号
+         * @param variable 変数名
+         * @param value 値
+         * @see Service
+         */
         void onNotifyEvent(Service service, long seq, String variable, String value);
     }
 
@@ -65,7 +96,7 @@ public class ControlPoint {
     private final Map<String, Device> mDeviceMap;
     private final Map<String, Device> mPendingDeviceMap;
     private final Map<String, Service> mSubscribeServiceMap;
-    private final EventReceiver mEventServer;
+    private final EventReceiver mEventReseiver;
     private final ExecutorService mCachedThreadPool;
     private final ExecutorService mNotifyExecutor;
     private boolean mInitialized = false;
@@ -153,7 +184,7 @@ public class ControlPoint {
         }
     }
 
-    private final EventPacketListener mEventPacketListener = new EventPacketListener() {
+    private final EventMessageListener mEventMessageListener = new EventMessageListener() {
         @Override
         public boolean onEventReceived(HttpRequest request) {
             final String sid = request.getHeader(Http.SID);
@@ -223,10 +254,23 @@ public class ControlPoint {
         }
     }
 
+    /**
+     * インスタンス作成。
+     *
+     * 使用するインターフェースは自動的に選定される。
+     *
+     * @throws IllegalStateException 使用可能なインターフェースがない
+     */
     public ControlPoint() throws IllegalStateException {
         this(null);
     }
 
+    /**
+     * 利用するインターフェースを指定してインスタンス作成。
+     *
+     * @param interfaces 使用するインターフェース、nullの場合自動選択となる。
+     * @throws IllegalStateException 使用可能なインターフェースがない。
+     */
     public ControlPoint(Collection<NetworkInterface> interfaces) throws IllegalStateException {
         if (interfaces == null) {
             interfaces = getValidNetworkInterfaces();
@@ -251,8 +295,8 @@ public class ControlPoint {
             notify.setNotifyListener(mNotifyListener);
             mNotifyList.add(notify);
         }
-        mEventServer = new EventReceiver();
-        mEventServer.setEventPacketListener(mEventPacketListener);
+        mEventReseiver = new EventReceiver();
+        mEventReseiver.setEventMessageListener(mEventMessageListener);
     }
 
     private Collection<NetworkInterface> getValidNetworkInterfaces() {
@@ -309,6 +353,16 @@ public class ControlPoint {
         return true;
     }
 
+    /**
+     * 初期化を行う。
+     *
+     * 利用前にかならず実行する。
+     * 一度初期化を行うと再初期化は不可能。
+     * インターフェースの変更など、再初期化が必要な場合はインスタンスの生成からやり直すこと。
+     * また、終了する際は必ず{@link #terminate()}をコールすること。
+     *
+     * @see #initialize()
+     */
     public void initialize() {
         if (mInitialized) {
             return;
@@ -324,6 +378,16 @@ public class ControlPoint {
         mInitialized = true;
     }
 
+    /**
+     * 終了処理を行う。
+     *
+     * 動作中の場合、停止処理を行う。
+     * 一度終了処理を行ったあとは再初期化は不可能。
+     * インスタンス参照を破棄すること。
+     *
+     * @see #stop()
+     * @see #initialize()
+     */
     public void terminate() {
         if (mStarted) {
             stop();
@@ -348,6 +412,15 @@ public class ControlPoint {
         mDeviceExpirer = null;
     }
 
+    /**
+     * 処理を開始する。
+     *
+     * 本メソッドのコール前はネットワークに関連する処理を実行することはできない。
+     * 既に開始状態の場合は何も行われない。
+     * 一度開始したあとであっても、停止処理後であれば再度開始可能。
+     *
+     * @see #initialize()
+     */
     public void start() {
         if (!mInitialized) {
             initialize();
@@ -357,7 +430,7 @@ public class ControlPoint {
         }
         mStarted = true;
         try {
-            mEventServer.open();
+            mEventReseiver.open();
         } catch (final IOException e1) {
             Log.w(TAG, e1);
         }
@@ -379,6 +452,15 @@ public class ControlPoint {
         }
     }
 
+    /**
+     * 処理を停止する。
+     *
+     * 開始していない状態、既に停止済みの状態の場合なにも行われない。
+     * 停止に伴い発見済みDeviceはLost扱いとなる。
+     * 停止後は発見済みDeviceのインスタンスを保持していても正常に動作しない。
+     *
+     * @see #start()
+     */
     public void stop() {
         if (!mStarted) {
             return;
@@ -386,7 +468,7 @@ public class ControlPoint {
         mStarted = false;
         synchronized (mSubscribeServiceMap) {
             final Set<Entry<String, Service>> entrySet = mSubscribeServiceMap.entrySet();
-            for (final Iterator<Entry<String, Service>> i = entrySet.iterator(); i.hasNext(); ) {
+            for (final Iterator<Entry<String, Service>> i = entrySet.iterator(); i.hasNext();) {
                 final Entry<String, Service> entry = i.next();
                 i.remove();
                 executeParallel(new Runnable() {
@@ -413,7 +495,7 @@ public class ControlPoint {
         for (final SsdpServer server : mNotifyList) {
             server.close();
         }
-        mEventServer.close();
+        mEventReseiver.close();
         mSubscribeKeeper.clear();
         final List<Device> list = new ArrayList<>(mDeviceMap.values());
         for (final Device device : list) {
@@ -423,10 +505,23 @@ public class ControlPoint {
         mDeviceExpirer.clear();
     }
 
+    /**
+     * Searchパケットを送出する。
+     *
+     * {@link #search(String)}を
+     * search(null)でコールするのと等価。
+     */
     public void search() {
         search(null);
     }
 
+    /**
+     * Searchパケットを送出する。
+     *
+     * stがnullの場合、"ssdp:all"として動作する。
+     *
+     * @param st SearchパケットのSTフィールド
+     */
     public void search(String st) {
         if (!mStarted) {
             throw new IllegalStateException("ControlPoint is not started.");
@@ -436,6 +531,12 @@ public class ControlPoint {
         }
     }
 
+    /**
+     * 機器発見のリスナーを登録する。
+     *
+     * @param listener リスナー
+     * @see DiscoveryListener
+     */
     public void addDiscoveryListener(DiscoveryListener listener) {
         synchronized (mDiscoveryListeners) {
             if (!mDiscoveryListeners.contains(listener)) {
@@ -444,12 +545,24 @@ public class ControlPoint {
         }
     }
 
+    /**
+     * 機器発見リスナーを削除する。
+     *
+     * @param listener リスナー
+     * @see DiscoveryListener
+     */
     public void removeDiscoveryListener(DiscoveryListener listener) {
         synchronized (mDiscoveryListeners) {
             mDiscoveryListeners.remove(listener);
         }
     }
 
+    /**
+     * NotifyEvent受信リスナーを登録する。
+     *
+     * @param listener リスナー
+     * @see NotifyEventListener
+     */
     public void addNotifyEventListener(NotifyEventListener listener) {
         synchronized (mNotifyEventListeners) {
             if (!mNotifyEventListeners.contains(listener)) {
@@ -458,13 +571,19 @@ public class ControlPoint {
         }
     }
 
+    /**
+     * NotifyEvent受信リスナーを削除する。
+     *
+     * @param listener リスナー
+     * @see NotifyEventListener
+     */
     public void removeNotifyEventListener(NotifyEventListener listener) {
         synchronized (mNotifyEventListeners) {
             mNotifyEventListeners.remove(listener);
         }
     }
 
-    void discoverDevice(final Device device) {
+    private void discoverDevice(final Device device) {
         synchronized (mDeviceMap) {
             mDeviceMap.put(device.getUuid(), device);
             mDeviceExpirer.add(device);
@@ -481,10 +600,21 @@ public class ControlPoint {
         });
     }
 
-    void lostDevice(Device device) {
+    private void lostDevice(Device device) {
         lostDevice(device, false);
     }
 
+    /**
+     * デバイスの喪失を行う。
+     *
+     * Expirerからコールするためにパッケージデフォルトとする
+     * 他からはコールしないこと。
+     *
+     * @param device 喪失してデバイス
+     * @param fromExpirer trueの場合Expirerに通知しない。
+     * @see Device
+     * @see DeviceExpirer
+     */
     void lostDevice(final Device device, boolean fromExpirer) {
         synchronized (mDeviceMap) {
             final List<Service> list = device.getServiceList();
@@ -508,53 +638,129 @@ public class ControlPoint {
         });
     }
 
+    /**
+     * 発見したデバイスの数を返す。
+     *
+     * @return デバイスの数
+     */
     public int getDeviceListSize() {
         return mDeviceMap.size();
     }
 
+    /**
+     * 発見したデバイスのリストを返す。
+     *
+     * 内部で保持するリストのコピーが返される。
+     *
+     * @return デバイスのリスト
+     * @see Device
+     */
     public List<Device> getDeviceList() {
         synchronized (mDeviceMap) {
             return new ArrayList<>(mDeviceMap.values());
         }
     }
 
+    /**
+     * 指定UDNのデバイスを返す。
+     *
+     * 見つからない場合nullが返る。
+     *
+     * @param udn UDN
+     * @return 指定UDNのデバイス
+     * @see Device
+     */
     public Device getDevice(String udn) {
         return mDeviceMap.get(udn);
     }
 
+    /**
+     * イベント通知を受け取るポートを返す。
+     *
+     * @return イベント通知受信用ポート番号
+     * @see EventReceiver
+     */
     int getEventPort() {
-        return mEventServer.getLocalPort();
+        return mEventReseiver.getLocalPort();
     }
 
+    /**
+     * SubscriptionIDに合致するServiceを返す。
+     *
+     * 合致するServiceがない場合null
+     *
+     * @param subscriptionId SubscriptionID
+     * @return 該当Service
+     * @see Service
+     */
     Service getSubscribeService(String subscriptionId) {
         synchronized (mSubscribeServiceMap) {
             return mSubscribeServiceMap.get(subscriptionId);
         }
     }
 
+    /**
+     * SubscriptionIDが確定したServiceを購読リストに登録する
+     *
+     * Serviceのsubscribeが実行された後にServiceからコールされる。
+     *
+     * @param service 登録するService
+     * @see Service
+     * @see Service#subscribe()
+     */
     void registerSubscribeService(Service service) {
         synchronized (mSubscribeServiceMap) {
             mSubscribeServiceMap.put(service.getSubscriptionId(), service);
         }
     }
 
+    /**
+     * 指定SubscriptionIDのサービスを購読リストから削除する。
+     *
+     * @param service 削除するService
+     * @see Service
+     * @see Service#unsubscribe()
+     */
     void unregisterSubscribeService(Service service) {
-        unregisterSubscribeService(service, false);
-    }
-
-    void unregisterSubscribeService(Service service, boolean fromKeeper) {
         synchronized (mSubscribeServiceMap) {
             mSubscribeServiceMap.remove(service.getSubscriptionId());
         }
-        if (!fromKeeper) {
-            mSubscribeKeeper.remove(service);
+        mSubscribeKeeper.remove(service);
+    }
+
+    /**
+     * 購読期限切れのServiceを削除する。
+     */
+    void removeExpiredSubscribeService() {
+        synchronized (mSubscribeServiceMap) {
+            final long now = System.currentTimeMillis();
+            final Iterator<Entry<String, Service>> i = mSubscribeServiceMap.entrySet().iterator();
+            while (i.hasNext()) {
+                final Service service = i.next().getValue();
+                if (service.getSubscriptionStart()
+                        + service.getSubscriptionTimeout() < now) {
+                    mSubscribeKeeper.remove(service);
+                    i.remove();
+                    service.expired();
+                }
+            }
         }
     }
 
+    /**
+     * Subscribe継続処理へ登録する。
+     *
+     * @param service 登録するService
+     * @see Service
+     * @see SubscribeKeeper
+     */
     void addSubscribeKeeper(Service service) {
         mSubscribeKeeper.add(service);
     }
 
+    /**
+     * renew処理実行の通知
+     */
     void renewSubscribeService() {
         mSubscribeKeeper.update();
     }

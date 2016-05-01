@@ -14,20 +14,58 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * デバッグログ出力クラス。
+ *
+ * android.util.Logと同様のインターフェースで作成。
+ * 出力先は{@link Print}インターフェースを実装したクラスで置換可能。
+ * また、{@link #setLogLevel(int)}によりログレベルを動的に変更することが可能で
+ * 指定したレベル以下のログを表示させないようにすることができる。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Log {
+    /**
+     * ログレベルVERBOSE
+     */
     public static final int VERBOSE = 2;
+    /**
+     * ログレベルDEBUG
+     */
     public static final int DEBUG = 3;
+    /**
+     * ログレベルINFO
+     */
     public static final int INFO = 4;
+    /**
+     * ログレベルWARN
+     */
     public static final int WARN = 5;
+    /**
+     * ログレベルERROR
+     */
     public static final int ERROR = 6;
+    /**
+     * ログれレベルARRERT
+     */
     public static final int ASSERT = 7;
 
+    /**
+     * 出力処理のインターフェース
+     */
     public interface Print {
+        /**
+         * ログ出力を行う
+         *
+         * @param level ログレベル
+         * @param tag タグ
+         * @param message メッセージ
+         */
         void println(int level, String tag, String message);
     }
 
+    /**
+     * System.outへ出力するデフォルトの出力処理
+     */
     private static class DefaultPrint implements Print {
         private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -91,54 +129,149 @@ public class Log {
     private static Print sPrint = new DefaultPrint();
     private static int sLogLevel = VERBOSE;
 
+    /**
+     * 出力処理を変更する。
+     *
+     * @param print 出力処理
+     */
     public static void setPrint(Print print) {
         sPrint = print;
     }
 
+    /**
+     * ログレベルを変更する。
+     *
+     * 設定した値以上のログを出力する。
+     *
+     * @param level ログレベル。
+     */
     public static void setLogLevel(int level) {
         sLogLevel = level;
     }
 
+    /**
+     * VERBOSEレベルでのログ出力を行う。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     */
     public static void v(String tag, String message) {
         println(VERBOSE, tag, message);
     }
 
+    /**
+     * VERBOSEレベルでのログ出力を行う。
+     *
+     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     * @param tr Throwable
+     */
     public static void v(String tag, String message, Throwable tr) {
         println(VERBOSE, tag, message, tr);
     }
 
+    /**
+     * DEBUGレベルでのログ出力を行う。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     */
     public static void d(String tag, String message) {
         println(DEBUG, tag, message);
     }
 
+    /**
+     * DEBUGレベルでのログ出力を行う。
+     *
+     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     * @param tr Throwable
+     */
     public static void d(String tag, String message, Throwable tr) {
         println(DEBUG, tag, message, tr);
     }
 
+    /**
+     * INFOレベルでのログ出力を行う。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     */
     public static void i(String tag, String message) {
         println(INFO, tag, message);
     }
 
+    /**
+     * INFOレベルでのログ出力を行う。
+     *
+     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     * @param tr Throwable
+     */
     public static void i(String tag, String message, Throwable tr) {
         println(INFO, tag, message, tr);
     }
 
+    /**
+     * WARNレベルでのログ出力を行う。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     */
     public static void w(String tag, String message) {
         println(WARN, tag, message);
     }
 
+    /**
+     * WARNレベルでのログ出力を行う。
+     *
+     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     * @param tr Throwable
+     */
     public static void w(String tag, String message, Throwable tr) {
         println(WARN, tag, message, tr);
     }
 
+    /**
+     * WARNレベルでのログ出力を行う。
+     *
+     * 引数のThrowableのスタックトレースをメッセージとして表示する。
+     *
+     * @param tag タグ
+     * @param tr Throwable
+     */
     public static void w(String tag, Throwable tr) {
         println(WARN, tag, tr);
     }
 
+    /**
+     * ERRORレベルでのログ出力を行う。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     */
     public static void e(String tag, String message) {
         println(ERROR, tag, message);
     }
 
+    /**
+     * ERRORレベルでのログ出力を行う。
+     *
+     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     *
+     * @param tag タグ
+     * @param message メッセージ
+     * @param tr Throwable
+     */
     public static void e(String tag, String message, Throwable tr) {
         println(ERROR, tag, message, tr);
     }

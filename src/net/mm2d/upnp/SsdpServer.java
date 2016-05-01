@@ -22,10 +22,18 @@ import java.net.SocketTimeoutException;
 import java.util.List;
 
 /**
+ * SSDPパケットの受信を行うクラスの親クラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 abstract class SsdpServer {
+    /**
+     * SSDPに使用するアドレス。
+     */
     public static final String SSDP_ADDR = "239.255.255.250";
+    /**
+     * SSPDに使用するポート番号
+     */
     public static final int SSDP_PORT = 1900;
     private static final InetSocketAddress SSDP_SO_ADDR =
             new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
@@ -37,10 +45,23 @@ abstract class SsdpServer {
     private MulticastSocket mSocket;
     private ReceiveThread mThread;
 
+    /**
+     * 使用するインターフェースを指定してインスタンス作成。
+     *
+     * 使用するポートは自動割当となる。
+     *
+     * @param ni 使用するインターフェース
+     */
     public SsdpServer(NetworkInterface ni) {
         this(ni, 0);
     }
 
+    /**
+     * 使用するインターフェースとポート指定してインスタンス作成。
+     *
+     * @param ni 使用するインターフェース
+     * @param bindPort 使用するポート
+     */
     public SsdpServer(NetworkInterface ni, int bindPort) {
         mBindPort = bindPort;
         mInterface = ni;
@@ -56,6 +77,11 @@ abstract class SsdpServer {
         }
     }
 
+    /**
+     * ソケットのオープンを行う。
+     *
+     * @throws IOException ソケット作成に失敗
+     */
     public void open() throws IOException {
         if (mSocket == null) {
             close();
@@ -65,6 +91,9 @@ abstract class SsdpServer {
         mSocket.setTimeToLive(4);
     }
 
+    /**
+     * ソケットのクローズを行う
+     */
     public void close() {
         stop(false);
         if (mSocket != null) {
@@ -73,6 +102,9 @@ abstract class SsdpServer {
         }
     }
 
+    /**
+     * 受信スレッドの開始を行う。
+     */
     public void start() {
         if (mThread != null) {
             stop(false);
@@ -81,10 +113,22 @@ abstract class SsdpServer {
         mThread.start();
     }
 
+    /**
+     * 受信スレッドの停止を行う。
+     */
     public void stop() {
         stop(false);
     }
 
+    /**
+     * 受信スレッドの停止と必要があればJoinを行う。
+     *
+     * 現在の実装ではIO待ちに割り込むことはできないため、
+     * joinを指定しても偶然ソケットタイムアウトやソケット受信が発生しないかぎりjoinできない。
+     * TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
+     *
+     * @param join trueの時スレッドのJoin待ちを行う。
+     */
     public void stop(boolean join) {
         if (mThread == null) {
             return;
@@ -99,6 +143,11 @@ abstract class SsdpServer {
         }
     }
 
+    /**
+     * このソケットを使用してメッセージ送信を行う。
+     *
+     * @param message 送信するメッセージ
+     */
     public void send(SsdpMessage message) {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -109,6 +158,11 @@ abstract class SsdpServer {
         }
     }
 
+    /**
+     * このソケットを使用してメッセージ送信を行う。
+     *
+     * @param message 送信するメッセージ
+     */
     public void send(byte[] message) {
         try {
             final DatagramPacket dp = new DatagramPacket(message, message.length, SSDP_SO_ADDR);
@@ -118,14 +172,34 @@ abstract class SsdpServer {
         }
     }
 
+    /**
+     * メッセージ受信後の処理、小クラスにより実装する。
+     *
+     * @param addr 受信したインターフェース
+     * @param dp 受信したパケット
+     */
     protected abstract void onReceive(InterfaceAddress addr, DatagramPacket dp);
 
+    /**
+     * Joinを行う。
+     *
+     * 特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
+     *
+     * @throws IOException Joinコールにより発生
+     */
     private void joinGroup() throws IOException {
         if (mBindPort != 0) {
             mSocket.joinGroup(SSDP_INET_ADDR);
         }
     }
 
+    /**
+     * Leaveを行う。
+     *
+     * 特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
+     *
+     * @throws IOException Leaveコールにより発生
+     */
     private void leaveGroup() throws IOException {
         if (mBindPort != 0) {
             mSocket.leaveGroup(SSDP_INET_ADDR);
@@ -135,10 +209,18 @@ abstract class SsdpServer {
     private class ReceiveThread extends Thread {
         private volatile boolean mShutdownRequest;
 
+        /**
+         * インスタンス作成
+         */
         public ReceiveThread() {
             super("ReceiveThread");
         }
 
+        /**
+         * 割り込みを行い、スレッドを終了させる。
+         *
+         * 現在はSocketを使用しているため割り込みは効果がない。
+         */
         public void shutdownRequest() {
             mShutdownRequest = true;
             interrupt();

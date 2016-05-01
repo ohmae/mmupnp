@@ -32,6 +32,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
+ * UPnP Deviceを表現するクラス
+ *
+ * SubDeviceには非対応
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Device {
@@ -54,6 +58,11 @@ public class Device {
     private final List<Icon> mIconList;
     private final List<Service> mServiceList;
 
+    /**
+     * ControlPointに紐付いたインスタンスを作成。
+     *
+     * @param controlPoint 紐付けるControlPoint
+     */
     public Device(ControlPoint controlPoint) {
         mControlPoint = controlPoint;
         mIconList = new ArrayList<>();
@@ -62,30 +71,79 @@ public class Device {
         mTagMap.put("", new HashMap<String, String>());
     }
 
+    /**
+     * 紐付いたControlPointを返す。
+     *
+     * @return 紐付いたControlPoint
+     */
     public ControlPoint getControlPoint() {
         return mControlPoint;
     }
 
+    /**
+     * SSDPパケットを設定する。
+     *
+     * 同一性はSSDPパケットのUUIDで判断し
+     * SSDPパケット受信ごとに更新される
+     *
+     * @param message
+     */
     void setSsdpMessage(SsdpMessage message) {
         mSsdp = message;
     }
 
+    /**
+     * 最新のSSDPパケットを返す。
+     *
+     * @return 最新のSSDPパケット
+     */
     SsdpMessage getSsdpMessage() {
         return mSsdp;
     }
 
+    /**
+     * SSDPパケットに記述されたUUIDを返す。
+     *
+     * 本来はDeviceDescriptionに記述されたUDNと同一の値となるはずであるが
+     * 異なる場合もエラーとしては扱っていないため、同一性は保証されない。
+     *
+     * @return SSDPパケットに記述されたUUID
+     */
     public String getUuid() {
         return mSsdp.getUuid();
     }
 
+    /**
+     * 更新がなければ無効となる時間[ms]を返す。
+     *
+     * @return 更新がなければ無効となる時間[ms]
+     */
     public long getExpireTime() {
         return mSsdp.getExpireTime();
     }
 
+    /**
+     * DeviceDescriptionのXML文字列を返す。
+     *
+     * @return DeviceDescriptionのXML文字列
+     */
     public String getDescription() {
         return mDescription;
     }
 
+    /**
+     * URL情報を正規化して返す。
+     *
+     * "http://"から始まっていればそのまま利用する。
+     * "/"から始まっていればLocationホストの絶対パスとして
+     * Locationの"://"以降の最初の"/"までと結合する。
+     * それ以外の場合はLocationからの相対パスであり、
+     * Locationからクエリーを除去し、最後の"/"までと結合する。
+     *
+     * @param url URLパス情報
+     * @return 正規化したURL
+     * @throws MalformedURLException
+     */
     URL getAbsoluteUrl(String url) throws MalformedURLException {
         if (url.startsWith("http://")) {
             return new URL(url);
@@ -108,6 +166,16 @@ public class Device {
         return new URL(baseUrl + url);
     }
 
+    /**
+     * DeviceDescriptionを読み込む。
+     *
+     * Descriptionのパース後、そこに記述されている
+     * icon/serviceのDescriptionの読み込みパースもまとめて行う。
+     *
+     * @throws IOException 通信上での何らかの問題
+     * @throws SAXException XMLのパースに失敗
+     * @throws ParserConfigurationException XMLパーサが利用できない場合
+     */
     void loadDescription() throws IOException, SAXException, ParserConfigurationException {
         final HttpClient client = new HttpClient(true);
         final URL url = new URL(getLocation());
@@ -272,6 +340,19 @@ public class Device {
         }
     }
 
+    /**
+     * Descriptionに記述されていたタグの値を取得する。
+     *
+     * 個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
+     * 標準外のタグについても取得できるが、属性値の取得方法は提供されない、
+     * また同一タグが複数記述されている場合は最後に記述されていた値が取得される。
+     * タグ名にネームスペースプレフィックスは含まない。
+     * 複数のネームスペースがある場合は最初に見つかったネームスペースのタグが返される。
+     * 値が存在しない場合nullが返る。
+     *
+     * @param name タグ名
+     * @return タグの値
+     */
     public String getValue(String name) {
         for (final Entry<String, Map<String, String>> entry : mTagMap.entrySet()) {
             final String value = entry.getValue().get(name);
@@ -282,6 +363,19 @@ public class Device {
         return null;
     }
 
+    /**
+     * Descriptionに記述されていたタグの値を取得する。
+     *
+     * 個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
+     * 標準外のタグについても取得できるが、属性値の取得方法は提供されない、
+     * また同一タグが複数記述されている場合は最後に記述されていた値が取得される。
+     * ネームスペースはプレフィックスではなく、URIを指定する。
+     * 値が存在しない場合nullが返る。
+     *
+     * @param name タグ名
+     * @param namespace ネームスペース（URI）
+     * @return タグの値
+     */
     public String getValue(String name, String namespace) {
         final Map<String, String> nsmap = mTagMap.get(namespace);
         if (nsmap == null) {
@@ -290,10 +384,22 @@ public class Device {
         return nsmap.get(name);
     }
 
+    /**
+     * SSDPパケットに記述されているLocationヘッダの値を返す。
+     *
+     * @return Locationヘッダの値
+     */
     public String getLocation() {
         return mSsdp.getLocation();
     }
 
+    /**
+     * Locationに記述のIPアドレスを返す。
+     *
+     * 記述に異常がある場合は空文字が返る。
+     *
+     * @return IPアドレス
+     */
     public String getIpAddress() {
         try {
             final URL url = new URL(getLocation());
@@ -303,58 +409,156 @@ public class Device {
         }
     }
 
+    /**
+     * UDNタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return UDNタグの値
+     */
     public String getUdn() {
         return mUdn;
     }
 
+    /**
+     * deviceTypeタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return deviceTypeタグの値
+     */
     public String getDeviceType() {
         return mDeviceType;
     }
 
+    /**
+     * friendlyNameタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return friendlyNameタグの値
+     */
     public String getFriendlyName() {
         return mFriendlyName;
     }
 
+    /**
+     * manufacturerタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return manufacturerタグの値
+     */
     public String getManufacture() {
         return mManufacture;
     }
 
+    /**
+     * manufacturerURLタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return manufacturerURLタグの値
+     */
     public String getManufactureUrl() {
         return mManufactureUrl;
     }
 
+    /**
+     * modelNameタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return modelNameタグの値
+     */
     public String getModelName() {
         return mModelName;
     }
 
+    /**
+     * modelURLタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return modelURLタグの値
+     */
     public String getModelUrl() {
         return mModelUrl;
     }
 
+    /**
+     * modelDescriptionタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return modelDescriptionタグの値
+     */
     public String getModelDescription() {
         return mModelDescription;
     }
 
+    /**
+     * modelNumberタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return modelNumberタグの値
+     */
     public String getModelNumber() {
         return mModelNumber;
     }
 
+    /**
+     * serialNumberタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return serialNumberタグの値
+     */
     public String getSerialNumber() {
         return mSerialNumber;
     }
 
+    /**
+     * presentationURLタグの値を返す。
+     *
+     * 値が存在しない場合nullが返る。
+     *
+     * @return presentationURLタグの値
+     */
     public String getPresentationUrl() {
         return mPresentationUrl;
     }
 
+    /**
+     * Iconのリストを返す。
+     *
+     * @return Iconのリスト
+     * @see Icon
+     */
     public List<Icon> getIconList() {
         return Collections.unmodifiableList(mIconList);
     }
 
+    /**
+     * Serviceのリストを返す。
+     *
+     * @return Serviceのリスト
+     * @see Service
+     */
     public List<Service> getServiceList() {
         return Collections.unmodifiableList(mServiceList);
     }
 
+    /**
+     * 指定文字列とSerivceIDが合致するサービスを返す。
+     *
+     * 見つからない場合はnullを返す。
+     *
+     * @param id サーチするID
+     * @return 見つかったService
+     * @see Service
+     */
     public Service findServiceById(String id) {
         for (final Service service : mServiceList) {
             if (service.getServiceId().equals(id)) {
@@ -364,6 +568,15 @@ public class Device {
         return null;
     }
 
+    /**
+     * 指定文字列とSerivceTypeが合致するサービスを返す。
+     *
+     * 見つからない場合はnullを返す。
+     *
+     * @param type サーチするType
+     * @return 見つかったService
+     * @see Service
+     */
     public Service findServiceByType(String type) {
         for (final Service service : mServiceList) {
             if (service.getServiceType().equals(type)) {
@@ -373,6 +586,22 @@ public class Device {
         return null;
     }
 
+    /**
+     * 指定文字列の名前を持つActionを返す。
+     *
+     * 全サービスに対して検索をかけ、最初に見つかったものを返す。
+     * 見つからない場合はnullを返す。
+     *
+     * 特定のサービスのActionを取得したい場合は、
+     * {@link #findServiceById(String)} もしくは
+     * {@link #findServiceByType(String)} を使用してServiceを取得した後、
+     * {@link Service#findAction(String)} を使用する。
+     *
+     * @param name Action名
+     * @return 見つかったAction
+     * @see Service
+     * @see Action
+     */
     public Action findAction(String name) {
         for (final Service service : mServiceList) {
             final Action action = service.findAction(name);
