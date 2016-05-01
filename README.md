@@ -41,7 +41,7 @@ arg.put("Filter", "*");
 arg.put("StartingIndex", "0");
 arg.put("RequestedCount", "0");
 arg.put("SortCriteria", "");
-Map<String, String> result = action.invoke(arg);  // action invoke
+Map<String, String> result = browse.invoke(arg);  // action invoke
 String resultXml = result.get("Result");          // get result
 ...
 ```
