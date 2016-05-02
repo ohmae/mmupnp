@@ -51,6 +51,14 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ControlPoint {
     /**
      * 機器発見イベント通知用リスナー。
+     *
+     * {@link #onDiscover(Device)}
+     * {@link #onLost(Device)}
+     * 及び、
+     * {@link NotifyEventListener#onNotifyEvent(Service, long, String, String)}
+     * は、いずれも同一のスレッドからコールされる。
+     *
+     * @see NotifyEventListener
      */
     public interface DiscoveryListener {
         /**
@@ -74,6 +82,14 @@ public class ControlPoint {
 
     /**
      * NotifyEvent通知を受け取るリスナー。
+     *
+     * {@link #onNotifyEvent(Service, long, String, String)}
+     * 及び、
+     * {@link DiscoveryListener#onDiscover(Device)}
+     * {@link DiscoveryListener#onLost(Device)}
+     * は、いずれも同一のスレッドからコールされる。
+     *
+     * @see DiscoveryListener
      */
     public interface NotifyEventListener {
         /**
