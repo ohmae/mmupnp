@@ -4,11 +4,18 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## Feature
 
-- Easy for use
 - Pure Java implementation.
 - Suitable for both Java application and Android Apps
-- Lightweight
+- Easy for use
 - High response
+
+## Requirements
+
+- Java SE 7 or later
+
+## Example of use
+
+- DMS Explorer - [Google Play](https://play.google.com/store/apps/details?id=net.mm2d.dmsexplorer)
 
 ## How to use
 
@@ -22,6 +29,7 @@ cp.initialize();
 cp.addDiscoveryListener(...);
 cp.addNotifyEventListener(...);
 cp.start();
+...
 ```
 
 ### M-SEARCH
@@ -32,6 +40,7 @@ cp.search();
 ### Invoke Action
 Example of invoke "Browse" (ContentDirectory)
 ```
+...
 Device mediaServer = cp.getDevice(UDN);           // get device by UDN
 Action browse = mediaServer.findAction("Browse"); // find "Browse" action
 Map<String, String> arg = new HashMap<>();        // setup arguments
@@ -41,7 +50,7 @@ arg.put("Filter", "*");
 arg.put("StartingIndex", "0");
 arg.put("RequestedCount", "0");
 arg.put("SortCriteria", "");
-Map<String, String> result = browse.invoke(arg);  // action invoke
+Map<String, String> result = browse.invoke(arg);  // invoke action
 String resultXml = result.get("Result");          // get result
 ...
 ```
@@ -49,6 +58,7 @@ String resultXml = result.get("Result");          // get result
 ### Event Subscription
 Example of subscribe CDS events.
 ```
+...
 // add listener to receive event
 cp.addNotifyEventListener(new NotifyEventListener(){
   public void onNotifyEvent(Service service, long seq, String variable, String value) {
@@ -65,6 +75,7 @@ cds.unsubscribe(); // End subscribe
 
 ### Stop and Terminate
 ```
+...
 cp.stop();
 cp.removeDiscoveryListener(...);
 cp.removeNotifyEventListener(...);
