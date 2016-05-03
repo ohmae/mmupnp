@@ -1,20 +1,16 @@
 # mmupnp
-
 Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## Feature
-
 - Pure Java implementation.
-- Suitable for both Java application and Android Apps
-- Easy for use
+- Available in both Java application and Android apps
+- Easy to use
 - High response
 
 ## Requirements
-
 - Java SE 7 or later
 
 ## Example of use
-
 - DMS Explorer - [Google Play](https://play.google.com/store/apps/details?id=net.mm2d.dmsexplorer)
 
 ## How to use
@@ -32,10 +28,24 @@ cp.start();
 ...
 ```
 
+If you want to specify the network interface, describe the following.
+
+```
+NetworkInterface ni = NetworkInterface.getByName("eth0");
+ControlPoint cp = new ControlPoint(Arrays.asList(ni));
+```
+
+
 ### M-SEARCH
+Call ControlPoint#search() or ControlPoint#search(String) method.
 ```
-cp.search();
+cp.search();                   // default ST is ssdp:all
 ```
+```
+cp.search("upnp:rootdevice"); // to use specific ST
+```
+These methods send one M-SEARCH packet to all interface.
+
 
 ### Invoke Action
 Example of invoke "Browse" (ContentDirectory)

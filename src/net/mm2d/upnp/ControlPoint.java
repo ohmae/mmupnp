@@ -289,7 +289,7 @@ public class ControlPoint {
      */
     public ControlPoint(Collection<NetworkInterface> interfaces) throws IllegalStateException {
         if (interfaces == null) {
-            interfaces = getValidNetworkInterfaces();
+            interfaces = getAvailableInterfaces();
         }
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
@@ -315,7 +315,7 @@ public class ControlPoint {
         mEventReseiver.setEventMessageListener(mEventMessageListener);
     }
 
-    private Collection<NetworkInterface> getValidNetworkInterfaces() {
+    private Collection<NetworkInterface> getAvailableInterfaces() {
         final Collection<NetworkInterface> list = new ArrayList<>();
         final Enumeration<NetworkInterface> nis;
         try {
