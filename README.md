@@ -29,7 +29,6 @@ cp.start();
 ```
 
 If you want to specify the network interface, describe the following.
-
 ```
 NetworkInterface ni = NetworkInterface.getByName("eth0");
 ControlPoint cp = new ControlPoint(Arrays.asList(ni));
@@ -37,18 +36,18 @@ ControlPoint cp = new ControlPoint(Arrays.asList(ni));
 
 
 ### M-SEARCH
-Call ControlPoint#search() or ControlPoint#search(String) method.
+Call ControlPoint#search() or ControlPoint#search(String).
 ```
-cp.search();                   // default ST is ssdp:all
+cp.search();                   // Default ST is ssdp:all
 ```
 ```
-cp.search("upnp:rootdevice"); // to use specific ST
+cp.search("upnp:rootdevice"); // To use specific ST. In this case "upnp:rootdevice"
 ```
 These methods send one M-SEARCH packet to all interface.
 
 
 ### Invoke Action
-Example of invoke "Browse" (ContentDirectory)
+For example, to invoke "Browse" (ContentDirectory) action...
 ```
 ...
 Device mediaServer = cp.getDevice(UDN);           // get device by UDN
@@ -66,7 +65,7 @@ String resultXml = result.get("Result");          // get result
 ```
 
 ### Event Subscription
-Example of subscribe CDS events.
+For example, to subscribe ContentDirectory's events...
 ```
 ...
 // add listener to receive event
@@ -91,6 +90,8 @@ cp.removeDiscoveryListener(...);
 cp.removeNotifyEventListener(...);
 cp.terminate();
 ```
+It is not possible to re-initialize.
+When you want to reset, try again from the constructor call.
 
 ## Author
 大前 良介 (OHMAE Ryosuke)
