@@ -15,7 +15,7 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## How to use
 
-I describe Javadoc comments. Please refer to it for more information.
+I described Javadoc comments. Please refer to it for more information.
 
 ### Initialize and Start
 ```
@@ -43,7 +43,7 @@ cp.search();                   // Default ST is ssdp:all
 ```
 cp.search("upnp:rootdevice"); // To use specific ST. In this case "upnp:rootdevice"
 ```
-These methods send one M-SEARCH packet to all interface.
+These methods send one M-SEARCH packet to all interfaces.
 
 
 ### Invoke Action
