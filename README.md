@@ -11,7 +11,9 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 - Java SE 7 or later
 
 ## Example of use
-- DMS Explorer - [Google Play](https://play.google.com/store/apps/details?id=net.mm2d.dmsexplorer)
+- DMS Explorer --
+[[Google Play](https://play.google.com/store/apps/details?id=net.mm2d.dmsexplorer)]
+[[Source Code](https://github.com/ohmae/DmsExplorer)]
 
 ## How to use
 
