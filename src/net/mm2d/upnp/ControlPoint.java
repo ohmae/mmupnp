@@ -272,20 +272,12 @@ public class ControlPoint {
     }
 
     /**
-     * インスタンス作成。
+     * インスタンス初期化
      *
-     * 使用するインターフェースは自動的に選定される。
+     * 引数のインターフェースを利用するように初期化される。
+     * 引数なしの場合、使用するインターフェースは自動的に選定される。
      *
-     * @throws IllegalStateException 使用可能なインターフェースがない。
-     */
-    public ControlPoint() throws IllegalStateException {
-        this((Collection<NetworkInterface>) null);
-    }
-
-    /**
-     * 利用するインターフェースを指定してインスタンス作成。
-     *
-     * @param interfaces 使用するインターフェース
+     * @param interfaces 使用するインターフェース、指定しない場合は自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     public ControlPoint(NetworkInterface... interfaces) {
@@ -295,11 +287,11 @@ public class ControlPoint {
     /**
      * 利用するインターフェースを指定してインスタンス作成。
      *
-     * @param interfaces 使用するインターフェース、nullの場合自動選択となる。
+     * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     public ControlPoint(Collection<NetworkInterface> interfaces) throws IllegalStateException {
-        if (interfaces == null) {
+        if (interfaces == null || interfaces.isEmpty()) {
             interfaces = getAvailableInterfaces();
         }
         if (interfaces.isEmpty()) {
@@ -343,7 +335,6 @@ public class ControlPoint {
                         || !ni.isUp()) {
                     continue;
                 }
-                Log.e(TAG, ni.getName());
                 final List<InterfaceAddress> ifas = ni.getInterfaceAddresses();
                 for (final InterfaceAddress a : ifas) {
                     if (a.getAddress() instanceof Inet4Address) {
