@@ -24,6 +24,7 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -275,10 +276,20 @@ public class ControlPoint {
      *
      * 使用するインターフェースは自動的に選定される。
      *
-     * @throws IllegalStateException 使用可能なインターフェースがない
+     * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     public ControlPoint() throws IllegalStateException {
-        this(null);
+        this((Collection<NetworkInterface>) null);
+    }
+
+    /**
+     * 利用するインターフェースを指定してインスタンス作成。
+     *
+     * @param interfaces 使用するインターフェース
+     * @throws IllegalStateException 使用可能なインターフェースがない。
+     */
+    public ControlPoint(NetworkInterface... interfaces) {
+        this(Arrays.asList(interfaces));
     }
 
     /**
@@ -332,6 +343,7 @@ public class ControlPoint {
                         || !ni.isUp()) {
                     continue;
                 }
+                Log.e(TAG, ni.getName());
                 final List<InterfaceAddress> ifas = ni.getInterfaceAddresses();
                 for (final InterfaceAddress a : ifas) {
                     if (a.getAddress() instanceof Inet4Address) {

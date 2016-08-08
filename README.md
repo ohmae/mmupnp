@@ -33,7 +33,7 @@ cp.start();
 If you want to specify the network interface, describe the following.
 ```
 NetworkInterface ni = NetworkInterface.getByName("eth0");
-ControlPoint cp = new ControlPoint(Arrays.asList(ni));
+ControlPoint cp = new ControlPoint(ni);
 ```
 
 
