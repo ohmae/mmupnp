@@ -7,13 +7,13 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * Deviceの有効期限を確認し、有効期限が切れたDeviceをLost扱いするクラス。
@@ -38,7 +38,7 @@ class DeviceExpirer extends Thread {
      *
      * @param cp ControlPoint
      */
-    public DeviceExpirer(@NotNull ControlPoint cp) {
+    public DeviceExpirer(@Nonnull ControlPoint cp) {
         super(TAG);
         mDeviceList = new ArrayList<>();
         mControlPoint = cp;
@@ -64,7 +64,7 @@ class DeviceExpirer extends Thread {
      *
      * @param device 追加されるDevice
      */
-    public synchronized void add(@NotNull Device device) {
+    public synchronized void add(@Nonnull Device device) {
         mDeviceList.add(device);
         Collections.sort(mDeviceList, mComparator);
         notifyAll();
@@ -75,7 +75,7 @@ class DeviceExpirer extends Thread {
      *
      * @param device 削除されるDevice。
      */
-    public synchronized void remove(@NotNull Device device) {
+    public synchronized void remove(@Nonnull Device device) {
         mDeviceList.remove(device);
     }
 

@@ -7,13 +7,13 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * SSDP M-SEARCHとそのレスポンス受信を行うクラス。
@@ -30,7 +30,7 @@ class SsdpSearchServer extends SsdpServer {
          *
          * @param message 受信したレスポンスメッセージ
          */
-        void onReceiveResponse(@NotNull SsdpResponseMessage message);
+        void onReceiveResponse(@Nonnull SsdpResponseMessage message);
     }
 
     /**
@@ -49,7 +49,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    public SsdpSearchServer(@NotNull NetworkInterface ni) {
+    public SsdpSearchServer(@Nonnull NetworkInterface ni) {
         super(ni);
     }
 
@@ -91,7 +91,7 @@ class SsdpSearchServer extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(@NotNull InterfaceAddress addr, @NotNull DatagramPacket dp) {
+    protected void onReceive(@Nonnull InterfaceAddress addr, @Nonnull DatagramPacket dp) {
         try {
             final SsdpResponseMessage message = new SsdpResponseMessage(addr, dp);
             if (!message.hasValidLocation()) {

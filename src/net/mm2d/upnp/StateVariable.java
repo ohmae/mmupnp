@@ -7,12 +7,11 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * StateVariableを表現するクラス
@@ -50,7 +49,7 @@ public class StateVariable {
          *
          * @param service このStateVariableを保持するService
          */
-        public void setService(@NotNull Service service) {
+        public void setService(@Nonnull Service service) {
             mService = service;
         }
 
@@ -61,7 +60,7 @@ public class StateVariable {
          *
          * @param sendEvents SendEventsの値
          */
-        public void setSendEvents(@NotNull String sendEvents) {
+        public void setSendEvents(@Nonnull String sendEvents) {
             mSendEvents = !"no".equalsIgnoreCase(sendEvents);
         }
 
@@ -73,7 +72,7 @@ public class StateVariable {
          *
          * @param multicast Multicastの値
          */
-        public void setMulticast(@NotNull String multicast) {
+        public void setMulticast(@Nonnull String multicast) {
             mMulticast = "yes".equalsIgnoreCase(multicast);
         }
 
@@ -82,7 +81,7 @@ public class StateVariable {
          *
          * @param name StateVariable名
          */
-        public void setName(@NotNull String name) {
+        public void setName(@Nonnull String name) {
             mName = name;
         }
 
@@ -91,7 +90,7 @@ public class StateVariable {
          *
          * @param dataType DataType
          */
-        public void setDataType(@NotNull String dataType) {
+        public void setDataType(@Nonnull String dataType) {
             mDataType = dataType;
         }
 

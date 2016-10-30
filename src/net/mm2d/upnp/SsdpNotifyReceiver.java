@@ -7,9 +7,6 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import net.mm2d.util.Log;
 
 import java.io.IOException;
@@ -17,6 +14,9 @@ import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * SSDP NOTIFYを受信するクラス
@@ -33,7 +33,7 @@ class SsdpNotifyReceiver extends SsdpServer {
          *
          * @param message 受信したNOTFYメッセージ
          */
-        void onReceiveNotify(@NotNull SsdpRequestMessage message);
+        void onReceiveNotify(@Nonnull SsdpRequestMessage message);
     }
 
     private static final String TAG = "SsdpNotifyReceiver";
@@ -44,7 +44,7 @@ class SsdpNotifyReceiver extends SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    public SsdpNotifyReceiver(@NotNull NetworkInterface ni) {
+    public SsdpNotifyReceiver(@Nonnull NetworkInterface ni) {
         super(ni, SSDP_PORT);
     }
 
@@ -58,7 +58,7 @@ class SsdpNotifyReceiver extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(@NotNull InterfaceAddress addr, @NotNull DatagramPacket dp) {
+    protected void onReceive(@Nonnull InterfaceAddress addr, @Nonnull DatagramPacket dp) {
         // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
         // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
         // 受け取っても無駄なので破棄する。
@@ -84,7 +84,8 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
     }
 
-    private static boolean isSameSegment(@NotNull InterfaceAddress ifa, @NotNull DatagramPacket dp) {
+    private static boolean isSameSegment(@Nonnull InterfaceAddress ifa,
+            @Nonnull DatagramPacket dp) {
         final InetSocketAddress sa = (InetSocketAddress) dp.getSocketAddress();
         final byte[] a = ifa.getAddress().getAddress();
         final byte[] b = sa.getAddress().getAddress();

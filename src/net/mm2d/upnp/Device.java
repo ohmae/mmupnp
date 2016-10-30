@@ -7,9 +7,6 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import net.mm2d.util.Log;
 
 import org.w3c.dom.Document;
@@ -30,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -66,7 +65,7 @@ public class Device {
      *
      * @param controlPoint 紐付けるControlPoint
      */
-    public Device(@NotNull ControlPoint controlPoint) {
+    public Device(@Nonnull ControlPoint controlPoint) {
         mControlPoint = controlPoint;
         mIconList = new ArrayList<>();
         mServiceList = new ArrayList<>();
@@ -79,7 +78,7 @@ public class Device {
      *
      * @return 紐付いたControlPoint
      */
-    @NotNull
+    @Nonnull
     public ControlPoint getControlPoint() {
         return mControlPoint;
     }
@@ -92,7 +91,7 @@ public class Device {
      *
      * @param message SSDPパケット
      */
-    void setSsdpMessage(@NotNull SsdpMessage message) {
+    void setSsdpMessage(@Nonnull SsdpMessage message) {
         mSsdp = message;
     }
 
@@ -101,7 +100,7 @@ public class Device {
      *
      * @return 最新のSSDPパケット
      */
-    @NotNull
+    @Nonnull
     SsdpMessage getSsdpMessage() {
         return mSsdp;
     }
@@ -151,8 +150,8 @@ public class Device {
      * @return 正規化したURL
      * @throws MalformedURLException
      */
-    @NotNull
-    URL getAbsoluteUrl(@NotNull String url) throws MalformedURLException {
+    @Nonnull
+    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
         if (url.startsWith("http://")) {
             return new URL(url);
         }
@@ -211,7 +210,7 @@ public class Device {
         client.close();
     }
 
-    private void parseIconList(@NotNull Node listNode) {
+    private void parseIconList(@Nonnull Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -223,7 +222,7 @@ public class Device {
         }
     }
 
-    private Icon parseIcon(@NotNull Element element) {
+    private Icon parseIcon(@Nonnull Element element) {
         final Icon.Builder icon = new Icon.Builder();
         icon.setDevice(this);
         Node node = element.getFirstChild();
@@ -247,7 +246,7 @@ public class Device {
         return icon.build();
     }
 
-    private void parseServiceList(@NotNull Node listNode) throws IOException {
+    private void parseServiceList(@Nonnull Node listNode) throws IOException {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -259,8 +258,8 @@ public class Device {
         }
     }
 
-    @NotNull
-    private Service parseService(@NotNull Element element) throws IOException {
+    @Nonnull
+    private Service parseService(@Nonnull Element element) throws IOException {
         final Service.Builder service = new Service.Builder();
         service.setDevice(this);
         Node node = element.getFirstChild();
@@ -288,7 +287,7 @@ public class Device {
         }
     }
 
-    private void parseDescription(@NotNull String xml)
+    private void parseDescription(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -382,7 +381,7 @@ public class Device {
      * @return タグの値
      */
     @Nullable
-    public String getValue(@NotNull String name) {
+    public String getValue(@Nonnull String name) {
         for (final Entry<String, Map<String, String>> entry : mTagMap.entrySet()) {
             final String value = entry.getValue().get(name);
             if (value != null) {
@@ -406,7 +405,7 @@ public class Device {
      * @return タグの値
      */
     @Nullable
-    public String getValue(@NotNull String name, @NotNull String namespace) {
+    public String getValue(@Nonnull String name, @Nonnull String namespace) {
         final Map<String, String> nsmap = mTagMap.get(namespace);
         if (nsmap == null) {
             return null;
@@ -431,7 +430,7 @@ public class Device {
      *
      * @return IPアドレス
      */
-    @NotNull
+    @Nonnull
     public String getIpAddress() {
         try {
             final URL url = new URL(getLocation());
@@ -579,7 +578,7 @@ public class Device {
      * @return Iconのリスト
      * @see Icon
      */
-    @NotNull
+    @Nonnull
     public List<Icon> getIconList() {
         return Collections.unmodifiableList(mIconList);
     }
@@ -590,7 +589,7 @@ public class Device {
      * @return Serviceのリスト
      * @see Service
      */
-    @NotNull
+    @Nonnull
     public List<Service> getServiceList() {
         return Collections.unmodifiableList(mServiceList);
     }
@@ -605,7 +604,7 @@ public class Device {
      * @see Service
      */
     @Nullable
-    public Service findServiceById(@NotNull String id) {
+    public Service findServiceById(@Nonnull String id) {
         for (final Service service : mServiceList) {
             if (service.getServiceId().equals(id)) {
                 return service;
@@ -624,7 +623,7 @@ public class Device {
      * @see Service
      */
     @Nullable
-    public Service findServiceByType(@NotNull String type) {
+    public Service findServiceByType(@Nonnull String type) {
         for (final Service service : mServiceList) {
             if (service.getServiceType().equals(type)) {
                 return service;
@@ -650,7 +649,7 @@ public class Device {
      * @see Action
      */
     @Nullable
-    public Action findAction(@NotNull String name) {
+    public Action findAction(@Nonnull String name) {
         for (final Service service : mServiceList) {
             final Action action = service.findAction(name);
             if (action != null) {
@@ -678,7 +677,7 @@ public class Device {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public String toString() {
         return mFriendlyName != null ? mFriendlyName : "";
     }

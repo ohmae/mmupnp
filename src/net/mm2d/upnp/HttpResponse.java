@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * HTTPレスポンスメッセージを表現するクラス。
@@ -21,7 +21,7 @@ public class HttpResponse extends HttpMessage {
     private String mReasonPhrase = "";
 
     @Override
-    public void setStartLine(@NotNull String line) throws IllegalArgumentException {
+    public void setStartLine(@Nonnull String line) throws IllegalArgumentException {
         setStatusLine(line);
     }
 
@@ -33,7 +33,7 @@ public class HttpResponse extends HttpMessage {
      * @param line ステータスライン
      * @see #setStartLine(String)
      */
-    public void setStatusLine(@NotNull String line) throws IllegalArgumentException {
+    public void setStatusLine(@Nonnull String line) throws IllegalArgumentException {
         final String[] params = line.split(" ");
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -44,7 +44,7 @@ public class HttpResponse extends HttpMessage {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public String getStartLine() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getVersion());
@@ -92,7 +92,7 @@ public class HttpResponse extends HttpMessage {
      * @return レスポンスフレーズ
      * @see #getStatus()
      */
-    @NotNull
+    @Nonnull
     public String getReasonPhrase() {
         return mReasonPhrase;
     }
@@ -103,7 +103,7 @@ public class HttpResponse extends HttpMessage {
      * @param reasonPhrase レスポンスフレーズ
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    public void setReasonPhrase(@NotNull String reasonPhrase) {
+    public void setReasonPhrase(@Nonnull String reasonPhrase) {
         mReasonPhrase = reasonPhrase;
     }
 
@@ -112,7 +112,7 @@ public class HttpResponse extends HttpMessage {
      *
      * @param status ステータス
      */
-    public void setStatus(@NotNull Http.Status status) {
+    public void setStatus(@Nonnull Http.Status status) {
         mStatus = status;
         mStatusCode = status.getCode();
         mReasonPhrase = status.getPhrase();

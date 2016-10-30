@@ -7,9 +7,6 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import net.mm2d.util.Log;
 
 import org.w3c.dom.Document;
@@ -30,6 +27,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,7 +63,7 @@ public class Service {
          *
          * @param device このServiceを保持するDevice
          */
-        public void setDevice(@NotNull Device device) {
+        public void setDevice(@Nonnull Device device) {
             mDevice = device;
         }
 
@@ -73,7 +72,7 @@ public class Service {
          *
          * @param serviceType serviceTytpe
          */
-        public void setServiceType(@NotNull String serviceType) {
+        public void setServiceType(@Nonnull String serviceType) {
             mServiceType = serviceType;
         }
 
@@ -82,7 +81,7 @@ public class Service {
          *
          * @param serviceId serviceId
          */
-        public void setServiceId(@NotNull String serviceId) {
+        public void setServiceId(@Nonnull String serviceId) {
             mServiceId = serviceId;
         }
 
@@ -91,7 +90,7 @@ public class Service {
          *
          * @param scpdUrl ScpdURL
          */
-        public void setScpdUrl(@NotNull String scpdUrl) {
+        public void setScpdUrl(@Nonnull String scpdUrl) {
             mScpdUrl = scpdUrl;
         }
 
@@ -100,7 +99,7 @@ public class Service {
          *
          * @param controlUrl controlURL
          */
-        public void setControlUrl(@NotNull String controlUrl) {
+        public void setControlUrl(@Nonnull String controlUrl) {
             mControlUrl = controlUrl;
         }
 
@@ -109,7 +108,7 @@ public class Service {
          *
          * @param eventSubUrl eventSubURL
          */
-        public void setEventSubUrl(@NotNull String eventSubUrl) {
+        public void setEventSubUrl(@Nonnull String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
         }
 
@@ -119,7 +118,7 @@ public class Service {
          * @return Serviceのインスタンス
          * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
-        @NotNull
+        @Nonnull
         public Service build() throws IllegalStateException {
             if (mDevice == null) {
                 throw new IllegalStateException("device must be set.");
@@ -177,7 +176,7 @@ public class Service {
      *
      * @return このServiceを保持するDevice
      */
-    @NotNull
+    @Nonnull
     public Device getDevice() {
         return mDevice;
     }
@@ -190,7 +189,7 @@ public class Service {
      * @throws MalformedURLException
      * @see Device#getAbsoluteUrl(String)
      */
-    @NotNull
+    @Nonnull
     URL getAbsoluteUrl(String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
@@ -200,7 +199,7 @@ public class Service {
      *
      * @return serviceType
      */
-    @NotNull
+    @Nonnull
     public String getServiceType() {
         return mServiceType;
     }
@@ -210,7 +209,7 @@ public class Service {
      *
      * @return serviceId
      */
-    @NotNull
+    @Nonnull
     public String getServiceId() {
         return mServiceId;
     }
@@ -220,7 +219,7 @@ public class Service {
      *
      * @return SCPDURL
      */
-    @NotNull
+    @Nonnull
     public String getScpdUrl() {
         return mScpdUrl;
     }
@@ -230,7 +229,7 @@ public class Service {
      *
      * @return controlURL
      */
-    @NotNull
+    @Nonnull
     public String getControlUrl() {
         return mControlUrl;
     }
@@ -240,7 +239,7 @@ public class Service {
      *
      * @return eventSubURL
      */
-    @NotNull
+    @Nonnull
     public String getEventSubUrl() {
         return mEventSubUrl;
     }
@@ -262,7 +261,7 @@ public class Service {
      *
      * @return 全Actionのリスト
      */
-    @NotNull
+    @Nonnull
     public List<Action> getActionList() {
         if (mActionList == null) {
             final List<Action> list = new ArrayList<>(mActionMap.values());
@@ -280,7 +279,7 @@ public class Service {
      * @return 該当するAction
      */
     @Nullable
-    public Action findAction(@NotNull String name) {
+    public Action findAction(@Nonnull String name) {
         return mActionMap.get(name);
     }
 
@@ -289,7 +288,7 @@ public class Service {
      *
      * @return 全StateVariableのリスト
      */
-    @NotNull
+    @Nonnull
     public List<StateVariable> getStateVariableList() {
         if (mStateVariableList == null) {
             final List<StateVariable> list = new ArrayList<>(mStateVariableMap.values());
@@ -307,7 +306,7 @@ public class Service {
      * @return 該当するStateVariable
      */
     @Nullable
-    public StateVariable findStateVariable(@NotNull String name) {
+    public StateVariable findStateVariable(@Nonnull String name) {
         return mStateVariableMap.get(name);
     }
 
@@ -321,7 +320,7 @@ public class Service {
      * @throws SAXException XMLパースエラー
      * @throws ParserConfigurationException XMLパーサーエラー
      */
-    void loadDescription(@NotNull HttpClient client)
+    void loadDescription(@Nonnull HttpClient client)
             throws IOException, SAXException, ParserConfigurationException {
         final URL url = getAbsoluteUrl(mScpdUrl);
         final HttpRequest request = new HttpRequest();
@@ -338,7 +337,7 @@ public class Service {
         parseDescription(mDescription);
     }
 
-    private void parseDescription(@NotNull String xml)
+    private void parseDescription(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -357,8 +356,8 @@ public class Service {
         }
     }
 
-    @NotNull
-    private List<Action.Builder> parseActionList(@NotNull NodeList nodeList) {
+    @Nonnull
+    private List<Action.Builder> parseActionList(@Nonnull NodeList nodeList) {
         final List<Action.Builder> list = new ArrayList<>();
         for (int i = 0; i < nodeList.getLength(); i++) {
             list.add(parseAction((Element) nodeList.item(i)));
@@ -366,7 +365,7 @@ public class Service {
         return list;
     }
 
-    private void parseStateVariableList(@NotNull NodeList nodeList) {
+    private void parseStateVariableList(@Nonnull NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             final StateVariable.Builder builder = parseStateVariable((Element) nodeList.item(i));
             final StateVariable variable = builder.build();
@@ -374,8 +373,8 @@ public class Service {
         }
     }
 
-    @NotNull
-    private Action.Builder parseAction(@NotNull Element element) {
+    @Nonnull
+    private Action.Builder parseAction(@Nonnull Element element) {
         final Action.Builder builder = new Action.Builder();
         builder.serService(this);
         Node node = element.getFirstChild();
@@ -400,8 +399,8 @@ public class Service {
         return builder;
     }
 
-    @NotNull
-    private Argument.Builder parseArgument(@NotNull Element element) {
+    @Nonnull
+    private Argument.Builder parseArgument(@Nonnull Element element) {
         final Argument.Builder builder = new Argument.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -421,8 +420,8 @@ public class Service {
         return builder;
     }
 
-    @NotNull
-    private StateVariable.Builder parseStateVariable(@NotNull Element element) {
+    @Nonnull
+    private StateVariable.Builder parseStateVariable(@Nonnull Element element) {
         final StateVariable.Builder builder = new StateVariable.Builder();
         builder.setService(this);
         builder.setSendEvents(element.getAttribute("sendEvents"));
@@ -469,7 +468,7 @@ public class Service {
         return builder;
     }
 
-    @NotNull
+    @Nonnull
     private String getCallback() {
         final StringBuilder sb = new StringBuilder();
         sb.append('<');
@@ -488,7 +487,7 @@ public class Service {
         return sb.toString();
     }
 
-    private long getTimeout(@NotNull HttpResponse response) {
+    private long getTimeout(@Nonnull HttpResponse response) {
         final String timeout = response.getHeader(Http.TIMEOUT).toLowerCase();
         if (timeout.contains("infinite")) {
             return -1;

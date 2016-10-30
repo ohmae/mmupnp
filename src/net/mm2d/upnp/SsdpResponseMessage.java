@@ -7,12 +7,12 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * SSDPレスポンスメッセージを表現するクラス。
@@ -27,18 +27,19 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @param dp 受信したDatagramPacket
      * @throws IOException 入出力エラー
      */
-    public SsdpResponseMessage(@NotNull InterfaceAddress ifa, @NotNull DatagramPacket dp) throws IOException {
+    public SsdpResponseMessage(@Nonnull InterfaceAddress ifa, @Nonnull DatagramPacket dp)
+            throws IOException {
         super(ifa, dp);
     }
 
     @Override
-    @NotNull
+    @Nonnull
     protected HttpMessage newMessage() {
         return new HttpResponse();
     }
 
     @Override
-    @NotNull
+    @Nonnull
     protected HttpResponse getMessage() {
         return (HttpResponse) super.getMessage();
     }
@@ -69,7 +70,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @return レスポンスフレーズ
      * @see #getStatus()
      */
-    @NotNull
+    @Nonnull
     public String getReasonPhrase() {
         return getMessage().getReasonPhrase();
     }
@@ -80,7 +81,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @param reasonPhrase レスポンスフレーズ
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    public void setReasonPhrase(@NotNull String reasonPhrase) {
+    public void setReasonPhrase(@Nonnull String reasonPhrase) {
         getMessage().setReasonPhrase(reasonPhrase);
     }
 
@@ -89,7 +90,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      *
      * @param status ステータス
      */
-    public void setStatus(@NotNull Http.Status status) {
+    public void setStatus(@Nonnull Http.Status status) {
         getMessage().setStatus(status);
     }
 

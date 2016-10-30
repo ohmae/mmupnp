@@ -7,11 +7,11 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
+
+import javax.annotation.Nonnull;
 
 /**
  * SSDPリクエストメッセージを表現するクラス。
@@ -33,18 +33,19 @@ public class SsdpRequestMessage extends SsdpMessage {
      * @param dp 受信したDatagramPacket
      * @throws IOException 入出力エラー
      */
-    public SsdpRequestMessage(@NotNull InterfaceAddress ifa, @NotNull DatagramPacket dp) throws IOException {
+    public SsdpRequestMessage(@Nonnull InterfaceAddress ifa, @Nonnull DatagramPacket dp)
+            throws IOException {
         super(ifa, dp);
     }
 
     @Override
-    @NotNull
+    @Nonnull
     protected HttpMessage newMessage() {
         return new HttpRequest();
     }
 
     @Override
-    @NotNull
+    @Nonnull
     protected HttpRequest getMessage() {
         return (HttpRequest) super.getMessage();
     }
@@ -54,7 +55,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      *
      * @return リクエストメソッド
      */
-    @NotNull
+    @Nonnull
     public String getMethod() {
         return getMessage().getMethod();
     }
@@ -64,7 +65,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      *
      * @param method リクエストメソッド
      */
-    public void setMethod(@NotNull String method) {
+    public void setMethod(@Nonnull String method) {
         getMessage().setMethod(method);
     }
 
@@ -73,7 +74,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      *
      * @return URI文字列
      */
-    @NotNull
+    @Nonnull
     public String getUri() {
         return getMessage().getUri();
     }
@@ -83,7 +84,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      *
      * @param uri URI文字列
      */
-    public void setUri(@NotNull String uri) {
+    public void setUri(@Nonnull String uri) {
         getMessage().setUri(uri);
     }
 }

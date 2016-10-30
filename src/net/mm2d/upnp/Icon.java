@@ -7,13 +7,13 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import net.mm2d.util.Log;
 
 import java.io.IOException;
 import java.net.URL;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Iconを表すクラス。
@@ -46,7 +46,7 @@ public class Icon {
          *
          * @param device このIconを保持するDevice
          */
-        public void setDevice(@NotNull Device device) {
+        public void setDevice(@Nonnull Device device) {
             mDevice = device;
         }
 
@@ -55,7 +55,7 @@ public class Icon {
          *
          * @param mimeType MimeType
          */
-        public void setMimeType(@NotNull String mimeType) {
+        public void setMimeType(@Nonnull String mimeType) {
             mMimeType = mimeType;
         }
 
@@ -64,7 +64,7 @@ public class Icon {
          *
          * @param height Height
          */
-        public void setHeight(@NotNull String height) {
+        public void setHeight(@Nonnull String height) {
             try {
                 mHeight = Integer.parseInt(height);
             } catch (NumberFormatException e) {
@@ -77,7 +77,7 @@ public class Icon {
          *
          * @param width Width
          */
-        public void setWidth(@NotNull String width) {
+        public void setWidth(@Nonnull String width) {
             try {
                 mWidth = Integer.parseInt(width);
             } catch (NumberFormatException e) {
@@ -90,7 +90,7 @@ public class Icon {
          *
          * @param depth Depth
          */
-        public void setDepth(@NotNull String depth) {
+        public void setDepth(@Nonnull String depth) {
             try {
                 mDepth = Integer.parseInt(depth);
             } catch (NumberFormatException e) {
@@ -103,7 +103,7 @@ public class Icon {
          *
          * @param url URL
          */
-        public void setUrl(@NotNull String url) {
+        public void setUrl(@Nonnull String url) {
             mUrl = url;
         }
 
@@ -126,7 +126,7 @@ public class Icon {
          * @return Iconのインスタンス
          * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
-        @NotNull
+        @Nonnull
         public Icon build() throws IllegalStateException {
             if (mDevice == null) {
                 throw new IllegalStateException("device must be set.");
@@ -159,7 +159,7 @@ public class Icon {
     private final String mUrl;
     private byte[] mBinary;
 
-    private Icon(@NotNull Builder builder) {
+    private Icon(@Nonnull Builder builder) {
         mDevice = builder.mDevice;
         mMimeType = builder.mMimeType;
         mHeight = builder.mHeight;
@@ -174,7 +174,7 @@ public class Icon {
      *
      * @return このIconを保持するDevice
      */
-    @NotNull
+    @Nonnull
     public Device getDevice() {
         return mDevice;
     }
@@ -184,7 +184,7 @@ public class Icon {
      * 
      * @return MimeType
      */
-    @NotNull
+    @Nonnull
     public String getMimeType() {
         return mMimeType;
     }
@@ -221,7 +221,7 @@ public class Icon {
      *
      * @return URL
      */
-    @NotNull
+    @Nonnull
     public String getUrl() {
         return mUrl;
     }

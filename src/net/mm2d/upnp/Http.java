@@ -7,15 +7,15 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * HTTPに必要な各種定義とユーティリティを提供する。
@@ -139,7 +139,7 @@ public final class Http {
          *
          * @return レスポンスフレーズ
          */
-        @NotNull
+        @Nonnull
         public String getPhrase() {
             return mPhrase;
         }
@@ -208,7 +208,7 @@ public final class Http {
      * @param date 日付
      * @return RFC1123形式の日付文字列
      */
-    @NotNull
+    @Nonnull
     public synchronized static String formatDate(long date) {
         return formatDate(new Date(date));
     }
@@ -219,8 +219,8 @@ public final class Http {
      * @param date 日付
      * @return RFC1123形式の日付文字列
      */
-    @NotNull
-    public synchronized static String formatDate(@NotNull Date date) {
+    @Nonnull
+    public synchronized static String formatDate(@Nonnull Date date) {
         return sRfc1123Format.format(date);
     }
 
@@ -229,7 +229,7 @@ public final class Http {
      *
      * @return RFC1123形式の日付文字列
      */
-    @NotNull
+    @Nonnull
     public synchronized static String getCurrentData() {
         return formatDate(System.currentTimeMillis());
     }

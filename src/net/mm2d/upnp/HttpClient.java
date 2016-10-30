@@ -7,14 +7,14 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
+import javax.annotation.Nonnull;
 
 /**
  * HTTP通信を行うクライアントソケット。
@@ -70,7 +70,7 @@ public class HttpClient {
      * @return 受信したレスポンス
      * @throws IOException 通信エラー
      */
-    @NotNull
+    @Nonnull
     public HttpResponse post(HttpRequest request) throws IOException {
         if (mSocket != null) {
             if (!mSocket.getInetAddress().equals(request.getAddress())
@@ -97,7 +97,7 @@ public class HttpClient {
         }
     }
 
-    private void openSocket(@NotNull HttpRequest request) throws IOException {
+    private void openSocket(@Nonnull HttpRequest request) throws IOException {
         mSocket = new Socket();
         mSocket.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT);
         mSocket.setSoTimeout(Property.DEFAULT_TIMEOUT);

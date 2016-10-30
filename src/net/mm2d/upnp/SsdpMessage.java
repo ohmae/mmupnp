@@ -7,9 +7,6 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -17,6 +14,9 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * SSDPメッセージを表現するクラス。
@@ -67,7 +67,7 @@ public abstract class SsdpMessage {
      *
      * @return {@link HttpMessage}のインスタンス
      */
-    @NotNull
+    @Nonnull
     protected abstract HttpMessage newMessage();
 
     /**
@@ -75,7 +75,7 @@ public abstract class SsdpMessage {
      *
      * @return 内部表現としての{@link HttpMessage}
      */
-    @NotNull
+    @Nonnull
     protected HttpMessage getMessage() {
         return mMessage;
     }
@@ -94,7 +94,8 @@ public abstract class SsdpMessage {
      * @param dp 受信したDatagramPacket
      * @throws IOException 入出力エラー
      */
-    public SsdpMessage(@NotNull InterfaceAddress ifa, @NotNull DatagramPacket dp) throws IOException {
+    public SsdpMessage(@Nonnull InterfaceAddress ifa, @Nonnull DatagramPacket dp)
+            throws IOException {
         mMessage = newMessage();
         mInterfaceAddress = ifa;
         mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
@@ -130,10 +131,10 @@ public abstract class SsdpMessage {
 
     /**
      * このパケットを受信したInterfaceAddressを返す。
-     * 
+     *
      * @return このパケットを受信したInterfaceAddress
      */
-    @NotNull
+    @Nonnull
     public InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
     }
@@ -177,7 +178,7 @@ public abstract class SsdpMessage {
      * @return 値
      */
     @Nullable
-    public String getHeader(@NotNull String name) {
+    public String getHeader(@Nonnull String name) {
         return mMessage.getHeader(name);
     }
 
@@ -187,7 +188,7 @@ public abstract class SsdpMessage {
      * @param name ヘッダ名
      * @param value 値
      */
-    public void setHeader(@NotNull String name, @NotNull String value) {
+    public void setHeader(@Nonnull String name, @Nonnull String value) {
         mMessage.setHeader(name, value);
     }
 
@@ -252,7 +253,7 @@ public abstract class SsdpMessage {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public String toString() {
         return mMessage.toString();
     }

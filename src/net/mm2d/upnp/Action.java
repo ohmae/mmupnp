@@ -7,9 +7,6 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import net.mm2d.util.Log;
 
 import org.w3c.dom.Attr;
@@ -32,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -72,7 +71,7 @@ public class Action {
          *
          * @param service このActionを保持するService
          */
-        public void serService(@NotNull Service service) {
+        public void serService(@Nonnull Service service) {
             mService = service;
         }
 
@@ -81,7 +80,7 @@ public class Action {
          *
          * @param name Action名
          */
-        public void setName(@NotNull String name) {
+        public void setName(@Nonnull String name) {
             mName = name;
         }
 
@@ -92,7 +91,7 @@ public class Action {
          *
          * @param argument Argumentのビルダー
          */
-        public void addArgumentBuilder(@NotNull Argument.Builder argument) {
+        public void addArgumentBuilder(@Nonnull Argument.Builder argument) {
             mArgumentList.add(argument);
         }
 
@@ -101,7 +100,7 @@ public class Action {
          *
          * @return Argumentのビルダーリスト
          */
-        @NotNull
+        @Nonnull
         public List<Argument.Builder> getArgumentBuilderList() {
             return mArgumentList;
         }
@@ -112,7 +111,7 @@ public class Action {
          * @return Actionのインスタンス
          * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
-        @NotNull
+        @Nonnull
         public Action build() throws IllegalStateException {
             if (mService == null) {
                 throw new IllegalStateException("service must be set.");
@@ -132,7 +131,7 @@ public class Action {
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
 
-    private Action(@NotNull Builder builder) {
+    private Action(@Nonnull Builder builder) {
         mService = builder.mService;
         mName = builder.mName;
         mArgumentMap = new LinkedHashMap<>(builder.mArgumentList.size());
@@ -148,7 +147,7 @@ public class Action {
      *
      * @return このActionを保持するService
      */
-    @NotNull
+    @Nonnull
     public Service getService() {
         return mService;
     }
@@ -158,7 +157,7 @@ public class Action {
      *
      * @return Action名
      */
-    @NotNull
+    @Nonnull
     public String getName() {
         return mName;
     }
@@ -171,7 +170,7 @@ public class Action {
      *
      * @return Argumentリスト
      */
-    @NotNull
+    @Nonnull
     public List<Argument> getArgumentList() {
         if (mArgumentList == null) {
             mArgumentList = Collections.unmodifiableList(new ArrayList<>(mArgumentMap.values()));
@@ -179,7 +178,7 @@ public class Action {
         return mArgumentList;
     }
 
-    @NotNull
+    @Nonnull
     private String getSoapActionName() {
         return '"' + mService.getServiceType() + '#' + mName + '"';
     }
@@ -198,8 +197,8 @@ public class Action {
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
      */
-    @NotNull
-    public Map<String, String> invoke(@NotNull Map<String, String> arguments)
+    @Nonnull
+    public Map<String, String> invoke(@Nonnull Map<String, String> arguments)
             throws IOException {
         final String soap = makeSoap(arguments);
         final URL url = mService.getAbsoluteUrl(mService.getControlUrl());
@@ -224,8 +223,8 @@ public class Action {
         }
     }
 
-    @NotNull
-    private String makeSoap(@NotNull Map<String, String> arguments) throws IOException {
+    @Nonnull
+    private String makeSoap(@Nonnull Map<String, String> arguments) throws IOException {
         try {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -269,7 +268,7 @@ public class Action {
     }
 
     @Nullable
-    private Element findChildElementByName(@NotNull Node node, @NotNull String name) {
+    private Element findChildElementByName(@Nonnull Node node, @Nonnull String name) {
         Node child = node.getFirstChild();
         for (; child != null; child = child.getNextSibling()) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
@@ -282,8 +281,8 @@ public class Action {
         return null;
     }
 
-    @NotNull
-    private Map<String, String> parseResponse(@NotNull String xml)
+    @Nonnull
+    private Map<String, String> parseResponse(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final String responseTag = mName + "Response";
         final Map<String, String> result = new HashMap<>();

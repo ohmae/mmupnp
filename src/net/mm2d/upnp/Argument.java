@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Argumentを表現するクラス。
@@ -41,7 +41,7 @@ public class Argument {
          *
          * @param action このArgumentを保持するAction
          */
-        public void setAction(@NotNull Action action) {
+        public void setAction(@Nonnull Action action) {
             mAction = action;
         }
 
@@ -50,7 +50,7 @@ public class Argument {
          *
          * @param name Argument名
          */
-        public void setName(@NotNull String name) {
+        public void setName(@Nonnull String name) {
             mName = name;
         }
 
@@ -61,7 +61,7 @@ public class Argument {
          *
          * @param direction Directionの値
          */
-        public void setDirection(@NotNull String direction) {
+        public void setDirection(@Nonnull String direction) {
             mInputDirection = "in".equalsIgnoreCase(direction);
         }
 
@@ -70,7 +70,7 @@ public class Argument {
          *
          * @param name RelatedStateVariableの値
          */
-        public void setRelatedStateVariableName(@NotNull String name) {
+        public void setRelatedStateVariableName(@Nonnull String name) {
             mRelatedStateVariableName = name;
         }
 
@@ -89,7 +89,7 @@ public class Argument {
          *
          * @param variable StateVariableのインスタンス
          */
-        public void setRelatedStateVariable(@NotNull StateVariable variable) {
+        public void setRelatedStateVariable(@Nonnull StateVariable variable) {
             mRelatedStateVariable = variable;
         }
 
@@ -119,7 +119,7 @@ public class Argument {
     private final boolean mInputDirection;
     private final StateVariable mRelatedStateVariable;
 
-    private Argument(@NotNull Builder builder) {
+    private Argument(@Nonnull Builder builder) {
         mAction = builder.mAction;
         mName = builder.mName;
         mInputDirection = builder.mInputDirection;
@@ -131,7 +131,7 @@ public class Argument {
      *
      * @return このArgumentを保持するAction
      */
-    @NotNull
+    @Nonnull
     public Action getAction() {
         return mAction;
     }
@@ -141,7 +141,7 @@ public class Argument {
      *
      * @return Argument名
      */
-    @NotNull
+    @Nonnull
     public String getName() {
         return mName;
     }
@@ -160,7 +160,7 @@ public class Argument {
      *
      * @return StateVariableのインスタンス
      */
-    @NotNull
+    @Nonnull
     public StateVariable getRelatedStateVariable() {
         return mRelatedStateVariable;
     }

@@ -7,11 +7,11 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
+
+import javax.annotation.Nonnull;
 
 /**
  * HTTPリクエストメッセージを表現するクラス。
@@ -30,7 +30,7 @@ public class HttpRequest extends HttpMessage {
     }
 
     @Override
-    public void setStartLine(@NotNull String line) throws IllegalArgumentException {
+    public void setStartLine(@Nonnull String line) throws IllegalArgumentException {
         setRequestLine(line);
     }
 
@@ -42,7 +42,7 @@ public class HttpRequest extends HttpMessage {
      * @param line リクエストライン
      * @see #setStartLine(String)
      */
-    public void setRequestLine(@NotNull String line) throws IllegalArgumentException {
+    public void setRequestLine(@Nonnull String line) throws IllegalArgumentException {
         final String[] params = line.split(" ");
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -53,7 +53,7 @@ public class HttpRequest extends HttpMessage {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public String getStartLine() {
         return getMethod() + " " + getUri() + " " + getVersion();
     }
@@ -64,7 +64,7 @@ public class HttpRequest extends HttpMessage {
      * @param url 接続先URL
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(@NotNull URL url) throws IOException {
+    public void setUrl(@Nonnull URL url) throws IOException {
         setUrl(url, false);
     }
 
@@ -75,7 +75,7 @@ public class HttpRequest extends HttpMessage {
      * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(@NotNull URL url, boolean withHostHeader) throws IOException {
+    public void setUrl(@Nonnull URL url, boolean withHostHeader) throws IOException {
         if (!"http".equals(url.getProtocol())) {
             throw new IOException("unsupported protocol." + url.getProtocol());
         }
@@ -96,7 +96,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @return リクエストメソッド
      */
-    @NotNull
+    @Nonnull
     public String getMethod() {
         return mMethod;
     }
@@ -106,7 +106,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @param method リクエストメソッド
      */
-    public void setMethod(@NotNull String method) {
+    public void setMethod(@Nonnull String method) {
         mMethod = method;
     }
 
@@ -115,7 +115,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @return URI
      */
-    @NotNull
+    @Nonnull
     public String getUri() {
         return mUri;
     }
@@ -125,7 +125,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @param uri URI
      */
-    public void setUri(@NotNull String uri) {
+    public void setUri(@Nonnull String uri) {
         mUri = uri;
     }
 }

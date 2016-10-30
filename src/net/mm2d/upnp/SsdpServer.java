@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-
 import net.mm2d.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -22,6 +20,8 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * SSDPパケットの受信を行うクラスの親クラス。
@@ -54,7 +54,7 @@ abstract class SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    public SsdpServer(@NotNull NetworkInterface ni) {
+    public SsdpServer(@Nonnull NetworkInterface ni) {
         this(ni, 0);
     }
 
@@ -64,7 +64,7 @@ abstract class SsdpServer {
      * @param ni 使用するインターフェース
      * @param bindPort 使用するポート
      */
-    public SsdpServer(@NotNull NetworkInterface ni, int bindPort) {
+    public SsdpServer(@Nonnull NetworkInterface ni, int bindPort) {
         mBindPort = bindPort;
         mInterface = ni;
         final List<InterfaceAddress> ifas = mInterface.getInterfaceAddresses();
@@ -150,7 +150,7 @@ abstract class SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    public void send(@NotNull SsdpMessage message) {
+    public void send(@Nonnull SsdpMessage message) {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.getMessage().writeData(baos);
@@ -165,7 +165,7 @@ abstract class SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    public void send(@NotNull byte[] message) {
+    public void send(@Nonnull byte[] message) {
         try {
             final DatagramPacket dp = new DatagramPacket(message, message.length, SSDP_SO_ADDR);
             mSocket.send(dp);
@@ -180,7 +180,7 @@ abstract class SsdpServer {
      * @param addr 受信したインターフェース
      * @param dp 受信したパケット
      */
-    protected abstract void onReceive(@NotNull InterfaceAddress addr, @NotNull DatagramPacket dp);
+    protected abstract void onReceive(@Nonnull InterfaceAddress addr, @Nonnull DatagramPacket dp);
 
     /**
      * Joinを行う。
