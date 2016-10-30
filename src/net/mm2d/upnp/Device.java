@@ -71,7 +71,7 @@ public class Device {
         mIconList = new ArrayList<>();
         mServiceList = new ArrayList<>();
         mTagMap = new LinkedHashMap<>();
-        mTagMap.put("", new HashMap<>());
+        mTagMap.put("", new HashMap<String, String>());
     }
 
     /**
@@ -283,7 +283,7 @@ public class Device {
         }
         try {
             return service.build();
-        } catch (IllegalStateException e) {
+        } catch (final IllegalStateException e) {
             throw new IOException(e.getMessage());
         }
     }
