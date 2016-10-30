@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import net.mm2d.util.Log;
 
 import org.w3c.dom.Attr;
@@ -69,7 +72,7 @@ public class Action {
          *
          * @param service このActionを保持するService
          */
-        public void serService(Service service) {
+        public void serService(@NotNull Service service) {
             mService = service;
         }
 
@@ -78,7 +81,7 @@ public class Action {
          *
          * @param name Action名
          */
-        public void setName(String name) {
+        public void setName(@NotNull String name) {
             mName = name;
         }
 
@@ -89,7 +92,7 @@ public class Action {
          *
          * @param argument Argumentのビルダー
          */
-        public void addArgumentBuilder(Argument.Builder argument) {
+        public void addArgumentBuilder(@NotNull Argument.Builder argument) {
             mArgumentList.add(argument);
         }
 
@@ -98,6 +101,7 @@ public class Action {
          *
          * @return Argumentのビルダーリスト
          */
+        @NotNull
         public List<Argument.Builder> getArgumentBuilderList() {
             return mArgumentList;
         }
@@ -106,8 +110,16 @@ public class Action {
          * Actionのインスタンスを作成する。
          *
          * @return Actionのインスタンス
+         * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
-        public Action build() {
+        @NotNull
+        public Action build() throws IllegalStateException {
+            if (mService == null) {
+                throw new IllegalStateException("service must be set.");
+            }
+            if (mName == null) {
+                throw new IllegalStateException("name must be set.");
+            }
             return new Action(this);
         }
     }
@@ -120,7 +132,7 @@ public class Action {
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
 
-    private Action(Builder builder) {
+    private Action(@NotNull Builder builder) {
         mService = builder.mService;
         mName = builder.mName;
         mArgumentMap = new LinkedHashMap<>(builder.mArgumentList.size());
@@ -136,6 +148,7 @@ public class Action {
      *
      * @return このActionを保持するService
      */
+    @NotNull
     public Service getService() {
         return mService;
     }
@@ -145,6 +158,7 @@ public class Action {
      *
      * @return Action名
      */
+    @NotNull
     public String getName() {
         return mName;
     }
@@ -157,6 +171,7 @@ public class Action {
      *
      * @return Argumentリスト
      */
+    @NotNull
     public List<Argument> getArgumentList() {
         if (mArgumentList == null) {
             mArgumentList = Collections.unmodifiableList(new ArrayList<>(mArgumentMap.values()));
@@ -164,9 +179,9 @@ public class Action {
         return mArgumentList;
     }
 
+    @NotNull
     private String getSoapActionName() {
-        return '"' + mService.getServiceType()
-                + '#' + mName + '"';
+        return '"' + mService.getServiceType() + '#' + mName + '"';
     }
 
     /**
@@ -183,12 +198,10 @@ public class Action {
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
      */
-    public Map<String, String> invoke(Map<String, String> arguments)
+    @NotNull
+    public Map<String, String> invoke(@NotNull Map<String, String> arguments)
             throws IOException {
         final String soap = makeSoap(arguments);
-        if (soap == null) {
-            return null;
-        }
         final URL url = mService.getAbsoluteUrl(mService.getControlUrl());
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.POST);
@@ -207,12 +220,12 @@ public class Action {
         try {
             return parseResponse(response.getBody());
         } catch (SAXException | ParserConfigurationException e) {
-            Log.w(TAG, e);
+            throw new IOException(response.getBody());
         }
-        return null;
     }
 
-    private String makeSoap(Map<String, String> arguments) {
+    @NotNull
+    private String makeSoap(@NotNull Map<String, String> arguments) throws IOException {
         try {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -251,12 +264,12 @@ public class Action {
                 | ParserConfigurationException
                 | TransformerFactoryConfigurationError
                 | TransformerException e) {
-            Log.w(TAG, e);
+            throw new IOException();
         }
-        return null;
     }
 
-    private Element findChildElementByName(Node node, String name) {
+    @Nullable
+    private Element findChildElementByName(@NotNull Node node, @NotNull String name) {
         Node child = node.getFirstChild();
         for (; child != null; child = child.getNextSibling()) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
@@ -269,7 +282,8 @@ public class Action {
         return null;
     }
 
-    private Map<String, String> parseResponse(String xml)
+    @NotNull
+    private Map<String, String> parseResponse(@NotNull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final String responseTag = mName + "Response";
         final Map<String, String> result = new HashMap<>();

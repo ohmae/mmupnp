@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -17,8 +19,8 @@ import java.net.URL;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpRequest extends HttpMessage {
-    private String mMethod;
-    private String mUri;
+    private String mMethod = "GET";
+    private String mUri = "";
 
     /**
      * インスタンス作成。
@@ -28,7 +30,7 @@ public class HttpRequest extends HttpMessage {
     }
 
     @Override
-    public void setStartLine(String line) {
+    public void setStartLine(@NotNull String line) throws IllegalArgumentException {
         setRequestLine(line);
     }
 
@@ -40,7 +42,7 @@ public class HttpRequest extends HttpMessage {
      * @param line リクエストライン
      * @see #setStartLine(String)
      */
-    public void setRequestLine(String line) {
+    public void setRequestLine(@NotNull String line) throws IllegalArgumentException {
         final String[] params = line.split(" ");
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -51,14 +53,9 @@ public class HttpRequest extends HttpMessage {
     }
 
     @Override
+    @NotNull
     public String getStartLine() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(getMethod());
-        sb.append(' ');
-        sb.append(getUri());
-        sb.append(' ');
-        sb.append(getVersion());
-        return sb.toString();
+        return getMethod() + " " + getUri() + " " + getVersion();
     }
 
     /**
@@ -67,7 +64,7 @@ public class HttpRequest extends HttpMessage {
      * @param url 接続先URL
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(URL url) throws IOException {
+    public void setUrl(@NotNull URL url) throws IOException {
         setUrl(url, false);
     }
 
@@ -78,7 +75,7 @@ public class HttpRequest extends HttpMessage {
      * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(URL url, boolean withHostHeader) throws IOException {
+    public void setUrl(@NotNull URL url, boolean withHostHeader) throws IOException {
         if (!"http".equals(url.getProtocol())) {
             throw new IOException("unsupported protocol." + url.getProtocol());
         }
@@ -99,6 +96,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @return リクエストメソッド
      */
+    @NotNull
     public String getMethod() {
         return mMethod;
     }
@@ -108,7 +106,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @param method リクエストメソッド
      */
-    public void setMethod(String method) {
+    public void setMethod(@NotNull String method) {
         mMethod = method;
     }
 
@@ -117,6 +115,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @return URI
      */
+    @NotNull
     public String getUri() {
         return mUri;
     }
@@ -126,7 +125,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @param uri URI
      */
-    public void setUri(String uri) {
+    public void setUri(@NotNull String uri) {
         mUri = uri;
     }
 }

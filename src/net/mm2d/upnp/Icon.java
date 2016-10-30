@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import net.mm2d.util.Log;
 
 import java.io.IOException;
@@ -43,7 +46,7 @@ public class Icon {
          *
          * @param device このIconを保持するDevice
          */
-        public void setDevice(Device device) {
+        public void setDevice(@NotNull Device device) {
             mDevice = device;
         }
 
@@ -52,7 +55,7 @@ public class Icon {
          *
          * @param mimeType MimeType
          */
-        public void setMimeType(String mimeType) {
+        public void setMimeType(@NotNull String mimeType) {
             mMimeType = mimeType;
         }
 
@@ -61,8 +64,12 @@ public class Icon {
          *
          * @param height Height
          */
-        public void setHeight(String height) {
-            mHeight = Integer.parseInt(height);
+        public void setHeight(@NotNull String height) {
+            try {
+                mHeight = Integer.parseInt(height);
+            } catch (NumberFormatException e) {
+                mHeight = 0;
+            }
         }
 
         /**
@@ -70,8 +77,12 @@ public class Icon {
          *
          * @param width Width
          */
-        public void setWidth(String width) {
-            mWidth = Integer.parseInt(width);
+        public void setWidth(@NotNull String width) {
+            try {
+                mWidth = Integer.parseInt(width);
+            } catch (NumberFormatException e) {
+                mWidth = 0;
+            }
         }
 
         /**
@@ -79,8 +90,12 @@ public class Icon {
          *
          * @param depth Depth
          */
-        public void setDepth(String depth) {
-            mDepth = Integer.parseInt(depth);
+        public void setDepth(@NotNull String depth) {
+            try {
+                mDepth = Integer.parseInt(depth);
+            } catch (NumberFormatException e) {
+                mDepth = 0;
+            }
         }
 
         /**
@@ -88,7 +103,7 @@ public class Icon {
          *
          * @param url URL
          */
-        public void setUrl(String url) {
+        public void setUrl(@NotNull String url) {
             mUrl = url;
         }
 
@@ -101,7 +116,7 @@ public class Icon {
          *
          * @param binary バイナリ
          */
-        public void setBinary(byte[] binary) {
+        public void setBinary(@Nullable byte[] binary) {
             mBinary = binary;
         }
 
@@ -109,8 +124,28 @@ public class Icon {
          * Iconのインスタンスを作成する。
          *
          * @return Iconのインスタンス
+         * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
-        public Icon build() {
+        @NotNull
+        public Icon build() throws IllegalStateException {
+            if (mDevice == null) {
+                throw new IllegalStateException("device must be set.");
+            }
+            if (mMimeType == null) {
+                throw new IllegalStateException("mimetype must be set.");
+            }
+            if (mWidth <= 0) {
+                throw new IllegalStateException("width must be > 0.");
+            }
+            if (mHeight <= 0) {
+                throw new IllegalStateException("height must be > 0.");
+            }
+            if (mDepth <= 0) {
+                throw new IllegalStateException("depth must be > 0.");
+            }
+            if (mUrl == null) {
+                throw new IllegalStateException("url must be set.");
+            }
             return new Icon(this);
         }
     }
@@ -124,7 +159,7 @@ public class Icon {
     private final String mUrl;
     private byte[] mBinary;
 
-    private Icon(Builder builder) {
+    private Icon(@NotNull Builder builder) {
         mDevice = builder.mDevice;
         mMimeType = builder.mMimeType;
         mHeight = builder.mHeight;
@@ -139,6 +174,7 @@ public class Icon {
      *
      * @return このIconを保持するDevice
      */
+    @NotNull
     public Device getDevice() {
         return mDevice;
     }
@@ -148,6 +184,7 @@ public class Icon {
      * 
      * @return MimeType
      */
+    @NotNull
     public String getMimeType() {
         return mMimeType;
     }
@@ -164,7 +201,7 @@ public class Icon {
     /**
      * Widthの値を返す。
      * 
-     * @return Wdith
+     * @return Width
      */
     public int getWidth() {
         return mWidth;
@@ -184,6 +221,7 @@ public class Icon {
      *
      * @return URL
      */
+    @NotNull
     public String getUrl() {
         return mUrl;
     }
@@ -214,6 +252,7 @@ public class Icon {
      * 
      * @return バイナリデータ
      */
+    @Nullable
     public byte[] getBinary() {
         return mBinary;
     }

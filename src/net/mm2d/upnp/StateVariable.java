@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +50,7 @@ public class StateVariable {
          *
          * @param service このStateVariableを保持するService
          */
-        public void setService(Service service) {
+        public void setService(@NotNull Service service) {
             mService = service;
         }
 
@@ -58,7 +61,7 @@ public class StateVariable {
          *
          * @param sendEvents SendEventsの値
          */
-        public void setSendEvents(String sendEvents) {
+        public void setSendEvents(@NotNull String sendEvents) {
             mSendEvents = !"no".equalsIgnoreCase(sendEvents);
         }
 
@@ -70,7 +73,7 @@ public class StateVariable {
          *
          * @param multicast Multicastの値
          */
-        public void setMulticast(String multicast) {
+        public void setMulticast(@NotNull String multicast) {
             mMulticast = "yes".equalsIgnoreCase(multicast);
         }
 
@@ -79,7 +82,7 @@ public class StateVariable {
          *
          * @param name StateVariable名
          */
-        public void setName(String name) {
+        public void setName(@NotNull String name) {
             mName = name;
         }
 
@@ -88,7 +91,7 @@ public class StateVariable {
          *
          * @param dataType DataType
          */
-        public void setDataType(String dataType) {
+        public void setDataType(@NotNull String dataType) {
             mDataType = dataType;
         }
 
@@ -122,10 +125,10 @@ public class StateVariable {
         /**
          * Maximumを登録する。
          *
-         * @param maximun Maximum
+         * @param maximum Maximum
          */
-        public void setMaximun(String maximun) {
-            mMaximum = maximun;
+        public void setMaximum(String maximum) {
+            mMaximum = maximum;
         }
 
         /**

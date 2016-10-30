@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
@@ -27,7 +30,7 @@ class SsdpSearchServer extends SsdpServer {
          *
          * @param message 受信したレスポンスメッセージ
          */
-        void onReceiveResponse(SsdpResponseMessage message);
+        void onReceiveResponse(@NotNull SsdpResponseMessage message);
     }
 
     /**
@@ -46,7 +49,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    public SsdpSearchServer(NetworkInterface ni) {
+    public SsdpSearchServer(@NotNull NetworkInterface ni) {
         super(ni);
     }
 
@@ -55,7 +58,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param listener リスナー
      */
-    public void setResponseListener(ResponseListener listener) {
+    public void setResponseListener(@Nullable ResponseListener listener) {
         mListener = listener;
     }
 
@@ -73,7 +76,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param st STの値
      */
-    public void search(String st) {
+    public void search(@Nullable String st) {
         if (st == null) {
             st = ST_ALL;
         }
@@ -88,7 +91,7 @@ class SsdpSearchServer extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(InterfaceAddress addr, DatagramPacket dp) {
+    protected void onReceive(@NotNull InterfaceAddress addr, @NotNull DatagramPacket dp) {
         try {
             final SsdpResponseMessage message = new SsdpResponseMessage(addr, dp);
             if (!message.hasValidLocation()) {

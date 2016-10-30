@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -136,6 +139,7 @@ public final class Http {
          *
          * @return レスポンスフレーズ
          */
+        @NotNull
         public String getPhrase() {
             return mPhrase;
         }
@@ -146,6 +150,7 @@ public final class Http {
          * @param code ステータスコード
          * @return 該当するStatus
          */
+        @Nullable
         public static Status valueOf(int code) {
             for (final Status c : values()) {
                 if (c.getCode() == code) {
@@ -158,7 +163,7 @@ public final class Http {
 
     private static final DateFormat sRfc1123Format;
     private static final DateFormat sRfc1036Format;
-    private static final DateFormat sAsctimeFormat;
+    private static final DateFormat sAscTimeFormat;
 
     static {
         final Locale locale = Locale.US;
@@ -167,8 +172,8 @@ public final class Http {
         sRfc1123Format.setTimeZone(tz);
         sRfc1036Format = new SimpleDateFormat("EEEE, dd-MMM-yy HH:mm:ss z", locale);
         sRfc1036Format.setTimeZone(tz);
-        sAsctimeFormat = new SimpleDateFormat("E MMM d HH:mm:ss yyyy", locale);
-        sAsctimeFormat.setTimeZone(tz);
+        sAscTimeFormat = new SimpleDateFormat("E MMM d HH:mm:ss yyyy", locale);
+        sAscTimeFormat.setTimeZone(tz);
     }
 
     /**
@@ -177,7 +182,11 @@ public final class Http {
      * @param string Dateヘッダ
      * @return パース結果、失敗した場合null
      */
-    public synchronized static Date parseDate(String string) {
+    @Nullable
+    public synchronized static Date parseDate(@Nullable String string) {
+        if (string == null) {
+            return null;
+        }
         try {
             return sRfc1123Format.parse(string);
         } catch (final ParseException ignored) {
@@ -187,7 +196,7 @@ public final class Http {
         } catch (final ParseException ignored) {
         }
         try {
-            return sAsctimeFormat.parse(string);
+            return sAscTimeFormat.parse(string);
         } catch (final ParseException ignored) {
         }
         return null;
@@ -199,6 +208,7 @@ public final class Http {
      * @param date 日付
      * @return RFC1123形式の日付文字列
      */
+    @NotNull
     public synchronized static String formatDate(long date) {
         return formatDate(new Date(date));
     }
@@ -209,7 +219,8 @@ public final class Http {
      * @param date 日付
      * @return RFC1123形式の日付文字列
      */
-    public synchronized static String formatDate(Date date) {
+    @NotNull
+    public synchronized static String formatDate(@NotNull Date date) {
         return sRfc1123Format.format(date);
     }
 
@@ -218,6 +229,7 @@ public final class Http {
      *
      * @return RFC1123形式の日付文字列
      */
+    @NotNull
     public synchronized static String getCurrentData() {
         return formatDate(System.currentTimeMillis());
     }

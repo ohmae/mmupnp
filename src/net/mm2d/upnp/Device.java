@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import net.mm2d.util.Log;
 
 import org.w3c.dom.Document;
@@ -63,12 +66,12 @@ public class Device {
      *
      * @param controlPoint 紐付けるControlPoint
      */
-    public Device(ControlPoint controlPoint) {
+    public Device(@NotNull ControlPoint controlPoint) {
         mControlPoint = controlPoint;
         mIconList = new ArrayList<>();
         mServiceList = new ArrayList<>();
         mTagMap = new LinkedHashMap<>();
-        mTagMap.put("", new HashMap<String, String>());
+        mTagMap.put("", new HashMap<>());
     }
 
     /**
@@ -76,6 +79,7 @@ public class Device {
      *
      * @return 紐付いたControlPoint
      */
+    @NotNull
     public ControlPoint getControlPoint() {
         return mControlPoint;
     }
@@ -86,9 +90,9 @@ public class Device {
      * 同一性はSSDPパケットのUUIDで判断し
      * SSDPパケット受信ごとに更新される
      *
-     * @param message
+     * @param message SSDPパケット
      */
-    void setSsdpMessage(SsdpMessage message) {
+    void setSsdpMessage(@NotNull SsdpMessage message) {
         mSsdp = message;
     }
 
@@ -97,6 +101,7 @@ public class Device {
      *
      * @return 最新のSSDPパケット
      */
+    @NotNull
     SsdpMessage getSsdpMessage() {
         return mSsdp;
     }
@@ -109,6 +114,7 @@ public class Device {
      *
      * @return SSDPパケットに記述されたUUID
      */
+    @Nullable
     public String getUuid() {
         return mSsdp.getUuid();
     }
@@ -127,6 +133,7 @@ public class Device {
      *
      * @return DeviceDescriptionのXML文字列
      */
+    @Nullable
     public String getDescription() {
         return mDescription;
     }
@@ -144,7 +151,8 @@ public class Device {
      * @return 正規化したURL
      * @throws MalformedURLException
      */
-    URL getAbsoluteUrl(String url) throws MalformedURLException {
+    @NotNull
+    URL getAbsoluteUrl(@NotNull String url) throws MalformedURLException {
         if (url.startsWith("http://")) {
             return new URL(url);
         }
@@ -203,7 +211,7 @@ public class Device {
         client.close();
     }
 
-    private void parseIconList(Node listNode) {
+    private void parseIconList(@NotNull Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -215,7 +223,7 @@ public class Device {
         }
     }
 
-    private Icon parseIcon(Element element) {
+    private Icon parseIcon(@NotNull Element element) {
         final Icon.Builder icon = new Icon.Builder();
         icon.setDevice(this);
         Node node = element.getFirstChild();
@@ -239,7 +247,7 @@ public class Device {
         return icon.build();
     }
 
-    private void parseServiceList(Node listNode) {
+    private void parseServiceList(@NotNull Node listNode) throws IOException {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -251,7 +259,8 @@ public class Device {
         }
     }
 
-    private Service parseService(Element element) {
+    @NotNull
+    private Service parseService(@NotNull Element element) throws IOException {
         final Service.Builder service = new Service.Builder();
         service.setDevice(this);
         Node node = element.getFirstChild();
@@ -272,10 +281,14 @@ public class Device {
                 service.setControlUrl(node.getTextContent());
             }
         }
-        return service.build();
+        try {
+            return service.build();
+        } catch (IllegalStateException e) {
+            throw new IOException(e.getMessage());
+        }
     }
 
-    private void parseDescription(String xml)
+    private void parseDescription(@NotNull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -338,13 +351,28 @@ public class Device {
                 }
             }
         }
+        if (mDeviceType == null) {
+            throw new IOException("deviceType must be set.");
+        }
+        if (mFriendlyName == null) {
+            throw new IOException("friendlyName must be set.");
+        }
+        if (mManufacture == null) {
+            throw new IOException("manufacturer must be set.");
+        }
+        if (mModelName == null) {
+            throw new IOException("modelName must be set.");
+        }
+        if (mUdn == null) {
+            throw new IOException("UDN must be set.");
+        }
     }
 
     /**
      * Descriptionに記述されていたタグの値を取得する。
      *
      * 個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
-     * 標準外のタグについても取得できるが、属性値の取得方法は提供されない、
+     * 標準外のタグについても取得できるが、属性値の取得方法は提供されない。
      * また同一タグが複数記述されている場合は最後に記述されていた値が取得される。
      * タグ名にネームスペースプレフィックスは含まない。
      * 複数のネームスペースがある場合は最初に見つかったネームスペースのタグが返される。
@@ -353,7 +381,8 @@ public class Device {
      * @param name タグ名
      * @return タグの値
      */
-    public String getValue(String name) {
+    @Nullable
+    public String getValue(@NotNull String name) {
         for (final Entry<String, Map<String, String>> entry : mTagMap.entrySet()) {
             final String value = entry.getValue().get(name);
             if (value != null) {
@@ -376,7 +405,8 @@ public class Device {
      * @param namespace ネームスペース（URI）
      * @return タグの値
      */
-    public String getValue(String name, String namespace) {
+    @Nullable
+    public String getValue(@NotNull String name, @NotNull String namespace) {
         final Map<String, String> nsmap = mTagMap.get(namespace);
         if (nsmap == null) {
             return null;
@@ -389,6 +419,7 @@ public class Device {
      *
      * @return Locationヘッダの値
      */
+    @Nullable
     public String getLocation() {
         return mSsdp.getLocation();
     }
@@ -400,6 +431,7 @@ public class Device {
      *
      * @return IPアドレス
      */
+    @NotNull
     public String getIpAddress() {
         try {
             final URL url = new URL(getLocation());
@@ -416,6 +448,7 @@ public class Device {
      *
      * @return UDNタグの値
      */
+    @Nullable
     public String getUdn() {
         return mUdn;
     }
@@ -427,6 +460,7 @@ public class Device {
      *
      * @return deviceTypeタグの値
      */
+    @Nullable
     public String getDeviceType() {
         return mDeviceType;
     }
@@ -438,6 +472,7 @@ public class Device {
      *
      * @return friendlyNameタグの値
      */
+    @Nullable
     public String getFriendlyName() {
         return mFriendlyName;
     }
@@ -449,6 +484,7 @@ public class Device {
      *
      * @return manufacturerタグの値
      */
+    @Nullable
     public String getManufacture() {
         return mManufacture;
     }
@@ -460,6 +496,7 @@ public class Device {
      *
      * @return manufacturerURLタグの値
      */
+    @Nullable
     public String getManufactureUrl() {
         return mManufactureUrl;
     }
@@ -471,6 +508,7 @@ public class Device {
      *
      * @return modelNameタグの値
      */
+    @Nullable
     public String getModelName() {
         return mModelName;
     }
@@ -482,6 +520,7 @@ public class Device {
      *
      * @return modelURLタグの値
      */
+    @Nullable
     public String getModelUrl() {
         return mModelUrl;
     }
@@ -493,6 +532,7 @@ public class Device {
      *
      * @return modelDescriptionタグの値
      */
+    @Nullable
     public String getModelDescription() {
         return mModelDescription;
     }
@@ -504,6 +544,7 @@ public class Device {
      *
      * @return modelNumberタグの値
      */
+    @Nullable
     public String getModelNumber() {
         return mModelNumber;
     }
@@ -515,6 +556,7 @@ public class Device {
      *
      * @return serialNumberタグの値
      */
+    @Nullable
     public String getSerialNumber() {
         return mSerialNumber;
     }
@@ -526,6 +568,7 @@ public class Device {
      *
      * @return presentationURLタグの値
      */
+    @Nullable
     public String getPresentationUrl() {
         return mPresentationUrl;
     }
@@ -536,6 +579,7 @@ public class Device {
      * @return Iconのリスト
      * @see Icon
      */
+    @NotNull
     public List<Icon> getIconList() {
         return Collections.unmodifiableList(mIconList);
     }
@@ -546,6 +590,7 @@ public class Device {
      * @return Serviceのリスト
      * @see Service
      */
+    @NotNull
     public List<Service> getServiceList() {
         return Collections.unmodifiableList(mServiceList);
     }
@@ -559,7 +604,8 @@ public class Device {
      * @return 見つかったService
      * @see Service
      */
-    public Service findServiceById(String id) {
+    @Nullable
+    public Service findServiceById(@NotNull String id) {
         for (final Service service : mServiceList) {
             if (service.getServiceId().equals(id)) {
                 return service;
@@ -577,7 +623,8 @@ public class Device {
      * @return 見つかったService
      * @see Service
      */
-    public Service findServiceByType(String type) {
+    @Nullable
+    public Service findServiceByType(@NotNull String type) {
         for (final Service service : mServiceList) {
             if (service.getServiceType().equals(type)) {
                 return service;
@@ -602,7 +649,8 @@ public class Device {
      * @see Service
      * @see Action
      */
-    public Action findAction(String name) {
+    @Nullable
+    public Action findAction(@NotNull String name) {
         for (final Service service : mServiceList) {
             final Action action = service.findAction(name);
             if (action != null) {
@@ -614,11 +662,11 @@ public class Device {
 
     @Override
     public int hashCode() {
-        return mUdn.hashCode();
+        return mUdn != null ? mUdn.hashCode() : 0;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == this) {
             return true;
         }
@@ -630,7 +678,8 @@ public class Device {
     }
 
     @Override
+    @NotNull
     public String toString() {
-        return mFriendlyName;
+        return mFriendlyName != null ? mFriendlyName : "";
     }
 }

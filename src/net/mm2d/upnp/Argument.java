@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 /**
  * Argumentを表現するクラス。
  *
@@ -38,7 +41,7 @@ public class Argument {
          *
          * @param action このArgumentを保持するAction
          */
-        public void setAction(Action action) {
+        public void setAction(@NotNull Action action) {
             mAction = action;
         }
 
@@ -47,7 +50,7 @@ public class Argument {
          *
          * @param name Argument名
          */
-        public void setName(String name) {
+        public void setName(@NotNull String name) {
             mName = name;
         }
 
@@ -58,7 +61,7 @@ public class Argument {
          *
          * @param direction Directionの値
          */
-        public void setDirection(String direction) {
+        public void setDirection(@NotNull String direction) {
             mInputDirection = "in".equalsIgnoreCase(direction);
         }
 
@@ -67,7 +70,7 @@ public class Argument {
          *
          * @param name RelatedStateVariableの値
          */
-        public void setRelatedStateVariableName(String name) {
+        public void setRelatedStateVariableName(@NotNull String name) {
             mRelatedStateVariableName = name;
         }
 
@@ -76,16 +79,17 @@ public class Argument {
          *
          * @return RelatedStateVariableの値
          */
+        @Nullable
         public String getRelatedStateVariableName() {
             return mRelatedStateVariableName;
         }
 
         /**
-         * RelatedStateVariableので指定されたStateVarialbeのインスタンスを登録する。
+         * RelatedStateVariableので指定されたStateVariableのインスタンスを登録する。
          *
          * @param variable StateVariableのインスタンス
          */
-        public void setRelatedStateVariable(StateVariable variable) {
+        public void setRelatedStateVariable(@NotNull StateVariable variable) {
             mRelatedStateVariable = variable;
         }
 
@@ -93,8 +97,19 @@ public class Argument {
          * Argumentのインスタンスを作成する。
          *
          * @return Argumentのインスタンス
+         * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
-        public Argument build() {
+        @Nullable
+        public Argument build() throws IllegalStateException {
+            if (mAction == null) {
+                throw new IllegalStateException("action must be set.");
+            }
+            if (mName == null) {
+                throw new IllegalStateException("name must be set.");
+            }
+            if (mRelatedStateVariable == null) {
+                throw new IllegalStateException("related state variable must be set.");
+            }
             return new Argument(this);
         }
     }
@@ -104,7 +119,7 @@ public class Argument {
     private final boolean mInputDirection;
     private final StateVariable mRelatedStateVariable;
 
-    private Argument(Builder builder) {
+    private Argument(@NotNull Builder builder) {
         mAction = builder.mAction;
         mName = builder.mName;
         mInputDirection = builder.mInputDirection;
@@ -116,6 +131,7 @@ public class Argument {
      *
      * @return このArgumentを保持するAction
      */
+    @NotNull
     public Action getAction() {
         return mAction;
     }
@@ -125,6 +141,7 @@ public class Argument {
      *
      * @return Argument名
      */
+    @NotNull
     public String getName() {
         return mName;
     }
@@ -139,10 +156,11 @@ public class Argument {
     }
 
     /**
-     * RelatedStateVariableでしてされたStateVariableのインスタンスを返す。
+     * RelatedStateVariableで指定されたStateVariableのインスタンスを返す。
      *
      * @return StateVariableのインスタンス
      */
+    @NotNull
     public StateVariable getRelatedStateVariable() {
         return mRelatedStateVariable;
     }

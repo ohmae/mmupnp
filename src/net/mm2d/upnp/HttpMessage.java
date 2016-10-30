@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import net.mm2d.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -21,7 +24,7 @@ import java.net.SocketAddress;
 /**
  * HTTPのメッセージを表現するクラスの親クラス。
  *
- * ResponceとRequestでStart Lineのフォーマットが異なるため
+ * ResponseとRequestでStart Lineのフォーマットが異なるため
  * その部分の実装は小クラスに任せている。
  *
  * UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
@@ -58,6 +61,7 @@ public abstract class HttpMessage {
      *
      * @return 宛先アドレス情報。
      */
+    @Nullable
     public InetAddress getAddress() {
         return mAddress;
     }
@@ -67,7 +71,7 @@ public abstract class HttpMessage {
      *
      * @param address 宛先アドレス。
      */
-    public void setAddress(InetAddress address) {
+    public void setAddress(@Nullable InetAddress address) {
         mAddress = address;
     }
 
@@ -94,7 +98,11 @@ public abstract class HttpMessage {
      *
      * @return アドレスとポート番号の組み合わせ文字列
      */
-    public String getAddressString() {
+    @NotNull
+    public String getAddressString() throws IllegalStateException {
+        if (mAddress == null) {
+            throw new IllegalStateException("address must be set");
+        }
         if (mPort == 80 || mPort <= 0) {
             return mAddress.getHostAddress();
         }
@@ -106,7 +114,11 @@ public abstract class HttpMessage {
      *
      * @return 宛先SocketAddress
      */
-    public SocketAddress getSocketAddress() {
+    @NotNull
+    public SocketAddress getSocketAddress() throws IllegalStateException {
+        if (mAddress == null) {
+            throw new IllegalStateException("address must be set");
+        }
         return new InetSocketAddress(mAddress, mPort);
     }
 
@@ -115,6 +127,7 @@ public abstract class HttpMessage {
      *
      * @return Start Line
      */
+    @Nullable
     public abstract String getStartLine();
 
     /**
@@ -122,13 +135,14 @@ public abstract class HttpMessage {
      *
      * @param line Start Line
      */
-    public abstract void setStartLine(String line);
+    public abstract void setStartLine(@NotNull String line) throws IllegalArgumentException;
 
     /**
      * HTTPバージョンの値を返す。
      *
      * @return HTTPバージョン
      */
+    @NotNull
     public String getVersion() {
         return mVersion;
     }
@@ -138,7 +152,7 @@ public abstract class HttpMessage {
      *
      * @param version HTTPバージョン
      */
-    public void setVersion(String version) {
+    public void setVersion(@NotNull String version) {
         mVersion = version;
     }
 
@@ -148,7 +162,7 @@ public abstract class HttpMessage {
      * @param name ヘッダ名
      * @param value 値
      */
-    public void setHeader(String name, String value) {
+    public void setHeader(@NotNull String name, @NotNull String value) {
         mHeaders.put(name, value);
     }
 
@@ -157,7 +171,7 @@ public abstract class HttpMessage {
      *
      * @param line ヘッダの1行
      */
-    public void setHeaderLine(String line) {
+    public void setHeaderLine(@NotNull String line) {
         final int pos = line.indexOf(':');
         if (pos < 0) {
             return;
@@ -173,7 +187,8 @@ public abstract class HttpMessage {
      * @param name ヘッダ名
      * @return ヘッダの値
      */
-    public String getHeader(String name) {
+    @Nullable
+    public String getHeader(@NotNull String name) {
         return mHeaders.get(name);
     }
 
@@ -227,7 +242,7 @@ public abstract class HttpMessage {
      * @param body メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
-    public void setBody(String body, boolean withContentLength) {
+    public void setBody(@Nullable String body, boolean withContentLength) {
         setBody(body);
         if (withContentLength) {
             final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
@@ -241,7 +256,7 @@ public abstract class HttpMessage {
      * @param body メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
-    public void setBodyBinary(byte[] body, boolean withContentLength) {
+    public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {
         setBodyBinary(body);
         if (withContentLength) {
             final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
@@ -254,7 +269,7 @@ public abstract class HttpMessage {
      *
      * @param body メッセージボディ
      */
-    public void setBody(String body) {
+    public void setBody(@Nullable String body) {
         mBody = body;
         if (body == null || body.isEmpty()) {
             mBodyBinary = null;
@@ -272,6 +287,7 @@ public abstract class HttpMessage {
      *
      * @return メッセージボディ
      */
+    @Nullable
     public String getBody() {
         if (mBody == null && mBodyBinary != null) {
             try {
@@ -288,7 +304,7 @@ public abstract class HttpMessage {
      *
      * @param body メッセージボディ
      */
-    public void setBodyBinary(byte[] body) {
+    public void setBodyBinary(@Nullable byte[] body) {
         mBodyBinary = body;
         mBody = null;
     }
@@ -298,11 +314,13 @@ public abstract class HttpMessage {
      *
      * @return メッセージボディ
      */
+    @Nullable
     public byte[] getBodyBinary() {
         return mBodyBinary;
     }
 
     @Override
+    @NotNull
     public String toString() {
         return getMessageString();
     }
@@ -312,6 +330,7 @@ public abstract class HttpMessage {
      *
      * @return ヘッダ文字列
      */
+    @NotNull
     public String getHeaderString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
@@ -331,6 +350,7 @@ public abstract class HttpMessage {
      *
      * @return ヘッダバイナリ
      */
+    @NotNull
     private byte[] getHeaderBytes() {
         try {
             return getHeaderString().getBytes(CHARSET);
@@ -345,6 +365,7 @@ public abstract class HttpMessage {
      *
      * @return メッセージ文字列
      */
+    @NotNull
     public String getMessageString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
@@ -369,7 +390,7 @@ public abstract class HttpMessage {
      * @param os 出力先
      * @throws IOException 入出力エラー
      */
-    public void writeData(OutputStream os) throws IOException {
+    public void writeData(@NotNull OutputStream os) throws IOException {
         os.write(getHeaderBytes());
         if (mBodyBinary != null) {
             os.write(mBodyBinary);
@@ -384,7 +405,7 @@ public abstract class HttpMessage {
      * @return 成功した場合true
      * @throws IOException 入出力エラー
      */
-    public boolean readData(InputStream is) throws IOException {
+    public boolean readData(@NotNull InputStream is) throws IOException {
         final String startLine = readLine(is);
         if (startLine == null || startLine.length() == 0) {
             return false;
@@ -435,7 +456,7 @@ public abstract class HttpMessage {
         return true;
     }
 
-    private int readChunkSize(InputStream is) throws IOException {
+    private int readChunkSize(@NotNull InputStream is) throws IOException {
         final String line = readLine(is);
         if (line == null || line.isEmpty()) {
             throw new IOException("Can not read chunk size!");
@@ -448,7 +469,7 @@ public abstract class HttpMessage {
         }
     }
 
-    private static String readLine(InputStream is) throws IOException {
+    private static String readLine(@NotNull InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {
             final int b = is.read();

@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -17,7 +19,7 @@ import java.net.Socket;
 /**
  * HTTP通信を行うクライアントソケット。
  *
- * UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
+ * UPnPの通信でよく利用される小さなデータのやり取りに特化したもの。
  * 長大なデータのやり取りは想定していない。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
@@ -68,6 +70,7 @@ public class HttpClient {
      * @return 受信したレスポンス
      * @throws IOException 通信エラー
      */
+    @NotNull
     public HttpResponse post(HttpRequest request) throws IOException {
         if (mSocket != null) {
             if (!mSocket.getInetAddress().equals(request.getAddress())
@@ -94,7 +97,7 @@ public class HttpClient {
         }
     }
 
-    private void openSocket(HttpRequest request) throws IOException {
+    private void openSocket(@NotNull HttpRequest request) throws IOException {
         mSocket = new Socket();
         mSocket.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT);
         mSocket.setSoTimeout(Property.DEFAULT_TIMEOUT);
@@ -103,27 +106,27 @@ public class HttpClient {
     }
 
     private void closeSocket() {
-        if (mInputStream != null) {
-            try {
+        try {
+            if (mInputStream != null) {
                 mInputStream.close();
-            } catch (final IOException ignored) {
             }
-            mInputStream = null;
+        } catch (final IOException ignored) {
         }
-        if (mOutputStream != null) {
-            try {
+        mInputStream = null;
+        try {
+            if (mOutputStream != null) {
                 mOutputStream.close();
-            } catch (final IOException ignored) {
             }
-            mOutputStream = null;
+        } catch (final IOException ignored) {
         }
-        if (mSocket != null) {
-            try {
+        mOutputStream = null;
+        try {
+            if (mSocket != null) {
                 mSocket.close();
-            } catch (final IOException ignored) {
             }
-            mSocket = null;
+        } catch (final IOException ignored) {
         }
+        mSocket = null;
     }
 
     /**

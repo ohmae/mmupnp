@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,7 +21,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class HttpHeader {
+public class HttpHeader {
     /**
      * ヘッダのエントリー情報
      */
@@ -32,7 +35,7 @@ class HttpHeader {
          * @param name ヘッダ名
          * @param value 値
          */
-        public Entry(String name, String value) {
+        public Entry(@NotNull String name, @NotNull String value) {
             mName = name;
             mValue = value;
         }
@@ -42,7 +45,7 @@ class HttpHeader {
          *
          * @param name ヘッダ名
          */
-        public void setName(String name) {
+        public void setName(@NotNull String name) {
             mName = name;
         }
 
@@ -51,6 +54,7 @@ class HttpHeader {
          *
          * @return ヘッダ名
          */
+        @NotNull
         public String getName() {
             return mName;
         }
@@ -60,7 +64,7 @@ class HttpHeader {
          *
          * @param value 値
          */
-        public void setValue(String value) {
+        public void setValue(@NotNull String value) {
             mValue = value;
         }
 
@@ -69,6 +73,7 @@ class HttpHeader {
          *
          * @return 値
          */
+        @NotNull
         public String getValue() {
             return mValue;
         }
@@ -118,7 +123,8 @@ class HttpHeader {
      * @param name ヘッダ名
      * @return ヘッダの値
      */
-    public String get(String name) {
+    @Nullable
+    public String get(@NotNull String name) {
         for (final Entry entry : mList) {
             if (entry.getName().equalsIgnoreCase(name)) {
                 return entry.getValue();
@@ -135,7 +141,8 @@ class HttpHeader {
      * @param name ヘッダ名
      * @return 削除されたヘッダがあった場合、ヘッダの値、なかった場合null
      */
-    public String remove(String name) {
+    @Nullable
+    public String remove(@NotNull String name) {
         final Iterator<Entry> i = mList.iterator();
         while (i.hasNext()) {
             final Entry entry = i.next();
@@ -159,7 +166,8 @@ class HttpHeader {
      * @param value ヘッダの値
      * @return 重複があった場合、既に登録されていた値。
      */
-    public String put(String name, String value) {
+    @Nullable
+    public String put(@NotNull String name, @NotNull String value) {
         for (final Entry entry : mList) {
             if (entry.getName().equalsIgnoreCase(name)) {
                 final String old = entry.getValue();
@@ -181,12 +189,9 @@ class HttpHeader {
      * @param value 含まれるか
      * @return 指定ヘッダにvalueが含まれる場合true
      */
-    public boolean containsValue(String name, String value) {
+    public boolean containsValue(@NotNull String name, @NotNull String value) {
         final String v = get(name);
-        if (v == null) {
-            return false;
-        }
-        return v.toLowerCase().contains(value.toLowerCase());
+        return v != null && v.toLowerCase().contains(value.toLowerCase());
     }
 
     /**
@@ -201,6 +206,7 @@ class HttpHeader {
      * 
      * @return 登録されているヘッダ情報へのSetビュー
      */
+    @NotNull
     public Set<Entry> entrySet() {
         if (mEntrySet == null) {
             mEntrySet = new EntrySet();
@@ -209,6 +215,7 @@ class HttpHeader {
     }
 
     @Override
+    @NotNull
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         for (final Entry entry : mList) {

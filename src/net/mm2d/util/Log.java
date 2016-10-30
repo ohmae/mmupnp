@@ -45,7 +45,7 @@ public class Log {
      */
     public static final int ERROR = 6;
     /**
-     * ログれレベルARRERT
+     * ログレベルASSERT
      */
     public static final int ASSERT = 7;
 

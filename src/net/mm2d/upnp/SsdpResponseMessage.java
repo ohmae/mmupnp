@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
@@ -24,16 +27,18 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @param dp 受信したDatagramPacket
      * @throws IOException 入出力エラー
      */
-    public SsdpResponseMessage(InterfaceAddress ifa, DatagramPacket dp) throws IOException {
+    public SsdpResponseMessage(@NotNull InterfaceAddress ifa, @NotNull DatagramPacket dp) throws IOException {
         super(ifa, dp);
     }
 
     @Override
+    @NotNull
     protected HttpMessage newMessage() {
         return new HttpResponse();
     }
 
     @Override
+    @NotNull
     protected HttpResponse getMessage() {
         return (HttpResponse) super.getMessage();
     }
@@ -64,6 +69,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @return レスポンスフレーズ
      * @see #getStatus()
      */
+    @NotNull
     public String getReasonPhrase() {
         return getMessage().getReasonPhrase();
     }
@@ -74,7 +80,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @param reasonPhrase レスポンスフレーズ
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    public void setReasonPhrase(String reasonPhrase) {
+    public void setReasonPhrase(@NotNull String reasonPhrase) {
         getMessage().setReasonPhrase(reasonPhrase);
     }
 
@@ -83,7 +89,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      *
      * @param status ステータス
      */
-    public void setStatus(Http.Status status) {
+    public void setStatus(@NotNull Http.Status status) {
         getMessage().setStatus(status);
     }
 
@@ -92,6 +98,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      *
      * @return ステータス
      */
+    @Nullable
     public Http.Status getStatus() {
         return getMessage().getStatus();
     }

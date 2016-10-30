@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
@@ -68,7 +71,7 @@ public class ControlPoint {
          * @param device 発見したDevice
          * @see Device
          */
-        void onDiscover(Device device);
+        void onDiscover(@NotNull Device device);
 
         /**
          * 機器喪失時にコールされる。
@@ -78,7 +81,7 @@ public class ControlPoint {
          * @param device 喪失したDevice
          * @see Device
          */
-        void onLost(Device device);
+        void onLost(@NotNull Device device);
     }
 
     /**
@@ -102,7 +105,7 @@ public class ControlPoint {
          * @param value 値
          * @see Service
          */
-        void onNotifyEvent(Service service, long seq, String variable, String value);
+        void onNotifyEvent(@NotNull Service service, long seq, @NotNull String variable, @NotNull String value);
     }
 
     private static final String TAG = "ControlPoint";
@@ -113,7 +116,7 @@ public class ControlPoint {
     private final Map<String, Device> mDeviceMap;
     private final Map<String, Device> mPendingDeviceMap;
     private final Map<String, Service> mSubscribeServiceMap;
-    private final EventReceiver mEventReseiver;
+    private final EventReceiver mEventReceiver;
     private final ExecutorService mCachedThreadPool;
     private final ExecutorService mNotifyExecutor;
     private boolean mInitialized = false;
@@ -121,30 +124,8 @@ public class ControlPoint {
     private boolean mTerminated = false;
     private DeviceExpirer mDeviceExpirer;
     private SubscribeKeeper mSubscribeKeeper;
-    private final ResponseListener mResponseListener = new ResponseListener() {
-        @Override
-        public void onReceiveResponse(final SsdpResponseMessage message) {
-            executeParallel(new Runnable() {
-                @Override
-                public void run() {
-                    onReceiveSsdp(message);
-                }
-            });
-        }
-    };
-    private final NotifyListener mNotifyListener = new NotifyListener() {
-        @Override
-        public void onReceiveNotify(final SsdpRequestMessage message) {
-            executeParallel(new Runnable() {
-                @Override
-                public void run() {
-                    onReceiveSsdp(message);
-                }
-            });
-        }
-    };
 
-    private void onReceiveSsdp(SsdpMessage message) {
+    private void onReceiveSsdp(@NotNull SsdpMessage message) {
         final String uuid = message.getUuid();
         synchronized (mDeviceMap) {
             Device device = mDeviceMap.get(uuid);
@@ -180,7 +161,7 @@ public class ControlPoint {
     private class DeviceLoader implements Runnable {
         private final Device mDevice;
 
-        public DeviceLoader(Device device) {
+        public DeviceLoader(@NotNull Device device) {
             mDevice = device;
         }
 
@@ -201,24 +182,12 @@ public class ControlPoint {
         }
     }
 
-    private final EventMessageListener mEventMessageListener = new EventMessageListener() {
-        @Override
-        public boolean onEventReceived(HttpRequest request) {
-            final String sid = request.getHeader(Http.SID);
-            final Service service = getSubscribeService(sid);
-            if (service == null) {
-                return false;
-            }
-            return executeSequential(new EventNotifyTask(request, service));
-        }
-    };
-
     private class EventNotifyTask implements Runnable {
         private final HttpRequest mRequest;
         private final Service mService;
         private long mSeq;
 
-        public EventNotifyTask(HttpRequest request, Service service) {
+        public EventNotifyTask(@NotNull HttpRequest request, @NotNull Service service) {
             mRequest = request;
             mService = service;
             try {
@@ -257,10 +226,10 @@ public class ControlPoint {
             }
         }
 
-        private void notify(String name, String value) {
+        private void notify(@Nullable String name, @Nullable String value) {
             final StateVariable variable = mService.findStateVariable(name);
-            if (variable == null || !variable.isSendEvents()) {
-                Log.w(TAG, "illegal notify argument:" + name);
+            if (variable == null || !variable.isSendEvents() || value == null) {
+                Log.w(TAG, "illegal notify argument:" + name + " " + value);
                 return;
             }
             synchronized (mNotifyEventListeners) {
@@ -280,7 +249,7 @@ public class ControlPoint {
      * @param interfaces 使用するインターフェース、指定しない場合は自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
-    public ControlPoint(NetworkInterface... interfaces) {
+    public ControlPoint(@NotNull NetworkInterface... interfaces) {
         this(Arrays.asList(interfaces));
     }
 
@@ -290,7 +259,7 @@ public class ControlPoint {
      * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
-    public ControlPoint(Collection<NetworkInterface> interfaces) throws IllegalStateException {
+    public ControlPoint(@Nullable Collection<NetworkInterface> interfaces) throws IllegalStateException {
         if (interfaces == null || interfaces.isEmpty()) {
             interfaces = getAvailableInterfaces();
         }
@@ -308,16 +277,44 @@ public class ControlPoint {
         mCachedThreadPool = Executors.newCachedThreadPool();
         for (final NetworkInterface nif : interfaces) {
             final SsdpSearchServer search = new SsdpSearchServer(nif);
-            search.setResponseListener(mResponseListener);
+            search.setResponseListener(new ResponseListener() {
+                @Override
+                public void onReceiveResponse(final SsdpResponseMessage message) {
+                    executeParallel(new Runnable() {
+                        @Override
+                        public void run() {
+                            onReceiveSsdp(message);
+                        }
+                    });
+                }
+            });
             mSearchList.add(search);
             final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);
-            notify.setNotifyListener(mNotifyListener);
+            notify.setNotifyListener(new NotifyListener() {
+                @Override
+                public void onReceiveNotify(final SsdpRequestMessage message) {
+                    executeParallel(new Runnable() {
+                        @Override
+                        public void run() {
+                            onReceiveSsdp(message);
+                        }
+                    });
+                }
+            });
             mNotifyList.add(notify);
         }
-        mEventReseiver = new EventReceiver();
-        mEventReseiver.setEventMessageListener(mEventMessageListener);
+        mEventReceiver = new EventReceiver();
+        mEventReceiver.setEventMessageListener(new EventMessageListener() {
+            @Override
+            public boolean onEventReceived(HttpRequest request) {
+                final String sid = request.getHeader(Http.SID);
+                final Service service = getSubscribeService(sid);
+                return service != null && executeSequential(new EventNotifyTask(request, service));
+            }
+        });
     }
 
+    @NotNull
     private Collection<NetworkInterface> getAvailableInterfaces() {
         final Collection<NetworkInterface> list = new ArrayList<>();
         final Enumeration<NetworkInterface> nis;
@@ -348,7 +345,7 @@ public class ControlPoint {
         return list;
     }
 
-    private boolean executeParallel(Runnable command) {
+    private boolean executeParallel(@NotNull Runnable command) {
         if (mCachedThreadPool.isShutdown()) {
             return false;
         }
@@ -360,7 +357,7 @@ public class ControlPoint {
         return true;
     }
 
-    private boolean executeSequential(Runnable command) {
+    private boolean executeSequential(@NotNull Runnable command) {
         if (mNotifyExecutor.isShutdown()) {
             return false;
         }
@@ -449,7 +446,7 @@ public class ControlPoint {
         }
         mStarted = true;
         try {
-            mEventReseiver.open();
+            mEventReceiver.open();
         } catch (final IOException e1) {
             Log.w(TAG, e1);
         }
@@ -514,7 +511,7 @@ public class ControlPoint {
         for (final SsdpServer server : mNotifyList) {
             server.close();
         }
-        mEventReseiver.close();
+        mEventReceiver.close();
         mSubscribeKeeper.clear();
         final List<Device> list = new ArrayList<>(mDeviceMap.values());
         for (final Device device : list) {
@@ -541,7 +538,7 @@ public class ControlPoint {
      *
      * @param st SearchパケットのSTフィールド
      */
-    public void search(String st) {
+    public void search(@Nullable String st) {
         if (!mStarted) {
             throw new IllegalStateException("ControlPoint is not started.");
         }
@@ -556,7 +553,7 @@ public class ControlPoint {
      * @param listener リスナー
      * @see DiscoveryListener
      */
-    public void addDiscoveryListener(DiscoveryListener listener) {
+    public void addDiscoveryListener(@NotNull DiscoveryListener listener) {
         synchronized (mDiscoveryListeners) {
             if (!mDiscoveryListeners.contains(listener)) {
                 mDiscoveryListeners.add(listener);
@@ -570,7 +567,7 @@ public class ControlPoint {
      * @param listener リスナー
      * @see DiscoveryListener
      */
-    public void removeDiscoveryListener(DiscoveryListener listener) {
+    public void removeDiscoveryListener(@NotNull DiscoveryListener listener) {
         synchronized (mDiscoveryListeners) {
             mDiscoveryListeners.remove(listener);
         }
@@ -582,7 +579,7 @@ public class ControlPoint {
      * @param listener リスナー
      * @see NotifyEventListener
      */
-    public void addNotifyEventListener(NotifyEventListener listener) {
+    public void addNotifyEventListener(@NotNull NotifyEventListener listener) {
         synchronized (mNotifyEventListeners) {
             if (!mNotifyEventListeners.contains(listener)) {
                 mNotifyEventListeners.add(listener);
@@ -596,13 +593,13 @@ public class ControlPoint {
      * @param listener リスナー
      * @see NotifyEventListener
      */
-    public void removeNotifyEventListener(NotifyEventListener listener) {
+    public void removeNotifyEventListener(@NotNull NotifyEventListener listener) {
         synchronized (mNotifyEventListeners) {
             mNotifyEventListeners.remove(listener);
         }
     }
 
-    private void discoverDevice(final Device device) {
+    private void discoverDevice(@NotNull final Device device) {
         synchronized (mDeviceMap) {
             mDeviceMap.put(device.getUuid(), device);
             mDeviceExpirer.add(device);
@@ -619,7 +616,7 @@ public class ControlPoint {
         });
     }
 
-    private void lostDevice(Device device) {
+    private void lostDevice(@NotNull Device device) {
         lostDevice(device, false);
     }
 
@@ -634,7 +631,7 @@ public class ControlPoint {
      * @see Device
      * @see DeviceExpirer
      */
-    void lostDevice(final Device device, boolean fromExpirer) {
+    void lostDevice(@NotNull final Device device, boolean fromExpirer) {
         synchronized (mDeviceMap) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
@@ -674,6 +671,7 @@ public class ControlPoint {
      * @return デバイスのリスト
      * @see Device
      */
+    @NotNull
     public List<Device> getDeviceList() {
         synchronized (mDeviceMap) {
             return new ArrayList<>(mDeviceMap.values());
@@ -689,6 +687,7 @@ public class ControlPoint {
      * @return 指定UDNのデバイス
      * @see Device
      */
+    @Nullable
     public Device getDevice(String udn) {
         return mDeviceMap.get(udn);
     }
@@ -700,7 +699,7 @@ public class ControlPoint {
      * @see EventReceiver
      */
     int getEventPort() {
-        return mEventReseiver.getLocalPort();
+        return mEventReceiver.getLocalPort();
     }
 
     /**
@@ -712,7 +711,8 @@ public class ControlPoint {
      * @return 該当Service
      * @see Service
      */
-    Service getSubscribeService(String subscriptionId) {
+    @Nullable
+    Service getSubscribeService(@NotNull String subscriptionId) {
         synchronized (mSubscribeServiceMap) {
             return mSubscribeServiceMap.get(subscriptionId);
         }
@@ -727,7 +727,7 @@ public class ControlPoint {
      * @see Service
      * @see Service#subscribe()
      */
-    void registerSubscribeService(Service service) {
+    void registerSubscribeService(@NotNull Service service) {
         synchronized (mSubscribeServiceMap) {
             mSubscribeServiceMap.put(service.getSubscriptionId(), service);
         }
@@ -740,7 +740,7 @@ public class ControlPoint {
      * @see Service
      * @see Service#unsubscribe()
      */
-    void unregisterSubscribeService(Service service) {
+    void unregisterSubscribeService(@NotNull Service service) {
         synchronized (mSubscribeServiceMap) {
             mSubscribeServiceMap.remove(service.getSubscriptionId());
         }
@@ -773,7 +773,7 @@ public class ControlPoint {
      * @see Service
      * @see SubscribeKeeper
      */
-    void addSubscribeKeeper(Service service) {
+    void addSubscribeKeeper(@NotNull Service service) {
         mSubscribeKeeper.add(service);
     }
 

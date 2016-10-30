@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+
 import net.mm2d.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -52,7 +54,7 @@ abstract class SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    public SsdpServer(NetworkInterface ni) {
+    public SsdpServer(@NotNull NetworkInterface ni) {
         this(ni, 0);
     }
 
@@ -62,7 +64,7 @@ abstract class SsdpServer {
      * @param ni 使用するインターフェース
      * @param bindPort 使用するポート
      */
-    public SsdpServer(NetworkInterface ni, int bindPort) {
+    public SsdpServer(@NotNull NetworkInterface ni, int bindPort) {
         mBindPort = bindPort;
         mInterface = ni;
         final List<InterfaceAddress> ifas = mInterface.getInterfaceAddresses();
@@ -137,7 +139,7 @@ abstract class SsdpServer {
         if (join) {
             try {
                 mThread.join(1000);
-            } catch (final InterruptedException e) {
+            } catch (final InterruptedException ignored) {
             }
             mThread = null;
         }
@@ -148,7 +150,7 @@ abstract class SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    public void send(SsdpMessage message) {
+    public void send(@NotNull SsdpMessage message) {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.getMessage().writeData(baos);
@@ -163,7 +165,7 @@ abstract class SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    public void send(byte[] message) {
+    public void send(@NotNull byte[] message) {
         try {
             final DatagramPacket dp = new DatagramPacket(message, message.length, SSDP_SO_ADDR);
             mSocket.send(dp);
@@ -178,7 +180,7 @@ abstract class SsdpServer {
      * @param addr 受信したインターフェース
      * @param dp 受信したパケット
      */
-    protected abstract void onReceive(InterfaceAddress addr, DatagramPacket dp);
+    protected abstract void onReceive(@NotNull InterfaceAddress addr, @NotNull DatagramPacket dp);
 
     /**
      * Joinを行う。
@@ -239,7 +241,7 @@ abstract class SsdpServer {
                             break;
                         }
                         onReceive(mInterfaceAddress, dp);
-                    } catch (final SocketTimeoutException e) {
+                    } catch (final SocketTimeoutException ignored) {
                     }
                 }
                 leaveGroup();

@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -64,13 +67,15 @@ public abstract class SsdpMessage {
      *
      * @return {@link HttpMessage}のインスタンス
      */
+    @NotNull
     protected abstract HttpMessage newMessage();
 
     /**
      * 内部表現としての{@link HttpMessage}を返す。
-     * 
+     *
      * @return 内部表現としての{@link HttpMessage}
      */
+    @NotNull
     protected HttpMessage getMessage() {
         return mMessage;
     }
@@ -89,7 +94,7 @@ public abstract class SsdpMessage {
      * @param dp 受信したDatagramPacket
      * @throws IOException 入出力エラー
      */
-    public SsdpMessage(InterfaceAddress ifa, DatagramPacket dp) throws IOException {
+    public SsdpMessage(@NotNull InterfaceAddress ifa, @NotNull DatagramPacket dp) throws IOException {
         mMessage = newMessage();
         mInterfaceAddress = ifa;
         mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
@@ -109,13 +114,10 @@ public abstract class SsdpMessage {
         final String packetAddress = mPacketAddress.getHostAddress();
         try {
             final String locationAddress = new URL(mLocation).getHost();
-            if (!packetAddress.equals(locationAddress)) {
-                return false;
-            }
-        } catch (final MalformedURLException e) {
-            return false;
+            return packetAddress.equals(locationAddress);
+        } catch (final MalformedURLException ignored) {
         }
-        return true;
+        return false;
     }
 
     private void parseMessage() {
@@ -131,6 +133,7 @@ public abstract class SsdpMessage {
      * 
      * @return このパケットを受信したInterfaceAddress
      */
+    @NotNull
     public InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
     }
@@ -173,7 +176,8 @@ public abstract class SsdpMessage {
      * @param name ヘッダ名
      * @return 値
      */
-    public String getHeader(String name) {
+    @Nullable
+    public String getHeader(@NotNull String name) {
         return mMessage.getHeader(name);
     }
 
@@ -183,7 +187,7 @@ public abstract class SsdpMessage {
      * @param name ヘッダ名
      * @param value 値
      */
-    public void setHeader(String name, String value) {
+    public void setHeader(@NotNull String name, @NotNull String value) {
         mMessage.setHeader(name, value);
     }
 
@@ -192,6 +196,7 @@ public abstract class SsdpMessage {
      *
      * @return UUID
      */
+    @Nullable
     public String getUuid() {
         return mUuid;
     }
@@ -201,6 +206,7 @@ public abstract class SsdpMessage {
      *
      * @return Type
      */
+    @Nullable
     public String getType() {
         return mType;
     }
@@ -210,6 +216,7 @@ public abstract class SsdpMessage {
      *
      * @return NSTフィールドの値
      */
+    @Nullable
     public String getNts() {
         return mNts;
     }
@@ -239,11 +246,13 @@ public abstract class SsdpMessage {
      *
      * @return Locationの値
      */
+    @Nullable
     public String getLocation() {
         return mLocation;
     }
 
     @Override
+    @NotNull
     public String toString() {
         return mMessage.toString();
     }

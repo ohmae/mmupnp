@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import net.mm2d.util.Log;
 
 import java.io.BufferedInputStream;
@@ -39,7 +42,7 @@ class EventReceiver {
          * @param request 受信したHTTPメッセージ
          * @return HTTPメッセージが正常であればtrue
          */
-        boolean onEventReceived(HttpRequest request);
+        boolean onEventReceived(@NotNull HttpRequest request);
     }
 
     private static final String TAG = "EventReceiver";
@@ -58,7 +61,7 @@ class EventReceiver {
      *
      * @param listener リスナー
      */
-    public void setEventMessageListener(EventMessageListener listener) {
+    public void setEventMessageListener(@Nullable EventMessageListener listener) {
         mListener = listener;
         if (mServerThread != null) {
             mServerThread.setEventMessageListener(listener);
@@ -105,7 +108,7 @@ class EventReceiver {
          *
          * @param sock サーバソケット
          */
-        public ServerThread(ServerSocket sock) {
+        public ServerThread(@NotNull ServerSocket sock) {
             super("EventReceiver::ServerThread");
             mServerSocket = sock;
             mClientList = Collections.synchronizedList(new LinkedList<ClientThread>());
@@ -137,16 +140,16 @@ class EventReceiver {
          *
          * @param client 終了したClientスレッド
          */
-        public void notifyClientFinish(ClientThread client) {
+        public void notifyClientFinish(@NotNull ClientThread client) {
             mClientList.remove(client);
         }
 
         /**
          * イベントリスナーの登録
          *
-         * @param listener
+         * @param listener リスナー
          */
-        public void setEventMessageListener(EventMessageListener listener) {
+        public void setEventMessageListener(@NotNull EventMessageListener listener) {
             mListener = listener;
         }
 
@@ -156,7 +159,7 @@ class EventReceiver {
          * @param request 受信したHTTPメッセージ
          * @return HTTPメッセージが正常であればtrue
          */
-        private boolean notifyEvent(HttpRequest request) {
+        private boolean notifyEvent(@NotNull HttpRequest request) {
             return mListener != null && mListener.onEventReceived(request);
         }
 
@@ -208,7 +211,7 @@ class EventReceiver {
          * @param server サーバスレッド
          * @param sock クライアントソケット
          */
-        public ClientThread(ServerThread server, Socket sock) {
+        public ClientThread(@NotNull ServerThread server, @NotNull Socket sock) {
             super("EventReceiver::ClientThread");
             mServer = server;
             mSocket = sock;
@@ -226,7 +229,7 @@ class EventReceiver {
             }
         }
 
-        private boolean notifyEvent(HttpRequest request) {
+        private boolean notifyEvent(@NotNull HttpRequest request) {
             return mServer.notifyEvent(request);
         }
 
@@ -263,17 +266,17 @@ class EventReceiver {
             } catch (final IOException e) {
                 Log.w(TAG, e);
             } finally {
-                if (is != null) {
-                    try {
+                try {
+                    if (is != null) {
                         is.close();
-                    } catch (final IOException ignored) {
                     }
+                } catch (final IOException ignored) {
                 }
-                if (os != null) {
-                    try {
+                try {
+                    if (os != null) {
                         os.close();
-                    } catch (final IOException ignored) {
                     }
+                } catch (final IOException ignored) {
                 }
                 try {
                     mSocket.close();

@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+
 import net.mm2d.util.Log;
 
 import java.io.IOException;
@@ -32,7 +34,7 @@ class SubscribeKeeper extends Thread {
         }
     };
 
-    private long getRenewTime(Service service) {
+    private long getRenewTime(@NotNull Service service) {
         long timeout = service.getSubscriptionTimeout();
         if (timeout > MARGIN_TIME) {
             timeout -= MARGIN_TIME;
@@ -42,7 +44,7 @@ class SubscribeKeeper extends Thread {
         return service.getSubscriptionStart() + timeout;
     }
 
-    public SubscribeKeeper(ControlPoint controlPoint) {
+    public SubscribeKeeper(@NotNull ControlPoint controlPoint) {
         super(TAG);
         mControlPoint = controlPoint;
         mServiceList = new ArrayList<>();
@@ -57,13 +59,13 @@ class SubscribeKeeper extends Thread {
         Collections.sort(mServiceList, mComparator);
     }
 
-    public synchronized void add(Service service) {
+    public synchronized void add(@NotNull Service service) {
         mServiceList.add(service);
         Collections.sort(mServiceList, mComparator);
         notifyAll();
     }
 
-    public synchronized void remove(Service service) {
+    public synchronized void remove(@NotNull Service service) {
         mServiceList.remove(service);
     }
 

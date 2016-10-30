@@ -1,6 +1,6 @@
 /.settings
 /bin
-/doc
+/docs
 *.class
 .classpath
 .project

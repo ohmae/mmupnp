@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 /**
  * HTTPレスポンスメッセージを表現するクラス。
  *
@@ -15,10 +18,10 @@ package net.mm2d.upnp;
 public class HttpResponse extends HttpMessage {
     private Http.Status mStatus;
     private int mStatusCode;
-    private String mReasonPhrase;
+    private String mReasonPhrase = "";
 
     @Override
-    public void setStartLine(String line) {
+    public void setStartLine(@NotNull String line) throws IllegalArgumentException {
         setStatusLine(line);
     }
 
@@ -30,7 +33,7 @@ public class HttpResponse extends HttpMessage {
      * @param line ステータスライン
      * @see #setStartLine(String)
      */
-    public void setStatusLine(String line) {
+    public void setStatusLine(@NotNull String line) throws IllegalArgumentException {
         final String[] params = line.split(" ");
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -41,6 +44,7 @@ public class HttpResponse extends HttpMessage {
     }
 
     @Override
+    @NotNull
     public String getStartLine() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getVersion());
@@ -76,9 +80,10 @@ public class HttpResponse extends HttpMessage {
     public void setStatusCode(int code) {
         mStatusCode = code;
         mStatus = Http.Status.valueOf(code);
-        if (mStatus != null) {
-            mReasonPhrase = mStatus.getPhrase();
+        if (mStatus == null) {
+            throw new IllegalArgumentException("unexpected status code:" + code);
         }
+        mReasonPhrase = mStatus.getPhrase();
     }
 
     /**
@@ -87,6 +92,7 @@ public class HttpResponse extends HttpMessage {
      * @return レスポンスフレーズ
      * @see #getStatus()
      */
+    @NotNull
     public String getReasonPhrase() {
         return mReasonPhrase;
     }
@@ -97,7 +103,7 @@ public class HttpResponse extends HttpMessage {
      * @param reasonPhrase レスポンスフレーズ
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    public void setReasonPhrase(String reasonPhrase) {
+    public void setReasonPhrase(@NotNull String reasonPhrase) {
         mReasonPhrase = reasonPhrase;
     }
 
@@ -106,7 +112,7 @@ public class HttpResponse extends HttpMessage {
      *
      * @param status ステータス
      */
-    public void setStatus(Http.Status status) {
+    public void setStatus(@NotNull Http.Status status) {
         mStatus = status;
         mStatusCode = status.getCode();
         mReasonPhrase = status.getPhrase();
@@ -117,6 +123,7 @@ public class HttpResponse extends HttpMessage {
      *
      * @return ステータス
      */
+    @Nullable
     public Http.Status getStatus() {
         return mStatus;
     }

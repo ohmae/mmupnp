@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +38,7 @@ class DeviceExpirer extends Thread {
      *
      * @param cp ControlPoint
      */
-    public DeviceExpirer(ControlPoint cp) {
+    public DeviceExpirer(@NotNull ControlPoint cp) {
         super(TAG);
         mDeviceList = new ArrayList<>();
         mControlPoint = cp;
@@ -62,7 +64,7 @@ class DeviceExpirer extends Thread {
      *
      * @param device 追加されるDevice
      */
-    public synchronized void add(Device device) {
+    public synchronized void add(@NotNull Device device) {
         mDeviceList.add(device);
         Collections.sort(mDeviceList, mComparator);
         notifyAll();
@@ -73,7 +75,7 @@ class DeviceExpirer extends Thread {
      *
      * @param device 削除されるDevice。
      */
-    public synchronized void remove(Device device) {
+    public synchronized void remove(@NotNull Device device) {
         mDeviceList.remove(device);
     }
 

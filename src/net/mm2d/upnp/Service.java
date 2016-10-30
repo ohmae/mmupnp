@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import net.mm2d.util.Log;
 
 import org.w3c.dom.Document;
@@ -61,7 +64,7 @@ public class Service {
          *
          * @param device このServiceを保持するDevice
          */
-        public void setDevice(Device device) {
+        public void setDevice(@NotNull Device device) {
             mDevice = device;
         }
 
@@ -70,7 +73,7 @@ public class Service {
          *
          * @param serviceType serviceTytpe
          */
-        public void setServiceType(String serviceType) {
+        public void setServiceType(@NotNull String serviceType) {
             mServiceType = serviceType;
         }
 
@@ -79,7 +82,7 @@ public class Service {
          *
          * @param serviceId serviceId
          */
-        public void setServiceId(String serviceId) {
+        public void setServiceId(@NotNull String serviceId) {
             mServiceId = serviceId;
         }
 
@@ -88,7 +91,7 @@ public class Service {
          *
          * @param scpdUrl ScpdURL
          */
-        public void setScpdUrl(String scpdUrl) {
+        public void setScpdUrl(@NotNull String scpdUrl) {
             mScpdUrl = scpdUrl;
         }
 
@@ -97,7 +100,7 @@ public class Service {
          *
          * @param controlUrl controlURL
          */
-        public void setControlUrl(String controlUrl) {
+        public void setControlUrl(@NotNull String controlUrl) {
             mControlUrl = controlUrl;
         }
 
@@ -106,11 +109,36 @@ public class Service {
          *
          * @param eventSubUrl eventSubURL
          */
-        public void setEventSubUrl(String eventSubUrl) {
+        public void setEventSubUrl(@NotNull String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
         }
 
-        public Service build() {
+        /**
+         * Serviceのインスタンスを作成する。
+         *
+         * @return Serviceのインスタンス
+         * @throws IllegalStateException 必須パラメータが設定されていない場合
+         */
+        @NotNull
+        public Service build() throws IllegalStateException {
+            if (mDevice == null) {
+                throw new IllegalStateException("device must be set.");
+            }
+            if (mServiceType == null) {
+                throw new IllegalStateException("serviceType must be set.");
+            }
+            if (mServiceId == null) {
+                throw new IllegalStateException("serviceId must be set.");
+            }
+            if (mScpdUrl == null) {
+                throw new IllegalStateException("SCDPURL must be set.");
+            }
+            if (mControlUrl == null) {
+                throw new IllegalStateException("controlURL must be set.");
+            }
+            if (mEventSubUrl == null) {
+                throw new IllegalStateException("eventSubURL must be set.");
+            }
             return new Service(this);
         }
     }
@@ -149,6 +177,7 @@ public class Service {
      *
      * @return このServiceを保持するDevice
      */
+    @NotNull
     public Device getDevice() {
         return mDevice;
     }
@@ -156,11 +185,12 @@ public class Service {
     /**
      * URL関連プロパティの値からURLに変換する。
      *
-     * @param url
-     * @return
+     * @param url URLプロパティ値
+     * @return URLオブジェクト
      * @throws MalformedURLException
      * @see Device#getAbsoluteUrl(String)
      */
+    @NotNull
     URL getAbsoluteUrl(String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
@@ -170,6 +200,7 @@ public class Service {
      *
      * @return serviceType
      */
+    @NotNull
     public String getServiceType() {
         return mServiceType;
     }
@@ -179,6 +210,7 @@ public class Service {
      *
      * @return serviceId
      */
+    @NotNull
     public String getServiceId() {
         return mServiceId;
     }
@@ -188,6 +220,7 @@ public class Service {
      *
      * @return SCPDURL
      */
+    @NotNull
     public String getScpdUrl() {
         return mScpdUrl;
     }
@@ -197,6 +230,7 @@ public class Service {
      *
      * @return controlURL
      */
+    @NotNull
     public String getControlUrl() {
         return mControlUrl;
     }
@@ -206,15 +240,17 @@ public class Service {
      *
      * @return eventSubURL
      */
+    @NotNull
     public String getEventSubUrl() {
         return mEventSubUrl;
     }
 
     /**
-     * ServiceDiscriptionのXMLを返す。
+     * ServiceDescriptionのXMLを返す。
      *
      * @return ServiceDescription
      */
+    @Nullable
     public String getDescription() {
         return mDescription;
     }
@@ -226,6 +262,7 @@ public class Service {
      *
      * @return 全Actionのリスト
      */
+    @NotNull
     public List<Action> getActionList() {
         if (mActionList == null) {
             final List<Action> list = new ArrayList<>(mActionMap.values());
@@ -242,7 +279,8 @@ public class Service {
      * @param name Action名
      * @return 該当するAction
      */
-    public Action findAction(String name) {
+    @Nullable
+    public Action findAction(@NotNull String name) {
         return mActionMap.get(name);
     }
 
@@ -251,6 +289,7 @@ public class Service {
      *
      * @return 全StateVariableのリスト
      */
+    @NotNull
     public List<StateVariable> getStateVariableList() {
         if (mStateVariableList == null) {
             final List<StateVariable> list = new ArrayList<>(mStateVariableMap.values());
@@ -267,7 +306,8 @@ public class Service {
      * @param name StateVariable名
      * @return 該当するStateVariable
      */
-    public StateVariable findStateVariable(String name) {
+    @Nullable
+    public StateVariable findStateVariable(@NotNull String name) {
         return mStateVariableMap.get(name);
     }
 
@@ -281,7 +321,7 @@ public class Service {
      * @throws SAXException XMLパースエラー
      * @throws ParserConfigurationException XMLパーサーエラー
      */
-    void loadDescription(HttpClient client)
+    void loadDescription(@NotNull HttpClient client)
             throws IOException, SAXException, ParserConfigurationException {
         final URL url = getAbsoluteUrl(mScpdUrl);
         final HttpRequest request = new HttpRequest();
@@ -298,7 +338,7 @@ public class Service {
         parseDescription(mDescription);
     }
 
-    private void parseDescription(String xml)
+    private void parseDescription(@NotNull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -317,7 +357,8 @@ public class Service {
         }
     }
 
-    private List<Action.Builder> parseActionList(NodeList nodeList) {
+    @NotNull
+    private List<Action.Builder> parseActionList(@NotNull NodeList nodeList) {
         final List<Action.Builder> list = new ArrayList<>();
         for (int i = 0; i < nodeList.getLength(); i++) {
             list.add(parseAction((Element) nodeList.item(i)));
@@ -325,7 +366,7 @@ public class Service {
         return list;
     }
 
-    private void parseStateVariableList(NodeList nodeList) {
+    private void parseStateVariableList(@NotNull NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             final StateVariable.Builder builder = parseStateVariable((Element) nodeList.item(i));
             final StateVariable variable = builder.build();
@@ -333,7 +374,8 @@ public class Service {
         }
     }
 
-    private Action.Builder parseAction(Element element) {
+    @NotNull
+    private Action.Builder parseAction(@NotNull Element element) {
         final Action.Builder builder = new Action.Builder();
         builder.serService(this);
         Node node = element.getFirstChild();
@@ -358,7 +400,8 @@ public class Service {
         return builder;
     }
 
-    private Argument.Builder parseArgument(Element element) {
+    @NotNull
+    private Argument.Builder parseArgument(@NotNull Element element) {
         final Argument.Builder builder = new Argument.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -378,7 +421,8 @@ public class Service {
         return builder;
     }
 
-    private StateVariable.Builder parseStateVariable(Element element) {
+    @NotNull
+    private StateVariable.Builder parseStateVariable(@NotNull Element element) {
         final StateVariable.Builder builder = new StateVariable.Builder();
         builder.setService(this);
         builder.setSendEvents(element.getAttribute("sendEvents"));
@@ -417,7 +461,7 @@ public class Service {
                     } else if ("minimum".equals(ctag)) {
                         builder.setMinimum(child.getTextContent());
                     } else if ("maximum".equals(ctag)) {
-                        builder.setMaximun(child.getTextContent());
+                        builder.setMaximum(child.getTextContent());
                     }
                 }
             }
@@ -425,6 +469,7 @@ public class Service {
         return builder;
     }
 
+    @NotNull
     private String getCallback() {
         final StringBuilder sb = new StringBuilder();
         sb.append('<');
@@ -443,7 +488,7 @@ public class Service {
         return sb.toString();
     }
 
-    private long getTimeout(HttpResponse response) {
+    private long getTimeout(@NotNull HttpResponse response) {
         final String timeout = response.getHeader(Http.TIMEOUT).toLowerCase();
         if (timeout.contains("infinite")) {
             return -1;
@@ -604,8 +649,9 @@ public class Service {
     /**
      * SID(SubscriptionID)を返す。
      *
-     * @return SubscriptonID
+     * @return SubscriptionID
      */
+    @Nullable
     public String getSubscriptionId() {
         return mSubscriptionId;
     }
