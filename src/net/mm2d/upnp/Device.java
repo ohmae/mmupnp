@@ -595,7 +595,7 @@ public class Device {
     }
 
     /**
-     * 指定文字列とSerivceIDが合致するサービスを返す。
+     * 指定文字列とServiceIDが合致するサービスを返す。
      *
      * 見つからない場合はnullを返す。
      *
@@ -614,7 +614,7 @@ public class Device {
     }
 
     /**
-     * 指定文字列とSerivceTypeが合致するサービスを返す。
+     * 指定文字列とServiceTypeが合致するサービスを返す。
      *
      * 見つからない場合はnullを返す。
      *

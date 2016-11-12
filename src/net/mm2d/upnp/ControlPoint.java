@@ -96,7 +96,7 @@ public class ControlPoint {
      */
     public interface NotifyEventListener {
         /**
-         * NofiyEvnet受信時にコールされる。
+         * NotifyEvent受信時にコールされる。
          *
          * @param service 対応するService
          * @param seq シーケンス番号
