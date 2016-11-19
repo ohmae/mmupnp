@@ -48,6 +48,8 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Action {
+    private static final String TAG = Action.class.getSimpleName();
+
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
@@ -123,7 +125,6 @@ public class Action {
         }
     }
 
-    private static final String TAG = "Action";
     private final Service mService;
     private final String mName;
     private List<Argument> mArgumentList;

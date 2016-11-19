@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 abstract class SsdpServer {
+    private static final String TAG = SsdpServer.class.getSimpleName();
     /**
      * SSDPに使用するアドレス。
      */
@@ -40,7 +41,6 @@ abstract class SsdpServer {
     private static final InetSocketAddress SSDP_SO_ADDR =
             new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
     private static final InetAddress SSDP_INET_ADDR = SSDP_SO_ADDR.getAddress();
-    private static final String TAG = "SsdpServer";
     private final NetworkInterface mInterface;
     private InterfaceAddress mInterfaceAddress;
     private final int mBindPort;

@@ -22,6 +22,15 @@ import javax.annotation.Nullable;
  */
 class SsdpSearchServer extends SsdpServer {
     /**
+     * ST(SearchType) 全機器。
+     */
+    public static final String ST_ALL = "ssdp:all";
+    /**
+     * ST(SearchType) rootdevice。
+     */
+    public static final String ST_ROOTDEVICE = "upnp:rootdevice";
+
+    /**
      * M-SEARCHによるレスポンス受信を受け取るリスナー。
      */
     public interface ResponseListener {
@@ -32,15 +41,6 @@ class SsdpSearchServer extends SsdpServer {
          */
         void onReceiveResponse(@Nonnull SsdpResponseMessage message);
     }
-
-    /**
-     * ST(SearchType) 全機器。
-     */
-    public static final String ST_ALL = "ssdp:all";
-    /**
-     * ST(SearchType) rootdevice。
-     */
-    public static final String ST_ROOTDEVICE = "upnp:rootdevice";
 
     private ResponseListener mListener;
 

@@ -21,6 +21,8 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Icon {
+    private static final String TAG = Icon.class.getSimpleName();
+
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
@@ -67,7 +69,7 @@ public class Icon {
         public void setHeight(@Nonnull String height) {
             try {
                 mHeight = Integer.parseInt(height);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 mHeight = 0;
             }
         }
@@ -80,7 +82,7 @@ public class Icon {
         public void setWidth(@Nonnull String width) {
             try {
                 mWidth = Integer.parseInt(width);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 mWidth = 0;
             }
         }
@@ -93,7 +95,7 @@ public class Icon {
         public void setDepth(@Nonnull String depth) {
             try {
                 mDepth = Integer.parseInt(depth);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 mDepth = 0;
             }
         }
@@ -150,7 +152,6 @@ public class Icon {
         }
     }
 
-    private static final String TAG = "Icon";
     private final Device mDevice;
     private final String mMimeType;
     private final int mHeight;
@@ -181,7 +182,7 @@ public class Icon {
 
     /**
      * MimeTypeの値を返す。
-     * 
+     *
      * @return MimeType
      */
     @Nonnull
@@ -191,7 +192,7 @@ public class Icon {
 
     /**
      * Heightの値を返す。
-     * 
+     *
      * @return Height
      */
     public int getHeight() {
@@ -200,7 +201,7 @@ public class Icon {
 
     /**
      * Widthの値を返す。
-     * 
+     *
      * @return Width
      */
     public int getWidth() {
@@ -209,7 +210,7 @@ public class Icon {
 
     /**
      * Depthの値を返す。
-     * 
+     *
      * @return Depth
      */
     public int getDepth() {
@@ -249,7 +250,7 @@ public class Icon {
 
     /**
      * バイナリデータを返す。
-     * 
+     *
      * @return バイナリデータ
      */
     @Nullable

@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SubscribeKeeper extends Thread {
-    private static final String TAG = "SubscribeKeeper";
+    private static final String TAG = SubscribeKeeper.class.getSimpleName();
     private static final long MARGIN_TIME = 10000;
     private static final long MIN_INTERVAL = 1000;
     private final ControlPoint mControlPoint;

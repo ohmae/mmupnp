@@ -52,6 +52,8 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ControlPoint {
+    private static final String TAG = ControlPoint.class.getSimpleName();
+
     /**
      * 機器発見イベント通知用リスナー。
      *
@@ -108,7 +110,6 @@ public class ControlPoint {
                 @Nonnull String value);
     }
 
-    private static final String TAG = "ControlPoint";
     private final List<DiscoveryListener> mDiscoveryListeners;
     private final List<NotifyEventListener> mNotifyEventListeners;
     private final Collection<SsdpSearchServer> mSearchList;

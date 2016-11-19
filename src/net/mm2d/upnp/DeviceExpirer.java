@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class DeviceExpirer extends Thread {
-    private static final String TAG = "DeviceExpirer";
+    private static final String TAG = DeviceExpirer.class.getSimpleName();
     private static final long MARGIN_TIME = 10000;
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;

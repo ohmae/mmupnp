@@ -41,7 +41,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Device {
-    private static final String TAG = "Device";
+    private static final String TAG = Device.class.getSimpleName();
     private final ControlPoint mControlPoint;
     private SsdpMessage mSsdp;
     private String mDescription;

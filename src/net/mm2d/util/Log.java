@@ -13,13 +13,20 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * デバッグログ出力クラス。
  *
- * android.util.Logと同様のインターフェースで作成。
+ * <p>android.util.Logと同様のインターフェースで作成。
  * 出力先は{@link Print}インターフェースを実装したクラスで置換可能。
  * また、{@link #setLogLevel(int)}によりログレベルを動的に変更することが可能で
  * 指定したレベル以下のログを表示させないようにすることができる。
+ *
+ * <p>TAGにnullを指定することもできる。
+ * nullを指定した場合はStackTraceから呼び出し元の場所をTAGとして使用する。
+ * コストが大きいため常時出力されるログには使用しないこと。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -60,7 +67,7 @@ public class Log {
          * @param tag タグ
          * @param message メッセージ
          */
-        void println(int level, String tag, String message);
+        void println(int level, @Nullable String tag, @Nullable String message);
     }
 
     /**
@@ -70,7 +77,7 @@ public class Log {
         private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         @Override
-        public void println(int level, String tag, String message) {
+        public void println(int level, @Nullable String tag, @Nullable String message) {
             synchronized (FORMAT) {
                 final StringBuilder sb = new StringBuilder();
                 sb.append(FORMAT.format(new Date(System.currentTimeMillis())));
@@ -134,14 +141,15 @@ public class Log {
      *
      * @param print 出力処理
      */
-    public static void setPrint(Print print) {
+    public static void setPrint(@Nonnull Print print) {
         sPrint = print;
     }
 
     /**
      * ログレベルを変更する。
      *
-     * 設定した値以上のログを出力する。
+     * <p>設定した値以上のログを出力する。
+     * ERRORを指定した場合はERRORとASSERTのレベルのログが出力される。
      *
      * @param level ログレベル。
      */
@@ -155,8 +163,8 @@ public class Log {
      * @param tag タグ
      * @param message メッセージ
      */
-    public static void v(String tag, String message) {
-        println(VERBOSE, tag, message);
+    public static void v(@Nullable String tag, @Nullable String message) {
+        log(VERBOSE, tag, message);
     }
 
     /**
@@ -168,8 +176,8 @@ public class Log {
      * @param message メッセージ
      * @param tr Throwable
      */
-    public static void v(String tag, String message, Throwable tr) {
-        println(VERBOSE, tag, message, tr);
+    public static void v(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
+        log(VERBOSE, tag, message, tr);
     }
 
     /**
@@ -178,8 +186,8 @@ public class Log {
      * @param tag タグ
      * @param message メッセージ
      */
-    public static void d(String tag, String message) {
-        println(DEBUG, tag, message);
+    public static void d(@Nullable String tag, @Nullable String message) {
+        log(DEBUG, tag, message);
     }
 
     /**
@@ -191,8 +199,8 @@ public class Log {
      * @param message メッセージ
      * @param tr Throwable
      */
-    public static void d(String tag, String message, Throwable tr) {
-        println(DEBUG, tag, message, tr);
+    public static void d(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
+        log(DEBUG, tag, message, tr);
     }
 
     /**
@@ -201,8 +209,8 @@ public class Log {
      * @param tag タグ
      * @param message メッセージ
      */
-    public static void i(String tag, String message) {
-        println(INFO, tag, message);
+    public static void i(@Nullable String tag, @Nullable String message) {
+        log(INFO, tag, message);
     }
 
     /**
@@ -214,8 +222,8 @@ public class Log {
      * @param message メッセージ
      * @param tr Throwable
      */
-    public static void i(String tag, String message, Throwable tr) {
-        println(INFO, tag, message, tr);
+    public static void i(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
+        log(INFO, tag, message, tr);
     }
 
     /**
@@ -224,8 +232,8 @@ public class Log {
      * @param tag タグ
      * @param message メッセージ
      */
-    public static void w(String tag, String message) {
-        println(WARN, tag, message);
+    public static void w(@Nullable String tag, @Nullable String message) {
+        log(WARN, tag, message);
     }
 
     /**
@@ -237,8 +245,8 @@ public class Log {
      * @param message メッセージ
      * @param tr Throwable
      */
-    public static void w(String tag, String message, Throwable tr) {
-        println(WARN, tag, message, tr);
+    public static void w(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
+        log(WARN, tag, message, tr);
     }
 
     /**
@@ -249,8 +257,8 @@ public class Log {
      * @param tag タグ
      * @param tr Throwable
      */
-    public static void w(String tag, Throwable tr) {
-        println(WARN, tag, tr);
+    public static void w(@Nullable String tag, @Nullable Throwable tr) {
+        log(WARN, tag, tr);
     }
 
     /**
@@ -259,8 +267,8 @@ public class Log {
      * @param tag タグ
      * @param message メッセージ
      */
-    public static void e(String tag, String message) {
-        println(ERROR, tag, message);
+    public static void e(@Nullable String tag, @Nullable String message) {
+        log(ERROR, tag, message);
     }
 
     /**
@@ -272,40 +280,51 @@ public class Log {
      * @param message メッセージ
      * @param tr Throwable
      */
-    public static void e(String tag, String message, Throwable tr) {
-        println(ERROR, tag, message, tr);
+    public static void e(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
+        log(ERROR, tag, message, tr);
     }
 
-    private static void println(int level, String tag, Throwable tr) {
+    private static void log(int level, @Nullable String tag, @Nullable Throwable tr) {
+        println(level, tag, null, tr);
+    }
+
+    private static void log(int level, @Nullable String tag, @Nullable String message) {
+        println(level, tag, message, null);
+    }
+
+    private static void log(
+            int level, @Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
+        println(level, tag, message, tr);
+    }
+
+    private static void println(
+            int level, @Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
         if (level < sLogLevel) {
             return;
         }
-        println(level, tag, getStackTraceString(tr));
-    }
-
-    private static void println(int level, String tag, String message, Throwable tr) {
-        if (level < sLogLevel) {
-            return;
+        if (tag == null) {
+            try {
+                // println -> log -> v/d/i/w/e -> ログコール場所
+                tag = new Throwable().getStackTrace()[3].toString();
+            } catch (final Exception ignored) { // 念のため
+                tag = "tag";
+            }
         }
-        println(level, tag, message + "\n" + getStackTraceString(tr));
-    }
-
-    private static void println(int level, String tag, String message) {
-        if (level < sLogLevel) {
-            return;
-        }
-        sPrint.println(level, tag, message);
-    }
-
-    private static String getStackTraceString(Throwable tr) {
         if (tr == null) {
-            return "";
+            sPrint.println(level, tag, message);
+        } else if (message == null) {
+            sPrint.println(level, tag, getStackTraceString(tr));
+        } else {
+            sPrint.println(level, tag, message + "\n" + getStackTraceString(tr));
         }
+    }
+
+    @Nonnull
+    private static String getStackTraceString(@Nonnull Throwable tr) {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter(sw);
         tr.printStackTrace(pw);
         pw.flush();
         return sw.toString();
     }
-
 }

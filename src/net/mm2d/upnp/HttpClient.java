@@ -7,8 +7,11 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.Log;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +28,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpClient {
+    private static final String TAG = HttpClient.class.getSimpleName();
     private Socket mSocket;
     private boolean mKeepAlive;
     private InputStream mInputStream;
@@ -106,27 +110,23 @@ public class HttpClient {
     }
 
     private void closeSocket() {
-        try {
-            if (mInputStream != null) {
-                mInputStream.close();
-            }
-        } catch (final IOException ignored) {
-        }
+        closeCloseable(mInputStream);
+        closeCloseable(mOutputStream);
+        closeCloseable(mSocket);
         mInputStream = null;
-        try {
-            if (mOutputStream != null) {
-                mOutputStream.close();
-            }
-        } catch (final IOException ignored) {
-        }
         mOutputStream = null;
-        try {
-            if (mSocket != null) {
-                mSocket.close();
-            }
-        } catch (final IOException ignored) {
-        }
         mSocket = null;
+    }
+
+    private static void closeCloseable(Closeable closeable) {
+        if (closeable == null) {
+            return;
+        }
+        try {
+            closeable.close();
+        } catch (final IOException ignored) {
+            Log.w(TAG, ignored);
+        }
     }
 
     /**

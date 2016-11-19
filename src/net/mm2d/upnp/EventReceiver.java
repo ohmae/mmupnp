@@ -32,6 +32,8 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class EventReceiver {
+    private static final String TAG = EventReceiver.class.getSimpleName();
+
     /**
      * イベントデータの受信を受け取るリスナー。
      */
@@ -45,7 +47,6 @@ class EventReceiver {
         boolean onEventReceived(@Nonnull HttpRequest request);
     }
 
-    private static final String TAG = "EventReceiver";
     private ServerSocket mServerSocket;
     private ServerThread mServerThread;
     private EventMessageListener mListener;

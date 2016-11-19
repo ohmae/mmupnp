@@ -24,6 +24,8 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpNotifyReceiver extends SsdpServer {
+    private static final String TAG = SsdpNotifyReceiver.class.getSimpleName();
+
     /**
      * NOTIFY受信を受け取るリスナー。
      */
@@ -36,7 +38,6 @@ class SsdpNotifyReceiver extends SsdpServer {
         void onReceiveNotify(@Nonnull SsdpRequestMessage message);
     }
 
-    private static final String TAG = "SsdpNotifyReceiver";
     private NotifyListener mListener;
 
     /**

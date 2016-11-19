@@ -35,7 +35,7 @@ import javax.annotation.Nullable;
  * @see HttpRequest
  */
 public abstract class HttpMessage {
-    private static final String TAG = "HttpMessage";
+    private static final String TAG = HttpMessage.class.getSimpleName();
     private static final int BUFFER_SIZE = 1500;
     private static final int CR = 0x0d;
     private static final int LF = 0x0a;

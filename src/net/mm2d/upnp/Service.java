@@ -39,6 +39,8 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Service {
+    private static final String TAG = Service.class.getSimpleName();
+
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
@@ -142,7 +144,6 @@ public class Service {
         }
     }
 
-    private static final String TAG = "Service";
     private final ControlPoint mControlPoint;
     private final Device mDevice;
     private String mDescription;
@@ -666,7 +667,7 @@ public class Service {
 
     /**
      * Subscriptionの有効期間
-     * 
+     *
      * @return Subscriptionの有効期間
      */
     public long getSubscriptionTimeout() {
