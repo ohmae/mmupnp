@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TextUtils;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
@@ -77,7 +79,7 @@ class SsdpSearchServer extends SsdpServer {
      * @param st STの値
      */
     public void search(@Nullable String st) {
-        if (st == null) {
+        if (TextUtils.isEmpty(st)) {
             st = ST_ALL;
         }
         final SsdpRequestMessage message = new SsdpRequestMessage();

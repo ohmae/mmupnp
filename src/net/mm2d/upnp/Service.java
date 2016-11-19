@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -545,7 +546,7 @@ public class Service {
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = getTimeout(response);
-        if (sid == null || sid.isEmpty() || timeout == 0) {
+        if (TextUtils.isEmpty(sid) || timeout == 0) {
             System.out.println(response.toString());
             return false;
         }
@@ -577,7 +578,7 @@ public class Service {
      * @throws IOException 通信エラー
      */
     boolean renewSubscribe(boolean notify) throws IOException {
-        if (mEventSubUrl == null || mSubscriptionId == null) {
+        if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
         final HttpRequest request = new HttpRequest();
@@ -595,8 +596,7 @@ public class Service {
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = getTimeout(response);
-        if (sid == null || sid.isEmpty()
-                || !sid.equals(mSubscriptionId) || timeout == 0) {
+        if (TextUtils.isEmpty(sid) || !sid.equals(mSubscriptionId) || timeout == 0) {
             System.out.println(response.toString());
             return false;
         }
@@ -615,7 +615,7 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean unsubscribe() throws IOException {
-        if (mEventSubUrl == null || mSubscriptionId == null) {
+        if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
         final HttpRequest request = new HttpRequest();

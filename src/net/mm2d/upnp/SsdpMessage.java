@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TextUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -109,7 +111,7 @@ public abstract class SsdpMessage {
      * @return 一致している場合true
      */
     public boolean hasValidLocation() {
-        if (mLocation == null) {
+        if (TextUtils.isEmpty(mLocation)) {
             return false;
         }
         final String packetAddress = mPacketAddress.getHostAddress();
@@ -142,7 +144,7 @@ public abstract class SsdpMessage {
     private void parseCacheControl() {
         mMaxAge = DEFAULT_MAX_AGE;
         final String age = mMessage.getHeader(Http.CACHE_CONTROL);
-        if (age == null || !age.toLowerCase().startsWith("max-age")) {
+        if (TextUtils.isEmpty(age) || !age.toLowerCase().startsWith("max-age")) {
             return;
         }
         final int pos = age.indexOf('=');
@@ -157,7 +159,7 @@ public abstract class SsdpMessage {
 
     private void parseUsn() {
         final String usn = mMessage.getHeader(Http.USN);
-        if (usn == null || !usn.startsWith("uuid")) {
+        if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
             return;
         }
         final int pos = usn.indexOf("::");

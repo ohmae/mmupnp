@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TextUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -146,7 +148,7 @@ public final class Http {
 
         /**
          * ステータスコードのint値から該当するステータスコードを返す。
-         * 
+         *
          * @param code ステータスコード
          * @return 該当するStatus
          */
@@ -184,7 +186,7 @@ public final class Http {
      */
     @Nullable
     public synchronized static Date parseDate(@Nullable String string) {
-        if (string == null) {
+        if (TextUtils.isEmpty(string)) {
             return null;
         }
         try {

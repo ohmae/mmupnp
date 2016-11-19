@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -271,7 +272,7 @@ public abstract class HttpMessage {
      */
     public void setBody(@Nullable String body) {
         mBody = body;
-        if (body == null || body.isEmpty()) {
+        if (TextUtils.isEmpty(body)) {
             mBodyBinary = null;
         } else {
             try {
@@ -407,7 +408,7 @@ public abstract class HttpMessage {
      */
     public boolean readData(@Nonnull InputStream is) throws IOException {
         final String startLine = readLine(is);
-        if (startLine == null || startLine.length() == 0) {
+        if (TextUtils.isEmpty(startLine)) {
             return false;
         }
         try {
@@ -458,7 +459,7 @@ public abstract class HttpMessage {
 
     private int readChunkSize(@Nonnull InputStream is) throws IOException {
         final String line = readLine(is);
-        if (line == null || line.isEmpty()) {
+        if (TextUtils.isEmpty(line)) {
             throw new IOException("Can not read chunk size!");
         }
         final String chunkSize = line.split(";", 2)[0];

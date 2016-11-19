@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.IOUtils;
 import net.mm2d.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -98,10 +99,8 @@ abstract class SsdpServer {
      */
     public void close() {
         stop(false);
-        if (mSocket != null) {
-            mSocket.close();
-            mSocket = null;
-        }
+        IOUtils.closeQuietly(mSocket);
+        mSocket = null;
     }
 
     /**

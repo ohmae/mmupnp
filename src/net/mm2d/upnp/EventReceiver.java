@@ -7,7 +7,9 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.IOUtils;
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -123,11 +125,7 @@ class EventReceiver {
         public void shutdownRequest() {
             mShutdownRequest = true;
             interrupt();
-            try {
-                mServerSocket.close();
-            } catch (final IOException e) {
-                Log.w(TAG, e);
-            }
+            IOUtils.closeQuietly(mServerSocket);
             synchronized (mClientList) {
                 for (final ClientThread client : mClientList) {
                     client.shutdownRequest();
@@ -176,10 +174,7 @@ class EventReceiver {
                 }
             } catch (final IOException ignored) {
             } finally {
-                try {
-                    mServerSocket.close();
-                } catch (final IOException ignored) {
-                }
+                IOUtils.closeQuietly(mServerSocket);
             }
         }
     }
@@ -223,11 +218,7 @@ class EventReceiver {
          */
         public void shutdownRequest() {
             interrupt();
-            try {
-                mSocket.close();
-            } catch (final IOException e) {
-                Log.w(TAG, e);
-            }
+            IOUtils.closeQuietly(mSocket);
         }
 
         private boolean notifyEvent(@Nonnull HttpRequest request) {
@@ -236,11 +227,8 @@ class EventReceiver {
 
         @Override
         public void run() {
-            InputStream is = null;
-            OutputStream os = null;
-            try {
-                is = new BufferedInputStream(mSocket.getInputStream());
-                os = new BufferedOutputStream(mSocket.getOutputStream());
+            try (final InputStream is = new BufferedInputStream(mSocket.getInputStream());
+                    final OutputStream os = new BufferedOutputStream(mSocket.getOutputStream())) {
                 final HttpRequest request = new HttpRequest();
                 request.setAddress(mSocket.getInetAddress());
                 request.setPort(mSocket.getPort());
@@ -250,10 +238,9 @@ class EventReceiver {
                 final String nt = request.getHeader(Http.NT);
                 final String nts = request.getHeader(Http.NTS);
                 final String sid = request.getHeader(Http.SID);
-                if (nt == null || nt.length() == 0
-                        || nts == null || nts.length() == 0) {
+                if (TextUtils.isEmpty(nt) || TextUtils.isEmpty(nts)) {
                     RESPONSE_BAD.writeData(os);
-                } else if (sid == null || sid.length() == 0
+                } else if (TextUtils.isEmpty(sid)
                         || !nt.equals(Http.UPNP_EVENT)
                         || !nts.equals(Http.UPNP_PROPCHANGE)) {
                     RESPONSE_FAIL.writeData(os);
@@ -267,22 +254,7 @@ class EventReceiver {
             } catch (final IOException e) {
                 Log.w(TAG, e);
             } finally {
-                try {
-                    if (is != null) {
-                        is.close();
-                    }
-                } catch (final IOException ignored) {
-                }
-                try {
-                    if (os != null) {
-                        os.close();
-                    }
-                } catch (final IOException ignored) {
-                }
-                try {
-                    mSocket.close();
-                } catch (final IOException ignored) {
-                }
+                IOUtils.closeQuietly(mSocket);
                 mServer.notifyClientFinish(this);
             }
         }

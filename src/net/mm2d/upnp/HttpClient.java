@@ -7,11 +7,10 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
+import net.mm2d.util.IOUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -110,23 +109,12 @@ public class HttpClient {
     }
 
     private void closeSocket() {
-        closeCloseable(mInputStream);
-        closeCloseable(mOutputStream);
-        closeCloseable(mSocket);
+        IOUtils.closeQuietly(mInputStream);
+        IOUtils.closeQuietly(mOutputStream);
+        IOUtils.closeQuietly(mSocket);
         mInputStream = null;
         mOutputStream = null;
         mSocket = null;
-    }
-
-    private static void closeCloseable(Closeable closeable) {
-        if (closeable == null) {
-            return;
-        }
-        try {
-            closeable.close();
-        } catch (final IOException ignored) {
-            Log.w(TAG, ignored);
-        }
     }
 
     /**
