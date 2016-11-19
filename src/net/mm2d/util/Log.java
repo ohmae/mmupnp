@@ -239,6 +239,18 @@ public class Log {
     /**
      * WARNレベルでのログ出力を行う。
      *
+     * 引数のThrowableのスタックトレースをメッセージとして表示する。
+     *
+     * @param tag タグ
+     * @param tr Throwable
+     */
+    public static void w(@Nullable String tag, @Nullable Throwable tr) {
+        log(WARN, tag, tr);
+    }
+
+    /**
+     * WARNレベルでのログ出力を行う。
+     *
      * 引数のThrowableを元にスタックトレースを合わせて表示する。
      *
      * @param tag タグ
@@ -247,18 +259,6 @@ public class Log {
      */
     public static void w(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
         log(WARN, tag, message, tr);
-    }
-
-    /**
-     * WARNレベルでのログ出力を行う。
-     *
-     * 引数のThrowableのスタックトレースをメッセージとして表示する。
-     *
-     * @param tag タグ
-     * @param tr Throwable
-     */
-    public static void w(@Nullable String tag, @Nullable Throwable tr) {
-        log(WARN, tag, tr);
     }
 
     /**

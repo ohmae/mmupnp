@@ -8,10 +8,10 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-/**
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
- */
+@RunWith(JUnit4.class)
 public class ArgumentTest {
 
     @Test(expected = IllegalStateException.class)
@@ -101,7 +101,6 @@ public class ArgumentTest {
 
     @Test
     public void getRelatedStateVariable_Builderで指定した値が得られる() {
-
         final Action action = mock(Action.class);
         final String name = "test";
         final StateVariable stateVariable = mock(StateVariable.class);
