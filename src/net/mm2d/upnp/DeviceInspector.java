@@ -20,8 +20,8 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class DeviceExpirer extends Thread {
-    private static final String TAG = DeviceExpirer.class.getSimpleName();
+class DeviceInspector extends Thread {
+    private static final String TAG = DeviceInspector.class.getSimpleName();
     private static final long MARGIN_TIME = 10000;
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;
@@ -38,7 +38,7 @@ class DeviceExpirer extends Thread {
      *
      * @param cp ControlPoint
      */
-    public DeviceExpirer(@Nonnull ControlPoint cp) {
+    public DeviceInspector(@Nonnull ControlPoint cp) {
         super(TAG);
         mDeviceList = new ArrayList<>();
         mControlPoint = cp;
@@ -99,7 +99,7 @@ class DeviceExpirer extends Thread {
                     final Device device = i.next();
                     if (device.getExpireTime() < current) {
                         i.remove();
-                        mControlPoint.lostDevice(device, true);
+                        mControlPoint.lostDevice(device, false);
                     } else {
                         break;
                     }

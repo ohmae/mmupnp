@@ -123,7 +123,7 @@ public class ControlPoint {
     private boolean mInitialized = false;
     private boolean mStarted = false;
     private boolean mTerminated = false;
-    private DeviceExpirer mDeviceExpirer;
+    private DeviceInspector mDeviceInspector;
     private SubscribeKeeper mSubscribeKeeper;
 
     private void onReceiveSsdp(@Nonnull SsdpMessage message) {
@@ -153,7 +153,7 @@ public class ControlPoint {
                     lostDevice(device);
                 } else {
                     device.setSsdpMessage(message);
-                    mDeviceExpirer.update();
+                    mDeviceInspector.update();
                 }
             }
         }
@@ -389,8 +389,8 @@ public class ControlPoint {
             throw new IllegalStateException(
                     "ControlPoint is already terminated, cannot re-initialize.");
         }
-        mDeviceExpirer = new DeviceExpirer(this);
-        mDeviceExpirer.start();
+        mDeviceInspector = new DeviceInspector(this);
+        mDeviceInspector.start();
         mSubscribeKeeper = new SubscribeKeeper(this);
         mSubscribeKeeper.start();
         mInitialized = true;
@@ -426,8 +426,8 @@ public class ControlPoint {
         }
         mSubscribeKeeper.shutdownRequest();
         mSubscribeKeeper = null;
-        mDeviceExpirer.shutdownRequest();
-        mDeviceExpirer = null;
+        mDeviceInspector.shutdownRequest();
+        mDeviceInspector = null;
     }
 
     /**
@@ -520,7 +520,7 @@ public class ControlPoint {
             lostDevice(device);
         }
         mDeviceMap.clear();
-        mDeviceExpirer.clear();
+        mDeviceInspector.clear();
     }
 
     /**
@@ -605,7 +605,7 @@ public class ControlPoint {
     final Device device) {
         synchronized (mDeviceMap) {
             mDeviceMap.put(device.getUuid(), device);
-            mDeviceExpirer.add(device);
+            mDeviceInspector.add(device);
         }
         executeSequential(new Runnable() {
             @Override
@@ -620,30 +620,29 @@ public class ControlPoint {
     }
 
     private void lostDevice(@Nonnull Device device) {
-        lostDevice(device, false);
+        lostDevice(device, true);
     }
 
     /**
      * デバイスの喪失を行う。
      *
-     * Expirerからコールするためにパッケージデフォルトとする
+     * DeviceInspectorからコールするためにパッケージデフォルトとする
      * 他からはコールしないこと。
      *
      * @param device 喪失してデバイス
-     * @param fromExpirer trueの場合Expirerに通知しない。
+     * @param notify falseの場合Inspectorに通知しない
      * @see Device
-     * @see DeviceExpirer
+     * @see DeviceInspector
      */
-    void lostDevice(@Nonnull
-    final Device device, boolean fromExpirer) {
+    void lostDevice(final @Nonnull Device device, boolean notify) {
         synchronized (mDeviceMap) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
                 unregisterSubscribeService(s);
             }
             mDeviceMap.remove(device.getUuid());
-            if (!fromExpirer) {
-                mDeviceExpirer.remove(device);
+            if (notify) {
+                mDeviceInspector.remove(device);
             }
         }
         executeSequential(new Runnable() {
