@@ -33,7 +33,7 @@ class SsdpNotifyReceiver extends SsdpServer {
         /**
          * NOTIFY受信時にコール。
          *
-         * @param message 受信したNOTFYメッセージ
+         * @param message 受信したNOTIFYメッセージ
          */
         void onReceiveNotify(@Nonnull SsdpRequestMessage message);
     }

@@ -73,7 +73,7 @@ public class Service {
         /**
          * serviceTypeを登録する。
          *
-         * @param serviceType serviceTytpe
+         * @param serviceType serviceType
          */
         public void setServiceType(@Nonnull String serviceType) {
             mServiceType = serviceType;
@@ -98,7 +98,7 @@ public class Service {
         }
 
         /**
-         * conrolURLを登録する。
+         * controlURLを登録する。
          *
          * @param controlUrl controlURL
          */

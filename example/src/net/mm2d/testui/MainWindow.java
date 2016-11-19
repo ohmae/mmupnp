@@ -112,7 +112,7 @@ public class MainWindow extends JFrame {
                     if (result == null) {
                         return;
                     }
-                    perseResult(result.get("Result"));
+                    parseResult(result.get("Result"));
                 } catch (IOException | SAXException | ParserConfigurationException e) {
                     Log.w(TAG, e);
                 }
@@ -127,7 +127,7 @@ public class MainWindow extends JFrame {
         }
     };
 
-    private void perseResult(String xml)
+    private void parseResult(String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final StringBuilder sb = new StringBuilder();
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

@@ -18,12 +18,12 @@ public class IOUtils {
     private static final String TAG = IOUtils.class.getSimpleName();
 
     /**
-     * Nullチェック、Exceptionキャッチ付きでクローズ処理を行う。
+     * Nullチェック、Exceptionキャッチ付きでclose処理を行う。
      *
      * nullの場合は何も行わない、
      * closeでIOExceptionが発生した場合はログ出力をする。
      *
-     * @param closeable
+     * @param closeable close処理をするcloseable
      */
     public static void closeQuietly(@Nullable Closeable closeable) {
         if (closeable == null) {
