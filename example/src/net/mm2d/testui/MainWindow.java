@@ -109,9 +109,6 @@ public class MainWindow extends JFrame {
                 arg.put("SortCriteria", "");
                 try {
                     final Map<String, String> result = action.invoke(arg);
-                    if (result == null) {
-                        return;
-                    }
                     parseResult(result.get("Result"));
                 } catch (IOException | SAXException | ParserConfigurationException e) {
                     Log.w(TAG, e);

@@ -308,7 +308,7 @@ public class Service {
      * @return 該当するStateVariable
      */
     @Nullable
-    public StateVariable findStateVariable(@Nonnull String name) {
+    public StateVariable findStateVariable(@Nullable String name) {
         return mStateVariableMap.get(name);
     }
 

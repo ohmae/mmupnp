@@ -665,7 +665,7 @@ public class Device {
     }
 
     @Override
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (obj == this) {
             return true;
         }

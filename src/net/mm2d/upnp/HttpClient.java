@@ -27,7 +27,6 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpClient {
-    private static final String TAG = HttpClient.class.getSimpleName();
     private Socket mSocket;
     private boolean mKeepAlive;
     private InputStream mInputStream;
