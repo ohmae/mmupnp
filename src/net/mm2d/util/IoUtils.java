@@ -1,5 +1,8 @@
 /*
  * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/MIT
  */
 
 package net.mm2d.util;
@@ -14,13 +17,13 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class IOUtils {
-    private static final String TAG = IOUtils.class.getSimpleName();
+public class IoUtils {
+    private static final String TAG = IoUtils.class.getSimpleName();
 
     /**
      * Nullチェック、Exceptionキャッチ付きでclose処理を行う。
      *
-     * nullの場合は何も行わない、
+     * <p>nullの場合は何も行わない、
      * closeでIOExceptionが発生した場合はログ出力をする。
      *
      * @param closeable close処理をするcloseable

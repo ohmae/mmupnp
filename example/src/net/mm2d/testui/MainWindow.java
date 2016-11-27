@@ -11,6 +11,7 @@ import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.Service;
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -109,7 +111,11 @@ public class MainWindow extends JFrame {
                 arg.put("SortCriteria", "");
                 try {
                     final Map<String, String> result = action.invoke(arg);
-                    parseResult(result.get("Result"));
+                    final String res = result.get("Result");
+                    if (TextUtils.isEmpty(res)) {
+                        return;
+                    }
+                    perseResult(res);
                 } catch (IOException | SAXException | ParserConfigurationException e) {
                     Log.w(TAG, e);
                 }
@@ -124,7 +130,7 @@ public class MainWindow extends JFrame {
         }
     };
 
-    private void parseResult(String xml)
+    private void perseResult(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final StringBuilder sb = new StringBuilder();
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

@@ -47,79 +47,93 @@ public class Icon {
          * このIconを保持するDeviceを登録する。
          *
          * @param device このIconを保持するDevice
+         * @return Builder
          */
-        public void setDevice(@Nonnull Device device) {
+        public Builder setDevice(@Nonnull Device device) {
             mDevice = device;
+            return this;
         }
 
         /**
          * MimeTypeの値を登録する。
          *
          * @param mimeType MimeType
+         * @return Builder
          */
-        public void setMimeType(@Nonnull String mimeType) {
+        public Builder setMimeType(@Nonnull String mimeType) {
             mMimeType = mimeType;
+            return this;
         }
 
         /**
          * Heightの値を登録する
          *
          * @param height Height
+         * @return Builder
          */
-        public void setHeight(@Nonnull String height) {
+        public Builder setHeight(@Nonnull String height) {
             try {
                 mHeight = Integer.parseInt(height);
             } catch (final NumberFormatException e) {
                 mHeight = 0;
             }
+            return this;
         }
 
         /**
          * Widthの値を登録する。
          *
          * @param width Width
+         * @return Builder
          */
-        public void setWidth(@Nonnull String width) {
+        public Builder setWidth(@Nonnull String width) {
             try {
                 mWidth = Integer.parseInt(width);
             } catch (final NumberFormatException e) {
                 mWidth = 0;
             }
+            return this;
         }
 
         /**
          * Depthの値を登録する
          *
          * @param depth Depth
+         * @return Builder
          */
-        public void setDepth(@Nonnull String depth) {
+        public Builder setDepth(@Nonnull String depth) {
             try {
                 mDepth = Integer.parseInt(depth);
             } catch (final NumberFormatException e) {
                 mDepth = 0;
             }
+            return this;
         }
 
         /**
          * URLの値を登録する。
          *
          * @param url URL
+         * @return Builder
          */
-        public void setUrl(@Nonnull String url) {
+        public Builder setUrl(@Nonnull String url) {
             mUrl = url;
+            return this;
         }
 
         /**
          * バイナリデータを登録する。
          *
-         * DeviceDescriptionからの読み込みの場合、
+         * <p>DeviceDescriptionからの読み込みの場合、
          * Iconのインスタンスを作成した後読み込みを実行するため。
          * このメソッドは使用しない。
          *
          * @param binary バイナリ
+         * @return Builder
          */
-        public void setBinary(@Nullable byte[] binary) {
+        public Builder setBinary(@Nullable byte[] binary) {
             mBinary = binary;
+            return this;
         }
 
         /**

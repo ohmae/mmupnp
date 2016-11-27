@@ -1,5 +1,8 @@
 /*
  * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/MIT
  */
 
 package net.mm2d.util;
@@ -9,12 +12,18 @@ import static org.mockito.Mockito.*;
 
 import net.mm2d.util.Log.Print;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class LogTest {
+    @Before
+    public void before() {
+        Log.setLogLevel(Log.VERBOSE);
+    }
+
     @Test
     public void v_VERBOSEレベルでコールされること() {
         final String tag = "TAG";
@@ -103,5 +112,116 @@ public class LogTest {
         Log.setPrint(print);
         Log.e(tag, message, throwable);
         verify(print).println(eq(Log.ERROR), eq(tag), contains(message));
+    }
+
+    @Test
+    public void setLogLevel_指定したレベル以上のログのみ出力される() {
+        final String tag = "TAG";
+        final String message = "MESSAGE";
+        final Throwable throwable = new Throwable();
+        Print print;
+
+        Log.setLogLevel(Log.VERBOSE);
+        print = mock(Print.class);
+        Log.setPrint(print);
+        Log.v(tag, message);
+        Log.v(tag, message, throwable);
+        Log.d(tag, message);
+        Log.d(tag, message, throwable);
+        Log.i(tag, message);
+        Log.i(tag, message, throwable);
+        Log.w(tag, message);
+        Log.w(tag, message, throwable);
+        Log.w(tag, throwable);
+        Log.e(tag, message);
+        Log.e(tag, message, throwable);
+        verify(print, times(11)).println(anyInt(), anyString(), anyString());
+
+        Log.setLogLevel(Log.DEBUG);
+        print = mock(Print.class);
+        Log.setPrint(print);
+        Log.v(tag, message);
+        Log.v(tag, message, throwable);
+        verify(print, never()).println(anyInt(), anyString(), anyString());
+        Log.d(tag, message);
+        Log.d(tag, message, throwable);
+        Log.i(tag, message);
+        Log.i(tag, message, throwable);
+        Log.w(tag, message);
+        Log.w(tag, message, throwable);
+        Log.w(tag, throwable);
+        Log.e(tag, message);
+        Log.e(tag, message, throwable);
+        verify(print, times(9)).println(anyInt(), anyString(), anyString());
+
+        Log.setLogLevel(Log.INFO);
+        print = mock(Print.class);
+        Log.setPrint(print);
+        Log.v(tag, message);
+        Log.v(tag, message, throwable);
+        Log.d(tag, message);
+        Log.d(tag, message, throwable);
+        verify(print, never()).println(anyInt(), anyString(), anyString());
+
+        Log.i(tag, message);
+        Log.i(tag, message, throwable);
+        Log.w(tag, message);
+        Log.w(tag, message, throwable);
+        Log.w(tag, throwable);
+        Log.e(tag, message);
+        Log.e(tag, message, throwable);
+        verify(print, times(7)).println(anyInt(), anyString(), anyString());
+
+        Log.setLogLevel(Log.WARN);
+        print = mock(Print.class);
+        Log.setPrint(print);
+        Log.v(tag, message);
+        Log.v(tag, message, throwable);
+        Log.d(tag, message);
+        Log.d(tag, message, throwable);
+        Log.i(tag, message);
+        Log.i(tag, message, throwable);
+        verify(print, never()).println(anyInt(), anyString(), anyString());
+
+        Log.w(tag, message);
+        Log.w(tag, message, throwable);
+        Log.w(tag, throwable);
+        Log.e(tag, message);
+        Log.e(tag, message, throwable);
+        verify(print, times(5)).println(anyInt(), anyString(), anyString());
+
+        Log.setLogLevel(Log.ERROR);
+        print = mock(Print.class);
+        Log.setPrint(print);
+        Log.v(tag, message);
+        Log.v(tag, message, throwable);
+        Log.d(tag, message);
+        Log.d(tag, message, throwable);
+        Log.i(tag, message);
+        Log.i(tag, message, throwable);
+        Log.w(tag, message);
+        Log.w(tag, message, throwable);
+        Log.w(tag, throwable);
+        verify(print, never()).println(anyInt(), anyString(), anyString());
+
+        Log.e(tag, message);
+        Log.e(tag, message, throwable);
+        verify(print, times(2)).println(anyInt(), anyString(), anyString());
+
+        Log.setLogLevel(Log.ASSERT);
+        print = mock(Print.class);
+        Log.setPrint(print);
+        Log.v(tag, message);
+        Log.v(tag, message, throwable);
+        Log.d(tag, message);
+        Log.d(tag, message, throwable);
+        Log.i(tag, message);
+        Log.i(tag, message, throwable);
+        Log.w(tag, message);
+        Log.w(tag, message, throwable);
+        Log.w(tag, throwable);
+        Log.e(tag, message);
+        Log.e(tag, message, throwable);
+        verify(print, never()).println(anyInt(), anyString(), anyString());
     }
 }

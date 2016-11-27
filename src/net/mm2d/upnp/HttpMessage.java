@@ -25,10 +25,10 @@ import javax.annotation.Nullable;
 /**
  * HTTPのメッセージを表現するクラスの親クラス。
  *
- * ResponseとRequestでStart Lineのフォーマットが異なるため
+ * <p>ResponseとRequestでStart Lineのフォーマットが異なるため
  * その部分の実装は小クラスに任せている。
  *
- * UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
+ * <p>UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
  * 長大なデータのやり取りは想定していない。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
@@ -205,9 +205,9 @@ public abstract class HttpMessage {
     /**
      * ヘッダの値からKeepAliveか否かを返す。
      *
-     * HTTP/1.0の場合、Connection: keep-aliveの場合に
-     * HTTP/1.1の場合、Connection: closeでない場合に
-     * KeepAliveと判定する。
+     * <p>HTTP/1.0の場合、Connection: keep-aliveの場合に、
+     * HTTP/1.1の場合、Connection: closeでない場合に、
+     * KeepAliveと判定し、trueを返す。
      *
      * @return KeepAliveの場合true
      */
@@ -221,7 +221,7 @@ public abstract class HttpMessage {
     /**
      * Content-Lengthの値を返す。
      *
-     * 不明な場合0
+     * <p>不明な場合0
      *
      * @return Content-Lengthの値
      */
@@ -245,20 +245,6 @@ public abstract class HttpMessage {
      */
     public void setBody(@Nullable String body, boolean withContentLength) {
         setBody(body);
-        if (withContentLength) {
-            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
-            setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
-        }
-    }
-
-    /**
-     * メッセージボディを設定する。
-     *
-     * @param body メッセージボディ
-     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
-     */
-    public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {
-        setBodyBinary(body);
         if (withContentLength) {
             final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
             setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
@@ -298,6 +284,20 @@ public abstract class HttpMessage {
             }
         }
         return mBody;
+    }
+
+    /**
+     * メッセージボディを設定する。
+     *
+     * @param body メッセージボディ
+     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     */
+    public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {
+        setBodyBinary(body);
+        if (withContentLength) {
+            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
+            setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
+        }
     }
 
     /**

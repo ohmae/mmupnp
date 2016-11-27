@@ -1,9 +1,13 @@
 /*
  * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/MIT
  */
 
 package net.mm2d.upnp;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -13,103 +17,63 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class ArgumentTest {
-
     @Test(expected = IllegalStateException.class)
     public void build_Actionを設定していないとException() {
-        final Argument.Builder builder = new Argument.Builder();
-        builder.build();
+        new Argument.Builder()
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void build_Nameを設定していないとException() {
-        final Argument.Builder builder = new Argument.Builder();
-        builder.setAction(mock(Action.class));
-        builder.build();
+        new Argument.Builder()
+                .setAction(mock(Action.class))
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void Builder_build_RelatedStateVariableを設定していないとException() {
-        final Argument.Builder builder = new Argument.Builder();
-        builder.setAction(mock(Action.class));
-        builder.setName("");
-        builder.build();
+    public void build_RelatedStateVariableを設定していないとException() {
+        new Argument.Builder()
+                .setAction(mock(Action.class))
+                .setName("")
+                .build();
     }
 
     @Test
     public void getRelatedStateVariableName_setした値が返る() {
-        final String name = "test";
-        final Argument.Builder builder = new Argument.Builder();
-        builder.setRelatedStateVariableName(name);
-        assertEquals(name, builder.getRelatedStateVariableName());
+        final String name = "name";
+        final Argument.Builder builder = new Argument.Builder()
+                .setRelatedStateVariableName(name);
+        assertThat(builder.getRelatedStateVariableName(), is(name));
     }
 
     @Test
-    public void getAction_Builderで指定した値が得られる() {
+    public void build_Builderで指定した値が得られる() {
         final Action action = mock(Action.class);
-        final String name = "test";
+        final String name = "name";
         final StateVariable stateVariable = mock(StateVariable.class);
-        final Argument.Builder builder = new Argument.Builder();
-        builder.setAction(action);
-        builder.setName(name);
-        builder.setDirection("in");
-        builder.setRelatedStateVariable(stateVariable);
-        final Argument argument = builder.build();
-        assertEquals(action, argument.getAction());
-    }
-
-    @Test
-    public void getName_Builderで指定した値が得られる() {
-        final Action action = mock(Action.class);
-        final String name = "test";
-        final StateVariable stateVariable = mock(StateVariable.class);
-        final Argument.Builder builder = new Argument.Builder();
-        builder.setAction(action);
-        builder.setName(name);
-        builder.setDirection("in");
-        builder.setRelatedStateVariable(stateVariable);
-        final Argument argument = builder.build();
-        assertEquals(name, argument.getName());
-    }
-
-    @Test
-    public void isInputDirection_Builderでinを指定した場合true() {
-        final Action action = mock(Action.class);
-        final String name = "test";
-        final StateVariable stateVariable = mock(StateVariable.class);
-        final Argument.Builder builder = new Argument.Builder();
-        builder.setAction(action);
-        builder.setName(name);
-        builder.setDirection("in");
-        builder.setRelatedStateVariable(stateVariable);
-        final Argument argument = builder.build();
-        assertTrue(argument.isInputDirection());
+        final Argument argument = new Argument.Builder()
+                .setAction(action)
+                .setName(name)
+                .setDirection("in")
+                .setRelatedStateVariable(stateVariable)
+                .build();
+        assertThat(argument.getAction(), is(action));
+        assertThat(argument.getRelatedStateVariable(), is(stateVariable));
+        assertThat(argument.getName(), is(name));
+        assertThat(argument.isInputDirection(), is(true));
     }
 
     @Test
     public void isInputDirection_Builderでoutを指定した場合false() {
         final Action action = mock(Action.class);
-        final String name = "test";
+        final String name = "name";
         final StateVariable stateVariable = mock(StateVariable.class);
-        final Argument.Builder builder = new Argument.Builder();
-        builder.setAction(action);
-        builder.setName(name);
-        builder.setDirection("out");
-        builder.setRelatedStateVariable(stateVariable);
-        final Argument argument = builder.build();
-        assertFalse(argument.isInputDirection());
-    }
-
-    @Test
-    public void getRelatedStateVariable_Builderで指定した値が得られる() {
-        final Action action = mock(Action.class);
-        final String name = "test";
-        final StateVariable stateVariable = mock(StateVariable.class);
-        final Argument.Builder builder = new Argument.Builder();
-        builder.setAction(action);
-        builder.setName(name);
-        builder.setDirection("in");
-        builder.setRelatedStateVariable(stateVariable);
-        final Argument argument = builder.build();
-        assertEquals(stateVariable, argument.getRelatedStateVariable());
+        final Argument argument = new Argument.Builder()
+                .setAction(action)
+                .setName(name)
+                .setDirection("out")
+                .setRelatedStateVariable(stateVariable)
+                .build();
+        assertThat(argument.isInputDirection(), is(false));
     }
 }

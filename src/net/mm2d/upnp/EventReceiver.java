@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.IOUtils;
+import net.mm2d.util.IoUtils;
 import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
 
@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 /**
  * イベント購読によって通知されるEventを受信するクラス。
  *
- * HTTPのサーバとしてリクエストの受付のみを行う。
+ * <p>HTTPのサーバとしてリクエストの受付のみを行う。
  * HTTPメッセージのパースはリスナーの実装側が行う。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
@@ -125,7 +125,7 @@ class EventReceiver {
         public void shutdownRequest() {
             mShutdownRequest = true;
             interrupt();
-            IOUtils.closeQuietly(mServerSocket);
+            IoUtils.closeQuietly(mServerSocket);
             synchronized (mClientList) {
                 for (final ClientThread client : mClientList) {
                     client.shutdownRequest();
@@ -174,7 +174,7 @@ class EventReceiver {
                 }
             } catch (final IOException ignored) {
             } finally {
-                IOUtils.closeQuietly(mServerSocket);
+                IoUtils.closeQuietly(mServerSocket);
             }
         }
     }
@@ -218,7 +218,7 @@ class EventReceiver {
          */
         public void shutdownRequest() {
             interrupt();
-            IOUtils.closeQuietly(mSocket);
+            IoUtils.closeQuietly(mSocket);
         }
 
         private boolean notifyEvent(@Nonnull HttpRequest request) {
@@ -254,7 +254,7 @@ class EventReceiver {
             } catch (final IOException e) {
                 Log.w(TAG, e);
             } finally {
-                IOUtils.closeQuietly(mSocket);
+                IoUtils.closeQuietly(mSocket);
                 mServer.notifyClientFinish(this);
             }
         }

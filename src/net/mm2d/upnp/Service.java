@@ -9,16 +9,15 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
+import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,8 +29,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -65,54 +62,66 @@ public class Service {
          * このServiceを保持するDeviceを登録する。
          *
          * @param device このServiceを保持するDevice
+         * @return Builder
          */
-        public void setDevice(@Nonnull Device device) {
+        public Builder setDevice(@Nonnull Device device) {
             mDevice = device;
+            return this;
         }
 
         /**
          * serviceTypeを登録する。
          *
          * @param serviceType serviceType
+         * @return Builder
          */
-        public void setServiceType(@Nonnull String serviceType) {
+        public Builder setServiceType(@Nonnull String serviceType) {
             mServiceType = serviceType;
+            return this;
         }
 
         /**
          * serviceIdを登録する
          *
          * @param serviceId serviceId
+         * @return Builder
          */
-        public void setServiceId(@Nonnull String serviceId) {
+        public Builder setServiceId(@Nonnull String serviceId) {
             mServiceId = serviceId;
+            return this;
         }
 
         /**
          * SCPDURLを登録する
          *
          * @param scpdUrl ScpdURL
+         * @return Builder
          */
-        public void setScpdUrl(@Nonnull String scpdUrl) {
+        public Builder setScpdUrl(@Nonnull String scpdUrl) {
             mScpdUrl = scpdUrl;
+            return this;
         }
 
         /**
          * controlURLを登録する。
          *
          * @param controlUrl controlURL
+         * @return Builder
          */
-        public void setControlUrl(@Nonnull String controlUrl) {
+        public Builder setControlUrl(@Nonnull String controlUrl) {
             mControlUrl = controlUrl;
+            return this;
         }
 
         /**
          * eventSubURLを登録する。
          *
          * @param eventSubUrl eventSubURL
+         * @return Builder
          */
-        public void setEventSubUrl(@Nonnull String eventSubUrl) {
+        public Builder setEventSubUrl(@Nonnull String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
+            return this;
         }
 
         /**
@@ -160,8 +169,9 @@ public class Service {
     private long mSubscriptionStart;
     private long mSubscriptionTimeout;
     private String mSubscriptionId;
+    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
-    private Service(Builder builder) {
+    private Service(@Nonnull Builder builder) {
         mDevice = builder.mDevice;
         mControlPoint = mDevice.getControlPoint();
         mServiceType = builder.mServiceType;
@@ -188,11 +198,11 @@ public class Service {
      *
      * @param url URLプロパティ値
      * @return URLオブジェクト
-     * @throws MalformedURLException
+     * @throws MalformedURLException 不正なURL
      * @see Device#getAbsoluteUrl(String)
      */
     @Nonnull
-    URL getAbsoluteUrl(String url) throws MalformedURLException {
+    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
 
@@ -259,7 +269,7 @@ public class Service {
     /**
      * このサービスが保持する全Actionのリストを返す。
      *
-     * リストは変更不可。
+     * <p>リストは変更不可。
      *
      * @return 全Actionのリスト
      */
@@ -275,10 +285,10 @@ public class Service {
     /**
      * 名前から該当するActionを探す。
      *
-     * 見つからない場合はnullが返る。
+     * <p>見つからない場合はnullが返る。
      *
      * @param name Action名
-     * @return 該当するAction
+     * @return 該当するAction、見つからない場合null
      */
     @Nullable
     public Action findAction(@Nonnull String name) {
@@ -302,10 +312,10 @@ public class Service {
     /**
      * 名前から該当するStateVariableを探す。
      *
-     * 見つからない場合はnullが返る。
+     * <p>見つからない場合はnullが返る。
      *
      * @param name StateVariable名
-     * @return 該当するStateVariable
+     * @return 該当するStateVariable、見つからない場合null
      */
     @Nullable
     public StateVariable findStateVariable(@Nullable String name) {
@@ -315,7 +325,7 @@ public class Service {
     /**
      * SCPDURLからDescriptionを取得し、パースする。
      *
-     * 可能であればKeepAliveを行う。
+     * <p>可能であればKeepAliveを行う。
      *
      * @param client 通信に使用するHttpClient
      * @throws IOException 通信エラー
@@ -340,11 +350,8 @@ public class Service {
     }
 
     private void parseDescription(@Nonnull String xml)
-            throws IOException, SAXException, ParserConfigurationException {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        final DocumentBuilder db = dbf.newDocumentBuilder();
-        final Document doc = db.parse(new InputSource(new StringReader(xml)));
+            throws IOException, SAXException {
+        final Document doc = XmlUtils.newDocument(xml);
         final List<Action.Builder> alist = parseActionList(doc.getElementsByTagName("action"));
         parseStateVariableList(doc.getElementsByTagName("stateVariable"));
         for (final Action.Builder builder : alist) {
@@ -378,7 +385,7 @@ public class Service {
     @Nonnull
     private Action.Builder parseAction(@Nonnull Element element) {
         final Action.Builder builder = new Action.Builder();
-        builder.serService(this);
+        builder.setService(this);
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -510,6 +517,19 @@ public class Service {
     }
 
     /**
+     * HttpClientのファクトリークラスを変更する。
+     *
+     * @param factory ファクトリークラス
+     */
+    void setHttpClientFactory(HttpClientFactory factory) {
+        mHttpClientFactory = factory;
+    }
+
+    private HttpClient createHttpClient() {
+        return mHttpClientFactory.createHttpClient(false);
+    }
+
+    /**
      * Subscribeの実行
      *
      * @return 成功時true
@@ -538,7 +558,7 @@ public class Service {
         request.setHeader(Http.CALLBACK, getCallback());
         request.setHeader(Http.TIMEOUT, "Second-300");
         request.setHeader(Http.CONTENT_LENGTH, "0");
-        final HttpClient client = new HttpClient(false);
+        final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             System.out.println(response.toString());
@@ -588,7 +608,7 @@ public class Service {
         request.setHeader(Http.SID, mSubscriptionId);
         request.setHeader(Http.TIMEOUT, "Second-300");
         request.setHeader(Http.CONTENT_LENGTH, "0");
-        final HttpClient client = new HttpClient(false);
+        final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             System.out.println(response.toString());

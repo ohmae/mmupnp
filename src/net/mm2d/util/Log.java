@@ -170,7 +170,7 @@ public class Log {
     /**
      * VERBOSEレベルでのログ出力を行う。
      *
-     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
      * @param tag タグ
      * @param message メッセージ
@@ -193,7 +193,7 @@ public class Log {
     /**
      * DEBUGレベルでのログ出力を行う。
      *
-     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
      * @param tag タグ
      * @param message メッセージ
@@ -216,7 +216,7 @@ public class Log {
     /**
      * INFOレベルでのログ出力を行う。
      *
-     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
      * @param tag タグ
      * @param message メッセージ
@@ -239,7 +239,7 @@ public class Log {
     /**
      * WARNレベルでのログ出力を行う。
      *
-     * 引数のThrowableのスタックトレースをメッセージとして表示する。
+     * <p>引数のThrowableのスタックトレースをメッセージとして表示する。
      *
      * @param tag タグ
      * @param tr Throwable
@@ -251,7 +251,7 @@ public class Log {
     /**
      * WARNレベルでのログ出力を行う。
      *
-     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
      * @param tag タグ
      * @param message メッセージ
@@ -274,7 +274,7 @@ public class Log {
     /**
      * ERRORレベルでのログ出力を行う。
      *
-     * 引数のThrowableを元にスタックトレースを合わせて表示する。
+     * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
      * @param tag タグ
      * @param message メッセージ

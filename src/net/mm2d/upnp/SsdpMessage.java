@@ -236,7 +236,7 @@ public abstract class SsdpMessage {
     /**
      * 有効期限が切れる時刻を返す。
      *
-     * 受信時刻からmax-ageを加算した時刻
+     * <p>受信時刻からmax-ageを加算した時刻
      *
      * @return 有効期限が切れる時刻
      */

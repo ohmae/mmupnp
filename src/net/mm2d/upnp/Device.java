@@ -8,15 +8,14 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,14 +28,12 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * UPnP Deviceを表現するクラス
  *
- * SubDeviceには非対応
+ * <p>SubDeviceには非対応
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -59,6 +56,7 @@ public class Device {
     private final Map<String, Map<String, String>> mTagMap;
     private final List<Icon> mIconList;
     private final List<Service> mServiceList;
+    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     /**
      * ControlPointに紐付いたインスタンスを作成。
@@ -86,7 +84,7 @@ public class Device {
     /**
      * SSDPパケットを設定する。
      *
-     * 同一性はSSDPパケットのUUIDで判断し
+     * <p>同一性はSSDPパケットのUUIDで判断し
      * SSDPパケット受信ごとに更新される
      *
      * @param message SSDPパケット
@@ -108,7 +106,7 @@ public class Device {
     /**
      * SSDPパケットに記述されたUUIDを返す。
      *
-     * 本来はDeviceDescriptionに記述されたUDNと同一の値となるはずであるが
+     * <p>本来はDeviceDescriptionに記述されたUDNと同一の値となるはずであるが
      * 異なる場合もエラーとしては扱っていないため、同一性は保証されない。
      *
      * @return SSDPパケットに記述されたUUID
@@ -140,7 +138,7 @@ public class Device {
     /**
      * URL情報を正規化して返す。
      *
-     * "http://"から始まっていればそのまま利用する。
+     * <p>"http://"から始まっていればそのまま利用する。
      * "/"から始まっていればLocationホストの絶対パスとして
      * Locationの"://"以降の最初の"/"までと結合する。
      * それ以外の場合はLocationからの相対パスであり、
@@ -148,7 +146,7 @@ public class Device {
      *
      * @param url URLパス情報
      * @return 正規化したURL
-     * @throws MalformedURLException
+     * @throws MalformedURLException 不正なURL
      */
     @Nonnull
     URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
@@ -174,9 +172,22 @@ public class Device {
     }
 
     /**
+     * HttpClientのファクトリークラスを変更する。
+     *
+     * @param factory ファクトリークラス
+     */
+    void setHttpClientFactory(HttpClientFactory factory) {
+        mHttpClientFactory = factory;
+    }
+
+    private HttpClient createHttpClient() {
+        return mHttpClientFactory.createHttpClient(true);
+    }
+
+    /**
      * DeviceDescriptionを読み込む。
      *
-     * Descriptionのパース後、そこに記述されている
+     * <p>Descriptionのパース後、そこに記述されている
      * icon/serviceのDescriptionの読み込みパースもまとめて行う。
      *
      * @throws IOException 通信上での何らかの問題
@@ -184,7 +195,7 @@ public class Device {
      * @throws ParserConfigurationException XMLパーサが利用できない場合
      */
     void loadDescription() throws IOException, SAXException, ParserConfigurationException {
-        final HttpClient client = new HttpClient(true);
+        final HttpClient client = createHttpClient();
         final URL url = new URL(getLocation());
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
@@ -289,29 +300,20 @@ public class Device {
 
     private void parseDescription(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        final DocumentBuilder db = dbf.newDocumentBuilder();
-        final Document doc = db.parse(new InputSource(new StringReader(xml)));
-        Node n = doc.getDocumentElement().getFirstChild();
-        for (; n != null; n = n.getNextSibling()) {
-            if (n.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("device".equals(n.getLocalName())) {
-                break;
-            }
-        }
-        if (n == null) {
+        final Document doc = XmlUtils.newDocument(xml);
+        final Node device =
+                XmlUtils.findChildElementByLocalName(doc.getDocumentElement(), "device");
+        if (device == null) {
             return;
         }
-        Node node = n.getFirstChild();
+        Node node = device.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
             final String tag = node.getLocalName();
             if ("iconList".equals(tag)) {
+
                 parseIconList(node);
             } else if ("serviceList".equals(tag)) {
                 parseServiceList(node);
@@ -370,7 +372,7 @@ public class Device {
     /**
      * Descriptionに記述されていたタグの値を取得する。
      *
-     * 個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
+     * <p>個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
      * 標準外のタグについても取得できるが、属性値の取得方法は提供されない。
      * また同一タグが複数記述されている場合は最後に記述されていた値が取得される。
      * タグ名にネームスペースプレフィックスは含まない。
@@ -394,7 +396,7 @@ public class Device {
     /**
      * Descriptionに記述されていたタグの値を取得する。
      *
-     * 個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
+     * <p>個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
      * 標準外のタグについても取得できるが、属性値の取得方法は提供されない、
      * また同一タグが複数記述されている場合は最後に記述されていた値が取得される。
      * ネームスペースはプレフィックスではなく、URIを指定する。
@@ -426,7 +428,7 @@ public class Device {
     /**
      * Locationに記述のIPアドレスを返す。
      *
-     * 記述に異常がある場合は空文字が返る。
+     * <p>記述に異常がある場合は空文字が返る。
      *
      * @return IPアドレス
      */
@@ -443,7 +445,7 @@ public class Device {
     /**
      * UDNタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return UDNタグの値
      */
@@ -455,7 +457,7 @@ public class Device {
     /**
      * deviceTypeタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return deviceTypeタグの値
      */
@@ -467,7 +469,7 @@ public class Device {
     /**
      * friendlyNameタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return friendlyNameタグの値
      */
@@ -479,7 +481,7 @@ public class Device {
     /**
      * manufacturerタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return manufacturerタグの値
      */
@@ -491,7 +493,7 @@ public class Device {
     /**
      * manufacturerURLタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return manufacturerURLタグの値
      */
@@ -503,7 +505,7 @@ public class Device {
     /**
      * modelNameタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return modelNameタグの値
      */
@@ -515,7 +517,7 @@ public class Device {
     /**
      * modelURLタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return modelURLタグの値
      */
@@ -527,7 +529,7 @@ public class Device {
     /**
      * modelDescriptionタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return modelDescriptionタグの値
      */
@@ -539,7 +541,7 @@ public class Device {
     /**
      * modelNumberタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return modelNumberタグの値
      */
@@ -551,7 +553,7 @@ public class Device {
     /**
      * serialNumberタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return serialNumberタグの値
      */
@@ -563,7 +565,7 @@ public class Device {
     /**
      * presentationURLタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return presentationURLタグの値
      */
@@ -597,7 +599,7 @@ public class Device {
     /**
      * 指定文字列とServiceIDが合致するサービスを返す。
      *
-     * 見つからない場合はnullを返す。
+     * <p>見つからない場合はnullを返す。
      *
      * @param id サーチするID
      * @return 見つかったService
@@ -616,7 +618,7 @@ public class Device {
     /**
      * 指定文字列とServiceTypeが合致するサービスを返す。
      *
-     * 見つからない場合はnullを返す。
+     * <p>見つからない場合はnullを返す。
      *
      * @param type サーチするType
      * @return 見つかったService
@@ -635,10 +637,10 @@ public class Device {
     /**
      * 指定文字列の名前を持つActionを返す。
      *
-     * 全サービスに対して検索をかけ、最初に見つかったものを返す。
+     * <p>全サービスに対して検索をかけ、最初に見つかったものを返す。
      * 見つからない場合はnullを返す。
      *
-     * 特定のサービスのActionを取得したい場合は、
+     * <p>特定のサービスのActionを取得したい場合は、
      * {@link #findServiceById(String)} もしくは
      * {@link #findServiceByType(String)} を使用してServiceを取得した後、
      * {@link Service#findAction(String)} を使用する。

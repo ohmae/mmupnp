@@ -11,14 +11,13 @@ import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.Log;
+import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.Inet4Address;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -42,8 +41,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -77,7 +74,7 @@ public class ControlPoint {
         /**
          * 機器喪失時にコールされる。
          *
-         * 有効期限切れ、SSDP byebye受信、ControlPointの停止によって発生する
+         * <p>有効期限切れ、SSDP byebye受信、ControlPointの停止によって発生する
          *
          * @param device 喪失したDevice
          * @see Device
@@ -201,11 +198,7 @@ public class ControlPoint {
         @Override
         public void run() {
             try {
-                final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                dbf.setNamespaceAware(true);
-                final DocumentBuilder db = dbf.newDocumentBuilder();
-                final Document doc = db
-                        .parse(new InputSource(new StringReader(mRequest.getBody())));
+                final Document doc = XmlUtils.newDocument(mRequest.getBody());
                 Node node = doc.getDocumentElement().getFirstChild();
                 for (; node != null; node = node.getNextSibling()) {
                     if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -223,7 +216,7 @@ public class ControlPoint {
                         }
                     }
                 }
-            } catch (IOException | SAXException | ParserConfigurationException ignored) {
+            } catch (IOException | SAXException ignored) {
             }
         }
 
@@ -244,7 +237,7 @@ public class ControlPoint {
     /**
      * インスタンス初期化
      *
-     * 引数のインターフェースを利用するように初期化される。
+     * <p>引数のインターフェースを利用するように初期化される。
      * 引数なしの場合、使用するインターフェースは自動的に選定される。
      *
      * @param interfaces 使用するインターフェース、指定しない場合は自動選択となる。
@@ -374,7 +367,7 @@ public class ControlPoint {
     /**
      * 初期化を行う。
      *
-     * 利用前にかならず実行する。
+     * <p>利用前にかならず実行する。
      * 一度初期化を行うと再初期化は不可能。
      * インターフェースの変更など、再初期化が必要な場合はインスタンスの生成からやり直すこと。
      * また、終了する際は必ず{@link #terminate()}をコールすること。
@@ -399,7 +392,7 @@ public class ControlPoint {
     /**
      * 終了処理を行う。
      *
-     * 動作中の場合、停止処理を行う。
+     * <p>動作中の場合、停止処理を行う。
      * 一度終了処理を行ったあとは再初期化は不可能。
      * インスタンス参照を破棄すること。
      *
@@ -473,7 +466,7 @@ public class ControlPoint {
     /**
      * 処理を停止する。
      *
-     * 開始していない状態、既に停止済みの状態の場合なにも行われない。
+     * <p>開始していない状態、既に停止済みの状態の場合なにも行われない。
      * 停止に伴い発見済みDeviceはLost扱いとなる。
      * 停止後は発見済みDeviceのインスタンスを保持していても正常に動作しない。
      *
@@ -536,7 +529,7 @@ public class ControlPoint {
     /**
      * Searchパケットを送出する。
      *
-     * stがnullの場合、"ssdp:all"として動作する。
+     * <p>stがnullの場合、"ssdp:all"として動作する。
      *
      * @param st SearchパケットのSTフィールド
      */
@@ -601,8 +594,7 @@ public class ControlPoint {
         }
     }
 
-    private void discoverDevice(@Nonnull
-    final Device device) {
+    private void discoverDevice(final @Nonnull Device device) {
         synchronized (mDeviceMap) {
             mDeviceMap.put(device.getUuid(), device);
             mDeviceInspector.add(device);
@@ -626,7 +618,7 @@ public class ControlPoint {
     /**
      * デバイスの喪失を行う。
      *
-     * DeviceInspectorからコールするためにパッケージデフォルトとする
+     * <p>DeviceInspectorからコールするためにパッケージデフォルトとする
      * 他からはコールしないこと。
      *
      * @param device 喪失してデバイス
@@ -669,7 +661,7 @@ public class ControlPoint {
     /**
      * 発見したデバイスのリストを返す。
      *
-     * 内部で保持するリストのコピーが返される。
+     * <p>内部で保持するリストのコピーが返される。
      *
      * @return デバイスのリスト
      * @see Device
@@ -684,7 +676,7 @@ public class ControlPoint {
     /**
      * 指定UDNのデバイスを返す。
      *
-     * 見つからない場合nullが返る。
+     * <p>見つからない場合nullが返る。
      *
      * @param udn UDN
      * @return 指定UDNのデバイス
@@ -708,7 +700,7 @@ public class ControlPoint {
     /**
      * SubscriptionIDに合致するServiceを返す。
      *
-     * 合致するServiceがない場合null
+     * <p>合致するServiceがない場合null
      *
      * @param subscriptionId SubscriptionID
      * @return 該当Service
@@ -724,7 +716,7 @@ public class ControlPoint {
     /**
      * SubscriptionIDが確定したServiceを購読リストに登録する
      *
-     * Serviceのsubscribeが実行された後にServiceからコールされる。
+     * <p>Serviceのsubscribeが実行された後にServiceからコールされる。
      *
      * @param service 登録するService
      * @see Service

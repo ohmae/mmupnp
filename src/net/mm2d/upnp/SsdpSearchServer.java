@@ -67,7 +67,7 @@ class SsdpSearchServer extends SsdpServer {
     /**
      * M-SEARCHを実行する。
      *
-     * STはssdp:allで実行する。
+     * <p>STはssdp:allで実行する。
      */
     public void search() {
         search(null);

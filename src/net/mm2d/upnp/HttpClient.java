@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.IOUtils;
+import net.mm2d.util.IoUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -21,8 +21,14 @@ import javax.annotation.Nonnull;
 /**
  * HTTP通信を行うクライアントソケット。
  *
- * UPnPの通信でよく利用される小さなデータのやり取りに特化したもの。
+ * <p>UPnPの通信でよく利用される小さなデータのやり取りに特化したもの。
  * 長大なデータのやり取りは想定していない。
+ *
+ * <p>相手の応答がkeep-alive可能な応答であった場合はコネクションを切断せず、
+ * 継続して利用するという、消極的なkeep-alive機能も提供する。
+ *
+ * <p>keep-alive状態であっても、post時に維持したコネクションと同一のホスト・ポートでない場合は
+ * 切断、再接続を行う。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -34,14 +40,18 @@ public class HttpClient {
 
     /**
      * インスタンス作成
+     *
+     * @see #setKeepAlive(boolean)
      */
     public HttpClient() {
+        setKeepAlive(true);
     }
 
     /**
      * インスタンス作成
      *
-     * @param keepAlive keep-alive通信を行う場合
+     * @param keepAlive keep-alive通信を行う場合true
+     * @see #setKeepAlive(boolean)
      */
     public HttpClient(boolean keepAlive) {
         setKeepAlive(keepAlive);
@@ -59,6 +69,16 @@ public class HttpClient {
     /**
      * keep-alive設定を行う。
      *
+     * <p>デフォルトはtrue。
+     * trueを指定した場合、応答がkeep-alive可能なものであればコネクションを継続する。
+     * trueを指定しても、応答がkeep-alive可能でない場合はコネクションを切断する。
+     * falseを指定した場合、応答の内容によらずコネクションは切断する。
+     *
+     * <p>また、true/falseどちらを指定した場合であっても、
+     * postの引数で渡された{@link HttpRequest}の内容を変更することはない。
+     * ヘッダへkeep-aliveの記述が必要な場合はpostをコールする前に、
+     * {@link HttpRequest}へ設定しておく必要がある。
+     *
      * @param keepAlive keep-aliveを行う場合true
      */
     public void setKeepAlive(boolean keepAlive) {
@@ -66,25 +86,36 @@ public class HttpClient {
     }
 
     /**
-     * リクエストを送信し、レスポンスを受信する
+     * リクエストを送信し、レスポンスを受信する。
+     *
+     * <p>利用するHTTPメソッドは引数に依存する。
      *
      * @param request 送信するリクエスト
      * @return 受信したレスポンス
      * @throws IOException 通信エラー
      */
     @Nonnull
-    public HttpResponse post(HttpRequest request) throws IOException {
-        if (mSocket != null) {
-            if (!mSocket.getInetAddress().equals(request.getAddress())
-                    || mSocket.getPort() != request.getPort()) {
+    public HttpResponse post(@Nonnull HttpRequest request) throws IOException {
+        if (!isClosed()) {
+            if (!canReuse(request)) {
                 closeSocket();
             }
         }
         try {
-            if (mSocket == null) {
+            if (isClosed()) {
                 openSocket(request);
+                request.writeData(mOutputStream);
+            } else {
+                try {
+                    request.writeData(mOutputStream);
+                } catch (final IOException e) {
+                    // コネクションを再利用した場合は
+                    // 既に切断されていた可能性があるためリトライを行う
+                    closeSocket();
+                    openSocket(request);
+                    request.writeData(mOutputStream);
+                }
             }
-            request.writeData(mOutputStream);
             final HttpResponse response = new HttpResponse();
             response.setAddress(mSocket.getInetAddress());
             response.setPort(mSocket.getPort());
@@ -99,6 +130,15 @@ public class HttpClient {
         }
     }
 
+    private boolean canReuse(HttpRequest request) {
+        return mSocket.getInetAddress().equals(request.getAddress())
+                && mSocket.getPort() == request.getPort();
+    }
+
+    private boolean isClosed() {
+        return mSocket == null;
+    }
+
     private void openSocket(@Nonnull HttpRequest request) throws IOException {
         mSocket = new Socket();
         mSocket.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT);
@@ -108,9 +148,9 @@ public class HttpClient {
     }
 
     private void closeSocket() {
-        IOUtils.closeQuietly(mInputStream);
-        IOUtils.closeQuietly(mOutputStream);
-        IOUtils.closeQuietly(mSocket);
+        IoUtils.closeQuietly(mInputStream);
+        IoUtils.closeQuietly(mOutputStream);
+        IoUtils.closeQuietly(mSocket);
         mInputStream = null;
         mOutputStream = null;
         mSocket = null;

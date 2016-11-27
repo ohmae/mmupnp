@@ -30,11 +30,11 @@ class SubscribeKeeper extends Thread {
     private final Comparator<Service> mComparator = new Comparator<Service>() {
         @Override
         public int compare(Service s1, Service s2) {
-            return (int) (getRenewTime(s1) - getRenewTime(s2));
+            return (int) (calculateRenewTime(s1) - calculateRenewTime(s2));
         }
     };
 
-    private long getRenewTime(@Nonnull Service service) {
+    private long calculateRenewTime(@Nonnull Service service) {
         long timeout = service.getSubscriptionTimeout();
         if (timeout > MARGIN_TIME) {
             timeout -= MARGIN_TIME;
@@ -86,7 +86,7 @@ class SubscribeKeeper extends Thread {
                 }
                 final long now = System.currentTimeMillis();
                 for (final Service service : work) {
-                    if (getRenewTime(service) < now) {
+                    if (calculateRenewTime(service) < now) {
                         try {
                             service.renewSubscribe(false);
                         } catch (final IOException e) {
@@ -101,7 +101,7 @@ class SubscribeKeeper extends Thread {
                     Collections.sort(mServiceList, mComparator);
                     if (mServiceList.size() != 0) {
                         final Service service = mServiceList.get(0);
-                        long sleep = getRenewTime(service) - System.currentTimeMillis();
+                        long sleep = calculateRenewTime(service) - System.currentTimeMillis();
                         if (sleep < MIN_INTERVAL) {
                             sleep = MIN_INTERVAL;
                         }
