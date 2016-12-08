@@ -22,9 +22,6 @@ public class TextUtils {
      * @return 引数がnullもしくは空の場合にtrue
      */
     public static boolean isEmpty(@Nullable String string) {
-        if (string == null || string.length() == 0) {
-            return true;
-        }
-        return false;
+        return string == null || string.length() == 0;
     }
 }

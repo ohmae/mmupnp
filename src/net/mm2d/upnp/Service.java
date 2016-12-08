@@ -330,7 +330,7 @@ public class Service {
      * @param client 通信に使用するHttpClient
      * @throws IOException 通信エラー
      * @throws SAXException XMLパースエラー
-     * @throws ParserConfigurationException XMLパーサーエラー
+     * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     void loadDescription(@Nonnull HttpClient client)
             throws IOException, SAXException, ParserConfigurationException {
@@ -350,7 +350,7 @@ public class Service {
     }
 
     private void parseDescription(@Nonnull String xml)
-            throws IOException, SAXException {
+            throws IOException, SAXException, ParserConfigurationException {
         final Document doc = XmlUtils.newDocument(xml);
         final List<Action.Builder> alist = parseActionList(doc.getElementsByTagName("action"));
         parseStateVariableList(doc.getElementsByTagName("stateVariable"));

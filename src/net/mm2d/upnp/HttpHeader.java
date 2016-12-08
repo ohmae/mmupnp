@@ -195,7 +195,7 @@ public class HttpHeader {
     }
 
     /**
-     * 登録所法のクリアを行う。
+     * 登録情報のクリアを行う。
      */
     public void clear() {
         mList.clear();

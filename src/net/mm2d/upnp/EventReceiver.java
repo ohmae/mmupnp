@@ -227,8 +227,11 @@ class EventReceiver {
 
         @Override
         public void run() {
-            try (final InputStream is = new BufferedInputStream(mSocket.getInputStream());
-                    final OutputStream os = new BufferedOutputStream(mSocket.getOutputStream())) {
+            InputStream is = null;
+            OutputStream os = null;
+            try {
+                is = new BufferedInputStream(mSocket.getInputStream());
+                os = new BufferedOutputStream(mSocket.getOutputStream());
                 final HttpRequest request = new HttpRequest();
                 request.setAddress(mSocket.getInetAddress());
                 request.setPort(mSocket.getPort());
@@ -254,6 +257,8 @@ class EventReceiver {
             } catch (final IOException e) {
                 Log.w(TAG, e);
             } finally {
+                IoUtils.closeQuietly(is);
+                IoUtils.closeQuietly(os);
                 IoUtils.closeQuietly(mSocket);
                 mServer.notifyClientFinish(this);
             }

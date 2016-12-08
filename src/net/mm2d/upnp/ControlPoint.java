@@ -107,20 +107,32 @@ public class ControlPoint {
                 @Nonnull String value);
     }
 
+    @Nonnull
     private final List<DiscoveryListener> mDiscoveryListeners;
+    @Nonnull
     private final List<NotifyEventListener> mNotifyEventListeners;
+    @Nonnull
     private final Collection<SsdpSearchServer> mSearchList;
+    @Nonnull
     private final Collection<SsdpNotifyReceiver> mNotifyList;
+    @Nonnull
     private final Map<String, Device> mDeviceMap;
+    @Nonnull
     private final Map<String, Device> mPendingDeviceMap;
+    @Nonnull
     private final Map<String, Service> mSubscribeServiceMap;
+    @Nonnull
     private final EventReceiver mEventReceiver;
+    @Nonnull
     private final ExecutorService mCachedThreadPool;
+    @Nonnull
     private final ExecutorService mNotifyExecutor;
     private boolean mInitialized = false;
     private boolean mStarted = false;
     private boolean mTerminated = false;
+    @Nullable
     private DeviceInspector mDeviceInspector;
+    @Nullable
     private SubscribeKeeper mSubscribeKeeper;
 
     private void onReceiveSsdp(@Nonnull SsdpMessage message) {
@@ -212,15 +224,15 @@ public class ControlPoint {
                             }
                             final String name = c.getLocalName();
                             final String value = c.getTextContent();
-                            notify(name, value);
+                            notifyEvent(name, value);
                         }
                     }
                 }
-            } catch (IOException | SAXException ignored) {
+            } catch (IOException | SAXException | ParserConfigurationException ignored) {
             }
         }
 
-        private void notify(@Nullable String name, @Nullable String value) {
+        private void notifyEvent(@Nullable String name, @Nullable String value) {
             final StateVariable variable = mService.findStateVariable(name);
             if (variable == null || !variable.isSendEvents() || value == null) {
                 Log.w(TAG, "illegal notify argument:" + name + " " + value);

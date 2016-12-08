@@ -124,9 +124,12 @@ public class Argument {
         }
     }
 
+    @Nonnull
     private final Action mAction;
+    @Nonnull
     private final String mName;
     private final boolean mInputDirection;
+    @Nonnull
     private final StateVariable mRelatedStateVariable;
 
     private Argument(@Nonnull Builder builder) {

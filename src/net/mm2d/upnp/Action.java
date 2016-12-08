@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -234,7 +235,7 @@ public class Action {
         }
         try {
             return parseResponse(response.getBody());
-        } catch (final SAXException e) {
+        } catch (final SAXException | ParserConfigurationException e) {
             throw new IOException(response.getBody(), e);
         }
     }
@@ -274,14 +275,15 @@ public class Action {
             return sw.toString();
         } catch (DOMException
                 | TransformerFactoryConfigurationError
-                | TransformerException e) {
+                | TransformerException
+                | ParserConfigurationException e) {
             throw new IOException(e);
         }
     }
 
     @Nonnull
     private Map<String, String> parseResponse(@Nonnull String xml)
-            throws IOException, SAXException {
+            throws IOException, SAXException, ParserConfigurationException {
         final Map<String, String> result = new HashMap<>();
         final String responseTag = mName + "Response";
         final Document doc = XmlUtils.newDocument(xml);

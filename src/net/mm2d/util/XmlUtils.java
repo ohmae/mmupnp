@@ -29,24 +29,29 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class XmlUtils {
     private static DocumentBuilder sDocumentBuilder;
-    static {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        try {
-            sDocumentBuilder = dbf.newDocumentBuilder();
-        } catch (final ParserConfigurationException ignored) {
-            sDocumentBuilder = null;
+
+    private static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        return factory.newDocumentBuilder();
+    }
+
+    private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+        if (sDocumentBuilder == null) {
+            sDocumentBuilder = newDocumentBuilder();
         }
+        return sDocumentBuilder;
     }
 
     /**
      * 空のDocumentを作成する。
      *
      * @return Document
+     * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     @Nonnull
-    public static Document newDocument() {
-        return sDocumentBuilder.newDocument();
+    public static synchronized Document newDocument() throws ParserConfigurationException {
+        return getDocumentBuilder().newDocument();
     }
 
     /**
@@ -56,10 +61,12 @@ public class XmlUtils {
      * @return Document
      * @throws SAXException 構文解析エラーが発生した
      * @throws IOException 入出力エラーが発生した
+     * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     @Nonnull
-    public static Document newDocument(@Nonnull String xml) throws SAXException, IOException {
-        return sDocumentBuilder.parse(new InputSource(new StringReader(xml)));
+    public static synchronized Document newDocument(@Nonnull String xml)
+            throws SAXException, IOException, ParserConfigurationException {
+        return getDocumentBuilder().parse(new InputSource(new StringReader(xml)));
     }
 
     /**
@@ -70,8 +77,8 @@ public class XmlUtils {
      * @return 見つかったエレメントノード、見つからなければnull
      */
     @Nullable
-    public static Element findChildElementByLocalName(@Nonnull Node parent,
-            @Nonnull String localName) {
+    public static Element findChildElementByLocalName(
+            @Nonnull Node parent, @Nonnull String localName) {
         Node child = parent.getFirstChild();
         for (; child != null; child = child.getNextSibling()) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {

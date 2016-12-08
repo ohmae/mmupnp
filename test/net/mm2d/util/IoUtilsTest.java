@@ -16,27 +16,103 @@ import org.junit.runners.JUnit4;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.channels.Selector;
 
 @RunWith(JUnit4.class)
 public class IoUtilsTest {
     @Test
-    public void closeQuietly_closeがコールされる() throws IOException {
+    public void closeQuietly_Closeable_closeがコールされる() throws IOException {
         final Closeable closeable = mock(Closeable.class);
         IoUtils.closeQuietly(closeable);
         verify(closeable).close();
     }
 
     @Test
-    public void closeQuietly_nullを渡してもExceptionが発生しない() {
-        IoUtils.closeQuietly(null);
+    public void closeQuietly_Closeable_nullを渡してもExceptionが発生しない() {
+        final Closeable closeable = null;
+        IoUtils.closeQuietly(closeable);
     }
 
     @Test
-    public void closeQuietly_closeでIOExceptionが発生しても外に伝搬しない() {
+    public void closeQuietly_Closeable_closeでIOExceptionが発生しても外に伝搬しない() {
         try {
             final Closeable closeable = mock(Closeable.class);
             doThrow(new IOException()).when(closeable).close();
             IoUtils.closeQuietly(closeable);
+        } catch (final IOException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void closeQuietly_Socket_closeがコールされる() throws IOException {
+        final Socket socket = mock(Socket.class);
+        IoUtils.closeQuietly(socket);
+        verify(socket).close();
+    }
+
+    @Test
+    public void closeQuietly_Socket_nullを渡してもExceptionが発生しない() {
+        final Socket socket = null;
+        IoUtils.closeQuietly(socket);
+    }
+
+    @Test
+    public void closeQuietly_Socket_closeでIOExceptionが発生しても外に伝搬しない() {
+        try {
+            final Socket socket = mock(Socket.class);
+            doThrow(new IOException()).when(socket).close();
+            IoUtils.closeQuietly(socket);
+        } catch (final IOException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void closeQuietly_ServerSocket_closeがコールされる() throws IOException {
+        final ServerSocket serverSocket = mock(ServerSocket.class);
+        IoUtils.closeQuietly(serverSocket);
+        verify(serverSocket).close();
+    }
+
+    @Test
+    public void closeQuietly_ServerSocket_nullを渡してもExceptionが発生しない() {
+        final ServerSocket serverSocket = null;
+        IoUtils.closeQuietly(serverSocket);
+    }
+
+    @Test
+    public void closeQuietly_ServerSocket_closeでIOExceptionが発生しても外に伝搬しない() {
+        try {
+            final ServerSocket serverSocket = mock(ServerSocket.class);
+            doThrow(new IOException()).when(serverSocket).close();
+            IoUtils.closeQuietly(serverSocket);
+        } catch (final IOException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void closeQuietly_Selector_closeがコールされる() throws IOException {
+        final Selector selector = mock(Selector.class);
+        IoUtils.closeQuietly(selector);
+        verify(selector).close();
+    }
+
+    @Test
+    public void closeQuietly_Selector_nullを渡してもExceptionが発生しない() {
+        final Selector selector = null;
+        IoUtils.closeQuietly(selector);
+    }
+
+    @Test
+    public void closeQuietly_Selector_closeでIOExceptionが発生しても外に伝搬しない() {
+        try {
+            final Selector selector = mock(Selector.class);
+            doThrow(new IOException()).when(selector).close();
+            IoUtils.closeQuietly(selector);
         } catch (final IOException e) {
             fail();
         }

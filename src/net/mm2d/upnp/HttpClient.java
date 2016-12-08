@@ -130,7 +130,7 @@ public class HttpClient {
         }
     }
 
-    private boolean canReuse(HttpRequest request) {
+    private boolean canReuse(@Nonnull HttpRequest request) {
         return mSocket.getInetAddress().equals(request.getAddress())
                 && mSocket.getPort() == request.getPort();
     }
