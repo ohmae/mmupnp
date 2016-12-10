@@ -148,7 +148,7 @@ class EventReceiver {
          *
          * @param listener リスナー
          */
-        public void setEventMessageListener(@Nonnull EventMessageListener listener) {
+        public void setEventMessageListener(@Nullable EventMessageListener listener) {
             mListener = listener;
         }
 

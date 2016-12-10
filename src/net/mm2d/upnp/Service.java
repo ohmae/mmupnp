@@ -142,7 +142,7 @@ public class Service {
                 throw new IllegalStateException("serviceId must be set.");
             }
             if (mScpdUrl == null) {
-                throw new IllegalStateException("SCDPURL must be set.");
+                throw new IllegalStateException("SCPDURL must be set.");
             }
             if (mControlUrl == null) {
                 throw new IllegalStateException("controlURL must be set.");
@@ -341,7 +341,7 @@ public class Service {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK) {
+        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
             Log.i(TAG, response.toString());
             throw new IOException(response.getStartLine());
         }
@@ -497,7 +497,10 @@ public class Service {
     }
 
     private long getTimeout(@Nonnull HttpResponse response) {
-        final String timeout = response.getHeader(Http.TIMEOUT).toLowerCase();
+        final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
+        if (TextUtils.isEmpty(timeout)) {
+            return 0;
+        }
         if (timeout.contains("infinite")) {
             return -1;
         }

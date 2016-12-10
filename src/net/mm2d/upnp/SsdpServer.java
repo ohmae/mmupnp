@@ -36,7 +36,7 @@ abstract class SsdpServer {
      */
     public static final String SSDP_ADDR = "239.255.255.250";
     /**
-     * SSPDに使用するポート番号
+     * SSDPに使用するポート番号
      */
     public static final int SSDP_PORT = 1900;
     private static final InetSocketAddress SSDP_SO_ADDR =

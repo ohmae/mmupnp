@@ -207,6 +207,7 @@ public class StateVariable {
      *
      * @return このStateVariableを保持するService
      */
+    @Nonnull
     public Service getService() {
         return mService;
     }
@@ -234,6 +235,7 @@ public class StateVariable {
      *
      * @return StateVariable名
      */
+    @Nonnull
     public String getName() {
         return mName;
     }

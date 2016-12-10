@@ -143,8 +143,8 @@ public abstract class SsdpMessage {
 
     private void parseCacheControl() {
         mMaxAge = DEFAULT_MAX_AGE;
-        final String age = mMessage.getHeader(Http.CACHE_CONTROL);
-        if (TextUtils.isEmpty(age) || !age.toLowerCase().startsWith("max-age")) {
+        final String age = TextUtils.toLowerCase(mMessage.getHeader(Http.CACHE_CONTROL));
+        if (TextUtils.isEmpty(age) || !age.startsWith("max-age")) {
             return;
         }
         final int pos = age.indexOf('=');

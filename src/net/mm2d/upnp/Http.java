@@ -112,7 +112,7 @@ public final class Http {
         HTTP_URI_TOO_LONG(414, "Request-URI Too Large"),
         HTTP_UNSUPPORTED_TYPE(415, "Unsupported Media Type"),
         HTTP_RANGE_NOT_SATISFIABLE(416, "Requested range not satisfiable"),
-        HTTP_EXPECTION_FAILED(417, "Expectation Failed"),
+        HTTP_EXPECTATION_FAILED(417, "Expectation Failed"),
         HTTP_INTERNAL_ERROR(500, "Internal Server Error"),
         HTTP_NOT_IMPLEMENTED(501, "Not Implemented"),
         HTTP_BAD_GATEWAY(502, "Bad Gateway"),

@@ -11,6 +11,7 @@ import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
@@ -103,8 +104,8 @@ public class ControlPoint {
          * @param value 値
          * @see Service
          */
-        void onNotifyEvent(@Nonnull Service service, long seq, @Nonnull String variable,
-                @Nonnull String value);
+        void onNotifyEvent(@Nonnull Service service, long seq,
+                @Nonnull String variable, @Nonnull String value);
     }
 
     @Nonnull
@@ -200,8 +201,13 @@ public class ControlPoint {
         public EventNotifyTask(@Nonnull HttpRequest request, @Nonnull Service service) {
             mRequest = request;
             mService = service;
+            final String seq = mRequest.getHeader(Http.SEQ);
+            if (TextUtils.isEmpty(seq)) {
+                mSeq = 0;
+                return;
+            }
             try {
-                mSeq = Long.parseLong(mRequest.getHeader(Http.SEQ));
+                mSeq = Long.parseLong(seq);
             } catch (final NumberFormatException e) {
                 mSeq = 0;
             }
@@ -209,8 +215,12 @@ public class ControlPoint {
 
         @Override
         public void run() {
+            final String xml = mRequest.getBody();
+            if (TextUtils.isEmpty(xml)) {
+                return;
+            }
             try {
-                final Document doc = XmlUtils.newDocument(mRequest.getBody());
+                final Document doc = XmlUtils.newDocument(xml);
                 Node node = doc.getDocumentElement().getFirstChild();
                 for (; node != null; node = node.getNextSibling()) {
                     if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -240,7 +250,7 @@ public class ControlPoint {
             }
             synchronized (mNotifyEventListeners) {
                 for (final NotifyEventListener l : mNotifyEventListeners) {
-                    l.onNotifyEvent(mService, mSeq, name, value);
+                    l.onNotifyEvent(mService, mSeq, variable.getName(), value);
                 }
             }
         }
@@ -286,7 +296,7 @@ public class ControlPoint {
             final SsdpSearchServer search = new SsdpSearchServer(nif);
             search.setResponseListener(new ResponseListener() {
                 @Override
-                public void onReceiveResponse(final SsdpResponseMessage message) {
+                public void onReceiveResponse(final @Nonnull SsdpResponseMessage message) {
                     executeParallel(new Runnable() {
                         @Override
                         public void run() {
@@ -299,7 +309,7 @@ public class ControlPoint {
             final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);
             notify.setNotifyListener(new NotifyListener() {
                 @Override
-                public void onReceiveNotify(final SsdpRequestMessage message) {
+                public void onReceiveNotify(final @Nonnull SsdpRequestMessage message) {
                     executeParallel(new Runnable() {
                         @Override
                         public void run() {
@@ -313,7 +323,7 @@ public class ControlPoint {
         mEventReceiver = new EventReceiver();
         mEventReceiver.setEventMessageListener(new EventMessageListener() {
             @Override
-            public boolean onEventReceived(HttpRequest request) {
+            public boolean onEventReceived(@Nonnull HttpRequest request) {
                 final String sid = request.getHeader(Http.SID);
                 final Service service = getSubscribeService(sid);
                 return service != null && executeSequential(new EventNotifyTask(request, service));

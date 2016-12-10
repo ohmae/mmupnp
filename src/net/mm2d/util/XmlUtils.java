@@ -30,13 +30,16 @@ import javax.xml.parsers.ParserConfigurationException;
 public class XmlUtils {
     private static DocumentBuilder sDocumentBuilder;
 
+    @Nonnull
     private static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         return factory.newDocumentBuilder();
     }
 
-    private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+    @Nonnull
+    private static synchronized DocumentBuilder getDocumentBuilder()
+            throws ParserConfigurationException {
         if (sDocumentBuilder == null) {
             sDocumentBuilder = newDocumentBuilder();
         }

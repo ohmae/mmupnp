@@ -16,6 +16,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.Selector;
@@ -68,6 +69,19 @@ public class IoUtilsTest {
         } catch (final IOException e) {
             fail();
         }
+    }
+
+    @Test
+    public void closeQuietly_DatagramSocket_closeがコールされる() throws IOException {
+        final DatagramSocket datagramSocket = mock(DatagramSocket.class);
+        IoUtils.closeQuietly(datagramSocket);
+        verify(datagramSocket).close();
+    }
+
+    @Test
+    public void closeQuietly_DatagramSocket_nullを渡してもExceptionが発生しない() {
+        final DatagramSocket datagramSocket = null;
+        IoUtils.closeQuietly(datagramSocket);
     }
 
     @Test

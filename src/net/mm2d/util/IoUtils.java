@@ -9,6 +9,7 @@ package net.mm2d.util;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.Selector;
@@ -21,8 +22,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class IoUtils {
-    private static final String TAG = IoUtils.class.getSimpleName();
-
     /**
      * Nullチェック、Exceptionキャッチ付きでclose処理を行う。
      *
@@ -57,6 +56,21 @@ public class IoUtils {
             socket.close();
         } catch (final IOException ignored) {
         }
+    }
+
+    /**
+     * Nullチェック、Exceptionキャッチ付きでclose処理を行う。
+     *
+     * <p>nullの場合は何も行わない、
+     * closeでIOExceptionが発生した場合はログ出力をする。
+     *
+     * @param datagramSocket close処理をするDatagramSocket
+     */
+    public static void closeQuietly(@Nullable DatagramSocket datagramSocket) {
+        if (datagramSocket == null) {
+            return;
+        }
+        datagramSocket.close();
     }
 
     /**

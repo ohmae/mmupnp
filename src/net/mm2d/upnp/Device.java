@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
@@ -203,7 +204,7 @@ public class Device {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK) {
+        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
             Log.i(TAG, response.toString());
             client.close();
             throw new IOException(response.getStartLine());

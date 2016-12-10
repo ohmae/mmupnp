@@ -70,67 +70,8 @@ public class MainWindow extends JFrame {
     private final JTextArea mDetail2;
     private final JTextArea mEvent;
     private final UpnpNode mRootNode;
-    private final DiscoveryListener mListener = new DiscoveryListener() {
-        @Override
-        public void onDiscover(Device device) {
-            update();
-        }
 
-        @Override
-        public void onLost(Device device) {
-            update();
-        }
-
-        private void update() {
-            final List<Device> deviceList = mControlPoint.getDeviceList();
-            mRootNode.removeAllChildren();
-            for (final Device device : deviceList) {
-                mRootNode.add(new DeviceNode(device));
-            }
-            final DefaultTreeModel model = (DefaultTreeModel) mTree.getModel();
-            model.reload();
-        }
-    };
-    private final TreeSelectionListener mSelectionListener = new TreeSelectionListener() {
-        @Override
-        public void valueChanged(TreeSelectionEvent event) {
-            final UpnpNode node = (UpnpNode) mTree.getLastSelectedPathComponent();
-            mDetail1.setText(node.getDetailText());
-            mDetail2.setText(node.getDetailXml());
-            if (node.getUserObject() instanceof Action) {
-                final Action action = (Action) node.getUserObject();
-                if (!action.getName().equals("Browse")) {
-                    return;
-                }
-                final Map<String, String> arg = new HashMap<>();
-                arg.put("ObjectID", "0");
-                arg.put("BrowseFlag", "BrowseDirectChildren");
-                arg.put("Filter", "*");
-                arg.put("StartingIndex", "0");
-                arg.put("RequestedCount", "0");
-                arg.put("SortCriteria", "");
-                try {
-                    final Map<String, String> result = action.invoke(arg);
-                    final String res = result.get("Result");
-                    if (TextUtils.isEmpty(res)) {
-                        return;
-                    }
-                    perseResult(res);
-                } catch (IOException | SAXException | ParserConfigurationException e) {
-                    Log.w(TAG, e);
-                }
-            } else if (node.getUserObject() instanceof Service) {
-                final Service service = (Service) node.getUserObject();
-                try {
-                    service.subscribe(true);
-                } catch (final IOException e) {
-                    Log.w(TAG, e);
-                }
-            }
-        }
-    };
-
-    private void perseResult(@Nonnull String xml)
+    private void parseResult(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final StringBuilder sb = new StringBuilder();
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -159,20 +100,40 @@ public class MainWindow extends JFrame {
         mDetail2.setText(sb.toString());
     }
 
-    private final NotifyEventListener mEventListener = new NotifyEventListener() {
-        @Override
-        public void onNotifyEvent(Service service, long seq, String variable, String value) {
-            mEvent.setText(mEvent.getText() + service.getServiceType() + " : " + seq + " : "
-                    + variable + " : " + value + "\n");
-        }
-    };
-
     public MainWindow() {
         super();
         mControlPoint = new ControlPoint();
         mControlPoint.initialize();
-        mControlPoint.addDiscoveryListener(mListener);
-        mControlPoint.addNotifyEventListener(mEventListener);
+        mControlPoint.addDiscoveryListener(new DiscoveryListener() {
+            @Override
+            public void onDiscover(@Nonnull Device device) {
+                update();
+            }
+
+            @Override
+            public void onLost(@Nonnull Device device) {
+                update();
+            }
+
+            private void update() {
+                final List<Device> deviceList = mControlPoint.getDeviceList();
+                mRootNode.removeAllChildren();
+                for (final Device device : deviceList) {
+                    mRootNode.add(new DeviceNode(device));
+                }
+                final DefaultTreeModel model = (DefaultTreeModel) mTree.getModel();
+                model.reload();
+            }
+        });
+        final NotifyEventListener eventListener = new NotifyEventListener() {
+            @Override
+            public void onNotifyEvent(@Nonnull Service service, long seq,
+                    @Nonnull String variable, @Nonnull String value) {
+                mEvent.setText(mEvent.getText() + service.getServiceType() + " : " + seq + " : "
+                        + variable + " : " + value + "\n");
+            }
+        };
+        mControlPoint.addNotifyEventListener(eventListener);
         setTitle("UPnP");
         setSize(800, 800);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -189,7 +150,45 @@ public class MainWindow extends JFrame {
         mRootNode.setAllowsChildren(true);
         mTree = new JTree(mRootNode, true);
         mTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        mTree.addTreeSelectionListener(mSelectionListener);
+        final TreeSelectionListener selectionListener = new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent event) {
+                final UpnpNode node = (UpnpNode) mTree.getLastSelectedPathComponent();
+                mDetail1.setText(node.getDetailText());
+                mDetail2.setText(node.getDetailXml());
+                if (node.getUserObject() instanceof Action) {
+                    final Action action = (Action) node.getUserObject();
+                    if (!action.getName().equals("Browse")) {
+                        return;
+                    }
+                    final Map<String, String> arg = new HashMap<>();
+                    arg.put("ObjectID", "0");
+                    arg.put("BrowseFlag", "BrowseDirectChildren");
+                    arg.put("Filter", "*");
+                    arg.put("StartingIndex", "0");
+                    arg.put("RequestedCount", "0");
+                    arg.put("SortCriteria", "");
+                    try {
+                        final Map<String, String> result = action.invoke(arg);
+                        final String res = result.get("Result");
+                        if (TextUtils.isEmpty(res)) {
+                            return;
+                        }
+                        parseResult(res);
+                    } catch (IOException | SAXException | ParserConfigurationException e) {
+                        Log.w(TAG, e);
+                    }
+                } else if (node.getUserObject() instanceof Service) {
+                    final Service service = (Service) node.getUserObject();
+                    try {
+                        service.subscribe(true);
+                    } catch (final IOException e) {
+                        Log.w(TAG, e);
+                    }
+                }
+            }
+        };
+        mTree.addTreeSelectionListener(selectionListener);
         mDetail1 = new JTextArea();
         mDetail1.setEditable(false);
         mDetail1.setFont(new Font("Monospaced", Font.PLAIN, 12));
