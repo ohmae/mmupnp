@@ -393,7 +393,8 @@ public class Service {
 
     private void parseStateVariableList(@Nonnull NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
-            final StateVariable.Builder builder = parseStateVariable(this, (Element) nodeList.item(i));
+            final StateVariable.Builder builder =
+                    parseStateVariable(this, (Element) nodeList.item(i));
             final StateVariable variable = builder.build();
             mStateVariableMap.put(variable.getName(), variable);
         }
@@ -553,7 +554,7 @@ public class Service {
         return sb.toString();
     }
 
-    private long getTimeout(@Nonnull HttpResponse response) {
+    private static long parseTimeout(@Nonnull HttpResponse response) {
         final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
         if (TextUtils.isEmpty(timeout)) {
             return 0;
@@ -623,7 +624,7 @@ public class Service {
             return false;
         }
         final String sid = response.getHeader(Http.SID);
-        final long timeout = getTimeout(response);
+        final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
             System.out.println(response.toString());
             return false;
@@ -673,7 +674,7 @@ public class Service {
             return false;
         }
         final String sid = response.getHeader(Http.SID);
-        final long timeout = getTimeout(response);
+        final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
             System.out.println(response.toString());
             return false;

@@ -648,7 +648,7 @@ public class ControlPoint {
         });
     }
 
-    private void lostDevice(@Nonnull Device device) {
+    void lostDevice(@Nonnull Device device) {
         lostDevice(device, true);
     }
 
@@ -659,18 +659,18 @@ public class ControlPoint {
      * 他からはコールしないこと。
      *
      * @param device 喪失してデバイス
-     * @param notify falseの場合Inspectorに通知しない
+     * @param notifyInspector falseの場合Inspectorに通知しない
      * @see Device
      * @see DeviceInspector
      */
-    void lostDevice(final @Nonnull Device device, boolean notify) {
+    void lostDevice(final @Nonnull Device device, boolean notifyInspector) {
         synchronized (mDeviceMap) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
                 unregisterSubscribeService(s);
             }
             mDeviceMap.remove(device.getUuid());
-            if (notify) {
+            if (notifyInspector) {
                 mDeviceInspector.remove(device);
             }
         }

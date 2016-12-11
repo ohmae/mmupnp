@@ -27,30 +27,66 @@ class SubscribeKeeper extends Thread {
     private static final String TAG = SubscribeKeeper.class.getSimpleName();
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
     private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
+    private static final int RETRY_COUNT = 2;
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;
-    private final List<Service> mServiceList;
-    private final Comparator<Service> mComparator = new Comparator<Service>() {
+
+    private static class Container {
+        private final Service mService;
+        private int mFailCount;
+
+        Container(Service service) {
+            mService = service;
+            mFailCount = 0;
+        }
+
+        Service getService() {
+            return mService;
+        }
+
+        int getFailCount() {
+            return mFailCount;
+        }
+
+        void resetFailCount() {
+            mFailCount = 0;
+        }
+
+        void increaseFailCount() {
+            mFailCount++;
+        }
+    }
+
+    private final List<Container> mServiceList;
+    private final Comparator<Container> mComparator = new Comparator<Container>() {
         @Override
-        public int compare(Service s1, Service s2) {
-            return (int) (calculateRenewTime(s1) - calculateRenewTime(s2));
+        public int compare(Container c1, Container c2) {
+            return (int) (calculateRenewTime(c1) - calculateRenewTime(c2));
         }
     };
 
     /**
      * Renewを実行する時間(UTC[ms])を計算して返す。
      *
-     * @param service 調査するService
+     * <p>Subscribeのtimeoutの半分の時間を基準に実行、
+     * 実行に失敗した場合はtimeoutの時間を基準に実行し、
+     * 1回までの通信失敗は許容する。
+     *
+     * <p>また、基準時間から一定時間引いた時間に実行することで
+     * デバイスごとに時間が多少ずれていても動作できるようにする。
+     *
+     * @param c 調査するService
      * @return Renewを行う時間
      */
-    private long calculateRenewTime(@Nonnull Service service) {
-        long timeout = service.getSubscriptionTimeout();
-        if (timeout > MARGIN_TIME) {
-            timeout -= MARGIN_TIME;
+    private long calculateRenewTime(@Nonnull Container c) {
+        final Service service = c.getService();
+        long interval = service.getSubscriptionTimeout() * (c.getFailCount() + 1) / RETRY_COUNT;
+        if (interval > MARGIN_TIME * 2) {
+            interval -= MARGIN_TIME;
         } else {
-            timeout = timeout * 9 / 10;
+            interval = interval / 2;
         }
-        return service.getSubscriptionStart() + timeout;
+        return service.getSubscriptionStart() + interval;
     }
 
     public SubscribeKeeper(@Nonnull ControlPoint controlPoint) {
@@ -69,13 +105,18 @@ class SubscribeKeeper extends Thread {
     }
 
     public synchronized void add(@Nonnull Service service) {
-        mServiceList.add(service);
+        mServiceList.add(new Container(service));
         Collections.sort(mServiceList, mComparator);
         notifyAll();
     }
 
     public synchronized void remove(@Nonnull Service service) {
-        mServiceList.remove(service);
+        for (int i = 0; i < mServiceList.size(); i++) {
+            if (mServiceList.get(i).getService().equals(service)) {
+                mServiceList.remove(i);
+                break;
+            }
+        }
     }
 
     public synchronized void clear() {
@@ -86,33 +127,41 @@ class SubscribeKeeper extends Thread {
     public void run() {
         try {
             while (!mShutdownRequest) {
-                final List<Service> work;
+                final List<Container> work;
                 synchronized (this) {
                     while (mServiceList.size() == 0) {
                         wait();
                     }
+                    // リスト操作をロックしないようにコピーに対して処理を行う。
                     work = new ArrayList<>(mServiceList);
                 }
                 final long now = System.currentTimeMillis();
-                for (final Service service : work) {
-                    if (calculateRenewTime(service) < now) {
+                for (final Container c : work) {
+                    if (calculateRenewTime(c) < now) {
                         try {
-                            service.renewSubscribe(false);
+                            c.getService().renewSubscribe(false);
+                            c.resetFailCount();
                         } catch (final IOException e) {
                             Log.w(TAG, e);
+                            c.increaseFailCount();
+                            if (c.getFailCount() >= RETRY_COUNT) {
+                                // 2回renewに失敗した場合はDeviceとの通信に問題ありとしてlost扱いにする
+                                mControlPoint.lostDevice(c.getService().getDevice());
+                            }
                         }
                     } else {
                         break;
                     }
                 }
+                // 内部でunregisterされ、このクラスのremoveもコールされる。
                 mControlPoint.removeExpiredSubscribeService();
                 synchronized (this) {
                     Collections.sort(mServiceList, mComparator);
                     if (mServiceList.size() != 0) {
-                        final Service service = mServiceList.get(0);
-                        long sleep = calculateRenewTime(service) - System.currentTimeMillis();
+                        final Container c = mServiceList.get(0);
+                        long sleep = calculateRenewTime(c) - System.currentTimeMillis();
                         if (sleep < MIN_INTERVAL) {
-                            sleep = MIN_INTERVAL;
+                            sleep = MIN_INTERVAL; // ビジーループ阻止
                         }
                         wait(sleep);
                     }
