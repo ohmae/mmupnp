@@ -28,7 +28,7 @@ public class HttpResponse extends HttpMessage {
     /**
      * ステータスラインを設定する。
      *
-     * {@link #setStartLine(String)}のエイリアス。
+     * <p>{@link #setStartLine(String)}のエイリアス。
      *
      * @param line ステータスライン
      * @see #setStartLine(String)

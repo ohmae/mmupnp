@@ -72,7 +72,7 @@ public abstract class SsdpMessage {
     /**
      * 内部表現としての{@link HttpMessage}のインスタンスを作成する。
      *
-     * {@link HttpRequest}か{@link HttpResponse}のインスタンスを返すように小クラスで実装する。
+     * <p>{@link HttpRequest}か{@link HttpResponse}のインスタンスを返すように小クラスで実装する。
      *
      * @return {@link HttpMessage}のインスタンス
      */
@@ -136,7 +136,7 @@ public abstract class SsdpMessage {
             return DEFAULT_MAX_AGE;
         }
         try {
-             return Integer.parseInt(age.substring(pos + 1));
+            return Integer.parseInt(age.substring(pos + 1));
         } catch (final NumberFormatException ignored) {
         }
         return DEFAULT_MAX_AGE;
@@ -150,9 +150,13 @@ public abstract class SsdpMessage {
         }
         final int pos = usn.indexOf("::");
         if (pos < 0) {
-            return new String[] {usn, ""};
+            return new String[] {
+                    usn, ""
+            };
         }
-        return new String[] {usn.substring(0, pos), usn.substring(pos + 2)};
+        return new String[] {
+                usn.substring(0, pos), usn.substring(pos + 2)
+        };
     }
 
     /**

@@ -39,7 +39,7 @@ public class HttpRequest extends HttpMessage {
     /**
      * リクエストラインを設定する。
      *
-     * {@link #setStartLine(String)}のエイリアス。
+     * <p>{@link #setStartLine(String)}のエイリアス。
      *
      * @param line リクエストライン
      * @see #setStartLine(String)

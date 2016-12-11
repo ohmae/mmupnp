@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 /**
+ * Subscribeの期限が切れないように定期的にrenewを実行するクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SubscribeKeeper extends Thread {
@@ -35,6 +37,12 @@ class SubscribeKeeper extends Thread {
         }
     };
 
+    /**
+     * Renewを実行する時間(UTC[ms])を計算して返す。
+     *
+     * @param service 調査するService
+     * @return Renewを行う時間
+     */
     private long calculateRenewTime(@Nonnull Service service) {
         long timeout = service.getSubscriptionTimeout();
         if (timeout > MARGIN_TIME) {

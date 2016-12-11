@@ -30,7 +30,7 @@ public final class Property {
     /**
      * デフォルトタイムアウト値[ms]（30秒）
      *
-     * {@link java.net.Socket#setSoTimeout(int)}に渡すためint値で定義
+     * <p>{@link java.net.Socket#setSoTimeout(int)}に渡すためint値で定義
      */
     public static final int DEFAULT_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(30);
 

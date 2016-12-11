@@ -55,6 +55,7 @@ public class ControlPoint {
     /**
      * 機器発見イベント通知用リスナー。
      *
+     * <p>
      * {@link #onDiscover(Device)}
      * {@link #onLost(Device)}
      * 及び、
@@ -86,6 +87,7 @@ public class ControlPoint {
     /**
      * NotifyEvent通知を受け取るリスナー。
      *
+     * <p>
      * {@link #onNotifyEvent(Service, long, String, String)}
      * 及び、
      * {@link DiscoveryListener#onDiscover(Device)}
@@ -451,7 +453,7 @@ public class ControlPoint {
     /**
      * 処理を開始する。
      *
-     * 本メソッドのコール前はネットワークに関連する処理を実行することはできない。
+     * <p>本メソッドのコール前はネットワークに関連する処理を実行することはできない。
      * 既に開始状態の場合は何も行われない。
      * 一度開始したあとであっても、停止処理後であれば再度開始可能。
      *
@@ -544,8 +546,7 @@ public class ControlPoint {
     /**
      * Searchパケットを送出する。
      *
-     * {@link #search(String)}を
-     * search(null)でコールするのと等価。
+     * <p>{@link #search(String)}を引数nullでコールするのと等価。
      */
     public void search() {
         search(null);

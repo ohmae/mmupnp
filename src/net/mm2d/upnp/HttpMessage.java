@@ -308,6 +308,8 @@ public abstract class HttpMessage {
     /**
      * メッセージボディを設定する。
      *
+     * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
+     *
      * @param body メッセージボディ
      */
     public void setBodyBinary(@Nullable byte[] body) {
@@ -317,6 +319,8 @@ public abstract class HttpMessage {
 
     /**
      * メッセージボディを返す。
+     *
+     * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
      *
      * @return メッセージボディ
      */

@@ -42,7 +42,7 @@ public interface IconFilter {
     /**
      * ダウンロード時にバイナリデータをダウンロードするIconを選択する。
      *
-     * 戻り値で返したListに含まれるIconがダウンロードされる。
+     * <p>戻り値で返したListに含まれるIconがダウンロードされる。
      *
      * @param list Deviceに記述されたIconのリスト
      * @return ダウンロードするIconのリスト、nullを返してはならない
