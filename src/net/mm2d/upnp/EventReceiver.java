@@ -7,7 +7,9 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.IoUtils;
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -26,12 +28,14 @@ import javax.annotation.Nullable;
 /**
  * イベント購読によって通知されるEventを受信するクラス。
  *
- * HTTPのサーバとしてリクエストの受付のみを行う。
+ * <p>HTTPのサーバとしてリクエストの受付のみを行う。
  * HTTPメッセージのパースはリスナーの実装側が行う。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class EventReceiver {
+    private static final String TAG = EventReceiver.class.getSimpleName();
+
     /**
      * イベントデータの受信を受け取るリスナー。
      */
@@ -45,7 +49,6 @@ class EventReceiver {
         boolean onEventReceived(@Nonnull HttpRequest request);
     }
 
-    private static final String TAG = "EventReceiver";
     private ServerSocket mServerSocket;
     private ServerThread mServerThread;
     private EventMessageListener mListener;
@@ -99,7 +102,9 @@ class EventReceiver {
 
     private static class ServerThread extends Thread {
         private volatile boolean mShutdownRequest = false;
+        @Nonnull
         private final ServerSocket mServerSocket;
+        @Nonnull
         private final List<ClientThread> mClientList;
         private EventMessageListener mListener;
 
@@ -116,17 +121,14 @@ class EventReceiver {
 
         /**
          * 受信スレッドを終了させ、サーバソケットのクローズを行う。
-         * クライアントからの接続がある場合は、
+         *
+         * <p>クライアントからの接続がある場合は、
          * それらの受信スレッドを終了させ、クライアントソケットのクローズも行う。
          */
         public void shutdownRequest() {
             mShutdownRequest = true;
             interrupt();
-            try {
-                mServerSocket.close();
-            } catch (final IOException e) {
-                Log.w(TAG, e);
-            }
+            IoUtils.closeQuietly(mServerSocket);
             synchronized (mClientList) {
                 for (final ClientThread client : mClientList) {
                     client.shutdownRequest();
@@ -149,7 +151,7 @@ class EventReceiver {
          *
          * @param listener リスナー
          */
-        public void setEventMessageListener(@Nonnull EventMessageListener listener) {
+        public void setEventMessageListener(@Nullable EventMessageListener listener) {
             mListener = listener;
         }
 
@@ -175,16 +177,15 @@ class EventReceiver {
                 }
             } catch (final IOException ignored) {
             } finally {
-                try {
-                    mServerSocket.close();
-                } catch (final IOException ignored) {
-                }
+                IoUtils.closeQuietly(mServerSocket);
             }
         }
     }
 
     private static class ClientThread extends Thread {
+        @Nonnull
         private final ServerThread mServer;
+        @Nonnull
         private final Socket mSocket;
         private static final HttpResponse RESPONSE_OK = new HttpResponse();
         private static final HttpResponse RESPONSE_BAD = new HttpResponse();
@@ -222,11 +223,7 @@ class EventReceiver {
          */
         public void shutdownRequest() {
             interrupt();
-            try {
-                mSocket.close();
-            } catch (final IOException e) {
-                Log.w(TAG, e);
-            }
+            IoUtils.closeQuietly(mSocket);
         }
 
         private boolean notifyEvent(@Nonnull HttpRequest request) {
@@ -249,10 +246,9 @@ class EventReceiver {
                 final String nt = request.getHeader(Http.NT);
                 final String nts = request.getHeader(Http.NTS);
                 final String sid = request.getHeader(Http.SID);
-                if (nt == null || nt.length() == 0
-                        || nts == null || nts.length() == 0) {
+                if (TextUtils.isEmpty(nt) || TextUtils.isEmpty(nts)) {
                     RESPONSE_BAD.writeData(os);
-                } else if (sid == null || sid.length() == 0
+                } else if (TextUtils.isEmpty(sid)
                         || !nt.equals(Http.UPNP_EVENT)
                         || !nts.equals(Http.UPNP_PROPCHANGE)) {
                     RESPONSE_FAIL.writeData(os);
@@ -266,22 +262,9 @@ class EventReceiver {
             } catch (final IOException e) {
                 Log.w(TAG, e);
             } finally {
-                try {
-                    if (is != null) {
-                        is.close();
-                    }
-                } catch (final IOException ignored) {
-                }
-                try {
-                    if (os != null) {
-                        os.close();
-                    }
-                } catch (final IOException ignored) {
-                }
-                try {
-                    mSocket.close();
-                } catch (final IOException ignored) {
-                }
+                IoUtils.closeQuietly(is);
+                IoUtils.closeQuietly(os);
+                IoUtils.closeQuietly(mSocket);
                 mServer.notifyClientFinish(this);
             }
         }

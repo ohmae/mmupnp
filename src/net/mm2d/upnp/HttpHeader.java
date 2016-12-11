@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TextUtils;
+
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,9 +25,21 @@ import javax.annotation.Nullable;
  */
 public class HttpHeader {
     /**
+     * 名前をもとにKeyとして使用できる文字列を作成して返す。
+     *
+     * @param name 名前
+     * @return Key
+     */
+    @Nonnull
+    private static String toKey(@Nonnull String name) {
+        return TextUtils.toLowerCase(name);
+    }
+
+    /**
      * ヘッダのエントリー情報
      */
     public static class Entry {
+        private String mKey;
         private String mName;
         private String mValue;
 
@@ -36,8 +50,18 @@ public class HttpHeader {
          * @param value 値
          */
         public Entry(@Nonnull String name, @Nonnull String value) {
+            mKey = toKey(name);
             mName = name;
             mValue = value;
+        }
+
+        /**
+         * Keyを返す。
+         *
+         * @return Key
+         */
+        private String getKey() {
+            return mKey;
         }
 
         /**
@@ -46,6 +70,7 @@ public class HttpHeader {
          * @param name ヘッダ名
          */
         public void setName(@Nonnull String name) {
+            mKey = toKey(name);
             mName = name;
         }
 
@@ -84,6 +109,7 @@ public class HttpHeader {
      */
     private class EntrySet extends AbstractSet<Entry> {
         @Override
+        @Nonnull
         public Iterator<Entry> iterator() {
             return mList.iterator();
         }
@@ -118,15 +144,16 @@ public class HttpHeader {
     /**
      * 指定されたヘッダ名の値を返す。
      *
-     * ヘッダの検索において大文字小文字の区別は行わない。
+     * <p>ヘッダの検索において大文字小文字の区別は行わない。
      *
      * @param name ヘッダ名
      * @return ヘッダの値
      */
     @Nullable
     public String get(@Nonnull String name) {
+        final String key = toKey(name);
         for (final Entry entry : mList) {
-            if (entry.getName().equalsIgnoreCase(name)) {
+            if (entry.getKey().equals(key)) {
                 return entry.getValue();
             }
         }
@@ -136,17 +163,18 @@ public class HttpHeader {
     /**
      * ヘッダの削除を行う。
      *
-     * ヘッダの検索において大文字小文字の区別は行わない。
+     * <p>ヘッダの検索において大文字小文字の区別は行わない。
      *
      * @param name ヘッダ名
      * @return 削除されたヘッダがあった場合、ヘッダの値、なかった場合null
      */
     @Nullable
     public String remove(@Nonnull String name) {
+        final String key = toKey(name);
         final Iterator<Entry> i = mList.iterator();
         while (i.hasNext()) {
             final Entry entry = i.next();
-            if (entry.getName().equalsIgnoreCase(name)) {
+            if (entry.getKey().equals(key)) {
                 i.remove();
                 return entry.mValue;
             }
@@ -157,7 +185,7 @@ public class HttpHeader {
     /**
      * ヘッダ情報を登録する。
      *
-     * ヘッダ名は登録においては大文字小文字の区別を保持して登録される。
+     * <p>ヘッダ名は登録においては大文字小文字の区別を保持して登録される。
      * 既に同一名のヘッダが登録されている場合置換される。
      * ヘッダの重複は大文字小文字の区別を行わない。
      * 置換された場合、ヘッダ名も引数のもので置き換えられる。
@@ -168,8 +196,9 @@ public class HttpHeader {
      */
     @Nullable
     public String put(@Nonnull String name, @Nonnull String value) {
+        final String key = toKey(name);
         for (final Entry entry : mList) {
-            if (entry.getName().equalsIgnoreCase(name)) {
+            if (entry.getKey().equals(key)) {
                 final String old = entry.getValue();
                 entry.setName(name);
                 entry.setValue(value);
@@ -183,19 +212,19 @@ public class HttpHeader {
     /**
      * 指定ヘッダに指定文字列が含まれるかを大文字小文字の区別なく判定する。
      *
-     * 該当ヘッダ名の検索も大文字小文字の区別を行わない。
+     * <p>該当ヘッダ名の検索も大文字小文字の区別を行わない。
      *
      * @param name ヘッダ名
      * @param value 含まれるか
      * @return 指定ヘッダにvalueが含まれる場合true
      */
     public boolean containsValue(@Nonnull String name, @Nonnull String value) {
-        final String v = get(name);
-        return v != null && v.toLowerCase().contains(value.toLowerCase());
+        final String v = TextUtils.toLowerCase(get(name));
+        return v != null && v.contains(TextUtils.toLowerCase(value));
     }
 
     /**
-     * 登録所法のクリアを行う。
+     * 登録情報のクリアを行う。
      */
     public void clear() {
         mList.clear();
@@ -203,7 +232,7 @@ public class HttpHeader {
 
     /**
      * 登録されているヘッダ情報へのSetビューを返す。
-     * 
+     *
      * @return 登録されているヘッダ情報へのSetビュー
      */
     @Nonnull

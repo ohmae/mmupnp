@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -20,11 +21,13 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class DeviceExpirer extends Thread {
-    private static final String TAG = "DeviceExpirer";
-    private static final long MARGIN_TIME = 10000;
+class DeviceInspector extends Thread {
+    private static final String TAG = DeviceInspector.class.getSimpleName();
+    private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
+    @Nonnull
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;
+    @Nonnull
     private final List<Device> mDeviceList;
     private final Comparator<Device> mComparator = new Comparator<Device>() {
         @Override
@@ -38,7 +41,7 @@ class DeviceExpirer extends Thread {
      *
      * @param cp ControlPoint
      */
-    public DeviceExpirer(@Nonnull ControlPoint cp) {
+    public DeviceInspector(@Nonnull ControlPoint cp) {
         super(TAG);
         mDeviceList = new ArrayList<>();
         mControlPoint = cp;
@@ -93,20 +96,20 @@ class DeviceExpirer extends Thread {
                 while (mDeviceList.size() == 0) {
                     wait();
                 }
-                final long current = System.currentTimeMillis();
+                final long now = System.currentTimeMillis();
                 final Iterator<Device> i = mDeviceList.iterator();
                 while (i.hasNext()) {
                     final Device device = i.next();
-                    if (device.getExpireTime() < current) {
+                    if (device.getExpireTime() < now) {
                         i.remove();
-                        mControlPoint.lostDevice(device, true);
+                        mControlPoint.lostDevice(device, false);
                     } else {
                         break;
                     }
                 }
                 if (mDeviceList.size() != 0) {
                     final Device device = mDeviceList.get(0);
-                    final long sleep = device.getExpireTime() - current + MARGIN_TIME;
+                    final long sleep = device.getExpireTime() - now + MARGIN_TIME;
                     wait(sleep);
                 }
             }

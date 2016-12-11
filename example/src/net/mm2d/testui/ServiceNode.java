@@ -31,22 +31,20 @@ public class ServiceNode extends UpnpNode {
     @Override
     public String getDetailText() {
         final Service service = (Service) getUserObject();
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ServiceType: ");
-        sb.append(service.getServiceType());
-        sb.append('\n');
-        sb.append("ServiceId: ");
-        sb.append(service.getServiceId());
-        sb.append('\n');
-        sb.append("ScpdUrl: ");
-        sb.append(service.getScpdUrl());
-        sb.append('\n');
-        sb.append("ControlUrl: ");
-        sb.append(service.getControlUrl());
-        sb.append('\n');
-        sb.append("EventSubUrl: ");
-        sb.append(service.getEventSubUrl());
-        return sb.toString();
+        return "ServiceType: " +
+                service.getServiceType() +
+                '\n' +
+                "ServiceId: " +
+                service.getServiceId() +
+                '\n' +
+                "ScpdUrl: " +
+                service.getScpdUrl() +
+                '\n' +
+                "ControlUrl: " +
+                service.getControlUrl() +
+                '\n' +
+                "EventSubUrl: " +
+                service.getEventSubUrl();
     }
 
     @Override

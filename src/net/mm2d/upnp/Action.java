@@ -8,17 +8,16 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,9 +29,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -48,10 +44,12 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Action {
+    private static final String TAG = Action.class.getSimpleName();
+
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      * @see Service#loadDescription(HttpClient)
      */
     public static class Builder {
@@ -70,29 +68,38 @@ public class Action {
          * このActionを保持するServiceへの参照を登録。
          *
          * @param service このActionを保持するService
+         * @return Builder
          */
-        public void serService(@Nonnull Service service) {
+        @Nonnull
+        public Builder setService(@Nonnull Service service) {
             mService = service;
+            return this;
         }
 
         /**
          * Action名を登録する。
          *
          * @param name Action名
+         * @return Builder
          */
-        public void setName(@Nonnull String name) {
+        @Nonnull
+        public Builder setName(@Nonnull String name) {
             mName = name;
+            return this;
         }
 
         /**
          * Argumentのビルダーを登録する。
          *
-         * Actionのインスタンス作成後にArgumentを登録することはできない
+         * <p>Actionのインスタンス作成後にArgumentを登録することはできない
          *
          * @param argument Argumentのビルダー
+         * @return Builder
          */
-        public void addArgumentBuilder(@Nonnull Argument.Builder argument) {
+        @Nonnull
+        public Builder addArgumentBuilder(@Nonnull Argument.Builder argument) {
             mArgumentList.add(argument);
+            return this;
         }
 
         /**
@@ -123,13 +130,17 @@ public class Action {
         }
     }
 
-    private static final String TAG = "Action";
-    private final Service mService;
-    private final String mName;
-    private List<Argument> mArgumentList;
-    private final Map<String, Argument> mArgumentMap;
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
+    @Nonnull
+    private final Service mService;
+    @Nonnull
+    private final String mName;
+    @Nonnull
+    private final Map<String, Argument> mArgumentMap;
+    private List<Argument> mArgumentList;
+    @Nonnull
+    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     private Action(@Nonnull Builder builder) {
         mService = builder.mService;
@@ -165,7 +176,7 @@ public class Action {
     /**
      * Argumentリストを返す。
      *
-     * リストは変更不可であり、
+     * <p>リストは変更不可であり、
      * 変更しようとするとUnsupportedOperationExceptionが発生する。
      *
      * @return Argumentリスト
@@ -184,9 +195,23 @@ public class Action {
     }
 
     /**
+     * HttpClientのファクトリークラスを変更する。
+     *
+     * @param factory ファクトリークラス
+     */
+    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
+        mHttpClientFactory = factory;
+    }
+
+    @Nonnull
+    private HttpClient createHttpClient() {
+        return mHttpClientFactory.createHttpClient(false);
+    }
+
+    /**
      * Actionを実行する。
      *
-     * 実行引数及び実行結果はArgument名をkeyとし、値をvalueとしたMapでやり取りする。
+     * <p>実行引数及び実行結果はArgument名をkeyとし、値をvalueとしたMapでやり取りする。
      * 値はすべてStringで表現する。
      * Argument(StateVariable)のDataTypeに応じた値チェックは行われない。
      * 引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が反映される。
@@ -210,26 +235,23 @@ public class Action {
         request.setHeader(Http.CONNECTION, Http.CLOSE);
         request.setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT);
         request.setBody(soap, true);
-        final HttpClient client = new HttpClient(false);
+        final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK) {
+        if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
             Log.w(TAG, response.toString());
             throw new IOException(response.getStartLine());
         }
         try {
             return parseResponse(response.getBody());
-        } catch (SAXException | ParserConfigurationException e) {
-            throw new IOException(response.getBody());
+        } catch (final SAXException | ParserConfigurationException e) {
+            throw new IOException(response.getBody(), e);
         }
     }
 
     @Nonnull
     private String makeSoap(@Nonnull Map<String, String> arguments) throws IOException {
         try {
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            final DocumentBuilder db = dbf.newDocumentBuilder();
-            final Document doc = db.newDocument();
+            final Document doc = XmlUtils.newDocument();
             final Element envelope = doc.createElementNS(SOAP_NS, "s:Envelope");
             doc.appendChild(envelope);
             final Attr style = doc.createAttributeNS(SOAP_NS, "s:encodingStyle");
@@ -260,43 +282,26 @@ public class Action {
             transformer.transform(new DOMSource(doc), new StreamResult(sw));
             return sw.toString();
         } catch (DOMException
-                | ParserConfigurationException
                 | TransformerFactoryConfigurationError
-                | TransformerException e) {
-            throw new IOException();
+                | TransformerException
+                | ParserConfigurationException e) {
+            throw new IOException(e);
         }
-    }
-
-    @Nullable
-    private Element findChildElementByName(@Nonnull Node node, @Nonnull String name) {
-        Node child = node.getFirstChild();
-        for (; child != null; child = child.getNextSibling()) {
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (name.equals(child.getLocalName())) {
-                return (Element) child;
-            }
-        }
-        return null;
     }
 
     @Nonnull
     private Map<String, String> parseResponse(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
-        final String responseTag = mName + "Response";
         final Map<String, String> result = new HashMap<>();
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        final DocumentBuilder db = dbf.newDocumentBuilder();
-        final Document doc = db.parse(new InputSource(new StringReader(xml)));
+        final String responseTag = mName + "Response";
+        final Document doc = XmlUtils.newDocument(xml);
         final Element envelope = doc.getDocumentElement();
-        final Element body = findChildElementByName(envelope, "Body");
+        final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
         if (body == null) {
             Log.w(TAG, "no body tag");
             throw new IOException("no body tag");
         }
-        final Element response = findChildElementByName(body, responseTag);
+        final Element response = XmlUtils.findChildElementByLocalName(body, responseTag);
         if (response == null) {
             Log.w(TAG, "no response tag");
             throw new IOException("no response tag");

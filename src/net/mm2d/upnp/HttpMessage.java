@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,10 +25,10 @@ import javax.annotation.Nullable;
 /**
  * HTTPのメッセージを表現するクラスの親クラス。
  *
- * ResponseとRequestでStart Lineのフォーマットが異なるため
+ * <p>ResponseとRequestでStart Lineのフォーマットが異なるため
  * その部分の実装は小クラスに任せている。
  *
- * UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
+ * <p>UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
  * 長大なデータのやり取りは想定していない。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
@@ -35,18 +36,23 @@ import javax.annotation.Nullable;
  * @see HttpRequest
  */
 public abstract class HttpMessage {
-    private static final String TAG = "HttpMessage";
+    private static final String TAG = HttpMessage.class.getSimpleName();
     private static final int BUFFER_SIZE = 1500;
     private static final int CR = 0x0d;
     private static final int LF = 0x0a;
     private static final String CRLF = "\r\n";
     private static final String CHARSET = "utf-8";
 
+    @Nullable
     private InetAddress mAddress;
     private int mPort;
+    @Nonnull
     private final HttpHeader mHeaders;
+    @Nonnull
     private String mVersion = Http.DEFAULT_HTTP_VERSION;
+    @Nullable
     private byte[] mBodyBinary;
+    @Nullable
     private String mBody;
 
     /**
@@ -204,9 +210,9 @@ public abstract class HttpMessage {
     /**
      * ヘッダの値からKeepAliveか否かを返す。
      *
-     * HTTP/1.0の場合、Connection: keep-aliveの場合に
-     * HTTP/1.1の場合、Connection: closeでない場合に
-     * KeepAliveと判定する。
+     * <p>HTTP/1.0の場合、Connection: keep-aliveの場合に、
+     * HTTP/1.1の場合、Connection: closeでない場合に、
+     * KeepAliveと判定し、trueを返す。
      *
      * @return KeepAliveの場合true
      */
@@ -220,7 +226,7 @@ public abstract class HttpMessage {
     /**
      * Content-Lengthの値を返す。
      *
-     * 不明な場合0
+     * <p>不明な場合0
      *
      * @return Content-Lengthの値
      */
@@ -254,24 +260,10 @@ public abstract class HttpMessage {
      * メッセージボディを設定する。
      *
      * @param body メッセージボディ
-     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
-     */
-    public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {
-        setBodyBinary(body);
-        if (withContentLength) {
-            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
-            setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
-        }
-    }
-
-    /**
-     * メッセージボディを設定する。
-     *
-     * @param body メッセージボディ
      */
     public void setBody(@Nullable String body) {
         mBody = body;
-        if (body == null || body.isEmpty()) {
+        if (TextUtils.isEmpty(body)) {
             mBodyBinary = null;
         } else {
             try {
@@ -303,6 +295,22 @@ public abstract class HttpMessage {
      * メッセージボディを設定する。
      *
      * @param body メッセージボディ
+     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     */
+    public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {
+        setBodyBinary(body);
+        if (withContentLength) {
+            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
+            setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
+        }
+    }
+
+    /**
+     * メッセージボディを設定する。
+     *
+     * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
+     *
+     * @param body メッセージボディ
      */
     public void setBodyBinary(@Nullable byte[] body) {
         mBodyBinary = body;
@@ -311,6 +319,8 @@ public abstract class HttpMessage {
 
     /**
      * メッセージボディを返す。
+     *
+     * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
      *
      * @return メッセージボディ
      */
@@ -407,7 +417,7 @@ public abstract class HttpMessage {
      */
     public boolean readData(@Nonnull InputStream is) throws IOException {
         final String startLine = readLine(is);
-        if (startLine == null || startLine.length() == 0) {
+        if (TextUtils.isEmpty(startLine)) {
             return false;
         }
         try {
@@ -458,7 +468,7 @@ public abstract class HttpMessage {
 
     private int readChunkSize(@Nonnull InputStream is) throws IOException {
         final String line = readLine(is);
-        if (line == null || line.isEmpty()) {
+        if (TextUtils.isEmpty(line)) {
             throw new IOException("Can not read chunk size!");
         }
         final String chunkSize = line.split(";", 2)[0];

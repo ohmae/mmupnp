@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -24,6 +25,8 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpNotifyReceiver extends SsdpServer {
+    private static final String TAG = SsdpNotifyReceiver.class.getSimpleName();
+
     /**
      * NOTIFY受信を受け取るリスナー。
      */
@@ -31,12 +34,11 @@ class SsdpNotifyReceiver extends SsdpServer {
         /**
          * NOTIFY受信時にコール。
          *
-         * @param message 受信したNOTFYメッセージ
+         * @param message 受信したNOTIFYメッセージ
          */
         void onReceiveNotify(@Nonnull SsdpRequestMessage message);
     }
 
-    private static final String TAG = "SsdpNotifyReceiver";
     private NotifyListener mListener;
 
     /**
@@ -70,10 +72,11 @@ class SsdpNotifyReceiver extends SsdpServer {
         try {
             final SsdpRequestMessage message = new SsdpRequestMessage(addr, dp);
             // M-SEARCHパケットは無視する
-            if (SsdpMessage.M_SEARCH.equals(message.getMethod())) {
+            if (TextUtils.equals(message.getMethod(), SsdpMessage.M_SEARCH)) {
                 return;
             }
-            if (!SsdpMessage.SSDP_BYEBYE.equals(message.getNts())
+            // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
+            if (!TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)
                     && !message.hasValidLocation()) {
                 return;
             }

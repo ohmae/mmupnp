@@ -19,7 +19,7 @@ public class Argument {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      * @see Service#loadDescription(HttpClient)
      * @see Action.Builder
      */
@@ -40,38 +40,50 @@ public class Argument {
          * このArgumentを保持するActionを登録する。
          *
          * @param action このArgumentを保持するAction
+         * @return Builder
          */
-        public void setAction(@Nonnull Action action) {
+        @Nonnull
+        public Builder setAction(@Nonnull Action action) {
             mAction = action;
+            return this;
         }
 
         /**
          * Argument名を登録する。
          *
          * @param name Argument名
+         * @return Builder
          */
-        public void setName(@Nonnull String name) {
+        @Nonnull
+        public Builder setName(@Nonnull String name) {
             mName = name;
+            return this;
         }
 
         /**
          * Directionの値を登録する
          *
-         * "in"の場合のみinput、それ以外をoutputと判定する。
+         * <p>"in"の場合のみinput、それ以外をoutputと判定する。
          *
          * @param direction Directionの値
+         * @return Builder
          */
-        public void setDirection(@Nonnull String direction) {
+        @Nonnull
+        public Builder setDirection(@Nonnull String direction) {
             mInputDirection = "in".equalsIgnoreCase(direction);
+            return this;
         }
 
         /**
          * RelatedStateVariableの値を登録する。
          *
          * @param name RelatedStateVariableの値
+         * @return Builder
          */
-        public void setRelatedStateVariableName(@Nonnull String name) {
+        @Nonnull
+        public Builder setRelatedStateVariableName(@Nonnull String name) {
             mRelatedStateVariableName = name;
+            return this;
         }
 
         /**
@@ -88,9 +100,12 @@ public class Argument {
          * RelatedStateVariableので指定されたStateVariableのインスタンスを登録する。
          *
          * @param variable StateVariableのインスタンス
+         * @return Builder
          */
-        public void setRelatedStateVariable(@Nonnull StateVariable variable) {
+        @Nonnull
+        public Builder setRelatedStateVariable(@Nonnull StateVariable variable) {
             mRelatedStateVariable = variable;
+            return this;
         }
 
         /**
@@ -99,7 +114,7 @@ public class Argument {
          * @return Argumentのインスタンス
          * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
-        @Nullable
+        @Nonnull
         public Argument build() throws IllegalStateException {
             if (mAction == null) {
                 throw new IllegalStateException("action must be set.");
@@ -114,9 +129,12 @@ public class Argument {
         }
     }
 
+    @Nonnull
     private final Action mAction;
+    @Nonnull
     private final String mName;
     private final boolean mInputDirection;
+    @Nonnull
     private final StateVariable mRelatedStateVariable;
 
     private Argument(@Nonnull Builder builder) {

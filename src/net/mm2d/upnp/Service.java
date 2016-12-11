@@ -8,16 +8,16 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
+import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,8 +29,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -39,10 +37,12 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Service {
+    private static final String TAG = Service.class.getSimpleName();
+
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      */
     public static class Builder {
         private Device mDevice;
@@ -62,54 +62,72 @@ public class Service {
          * このServiceを保持するDeviceを登録する。
          *
          * @param device このServiceを保持するDevice
+         * @return Builder
          */
-        public void setDevice(@Nonnull Device device) {
+        @Nonnull
+        public Builder setDevice(@Nonnull Device device) {
             mDevice = device;
+            return this;
         }
 
         /**
          * serviceTypeを登録する。
          *
-         * @param serviceType serviceTytpe
+         * @param serviceType serviceType
+         * @return Builder
          */
-        public void setServiceType(@Nonnull String serviceType) {
+        @Nonnull
+        public Builder setServiceType(@Nonnull String serviceType) {
             mServiceType = serviceType;
+            return this;
         }
 
         /**
          * serviceIdを登録する
          *
          * @param serviceId serviceId
+         * @return Builder
          */
-        public void setServiceId(@Nonnull String serviceId) {
+        @Nonnull
+        public Builder setServiceId(@Nonnull String serviceId) {
             mServiceId = serviceId;
+            return this;
         }
 
         /**
          * SCPDURLを登録する
          *
          * @param scpdUrl ScpdURL
+         * @return Builder
          */
-        public void setScpdUrl(@Nonnull String scpdUrl) {
+        @Nonnull
+        public Builder setScpdUrl(@Nonnull String scpdUrl) {
             mScpdUrl = scpdUrl;
+            return this;
         }
 
         /**
-         * conrolURLを登録する。
+         * controlURLを登録する。
          *
          * @param controlUrl controlURL
+         * @return Builder
          */
-        public void setControlUrl(@Nonnull String controlUrl) {
+        @Nonnull
+        public Builder setControlUrl(@Nonnull String controlUrl) {
             mControlUrl = controlUrl;
+            return this;
         }
 
         /**
          * eventSubURLを登録する。
          *
          * @param eventSubUrl eventSubURL
+         * @return Builder
          */
-        public void setEventSubUrl(@Nonnull String eventSubUrl) {
+        @Nonnull
+        public Builder setEventSubUrl(@Nonnull String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
+            return this;
         }
 
         /**
@@ -130,7 +148,7 @@ public class Service {
                 throw new IllegalStateException("serviceId must be set.");
             }
             if (mScpdUrl == null) {
-                throw new IllegalStateException("SCDPURL must be set.");
+                throw new IllegalStateException("SCPDURL must be set.");
             }
             if (mControlUrl == null) {
                 throw new IllegalStateException("controlURL must be set.");
@@ -142,24 +160,35 @@ public class Service {
         }
     }
 
-    private static final String TAG = "Service";
+    @Nonnull
     private final ControlPoint mControlPoint;
+    @Nonnull
     private final Device mDevice;
     private String mDescription;
+    @Nonnull
     private final String mServiceType;
+    @Nonnull
     private final String mServiceId;
+    @Nonnull
     private final String mScpdUrl;
+    @Nonnull
     private final String mControlUrl;
+    @Nonnull
     private final String mEventSubUrl;
     private List<Action> mActionList;
+    @Nonnull
     private final Map<String, Action> mActionMap;
     private List<StateVariable> mStateVariableList;
+    @Nonnull
     private final Map<String, StateVariable> mStateVariableMap;
     private long mSubscriptionStart;
     private long mSubscriptionTimeout;
+    @Nullable
     private String mSubscriptionId;
+    @Nonnull
+    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
-    private Service(Builder builder) {
+    private Service(@Nonnull Builder builder) {
         mDevice = builder.mDevice;
         mControlPoint = mDevice.getControlPoint();
         mServiceType = builder.mServiceType;
@@ -186,11 +215,11 @@ public class Service {
      *
      * @param url URLプロパティ値
      * @return URLオブジェクト
-     * @throws MalformedURLException
+     * @throws MalformedURLException 不正なURL
      * @see Device#getAbsoluteUrl(String)
      */
     @Nonnull
-    URL getAbsoluteUrl(String url) throws MalformedURLException {
+    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
 
@@ -257,7 +286,7 @@ public class Service {
     /**
      * このサービスが保持する全Actionのリストを返す。
      *
-     * リストは変更不可。
+     * <p>リストは変更不可。
      *
      * @return 全Actionのリスト
      */
@@ -273,10 +302,10 @@ public class Service {
     /**
      * 名前から該当するActionを探す。
      *
-     * 見つからない場合はnullが返る。
+     * <p>見つからない場合はnullが返る。
      *
      * @param name Action名
-     * @return 該当するAction
+     * @return 該当するAction、見つからない場合null
      */
     @Nullable
     public Action findAction(@Nonnull String name) {
@@ -300,25 +329,25 @@ public class Service {
     /**
      * 名前から該当するStateVariableを探す。
      *
-     * 見つからない場合はnullが返る。
+     * <p>見つからない場合はnullが返る。
      *
      * @param name StateVariable名
-     * @return 該当するStateVariable
+     * @return 該当するStateVariable、見つからない場合null
      */
     @Nullable
-    public StateVariable findStateVariable(@Nonnull String name) {
+    public StateVariable findStateVariable(@Nullable String name) {
         return mStateVariableMap.get(name);
     }
 
     /**
      * SCPDURLからDescriptionを取得し、パースする。
      *
-     * 可能であればKeepAliveを行う。
+     * <p>可能であればKeepAliveを行う。
      *
      * @param client 通信に使用するHttpClient
      * @throws IOException 通信エラー
      * @throws SAXException XMLパースエラー
-     * @throws ParserConfigurationException XMLパーサーエラー
+     * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     void loadDescription(@Nonnull HttpClient client)
             throws IOException, SAXException, ParserConfigurationException {
@@ -329,7 +358,7 @@ public class Service {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK) {
+        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
             Log.i(TAG, response.toString());
             throw new IOException(response.getStartLine());
         }
@@ -339,10 +368,7 @@ public class Service {
 
     private void parseDescription(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        final DocumentBuilder db = dbf.newDocumentBuilder();
-        final Document doc = db.parse(new InputSource(new StringReader(xml)));
+        final Document doc = XmlUtils.newDocument(xml);
         final List<Action.Builder> alist = parseActionList(doc.getElementsByTagName("action"));
         parseStateVariableList(doc.getElementsByTagName("stateVariable"));
         for (final Action.Builder builder : alist) {
@@ -367,7 +393,8 @@ public class Service {
 
     private void parseStateVariableList(@Nonnull NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
-            final StateVariable.Builder builder = parseStateVariable((Element) nodeList.item(i));
+            final StateVariable.Builder builder =
+                    parseStateVariable(this, (Element) nodeList.item(i));
             final StateVariable variable = builder.build();
             mStateVariableMap.put(variable.getName(), variable);
         }
@@ -376,21 +403,21 @@ public class Service {
     @Nonnull
     private Action.Builder parseAction(@Nonnull Element element) {
         final Action.Builder builder = new Action.Builder();
-        builder.serService(this);
+        builder.setService(this);
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("name".equals(tag)) {
+            if (TextUtils.equals(tag, "name")) {
                 builder.setName(node.getTextContent());
-            } else if ("argumentList".equals(tag)) {
+            } else if (TextUtils.equals(tag, "argumentList")) {
                 for (Node c = node.getFirstChild(); c != null; c = c.getNextSibling()) {
                     if (c.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if ("argument".equals(c.getLocalName())) {
+                    if (TextUtils.equals(c.getLocalName(), "argument")) {
                         builder.addArgumentBuilder(parseArgument((Element) c));
                     }
                 }
@@ -408,22 +435,32 @@ public class Service {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("name".equals(tag)) {
-                builder.setName(node.getTextContent());
-            } else if ("direction".equals(tag)) {
-                builder.setDirection(node.getTextContent());
-            } else if ("relatedStateVariable".equals(tag)) {
-                final String text = node.getTextContent();
-                builder.setRelatedStateVariableName(text);
+            if (tag == null) {
+                continue;
+            }
+            final String text = node.getTextContent();
+            switch (tag) {
+                case "name":
+                    builder.setName(text);
+                    break;
+                case "direction":
+                    builder.setDirection(text);
+                    break;
+                case "relatedStateVariable":
+                    builder.setRelatedStateVariableName(text);
+                    break;
+                default:
+                    break;
             }
         }
         return builder;
     }
 
     @Nonnull
-    private StateVariable.Builder parseStateVariable(@Nonnull Element element) {
+    private static StateVariable.Builder parseStateVariable(
+            @Nonnull Service service, @Nonnull Element element) {
         final StateVariable.Builder builder = new StateVariable.Builder();
-        builder.setService(this);
+        builder.setService(service);
         builder.setSendEvents(element.getAttribute("sendEvents"));
         builder.setMulticast(element.getAttribute("multicast"));
         Node node = element.getFirstChild();
@@ -432,40 +469,70 @@ public class Service {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("name".equals(tag)) {
-                builder.setName(node.getTextContent());
-            } else if ("dataType".equals(tag)) {
-                builder.setDataType(node.getTextContent());
-            } else if ("defaultValue".equals(tag)) {
-                builder.setDefaultValue(node.getTextContent());
-            } else if ("allowedValueList".equals(tag)) {
-                Node child = node.getFirstChild();
-                for (; child != null; child = child.getNextSibling()) {
-                    if (child.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    if ("allowedValue".equals(child.getLocalName())) {
-                        builder.addAllowedValue(child.getTextContent());
-                    }
-                }
-            } else if ("allowedValueRange".equals(tag)) {
-                Node child = node.getFirstChild();
-                for (; child != null; child = child.getNextSibling()) {
-                    if (child.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    final String ctag = child.getLocalName();
-                    if ("step".equals(ctag)) {
-                        builder.setStep(child.getTextContent());
-                    } else if ("minimum".equals(ctag)) {
-                        builder.setMinimum(child.getTextContent());
-                    } else if ("maximum".equals(ctag)) {
-                        builder.setMaximum(child.getTextContent());
-                    }
-                }
+            if (tag == null) {
+                continue;
+            }
+            switch (tag) {
+                case "name":
+                    builder.setName(node.getTextContent());
+                    break;
+                case "dataType":
+                    builder.setDataType(node.getTextContent());
+                    break;
+                case "defaultValue":
+                    builder.setDefaultValue(node.getTextContent());
+                    break;
+                case "allowedValueList":
+                    parseAllowedValueList(builder, (Element) node);
+                    break;
+                case "allowedValueRange":
+                    parseAllowedValueRange(builder, (Element) node);
+                default:
+                    break;
             }
         }
         return builder;
+    }
+
+    private static void parseAllowedValueList(
+            @Nonnull StateVariable.Builder builder, @Nonnull Element element) {
+        Node node = element.getFirstChild();
+        for (; node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            if ("allowedValue".equals(node.getLocalName())) {
+                builder.addAllowedValue(node.getTextContent());
+            }
+        }
+    }
+
+    private static void parseAllowedValueRange(
+            @Nonnull StateVariable.Builder builder, @Nonnull Element element) {
+        Node node = element.getFirstChild();
+        for (; node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            final String tag = node.getLocalName();
+            if (tag == null) {
+                continue;
+            }
+            final String text = node.getTextContent();
+            switch (tag) {
+                case "step":
+                    builder.setStep(text);
+                    break;
+                case "minimum":
+                    builder.setMinimum(text);
+                    break;
+                case "maximum":
+                    builder.setMaximum(text);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @Nonnull
@@ -487,8 +554,11 @@ public class Service {
         return sb.toString();
     }
 
-    private long getTimeout(@Nonnull HttpResponse response) {
-        final String timeout = response.getHeader(Http.TIMEOUT).toLowerCase();
+    private static long parseTimeout(@Nonnull HttpResponse response) {
+        final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
+        if (TextUtils.isEmpty(timeout)) {
+            return 0;
+        }
         if (timeout.contains("infinite")) {
             return -1;
         }
@@ -505,6 +575,20 @@ public class Service {
             Log.w(TAG, e);
         }
         return 0;
+    }
+
+    /**
+     * HttpClientのファクトリークラスを変更する。
+     *
+     * @param factory ファクトリークラス
+     */
+    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
+        mHttpClientFactory = factory;
+    }
+
+    @Nonnull
+    private HttpClient createHttpClient() {
+        return mHttpClientFactory.createHttpClient(false);
     }
 
     /**
@@ -525,9 +609,6 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean subscribe(boolean keep) throws IOException {
-        if (mEventSubUrl == null) {
-            return false;
-        }
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
         final URL url = getAbsoluteUrl(mEventSubUrl);
@@ -536,15 +617,15 @@ public class Service {
         request.setHeader(Http.CALLBACK, getCallback());
         request.setHeader(Http.TIMEOUT, "Second-300");
         request.setHeader(Http.CONTENT_LENGTH, "0");
-        final HttpClient client = new HttpClient(false);
+        final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             System.out.println(response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
-        final long timeout = getTimeout(response);
-        if (sid == null || sid.isEmpty() || timeout == 0) {
+        final long timeout = parseTimeout(response);
+        if (TextUtils.isEmpty(sid) || timeout == 0) {
             System.out.println(response.toString());
             return false;
         }
@@ -576,7 +657,7 @@ public class Service {
      * @throws IOException 通信エラー
      */
     boolean renewSubscribe(boolean notify) throws IOException {
-        if (mEventSubUrl == null || mSubscriptionId == null) {
+        if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
         final HttpRequest request = new HttpRequest();
@@ -586,16 +667,15 @@ public class Service {
         request.setHeader(Http.SID, mSubscriptionId);
         request.setHeader(Http.TIMEOUT, "Second-300");
         request.setHeader(Http.CONTENT_LENGTH, "0");
-        final HttpClient client = new HttpClient(false);
+        final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             System.out.println(response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
-        final long timeout = getTimeout(response);
-        if (sid == null || sid.isEmpty()
-                || !sid.equals(mSubscriptionId) || timeout == 0) {
+        final long timeout = parseTimeout(response);
+        if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
             System.out.println(response.toString());
             return false;
         }
@@ -614,7 +694,7 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean unsubscribe() throws IOException {
-        if (mEventSubUrl == null || mSubscriptionId == null) {
+        if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
         final HttpRequest request = new HttpRequest();
@@ -666,7 +746,7 @@ public class Service {
 
     /**
      * Subscriptionの有効期間
-     * 
+     *
      * @return Subscriptionの有効期間
      */
     public long getSubscriptionTimeout() {

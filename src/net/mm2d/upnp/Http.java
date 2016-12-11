@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TextUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -110,7 +112,7 @@ public final class Http {
         HTTP_URI_TOO_LONG(414, "Request-URI Too Large"),
         HTTP_UNSUPPORTED_TYPE(415, "Unsupported Media Type"),
         HTTP_RANGE_NOT_SATISFIABLE(416, "Requested range not satisfiable"),
-        HTTP_EXPECTION_FAILED(417, "Expectation Failed"),
+        HTTP_EXPECTATION_FAILED(417, "Expectation Failed"),
         HTTP_INTERNAL_ERROR(500, "Internal Server Error"),
         HTTP_NOT_IMPLEMENTED(501, "Not Implemented"),
         HTTP_BAD_GATEWAY(502, "Bad Gateway"),
@@ -146,7 +148,7 @@ public final class Http {
 
         /**
          * ステータスコードのint値から該当するステータスコードを返す。
-         * 
+         *
          * @param code ステータスコード
          * @return 該当するStatus
          */
@@ -161,19 +163,19 @@ public final class Http {
         }
     }
 
-    private static final DateFormat sRfc1123Format;
-    private static final DateFormat sRfc1036Format;
-    private static final DateFormat sAscTimeFormat;
+    private static final DateFormat RFC_1123_FORMAT;
+    private static final DateFormat RFC_1036_FORMAT;
+    private static final DateFormat ASC_TIME_FORMAT;
 
     static {
         final Locale locale = Locale.US;
         final TimeZone tz = TimeZone.getTimeZone("GMT");
-        sRfc1123Format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", locale);
-        sRfc1123Format.setTimeZone(tz);
-        sRfc1036Format = new SimpleDateFormat("EEEE, dd-MMM-yy HH:mm:ss z", locale);
-        sRfc1036Format.setTimeZone(tz);
-        sAscTimeFormat = new SimpleDateFormat("E MMM d HH:mm:ss yyyy", locale);
-        sAscTimeFormat.setTimeZone(tz);
+        RFC_1123_FORMAT = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", locale);
+        RFC_1123_FORMAT.setTimeZone(tz);
+        RFC_1036_FORMAT = new SimpleDateFormat("EEEE, dd-MMM-yy HH:mm:ss z", locale);
+        RFC_1036_FORMAT.setTimeZone(tz);
+        ASC_TIME_FORMAT = new SimpleDateFormat("E MMM d HH:mm:ss yyyy", locale);
+        ASC_TIME_FORMAT.setTimeZone(tz);
     }
 
     /**
@@ -183,20 +185,20 @@ public final class Http {
      * @return パース結果、失敗した場合null
      */
     @Nullable
-    public synchronized static Date parseDate(@Nullable String string) {
-        if (string == null) {
+    public static synchronized Date parseDate(@Nullable String string) {
+        if (TextUtils.isEmpty(string)) {
             return null;
         }
         try {
-            return sRfc1123Format.parse(string);
+            return RFC_1123_FORMAT.parse(string);
         } catch (final ParseException ignored) {
         }
         try {
-            return sRfc1036Format.parse(string);
+            return RFC_1036_FORMAT.parse(string);
         } catch (final ParseException ignored) {
         }
         try {
-            return sAscTimeFormat.parse(string);
+            return ASC_TIME_FORMAT.parse(string);
         } catch (final ParseException ignored) {
         }
         return null;
@@ -209,7 +211,7 @@ public final class Http {
      * @return RFC1123形式の日付文字列
      */
     @Nonnull
-    public synchronized static String formatDate(long date) {
+    public static synchronized String formatDate(long date) {
         return formatDate(new Date(date));
     }
 
@@ -220,8 +222,8 @@ public final class Http {
      * @return RFC1123形式の日付文字列
      */
     @Nonnull
-    public synchronized static String formatDate(@Nonnull Date date) {
-        return sRfc1123Format.format(date);
+    public static synchronized String formatDate(@Nonnull Date date) {
+        return RFC_1123_FORMAT.format(date);
     }
 
     /**
@@ -230,7 +232,7 @@ public final class Http {
      * @return RFC1123形式の日付文字列
      */
     @Nonnull
-    public synchronized static String getCurrentData() {
+    public static synchronized String getCurrentData() {
         return formatDate(System.currentTimeMillis());
     }
 }

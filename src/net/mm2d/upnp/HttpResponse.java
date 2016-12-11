@@ -28,7 +28,7 @@ public class HttpResponse extends HttpMessage {
     /**
      * ステータスラインを設定する。
      *
-     * {@link #setStartLine(String)}のエイリアス。
+     * <p>{@link #setStartLine(String)}のエイリアス。
      *
      * @param line ステータスライン
      * @see #setStartLine(String)
@@ -78,11 +78,11 @@ public class HttpResponse extends HttpMessage {
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
     public void setStatusCode(int code) {
-        mStatusCode = code;
         mStatus = Http.Status.valueOf(code);
         if (mStatus == null) {
             throw new IllegalArgumentException("unexpected status code:" + code);
         }
+        mStatusCode = code;
         mReasonPhrase = mStatus.getPhrase();
     }
 

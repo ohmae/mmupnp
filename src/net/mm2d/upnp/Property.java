@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * ライブラリのプロパティ情報を管理するクラス。
  *
@@ -26,34 +28,16 @@ public final class Property {
      */
     public static final String UPNP_VERSION = "UPnP/1.0";
     /**
-     * デフォルトタイムアウト値（30秒）
+     * デフォルトタイムアウト値[ms]（30秒）
+     *
+     * <p>{@link java.net.Socket#setSoTimeout(int)}に渡すためint値で定義
      */
-    public static final int DEFAULT_TIMEOUT = 30000;
+    public static final int DEFAULT_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(30);
 
     // SystemプロパティからOS名とバージョン番号を取得する
     static {
         final String os = System.getProperty("os.name").split(" ")[0];
         final String ver = System.getProperty("os.version");
         OS_VERSION = os + "/" + ver;
-    }
-
-    private static boolean sGetIconOnLoadDescription = false;
-
-    /**
-     * DeviceDescriptionのパース時にアイコンを読み込むかを返す
-     *
-     * @return trueの場合読み込む
-     */
-    static boolean isGetIconOnLoadDescription() {
-        return sGetIconOnLoadDescription;
-    }
-
-    /**
-     * DeviceDescriptionのパース時にアイコンを読み込むかを設定する。
-     *
-     * @param getIcon 読み込む場合true
-     */
-    public static void setGetIconOnLoadDescription(boolean getIcon) {
-        sGetIconOnLoadDescription = getIcon;
     }
 }

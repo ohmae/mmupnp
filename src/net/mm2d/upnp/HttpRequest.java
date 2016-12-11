@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TextUtils;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -37,7 +39,7 @@ public class HttpRequest extends HttpMessage {
     /**
      * リクエストラインを設定する。
      *
-     * {@link #setStartLine(String)}のエイリアス。
+     * <p>{@link #setStartLine(String)}のエイリアス。
      *
      * @param line リクエストライン
      * @see #setStartLine(String)
@@ -76,7 +78,7 @@ public class HttpRequest extends HttpMessage {
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
     public void setUrl(@Nonnull URL url, boolean withHostHeader) throws IOException {
-        if (!"http".equals(url.getProtocol())) {
+        if (!TextUtils.equals(url.getProtocol(), "http")) {
             throw new IOException("unsupported protocol." + url.getProtocol());
         }
         setAddress(InetAddress.getByName(url.getHost()));

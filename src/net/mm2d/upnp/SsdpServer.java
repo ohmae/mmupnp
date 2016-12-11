@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.IoUtils;
 import net.mm2d.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -29,19 +30,21 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 abstract class SsdpServer {
+    private static final String TAG = SsdpServer.class.getSimpleName();
     /**
      * SSDPに使用するアドレス。
      */
     public static final String SSDP_ADDR = "239.255.255.250";
     /**
-     * SSPDに使用するポート番号
+     * SSDPに使用するポート番号
      */
     public static final int SSDP_PORT = 1900;
     private static final InetSocketAddress SSDP_SO_ADDR =
             new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
     private static final InetAddress SSDP_INET_ADDR = SSDP_SO_ADDR.getAddress();
-    private static final String TAG = "SsdpServer";
+    @Nonnull
     private final NetworkInterface mInterface;
+    @Nonnull
     private InterfaceAddress mInterfaceAddress;
     private final int mBindPort;
     private MulticastSocket mSocket;
@@ -50,7 +53,7 @@ abstract class SsdpServer {
     /**
      * 使用するインターフェースを指定してインスタンス作成。
      *
-     * 使用するポートは自動割当となる。
+     * <p>使用するポートは自動割当となる。
      *
      * @param ni 使用するインターフェース
      */
@@ -67,16 +70,18 @@ abstract class SsdpServer {
     public SsdpServer(@Nonnull NetworkInterface ni, int bindPort) {
         mBindPort = bindPort;
         mInterface = ni;
+        InterfaceAddress addr = null;
         final List<InterfaceAddress> ifas = mInterface.getInterfaceAddresses();
         for (final InterfaceAddress ifa : ifas) {
             if (ifa.getAddress() instanceof Inet4Address) {
-                mInterfaceAddress = ifa;
+                addr = ifa;
                 break;
             }
         }
-        if (mInterfaceAddress == null) {
+        if (addr == null) {
             throw new IllegalArgumentException("ni does not have IPv4 address.");
         }
+        mInterfaceAddress = addr;
     }
 
     /**
@@ -98,10 +103,8 @@ abstract class SsdpServer {
      */
     public void close() {
         stop(false);
-        if (mSocket != null) {
-            mSocket.close();
-            mSocket = null;
-        }
+        IoUtils.closeQuietly(mSocket);
+        mSocket = null;
     }
 
     /**
@@ -125,12 +128,12 @@ abstract class SsdpServer {
     /**
      * 受信スレッドの停止と必要があればJoinを行う。
      *
-     * 現在の実装ではIO待ちに割り込むことはできないため、
+     * <p>現在の実装ではIO待ちに割り込むことはできないため、
      * joinを指定しても偶然ソケットタイムアウトやソケット受信が発生しないかぎりjoinできない。
-     * TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
      *
      * @param join trueの時スレッドのJoin待ちを行う。
      */
+    // TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
     public void stop(boolean join) {
         if (mThread == null) {
             return;
@@ -185,7 +188,7 @@ abstract class SsdpServer {
     /**
      * Joinを行う。
      *
-     * 特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
+     * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
      *
      * @throws IOException Joinコールにより発生
      */
@@ -198,7 +201,7 @@ abstract class SsdpServer {
     /**
      * Leaveを行う。
      *
-     * 特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
+     * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
      *
      * @throws IOException Leaveコールにより発生
      */
@@ -221,7 +224,7 @@ abstract class SsdpServer {
         /**
          * 割り込みを行い、スレッドを終了させる。
          *
-         * 現在はSocketを使用しているため割り込みは効果がない。
+         * <p>現在はSocketを使用しているため割り込みは効果がない。
          */
         public void shutdownRequest() {
             mShutdownRequest = true;

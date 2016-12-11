@@ -30,43 +30,41 @@ public class DeviceNode extends UpnpNode {
     @Override
     public String getDetailText() {
         final Device device = (Device) getUserObject();
-        final StringBuilder sb = new StringBuilder();
-        sb.append("uuid: ");
-        sb.append(device.getUuid());
-        sb.append('\n');
-        sb.append("UDN:  ");
-        sb.append(device.getUdn());
-        sb.append('\n');
-        sb.append("DeviceType: ");
-        sb.append(device.getDeviceType());
-        sb.append('\n');
-        sb.append("FriendlyName: ");
-        sb.append(device.getFriendlyName());
-        sb.append('\n');
-        sb.append("Manufacture: ");
-        sb.append(device.getManufacture());
-        sb.append('\n');
-        sb.append("ManufactureUrl: ");
-        sb.append(device.getManufactureUrl());
-        sb.append('\n');
-        sb.append("ModelName: ");
-        sb.append(device.getModelName());
-        sb.append('\n');
-        sb.append("ModelUrl: ");
-        sb.append(device.getModelUrl());
-        sb.append('\n');
-        sb.append("ModelDescription: ");
-        sb.append(device.getModelDescription());
-        sb.append('\n');
-        sb.append("ModelNumber: ");
-        sb.append(device.getModelNumber());
-        sb.append('\n');
-        sb.append("SerialNumber: ");
-        sb.append(device.getSerialNumber());
-        sb.append('\n');
-        sb.append("PresentationUrl: ");
-        sb.append(device.getPresentationUrl());
-        return sb.toString();
+        return "uuid: " +
+                device.getUuid() +
+                '\n' +
+                "UDN:  " +
+                device.getUdn() +
+                '\n' +
+                "DeviceType: " +
+                device.getDeviceType() +
+                '\n' +
+                "FriendlyName: " +
+                device.getFriendlyName() +
+                '\n' +
+                "Manufacture: " +
+                device.getManufacture() +
+                '\n' +
+                "ManufactureUrl: " +
+                device.getManufactureUrl() +
+                '\n' +
+                "ModelName: " +
+                device.getModelName() +
+                '\n' +
+                "ModelUrl: " +
+                device.getModelUrl() +
+                '\n' +
+                "ModelDescription: " +
+                device.getModelDescription() +
+                '\n' +
+                "ModelNumber: " +
+                device.getModelNumber() +
+                '\n' +
+                "SerialNumber: " +
+                device.getSerialNumber() +
+                '\n' +
+                "PresentationUrl: " +
+                device.getPresentationUrl();
     }
 
     @Override

@@ -11,14 +11,14 @@ import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
+import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.Inet4Address;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -42,8 +42,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -52,9 +50,12 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ControlPoint {
+    private static final String TAG = ControlPoint.class.getSimpleName();
+
     /**
      * 機器発見イベント通知用リスナー。
      *
+     * <p>
      * {@link #onDiscover(Device)}
      * {@link #onLost(Device)}
      * 及び、
@@ -75,7 +76,7 @@ public class ControlPoint {
         /**
          * 機器喪失時にコールされる。
          *
-         * 有効期限切れ、SSDP byebye受信、ControlPointの停止によって発生する
+         * <p>有効期限切れ、SSDP byebye受信、ControlPointの停止によって発生する
          *
          * @param device 喪失したDevice
          * @see Device
@@ -86,6 +87,7 @@ public class ControlPoint {
     /**
      * NotifyEvent通知を受け取るリスナー。
      *
+     * <p>
      * {@link #onNotifyEvent(Service, long, String, String)}
      * 及び、
      * {@link DiscoveryListener#onDiscover(Device)}
@@ -104,25 +106,37 @@ public class ControlPoint {
          * @param value 値
          * @see Service
          */
-        void onNotifyEvent(@Nonnull Service service, long seq, @Nonnull String variable,
-                @Nonnull String value);
+        void onNotifyEvent(@Nonnull Service service, long seq,
+                @Nonnull String variable, @Nonnull String value);
     }
 
-    private static final String TAG = "ControlPoint";
+    private IconFilter mIconFilter = IconFilter.NONE;
+    @Nonnull
     private final List<DiscoveryListener> mDiscoveryListeners;
+    @Nonnull
     private final List<NotifyEventListener> mNotifyEventListeners;
+    @Nonnull
     private final Collection<SsdpSearchServer> mSearchList;
+    @Nonnull
     private final Collection<SsdpNotifyReceiver> mNotifyList;
+    @Nonnull
     private final Map<String, Device> mDeviceMap;
+    @Nonnull
     private final Map<String, Device> mPendingDeviceMap;
+    @Nonnull
     private final Map<String, Service> mSubscribeServiceMap;
+    @Nonnull
     private final EventReceiver mEventReceiver;
+    @Nonnull
     private final ExecutorService mCachedThreadPool;
+    @Nonnull
     private final ExecutorService mNotifyExecutor;
     private boolean mInitialized = false;
     private boolean mStarted = false;
     private boolean mTerminated = false;
-    private DeviceExpirer mDeviceExpirer;
+    @Nullable
+    private DeviceInspector mDeviceInspector;
+    @Nullable
     private SubscribeKeeper mSubscribeKeeper;
 
     private void onReceiveSsdp(@Nonnull SsdpMessage message) {
@@ -130,7 +144,7 @@ public class ControlPoint {
         synchronized (mDeviceMap) {
             Device device = mDeviceMap.get(uuid);
             if (device == null) {
-                if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
+                if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
                     if (mPendingDeviceMap.get(uuid) != null) {
                         mPendingDeviceMap.remove(uuid);
                     }
@@ -148,11 +162,11 @@ public class ControlPoint {
                     }
                 }
             } else {
-                if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
+                if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
                     lostDevice(device);
                 } else {
                     device.setSsdpMessage(message);
-                    mDeviceExpirer.update();
+                    mDeviceInspector.update();
                 }
             }
         }
@@ -169,7 +183,7 @@ public class ControlPoint {
         public void run() {
             final String uuid = mDevice.getUuid();
             try {
-                mDevice.loadDescription();
+                mDevice.loadDescription(mIconFilter);
                 synchronized (mDeviceMap) {
                     if (mPendingDeviceMap.get(uuid) != null) {
                         mPendingDeviceMap.remove(uuid);
@@ -177,7 +191,9 @@ public class ControlPoint {
                     }
                 }
             } catch (final IOException | SAXException | ParserConfigurationException e) {
-                mPendingDeviceMap.remove(uuid);
+                synchronized (mDeviceMap) {
+                    mPendingDeviceMap.remove(uuid);
+                }
             }
         }
     }
@@ -190,8 +206,13 @@ public class ControlPoint {
         public EventNotifyTask(@Nonnull HttpRequest request, @Nonnull Service service) {
             mRequest = request;
             mService = service;
+            final String seq = mRequest.getHeader(Http.SEQ);
+            if (TextUtils.isEmpty(seq)) {
+                mSeq = 0;
+                return;
+            }
             try {
-                mSeq = Long.parseLong(mRequest.getHeader(Http.SEQ));
+                mSeq = Long.parseLong(seq);
             } catch (final NumberFormatException e) {
                 mSeq = 0;
             }
@@ -199,18 +220,18 @@ public class ControlPoint {
 
         @Override
         public void run() {
+            final String xml = mRequest.getBody();
+            if (TextUtils.isEmpty(xml)) {
+                return;
+            }
             try {
-                final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                dbf.setNamespaceAware(true);
-                final DocumentBuilder db = dbf.newDocumentBuilder();
-                final Document doc = db
-                        .parse(new InputSource(new StringReader(mRequest.getBody())));
+                final Document doc = XmlUtils.newDocument(xml);
                 Node node = doc.getDocumentElement().getFirstChild();
                 for (; node != null; node = node.getNextSibling()) {
                     if (node.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if ("property".equals(node.getLocalName())) {
+                    if (TextUtils.equals(node.getLocalName(), "property")) {
                         Node c = node.getFirstChild();
                         for (; c != null; c = c.getNextSibling()) {
                             if (c.getNodeType() != Node.ELEMENT_NODE) {
@@ -218,7 +239,7 @@ public class ControlPoint {
                             }
                             final String name = c.getLocalName();
                             final String value = c.getTextContent();
-                            notify(name, value);
+                            notifyEvent(name, value);
                         }
                     }
                 }
@@ -226,7 +247,7 @@ public class ControlPoint {
             }
         }
 
-        private void notify(@Nullable String name, @Nullable String value) {
+        private void notifyEvent(@Nullable String name, @Nullable String value) {
             final StateVariable variable = mService.findStateVariable(name);
             if (variable == null || !variable.isSendEvents() || value == null) {
                 Log.w(TAG, "illegal notify argument:" + name + " " + value);
@@ -234,7 +255,7 @@ public class ControlPoint {
             }
             synchronized (mNotifyEventListeners) {
                 for (final NotifyEventListener l : mNotifyEventListeners) {
-                    l.onNotifyEvent(mService, mSeq, name, value);
+                    l.onNotifyEvent(mService, mSeq, variable.getName(), value);
                 }
             }
         }
@@ -243,7 +264,7 @@ public class ControlPoint {
     /**
      * インスタンス初期化
      *
-     * 引数のインターフェースを利用するように初期化される。
+     * <p>引数のインターフェースを利用するように初期化される。
      * 引数なしの場合、使用するインターフェースは自動的に選定される。
      *
      * @param interfaces 使用するインターフェース、指定しない場合は自動選択となる。
@@ -280,7 +301,7 @@ public class ControlPoint {
             final SsdpSearchServer search = new SsdpSearchServer(nif);
             search.setResponseListener(new ResponseListener() {
                 @Override
-                public void onReceiveResponse(final SsdpResponseMessage message) {
+                public void onReceiveResponse(final @Nonnull SsdpResponseMessage message) {
                     executeParallel(new Runnable() {
                         @Override
                         public void run() {
@@ -293,7 +314,7 @@ public class ControlPoint {
             final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);
             notify.setNotifyListener(new NotifyListener() {
                 @Override
-                public void onReceiveNotify(final SsdpRequestMessage message) {
+                public void onReceiveNotify(final @Nonnull SsdpRequestMessage message) {
                     executeParallel(new Runnable() {
                         @Override
                         public void run() {
@@ -307,7 +328,7 @@ public class ControlPoint {
         mEventReceiver = new EventReceiver();
         mEventReceiver.setEventMessageListener(new EventMessageListener() {
             @Override
-            public boolean onEventReceived(HttpRequest request) {
+            public boolean onEventReceived(@Nonnull HttpRequest request) {
                 final String sid = request.getHeader(Http.SID);
                 final Service service = getSubscribeService(sid);
                 return service != null && executeSequential(new EventNotifyTask(request, service));
@@ -373,7 +394,7 @@ public class ControlPoint {
     /**
      * 初期化を行う。
      *
-     * 利用前にかならず実行する。
+     * <p>利用前にかならず実行する。
      * 一度初期化を行うと再初期化は不可能。
      * インターフェースの変更など、再初期化が必要な場合はインスタンスの生成からやり直すこと。
      * また、終了する際は必ず{@link #terminate()}をコールすること。
@@ -388,8 +409,8 @@ public class ControlPoint {
             throw new IllegalStateException(
                     "ControlPoint is already terminated, cannot re-initialize.");
         }
-        mDeviceExpirer = new DeviceExpirer(this);
-        mDeviceExpirer.start();
+        mDeviceInspector = new DeviceInspector(this);
+        mDeviceInspector.start();
         mSubscribeKeeper = new SubscribeKeeper(this);
         mSubscribeKeeper.start();
         mInitialized = true;
@@ -398,7 +419,7 @@ public class ControlPoint {
     /**
      * 終了処理を行う。
      *
-     * 動作中の場合、停止処理を行う。
+     * <p>動作中の場合、停止処理を行う。
      * 一度終了処理を行ったあとは再初期化は不可能。
      * インスタンス参照を破棄すること。
      *
@@ -425,14 +446,14 @@ public class ControlPoint {
         }
         mSubscribeKeeper.shutdownRequest();
         mSubscribeKeeper = null;
-        mDeviceExpirer.shutdownRequest();
-        mDeviceExpirer = null;
+        mDeviceInspector.shutdownRequest();
+        mDeviceInspector = null;
     }
 
     /**
      * 処理を開始する。
      *
-     * 本メソッドのコール前はネットワークに関連する処理を実行することはできない。
+     * <p>本メソッドのコール前はネットワークに関連する処理を実行することはできない。
      * 既に開始状態の場合は何も行われない。
      * 一度開始したあとであっても、停止処理後であれば再度開始可能。
      *
@@ -472,7 +493,7 @@ public class ControlPoint {
     /**
      * 処理を停止する。
      *
-     * 開始していない状態、既に停止済みの状態の場合なにも行われない。
+     * <p>開始していない状態、既に停止済みの状態の場合なにも行われない。
      * 停止に伴い発見済みDeviceはLost扱いとなる。
      * 停止後は発見済みDeviceのインスタンスを保持していても正常に動作しない。
      *
@@ -519,14 +540,13 @@ public class ControlPoint {
             lostDevice(device);
         }
         mDeviceMap.clear();
-        mDeviceExpirer.clear();
+        mDeviceInspector.clear();
     }
 
     /**
      * Searchパケットを送出する。
      *
-     * {@link #search(String)}を
-     * search(null)でコールするのと等価。
+     * <p>{@link #search(String)}を引数nullでコールするのと等価。
      */
     public void search() {
         search(null);
@@ -535,7 +555,7 @@ public class ControlPoint {
     /**
      * Searchパケットを送出する。
      *
-     * stがnullの場合、"ssdp:all"として動作する。
+     * <p>stがnullの場合、"ssdp:all"として動作する。
      *
      * @param st SearchパケットのSTフィールド
      */
@@ -546,6 +566,17 @@ public class ControlPoint {
         for (final SsdpSearchServer server : mSearchList) {
             server.search(st);
         }
+    }
+
+    /**
+     * ダウンロードするIconを選択するフィルタを設定する。
+     *
+     * @param filter 設定するフィルタ、nullは指定できない。
+     * @see IconFilter#NONE
+     * @see IconFilter#ALL
+     */
+    public void setIconFilter(@Nonnull IconFilter filter) {
+        mIconFilter = filter;
     }
 
     /**
@@ -600,11 +631,10 @@ public class ControlPoint {
         }
     }
 
-    private void discoverDevice(@Nonnull
-    final Device device) {
+    private void discoverDevice(final @Nonnull Device device) {
         synchronized (mDeviceMap) {
             mDeviceMap.put(device.getUuid(), device);
-            mDeviceExpirer.add(device);
+            mDeviceInspector.add(device);
         }
         executeSequential(new Runnable() {
             @Override
@@ -618,31 +648,30 @@ public class ControlPoint {
         });
     }
 
-    private void lostDevice(@Nonnull Device device) {
-        lostDevice(device, false);
+    void lostDevice(@Nonnull Device device) {
+        lostDevice(device, true);
     }
 
     /**
      * デバイスの喪失を行う。
      *
-     * Expirerからコールするためにパッケージデフォルトとする
+     * <p>DeviceInspectorからコールするためにパッケージデフォルトとする
      * 他からはコールしないこと。
      *
      * @param device 喪失してデバイス
-     * @param fromExpirer trueの場合Expirerに通知しない。
+     * @param notifyInspector falseの場合Inspectorに通知しない
      * @see Device
-     * @see DeviceExpirer
+     * @see DeviceInspector
      */
-    void lostDevice(@Nonnull
-    final Device device, boolean fromExpirer) {
+    void lostDevice(final @Nonnull Device device, boolean notifyInspector) {
         synchronized (mDeviceMap) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
                 unregisterSubscribeService(s);
             }
             mDeviceMap.remove(device.getUuid());
-            if (!fromExpirer) {
-                mDeviceExpirer.remove(device);
+            if (notifyInspector) {
+                mDeviceInspector.remove(device);
             }
         }
         executeSequential(new Runnable() {
@@ -669,7 +698,7 @@ public class ControlPoint {
     /**
      * 発見したデバイスのリストを返す。
      *
-     * 内部で保持するリストのコピーが返される。
+     * <p>内部で保持するリストのコピーが返される。
      *
      * @return デバイスのリスト
      * @see Device
@@ -684,14 +713,14 @@ public class ControlPoint {
     /**
      * 指定UDNのデバイスを返す。
      *
-     * 見つからない場合nullが返る。
+     * <p>見つからない場合nullが返る。
      *
      * @param udn UDN
      * @return 指定UDNのデバイス
      * @see Device
      */
     @Nullable
-    public Device getDevice(String udn) {
+    public Device getDevice(@Nullable String udn) {
         return mDeviceMap.get(udn);
     }
 
@@ -708,7 +737,7 @@ public class ControlPoint {
     /**
      * SubscriptionIDに合致するServiceを返す。
      *
-     * 合致するServiceがない場合null
+     * <p>合致するServiceがない場合null
      *
      * @param subscriptionId SubscriptionID
      * @return 該当Service
@@ -724,7 +753,7 @@ public class ControlPoint {
     /**
      * SubscriptionIDが確定したServiceを購読リストに登録する
      *
-     * Serviceのsubscribeが実行された後にServiceからコールされる。
+     * <p>Serviceのsubscribeが実行された後にServiceからコールされる。
      *
      * @param service 登録するService
      * @see Service

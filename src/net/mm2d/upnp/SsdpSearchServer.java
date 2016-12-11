@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TextUtils;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
@@ -22,6 +24,15 @@ import javax.annotation.Nullable;
  */
 class SsdpSearchServer extends SsdpServer {
     /**
+     * ST(SearchType) 全機器。
+     */
+    public static final String ST_ALL = "ssdp:all";
+    /**
+     * ST(SearchType) rootdevice。
+     */
+    public static final String ST_ROOTDEVICE = "upnp:rootdevice";
+
+    /**
      * M-SEARCHによるレスポンス受信を受け取るリスナー。
      */
     public interface ResponseListener {
@@ -32,15 +43,6 @@ class SsdpSearchServer extends SsdpServer {
          */
         void onReceiveResponse(@Nonnull SsdpResponseMessage message);
     }
-
-    /**
-     * ST(SearchType) 全機器。
-     */
-    public static final String ST_ALL = "ssdp:all";
-    /**
-     * ST(SearchType) rootdevice。
-     */
-    public static final String ST_ROOTDEVICE = "upnp:rootdevice";
 
     private ResponseListener mListener;
 
@@ -65,7 +67,7 @@ class SsdpSearchServer extends SsdpServer {
     /**
      * M-SEARCHを実行する。
      *
-     * STはssdp:allで実行する。
+     * <p>STはssdp:allで実行する。
      */
     public void search() {
         search(null);
@@ -77,7 +79,7 @@ class SsdpSearchServer extends SsdpServer {
      * @param st STの値
      */
     public void search(@Nullable String st) {
-        if (st == null) {
+        if (TextUtils.isEmpty(st)) {
             st = ST_ALL;
         }
         final SsdpRequestMessage message = new SsdpRequestMessage();

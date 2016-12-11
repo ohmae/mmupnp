@@ -21,10 +21,12 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Icon {
+    private static final String TAG = Icon.class.getSimpleName();
+
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      */
     public static class Builder {
         private Device mDevice;
@@ -45,79 +47,100 @@ public class Icon {
          * このIconを保持するDeviceを登録する。
          *
          * @param device このIconを保持するDevice
+         * @return Builder
          */
-        public void setDevice(@Nonnull Device device) {
+        @Nonnull
+        public Builder setDevice(@Nonnull Device device) {
             mDevice = device;
+            return this;
         }
 
         /**
          * MimeTypeの値を登録する。
          *
          * @param mimeType MimeType
+         * @return Builder
          */
-        public void setMimeType(@Nonnull String mimeType) {
+        @Nonnull
+        public Builder setMimeType(@Nonnull String mimeType) {
             mMimeType = mimeType;
+            return this;
         }
 
         /**
          * Heightの値を登録する
          *
          * @param height Height
+         * @return Builder
          */
-        public void setHeight(@Nonnull String height) {
+        @Nonnull
+        public Builder setHeight(@Nonnull String height) {
             try {
                 mHeight = Integer.parseInt(height);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 mHeight = 0;
             }
+            return this;
         }
 
         /**
          * Widthの値を登録する。
          *
          * @param width Width
+         * @return Builder
          */
-        public void setWidth(@Nonnull String width) {
+        @Nonnull
+        public Builder setWidth(@Nonnull String width) {
             try {
                 mWidth = Integer.parseInt(width);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 mWidth = 0;
             }
+            return this;
         }
 
         /**
          * Depthの値を登録する
          *
          * @param depth Depth
+         * @return Builder
          */
-        public void setDepth(@Nonnull String depth) {
+        @Nonnull
+        public Builder setDepth(@Nonnull String depth) {
             try {
                 mDepth = Integer.parseInt(depth);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 mDepth = 0;
             }
+            return this;
         }
 
         /**
          * URLの値を登録する。
          *
          * @param url URL
+         * @return Builder
          */
-        public void setUrl(@Nonnull String url) {
+        @Nonnull
+        public Builder setUrl(@Nonnull String url) {
             mUrl = url;
+            return this;
         }
 
         /**
          * バイナリデータを登録する。
          *
-         * DeviceDescriptionからの読み込みの場合、
+         * <p>DeviceDescriptionからの読み込みの場合、
          * Iconのインスタンスを作成した後読み込みを実行するため。
          * このメソッドは使用しない。
          *
          * @param binary バイナリ
+         * @return Builder
          */
-        public void setBinary(@Nullable byte[] binary) {
+        @Nonnull
+        public Builder setBinary(@Nullable byte[] binary) {
             mBinary = binary;
+            return this;
         }
 
         /**
@@ -150,13 +173,16 @@ public class Icon {
         }
     }
 
-    private static final String TAG = "Icon";
+    @Nonnull
     private final Device mDevice;
+    @Nonnull
     private final String mMimeType;
     private final int mHeight;
     private final int mWidth;
     private final int mDepth;
+    @Nonnull
     private final String mUrl;
+    @Nullable
     private byte[] mBinary;
 
     private Icon(@Nonnull Builder builder) {
@@ -181,7 +207,7 @@ public class Icon {
 
     /**
      * MimeTypeの値を返す。
-     * 
+     *
      * @return MimeType
      */
     @Nonnull
@@ -191,7 +217,7 @@ public class Icon {
 
     /**
      * Heightの値を返す。
-     * 
+     *
      * @return Height
      */
     public int getHeight() {
@@ -200,7 +226,7 @@ public class Icon {
 
     /**
      * Widthの値を返す。
-     * 
+     *
      * @return Width
      */
     public int getWidth() {
@@ -209,7 +235,7 @@ public class Icon {
 
     /**
      * Depthの値を返す。
-     * 
+     *
      * @return Depth
      */
     public int getDepth() {
@@ -232,7 +258,7 @@ public class Icon {
      * @param client 通信に使用する{@link HttpClient}
      * @throws IOException 通信エラー
      */
-    public void loadBinary(HttpClient client) throws IOException {
+    public void loadBinary(@Nonnull HttpClient client) throws IOException {
         final URL url = mDevice.getAbsoluteUrl(mUrl);
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
@@ -249,7 +275,9 @@ public class Icon {
 
     /**
      * バイナリデータを返す。
-     * 
+     *
+     * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
+     *
      * @return バイナリデータ
      */
     @Nullable

@@ -8,15 +8,15 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
+import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,19 +29,18 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * UPnP Deviceを表現するクラス
  *
- * SubDeviceには非対応
+ * <p>SubDeviceには非対応
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Device {
-    private static final String TAG = "Device";
+    private static final String TAG = Device.class.getSimpleName();
+    @Nonnull
     private final ControlPoint mControlPoint;
     private SsdpMessage mSsdp;
     private String mDescription;
@@ -56,9 +55,14 @@ public class Device {
     private String mModelNumber;
     private String mSerialNumber;
     private String mPresentationUrl;
+    @Nonnull
     private final Map<String, Map<String, String>> mTagMap;
+    @Nonnull
     private final List<Icon> mIconList;
+    @Nonnull
     private final List<Service> mServiceList;
+    @Nonnull
+    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     /**
      * ControlPointに紐付いたインスタンスを作成。
@@ -86,7 +90,7 @@ public class Device {
     /**
      * SSDPパケットを設定する。
      *
-     * 同一性はSSDPパケットのUUIDで判断し
+     * <p>同一性はSSDPパケットのUUIDで判断し
      * SSDPパケット受信ごとに更新される
      *
      * @param message SSDPパケット
@@ -108,7 +112,7 @@ public class Device {
     /**
      * SSDPパケットに記述されたUUIDを返す。
      *
-     * 本来はDeviceDescriptionに記述されたUDNと同一の値となるはずであるが
+     * <p>本来はDeviceDescriptionに記述されたUDNと同一の値となるはずであるが
      * 異なる場合もエラーとしては扱っていないため、同一性は保証されない。
      *
      * @return SSDPパケットに記述されたUUID
@@ -140,7 +144,7 @@ public class Device {
     /**
      * URL情報を正規化して返す。
      *
-     * "http://"から始まっていればそのまま利用する。
+     * <p>"http://"から始まっていればそのまま利用する。
      * "/"から始まっていればLocationホストの絶対パスとして
      * Locationの"://"以降の最初の"/"までと結合する。
      * それ以外の場合はLocationからの相対パスであり、
@@ -148,7 +152,7 @@ public class Device {
      *
      * @param url URLパス情報
      * @return 正規化したURL
-     * @throws MalformedURLException
+     * @throws MalformedURLException 不正なURL
      */
     @Nonnull
     URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
@@ -174,17 +178,32 @@ public class Device {
     }
 
     /**
+     * HttpClientのファクトリークラスを変更する。
+     *
+     * @param factory ファクトリークラス
+     */
+    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
+        mHttpClientFactory = factory;
+    }
+
+    @Nonnull
+    private HttpClient createHttpClient() {
+        return mHttpClientFactory.createHttpClient(true);
+    }
+
+    /**
      * DeviceDescriptionを読み込む。
      *
-     * Descriptionのパース後、そこに記述されている
+     * <p>Descriptionのパース後、そこに記述されている
      * icon/serviceのDescriptionの読み込みパースもまとめて行う。
      *
      * @throws IOException 通信上での何らかの問題
      * @throws SAXException XMLのパースに失敗
      * @throws ParserConfigurationException XMLパーサが利用できない場合
      */
-    void loadDescription() throws IOException, SAXException, ParserConfigurationException {
-        final HttpClient client = new HttpClient(true);
+    void loadDescription(@Nonnull IconFilter filter)
+            throws IOException, SAXException, ParserConfigurationException {
+        final HttpClient client = createHttpClient();
         final URL url = new URL(getLocation());
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
@@ -192,15 +211,16 @@ public class Device {
         request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK) {
+        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
             Log.i(TAG, response.toString());
             client.close();
             throw new IOException(response.getStartLine());
         }
         mDescription = response.getBody();
         parseDescription(mDescription);
-        if (Property.isGetIconOnLoadDescription()) {
-            for (final Icon icon : mIconList) {
+        if (!mIconList.isEmpty()) {
+            final List<Icon> loadList = filter.filter(mIconList);
+            for (final Icon icon : loadList) {
                 icon.loadBinary(client);
             }
         }
@@ -216,7 +236,7 @@ public class Device {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            if ("icon".equals(node.getLocalName())) {
+            if (TextUtils.equals(node.getLocalName(), "icon")) {
                 mIconList.add(parseIcon((Element) node));
             }
         }
@@ -231,16 +251,28 @@ public class Device {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("mimetype".equals(tag)) {
-                icon.setMimeType(node.getTextContent());
-            } else if ("height".equals(tag)) {
-                icon.setHeight(node.getTextContent());
-            } else if ("width".equals(tag)) {
-                icon.setWidth(node.getTextContent());
-            } else if ("depth".equals(tag)) {
-                icon.setDepth(node.getTextContent());
-            } else if ("url".equals(tag)) {
-                icon.setUrl(node.getTextContent());
+            if (tag == null) {
+                continue;
+            }
+            final String text = node.getTextContent();
+            switch (tag) {
+                case "mimetype":
+                    icon.setMimeType(text);
+                    break;
+                case "height":
+                    icon.setHeight(text);
+                    break;
+                case "width":
+                    icon.setWidth(text);
+                    break;
+                case "depth":
+                    icon.setDepth(text);
+                    break;
+                case "url":
+                    icon.setUrl(text);
+                    break;
+                default:
+                    break;
             }
         }
         return icon.build();
@@ -252,7 +284,7 @@ public class Device {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            if ("service".equals(node.getLocalName())) {
+            if (TextUtils.equals(node.getLocalName(), "service")) {
                 mServiceList.add(parseService((Element) node));
             }
         }
@@ -268,16 +300,28 @@ public class Device {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("serviceType".equals(tag)) {
-                service.setServiceType(node.getTextContent());
-            } else if ("serviceId".equals(tag)) {
-                service.setServiceId(node.getTextContent());
-            } else if ("SCPDURL".equals(tag)) {
-                service.setScpdUrl(node.getTextContent());
-            } else if ("eventSubURL".equals(tag)) {
-                service.setEventSubUrl(node.getTextContent());
-            } else if ("controlURL".equals(tag)) {
-                service.setControlUrl(node.getTextContent());
+            if (tag == null) {
+                continue;
+            }
+            final String text = node.getTextContent();
+            switch (tag) {
+                case "serviceType":
+                    service.setServiceType(text);
+                    break;
+                case "serviceId":
+                    service.setServiceId(text);
+                    break;
+                case "SCPDURL":
+                    service.setScpdUrl(text);
+                    break;
+                case "eventSubURL":
+                    service.setEventSubUrl(text);
+                    break;
+                case "controlURL":
+                    service.setControlUrl(text);
+                    break;
+                default:
+                    break;
             }
         }
         try {
@@ -289,65 +333,40 @@ public class Device {
 
     private void parseDescription(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        final DocumentBuilder db = dbf.newDocumentBuilder();
-        final Document doc = db.parse(new InputSource(new StringReader(xml)));
-        Node n = doc.getDocumentElement().getFirstChild();
-        for (; n != null; n = n.getNextSibling()) {
-            if (n.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("device".equals(n.getLocalName())) {
-                break;
-            }
-        }
-        if (n == null) {
+        final Document doc = XmlUtils.newDocument(xml);
+        final Node device =
+                XmlUtils.findChildElementByLocalName(doc.getDocumentElement(), "device");
+        if (device == null) {
             return;
         }
-        Node node = n.getFirstChild();
+        Node node = device.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("iconList".equals(tag)) {
-                parseIconList(node);
-            } else if ("serviceList".equals(tag)) {
-                parseServiceList(node);
-            } else {
-                String ns = node.getNamespaceURI();
-                ns = ns == null ? "" : ns;
-                final String text = node.getTextContent();
-                Map<String, String> nsmap = mTagMap.get(ns);
-                if (nsmap == null) {
-                    nsmap = new HashMap<>();
-                    mTagMap.put(ns, nsmap);
-                }
-                nsmap.put(tag, node.getTextContent());
-                if ("UDN".equals(tag)) {
-                    mUdn = text;
-                } else if ("deviceType".equals(tag)) {
-                    mDeviceType = text;
-                } else if ("friendlyName".equals(tag)) {
-                    mFriendlyName = text;
-                } else if ("manufacturer".equals(tag)) {
-                    mManufacture = text;
-                } else if ("manufacturerURL".equals(tag)) {
-                    mManufactureUrl = text;
-                } else if ("modelName".equals(tag)) {
-                    mModelName = text;
-                } else if ("modelURL".equals(tag)) {
-                    mModelUrl = text;
-                } else if ("modelDescription".equals(tag)) {
-                    mModelDescription = text;
-                } else if ("modelNumber".equals(tag)) {
-                    mModelNumber = text;
-                } else if ("serialNumber".equals(tag)) {
-                    mSerialNumber = text;
-                } else if ("presentationURL".equals(tag)) {
-                    mPresentationUrl = text;
-                }
+            if (tag == null) {
+                continue;
+            }
+            switch (tag) {
+                case "iconList":
+                    parseIconList(node);
+                    break;
+                case "serviceList":
+                    parseServiceList(node);
+                    break;
+                default:
+                    String ns = node.getNamespaceURI();
+                    ns = ns == null ? "" : ns;
+                    final String text = node.getTextContent();
+                    Map<String, String> nsMap = mTagMap.get(ns);
+                    if (nsMap == null) {
+                        nsMap = new HashMap<>();
+                        mTagMap.put(ns, nsMap);
+                    }
+                    nsMap.put(tag, node.getTextContent());
+                    setField(tag, text);
+                    break;
             }
         }
         if (mDeviceType == null) {
@@ -367,10 +386,50 @@ public class Device {
         }
     }
 
+    private void setField(@Nonnull String tag, @Nullable String value) {
+        switch (tag) {
+            case "UDN":
+                mUdn = value;
+                break;
+            case "deviceType":
+                mDeviceType = value;
+                break;
+            case "friendlyName":
+                mFriendlyName = value;
+                break;
+            case "manufacturer":
+                mManufacture = value;
+                break;
+            case "manufacturerURL":
+                mManufactureUrl = value;
+                break;
+            case "modelName":
+                mModelName = value;
+                break;
+            case "modelURL":
+                mModelUrl = value;
+                break;
+            case "modelDescription":
+                mModelDescription = value;
+                break;
+            case "modelNumber":
+                mModelNumber = value;
+                break;
+            case "serialNumber":
+                mSerialNumber = value;
+                break;
+            case "presentationURL":
+                mPresentationUrl = value;
+                break;
+            default:
+                break;
+        }
+    }
+
     /**
      * Descriptionに記述されていたタグの値を取得する。
      *
-     * 個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
+     * <p>個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
      * 標準外のタグについても取得できるが、属性値の取得方法は提供されない。
      * また同一タグが複数記述されている場合は最後に記述されていた値が取得される。
      * タグ名にネームスペースプレフィックスは含まない。
@@ -394,7 +453,7 @@ public class Device {
     /**
      * Descriptionに記述されていたタグの値を取得する。
      *
-     * 個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
+     * <p>個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
      * 標準外のタグについても取得できるが、属性値の取得方法は提供されない、
      * また同一タグが複数記述されている場合は最後に記述されていた値が取得される。
      * ネームスペースはプレフィックスではなく、URIを指定する。
@@ -406,11 +465,11 @@ public class Device {
      */
     @Nullable
     public String getValue(@Nonnull String name, @Nonnull String namespace) {
-        final Map<String, String> nsmap = mTagMap.get(namespace);
-        if (nsmap == null) {
+        final Map<String, String> map = mTagMap.get(namespace);
+        if (map == null) {
             return null;
         }
-        return nsmap.get(name);
+        return map.get(name);
     }
 
     /**
@@ -426,7 +485,7 @@ public class Device {
     /**
      * Locationに記述のIPアドレスを返す。
      *
-     * 記述に異常がある場合は空文字が返る。
+     * <p>記述に異常がある場合は空文字が返る。
      *
      * @return IPアドレス
      */
@@ -443,7 +502,7 @@ public class Device {
     /**
      * UDNタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return UDNタグの値
      */
@@ -455,7 +514,7 @@ public class Device {
     /**
      * deviceTypeタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return deviceTypeタグの値
      */
@@ -467,7 +526,7 @@ public class Device {
     /**
      * friendlyNameタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return friendlyNameタグの値
      */
@@ -479,7 +538,7 @@ public class Device {
     /**
      * manufacturerタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return manufacturerタグの値
      */
@@ -491,7 +550,7 @@ public class Device {
     /**
      * manufacturerURLタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return manufacturerURLタグの値
      */
@@ -503,7 +562,7 @@ public class Device {
     /**
      * modelNameタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return modelNameタグの値
      */
@@ -515,7 +574,7 @@ public class Device {
     /**
      * modelURLタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return modelURLタグの値
      */
@@ -527,7 +586,7 @@ public class Device {
     /**
      * modelDescriptionタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return modelDescriptionタグの値
      */
@@ -539,7 +598,7 @@ public class Device {
     /**
      * modelNumberタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return modelNumberタグの値
      */
@@ -551,7 +610,7 @@ public class Device {
     /**
      * serialNumberタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return serialNumberタグの値
      */
@@ -563,7 +622,7 @@ public class Device {
     /**
      * presentationURLタグの値を返す。
      *
-     * 値が存在しない場合nullが返る。
+     * <p>値が存在しない場合nullが返る。
      *
      * @return presentationURLタグの値
      */
@@ -597,7 +656,7 @@ public class Device {
     /**
      * 指定文字列とServiceIDが合致するサービスを返す。
      *
-     * 見つからない場合はnullを返す。
+     * <p>見つからない場合はnullを返す。
      *
      * @param id サーチするID
      * @return 見つかったService
@@ -616,7 +675,7 @@ public class Device {
     /**
      * 指定文字列とServiceTypeが合致するサービスを返す。
      *
-     * 見つからない場合はnullを返す。
+     * <p>見つからない場合はnullを返す。
      *
      * @param type サーチするType
      * @return 見つかったService
@@ -635,10 +694,10 @@ public class Device {
     /**
      * 指定文字列の名前を持つActionを返す。
      *
-     * 全サービスに対して検索をかけ、最初に見つかったものを返す。
+     * <p>全サービスに対して検索をかけ、最初に見つかったものを返す。
      * 見つからない場合はnullを返す。
      *
-     * 特定のサービスのActionを取得したい場合は、
+     * <p>特定のサービスのActionを取得したい場合は、
      * {@link #findServiceById(String)} もしくは
      * {@link #findServiceByType(String)} を使用してServiceを取得した後、
      * {@link Service#findAction(String)} を使用する。
@@ -665,7 +724,7 @@ public class Device {
     }
 
     @Override
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (obj == this) {
             return true;
         }
@@ -673,7 +732,7 @@ public class Device {
             return false;
         }
         final Device d = (Device) obj;
-        return mUdn.equals(d.getUdn());
+        return mUdn != null && mUdn.equals(d.getUdn());
     }
 
     @Override
