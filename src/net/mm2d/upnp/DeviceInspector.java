@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -22,7 +23,7 @@ import javax.annotation.Nonnull;
  */
 class DeviceInspector extends Thread {
     private static final String TAG = DeviceInspector.class.getSimpleName();
-    private static final long MARGIN_TIME = 10000;
+    private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
     @Nonnull
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;

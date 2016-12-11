@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * ライブラリのプロパティ情報を管理するクラス。
  *
@@ -26,9 +28,11 @@ public final class Property {
      */
     public static final String UPNP_VERSION = "UPnP/1.0";
     /**
-     * デフォルトタイムアウト値（30秒）
+     * デフォルトタイムアウト値[ms]（30秒）
+     *
+     * {@link java.net.Socket#setSoTimeout(int)}に渡すためint値で定義
      */
-    public static final int DEFAULT_TIMEOUT = 30000;
+    public static final int DEFAULT_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(30);
 
     // SystemプロパティからOS名とバージョン番号を取得する
     static {

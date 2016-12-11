@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -22,8 +23,8 @@ import javax.annotation.Nonnull;
  */
 class SubscribeKeeper extends Thread {
     private static final String TAG = SubscribeKeeper.class.getSimpleName();
-    private static final long MARGIN_TIME = 10000;
-    private static final long MIN_INTERVAL = 1000;
+    private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
+    private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;
     private final List<Service> mServiceList;
