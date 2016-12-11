@@ -49,7 +49,7 @@ public class Action {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      * @see Service#loadDescription(HttpClient)
      */
     public static class Builder {
@@ -70,6 +70,7 @@ public class Action {
          * @param service このActionを保持するService
          * @return Builder
          */
+        @Nonnull
         public Builder setService(@Nonnull Service service) {
             mService = service;
             return this;
@@ -81,6 +82,7 @@ public class Action {
          * @param name Action名
          * @return Builder
          */
+        @Nonnull
         public Builder setName(@Nonnull String name) {
             mName = name;
             return this;
@@ -94,6 +96,7 @@ public class Action {
          * @param argument Argumentのビルダー
          * @return Builder
          */
+        @Nonnull
         public Builder addArgumentBuilder(@Nonnull Argument.Builder argument) {
             mArgumentList.add(argument);
             return this;
@@ -129,10 +132,14 @@ public class Action {
 
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
+    @Nonnull
     private final Service mService;
+    @Nonnull
     private final String mName;
+    @Nonnull
     private final Map<String, Argument> mArgumentMap;
     private List<Argument> mArgumentList;
+    @Nonnull
     private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     private Action(@Nonnull Builder builder) {
@@ -192,10 +199,11 @@ public class Action {
      *
      * @param factory ファクトリークラス
      */
-    void setHttpClientFactory(HttpClientFactory factory) {
+    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }
 
+    @Nonnull
     private HttpClient createHttpClient() {
         return mHttpClientFactory.createHttpClient(false);
     }

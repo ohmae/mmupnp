@@ -51,16 +51,23 @@ public abstract class SsdpMessage {
      */
     public static final String SSDP_DISCOVER = "\"ssdp:discover\"";
 
+    @Nonnull
     private final HttpMessage mMessage;
     private static final int DEFAULT_MAX_AGE = 1800;
-    private int mMaxAge;
-    private long mExpireTime;
-    private String mUuid;
-    private String mType;
-    private String mNts;
-    private String mLocation;
-    private InetAddress mPacketAddress;
-    private InterfaceAddress mInterfaceAddress;
+    private final int mMaxAge;
+    private final long mExpireTime;
+    @Nonnull
+    private final String mUuid;
+    @Nonnull
+    private final String mType;
+    @Nullable
+    private final String mNts;
+    @Nullable
+    private final String mLocation;
+    @Nullable
+    private final InetAddress mPacketAddress;
+    @Nullable
+    private final InterfaceAddress mInterfaceAddress;
 
     /**
      * 内部表現としての{@link HttpMessage}のインスタンスを作成する。
@@ -87,6 +94,14 @@ public abstract class SsdpMessage {
      */
     public SsdpMessage() {
         mMessage = newMessage();
+        mMaxAge = 0;
+        mExpireTime = 0;
+        mUuid = "";
+        mType = "";
+        mNts = "";
+        mLocation = "";
+        mPacketAddress = null;
+        mInterfaceAddress = null;
     }
 
     /**
@@ -100,9 +115,44 @@ public abstract class SsdpMessage {
             throws IOException {
         mMessage = newMessage();
         mInterfaceAddress = ifa;
-        mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
-        parseMessage();
         mPacketAddress = dp.getAddress();
+        mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
+        mMaxAge = parseCacheControl(mMessage);
+        final String[] result = parseUsn(mMessage);
+        mUuid = result[0];
+        mType = result[1];
+        mExpireTime = mMaxAge * 1000 + System.currentTimeMillis();
+        mLocation = mMessage.getHeader(Http.LOCATION);
+        mNts = mMessage.getHeader(Http.NTS);
+    }
+
+    private static int parseCacheControl(@Nonnull HttpMessage message) {
+        final String age = TextUtils.toLowerCase(message.getHeader(Http.CACHE_CONTROL));
+        if (TextUtils.isEmpty(age) || !age.startsWith("max-age")) {
+            return DEFAULT_MAX_AGE;
+        }
+        final int pos = age.indexOf('=');
+        if (pos < 0 || pos + 1 == age.length()) {
+            return DEFAULT_MAX_AGE;
+        }
+        try {
+             return Integer.parseInt(age.substring(pos + 1));
+        } catch (final NumberFormatException ignored) {
+        }
+        return DEFAULT_MAX_AGE;
+    }
+
+    @Nonnull
+    private static String[] parseUsn(@Nonnull HttpMessage message) throws IOException {
+        final String usn = message.getHeader(Http.USN);
+        if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
+            throw new IOException("");
+        }
+        final int pos = usn.indexOf("::");
+        if (pos < 0) {
+            return new String[] {usn, ""};
+        }
+        return new String[] {usn.substring(0, pos), usn.substring(pos + 2)};
     }
 
     /**
@@ -123,54 +173,14 @@ public abstract class SsdpMessage {
         return false;
     }
 
-    private void parseMessage() {
-        parseCacheControl();
-        parseUsn();
-        mExpireTime = mMaxAge * 1000 + System.currentTimeMillis();
-        mLocation = mMessage.getHeader(Http.LOCATION);
-        mNts = mMessage.getHeader(Http.NTS);
-    }
-
     /**
      * このパケットを受信したInterfaceAddressを返す。
      *
      * @return このパケットを受信したInterfaceAddress
      */
-    @Nonnull
+    @Nullable
     public InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
-    }
-
-    private void parseCacheControl() {
-        mMaxAge = DEFAULT_MAX_AGE;
-        final String age = TextUtils.toLowerCase(mMessage.getHeader(Http.CACHE_CONTROL));
-        if (TextUtils.isEmpty(age) || !age.startsWith("max-age")) {
-            return;
-        }
-        final int pos = age.indexOf('=');
-        if (pos < 0 || pos + 1 == age.length()) {
-            return;
-        }
-        try {
-            mMaxAge = Integer.parseInt(age.substring(pos + 1));
-        } catch (final NumberFormatException ignored) {
-        }
-    }
-
-    private void parseUsn() {
-        final String usn = mMessage.getHeader(Http.USN);
-        if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
-            return;
-        }
-        final int pos = usn.indexOf("::");
-        if (pos < 0) {
-            mUuid = usn;
-            return;
-        }
-        mUuid = usn.substring(0, pos);
-        if (pos + 2 < usn.length()) {
-            mType = usn.substring(pos + 2);
-        }
     }
 
     /**
@@ -199,7 +209,7 @@ public abstract class SsdpMessage {
      *
      * @return UUID
      */
-    @Nullable
+    @Nonnull
     public String getUuid() {
         return mUuid;
     }
@@ -209,7 +219,7 @@ public abstract class SsdpMessage {
      *
      * @return Type
      */
-    @Nullable
+    @Nonnull
     public String getType() {
         return mType;
     }
@@ -217,7 +227,7 @@ public abstract class SsdpMessage {
     /**
      * NTSフィールドの値を返す。
      *
-     * @return NSTフィールドの値
+     * @return NTSフィールドの値
      */
     @Nullable
     public String getNts() {

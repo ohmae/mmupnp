@@ -78,11 +78,11 @@ public class HttpResponse extends HttpMessage {
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
     public void setStatusCode(int code) {
-        mStatusCode = code;
         mStatus = Http.Status.valueOf(code);
         if (mStatus == null) {
             throw new IllegalArgumentException("unexpected status code:" + code);
         }
+        mStatusCode = code;
         mReasonPhrase = mStatus.getPhrase();
     }
 

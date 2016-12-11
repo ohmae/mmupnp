@@ -19,7 +19,7 @@ public class Argument {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      * @see Service#loadDescription(HttpClient)
      * @see Action.Builder
      */
@@ -42,6 +42,7 @@ public class Argument {
          * @param action このArgumentを保持するAction
          * @return Builder
          */
+        @Nonnull
         public Builder setAction(@Nonnull Action action) {
             mAction = action;
             return this;
@@ -53,6 +54,7 @@ public class Argument {
          * @param name Argument名
          * @return Builder
          */
+        @Nonnull
         public Builder setName(@Nonnull String name) {
             mName = name;
             return this;
@@ -66,6 +68,7 @@ public class Argument {
          * @param direction Directionの値
          * @return Builder
          */
+        @Nonnull
         public Builder setDirection(@Nonnull String direction) {
             mInputDirection = "in".equalsIgnoreCase(direction);
             return this;
@@ -77,6 +80,7 @@ public class Argument {
          * @param name RelatedStateVariableの値
          * @return Builder
          */
+        @Nonnull
         public Builder setRelatedStateVariableName(@Nonnull String name) {
             mRelatedStateVariableName = name;
             return this;
@@ -98,6 +102,7 @@ public class Argument {
          * @param variable StateVariableのインスタンス
          * @return Builder
          */
+        @Nonnull
         public Builder setRelatedStateVariable(@Nonnull StateVariable variable) {
             mRelatedStateVariable = variable;
             return this;
@@ -109,7 +114,7 @@ public class Argument {
          * @return Argumentのインスタンス
          * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
-        @Nullable
+        @Nonnull
         public Argument build() throws IllegalStateException {
             if (mAction == null) {
                 throw new IllegalStateException("action must be set.");

@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import javax.annotation.Nonnull;
+
 /**
  * HttpClientを作成するファクトリークラス。
  *
@@ -20,6 +22,7 @@ public class HttpClientFactory {
      * @return HttpClientのインスタンス
      * @see HttpClient#HttpClient(boolean)
      */
+    @Nonnull
     public HttpClient createHttpClient(boolean keepAlive) {
         return new HttpClient(keepAlive);
     }

@@ -36,24 +36,4 @@ public final class Property {
         final String ver = System.getProperty("os.version");
         OS_VERSION = os + "/" + ver;
     }
-
-    private static boolean sGetIconOnLoadDescription = false;
-
-    /**
-     * DeviceDescriptionのパース時にアイコンを読み込むかを返す
-     *
-     * @return trueの場合読み込む
-     */
-    static boolean isGetIconOnLoadDescription() {
-        return sGetIconOnLoadDescription;
-    }
-
-    /**
-     * DeviceDescriptionのパース時にアイコンを読み込むかを設定する。
-     *
-     * @param getIcon 読み込む場合true
-     */
-    public static void setGetIconOnLoadDescription(boolean getIcon) {
-        sGetIconOnLoadDescription = getIcon;
-    }
 }

@@ -40,6 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class Device {
     private static final String TAG = Device.class.getSimpleName();
+    @Nonnull
     private final ControlPoint mControlPoint;
     private SsdpMessage mSsdp;
     private String mDescription;
@@ -54,9 +55,13 @@ public class Device {
     private String mModelNumber;
     private String mSerialNumber;
     private String mPresentationUrl;
+    @Nonnull
     private final Map<String, Map<String, String>> mTagMap;
+    @Nonnull
     private final List<Icon> mIconList;
+    @Nonnull
     private final List<Service> mServiceList;
+    @Nonnull
     private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     /**
@@ -177,10 +182,11 @@ public class Device {
      *
      * @param factory ファクトリークラス
      */
-    void setHttpClientFactory(HttpClientFactory factory) {
+    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }
 
+    @Nonnull
     private HttpClient createHttpClient() {
         return mHttpClientFactory.createHttpClient(true);
     }
@@ -195,7 +201,8 @@ public class Device {
      * @throws SAXException XMLのパースに失敗
      * @throws ParserConfigurationException XMLパーサが利用できない場合
      */
-    void loadDescription() throws IOException, SAXException, ParserConfigurationException {
+    void loadDescription(@Nonnull IconFilter filter)
+            throws IOException, SAXException, ParserConfigurationException {
         final HttpClient client = createHttpClient();
         final URL url = new URL(getLocation());
         final HttpRequest request = new HttpRequest();
@@ -211,10 +218,9 @@ public class Device {
         }
         mDescription = response.getBody();
         parseDescription(mDescription);
-        if (Property.isGetIconOnLoadDescription()) {
-            for (final Icon icon : mIconList) {
-                icon.loadBinary(client);
-            }
+        final List<Icon> loadList = filter.filter(mIconList);
+        for (final Icon icon : loadList) {
+            icon.loadBinary(client);
         }
         for (final Service service : mServiceList) {
             service.loadDescription(client);
@@ -228,7 +234,7 @@ public class Device {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            if ("icon".equals(node.getLocalName())) {
+            if (TextUtils.equals(node.getLocalName(), "icon")) {
                 mIconList.add(parseIcon((Element) node));
             }
         }
@@ -243,16 +249,28 @@ public class Device {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("mimetype".equals(tag)) {
-                icon.setMimeType(node.getTextContent());
-            } else if ("height".equals(tag)) {
-                icon.setHeight(node.getTextContent());
-            } else if ("width".equals(tag)) {
-                icon.setWidth(node.getTextContent());
-            } else if ("depth".equals(tag)) {
-                icon.setDepth(node.getTextContent());
-            } else if ("url".equals(tag)) {
-                icon.setUrl(node.getTextContent());
+            if (tag == null) {
+                continue;
+            }
+            final String text = node.getTextContent();
+            switch (tag) {
+                case "mimetype":
+                    icon.setMimeType(text);
+                    break;
+                case "height":
+                    icon.setHeight(text);
+                    break;
+                case "width":
+                    icon.setWidth(text);
+                    break;
+                case "depth":
+                    icon.setDepth(text);
+                    break;
+                case "url":
+                    icon.setUrl(text);
+                    break;
+                default:
+                    break;
             }
         }
         return icon.build();
@@ -264,7 +282,7 @@ public class Device {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            if ("service".equals(node.getLocalName())) {
+            if (TextUtils.equals(node.getLocalName(), "service")) {
                 mServiceList.add(parseService((Element) node));
             }
         }
@@ -280,16 +298,28 @@ public class Device {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("serviceType".equals(tag)) {
-                service.setServiceType(node.getTextContent());
-            } else if ("serviceId".equals(tag)) {
-                service.setServiceId(node.getTextContent());
-            } else if ("SCPDURL".equals(tag)) {
-                service.setScpdUrl(node.getTextContent());
-            } else if ("eventSubURL".equals(tag)) {
-                service.setEventSubUrl(node.getTextContent());
-            } else if ("controlURL".equals(tag)) {
-                service.setControlUrl(node.getTextContent());
+            if (tag == null) {
+                continue;
+            }
+            final String text = node.getTextContent();
+            switch (tag) {
+                case "serviceType":
+                    service.setServiceType(text);
+                    break;
+                case "serviceId":
+                    service.setServiceId(text);
+                    break;
+                case "SCPDURL":
+                    service.setScpdUrl(text);
+                    break;
+                case "eventSubURL":
+                    service.setEventSubUrl(text);
+                    break;
+                case "controlURL":
+                    service.setControlUrl(text);
+                    break;
+                default:
+                    break;
             }
         }
         try {
@@ -313,44 +343,28 @@ public class Device {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("iconList".equals(tag)) {
-
-                parseIconList(node);
-            } else if ("serviceList".equals(tag)) {
-                parseServiceList(node);
-            } else {
-                String ns = node.getNamespaceURI();
-                ns = ns == null ? "" : ns;
-                final String text = node.getTextContent();
-                Map<String, String> nsmap = mTagMap.get(ns);
-                if (nsmap == null) {
-                    nsmap = new HashMap<>();
-                    mTagMap.put(ns, nsmap);
-                }
-                nsmap.put(tag, node.getTextContent());
-                if ("UDN".equals(tag)) {
-                    mUdn = text;
-                } else if ("deviceType".equals(tag)) {
-                    mDeviceType = text;
-                } else if ("friendlyName".equals(tag)) {
-                    mFriendlyName = text;
-                } else if ("manufacturer".equals(tag)) {
-                    mManufacture = text;
-                } else if ("manufacturerURL".equals(tag)) {
-                    mManufactureUrl = text;
-                } else if ("modelName".equals(tag)) {
-                    mModelName = text;
-                } else if ("modelURL".equals(tag)) {
-                    mModelUrl = text;
-                } else if ("modelDescription".equals(tag)) {
-                    mModelDescription = text;
-                } else if ("modelNumber".equals(tag)) {
-                    mModelNumber = text;
-                } else if ("serialNumber".equals(tag)) {
-                    mSerialNumber = text;
-                } else if ("presentationURL".equals(tag)) {
-                    mPresentationUrl = text;
-                }
+            if (tag == null) {
+                continue;
+            }
+            switch (tag) {
+                case "iconList":
+                    parseIconList(node);
+                    break;
+                case "serviceList":
+                    parseServiceList(node);
+                    break;
+                default:
+                    String ns = node.getNamespaceURI();
+                    ns = ns == null ? "" : ns;
+                    final String text = node.getTextContent();
+                    Map<String, String> nsMap = mTagMap.get(ns);
+                    if (nsMap == null) {
+                        nsMap = new HashMap<>();
+                        mTagMap.put(ns, nsMap);
+                    }
+                    nsMap.put(tag, node.getTextContent());
+                    setField(tag, text);
+                    break;
             }
         }
         if (mDeviceType == null) {
@@ -367,6 +381,46 @@ public class Device {
         }
         if (mUdn == null) {
             throw new IOException("UDN must be set.");
+        }
+    }
+
+    private void setField(@Nonnull String tag, @Nullable String value) {
+        switch (tag) {
+            case "UDN":
+                mUdn = value;
+                break;
+            case "deviceType":
+                mDeviceType = value;
+                break;
+            case "friendlyName":
+                mFriendlyName = value;
+                break;
+            case "manufacturer":
+                mManufacture = value;
+                break;
+            case "manufacturerURL":
+                mManufactureUrl = value;
+                break;
+            case "modelName":
+                mModelName = value;
+                break;
+            case "modelURL":
+                mModelUrl = value;
+                break;
+            case "modelDescription":
+                mModelDescription = value;
+                break;
+            case "modelNumber":
+                mModelNumber = value;
+                break;
+            case "serialNumber":
+                mSerialNumber = value;
+                break;
+            case "presentationURL":
+                mPresentationUrl = value;
+                break;
+            default:
+                break;
         }
     }
 
@@ -409,11 +463,11 @@ public class Device {
      */
     @Nullable
     public String getValue(@Nonnull String name, @Nonnull String namespace) {
-        final Map<String, String> nsmap = mTagMap.get(namespace);
-        if (nsmap == null) {
+        final Map<String, String> map = mTagMap.get(namespace);
+        if (map == null) {
             return null;
         }
-        return nsmap.get(name);
+        return map.get(name);
     }
 
     /**
@@ -676,7 +730,7 @@ public class Device {
             return false;
         }
         final Device d = (Device) obj;
-        return mUdn.equals(d.getUdn());
+        return mUdn != null && mUdn.equals(d.getUdn());
     }
 
     @Override

@@ -42,7 +42,9 @@ abstract class SsdpServer {
     private static final InetSocketAddress SSDP_SO_ADDR =
             new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
     private static final InetAddress SSDP_INET_ADDR = SSDP_SO_ADDR.getAddress();
+    @Nonnull
     private final NetworkInterface mInterface;
+    @Nonnull
     private InterfaceAddress mInterfaceAddress;
     private final int mBindPort;
     private MulticastSocket mSocket;
@@ -68,16 +70,18 @@ abstract class SsdpServer {
     public SsdpServer(@Nonnull NetworkInterface ni, int bindPort) {
         mBindPort = bindPort;
         mInterface = ni;
+        InterfaceAddress addr = null;
         final List<InterfaceAddress> ifas = mInterface.getInterfaceAddresses();
         for (final InterfaceAddress ifa : ifas) {
             if (ifa.getAddress() instanceof Inet4Address) {
-                mInterfaceAddress = ifa;
+                addr = ifa;
                 break;
             }
         }
-        if (mInterfaceAddress == null) {
+        if (addr == null) {
             throw new IllegalArgumentException("ni does not have IPv4 address.");
         }
+        mInterfaceAddress = addr;
     }
 
     /**

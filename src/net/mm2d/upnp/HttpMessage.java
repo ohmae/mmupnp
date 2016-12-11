@@ -43,11 +43,16 @@ public abstract class HttpMessage {
     private static final String CRLF = "\r\n";
     private static final String CHARSET = "utf-8";
 
+    @Nullable
     private InetAddress mAddress;
     private int mPort;
+    @Nonnull
     private final HttpHeader mHeaders;
+    @Nonnull
     private String mVersion = Http.DEFAULT_HTTP_VERSION;
+    @Nullable
     private byte[] mBodyBinary;
+    @Nullable
     private String mBody;
 
     /**

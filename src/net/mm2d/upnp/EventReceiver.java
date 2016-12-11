@@ -102,7 +102,9 @@ class EventReceiver {
 
     private static class ServerThread extends Thread {
         private volatile boolean mShutdownRequest = false;
+        @Nonnull
         private final ServerSocket mServerSocket;
+        @Nonnull
         private final List<ClientThread> mClientList;
         private EventMessageListener mListener;
 
@@ -180,7 +182,9 @@ class EventReceiver {
     }
 
     private static class ClientThread extends Thread {
+        @Nonnull
         private final ServerThread mServer;
+        @Nonnull
         private final Socket mSocket;
         private static final HttpResponse RESPONSE_OK = new HttpResponse();
         private static final HttpResponse RESPONSE_BAD = new HttpResponse();

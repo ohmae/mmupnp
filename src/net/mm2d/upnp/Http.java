@@ -163,19 +163,19 @@ public final class Http {
         }
     }
 
-    private static final DateFormat sRfc1123Format;
-    private static final DateFormat sRfc1036Format;
-    private static final DateFormat sAscTimeFormat;
+    private static final DateFormat RFC_1123_FORMAT;
+    private static final DateFormat RFC_1036_FORMAT;
+    private static final DateFormat ASC_TIME_FORMAT;
 
     static {
         final Locale locale = Locale.US;
         final TimeZone tz = TimeZone.getTimeZone("GMT");
-        sRfc1123Format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", locale);
-        sRfc1123Format.setTimeZone(tz);
-        sRfc1036Format = new SimpleDateFormat("EEEE, dd-MMM-yy HH:mm:ss z", locale);
-        sRfc1036Format.setTimeZone(tz);
-        sAscTimeFormat = new SimpleDateFormat("E MMM d HH:mm:ss yyyy", locale);
-        sAscTimeFormat.setTimeZone(tz);
+        RFC_1123_FORMAT = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", locale);
+        RFC_1123_FORMAT.setTimeZone(tz);
+        RFC_1036_FORMAT = new SimpleDateFormat("EEEE, dd-MMM-yy HH:mm:ss z", locale);
+        RFC_1036_FORMAT.setTimeZone(tz);
+        ASC_TIME_FORMAT = new SimpleDateFormat("E MMM d HH:mm:ss yyyy", locale);
+        ASC_TIME_FORMAT.setTimeZone(tz);
     }
 
     /**
@@ -190,15 +190,15 @@ public final class Http {
             return null;
         }
         try {
-            return sRfc1123Format.parse(string);
+            return RFC_1123_FORMAT.parse(string);
         } catch (final ParseException ignored) {
         }
         try {
-            return sRfc1036Format.parse(string);
+            return RFC_1036_FORMAT.parse(string);
         } catch (final ParseException ignored) {
         }
         try {
-            return sAscTimeFormat.parse(string);
+            return ASC_TIME_FORMAT.parse(string);
         } catch (final ParseException ignored) {
         }
         return null;
@@ -223,7 +223,7 @@ public final class Http {
      */
     @Nonnull
     public static synchronized String formatDate(@Nonnull Date date) {
-        return sRfc1123Format.format(date);
+        return RFC_1123_FORMAT.format(date);
     }
 
     /**

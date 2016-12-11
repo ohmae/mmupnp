@@ -9,6 +9,7 @@ import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.Device;
+import net.mm2d.upnp.IconFilter;
 import net.mm2d.upnp.Service;
 import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
@@ -103,6 +104,7 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         super();
         mControlPoint = new ControlPoint();
+        mControlPoint.setIconFilter(IconFilter.ALL);
         mControlPoint.initialize();
         mControlPoint.addDiscoveryListener(new DiscoveryListener() {
             @Override

@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -71,10 +72,11 @@ class SsdpNotifyReceiver extends SsdpServer {
         try {
             final SsdpRequestMessage message = new SsdpRequestMessage(addr, dp);
             // M-SEARCHパケットは無視する
-            if (SsdpMessage.M_SEARCH.equals(message.getMethod())) {
+            if (TextUtils.equals(message.getMethod(), SsdpMessage.M_SEARCH)) {
                 return;
             }
-            if (!SsdpMessage.SSDP_BYEBYE.equals(message.getNts())
+            // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
+            if (!TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)
                     && !message.hasValidLocation()) {
                 return;
             }

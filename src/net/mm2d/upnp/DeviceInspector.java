@@ -23,8 +23,10 @@ import javax.annotation.Nonnull;
 class DeviceInspector extends Thread {
     private static final String TAG = DeviceInspector.class.getSimpleName();
     private static final long MARGIN_TIME = 10000;
+    @Nonnull
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;
+    @Nonnull
     private final List<Device> mDeviceList;
     private final Comparator<Device> mComparator = new Comparator<Device>() {
         @Override

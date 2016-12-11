@@ -24,6 +24,7 @@ public class MockHttpClientFactory extends HttpClientFactory {
     }
 
     @Override
+    @Nonnull
     public HttpClient createHttpClient(boolean keepAlive) {
         return new HttpClient() {
             @Nonnull

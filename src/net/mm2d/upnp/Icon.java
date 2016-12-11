@@ -26,7 +26,7 @@ public class Icon {
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      */
     public static class Builder {
         private Device mDevice;
@@ -49,6 +49,7 @@ public class Icon {
          * @param device このIconを保持するDevice
          * @return Builder
          */
+        @Nonnull
         public Builder setDevice(@Nonnull Device device) {
             mDevice = device;
             return this;
@@ -60,6 +61,7 @@ public class Icon {
          * @param mimeType MimeType
          * @return Builder
          */
+        @Nonnull
         public Builder setMimeType(@Nonnull String mimeType) {
             mMimeType = mimeType;
             return this;
@@ -71,6 +73,7 @@ public class Icon {
          * @param height Height
          * @return Builder
          */
+        @Nonnull
         public Builder setHeight(@Nonnull String height) {
             try {
                 mHeight = Integer.parseInt(height);
@@ -86,6 +89,7 @@ public class Icon {
          * @param width Width
          * @return Builder
          */
+        @Nonnull
         public Builder setWidth(@Nonnull String width) {
             try {
                 mWidth = Integer.parseInt(width);
@@ -101,6 +105,7 @@ public class Icon {
          * @param depth Depth
          * @return Builder
          */
+        @Nonnull
         public Builder setDepth(@Nonnull String depth) {
             try {
                 mDepth = Integer.parseInt(depth);
@@ -116,6 +121,7 @@ public class Icon {
          * @param url URL
          * @return Builder
          */
+        @Nonnull
         public Builder setUrl(@Nonnull String url) {
             mUrl = url;
             return this;
@@ -131,6 +137,7 @@ public class Icon {
          * @param binary バイナリ
          * @return Builder
          */
+        @Nonnull
         public Builder setBinary(@Nullable byte[] binary) {
             mBinary = binary;
             return this;
@@ -166,12 +173,16 @@ public class Icon {
         }
     }
 
+    @Nonnull
     private final Device mDevice;
+    @Nonnull
     private final String mMimeType;
     private final int mHeight;
     private final int mWidth;
     private final int mDepth;
+    @Nonnull
     private final String mUrl;
+    @Nullable
     private byte[] mBinary;
 
     private Icon(@Nonnull Builder builder) {
@@ -247,7 +258,7 @@ public class Icon {
      * @param client 通信に使用する{@link HttpClient}
      * @throws IOException 通信エラー
      */
-    public void loadBinary(HttpClient client) throws IOException {
+    public void loadBinary(@Nonnull HttpClient client) throws IOException {
         final URL url = mDevice.getAbsoluteUrl(mUrl);
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);

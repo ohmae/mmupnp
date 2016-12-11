@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 @RunWith(JUnit4.class)
 public class ActionInvokeTest {
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
@@ -103,6 +105,7 @@ public class ActionInvokeTest {
         when(client.post((HttpRequest) any())).thenThrow(IOException.class);
         mAction.setHttpClientFactory(new HttpClientFactory() {
             @Override
+            @Nonnull
             public HttpClient createHttpClient(boolean keepAlive) {
                 return client;
             }

@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * StateVariableを表現するクラス
@@ -22,7 +23,7 @@ public class StateVariable {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      * @see Service#loadDescription(HttpClient)
      */
     public static class Builder {
@@ -50,6 +51,7 @@ public class StateVariable {
          * @param service このStateVariableを保持するService
          * @return Builder
          */
+        @Nonnull
         public Builder setService(@Nonnull Service service) {
             mService = service;
             return this;
@@ -63,6 +65,7 @@ public class StateVariable {
          * @param sendEvents SendEventsの値
          * @return Builder
          */
+        @Nonnull
         public Builder setSendEvents(@Nonnull String sendEvents) {
             mSendEvents = !"no".equalsIgnoreCase(sendEvents);
             return this;
@@ -77,6 +80,7 @@ public class StateVariable {
          * @param multicast Multicastの値
          * @return Builder
          */
+        @Nonnull
         public Builder setMulticast(@Nonnull String multicast) {
             mMulticast = "yes".equalsIgnoreCase(multicast);
             return this;
@@ -88,6 +92,7 @@ public class StateVariable {
          * @param name StateVariable名
          * @return Builder
          */
+        @Nonnull
         public Builder setName(@Nonnull String name) {
             mName = name;
             return this;
@@ -99,6 +104,7 @@ public class StateVariable {
          * @param dataType DataType
          * @return Builder
          */
+        @Nonnull
         public Builder setDataType(@Nonnull String dataType) {
             mDataType = dataType;
             return this;
@@ -110,7 +116,8 @@ public class StateVariable {
          * @param value AllowedValue
          * @return Builder
          */
-        public Builder addAllowedValue(String value) {
+        @Nonnull
+        public Builder addAllowedValue(@Nonnull String value) {
             mAllowedValueList.add(value);
             return this;
         }
@@ -121,7 +128,8 @@ public class StateVariable {
          * @param defaultValue DefaultValue
          * @return Builder
          */
-        public Builder setDefaultValue(String defaultValue) {
+        @Nonnull
+        public Builder setDefaultValue(@Nonnull String defaultValue) {
             mDefaultValue = defaultValue;
             return this;
         }
@@ -132,7 +140,8 @@ public class StateVariable {
          * @param minimum Minimum
          * @return Builder
          */
-        public Builder setMinimum(String minimum) {
+        @Nonnull
+        public Builder setMinimum(@Nonnull String minimum) {
             mMinimum = minimum;
             return this;
         }
@@ -143,7 +152,8 @@ public class StateVariable {
          * @param maximum Maximum
          * @return Builder
          */
-        public Builder setMaximum(String maximum) {
+        @Nonnull
+        public Builder setMaximum(@Nonnull String maximum) {
             mMaximum = maximum;
             return this;
         }
@@ -154,7 +164,8 @@ public class StateVariable {
          * @param step Step
          * @return Builder
          */
-        public Builder setStep(String step) {
+        @Nonnull
+        public Builder setStep(@Nonnull String step) {
             mStep = step;
             return this;
         }
@@ -164,6 +175,7 @@ public class StateVariable {
          *
          * @return StateVariableのインスタンス
          */
+        @Nonnull
         public StateVariable build() {
             if (mService == null) {
                 throw new IllegalStateException("service must be set.");
@@ -178,15 +190,23 @@ public class StateVariable {
         }
     }
 
+    @Nonnull
     private final Service mService;
     private final boolean mSendEvents;
     private final boolean mMulticast;
+    @Nonnull
     private final String mName;
+    @Nonnull
     private final String mDataType;
+    @Nonnull
     private final List<String> mAllowedValueList;
+    @Nullable
     private final String mDefaultValue;
+    @Nullable
     private final String mMinimum;
+    @Nullable
     private final String mMaximum;
+    @Nullable
     private final String mStep;
 
     private StateVariable(Builder builder) {
@@ -316,6 +336,7 @@ public class StateVariable {
      *
      * @return DataType
      */
+    @Nonnull
     public String getDataType() {
         return mDataType;
     }
@@ -327,6 +348,7 @@ public class StateVariable {
      *
      * @return AllowedValueList
      */
+    @Nonnull
     public List<String> getAllowedValueList() {
         return Collections.unmodifiableList(mAllowedValueList);
     }
@@ -336,6 +358,7 @@ public class StateVariable {
      *
      * @return DefaultValue
      */
+    @Nullable
     public String getDefaultValue() {
         return mDefaultValue;
     }
@@ -345,6 +368,7 @@ public class StateVariable {
      *
      * @return Minimum
      */
+    @Nullable
     public String getMinimum() {
         return mMinimum;
     }
@@ -354,6 +378,7 @@ public class StateVariable {
      *
      * @return Maximum
      */
+    @Nullable
     public String getMaximum() {
         return mMaximum;
     }
@@ -363,6 +388,7 @@ public class StateVariable {
      *
      * @return Stepの値
      */
+    @Nullable
     public String getStep() {
         return mStep;
     }

@@ -108,6 +108,7 @@ public class ControlPoint {
                 @Nonnull String variable, @Nonnull String value);
     }
 
+    private IconFilter mIconFilter = IconFilter.NONE;
     @Nonnull
     private final List<DiscoveryListener> mDiscoveryListeners;
     @Nonnull
@@ -141,7 +142,7 @@ public class ControlPoint {
         synchronized (mDeviceMap) {
             Device device = mDeviceMap.get(uuid);
             if (device == null) {
-                if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
+                if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
                     if (mPendingDeviceMap.get(uuid) != null) {
                         mPendingDeviceMap.remove(uuid);
                     }
@@ -159,7 +160,7 @@ public class ControlPoint {
                     }
                 }
             } else {
-                if (SsdpMessage.SSDP_BYEBYE.equals(message.getNts())) {
+                if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
                     lostDevice(device);
                 } else {
                     device.setSsdpMessage(message);
@@ -180,7 +181,7 @@ public class ControlPoint {
         public void run() {
             final String uuid = mDevice.getUuid();
             try {
-                mDevice.loadDescription();
+                mDevice.loadDescription(mIconFilter);
                 synchronized (mDeviceMap) {
                     if (mPendingDeviceMap.get(uuid) != null) {
                         mPendingDeviceMap.remove(uuid);
@@ -188,7 +189,9 @@ public class ControlPoint {
                     }
                 }
             } catch (final IOException | SAXException | ParserConfigurationException e) {
-                mPendingDeviceMap.remove(uuid);
+                synchronized (mDeviceMap) {
+                    mPendingDeviceMap.remove(uuid);
+                }
             }
         }
     }
@@ -226,7 +229,7 @@ public class ControlPoint {
                     if (node.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if ("property".equals(node.getLocalName())) {
+                    if (TextUtils.equals(node.getLocalName(), "property")) {
                         Node c = node.getFirstChild();
                         for (; c != null; c = c.getNextSibling()) {
                             if (c.getNodeType() != Node.ELEMENT_NODE) {
@@ -565,6 +568,17 @@ public class ControlPoint {
     }
 
     /**
+     * ダウンロードするIconを選択するフィルタを設定する。
+     *
+     * @param filter 設定するフィルタ、nullは指定できない。
+     * @see IconFilter#NONE
+     * @see IconFilter#ALL
+     */
+    public void setIconFilter(@Nonnull IconFilter filter) {
+        mIconFilter = filter;
+    }
+
+    /**
      * 機器発見のリスナーを登録する。
      *
      * @param listener リスナー
@@ -705,7 +719,7 @@ public class ControlPoint {
      * @see Device
      */
     @Nullable
-    public Device getDevice(String udn) {
+    public Device getDevice(@Nullable String udn) {
         return mDeviceMap.get(udn);
     }
 

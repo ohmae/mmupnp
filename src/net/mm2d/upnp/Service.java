@@ -42,7 +42,7 @@ public class Service {
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription()
+     * @see Device#loadDescription(IconFilter)
      */
     public static class Builder {
         private Device mDevice;
@@ -64,6 +64,7 @@ public class Service {
          * @param device このServiceを保持するDevice
          * @return Builder
          */
+        @Nonnull
         public Builder setDevice(@Nonnull Device device) {
             mDevice = device;
             return this;
@@ -75,6 +76,7 @@ public class Service {
          * @param serviceType serviceType
          * @return Builder
          */
+        @Nonnull
         public Builder setServiceType(@Nonnull String serviceType) {
             mServiceType = serviceType;
             return this;
@@ -86,6 +88,7 @@ public class Service {
          * @param serviceId serviceId
          * @return Builder
          */
+        @Nonnull
         public Builder setServiceId(@Nonnull String serviceId) {
             mServiceId = serviceId;
             return this;
@@ -97,6 +100,7 @@ public class Service {
          * @param scpdUrl ScpdURL
          * @return Builder
          */
+        @Nonnull
         public Builder setScpdUrl(@Nonnull String scpdUrl) {
             mScpdUrl = scpdUrl;
             return this;
@@ -108,6 +112,7 @@ public class Service {
          * @param controlUrl controlURL
          * @return Builder
          */
+        @Nonnull
         public Builder setControlUrl(@Nonnull String controlUrl) {
             mControlUrl = controlUrl;
             return this;
@@ -119,6 +124,7 @@ public class Service {
          * @param eventSubUrl eventSubURL
          * @return Builder
          */
+        @Nonnull
         public Builder setEventSubUrl(@Nonnull String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
             return this;
@@ -154,21 +160,32 @@ public class Service {
         }
     }
 
+    @Nonnull
     private final ControlPoint mControlPoint;
+    @Nonnull
     private final Device mDevice;
     private String mDescription;
+    @Nonnull
     private final String mServiceType;
+    @Nonnull
     private final String mServiceId;
+    @Nonnull
     private final String mScpdUrl;
+    @Nonnull
     private final String mControlUrl;
+    @Nonnull
     private final String mEventSubUrl;
     private List<Action> mActionList;
+    @Nonnull
     private final Map<String, Action> mActionMap;
     private List<StateVariable> mStateVariableList;
+    @Nonnull
     private final Map<String, StateVariable> mStateVariableMap;
     private long mSubscriptionStart;
     private long mSubscriptionTimeout;
+    @Nullable
     private String mSubscriptionId;
+    @Nonnull
     private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     private Service(@Nonnull Builder builder) {
@@ -376,7 +393,7 @@ public class Service {
 
     private void parseStateVariableList(@Nonnull NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
-            final StateVariable.Builder builder = parseStateVariable((Element) nodeList.item(i));
+            final StateVariable.Builder builder = parseStateVariable(this, (Element) nodeList.item(i));
             final StateVariable variable = builder.build();
             mStateVariableMap.put(variable.getName(), variable);
         }
@@ -392,14 +409,14 @@ public class Service {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("name".equals(tag)) {
+            if (TextUtils.equals(tag, "name")) {
                 builder.setName(node.getTextContent());
-            } else if ("argumentList".equals(tag)) {
+            } else if (TextUtils.equals(tag, "argumentList")) {
                 for (Node c = node.getFirstChild(); c != null; c = c.getNextSibling()) {
                     if (c.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if ("argument".equals(c.getLocalName())) {
+                    if (TextUtils.equals(c.getLocalName(), "argument")) {
                         builder.addArgumentBuilder(parseArgument((Element) c));
                     }
                 }
@@ -417,22 +434,32 @@ public class Service {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("name".equals(tag)) {
-                builder.setName(node.getTextContent());
-            } else if ("direction".equals(tag)) {
-                builder.setDirection(node.getTextContent());
-            } else if ("relatedStateVariable".equals(tag)) {
-                final String text = node.getTextContent();
-                builder.setRelatedStateVariableName(text);
+            if (tag == null) {
+                continue;
+            }
+            final String text = node.getTextContent();
+            switch (tag) {
+                case "name":
+                    builder.setName(text);
+                    break;
+                case "direction":
+                    builder.setDirection(text);
+                    break;
+                case "relatedStateVariable":
+                    builder.setRelatedStateVariableName(text);
+                    break;
+                default:
+                    break;
             }
         }
         return builder;
     }
 
     @Nonnull
-    private StateVariable.Builder parseStateVariable(@Nonnull Element element) {
+    private static StateVariable.Builder parseStateVariable(
+            @Nonnull Service service, @Nonnull Element element) {
         final StateVariable.Builder builder = new StateVariable.Builder();
-        builder.setService(this);
+        builder.setService(service);
         builder.setSendEvents(element.getAttribute("sendEvents"));
         builder.setMulticast(element.getAttribute("multicast"));
         Node node = element.getFirstChild();
@@ -441,40 +468,70 @@ public class Service {
                 continue;
             }
             final String tag = node.getLocalName();
-            if ("name".equals(tag)) {
-                builder.setName(node.getTextContent());
-            } else if ("dataType".equals(tag)) {
-                builder.setDataType(node.getTextContent());
-            } else if ("defaultValue".equals(tag)) {
-                builder.setDefaultValue(node.getTextContent());
-            } else if ("allowedValueList".equals(tag)) {
-                Node child = node.getFirstChild();
-                for (; child != null; child = child.getNextSibling()) {
-                    if (child.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    if ("allowedValue".equals(child.getLocalName())) {
-                        builder.addAllowedValue(child.getTextContent());
-                    }
-                }
-            } else if ("allowedValueRange".equals(tag)) {
-                Node child = node.getFirstChild();
-                for (; child != null; child = child.getNextSibling()) {
-                    if (child.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    final String ctag = child.getLocalName();
-                    if ("step".equals(ctag)) {
-                        builder.setStep(child.getTextContent());
-                    } else if ("minimum".equals(ctag)) {
-                        builder.setMinimum(child.getTextContent());
-                    } else if ("maximum".equals(ctag)) {
-                        builder.setMaximum(child.getTextContent());
-                    }
-                }
+            if (tag == null) {
+                continue;
+            }
+            switch (tag) {
+                case "name":
+                    builder.setName(node.getTextContent());
+                    break;
+                case "dataType":
+                    builder.setDataType(node.getTextContent());
+                    break;
+                case "defaultValue":
+                    builder.setDefaultValue(node.getTextContent());
+                    break;
+                case "allowedValueList":
+                    parseAllowedValueList(builder, (Element) node);
+                    break;
+                case "allowedValueRange":
+                    parseAllowedValueRange(builder, (Element) node);
+                default:
+                    break;
             }
         }
         return builder;
+    }
+
+    private static void parseAllowedValueList(
+            @Nonnull StateVariable.Builder builder, @Nonnull Element element) {
+        Node node = element.getFirstChild();
+        for (; node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            if ("allowedValue".equals(node.getLocalName())) {
+                builder.addAllowedValue(node.getTextContent());
+            }
+        }
+    }
+
+    private static void parseAllowedValueRange(
+            @Nonnull StateVariable.Builder builder, @Nonnull Element element) {
+        Node node = element.getFirstChild();
+        for (; node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            final String tag = node.getLocalName();
+            if (tag == null) {
+                continue;
+            }
+            final String text = node.getTextContent();
+            switch (tag) {
+                case "step":
+                    builder.setStep(text);
+                    break;
+                case "minimum":
+                    builder.setMinimum(text);
+                    break;
+                case "maximum":
+                    builder.setMaximum(text);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @Nonnull
@@ -524,10 +581,11 @@ public class Service {
      *
      * @param factory ファクトリークラス
      */
-    void setHttpClientFactory(HttpClientFactory factory) {
+    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }
 
+    @Nonnull
     private HttpClient createHttpClient() {
         return mHttpClientFactory.createHttpClient(false);
     }
@@ -550,9 +608,6 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean subscribe(boolean keep) throws IOException {
-        if (mEventSubUrl == null) {
-            return false;
-        }
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
         final URL url = getAbsoluteUrl(mEventSubUrl);
@@ -619,7 +674,7 @@ public class Service {
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = getTimeout(response);
-        if (TextUtils.isEmpty(sid) || !sid.equals(mSubscriptionId) || timeout == 0) {
+        if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
             System.out.println(response.toString());
             return false;
         }
