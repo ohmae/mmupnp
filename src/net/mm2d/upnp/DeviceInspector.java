@@ -96,11 +96,11 @@ class DeviceInspector extends Thread {
                 while (mDeviceList.size() == 0) {
                     wait();
                 }
-                final long current = System.currentTimeMillis();
+                final long now = System.currentTimeMillis();
                 final Iterator<Device> i = mDeviceList.iterator();
                 while (i.hasNext()) {
                     final Device device = i.next();
-                    if (device.getExpireTime() < current) {
+                    if (device.getExpireTime() < now) {
                         i.remove();
                         mControlPoint.lostDevice(device, false);
                     } else {
@@ -109,7 +109,7 @@ class DeviceInspector extends Thread {
                 }
                 if (mDeviceList.size() != 0) {
                     final Device device = mDeviceList.get(0);
-                    final long sleep = device.getExpireTime() - current + MARGIN_TIME;
+                    final long sleep = device.getExpireTime() - now + MARGIN_TIME;
                     wait(sleep);
                 }
             }

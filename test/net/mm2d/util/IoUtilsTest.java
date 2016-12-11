@@ -72,7 +72,7 @@ public class IoUtilsTest {
     }
 
     @Test
-    public void closeQuietly_DatagramSocket_closeがコールされる() throws IOException {
+    public void closeQuietly_DatagramSocket_closeがコールされる() {
         final DatagramSocket datagramSocket = mock(DatagramSocket.class);
         IoUtils.closeQuietly(datagramSocket);
         verify(datagramSocket).close();

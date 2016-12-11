@@ -218,9 +218,11 @@ public class Device {
         }
         mDescription = response.getBody();
         parseDescription(mDescription);
-        final List<Icon> loadList = filter.filter(mIconList);
-        for (final Icon icon : loadList) {
-            icon.loadBinary(client);
+        if (!mIconList.isEmpty()) {
+            final List<Icon> loadList = filter.filter(mIconList);
+            for (final Icon icon : loadList) {
+                icon.loadBinary(client);
+            }
         }
         for (final Service service : mServiceList) {
             service.loadDescription(client);
