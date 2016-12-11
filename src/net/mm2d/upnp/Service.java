@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -160,6 +161,7 @@ public class Service {
         }
     }
 
+    private static final long DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300);
     @Nonnull
     private final ControlPoint mControlPoint;
     @Nonnull
@@ -557,24 +559,24 @@ public class Service {
     private static long parseTimeout(@Nonnull HttpResponse response) {
         final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
         if (TextUtils.isEmpty(timeout)) {
-            return 0;
+            return DEFAULT_SUBSCRIPTION_TIMEOUT;
         }
-        if (timeout.contains("infinite")) {
-            return -1;
+        if (timeout.contains("infinite")) { // UPnP2.0でdeprecated扱い、有限な値にする。
+            return DEFAULT_SUBSCRIPTION_TIMEOUT;
         }
         final String prefix = "second-";
         final int pos = timeout.indexOf(prefix);
         if (pos < 0) {
-            return 0;
+            return DEFAULT_SUBSCRIPTION_TIMEOUT;
         }
         final String secondSection = timeout.substring(pos + prefix.length());
         try {
             final int second = Integer.parseInt(secondSection);
-            return second * 1000L;
+            return TimeUnit.SECONDS.toMillis(second);
         } catch (final NumberFormatException e) {
             Log.w(TAG, e);
         }
-        return 0;
+        return DEFAULT_SUBSCRIPTION_TIMEOUT;
     }
 
     /**

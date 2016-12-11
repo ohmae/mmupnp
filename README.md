@@ -9,6 +9,20 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## Requirements
 - Java SE 7 or later
+- Android API Level 15 (Android 4.0.3) or later
+
+As you know, Android Studio (2.2 or later) supports Java 8 development.
+But it is NOT fully support. Several statements depend on the API level.
+For example, try-with-resource statement requires API level 19.
+Therefore, this library restricts the use of such statement.
+
+## Restrictions
+- This library support only ControlPoint functions.
+There is no way to make Device. If you need it, please select another library.
+- Some functions that are not widely used are not implemented.
+ - Multicast eventing
+ - Embedded device
+ - IPv6
 
 ## Example of use
 - DMS Explorer --
