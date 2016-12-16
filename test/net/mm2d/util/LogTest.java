@@ -224,4 +224,9 @@ public class LogTest {
         Log.e(tag, message, throwable);
         verify(print, never()).println(anyInt(), anyString(), anyString());
     }
+
+    @Test
+    public void v_Tagがnullでも問題ない() {
+        Log.e(null, "");
+    }
 }

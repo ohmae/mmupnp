@@ -16,6 +16,7 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -121,7 +122,7 @@ public abstract class SsdpMessage {
         final String[] result = parseUsn(mMessage);
         mUuid = result[0];
         mType = result[1];
-        mExpireTime = mMaxAge * 1000 + System.currentTimeMillis();
+        mExpireTime = TimeUnit.SECONDS.toMillis(mMaxAge) + System.currentTimeMillis();
         mLocation = mMessage.getHeader(Http.LOCATION);
         mNts = mMessage.getHeader(Http.NTS);
     }

@@ -45,7 +45,7 @@ abstract class SsdpServer {
     @Nonnull
     private final NetworkInterface mInterface;
     @Nonnull
-    private InterfaceAddress mInterfaceAddress;
+    private final InterfaceAddress mInterfaceAddress;
     private final int mBindPort;
     private MulticastSocket mSocket;
     private ReceiveThread mThread;
@@ -235,10 +235,10 @@ abstract class SsdpServer {
         public void run() {
             try {
                 joinGroup();
+                final byte[] buf = new byte[1500];
                 while (!mShutdownRequest) {
-                    final byte[] buf = new byte[1500];
-                    final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                     try {
+                        final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                         mSocket.receive(dp);
                         if (mShutdownRequest) {
                             break;
