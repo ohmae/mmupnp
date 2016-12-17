@@ -2,7 +2,7 @@
  * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
  */
 
-package net.mm2d.testui;
+package net.mm2d.upnp.sample;
 
 import net.mm2d.upnp.Action;
 import net.mm2d.upnp.Argument;
