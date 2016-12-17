@@ -10,7 +10,7 @@ body {
   font-family: 'Roboto', 'Mplus 1p', 'ヒラギノ角ゴ ProN W3',
     'Hiragino Kaku Gothic ProN', 'メイリオ', Meiryo, Arial, Helvetica,
     sans-serif;
-  font-size: 14px;
+  font-size: 12pt;
   margin: 0;
 }
 
@@ -40,32 +40,32 @@ a[name]:hover {
 
 pre {
   font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
-  font-size: 14px;
+  font-size: 12pt;
 }
 
 h1 {
-  font-size: 20px;
+  font-size: 18pt;
 }
 
 h2 {
-  font-size: 18px;
+  font-size: 16pt;
 }
 
 h3 {
-  font-size: 16px;
+  font-size: 15pt;
   font-style: italic;
 }
 
 h4 {
-  font-size: 13px;
+  font-size: 14pt;
 }
 
 h5 {
-  font-size: 12px;
+  font-size: 13pt;
 }
 
 h6 {
-  font-size: 11px;
+  font-size: 12pt;
 }
 
 ul {
@@ -74,7 +74,7 @@ ul {
 
 code, tt {
   font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
-  font-size: 14px;
+  font-size: 12pt;
   padding-top: 4px;
   margin-top: 8px;
   line-height: 1.4em;
@@ -82,13 +82,13 @@ code, tt {
 
 dt code {
   font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
-  font-size: 14px;
+  font-size: 12pt;
   padding-top: 4px;
 }
 
 table tr td dt code {
   font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
-  font-size: 14px;
+  font-size: 12pt;
   vertical-align: top;
   padding-top: 4px;
 }
@@ -108,7 +108,7 @@ Document title and Copyright styles
 .aboutLanguage {
   float: right;
   padding: 0px 21px;
-  font-size: 11px;
+  font-size: 9pt;
   z-index: 200;
   margin-top: -9px;
 }
@@ -141,7 +141,7 @@ Navigation bar styles
   color: #FFFFFF;
   padding: .8em .5em .4em .8em;
   height: auto; /*height:1.8em;*/
-  font-size: 11px;
+  font-size: 9pt;
   margin: 0;
 }
 
@@ -155,7 +155,7 @@ Navigation bar styles
   height: 2.8em;
   padding-top: 10px;
   overflow: hidden;
-  font-size: 12px;
+  font-size: 10pt;
 }
 
 .bottomNav {
@@ -169,7 +169,7 @@ Navigation bar styles
   height: 2.8em;
   padding-top: 10px;
   overflow: hidden;
-  font-size: 12px;
+  font-size: 10pt;
 }
 
 .subNav {
@@ -178,7 +178,7 @@ Navigation bar styles
   float: left;
   width: 100%;
   overflow: hidden;
-  font-size: 12px;
+  font-size: 10pt;
 }
 
 .subNav div {
@@ -251,7 +251,7 @@ Page header and footer styles
 }
 
 .indexHeader h1 {
-  font-size: 13px;
+  font-size: 11pt;
 }
 
 .title {
@@ -274,7 +274,7 @@ Page header and footer styles
 
 .header ul li, .footer ul li {
   list-style: none;
-  font-size: 13px;
+  font-size: 11pt;
 }
 /*
 Heading styles
@@ -315,11 +315,11 @@ Page layout container styles
 .indexContainer {
   margin: 10px;
   position: relative;
-  font-size: 12px;
+  font-size: 10pt;
 }
 
 .indexContainer h2 {
-  font-size: 13px;
+  font-size: 11pt;
   padding: 0 0 3px 0;
 }
 
@@ -335,7 +335,7 @@ Page layout container styles
 
 .contentContainer .description dl dt, .contentContainer .details dl dt,
   .serializedFormContainer dl dt {
-  font-size: 12px;
+  font-size: 10pt;
   font-weight: bold;
   margin: 10px 0 0 0;
   color: #4E4E4E;
@@ -344,7 +344,7 @@ Page layout container styles
 .contentContainer .description dl dd, .contentContainer .details dl dd,
   .serializedFormContainer dl dd {
   margin: 5px 0 10px 0px;
-  font-size: 14px;
+  font-size: 12pt;
   font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
 }
 
@@ -576,15 +576,15 @@ th.colFirst, th.colLast, th.colOne, .constantsSummary th {
 
 td.colFirst, th.colFirst {
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 11pt;
 }
 
 td.colLast, th.colLast {
-  font-size: 13px;
+  font-size: 11pt;
 }
 
 td.colOne, th.colOne {
-  font-size: 13px;
+  font-size: 11pt;
 }
 
 .overviewSummary td.colFirst, .overviewSummary th.colFirst, .useSummary td.colFirst,
@@ -636,7 +636,7 @@ ul.blockList ul.blockList ul.blockList li.blockList h3 {
 }
 
 div.block {
-  font-size: 14px;
+  font-size: 12pt;
   font-family: 'Roboto', 'Mplus 1p', 'ヒラギノ角ゴ ProN W3',
     'Hiragino Kaku Gothic ProN', 'メイリオ', Meiryo, Arial, Helvetica,
     sans-serif;

@@ -1,5 +1,5 @@
-group 'net.mm2d'
-version '1.0.0'
+group 'net.mm2d.mmupnp'
+version '1.0.5'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
