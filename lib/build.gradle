@@ -20,7 +20,7 @@ javadoc {
     description "Generates Javadoc."
     options.charSet = 'UTF-8'
     options.encoding = "UTF-8"
-    options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.links("http://docs.oracle.com/javase/jp/7/api/")
     options.stylesheetFile = new File("stylesheet.css")
 }
 
