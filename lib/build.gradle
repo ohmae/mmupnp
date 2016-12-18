@@ -1,0 +1,48 @@
+group 'net.mm2d.mmupnp'
+version '1.0.5'
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+archivesBaseName = 'mmupnp'
+sourceCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+javadoc {
+    title = "mmupnp $version API"
+    description "Generates Javadoc."
+    options.charSet = 'UTF-8'
+    options.encoding = "UTF-8"
+    options.links("http://docs.oracle.com/javase/jp/7/api/")
+    options.stylesheetFile = new File("stylesheet.css")
+}
+
+dependencies {
+    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.29'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: 'file:build/maven')
+        }
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}

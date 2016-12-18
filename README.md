@@ -32,6 +32,8 @@ There is no way to make Device. If you need it, please select another library.
 ## How to use
 
 I described Javadoc comments. Please refer to it for more information.
+- Javadoc in Japanese
+ - http://ohmae.github.io/mmupnp/javadoc/
 
 ### Initialize and Start
 ```
