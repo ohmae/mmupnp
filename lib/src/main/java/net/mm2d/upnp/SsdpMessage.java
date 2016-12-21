@@ -163,19 +163,19 @@ public abstract class SsdpMessage {
     /**
      * Locationに記述のアドレスとパケットの送信元アドレスが一致しているかを返す。
      *
-     * @return 一致している場合true
+     * @return Locationに問題がある場合true
      */
-    public boolean hasValidLocation() {
+    public boolean hasInvalidLocation() {
         if (TextUtils.isEmpty(mLocation)) {
-            return false;
+            return true;
         }
         final String packetAddress = mPacketAddress.getHostAddress();
         try {
             final String locationAddress = new URL(mLocation).getHost();
-            return packetAddress.equals(locationAddress);
+            return !packetAddress.equals(locationAddress);
         } catch (final MalformedURLException ignored) {
         }
-        return false;
+        return true;
     }
 
     /**

@@ -134,10 +134,10 @@ public class ControlPoint {
     private boolean mInitialized = false;
     private boolean mStarted = false;
     private boolean mTerminated = false;
-    @Nullable
-    private DeviceInspector mDeviceInspector;
-    @Nullable
-    private SubscribeKeeper mSubscribeKeeper;
+    @Nonnull
+    private final DeviceInspector mDeviceInspector;
+    @Nonnull
+    private final SubscribeKeeper mSubscribeKeeper;
 
     private void onReceiveSsdp(@Nonnull SsdpMessage message) {
         final String uuid = message.getUuid();
@@ -297,6 +297,9 @@ public class ControlPoint {
         mNotifyEventListeners = new ArrayList<>();
         mNotifyExecutor = Executors.newSingleThreadExecutor();
         mCachedThreadPool = Executors.newCachedThreadPool();
+        mDeviceInspector = new DeviceInspector(this);
+        mSubscribeKeeper = new SubscribeKeeper(this);
+
         for (final NetworkInterface nif : interfaces) {
             final SsdpSearchServer search = new SsdpSearchServer(nif);
             search.setResponseListener(new ResponseListener() {
@@ -409,9 +412,7 @@ public class ControlPoint {
             throw new IllegalStateException(
                     "ControlPoint is already terminated, cannot re-initialize.");
         }
-        mDeviceInspector = new DeviceInspector(this);
         mDeviceInspector.start();
-        mSubscribeKeeper = new SubscribeKeeper(this);
         mSubscribeKeeper.start();
         mInitialized = true;
     }
@@ -445,9 +446,7 @@ public class ControlPoint {
             Log.w(TAG, e);
         }
         mSubscribeKeeper.shutdownRequest();
-        mSubscribeKeeper = null;
         mDeviceInspector.shutdownRequest();
-        mDeviceInspector = null;
     }
 
     /**

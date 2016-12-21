@@ -77,7 +77,7 @@ class SsdpNotifyReceiver extends SsdpServer {
             }
             // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
             if (!TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)
-                    && !message.hasValidLocation()) {
+                    && message.hasInvalidLocation()) {
                 return;
             }
             if (mListener != null) {

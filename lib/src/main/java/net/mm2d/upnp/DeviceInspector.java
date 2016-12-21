@@ -21,12 +21,13 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class DeviceInspector extends Thread {
+class DeviceInspector implements Runnable {
     private static final String TAG = DeviceInspector.class.getSimpleName();
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
     @Nonnull
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;
+    private Thread mThread;
     @Nonnull
     private final List<Device> mDeviceList;
     private final Comparator<Device> mComparator = new Comparator<Device>() {
@@ -41,24 +42,31 @@ class DeviceInspector extends Thread {
      *
      * @param cp ControlPoint
      */
-    public DeviceInspector(@Nonnull ControlPoint cp) {
-        super(TAG);
+    DeviceInspector(@Nonnull ControlPoint cp) {
         mDeviceList = new ArrayList<>();
         mControlPoint = cp;
     }
 
+    void start() {
+        mShutdownRequest = false;
+        mThread = new Thread(this, TAG);
+        mThread.start();
+    }
     /**
      * スレッドに割り込みをかけ終了させる。
      */
-    public void shutdownRequest() {
+    void shutdownRequest() {
         mShutdownRequest = true;
-        interrupt();
+        if (mThread != null) {
+            mThread.interrupt();
+            mThread = null;
+        }
     }
 
     /**
      * Deviceの有効期限変化時にコールする。
      */
-    public synchronized void update() {
+    synchronized void update() {
         Collections.sort(mDeviceList, mComparator);
     }
 
@@ -67,7 +75,7 @@ class DeviceInspector extends Thread {
      *
      * @param device 追加されるDevice
      */
-    public synchronized void add(@Nonnull Device device) {
+     synchronized void add(@Nonnull Device device) {
         mDeviceList.add(device);
         Collections.sort(mDeviceList, mComparator);
         notifyAll();
@@ -78,14 +86,14 @@ class DeviceInspector extends Thread {
      *
      * @param device 削除されるDevice。
      */
-    public synchronized void remove(@Nonnull Device device) {
+    synchronized void remove(@Nonnull Device device) {
         mDeviceList.remove(device);
     }
 
     /**
      * 登録されたDeviceをクリア。
      */
-    public synchronized void clear() {
+    synchronized void clear() {
         mDeviceList.clear();
     }
 

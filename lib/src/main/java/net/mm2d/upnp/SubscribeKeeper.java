@@ -23,13 +23,14 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class SubscribeKeeper extends Thread {
+class SubscribeKeeper implements Runnable {
     private static final String TAG = SubscribeKeeper.class.getSimpleName();
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
     private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
     private static final int RETRY_COUNT = 2;
     private final ControlPoint mControlPoint;
     private volatile boolean mShutdownRequest = false;
+    private Thread mThread;
 
     private static class Container {
         private final Service mService;
@@ -54,6 +55,23 @@ class SubscribeKeeper extends Thread {
 
         void increaseFailCount() {
             mFailCount++;
+        }
+
+        @Override
+        public int hashCode() {
+            return mService.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object == null) {
+                return false;
+            }
+            if (!(object instanceof Container)) {
+                return false;
+            }
+            Container c = (Container) object;
+            return mService.equals(c.getService());
         }
     }
 
@@ -89,28 +107,39 @@ class SubscribeKeeper extends Thread {
         return service.getSubscriptionStart() + interval;
     }
 
-    public SubscribeKeeper(@Nonnull ControlPoint controlPoint) {
-        super(TAG);
+    SubscribeKeeper(@Nonnull ControlPoint controlPoint) {
         mControlPoint = controlPoint;
         mServiceList = new ArrayList<>();
     }
 
-    public void shutdownRequest() {
-        mShutdownRequest = true;
-        interrupt();
+    void start() {
+        mShutdownRequest = false;
+        mThread = new Thread(this, TAG);
+        mThread.start();
     }
 
-    public synchronized void update() {
+    void shutdownRequest() {
+        mShutdownRequest = true;
+        if (mThread != null) {
+            mThread.interrupt();
+            mThread = null;
+        }
+    }
+
+    synchronized void update() {
         Collections.sort(mServiceList, mComparator);
     }
 
-    public synchronized void add(@Nonnull Service service) {
-        mServiceList.add(new Container(service));
+    synchronized void add(@Nonnull Service service) {
+        final Container container = new Container(service);
+        if (!mServiceList.contains(container)) {
+            mServiceList.add(container);
+        }
         Collections.sort(mServiceList, mComparator);
         notifyAll();
     }
 
-    public synchronized void remove(@Nonnull Service service) {
+    synchronized void remove(@Nonnull Service service) {
         for (int i = 0; i < mServiceList.size(); i++) {
             if (mServiceList.get(i).getService().equals(service)) {
                 mServiceList.remove(i);
@@ -119,7 +148,7 @@ class SubscribeKeeper extends Thread {
         }
     }
 
-    public synchronized void clear() {
+    synchronized void clear() {
         mServiceList.clear();
     }
 
@@ -127,47 +156,71 @@ class SubscribeKeeper extends Thread {
     public void run() {
         try {
             while (!mShutdownRequest) {
-                final List<Container> work;
-                synchronized (this) {
-                    while (mServiceList.size() == 0) {
-                        wait();
-                    }
-                    // リスト操作をロックしないようにコピーに対して処理を行う。
-                    work = new ArrayList<>(mServiceList);
-                }
-                final long now = System.currentTimeMillis();
-                for (final Container c : work) {
-                    if (calculateRenewTime(c) < now) {
-                        try {
-                            c.getService().renewSubscribe(false);
-                            c.resetFailCount();
-                        } catch (final IOException e) {
-                            Log.w(TAG, e);
-                            c.increaseFailCount();
-                            if (c.getFailCount() >= RETRY_COUNT) {
-                                // 2回renewに失敗した場合はDeviceとの通信に問題ありとしてlost扱いにする
-                                mControlPoint.lostDevice(c.getService().getDevice());
-                            }
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                // 内部でunregisterされ、このクラスのremoveもコールされる。
-                mControlPoint.removeExpiredSubscribeService();
-                synchronized (this) {
-                    Collections.sort(mServiceList, mComparator);
-                    if (mServiceList.size() != 0) {
-                        final Container c = mServiceList.get(0);
-                        long sleep = calculateRenewTime(c) - System.currentTimeMillis();
-                        if (sleep < MIN_INTERVAL) {
-                            sleep = MIN_INTERVAL; // ビジーループ阻止
-                        }
-                        wait(sleep);
-                    }
-                }
+                renewSubscribe(waitListEntry());
+                waitNextRenewTime();
             }
         } catch (final InterruptedException ignored) {
+        }
+    }
+
+    /**
+     * ServiceListに何らかのエントリーが追加されるまで待機する。
+     *
+     * @return ServiceListのコピー
+     * @throws InterruptedException 割り込みが発生した
+     */
+    private synchronized List<Container> waitListEntry() throws InterruptedException {
+        while (mServiceList.size() == 0) {
+            wait();
+        }
+        // リスト操作をロックしないようにコピーに対して処理を行う。
+        return new ArrayList<>(mServiceList);
+    }
+
+    /**
+     * Renewタイムを超えたサービスについてRenewを実行する。
+     *
+     * @param serviceList Renew実行までの時間が短い順にソートされたサービスリスト
+     */
+    private void renewSubscribe(final List<Container> serviceList) {
+        final long now = System.currentTimeMillis();
+        for (final Container c : serviceList) {
+            if (calculateRenewTime(c) > now) {
+                break;
+            }
+            try {
+                if (c.getService().renewSubscribe(false)) {
+                    c.resetFailCount();
+                } else {
+                    c.increaseFailCount();
+                }
+            } catch (final IOException e) {
+                Log.w(TAG, e);
+                c.increaseFailCount();
+            }
+            if (c.getFailCount() >= RETRY_COUNT) {
+                // 2回renewに失敗した場合はDeviceとの通信に問題ありとしてlost扱いにする
+                mControlPoint.lostDevice(c.getService().getDevice());
+            }
+        }
+        // 内部でunregisterされ、このクラスのremoveもコールされる。
+        mControlPoint.removeExpiredSubscribeService();
+    }
+
+    /**
+     * 直近のRenew実行時間まで待機する。
+     *
+     * @throws InterruptedException 割り込みが発生した
+     */
+    private synchronized void waitNextRenewTime() throws InterruptedException {
+        Collections.sort(mServiceList, mComparator);
+        if (mServiceList.size() != 0) {
+            final Container c = mServiceList.get(0);
+            long sleep = calculateRenewTime(c) - System.currentTimeMillis();
+            if (sleep < MIN_INTERVAL) {
+                sleep = MIN_INTERVAL; // ビジーループ阻止
+            }
+            wait(sleep);
         }
     }
 }

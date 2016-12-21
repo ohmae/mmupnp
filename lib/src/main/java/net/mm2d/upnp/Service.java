@@ -606,11 +606,11 @@ public class Service {
     /**
      * Subscribeの実行
      *
-     * @param keep trueを指定すると成功後、Expire前に定期的にrenewを行う。
+     * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
      * @return 成功時true
      * @throws IOException 通信エラー
      */
-    public boolean subscribe(boolean keep) throws IOException {
+    public boolean subscribe(boolean keepRenew) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
         final URL url = getAbsoluteUrl(mEventSubUrl);
@@ -622,20 +622,20 @@ public class Service {
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            System.out.println(response.toString());
+            Log.w(TAG, response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
-            System.out.println(response.toString());
+            Log.w(TAG, response.toString());
             return false;
         }
         mSubscriptionId = sid;
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
         mControlPoint.registerSubscribeService(this);
-        if (keep) {
+        if (keepRenew) {
             mControlPoint.addSubscribeKeeper(this);
         }
         return true;
@@ -672,13 +672,13 @@ public class Service {
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            System.out.println(response.toString());
+            Log.w(TAG, response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
-            System.out.println(response.toString());
+            Log.w(TAG, response.toString());
             return false;
         }
         mSubscriptionStart = System.currentTimeMillis();
@@ -708,7 +708,7 @@ public class Service {
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            System.out.println(response.toString());
+            Log.w(TAG, response.toString());
             return false;
         }
         mControlPoint.unregisterSubscribeService(this);
