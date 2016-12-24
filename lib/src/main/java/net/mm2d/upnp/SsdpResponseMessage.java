@@ -24,7 +24,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * 受信した情報からインスタンス作成
      *
      * @param ifa 受信したInterfaceAddress
-     * @param dp 受信したDatagramPacket
+     * @param dp  受信したDatagramPacket
      * @throws IOException 入出力エラー
      */
     public SsdpResponseMessage(@Nonnull InterfaceAddress ifa, @Nonnull DatagramPacket dp)

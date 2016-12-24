@@ -29,12 +29,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -100,14 +97,14 @@ public class ControlPoint {
         /**
          * NotifyEvent受信時にコールされる。
          *
-         * @param service 対応するService
-         * @param seq シーケンス番号
+         * @param service  対応するService
+         * @param seq      シーケンス番号
          * @param variable 変数名
-         * @param value 値
+         * @param value    値
          * @see Service
          */
         void onNotifyEvent(@Nonnull Service service, long seq,
-                @Nonnull String variable, @Nonnull String value);
+                           @Nonnull String variable, @Nonnull String value);
     }
 
     private IconFilter mIconFilter = IconFilter.NONE;
@@ -123,8 +120,6 @@ public class ControlPoint {
     private final Map<String, Device> mDeviceMap;
     @Nonnull
     private final Map<String, Device> mPendingDeviceMap;
-    @Nonnull
-    private final Map<String, Service> mSubscribeServiceMap;
     @Nonnull
     private final EventReceiver mEventReceiver;
     @Nonnull
@@ -175,7 +170,7 @@ public class ControlPoint {
     private class DeviceLoader implements Runnable {
         private final Device mDevice;
 
-        public DeviceLoader(@Nonnull Device device) {
+        DeviceLoader(@Nonnull Device device) {
             mDevice = device;
         }
 
@@ -292,13 +287,12 @@ public class ControlPoint {
         mNotifyList = new ArrayList<>();
         mDeviceMap = Collections.synchronizedMap(new LinkedHashMap<String, Device>());
         mPendingDeviceMap = new HashMap<>();
-        mSubscribeServiceMap = new HashMap<>();
         mDiscoveryListeners = new ArrayList<>();
         mNotifyEventListeners = new ArrayList<>();
         mNotifyExecutor = Executors.newSingleThreadExecutor();
         mCachedThreadPool = Executors.newCachedThreadPool();
         mDeviceInspector = new DeviceInspector(this);
-        mSubscribeKeeper = new SubscribeKeeper(this);
+        mSubscribeKeeper = new SubscribeKeeper();
 
         for (final NetworkInterface nif : interfaces) {
             final SsdpSearchServer search = new SsdpSearchServer(nif);
@@ -503,23 +497,20 @@ public class ControlPoint {
             return;
         }
         mStarted = false;
-        synchronized (mSubscribeServiceMap) {
-            final Set<Entry<String, Service>> entrySet = mSubscribeServiceMap.entrySet();
-            for (final Iterator<Entry<String, Service>> i = entrySet.iterator(); i.hasNext();) {
-                final Entry<String, Service> entry = i.next();
-                i.remove();
-                executeParallel(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            entry.getValue().unsubscribe();
-                        } catch (final IOException e) {
-                            Log.w(TAG, e);
-                        }
+        List<Service> serviceList = mSubscribeKeeper.getServiceList();
+        for (final Service service : serviceList) {
+            executeParallel(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        service.unsubscribe();
+                    } catch (final IOException e) {
+                        Log.w(TAG, e);
                     }
-                });
-            }
+                }
+            });
         }
+        mSubscribeKeeper.clear();
         for (final SsdpServer server : mSearchList) {
             server.stop();
         }
@@ -533,7 +524,6 @@ public class ControlPoint {
             server.close();
         }
         mEventReceiver.close();
-        mSubscribeKeeper.clear();
         final List<Device> list = new ArrayList<>(mDeviceMap.values());
         for (final Device device : list) {
             lostDevice(device);
@@ -657,7 +647,7 @@ public class ControlPoint {
      * <p>DeviceInspectorからコールするためにパッケージデフォルトとする
      * 他からはコールしないこと。
      *
-     * @param device 喪失してデバイス
+     * @param device          喪失してデバイス
      * @param notifyInspector falseの場合Inspectorに通知しない
      * @see Device
      * @see DeviceInspector
@@ -744,9 +734,7 @@ public class ControlPoint {
      */
     @Nullable
     Service getSubscribeService(@Nonnull String subscriptionId) {
-        synchronized (mSubscribeServiceMap) {
-            return mSubscribeServiceMap.get(subscriptionId);
-        }
+        return mSubscribeKeeper.getService(subscriptionId);
     }
 
     /**
@@ -758,10 +746,8 @@ public class ControlPoint {
      * @see Service
      * @see Service#subscribe()
      */
-    void registerSubscribeService(@Nonnull Service service) {
-        synchronized (mSubscribeServiceMap) {
-            mSubscribeServiceMap.put(service.getSubscriptionId(), service);
-        }
+    void registerSubscribeService(@Nonnull Service service, boolean keep) {
+        mSubscribeKeeper.add(service, keep);
     }
 
     /**
@@ -772,46 +758,6 @@ public class ControlPoint {
      * @see Service#unsubscribe()
      */
     void unregisterSubscribeService(@Nonnull Service service) {
-        synchronized (mSubscribeServiceMap) {
-            mSubscribeServiceMap.remove(service.getSubscriptionId());
-        }
         mSubscribeKeeper.remove(service);
-    }
-
-    /**
-     * 購読期限切れのServiceを削除する。
-     */
-    void removeExpiredSubscribeService() {
-        synchronized (mSubscribeServiceMap) {
-            final long now = System.currentTimeMillis();
-            final Iterator<Entry<String, Service>> i = mSubscribeServiceMap.entrySet().iterator();
-            while (i.hasNext()) {
-                final Service service = i.next().getValue();
-                if (service.getSubscriptionStart()
-                        + service.getSubscriptionTimeout() < now) {
-                    mSubscribeKeeper.remove(service);
-                    i.remove();
-                    service.expired();
-                }
-            }
-        }
-    }
-
-    /**
-     * Subscribe継続処理へ登録する。
-     *
-     * @param service 登録するService
-     * @see Service
-     * @see SubscribeKeeper
-     */
-    void addSubscribeKeeper(@Nonnull Service service) {
-        mSubscribeKeeper.add(service);
-    }
-
-    /**
-     * renew処理実行の通知
-     */
-    void renewSubscribeService() {
-        mSubscribeKeeper.update();
     }
 }

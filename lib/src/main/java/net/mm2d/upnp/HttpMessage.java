@@ -165,7 +165,7 @@ public abstract class HttpMessage {
     /**
      * ヘッダを設定する。
      *
-     * @param name ヘッダ名
+     * @param name  ヘッダ名
      * @param value 値
      */
     public void setHeader(@Nonnull String name, @Nonnull String value) {
@@ -245,7 +245,7 @@ public abstract class HttpMessage {
     /**
      * メッセージボディを設定する。
      *
-     * @param body メッセージボディ
+     * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
     public void setBody(@Nullable String body, boolean withContentLength) {
@@ -294,7 +294,7 @@ public abstract class HttpMessage {
     /**
      * メッセージボディを設定する。
      *
-     * @param body メッセージボディ
+     * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
     public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {

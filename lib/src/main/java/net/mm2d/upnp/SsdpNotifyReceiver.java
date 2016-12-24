@@ -88,7 +88,7 @@ class SsdpNotifyReceiver extends SsdpServer {
     }
 
     private static boolean isSameSegment(@Nonnull InterfaceAddress ifa,
-            @Nonnull DatagramPacket dp) {
+                                         @Nonnull DatagramPacket dp) {
         final InetSocketAddress sa = (InetSocketAddress) dp.getSocketAddress();
         final byte[] a = ifa.getAddress().getAddress();
         final byte[] b = sa.getAddress().getAddress();

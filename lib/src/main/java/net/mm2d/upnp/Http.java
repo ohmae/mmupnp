@@ -68,12 +68,7 @@ public final class Http {
     public static final String GET = "GET";
     public static final String POST = "POST";
 
-    public static final String USER_AGENT_VALUE = Property.OS_VERSION
-            + " " + Property.UPNP_VERSION
-            + " " + Property.LIB_VERSION;
-    public static final String SERVER_VALUE = Property.OS_VERSION
-            + " " + Property.UPNP_VERSION
-            + " " + Property.LIB_VERSION;
+    public static final int DEFAULT_PORT = 80;
 
     /**
      * HTTPのステータスコードを表現するEnum

@@ -63,8 +63,8 @@ public class Log {
         /**
          * ログ出力を行う
          *
-         * @param level ログレベル
-         * @param tag タグ
+         * @param level   ログレベル
+         * @param tag     タグ
          * @param message メッセージ
          */
         void println(int level, @Nullable String tag, @Nullable String message);
@@ -160,7 +160,7 @@ public class Log {
     /**
      * VERBOSEレベルでのログ出力を行う。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
      */
     public static void v(@Nullable String tag, @Nullable String message) {
@@ -172,9 +172,9 @@ public class Log {
      *
      * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
-     * @param tr Throwable
+     * @param tr      Throwable
      */
     public static void v(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
         log(VERBOSE, tag, message, tr);
@@ -183,7 +183,7 @@ public class Log {
     /**
      * DEBUGレベルでのログ出力を行う。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
      */
     public static void d(@Nullable String tag, @Nullable String message) {
@@ -195,9 +195,9 @@ public class Log {
      *
      * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
-     * @param tr Throwable
+     * @param tr      Throwable
      */
     public static void d(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
         log(DEBUG, tag, message, tr);
@@ -206,7 +206,7 @@ public class Log {
     /**
      * INFOレベルでのログ出力を行う。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
      */
     public static void i(@Nullable String tag, @Nullable String message) {
@@ -218,9 +218,9 @@ public class Log {
      *
      * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
-     * @param tr Throwable
+     * @param tr      Throwable
      */
     public static void i(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
         log(INFO, tag, message, tr);
@@ -229,7 +229,7 @@ public class Log {
     /**
      * WARNレベルでのログ出力を行う。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
      */
     public static void w(@Nullable String tag, @Nullable String message) {
@@ -242,7 +242,7 @@ public class Log {
      * <p>引数のThrowableのスタックトレースをメッセージとして表示する。
      *
      * @param tag タグ
-     * @param tr Throwable
+     * @param tr  Throwable
      */
     public static void w(@Nullable String tag, @Nullable Throwable tr) {
         log(WARN, tag, tr);
@@ -253,9 +253,9 @@ public class Log {
      *
      * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
-     * @param tr Throwable
+     * @param tr      Throwable
      */
     public static void w(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
         log(WARN, tag, message, tr);
@@ -264,7 +264,7 @@ public class Log {
     /**
      * ERRORレベルでのログ出力を行う。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
      */
     public static void e(@Nullable String tag, @Nullable String message) {
@@ -276,9 +276,9 @@ public class Log {
      *
      * <p>引数のThrowableを元にスタックトレースを合わせて表示する。
      *
-     * @param tag タグ
+     * @param tag     タグ
      * @param message メッセージ
-     * @param tr Throwable
+     * @param tr      Throwable
      */
     public static void e(@Nullable String tag, @Nullable String message, @Nullable Throwable tr) {
         log(ERROR, tag, message, tr);

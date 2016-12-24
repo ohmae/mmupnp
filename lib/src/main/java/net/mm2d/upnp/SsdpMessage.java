@@ -109,7 +109,7 @@ public abstract class SsdpMessage {
      * 受信した情報からインスタンス作成
      *
      * @param ifa 受信したInterfaceAddress
-     * @param dp 受信したDatagramPacket
+     * @param dp  受信したDatagramPacket
      * @throws IOException 入出力エラー
      */
     public SsdpMessage(@Nonnull InterfaceAddress ifa, @Nonnull DatagramPacket dp)
@@ -151,11 +151,11 @@ public abstract class SsdpMessage {
         }
         final int pos = usn.indexOf("::");
         if (pos < 0) {
-            return new String[] {
+            return new String[]{
                     usn, ""
             };
         }
-        return new String[] {
+        return new String[]{
                 usn.substring(0, pos), usn.substring(pos + 2)
         };
     }
@@ -202,7 +202,7 @@ public abstract class SsdpMessage {
     /**
      * ヘッダの値を設定する。
      *
-     * @param name ヘッダ名
+     * @param name  ヘッダ名
      * @param value 値
      */
     public void setHeader(@Nonnull String name, @Nonnull String value) {

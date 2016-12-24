@@ -193,15 +193,15 @@ class EventReceiver {
 
         static {
             RESPONSE_OK.setStatus(Http.Status.HTTP_OK);
-            RESPONSE_OK.setHeader(Http.SERVER, Http.SERVER_VALUE);
+            RESPONSE_OK.setHeader(Http.SERVER, Property.SERVER_VALUE);
             RESPONSE_OK.setHeader(Http.CONNECTION, Http.CLOSE);
             RESPONSE_OK.setHeader(Http.CONTENT_LENGTH, "0");
             RESPONSE_BAD.setStatus(Http.Status.HTTP_BAD_REQUEST);
-            RESPONSE_BAD.setHeader(Http.SERVER, Http.SERVER_VALUE);
+            RESPONSE_BAD.setHeader(Http.SERVER, Property.SERVER_VALUE);
             RESPONSE_BAD.setHeader(Http.CONNECTION, Http.CLOSE);
             RESPONSE_BAD.setHeader(Http.CONTENT_LENGTH, "0");
             RESPONSE_FAIL.setStatus(Http.Status.HTTP_PRECON_FAILED);
-            RESPONSE_FAIL.setHeader(Http.SERVER, Http.SERVER_VALUE);
+            RESPONSE_FAIL.setHeader(Http.SERVER, Property.SERVER_VALUE);
             RESPONSE_FAIL.setHeader(Http.CONNECTION, Http.CLOSE);
             RESPONSE_FAIL.setHeader(Http.CONTENT_LENGTH, "0");
         }
@@ -210,7 +210,7 @@ class EventReceiver {
          * インスタンス作成
          *
          * @param server サーバスレッド
-         * @param sock クライアントソケット
+         * @param sock   クライアントソケット
          */
         public ClientThread(@Nonnull ServerThread server, @Nonnull Socket sock) {
             super("EventReceiver::ClientThread");

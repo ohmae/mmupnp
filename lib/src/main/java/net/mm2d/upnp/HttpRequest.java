@@ -73,7 +73,7 @@ public class HttpRequest extends HttpMessage {
     /**
      * 接続先URLを設定する。
      *
-     * @param url 接続先URL
+     * @param url            接続先URL
      * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */

@@ -9,14 +9,15 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Subscribeの期限が切れないように定期的にrenewを実行するクラス。
@@ -25,99 +26,29 @@ import javax.annotation.Nonnull;
  */
 class SubscribeKeeper implements Runnable {
     private static final String TAG = SubscribeKeeper.class.getSimpleName();
-    private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
     private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
-    private static final int RETRY_COUNT = 2;
-    private final ControlPoint mControlPoint;
-    private volatile boolean mShutdownRequest = false;
+
+    private final Map<String, SubscribeService> mServiceMap;
+
     private Thread mThread;
+    private volatile boolean mShutdownRequest = false;
 
-    private static class Container {
-        private final Service mService;
-        private int mFailCount;
-
-        Container(Service service) {
-            mService = service;
-            mFailCount = 0;
-        }
-
-        Service getService() {
-            return mService;
-        }
-
-        int getFailCount() {
-            return mFailCount;
-        }
-
-        void resetFailCount() {
-            mFailCount = 0;
-        }
-
-        void increaseFailCount() {
-            mFailCount++;
-        }
-
-        @Override
-        public int hashCode() {
-            return mService.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object object) {
-            if (object == null) {
-                return false;
-            }
-            if (!(object instanceof Container)) {
-                return false;
-            }
-            Container c = (Container) object;
-            return mService.equals(c.getService());
-        }
+    SubscribeKeeper() {
+        mServiceMap = new HashMap<>();
     }
-
-    private final List<Container> mServiceList;
-    private final Comparator<Container> mComparator = new Comparator<Container>() {
-        @Override
-        public int compare(Container c1, Container c2) {
-            return (int) (calculateRenewTime(c1) - calculateRenewTime(c2));
-        }
-    };
 
     /**
-     * Renewを実行する時間(UTC[ms])を計算して返す。
-     *
-     * <p>Subscribeのtimeoutの半分の時間を基準に実行、
-     * 実行に失敗した場合はtimeoutの時間を基準に実行し、
-     * 1回までの通信失敗は許容する。
-     *
-     * <p>また、基準時間から一定時間引いた時間に実行することで
-     * デバイスごとに時間が多少ずれていても動作できるようにする。
-     *
-     * @param c 調査するService
-     * @return Renewを行う時間
+     * スレッドを開始する。
      */
-    private long calculateRenewTime(@Nonnull Container c) {
-        final Service service = c.getService();
-        long interval = service.getSubscriptionTimeout() * (c.getFailCount() + 1) / RETRY_COUNT;
-        if (interval > MARGIN_TIME * 2) {
-            interval -= MARGIN_TIME;
-        } else {
-            interval = interval / 2;
-        }
-        return service.getSubscriptionStart() + interval;
-    }
-
-    SubscribeKeeper(@Nonnull ControlPoint controlPoint) {
-        mControlPoint = controlPoint;
-        mServiceList = new ArrayList<>();
-    }
-
     void start() {
         mShutdownRequest = false;
         mThread = new Thread(this, TAG);
         mThread.start();
     }
 
+    /**
+     * スレッドの停止を要求する。
+     */
     void shutdownRequest() {
         mShutdownRequest = true;
         if (mThread != null) {
@@ -126,37 +57,73 @@ class SubscribeKeeper implements Runnable {
         }
     }
 
-    synchronized void update() {
-        Collections.sort(mServiceList, mComparator);
-    }
-
-    synchronized void add(@Nonnull Service service) {
-        final Container container = new Container(service);
-        if (!mServiceList.contains(container)) {
-            mServiceList.add(container);
+    /**
+     * Subscribeを開始したServiceを登録する。
+     *
+     * @param service   登録するService
+     * @param keepRenew 期限が切れる前にrenewSubscribeを続ける場合true
+     */
+    synchronized void add(@Nonnull Service service, boolean keepRenew) {
+        if (service.getSubscriptionId() == null) {
+            return;
         }
-        Collections.sort(mServiceList, mComparator);
+        final SubscribeService subscribeService = new SubscribeService(service, keepRenew);
+        mServiceMap.put(service.getSubscriptionId(), subscribeService);
         notifyAll();
     }
 
+    /**
+     * 指定したサービスを削除する。
+     *
+     * @param service 削除するサービス
+     */
     synchronized void remove(@Nonnull Service service) {
-        for (int i = 0; i < mServiceList.size(); i++) {
-            if (mServiceList.get(i).getService().equals(service)) {
-                mServiceList.remove(i);
-                break;
-            }
-        }
+        mServiceMap.remove(service.getSubscriptionId());
+        notifyAll();
     }
 
+    /**
+     * 保持しているServiceすべてを含むListを返す。
+     *
+     * @return Serviceリスト
+     */
+    @Nonnull
+    synchronized List<Service> getServiceList() {
+        final List<Service> list = new ArrayList<>(mServiceMap.size());
+        for (Map.Entry<String, SubscribeService> entry : mServiceMap.entrySet()) {
+            list.add(entry.getValue().getService());
+        }
+        return list;
+    }
+
+    /**
+     * Subscription IDに該当するServiceを返す。
+     *
+     * @param subscriptionId Subscription ID
+     * @return 該当するService
+     */
+    @Nullable
+    Service getService(final @Nonnull String subscriptionId) {
+        SubscribeService c = mServiceMap.get(subscriptionId);
+        if (c == null) {
+            return null;
+        }
+        return c.getService();
+    }
+
+    /**
+     * 保持しているServiceをすべて削除する。
+     */
     synchronized void clear() {
-        mServiceList.clear();
+        mServiceMap.clear();
     }
 
     @Override
     public void run() {
         try {
             while (!mShutdownRequest) {
-                renewSubscribe(waitListEntry());
+                renewSubscribe(waitEntry());
+                removeExpiredService();
                 waitNextRenewTime();
             }
         } catch (final InterruptedException ignored) {
@@ -166,45 +133,50 @@ class SubscribeKeeper implements Runnable {
     /**
      * ServiceListに何らかのエントリーが追加されるまで待機する。
      *
-     * @return ServiceListのコピー
+     * <p>戻り値としてrenewのトリガをかけるServiceのコレクションを返す。
+     * renew処理は排他を行わず実行するため、排他する必要が無いように、他に影響のないコピーを返す。
+     *
+     * @return renewのトリガをかけるServiceのコレクション
      * @throws InterruptedException 割り込みが発生した
      */
-    private synchronized List<Container> waitListEntry() throws InterruptedException {
-        while (mServiceList.size() == 0) {
+    @Nonnull
+    private synchronized Collection<SubscribeService> waitEntry() throws InterruptedException {
+        while (mServiceMap.size() == 0) {
             wait();
         }
-        // リスト操作をロックしないようにコピーに対して処理を行う。
-        return new ArrayList<>(mServiceList);
+        // 操作をロックしないようにコピーに対して処理を行う。
+        return new ArrayList<>(mServiceMap.values());
     }
 
     /**
-     * Renewタイムを超えたサービスについてRenewを実行する。
+     * 引数のService郡に対し、renewのトリガをかける。
      *
-     * @param serviceList Renew実行までの時間が短い順にソートされたサービスリスト
+     * <p>この処理はネットワーク通信を含むため全体を排他しない。
+     * その為引数となるリストは他からアクセスされないコレクションとする。
+     *
+     * @param serviceList renewのトリガをかけるServiceのコレクション
      */
-    private void renewSubscribe(final List<Container> serviceList) {
-        final long now = System.currentTimeMillis();
-        for (final Container c : serviceList) {
-            if (calculateRenewTime(c) > now) {
-                break;
-            }
-            try {
-                if (c.getService().renewSubscribe(false)) {
-                    c.resetFailCount();
-                } else {
-                    c.increaseFailCount();
-                }
-            } catch (final IOException e) {
-                Log.w(TAG, e);
-                c.increaseFailCount();
-            }
-            if (c.getFailCount() >= RETRY_COUNT) {
-                // 2回renewに失敗した場合はDeviceとの通信に問題ありとしてlost扱いにする
-                mControlPoint.lostDevice(c.getService().getDevice());
+    private void renewSubscribe(final @Nonnull Collection<SubscribeService> serviceList) {
+        for (final SubscribeService c : serviceList) {
+            if (!c.renewSubscribe(System.currentTimeMillis()) && c.isFailed()) {
+                remove(c.getService());
             }
         }
-        // 内部でunregisterされ、このクラスのremoveもコールされる。
-        mControlPoint.removeExpiredSubscribeService();
+    }
+
+    /**
+     * 期限切れのServiceを削除する。
+     */
+    private synchronized void removeExpiredService() {
+        final long now = System.currentTimeMillis();
+        List<SubscribeService> list = new ArrayList<>(mServiceMap.values());
+        for (SubscribeService c : list) {
+            if (c.isExpired(now)) {
+                final Service service = c.getService();
+                remove(service);
+                service.expired();
+            }
+        }
     }
 
     /**
@@ -213,14 +185,20 @@ class SubscribeKeeper implements Runnable {
      * @throws InterruptedException 割り込みが発生した
      */
     private synchronized void waitNextRenewTime() throws InterruptedException {
-        Collections.sort(mServiceList, mComparator);
-        if (mServiceList.size() != 0) {
-            final Container c = mServiceList.get(0);
-            long sleep = calculateRenewTime(c) - System.currentTimeMillis();
-            if (sleep < MIN_INTERVAL) {
-                sleep = MIN_INTERVAL; // ビジーループ阻止
-            }
-            wait(sleep);
+        if (mServiceMap.size() == 0) {
+            return;
         }
+        long recent = Long.MAX_VALUE;
+        for (SubscribeService c : mServiceMap.values()) {
+            final long wait = c.getNextTime();
+            if (recent > wait) {
+                recent = wait;
+            }
+        }
+        long sleep = recent - System.currentTimeMillis();
+        if (sleep < MIN_INTERVAL) { // ビジーループを回避するためMIN_INTERVALの間はwaitする
+            sleep = MIN_INTERVAL;
+        }
+        wait(sleep);
     }
 }

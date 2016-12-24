@@ -62,8 +62,8 @@ public class XmlUtils {
      *
      * @param xml XML文字列
      * @return Document
-     * @throws SAXException 構文解析エラーが発生した
-     * @throws IOException 入出力エラーが発生した
+     * @throws SAXException                 構文解析エラーが発生した
+     * @throws IOException                  入出力エラーが発生した
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     @Nonnull
@@ -75,7 +75,7 @@ public class XmlUtils {
     /**
      * ノード以下にある特定の名前を持つ最初のエレメントノードを返す
      *
-     * @param parent 親ノード
+     * @param parent    親ノード
      * @param localName 検索するローカル名
      * @return 見つかったエレメントノード、見つからなければnull
      */

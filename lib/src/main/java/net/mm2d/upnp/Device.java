@@ -197,8 +197,8 @@ public class Device {
      * <p>Descriptionのパース後、そこに記述されている
      * icon/serviceのDescriptionの読み込みパースもまとめて行う。
      *
-     * @throws IOException 通信上での何らかの問題
-     * @throws SAXException XMLのパースに失敗
+     * @throws IOException                  通信上での何らかの問題
+     * @throws SAXException                 XMLのパースに失敗
      * @throws ParserConfigurationException XMLパーサが利用できない場合
      */
     void loadDescription(@Nonnull IconFilter filter)
@@ -208,7 +208,7 @@ public class Device {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
         request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
+        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
@@ -459,7 +459,7 @@ public class Device {
      * ネームスペースはプレフィックスではなく、URIを指定する。
      * 値が存在しない場合nullが返る。
      *
-     * @param name タグ名
+     * @param name      タグ名
      * @param namespace ネームスペース（URI）
      * @return タグの値
      */

@@ -64,7 +64,7 @@ abstract class SsdpServer {
     /**
      * 使用するインターフェースとポート指定してインスタンス作成。
      *
-     * @param ni 使用するインターフェース
+     * @param ni       使用するインターフェース
      * @param bindPort 使用するポート
      */
     public SsdpServer(@Nonnull NetworkInterface ni, int bindPort) {
@@ -181,7 +181,7 @@ abstract class SsdpServer {
      * メッセージ受信後の処理、小クラスにより実装する。
      *
      * @param addr 受信したインターフェース
-     * @param dp 受信したパケット
+     * @param dp   受信したパケット
      */
     protected abstract void onReceive(@Nonnull InterfaceAddress addr, @Nonnull DatagramPacket dp);
 

@@ -46,7 +46,7 @@ public class HttpHeader {
         /**
          * インスタンス作成
          *
-         * @param name ヘッダ名
+         * @param name  ヘッダ名
          * @param value 値
          */
         public Entry(@Nonnull String name, @Nonnull String value) {
@@ -190,7 +190,7 @@ public class HttpHeader {
      * ヘッダの重複は大文字小文字の区別を行わない。
      * 置換された場合、ヘッダ名も引数のもので置き換えられる。
      *
-     * @param name ヘッダ名
+     * @param name  ヘッダ名
      * @param value ヘッダの値
      * @return 重複があった場合、既に登録されていた値。
      */
@@ -214,7 +214,7 @@ public class HttpHeader {
      *
      * <p>該当ヘッダ名の検索も大文字小文字の区別を行わない。
      *
-     * @param name ヘッダ名
+     * @param name  ヘッダ名
      * @param value 含まれるか
      * @return 指定ヘッダにvalueが含まれる場合true
      */

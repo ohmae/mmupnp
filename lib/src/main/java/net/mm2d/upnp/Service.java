@@ -185,6 +185,7 @@ public class Service {
     private final Map<String, StateVariable> mStateVariableMap;
     private long mSubscriptionStart;
     private long mSubscriptionTimeout;
+    private long mSbuscriptionExpiryTime;
     @Nullable
     private String mSubscriptionId;
     @Nonnull
@@ -347,8 +348,8 @@ public class Service {
      * <p>可能であればKeepAliveを行う。
      *
      * @param client 通信に使用するHttpClient
-     * @throws IOException 通信エラー
-     * @throws SAXException XMLパースエラー
+     * @throws IOException                  通信エラー
+     * @throws SAXException                 XMLパースエラー
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     void loadDescription(@Nonnull HttpClient client)
@@ -357,11 +358,11 @@ public class Service {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
         request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
+        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
-            Log.i(TAG, response.toString());
+            Log.i(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
             throw new IOException(response.getStartLine());
         }
         mDescription = response.getBody();
@@ -545,9 +546,11 @@ public class Service {
         final SsdpMessage ssdp = mDevice.getSsdpMessage();
         final InterfaceAddress ifa = ssdp.getInterfaceAddress();
         sb.append(ifa.getAddress().getHostAddress());
-        sb.append(':');
         final int port = mControlPoint.getEventPort();
-        sb.append(String.valueOf(port));
+        if (port != Http.DEFAULT_PORT) {
+            sb.append(':');
+            sb.append(String.valueOf(port));
+        }
         sb.append('/');
         sb.append(mDevice.getUdn());
         sb.append('/');
@@ -622,22 +625,20 @@ public class Service {
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, response.toString());
+            Log.w(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
-            Log.w(TAG, response.toString());
+            Log.w(TAG, "response:" + response.toString());
             return false;
         }
         mSubscriptionId = sid;
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
-        mControlPoint.registerSubscribeService(this);
-        if (keepRenew) {
-            mControlPoint.addSubscribeKeeper(this);
-        }
+        mSbuscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
+        mControlPoint.registerSubscribeService(this, keepRenew);
         return true;
     }
 
@@ -647,18 +648,7 @@ public class Service {
      * @return 成功時true
      * @throws IOException 通信エラー
      */
-    public boolean renewSubscribe() throws IOException {
-        return renewSubscribe(true);
-    }
-
-    /**
-     * RenewSubscribeを実行する
-     *
-     * @param notify trueの場合期限が変化したことをSubscribeKeeperに通知する
-     * @return 成功時true
-     * @throws IOException 通信エラー
-     */
-    boolean renewSubscribe(boolean notify) throws IOException {
+    boolean renewSubscribe() throws IOException {
         if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
@@ -672,20 +662,18 @@ public class Service {
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, response.toString());
+            Log.w(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
-            Log.w(TAG, response.toString());
+            Log.w(TAG, "\nresponse:" + response.toString());
             return false;
         }
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
-        if (notify) {
-            mControlPoint.renewSubscribeService();
-        }
+        mSbuscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
         return true;
     }
 
@@ -708,13 +696,14 @@ public class Service {
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, response.toString());
+            Log.w(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         mControlPoint.unregisterSubscribeService(this);
         mSubscriptionId = null;
         mSubscriptionStart = 0;
         mSubscriptionTimeout = 0;
+        mSbuscriptionExpiryTime = 0;
         return true;
     }
 
@@ -725,6 +714,7 @@ public class Service {
         mSubscriptionId = null;
         mSubscriptionStart = 0;
         mSubscriptionTimeout = 0;
+        mSbuscriptionExpiryTime = 0;
     }
 
     /**
@@ -753,5 +743,31 @@ public class Service {
      */
     public long getSubscriptionTimeout() {
         return mSubscriptionTimeout;
+    }
+
+    /**
+     * Subscriptionの有効期限
+     *
+     * @return Subscriptionの有効期限
+     */
+    public long getSubscriptionExpiryTime() {
+        return mSbuscriptionExpiryTime;
+    }
+
+    @Override
+    public int hashCode() {
+        return mDevice.hashCode() + mServiceId.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Service)) {
+            return false;
+        }
+        Service service = (Service) obj;
+        if (!mDevice.equals(service.getDevice())) {
+            return false;
+        }
+        return mServiceId.equals(service.getServiceId());
     }
 }

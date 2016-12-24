@@ -52,6 +52,7 @@ class DeviceInspector implements Runnable {
         mThread = new Thread(this, TAG);
         mThread.start();
     }
+
     /**
      * スレッドに割り込みをかけ終了させる。
      */
@@ -75,7 +76,7 @@ class DeviceInspector implements Runnable {
      *
      * @param device 追加されるDevice
      */
-     synchronized void add(@Nonnull Device device) {
+    synchronized void add(@Nonnull Device device) {
         mDeviceList.add(device);
         Collections.sort(mDeviceList, mComparator);
         notifyAll();
