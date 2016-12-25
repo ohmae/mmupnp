@@ -765,9 +765,6 @@ public class Service {
             return false;
         }
         Service service = (Service) obj;
-        if (!mDevice.equals(service.getDevice())) {
-            return false;
-        }
-        return mServiceId.equals(service.getServiceId());
+        return mDevice.equals(service.getDevice()) && mServiceId.equals(service.getServiceId());
     }
 }

@@ -36,7 +36,7 @@ public class HttpHeader {
     }
 
     /**
-     * ヘッダのエントリー情報
+     * ヘッダのエントリー情報。
      */
     public static class Entry {
         private String mKey;
@@ -44,7 +44,7 @@ public class HttpHeader {
         private String mValue;
 
         /**
-         * インスタンス作成
+         * インスタンス作成。
          *
          * @param name  ヘッダ名
          * @param value 値
@@ -53,6 +53,17 @@ public class HttpHeader {
             mKey = toKey(name);
             mName = name;
             mValue = value;
+        }
+
+        /**
+         * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
+         *
+         * @param original コピー元
+         */
+        public Entry(Entry original) {
+            mKey = original.mKey;
+            mName = original.mName;
+            mValue = original.mValue;
         }
 
         /**
@@ -69,7 +80,7 @@ public class HttpHeader {
          *
          * @param name ヘッダ名
          */
-        public void setName(@Nonnull String name) {
+        private void setName(@Nonnull String name) {
             mKey = toKey(name);
             mName = name;
         }
@@ -89,7 +100,7 @@ public class HttpHeader {
          *
          * @param value 値
          */
-        public void setValue(@Nonnull String value) {
+        private void setValue(@Nonnull String value) {
             mValue = value;
         }
 
@@ -121,7 +132,26 @@ public class HttpHeader {
     }
 
     private EntrySet mEntrySet;
-    private final List<Entry> mList = new LinkedList<>();
+    private final List<Entry> mList;
+
+    /**
+     * インスタンス初期化。
+     */
+    public HttpHeader() {
+        mList = new LinkedList<>();
+    }
+
+    /**
+     * 引数のHeaderと同一の内容を持つHeaderを作成する。
+     *
+     * @param original コピー元
+     */
+    public HttpHeader(HttpHeader original) {
+        mList = new LinkedList<>();
+        for (Entry entry : original.mList) {
+            mList.add(new Entry(entry));
+        }
+    }
 
     /**
      * ヘッダエントリー数を返す。

@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,6 +61,24 @@ public abstract class HttpMessage {
      */
     public HttpMessage() {
         mHeaders = new HttpHeader();
+    }
+
+    /**
+     * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
+     *
+     * @param original コピー元
+     */
+    public HttpMessage(HttpMessage original) {
+        mAddress = original.mAddress;
+        mPort = original.mPort;
+        mHeaders = new HttpHeader(original.mHeaders);
+        mVersion = original.mVersion;
+        if (original.mBodyBinary != null) {
+            mBodyBinary = Arrays.copyOf(original.mBodyBinary, original.mBodyBinary.length);
+        } else {
+            mBodyBinary = null;
+        }
+        mBody = original.mBody;
     }
 
     /**

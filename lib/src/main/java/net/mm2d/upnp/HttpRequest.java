@@ -31,6 +31,17 @@ public class HttpRequest extends HttpMessage {
         super();
     }
 
+    /**
+     * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
+     *
+     * @param original コピー元
+     */
+    public HttpRequest(HttpRequest original) {
+        super(original);
+        mMethod = original.mMethod;
+        mUri = original.mUri;
+    }
+
     @Override
     public void setStartLine(@Nonnull String line) throws IllegalArgumentException {
         setRequestLine(line);
@@ -81,7 +92,8 @@ public class HttpRequest extends HttpMessage {
         if (!TextUtils.equals(url.getProtocol(), "http")) {
             throw new IOException("unsupported protocol." + url.getProtocol());
         }
-        setAddress(InetAddress.getByName(url.getHost()));
+        final String host = url.getHost();
+        setAddress(InetAddress.getByName(host));
         int port = url.getPort();
         if (port < 0) {
             port = 80;
@@ -89,7 +101,11 @@ public class HttpRequest extends HttpMessage {
         setPort(port);
         setUri(url.getFile());
         if (withHostHeader) {
-            setHeader(Http.HOST, getAddressString());
+            if (port != Http.DEFAULT_PORT) {
+                setHeader(Http.HOST, host + ":" + port);
+            } else {
+                setHeader(Http.HOST, host);
+            }
         }
     }
 

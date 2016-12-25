@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -157,9 +155,9 @@ class SubscribeKeeper implements Runnable {
      * @param serviceList renewのトリガをかけるServiceのコレクション
      */
     private void renewSubscribe(final @Nonnull Collection<SubscribeService> serviceList) {
-        for (final SubscribeService c : serviceList) {
-            if (!c.renewSubscribe(System.currentTimeMillis()) && c.isFailed()) {
-                remove(c.getService());
+        for (final SubscribeService s : serviceList) {
+            if (!s.renewSubscribe(System.currentTimeMillis()) && s.isFailed()) {
+                remove(s.getService());
             }
         }
     }
@@ -170,9 +168,9 @@ class SubscribeKeeper implements Runnable {
     private synchronized void removeExpiredService() {
         final long now = System.currentTimeMillis();
         List<SubscribeService> list = new ArrayList<>(mServiceMap.values());
-        for (SubscribeService c : list) {
-            if (c.isExpired(now)) {
-                final Service service = c.getService();
+        for (SubscribeService s : list) {
+            if (s.isExpired(now)) {
+                final Service service = s.getService();
                 remove(service);
                 service.expired();
             }
@@ -189,8 +187,8 @@ class SubscribeKeeper implements Runnable {
             return;
         }
         long recent = Long.MAX_VALUE;
-        for (SubscribeService c : mServiceMap.values()) {
-            final long wait = c.getNextTime();
+        for (SubscribeService s : mServiceMap.values()) {
+            final long wait = s.getNextTime();
             if (recent > wait) {
                 recent = wait;
             }

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.URL;
 
 import javax.annotation.Nonnull;
 
@@ -34,6 +35,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpClient {
+    private static final int REDIRECT_MAX = 2;
     private Socket mSocket;
     private boolean mKeepAlive;
     private InputStream mInputStream;
@@ -97,6 +99,21 @@ public class HttpClient {
      */
     @Nonnull
     public HttpResponse post(@Nonnull HttpRequest request) throws IOException {
+        return post(request, 0);
+    }
+
+    /**
+     * リクエストを送信し、レスポンスを受信する。
+     *
+     * <p>利用するHTTPメソッドは引数に依存する。
+     *
+     * @param request       送信するリクエスト
+     * @param redirectDepth リダイレクトの深さ
+     * @return 受信したレスポンス
+     * @throws IOException 通信エラー
+     */
+    @Nonnull
+    public HttpResponse post(@Nonnull HttpRequest request, int redirectDepth) throws IOException {
         if (!isClosed()) {
             if (!canReuse(request)) {
                 closeSocket();
@@ -124,11 +141,38 @@ public class HttpClient {
             if (!isKeepAlive() || !response.isKeepAlive()) {
                 closeSocket();
             }
+            if (redirectDepth < REDIRECT_MAX
+                    && isRedirection(response.getStatus())) {
+                String location = response.getHeader(Http.LOCATION);
+                if (location != null) {
+                    return redirect(request, location, redirectDepth);
+                }
+            }
             return response;
         } catch (final IOException e) {
             closeSocket();
             throw e;
         }
+    }
+
+    private boolean isRedirection(Http.Status status) {
+        switch (status) {
+            case HTTP_MOVED_PERM:
+            case HTTP_FOUND:
+            case HTTP_SEE_OTHER:
+            case HTTP_TEMP_REDIRECT:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private HttpResponse redirect(@Nonnull HttpRequest request, @Nonnull String location, int redirectDepth)
+            throws IOException {
+        HttpRequest newRequest = new HttpRequest(request);
+        newRequest.setUrl(new URL(location), true);
+        newRequest.setHeader(Http.CONNECTION, Http.CLOSE);
+        return new HttpClient(false).post(newRequest, redirectDepth + 1);
     }
 
     private boolean canReuse(@Nonnull HttpRequest request) {

@@ -44,6 +44,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
@@ -141,7 +142,7 @@ public class MainWindow extends JFrame {
         mControlPoint.addNotifyEventListener(eventListener);
         setTitle("UPnP");
         setSize(800, 800);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         final JPanel contentPane = new JPanel();
         contentPane.setLayout(new FlowLayout());
         final JButton button1 = new JButton("START");

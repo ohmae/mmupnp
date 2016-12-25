@@ -221,7 +221,10 @@ public class Device {
         if (!mIconList.isEmpty()) {
             final List<Icon> loadList = filter.filter(mIconList);
             for (final Icon icon : loadList) {
-                icon.loadBinary(client);
+                try {
+                    icon.loadBinary(client);
+                } catch (final IOException ignored) {
+                }
             }
         }
         for (final Service service : mServiceList) {

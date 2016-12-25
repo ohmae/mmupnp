@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -142,6 +140,7 @@ class SubscribeService {
         if (object == null || !(object instanceof SubscribeService)) {
             return false;
         }
-        return mService.equals(((SubscribeService) object).getService());
+        final SubscribeService s = (SubscribeService) object;
+        return mService.equals(s.getService());
     }
 }
