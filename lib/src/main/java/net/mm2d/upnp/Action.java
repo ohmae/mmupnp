@@ -251,7 +251,7 @@ public class Action {
     @Nonnull
     private String makeSoap(@Nonnull Map<String, String> arguments) throws IOException {
         try {
-            final Document doc = XmlUtils.newDocument();
+            final Document doc = XmlUtils.newDocument(true);
             final Element envelope = doc.createElementNS(SOAP_NS, "s:Envelope");
             doc.appendChild(envelope);
             final Attr style = doc.createAttributeNS(SOAP_NS, "s:encodingStyle");
@@ -294,7 +294,7 @@ public class Action {
             throws IOException, SAXException, ParserConfigurationException {
         final Map<String, String> result = new HashMap<>();
         final String responseTag = mName + "Response";
-        final Document doc = XmlUtils.newDocument(xml);
+        final Document doc = XmlUtils.newDocument(true, xml);
         final Element envelope = doc.getDocumentElement();
         final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
         if (body == null) {

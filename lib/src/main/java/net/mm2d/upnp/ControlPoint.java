@@ -220,7 +220,7 @@ public class ControlPoint {
                 return;
             }
             try {
-                final Document doc = XmlUtils.newDocument(xml);
+                final Document doc = XmlUtils.newDocument(true, xml);
                 Node node = doc.getDocumentElement().getFirstChild();
                 for (; node != null; node = node.getNextSibling()) {
                     if (node.getNodeType() != Node.ELEMENT_NODE) {

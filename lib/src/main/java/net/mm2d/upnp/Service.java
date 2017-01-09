@@ -371,7 +371,7 @@ public class Service {
 
     private void parseDescription(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
-        final Document doc = XmlUtils.newDocument(xml);
+        final Document doc = XmlUtils.newDocument(true, xml);
         final List<Action.Builder> alist = parseActionList(doc.getElementsByTagName("action"));
         parseStateVariableList(doc.getElementsByTagName("stateVariable"));
         for (final Action.Builder builder : alist) {
