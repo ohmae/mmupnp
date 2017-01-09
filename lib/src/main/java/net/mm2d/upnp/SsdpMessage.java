@@ -158,7 +158,7 @@ public abstract class SsdpMessage {
     }
 
     /**
-     * Locationに記述のアドレスとパケットの送信元アドレスが一致しているかを返す。
+     * Locationに記述のアドレスとパケットの送信元アドレスに不一致がないか検査する
      *
      * @param sourceAddress 送信元アドレス
      * @return Locationに問題がある場合true
