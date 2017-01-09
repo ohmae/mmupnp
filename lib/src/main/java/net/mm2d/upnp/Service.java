@@ -492,6 +492,7 @@ public class Service {
                     break;
                 case "allowedValueRange":
                     parseAllowedValueRange(builder, (Element) node);
+                    break;
                 default:
                     break;
             }
