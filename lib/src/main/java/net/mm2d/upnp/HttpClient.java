@@ -134,9 +134,7 @@ public class HttpClient {
                     request.writeData(mOutputStream);
                 }
             }
-            final HttpResponse response = new HttpResponse();
-            response.setAddress(mSocket.getInetAddress());
-            response.setPort(mSocket.getPort());
+            final HttpResponse response = new HttpResponse(mSocket);
             response.readData(mInputStream);
             if (!isKeepAlive() || !response.isKeepAlive()) {
                 closeSocket();

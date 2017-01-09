@@ -18,9 +18,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -372,9 +374,9 @@ public class Service {
     private void parseDescription(@Nonnull String xml)
             throws IOException, SAXException, ParserConfigurationException {
         final Document doc = XmlUtils.newDocument(true, xml);
-        final List<Action.Builder> alist = parseActionList(doc.getElementsByTagName("action"));
+        final List<Action.Builder> actionList = parseActionList(doc.getElementsByTagName("action"));
         parseStateVariableList(doc.getElementsByTagName("stateVariable"));
-        for (final Action.Builder builder : alist) {
+        for (final Action.Builder builder : actionList) {
             for (final Argument.Builder b : builder.getArgumentBuilderList()) {
                 final String name = b.getRelatedStateVariableName();
                 final StateVariable v = mStateVariableMap.get(name);
@@ -552,9 +554,12 @@ public class Service {
             sb.append(String.valueOf(port));
         }
         sb.append('/');
-        sb.append(mDevice.getUdn());
-        sb.append('/');
-        sb.append(mServiceId);
+        try {
+            sb.append(URLEncoder.encode(mDevice.getUdn(), "UTF-8"));
+            sb.append('/');
+            sb.append(URLEncoder.encode(mServiceId, "UTF-8"));
+        } catch (UnsupportedEncodingException ignored) {
+        }
         sb.append('>');
         return sb.toString();
     }
@@ -625,13 +630,13 @@ public class Service {
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w(TAG, "subscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
-            Log.w(TAG, "response:" + response.toString());
+            Log.w(TAG, "subscribe response:" + response.toString());
             return false;
         }
         mSubscriptionId = sid;
@@ -662,13 +667,13 @@ public class Service {
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w(TAG, "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
-            Log.w(TAG, "\nresponse:" + response.toString());
+            Log.w(TAG, "renewSubscribe response:" + response.toString());
             return false;
         }
         mSubscriptionStart = System.currentTimeMillis();
@@ -696,7 +701,7 @@ public class Service {
         final HttpClient client = new HttpClient(false);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w(TAG, "unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         mControlPoint.unregisterSubscribeService(this);

@@ -85,6 +85,15 @@ abstract class SsdpServer {
     }
 
     /**
+     * BindされたInterfaceのアドレスを返す。
+     *
+     * @return BindされたInterfaceのアドレス
+     */
+    protected InterfaceAddress getInterfaceAddress() {
+        return mInterfaceAddress;
+    }
+
+    /**
      * ソケットのオープンを行う。
      *
      * @throws IOException ソケット作成に失敗
@@ -178,12 +187,13 @@ abstract class SsdpServer {
     }
 
     /**
-     * メッセージ受信後の処理、小クラスにより実装する。
+     * メッセージ受信後の処理、サブクラスにより実装する。
      *
-     * @param addr 受信したインターフェース
-     * @param dp   受信したパケット
+     * @param sourceAddress 送信元アドレス
+     * @param data          受信したデータ
+     * @param length        受信したデータの長さ
      */
-    protected abstract void onReceive(@Nonnull InterfaceAddress addr, @Nonnull DatagramPacket dp);
+    protected abstract void onReceive(@Nonnull InetAddress sourceAddress, @Nonnull byte[] data, int length);
 
     /**
      * Joinを行う。
@@ -243,7 +253,7 @@ abstract class SsdpServer {
                         if (mShutdownRequest) {
                             break;
                         }
-                        onReceive(mInterfaceAddress, dp);
+                        onReceive(dp.getAddress(), dp.getData(), dp.getLength());
                     } catch (final SocketTimeoutException ignored) {
                     }
                 }

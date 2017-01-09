@@ -11,6 +11,7 @@ import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
@@ -29,6 +30,15 @@ public class HttpRequest extends HttpMessage {
      */
     public HttpRequest() {
         super();
+    }
+
+    /**
+     * インスタンス作成
+     *
+     * @param socket 受信したsocket
+     */
+    public HttpRequest(Socket socket) {
+        super(socket);
     }
 
     /**

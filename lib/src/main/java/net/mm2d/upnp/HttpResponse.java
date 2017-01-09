@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import java.net.Socket;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -19,6 +21,22 @@ public class HttpResponse extends HttpMessage {
     private Http.Status mStatus;
     private int mStatusCode;
     private String mReasonPhrase = "";
+
+    /**
+     * インスタンス作成。
+     */
+    public HttpResponse() {
+        super();
+    }
+
+    /**
+     * インスタンス作成
+     *
+     * @param socket 受信したsocket
+     */
+    public HttpResponse(Socket socket) {
+        super(socket);
+    }
 
     @Override
     public void setStartLine(@Nonnull String line) throws IllegalArgumentException {

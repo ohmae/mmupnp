@@ -237,9 +237,7 @@ class EventReceiver {
             try {
                 is = new BufferedInputStream(mSocket.getInputStream());
                 os = new BufferedOutputStream(mSocket.getOutputStream());
-                final HttpRequest request = new HttpRequest();
-                request.setAddress(mSocket.getInetAddress());
-                request.setPort(mSocket.getPort());
+                final HttpRequest request = new HttpRequest(mSocket);
                 if (!request.readData(is)) {
                     return;
                 }

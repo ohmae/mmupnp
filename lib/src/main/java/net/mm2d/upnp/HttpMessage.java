@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.Arrays;
 
@@ -64,6 +65,17 @@ public abstract class HttpMessage {
     }
 
     /**
+     * インスタンス作成
+     *
+     * @param socket 受信したsocket
+     */
+    public HttpMessage(Socket socket) {
+        this();
+        mAddress = socket.getInetAddress();
+        mPort = socket.getPort();
+    }
+
+    /**
      * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
      *
      * @param original コピー元
@@ -96,7 +108,7 @@ public abstract class HttpMessage {
      *
      * @param address 宛先アドレス。
      */
-    public void setAddress(@Nullable InetAddress address) {
+    protected void setAddress(@Nullable InetAddress address) {
         mAddress = address;
     }
 
@@ -114,7 +126,7 @@ public abstract class HttpMessage {
      *
      * @param port 宛先ポート番号
      */
-    public void setPort(int port) {
+    protected void setPort(int port) {
         mPort = port;
     }
 
