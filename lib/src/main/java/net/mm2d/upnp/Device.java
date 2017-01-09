@@ -156,10 +156,29 @@ public class Device {
      */
     @Nonnull
     URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
+        return getAbsoluteUrl(getLocation(), url);
+    }
+
+    /**
+     * URL情報を正規化して返す。
+     *
+     * <p>"http://"から始まっていればそのまま利用する。
+     * "/"から始まっていればLocationホストの絶対パスとして
+     * Locationの"://"以降の最初の"/"までと結合する。
+     * それ以外の場合はLocationからの相対パスであり、
+     * Locationからクエリーを除去し、最後の"/"までと結合する。
+     *
+     * @param location SSDPパケットに記述されたLocation情報
+     * @param url      URLパス情報
+     * @return 正規化したURL
+     * @throws MalformedURLException 不正なURL
+     */
+    @Nonnull
+    static URL getAbsoluteUrl(@Nonnull String location, @Nonnull String url) throws MalformedURLException {
         if (url.startsWith("http://")) {
             return new URL(url);
         }
-        String baseUrl = getLocation();
+        String baseUrl = location;
         if (url.startsWith("/")) {
             int pos = baseUrl.indexOf("://");
             pos = baseUrl.indexOf("/", pos + 3);
