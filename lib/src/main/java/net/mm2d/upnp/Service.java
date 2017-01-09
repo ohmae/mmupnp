@@ -185,7 +185,7 @@ public class Service {
     private final Map<String, StateVariable> mStateVariableMap;
     private long mSubscriptionStart;
     private long mSubscriptionTimeout;
-    private long mSbuscriptionExpiryTime;
+    private long mSubscriptionExpiryTime;
     @Nullable
     private String mSubscriptionId;
     @Nonnull
@@ -637,7 +637,7 @@ public class Service {
         mSubscriptionId = sid;
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
-        mSbuscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
+        mSubscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
         mControlPoint.registerSubscribeService(this, keepRenew);
         return true;
     }
@@ -673,7 +673,7 @@ public class Service {
         }
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
-        mSbuscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
+        mSubscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
         return true;
     }
 
@@ -703,7 +703,7 @@ public class Service {
         mSubscriptionId = null;
         mSubscriptionStart = 0;
         mSubscriptionTimeout = 0;
-        mSbuscriptionExpiryTime = 0;
+        mSubscriptionExpiryTime = 0;
         return true;
     }
 
@@ -714,7 +714,7 @@ public class Service {
         mSubscriptionId = null;
         mSubscriptionStart = 0;
         mSubscriptionTimeout = 0;
-        mSbuscriptionExpiryTime = 0;
+        mSubscriptionExpiryTime = 0;
     }
 
     /**
@@ -751,7 +751,7 @@ public class Service {
      * @return Subscriptionの有効期限
      */
     public long getSubscriptionExpiryTime() {
-        return mSbuscriptionExpiryTime;
+        return mSubscriptionExpiryTime;
     }
 
     @Override

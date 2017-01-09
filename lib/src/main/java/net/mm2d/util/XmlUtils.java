@@ -50,7 +50,7 @@ public class XmlUtils {
     /**
      * 空のDocumentを作成する。
      *
-     * @param awareness trueのときXML namespaseに対応
+     * @param awareness trueのときXML namespaceに対応
      * @return Document
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
@@ -62,7 +62,7 @@ public class XmlUtils {
     /**
      * 引数のStringをもとにしたDocumentを作成する。
      *
-     * @param awareness trueのときXML namespaseに対応
+     * @param awareness trueのときXML namespaceに対応
      * @param xml       XML文字列
      * @return Document
      * @throws SAXException                 構文解析エラーが発生した
