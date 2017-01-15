@@ -26,7 +26,7 @@ public class Icon {
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription(IconFilter)
+     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
      */
     public static class Builder {
         private Device mDevice;
@@ -185,6 +185,11 @@ public class Icon {
     @Nullable
     private byte[] mBinary;
 
+    /**
+     * インスタンスを作成する。
+     *
+     * @param builder Builder
+     */
     private Icon(@Nonnull Builder builder) {
         mDevice = builder.mDevice;
         mMimeType = builder.mMimeType;
@@ -208,6 +213,9 @@ public class Icon {
     /**
      * MimeTypeの値を返す。
      *
+     * <p>Required. Icon's MIME type (see RFC 2045, 2046, and 2387). Single MIME image type.
+     * At least one icon should be of type “image/png” (Portable Network Graphics, see IETF RFC 2083).
+     *
      * @return MimeType
      */
     @Nonnull
@@ -218,6 +226,8 @@ public class Icon {
     /**
      * Heightの値を返す。
      *
+     * <p>Required. Vertical dimension of icon in pixels. Integer.
+     *
      * @return Height
      */
     public int getHeight() {
@@ -226,6 +236,8 @@ public class Icon {
 
     /**
      * Widthの値を返す。
+     *
+     * <p>Required. Horizontal dimension of icon in pixels. Integer.
      *
      * @return Width
      */
@@ -236,6 +248,8 @@ public class Icon {
     /**
      * Depthの値を返す。
      *
+     * <p>Required. Number of color bits per pixel. Integer.
+     *
      * @return Depth
      */
     public int getDepth() {
@@ -244,6 +258,10 @@ public class Icon {
 
     /**
      * URLの値を返す。
+     *
+     * <p>Required. Pointer to icon image. (XML does not support direct embedding of binary data. See note below.)
+     * Retrieved via HTTP. Shall be relative to the URL at which the device description is located in accordance with
+     * clause 5 of RFC 3986. Specified by UPnP vendor. Single URL.
      *
      * @return URL
      */

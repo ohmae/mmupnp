@@ -89,6 +89,7 @@ abstract class SsdpServer {
      *
      * @return BindされたInterfaceのアドレス
      */
+    @Nonnull
     protected InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
     }

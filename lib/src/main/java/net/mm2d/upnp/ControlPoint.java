@@ -119,7 +119,7 @@ public class ControlPoint {
     @Nonnull
     private final Map<String, Device> mDeviceMap;
     @Nonnull
-    private final Map<String, Device> mPendingDeviceMap;
+    private final Map<String, Device.Builder> mLoadingDeviceMap;
     @Nonnull
     private final EventReceiver mEventReceiver;
     @Nonnull
@@ -133,27 +133,42 @@ public class ControlPoint {
     private final DeviceInspector mDeviceInspector;
     @Nonnull
     private final SubscribeKeeper mSubscribeKeeper;
+    @Nonnull
+    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
+
+    /**
+     * HttpClientのファクトリークラスを変更する。
+     *
+     * @param factory ファクトリークラス
+     */
+    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
+        mHttpClientFactory = factory;
+    }
+
+    @Nonnull
+    private HttpClient createHttpClient() {
+        return mHttpClientFactory.createHttpClient(true);
+    }
 
     private void onReceiveSsdp(@Nonnull SsdpMessage message) {
         final String uuid = message.getUuid();
         synchronized (mDeviceMap) {
-            Device device = mDeviceMap.get(uuid);
+            final Device device = mDeviceMap.get(uuid);
             if (device == null) {
                 if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
-                    if (mPendingDeviceMap.get(uuid) != null) {
-                        mPendingDeviceMap.remove(uuid);
+                    if (mLoadingDeviceMap.get(uuid) != null) {
+                        mLoadingDeviceMap.remove(uuid);
                     }
                     return;
                 }
-                device = mPendingDeviceMap.get(uuid);
-                if (device != null) {
-                    device.setSsdpMessage(message);
+                Device.Builder deviceBuilder = mLoadingDeviceMap.get(uuid);
+                if (deviceBuilder != null) {
+                    deviceBuilder.setSsdpMessage(message);
                 } else {
-                    device = new Device(ControlPoint.this);
-                    device.setSsdpMessage(message);
-                    mPendingDeviceMap.put(message.getUuid(), device);
-                    if (!executeParallel(new DeviceLoader(device))) {
-                        mPendingDeviceMap.remove(message.getUuid());
+                    deviceBuilder = new Device.Builder(ControlPoint.this, message);
+                    mLoadingDeviceMap.put(message.getUuid(), deviceBuilder);
+                    if (!executeParallel(new DeviceLoader(deviceBuilder))) {
+                        mLoadingDeviceMap.remove(message.getUuid());
                     }
                 }
             } else {
@@ -168,27 +183,32 @@ public class ControlPoint {
     }
 
     private class DeviceLoader implements Runnable {
-        private final Device mDevice;
+        private final Device.Builder mDeviceBuilder;
 
-        DeviceLoader(@Nonnull Device device) {
-            mDevice = device;
+        DeviceLoader(@Nonnull Device.Builder builder) {
+            mDeviceBuilder = builder;
         }
 
         @Override
         public void run() {
-            final String uuid = mDevice.getUuid();
+            final HttpClient client = createHttpClient();
+            final String uuid = mDeviceBuilder.getUuid();
             try {
-                mDevice.loadDescription(mIconFilter);
+                DeviceParser.loadDescription(client, mDeviceBuilder);
+                final Device device = mDeviceBuilder.build();
+                device.loadIconBinary(client, mIconFilter);
                 synchronized (mDeviceMap) {
-                    if (mPendingDeviceMap.get(uuid) != null) {
-                        mPendingDeviceMap.remove(uuid);
-                        discoverDevice(mDevice);
+                    if (mLoadingDeviceMap.get(uuid) != null) {
+                        mLoadingDeviceMap.remove(uuid);
+                        discoverDevice(device);
                     }
                 }
             } catch (final IOException | SAXException | ParserConfigurationException e) {
                 synchronized (mDeviceMap) {
-                    mPendingDeviceMap.remove(uuid);
+                    mLoadingDeviceMap.remove(uuid);
                 }
+            } finally {
+                client.close();
             }
         }
     }
@@ -286,7 +306,7 @@ public class ControlPoint {
         mSearchList = new ArrayList<>();
         mNotifyList = new ArrayList<>();
         mDeviceMap = Collections.synchronizedMap(new LinkedHashMap<String, Device>());
-        mPendingDeviceMap = new HashMap<>();
+        mLoadingDeviceMap = new HashMap<>();
         mDiscoveryListeners = new ArrayList<>();
         mNotifyEventListeners = new ArrayList<>();
         mNotifyExecutor = Executors.newSingleThreadExecutor();

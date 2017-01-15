@@ -49,8 +49,8 @@ public class Action {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription(IconFilter)
-     * @see Service#loadDescription(HttpClient)
+     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, String, Service.Builder)
      */
     public static class Builder {
         private Service mService;
@@ -146,9 +146,8 @@ public class Action {
         mService = builder.mService;
         mName = builder.mName;
         mArgumentMap = new LinkedHashMap<>(builder.mArgumentList.size());
-        for (final Argument.Builder b : builder.mArgumentList) {
-            b.setAction(this);
-            final Argument argument = b.build();
+        for (final Argument.Builder argumentBuilder : builder.mArgumentList) {
+            final Argument argument = argumentBuilder.setAction(this).build();
             mArgumentMap.put(argument.getName(), argument);
         }
     }

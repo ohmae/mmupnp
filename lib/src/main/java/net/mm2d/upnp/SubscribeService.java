@@ -14,6 +14,8 @@ import javax.annotation.Nonnull;
 
 /**
  * ServiceのSubscribe状態を管理するクラス。
+ *
+ * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SubscribeService {
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);

@@ -7,15 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
-import net.mm2d.util.TextUtils;
-import net.mm2d.util.XmlUtils;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,7 +20,6 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * UPnP Deviceを表現するクラス
@@ -40,41 +30,371 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class Device {
     private static final String TAG = Device.class.getSimpleName();
+
+    /**
+     * DeviceのBuilder。
+     *
+     * XMLファイルの読み込み処理もBuilderに対して行う。
+     */
+    public static class Builder {
+        @Nonnull
+        private final ControlPoint mControlPoint;
+        private SsdpMessage mSsdpMessage;
+        private String mDescription;
+        private String mUdn;
+        private String mDeviceType;
+        private String mFriendlyName;
+        private String mManufacture;
+        private String mManufactureUrl;
+        private String mModelName;
+        private String mModelUrl;
+        private String mModelDescription;
+        private String mModelNumber;
+        private String mSerialNumber;
+        private String mPresentationUrl;
+        private List<Icon.Builder> mIconBuilderList;
+        private List<Service.Builder> mServiceBuilderList;
+        @Nonnull
+        private final Map<String, Map<String, String>> mTagMap;
+
+        /**
+         * インスタンスを作成する。
+         *
+         * @param controlPoint ControlPoint
+         * @param ssdpMessage  SSDPパケット
+         */
+        public Builder(@Nonnull ControlPoint controlPoint, @Nonnull SsdpMessage ssdpMessage) {
+            mControlPoint = controlPoint;
+            mSsdpMessage = ssdpMessage;
+            mTagMap = new LinkedHashMap<>();
+            mTagMap.put("", new HashMap<String, String>());
+        }
+
+        /**
+         * SSDPに記述されたLocationの値を返す。
+         *
+         * @return SSDPに記述されたLocationの値
+         */
+        public String getLocation() {
+            return mSsdpMessage.getLocation();
+        }
+
+        /**
+         * SSDPに記述されたUUIDを返す。
+         *
+         * @return SSDPに記述されたUUID
+         */
+        public String getUuid() {
+            return mSsdpMessage.getUuid();
+        }
+
+        /**
+         * SSDPパケットを登録する。
+         *
+         * @param ssdpMessage SSDPパケット
+         * @return Builder
+         */
+        public Builder setSsdpMessage(@Nonnull SsdpMessage ssdpMessage) {
+            mSsdpMessage = ssdpMessage;
+            return this;
+        }
+
+        /**
+         * パース前のDescriptionXMLを登録する。
+         *
+         * @param description DescriptionXML
+         * @return Builder
+         */
+        public Builder setDescription(@Nonnull String description) {
+            mDescription = description;
+            return this;
+        }
+
+        /**
+         * UDNの値を登録する。
+         *
+         * @param udn UDN
+         * @return Builder
+         */
+        public Builder setUdn(@Nonnull String udn) {
+            mUdn = udn;
+            return this;
+        }
+
+        /**
+         * DeviceTypeの値を登録する。
+         *
+         * @param deviceType DeviceType
+         * @return Builder
+         */
+        public Builder setDeviceType(@Nonnull String deviceType) {
+            mDeviceType = deviceType;
+            return this;
+        }
+
+        /**
+         * FriendlyNameの値を登録する。
+         *
+         * @param friendlyName FriendlyName
+         * @return Builder
+         */
+        public Builder setFriendlyName(@Nonnull String friendlyName) {
+            mFriendlyName = friendlyName;
+            return this;
+        }
+
+        /**
+         * Manufactureの値を登録する。
+         *
+         * @param manufacture Manufacture
+         * @return Builder
+         */
+        public Builder setManufacture(@Nonnull String manufacture) {
+            mManufacture = manufacture;
+            return this;
+        }
+
+        /**
+         * ManufactureUrlの値を登録する。
+         *
+         * @param manufactureUrl ManufactureUrl
+         * @return Builder
+         */
+        public Builder setManufactureUrl(@Nonnull String manufactureUrl) {
+            mManufactureUrl = manufactureUrl;
+            return this;
+        }
+
+        /**
+         * ModelNameの値を登録する。
+         *
+         * @param modelName ModelName
+         * @return Builder
+         */
+        public Builder setModelName(@Nonnull String modelName) {
+            mModelName = modelName;
+            return this;
+        }
+
+        /**
+         * ModelUrlの値を登録する。
+         *
+         * @param modelUrl ModelUrl
+         * @return Builder
+         */
+        public Builder setModelUrl(@Nonnull String modelUrl) {
+            mModelUrl = modelUrl;
+            return this;
+        }
+
+        /**
+         * ModelDescriptionの値を登録する。
+         *
+         * @param modelDescription ModelDescription
+         * @return Builder
+         */
+        public Builder setModelDescription(@Nonnull String modelDescription) {
+            mModelDescription = modelDescription;
+            return this;
+        }
+
+        /**
+         * ModelNumberの値を登録する。
+         *
+         * @param modelNumber ModelNumber
+         * @return Builder
+         */
+        public Builder setModelNumber(@Nonnull String modelNumber) {
+            mModelNumber = modelNumber;
+            return this;
+        }
+
+        /**
+         * SerialNumberの値を登録する。
+         *
+         * @param serialNumber SerialNumber
+         * @return Builder
+         */
+        public Builder setSerialNumber(@Nonnull String serialNumber) {
+            mSerialNumber = serialNumber;
+            return this;
+        }
+
+        /**
+         * PresentationUrlの値を登録する。
+         *
+         * @param presentationUrl PresentationUrl
+         * @return Builder
+         */
+        public Builder setPresentationUrl(@Nonnull String presentationUrl) {
+            mPresentationUrl = presentationUrl;
+            return this;
+        }
+
+        /**
+         * 全IconのBuilderを登録する。
+         *
+         * @param iconBuilderList 全IconのBuilder
+         * @return Builder
+         */
+        public Builder setIconBuilderList(@Nonnull List<Icon.Builder> iconBuilderList) {
+            mIconBuilderList = iconBuilderList;
+            return this;
+        }
+
+        /**
+         * 全ServiceのBuilderを登録する。
+         *
+         * @param serviceBuilderList 全ServiceのBuilder
+         * @return Builder
+         */
+        public Builder setServiceBuilderList(@Nonnull List<Service.Builder> serviceBuilderList) {
+            mServiceBuilderList = serviceBuilderList;
+            return this;
+        }
+
+        /**
+         * 全ServiceのBuilderを返す。
+         *
+         * @return 全ServiceのBuilder
+         */
+        public List<Service.Builder> getServiceBuilderList() {
+            return mServiceBuilderList;
+        }
+
+        /**
+         * XMLタグの情報を登録する。
+         *
+         * <p>DeviceDescriptionにはAttributeは使用されていないため
+         * Attributeには非対応
+         *
+         * @param namespace namespace uri
+         * @param tag       タグ名
+         * @param value     タグの値
+         * @return Builder
+         */
+        public Builder putTag(@Nonnull String namespace, @Nonnull String tag, @Nonnull String value) {
+            Map<String, String> map = mTagMap.get(namespace);
+            if (map == null) {
+                map = new HashMap<>();
+                mTagMap.put(namespace, map);
+            }
+            map.put(tag, value);
+            return this;
+        }
+
+        /**
+         * Deviceのインスタンスを作成する。
+         *
+         * @return Deviceのインスタンス
+         */
+        public Device build() {
+            if (mDescription == null) {
+                throw new IllegalStateException("description must be set.");
+            }
+            if (mDeviceType == null) {
+                throw new IllegalStateException("deviceType must be set.");
+            }
+            if (mFriendlyName == null) {
+                throw new IllegalStateException("friendlyName must be set.");
+            }
+            if (mManufacture == null) {
+                throw new IllegalStateException("manufacturer must be set.");
+            }
+            if (mModelName == null) {
+                throw new IllegalStateException("modelName must be set.");
+            }
+            if (mUdn == null) {
+                throw new IllegalStateException("UDN must be set.");
+            }
+            return new Device(this);
+        }
+    }
+
     @Nonnull
     private final ControlPoint mControlPoint;
-    private SsdpMessage mSsdp;
-    private String mDescription;
-    private String mUdn;
-    private String mDeviceType;
-    private String mFriendlyName;
-    private String mManufacture;
-    private String mManufactureUrl;
-    private String mModelName;
-    private String mModelUrl;
-    private String mModelDescription;
-    private String mModelNumber;
-    private String mSerialNumber;
-    private String mPresentationUrl;
+    @Nonnull
+    private SsdpMessage mSsdpMessage;
+    @Nonnull
+    private final String mDescription;
+    @Nonnull
+    private final String mUdn;
+    @Nonnull
+    private final String mDeviceType;
+    @Nonnull
+    private final String mFriendlyName;
+    private final String mManufacture;
+    private final String mManufactureUrl;
+    @Nonnull
+    private final String mModelName;
+    private final String mModelUrl;
+    private final String mModelDescription;
+    private final String mModelNumber;
+    private final String mSerialNumber;
+    private final String mPresentationUrl;
     @Nonnull
     private final Map<String, Map<String, String>> mTagMap;
     @Nonnull
     private final List<Icon> mIconList;
     @Nonnull
     private final List<Service> mServiceList;
-    @Nonnull
-    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     /**
      * ControlPointに紐付いたインスタンスを作成。
      *
-     * @param controlPoint 紐付けるControlPoint
+     * @param builder ビルダー
      */
-    public Device(@Nonnull ControlPoint controlPoint) {
-        mControlPoint = controlPoint;
-        mIconList = new ArrayList<>();
-        mServiceList = new ArrayList<>();
-        mTagMap = new LinkedHashMap<>();
-        mTagMap.put("", new HashMap<String, String>());
+    private Device(@Nonnull Builder builder) {
+        mControlPoint = builder.mControlPoint;
+        mSsdpMessage = builder.mSsdpMessage;
+        mUdn = builder.mUdn;
+        mDeviceType = builder.mDeviceType;
+        mFriendlyName = builder.mFriendlyName;
+        mManufacture = builder.mManufacture;
+        mManufactureUrl = builder.mManufactureUrl;
+        mModelName = builder.mModelName;
+        mModelUrl = builder.mModelUrl;
+        mModelDescription = builder.mModelDescription;
+        mModelNumber = builder.mModelNumber;
+        mSerialNumber = builder.mSerialNumber;
+        mPresentationUrl = builder.mPresentationUrl;
+        mDescription = builder.mDescription;
+        mTagMap = builder.mTagMap;
+        if (builder.mIconBuilderList == null) {
+            mIconList = Collections.emptyList();
+        } else {
+            mIconList = new ArrayList<>(builder.mIconBuilderList.size());
+            for (Icon.Builder iconBuilder : builder.mIconBuilderList) {
+                mIconList.add(iconBuilder.setDevice(this).build());
+            }
+        }
+        if (builder.mServiceBuilderList == null) {
+            mServiceList = Collections.emptyList();
+        } else {
+            mServiceList = new ArrayList<>(builder.mServiceBuilderList.size());
+            for (Service.Builder serviceBuilder : builder.mServiceBuilderList) {
+                mServiceList.add(serviceBuilder.setDevice(this).build());
+            }
+        }
+    }
+
+    /**
+     * Iconのバイナリーデータを読み込む
+     *
+     * @param client 通信に使用するHttpClient
+     * @param filter 読み込むIconを選別するFilter
+     */
+    void loadIconBinary(@Nonnull HttpClient client, @Nonnull IconFilter filter) {
+        if (mIconList.isEmpty()) {
+            return;
+        }
+        final List<Icon> loadList = filter.filter(mIconList);
+        for (final Icon icon : loadList) {
+            try {
+                icon.loadBinary(client);
+            } catch (final IOException ignored) {
+            }
+        }
     }
 
     /**
@@ -96,7 +416,7 @@ public class Device {
      * @param message SSDPパケット
      */
     void setSsdpMessage(@Nonnull SsdpMessage message) {
-        mSsdp = message;
+        mSsdpMessage = message;
     }
 
     /**
@@ -106,7 +426,7 @@ public class Device {
      */
     @Nonnull
     SsdpMessage getSsdpMessage() {
-        return mSsdp;
+        return mSsdpMessage;
     }
 
     /**
@@ -119,7 +439,7 @@ public class Device {
      */
     @Nullable
     public String getUuid() {
-        return mSsdp.getUuid();
+        return mSsdpMessage.getUuid();
     }
 
     /**
@@ -128,7 +448,7 @@ public class Device {
      * @return 更新がなければ無効となる時間[ms]
      */
     public long getExpireTime() {
-        return mSsdp.getExpireTime();
+        return mSsdpMessage.getExpireTime();
     }
 
     /**
@@ -136,7 +456,7 @@ public class Device {
      *
      * @return DeviceDescriptionのXML文字列
      */
-    @Nullable
+    @Nonnull
     public String getDescription() {
         return mDescription;
     }
@@ -197,258 +517,6 @@ public class Device {
     }
 
     /**
-     * HttpClientのファクトリークラスを変更する。
-     *
-     * @param factory ファクトリークラス
-     */
-    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
-        mHttpClientFactory = factory;
-    }
-
-    @Nonnull
-    private HttpClient createHttpClient() {
-        return mHttpClientFactory.createHttpClient(true);
-    }
-
-    /**
-     * DeviceDescriptionを読み込む。
-     *
-     * <p>Descriptionのパース後、そこに記述されている
-     * icon/serviceのDescriptionの読み込みパースもまとめて行う。
-     *
-     * @throws IOException                  通信上での何らかの問題
-     * @throws SAXException                 XMLのパースに失敗
-     * @throws ParserConfigurationException XMLパーサが利用できない場合
-     */
-    void loadDescription(@Nonnull IconFilter filter)
-            throws IOException, SAXException, ParserConfigurationException {
-        final HttpClient client = createHttpClient();
-        final URL url = new URL(getLocation());
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.GET);
-        request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-        final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
-            Log.i(TAG, response.toString());
-            client.close();
-            throw new IOException(response.getStartLine());
-        }
-        mDescription = response.getBody();
-        parseDescription(mDescription);
-        if (!mIconList.isEmpty()) {
-            final List<Icon> loadList = filter.filter(mIconList);
-            for (final Icon icon : loadList) {
-                try {
-                    icon.loadBinary(client);
-                } catch (final IOException ignored) {
-                }
-            }
-        }
-        for (final Service service : mServiceList) {
-            service.loadDescription(client);
-        }
-        client.close();
-    }
-
-    private void parseIconList(@Nonnull Node listNode) {
-        Node node = listNode.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (TextUtils.equals(node.getLocalName(), "icon")) {
-                mIconList.add(parseIcon((Element) node));
-            }
-        }
-    }
-
-    private Icon parseIcon(@Nonnull Element element) {
-        final Icon.Builder icon = new Icon.Builder();
-        icon.setDevice(this);
-        Node node = element.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
-            if (tag == null) {
-                continue;
-            }
-            final String text = node.getTextContent();
-            switch (tag) {
-                case "mimetype":
-                    icon.setMimeType(text);
-                    break;
-                case "height":
-                    icon.setHeight(text);
-                    break;
-                case "width":
-                    icon.setWidth(text);
-                    break;
-                case "depth":
-                    icon.setDepth(text);
-                    break;
-                case "url":
-                    icon.setUrl(text);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return icon.build();
-    }
-
-    private void parseServiceList(@Nonnull Node listNode) throws IOException {
-        Node node = listNode.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (TextUtils.equals(node.getLocalName(), "service")) {
-                mServiceList.add(parseService((Element) node));
-            }
-        }
-    }
-
-    @Nonnull
-    private Service parseService(@Nonnull Element element) throws IOException {
-        final Service.Builder service = new Service.Builder();
-        service.setDevice(this);
-        Node node = element.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
-            if (tag == null) {
-                continue;
-            }
-            final String text = node.getTextContent();
-            switch (tag) {
-                case "serviceType":
-                    service.setServiceType(text);
-                    break;
-                case "serviceId":
-                    service.setServiceId(text);
-                    break;
-                case "SCPDURL":
-                    service.setScpdUrl(text);
-                    break;
-                case "eventSubURL":
-                    service.setEventSubUrl(text);
-                    break;
-                case "controlURL":
-                    service.setControlUrl(text);
-                    break;
-                default:
-                    break;
-            }
-        }
-        try {
-            return service.build();
-        } catch (final IllegalStateException e) {
-            throw new IOException(e.getMessage());
-        }
-    }
-
-    private void parseDescription(@Nonnull String xml)
-            throws IOException, SAXException, ParserConfigurationException {
-        final Document doc = XmlUtils.newDocument(true, xml);
-        final Node device =
-                XmlUtils.findChildElementByLocalName(doc.getDocumentElement(), "device");
-        if (device == null) {
-            return;
-        }
-        Node node = device.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
-            if (tag == null) {
-                continue;
-            }
-            switch (tag) {
-                case "iconList":
-                    parseIconList(node);
-                    break;
-                case "serviceList":
-                    parseServiceList(node);
-                    break;
-                default:
-                    String ns = node.getNamespaceURI();
-                    ns = ns == null ? "" : ns;
-                    final String text = node.getTextContent();
-                    Map<String, String> nsMap = mTagMap.get(ns);
-                    if (nsMap == null) {
-                        nsMap = new HashMap<>();
-                        mTagMap.put(ns, nsMap);
-                    }
-                    nsMap.put(tag, node.getTextContent());
-                    setField(tag, text);
-                    break;
-            }
-        }
-        if (mDeviceType == null) {
-            throw new IOException("deviceType must be set.");
-        }
-        if (mFriendlyName == null) {
-            throw new IOException("friendlyName must be set.");
-        }
-        if (mManufacture == null) {
-            throw new IOException("manufacturer must be set.");
-        }
-        if (mModelName == null) {
-            throw new IOException("modelName must be set.");
-        }
-        if (mUdn == null) {
-            throw new IOException("UDN must be set.");
-        }
-    }
-
-    private void setField(@Nonnull String tag, @Nullable String value) {
-        switch (tag) {
-            case "UDN":
-                mUdn = value;
-                break;
-            case "deviceType":
-                mDeviceType = value;
-                break;
-            case "friendlyName":
-                mFriendlyName = value;
-                break;
-            case "manufacturer":
-                mManufacture = value;
-                break;
-            case "manufacturerURL":
-                mManufactureUrl = value;
-                break;
-            case "modelName":
-                mModelName = value;
-                break;
-            case "modelURL":
-                mModelUrl = value;
-                break;
-            case "modelDescription":
-                mModelDescription = value;
-                break;
-            case "modelNumber":
-                mModelNumber = value;
-                break;
-            case "serialNumber":
-                mSerialNumber = value;
-                break;
-            case "presentationURL":
-                mPresentationUrl = value;
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
      * Descriptionに記述されていたタグの値を取得する。
      *
      * <p>個別にメソッドが用意されているものも取得できるが、個別メソッドの利用を推奨。
@@ -501,7 +569,7 @@ public class Device {
      */
     @Nullable
     public String getLocation() {
-        return mSsdp.getLocation();
+        return mSsdpMessage.getLocation();
     }
 
     /**
@@ -526,9 +594,16 @@ public class Device {
      *
      * <p>値が存在しない場合nullが返る。
      *
+     * <p>Required. Unique Device Name. Universally-unique identifier for the device, whether root or embedded.
+     * shall be the same over time for a specific device instance (i.e., shall survive reboots).
+     * shall match the field value of the NT header field in device discovery messages. shall match the prefix of
+     * the USN header field in all discovery messages. (Clause 1, "Discovery" explains the NT and USN header fields.)
+     * shall begin with "uuid:" followed by a UUID suffix specified by a UPnP vendor. See clause 1.1.4,
+     * "UUID format and recommended generation algorithms" for the MANDATORY UUID format.
+     *
      * @return UDNタグの値
      */
-    @Nullable
+    @Nonnull
     public String getUdn() {
         return mUdn;
     }
@@ -538,9 +613,24 @@ public class Device {
      *
      * <p>値が存在しない場合nullが返る。
      *
+     * <p>Required. UPnP device type. Single URI.
+     * <ul>
+     * <li>For standard devices defined by a UPnP Forum working committee, shall begin with "urn:schemas-upnp-org:device:"
+     * followed by the standardized device type suffix, a colon, and an integer device version i.e.
+     * urn:schemas-upnp-org:device:deviceType:ver.
+     * The highest supported version of the device type shall be specified.
+     * <li>For non-standard devices specified by UPnP vendors, shall begin with "urn:", followed by a Vendor Domain Name,
+     * followed by ":device:", followed by a device type suffix, colon, and an integer version, i.e.,
+     * "urn:domain-name:device:deviceType:ver".
+     * Period characters in the Vendor Domain Name shall be replaced with hyphens in accordance with RFC 2141.
+     * The highest supported version of the device type shall be specified.
+     * </ul>
+     * <p>The device type suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be <= 64
+     * chars, not counting the version suffix and separating colon.
+     *
      * @return deviceTypeタグの値
      */
-    @Nullable
+    @Nonnull
     public String getDeviceType() {
         return mDeviceType;
     }
@@ -550,9 +640,12 @@ public class Device {
      *
      * <p>値が存在しない場合nullが返る。
      *
+     * <p>Required. Short description for end user. Is allowed to be localized (see ACCEPT- LANGUAGE and
+     * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be < 64 characters.
+     *
      * @return friendlyNameタグの値
      */
-    @Nullable
+    @Nonnull
     public String getFriendlyName() {
         return mFriendlyName;
     }
@@ -561,6 +654,9 @@ public class Device {
      * manufacturerタグの値を返す。
      *
      * <p>値が存在しない場合nullが返る。
+     *
+     * <p>Required. Manufacturer's name. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header
+     * fields). Specified by UPnP vendor. String. Should be < 64 characters.
      *
      * @return manufacturerタグの値
      */
@@ -574,6 +670,9 @@ public class Device {
      *
      * <p>値が存在しない場合nullが返る。
      *
+     * <p>Allowed. Web site for Manufacturer. Is allowed to have a different value depending on language requested
+     * (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields). Specified by UPnP vendor. Single URL.
+     *
      * @return manufacturerURLタグの値
      */
     @Nullable
@@ -586,9 +685,12 @@ public class Device {
      *
      * <p>値が存在しない場合nullが返る。
      *
+     * <p>Required. Model name. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT- LANGUAGE header fields).
+     * Specified by UPnP vendor. String. Should be < 32 characters.
+     *
      * @return modelNameタグの値
      */
-    @Nullable
+    @Nonnull
     public String getModelName() {
         return mModelName;
     }
@@ -597,6 +699,9 @@ public class Device {
      * modelURLタグの値を返す。
      *
      * <p>値が存在しない場合nullが返る。
+     *
+     * <p>Allowed. Web site for model. Is allowed to have a different value depending on language requested (see
+     * ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields). Specified by UPnP vendor. Single URL.
      *
      * @return modelURLタグの値
      */
@@ -610,6 +715,9 @@ public class Device {
      *
      * <p>値が存在しない場合nullが返る。
      *
+     * <p>Recommended. Long description for end user. Is allowed to be localized (see ACCEPT- LANGUAGE and
+     * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be < 128 characters.
+     *
      * @return modelDescriptionタグの値
      */
     @Nullable
@@ -621,6 +729,9 @@ public class Device {
      * modelNumberタグの値を返す。
      *
      * <p>値が存在しない場合nullが返る。
+     *
+     * <p>Recommended. Model number. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields).
+     * Specified by UPnP vendor. String. Should be < 32 characters.
      *
      * @return modelNumberタグの値
      */
@@ -634,6 +745,9 @@ public class Device {
      *
      * <p>値が存在しない場合nullが返る。
      *
+     * <p>Recommended. Serial number. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields).
+     * Specified by UPnP vendor. String. Should be < 64 characters.
+     *
      * @return serialNumberタグの値
      */
     @Nullable
@@ -645,6 +759,10 @@ public class Device {
      * presentationURLタグの値を返す。
      *
      * <p>値が存在しない場合nullが返る。
+     *
+     * <p>Recommended. URL to presentation for device (see clause 5, “Presentation”). shall be relative to the URL at
+     * which the device description is located in accordance with the rules specified in clause 5 of RFC 3986.
+     * Specified by UPnP vendor. Single URL.
      *
      * @return presentationURLタグの値
      */
@@ -742,7 +860,7 @@ public class Device {
 
     @Override
     public int hashCode() {
-        return mUdn != null ? mUdn.hashCode() : 0;
+        return mUdn.hashCode();
     }
 
     @Override
@@ -754,12 +872,12 @@ public class Device {
             return false;
         }
         final Device d = (Device) obj;
-        return mUdn != null && mUdn.equals(d.getUdn());
+        return mUdn.equals(d.getUdn());
     }
 
     @Override
     @Nonnull
     public String toString() {
-        return mFriendlyName != null ? mFriendlyName : "";
+        return mFriendlyName;
     }
 }

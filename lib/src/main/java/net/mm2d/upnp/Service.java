@@ -9,13 +9,6 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
-import net.mm2d.util.XmlUtils;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -32,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Serviceを表すクラス。
@@ -44,8 +36,6 @@ public class Service {
 
     /**
      * DeviceDescriptionのパース時に使用するビルダー
-     *
-     * @see Device#loadDescription(IconFilter)
      */
     public static class Builder {
         private Device mDevice;
@@ -54,6 +44,9 @@ public class Service {
         private String mScpdUrl;
         private String mControlUrl;
         private String mEventSubUrl;
+        private String mDescription;
+        private List<Action.Builder> mActionBuilderList;
+        private List<StateVariable.Builder> mVariableBuilderList;
 
         /**
          * インスタンス作成
@@ -109,6 +102,10 @@ public class Service {
             return this;
         }
 
+        public String getScpdUrl() {
+            return mScpdUrl;
+        }
+
         /**
          * controlURLを登録する。
          *
@@ -130,6 +127,39 @@ public class Service {
         @Nonnull
         public Builder setEventSubUrl(@Nonnull String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
+            return this;
+        }
+
+        /**
+         * Description XMLを登録する。
+         *
+         * @param description Description XML全内容
+         * @return Builder
+         */
+        public Builder setDescription(String description) {
+            mDescription = description;
+            return this;
+        }
+
+        /**
+         * 全ActionのBuilderを登録する。
+         *
+         * @param actionBuilderList Serviceで定義されている全ActionのBuilder
+         * @return Builder
+         */
+        public Builder setActionBuilderList(List<Action.Builder> actionBuilderList) {
+            mActionBuilderList = actionBuilderList;
+            return this;
+        }
+
+        /**
+         * 全StateVariableのBuilderを登録する。
+         *
+         * @param variableBuilderList Serviceで定義されている全StateVariableのBuilder
+         * @return Builder
+         */
+        public Builder setVariableBuilderList(List<StateVariable.Builder> variableBuilderList) {
+            mVariableBuilderList = variableBuilderList;
             return this;
         }
 
@@ -159,6 +189,15 @@ public class Service {
             if (mEventSubUrl == null) {
                 throw new IllegalStateException("eventSubURL must be set.");
             }
+            if (mDescription == null) {
+                throw new IllegalStateException("description must be set.");
+            }
+            if (mActionBuilderList == null) {
+                mActionBuilderList = Collections.emptyList();
+            }
+            if (mVariableBuilderList == null) {
+                mVariableBuilderList = Collections.emptyList();
+            }
             return new Service(this);
         }
     }
@@ -179,9 +218,11 @@ public class Service {
     private final String mControlUrl;
     @Nonnull
     private final String mEventSubUrl;
+    @Nullable
     private List<Action> mActionList;
     @Nonnull
     private final Map<String, Action> mActionMap;
+    @Nullable
     private List<StateVariable> mStateVariableList;
     @Nonnull
     private final Map<String, StateVariable> mStateVariableMap;
@@ -201,8 +242,25 @@ public class Service {
         mScpdUrl = builder.mScpdUrl;
         mControlUrl = builder.mControlUrl;
         mEventSubUrl = builder.mEventSubUrl;
-        mActionMap = new LinkedHashMap<>();
+        mDescription = builder.mDescription;
         mStateVariableMap = new LinkedHashMap<>();
+        for (StateVariable.Builder variableBuilder : builder.mVariableBuilderList) {
+            final StateVariable variable = variableBuilder.setService(this).build();
+            mStateVariableMap.put(variable.getName(), variable);
+        }
+        mActionMap = new LinkedHashMap<>();
+        for (final Action.Builder actionBuilder : builder.mActionBuilderList) {
+            for (final Argument.Builder argumentBuilder : actionBuilder.getArgumentBuilderList()) {
+                final String name = argumentBuilder.getRelatedStateVariableName();
+                final StateVariable variable = mStateVariableMap.get(name);
+                if (variable == null) {
+                    throw new IllegalArgumentException();
+                }
+                argumentBuilder.setRelatedStateVariable(variable);
+            }
+            final Action action = actionBuilder.setService(this).build();
+            mActionMap.put(action.getName(), action);
+        }
     }
 
     /**
@@ -231,6 +289,21 @@ public class Service {
     /**
      * serviceTypeを返す。
      *
+     * <p>Required. UPnP service type. Shall not contain a hash character (#, 23 Hex in UTF-8). Single URI.
+     * <ul>
+     * <li>For standard service types defined by a UPnP Forum working committee, shall begin with
+     * "urn:schemas-upnp-org:service:" followed by the standardized service type suffix, colon, and an integer service
+     * version i.e. urn:schemas-upnp-org:device:serviceType:ver.
+     * The highest supported version of the service type shall be specified.
+     * <li>For non-standard service types specified by UPnP vendors, shall begin with "urn:", followed by a
+     * Vendor Domain Name, followed by ":service:", followed by a service type suffix, colon,
+     * and an integer service version, i.e., "urn:domain-name:service:serviceType:ver".
+     * Period characters in the Vendor Domain Name shall be replaced with hyphens in accordance with RFC 2141.
+     * The highest supported version of the service type shall be specified.
+     * </ul>
+     * <p>The service type suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be
+     * <= 64 characters, not counting the version suffix and separating colon.
+     *
      * @return serviceType
      */
     @Nonnull
@@ -240,6 +313,25 @@ public class Service {
 
     /**
      * serviceIdを返す。
+     *
+     * <p>Required. Service identifier. Shall be unique within this device description. Single URI.
+     * <ul>
+     * <li>For standard services defined by a UPnP Forum working committee, shall begin with "urn:upnp-org:serviceId:"
+     * followed by a service ID suffix i.e. urn:upnp-org:serviceId:serviceID.
+     * If this instance of the specified service type (i.e. the <serviceType> element above) corresponds to one of
+     * the services defined by the specified device type (i.e. the <deviceType> element above), then the value of
+     * the service ID suffix shall be the service ID defined by the device type for this instance of the service.
+     * Otherwise, the value of the service ID suffix is vendor defined. (Note that upnp-org is used instead of
+     * schemas-upnp- org in this case because an XML schema is not defined for each service ID.)
+     * <li>For non-standard services specified by UPnP vendors, shall begin with “urn:”, followed by a Vendor Domain
+     * Name, followed by ":serviceId:", followed by a service ID suffix, i.e., "urn:domain- name:serviceId:serviceID".
+     * If this instance of the specified service type (i.e. the <serviceType> element above) corresponds to one of
+     * the services defined by the specified device type (i.e. the <deviceType> element above), then the value of
+     * the service ID suffix shall be the service ID defined by the device type for this instance of the service.
+     * Period characters in the Vendor Domain Name shall be replaced with hyphens in accordance with RFC 2141.
+     * </ul>
+     * <p>The service ID suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be <= 64
+     * characters.
      *
      * @return serviceId
      */
@@ -251,6 +343,10 @@ public class Service {
     /**
      * SCPDURLを返す。
      *
+     * <p>Required. URL for service description. (See clause 2.5, “Service description” below.) shall be relative to
+     * the URL at which the device description is located in accordance with clause 5 of RFC 3986. Specified by
+     * UPnP vendor. Single URL.
+     *
      * @return SCPDURL
      */
     @Nonnull
@@ -261,6 +357,9 @@ public class Service {
     /**
      * controlURLを返す。
      *
+     * <p>Required. URL for control (see clause 3, "Control"). shall be relative to the URL at which the device
+     * description is located in accordance with clause 5 of RFC 3986. Specified by UPnP vendor. Single URL.
+     *
      * @return controlURL
      */
     @Nonnull
@@ -270,6 +369,12 @@ public class Service {
 
     /**
      * eventSubURLを返す。
+     *
+     * <p>Required. URL for eventing (see clause 4, "Eventing"). shall be relative to the URL at which the device
+     * description is located in accordance with clause 5 of RFC 3986. shall be unique within the device;
+     * any two services shall not have the same URL for eventing. If the service has no evented variables,
+     * this element shall be present but shall be empty (i.e., &lt;eventSubURL\&gt;&lt;/eventSubURL&gt;.)
+     * Specified by UPnP vendor. Single URL.
      *
      * @return eventSubURL
      */
@@ -342,203 +447,6 @@ public class Service {
     @Nullable
     public StateVariable findStateVariable(@Nullable String name) {
         return mStateVariableMap.get(name);
-    }
-
-    /**
-     * SCPDURLからDescriptionを取得し、パースする。
-     *
-     * <p>可能であればKeepAliveを行う。
-     *
-     * @param client 通信に使用するHttpClient
-     * @throws IOException                  通信エラー
-     * @throws SAXException                 XMLパースエラー
-     * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
-     */
-    void loadDescription(@Nonnull HttpClient client)
-            throws IOException, SAXException, ParserConfigurationException {
-        final URL url = getAbsoluteUrl(mScpdUrl);
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.GET);
-        request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-        final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
-            Log.i(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
-            throw new IOException(response.getStartLine());
-        }
-        mDescription = response.getBody();
-        parseDescription(mDescription);
-    }
-
-    private void parseDescription(@Nonnull String xml)
-            throws IOException, SAXException, ParserConfigurationException {
-        final Document doc = XmlUtils.newDocument(true, xml);
-        final List<Action.Builder> actionList = parseActionList(doc.getElementsByTagName("action"));
-        parseStateVariableList(doc.getElementsByTagName("stateVariable"));
-        for (final Action.Builder builder : actionList) {
-            for (final Argument.Builder b : builder.getArgumentBuilderList()) {
-                final String name = b.getRelatedStateVariableName();
-                final StateVariable v = mStateVariableMap.get(name);
-                b.setRelatedStateVariable(v);
-            }
-            final Action a = builder.build();
-            mActionMap.put(a.getName(), a);
-        }
-    }
-
-    @Nonnull
-    private List<Action.Builder> parseActionList(@Nonnull NodeList nodeList) {
-        final List<Action.Builder> list = new ArrayList<>();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            list.add(parseAction((Element) nodeList.item(i)));
-        }
-        return list;
-    }
-
-    private void parseStateVariableList(@Nonnull NodeList nodeList) {
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            final StateVariable.Builder builder =
-                    parseStateVariable(this, (Element) nodeList.item(i));
-            final StateVariable variable = builder.build();
-            mStateVariableMap.put(variable.getName(), variable);
-        }
-    }
-
-    @Nonnull
-    private Action.Builder parseAction(@Nonnull Element element) {
-        final Action.Builder builder = new Action.Builder();
-        builder.setService(this);
-        Node node = element.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
-            if (TextUtils.equals(tag, "name")) {
-                builder.setName(node.getTextContent());
-            } else if (TextUtils.equals(tag, "argumentList")) {
-                for (Node c = node.getFirstChild(); c != null; c = c.getNextSibling()) {
-                    if (c.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    if (TextUtils.equals(c.getLocalName(), "argument")) {
-                        builder.addArgumentBuilder(parseArgument((Element) c));
-                    }
-                }
-            }
-        }
-        return builder;
-    }
-
-    @Nonnull
-    private Argument.Builder parseArgument(@Nonnull Element element) {
-        final Argument.Builder builder = new Argument.Builder();
-        Node node = element.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
-            if (tag == null) {
-                continue;
-            }
-            final String text = node.getTextContent();
-            switch (tag) {
-                case "name":
-                    builder.setName(text);
-                    break;
-                case "direction":
-                    builder.setDirection(text);
-                    break;
-                case "relatedStateVariable":
-                    builder.setRelatedStateVariableName(text);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return builder;
-    }
-
-    @Nonnull
-    private static StateVariable.Builder parseStateVariable(
-            @Nonnull Service service, @Nonnull Element element) {
-        final StateVariable.Builder builder = new StateVariable.Builder();
-        builder.setService(service);
-        builder.setSendEvents(element.getAttribute("sendEvents"));
-        builder.setMulticast(element.getAttribute("multicast"));
-        Node node = element.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
-            if (tag == null) {
-                continue;
-            }
-            switch (tag) {
-                case "name":
-                    builder.setName(node.getTextContent());
-                    break;
-                case "dataType":
-                    builder.setDataType(node.getTextContent());
-                    break;
-                case "defaultValue":
-                    builder.setDefaultValue(node.getTextContent());
-                    break;
-                case "allowedValueList":
-                    parseAllowedValueList(builder, (Element) node);
-                    break;
-                case "allowedValueRange":
-                    parseAllowedValueRange(builder, (Element) node);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return builder;
-    }
-
-    private static void parseAllowedValueList(
-            @Nonnull StateVariable.Builder builder, @Nonnull Element element) {
-        Node node = element.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("allowedValue".equals(node.getLocalName())) {
-                builder.addAllowedValue(node.getTextContent());
-            }
-        }
-    }
-
-    private static void parseAllowedValueRange(
-            @Nonnull StateVariable.Builder builder, @Nonnull Element element) {
-        Node node = element.getFirstChild();
-        for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
-            if (tag == null) {
-                continue;
-            }
-            final String text = node.getTextContent();
-            switch (tag) {
-                case "step":
-                    builder.setStep(text);
-                    break;
-                case "minimum":
-                    builder.setMinimum(text);
-                    break;
-                case "maximum":
-                    builder.setMaximum(text);
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
     @Nonnull
@@ -622,8 +530,7 @@ public class Service {
     public boolean subscribe(boolean keepRenew) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
-        final URL url = getAbsoluteUrl(mEventSubUrl);
-        request.setUrl(url, true);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
         request.setHeader(Http.NT, Http.UPNP_EVENT);
         request.setHeader(Http.CALLBACK, getCallback());
         request.setHeader(Http.TIMEOUT, "Second-300");
@@ -660,8 +567,7 @@ public class Service {
         }
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
-        final URL url = getAbsoluteUrl(mEventSubUrl);
-        request.setUrl(url, true);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
         request.setHeader(Http.SID, mSubscriptionId);
         request.setHeader(Http.TIMEOUT, "Second-300");
         request.setHeader(Http.CONTENT_LENGTH, "0");
@@ -695,8 +601,7 @@ public class Service {
         }
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.UNSUBSCRIBE);
-        final URL url = getAbsoluteUrl(mEventSubUrl);
-        request.setUrl(url, true);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
         request.setHeader(Http.SID, mSubscriptionId);
         request.setHeader(Http.CONTENT_LENGTH, "0");
         final HttpClient client = new HttpClient(false);

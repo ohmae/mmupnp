@@ -174,6 +174,13 @@ public final class Http {
     }
 
     /**
+     * インスタンス化禁止
+     */
+    private Http() {
+        throw new AssertionError();
+    }
+
+    /**
      * Dateヘッダのパースを行う。
      *
      * @param string Dateヘッダ

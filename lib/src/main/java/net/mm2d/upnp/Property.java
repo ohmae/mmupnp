@@ -50,4 +50,11 @@ public final class Property {
         USER_AGENT_VALUE = OS_VERSION + " " + UPNP_VERSION + " " + LIB_VERSION;
         SERVER_VALUE = OS_VERSION + " " + UPNP_VERSION + " " + LIB_VERSION;
     }
+
+    /**
+     * インスタンス化禁止
+     */
+    private Property() {
+        throw new AssertionError();
+    }
 }
