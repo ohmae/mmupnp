@@ -39,7 +39,7 @@ public class HttpHeader {
      * ヘッダのエントリー情報。
      */
     public static class Entry {
-        private String mKey;
+        private final String mKey;
         private String mName;
         private String mValue;
 
@@ -79,9 +79,12 @@ public class HttpHeader {
          * ヘッダ名を設定する。
          *
          * @param name ヘッダ名
+         * @throws IllegalArgumentException keyとしての値が一致しないものに更新しようとした場合
          */
         private void setName(@Nonnull String name) {
-            mKey = toKey(name);
+            if (!mKey.equals(toKey(name))) {
+                throw new IllegalArgumentException();
+            }
             mName = name;
         }
 
@@ -147,6 +150,7 @@ public class HttpHeader {
      * @param original コピー元
      */
     public HttpHeader(HttpHeader original) {
+        // EntryはmutableなのでDeep copyが必要
         mList = new LinkedList<>();
         for (Entry entry : original.mList) {
             mList.add(new Entry(entry));
