@@ -57,11 +57,14 @@ class SubscribeService {
     }
 
     /**
-     * 次のイベント時間を返す。
+     * 次にスキャンする時刻を返す。
      *
-     * @return 待ち時間。
+     * <p>keep指定している場合は次にRenewを実行する時刻、
+     * そうでない場合は、Expireする時刻
+     *
+     * @return スキャンする時刻
      */
-    long getNextTime() {
+    long getNextScanTime() {
         if (!mKeepRenew) {
             return mService.getSubscriptionExpiryTime();
         }

@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  */
 public class SsdpResponseMessage extends SsdpMessage {
     /**
-     * 受信した情報からインスタンス作成
+     * 受信した情報からインスタンス作成。
      *
      * @param address 受信したInterfaceAddress
      * @param data    受信したデータ
@@ -45,7 +45,7 @@ public class SsdpResponseMessage extends SsdpMessage {
     }
 
     /**
-     * ステータスコードを返す
+     * ステータスコードを返す。
      *
      * @return ステータスコード
      * @see #getStatus()
@@ -65,7 +65,7 @@ public class SsdpResponseMessage extends SsdpMessage {
     }
 
     /**
-     * レスポンスフレーズを取得する
+     * レスポンスフレーズを取得する。
      *
      * @return レスポンスフレーズ
      * @see #getStatus()

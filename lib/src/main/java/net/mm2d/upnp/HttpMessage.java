@@ -510,6 +510,7 @@ public abstract class HttpMessage {
         }
     }
 
+    @Nullable
     private static String readLine(@Nonnull InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {

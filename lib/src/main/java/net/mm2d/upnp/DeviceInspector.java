@@ -24,10 +24,13 @@ import javax.annotation.Nonnull;
 class DeviceInspector implements Runnable {
     private static final String TAG = DeviceInspector.class.getSimpleName();
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
-    @Nonnull
-    private final ControlPoint mControlPoint;
+
+    private final Object mThreadLock = new Object();
     private volatile boolean mShutdownRequest = false;
     private Thread mThread;
+
+    @Nonnull
+    private final ControlPoint mControlPoint;
     @Nonnull
     private final List<Device> mDeviceList;
     private final Comparator<Device> mComparator = new Comparator<Device>() {
@@ -49,8 +52,10 @@ class DeviceInspector implements Runnable {
 
     void start() {
         mShutdownRequest = false;
-        mThread = new Thread(this, TAG);
-        mThread.start();
+        synchronized (mThreadLock) {
+            mThread = new Thread(this, TAG);
+            mThread.start();
+        }
     }
 
     /**
@@ -58,9 +63,11 @@ class DeviceInspector implements Runnable {
      */
     void shutdownRequest() {
         mShutdownRequest = true;
-        if (mThread != null) {
-            mThread.interrupt();
-            mThread = null;
+        synchronized (mThreadLock) {
+            if (mThread != null) {
+                mThread.interrupt();
+                mThread = null;
+            }
         }
     }
 

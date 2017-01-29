@@ -528,6 +528,13 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean subscribe(boolean keepRenew) throws IOException {
+        if (getSubscriptionId() != null) {
+            if (renewSubscribe()) {
+                mControlPoint.registerSubscribeService(this, keepRenew);
+                return true;
+            }
+            return false;
+        }
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
         request.setUrl(getAbsoluteUrl(mEventSubUrl), true);

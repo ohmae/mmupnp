@@ -165,6 +165,7 @@ public class HttpClient {
         }
     }
 
+    @Nonnull
     private HttpResponse redirect(@Nonnull HttpRequest request, @Nonnull String location, int redirectDepth)
             throws IOException {
         HttpRequest newRequest = new HttpRequest(request);

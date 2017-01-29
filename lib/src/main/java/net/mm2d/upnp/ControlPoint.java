@@ -303,8 +303,28 @@ public class ControlPoint {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
         }
-        mSearchList = new ArrayList<>();
-        mNotifyList = new ArrayList<>();
+        mSearchList = setUpSsdpSearchServers(interfaces, new ResponseListener() {
+            @Override
+            public void onReceiveResponse(final @Nonnull SsdpResponseMessage message) {
+                executeParallel(new Runnable() {
+                    @Override
+                    public void run() {
+                        onReceiveSsdp(message);
+                    }
+                });
+            }
+        });
+        mNotifyList = setUpSsdpNotifyReceivers(interfaces, new NotifyListener() {
+            @Override
+            public void onReceiveNotify(final @Nonnull SsdpRequestMessage message) {
+                executeParallel(new Runnable() {
+                    @Override
+                    public void run() {
+                        onReceiveSsdp(message);
+                    }
+                });
+            }
+        });
         mDeviceMap = Collections.synchronizedMap(new LinkedHashMap<String, Device>());
         mLoadingDeviceMap = new HashMap<>();
         mDiscoveryListeners = new ArrayList<>();
@@ -314,34 +334,6 @@ public class ControlPoint {
         mDeviceInspector = new DeviceInspector(this);
         mSubscribeKeeper = new SubscribeKeeper();
 
-        for (final NetworkInterface nif : interfaces) {
-            final SsdpSearchServer search = new SsdpSearchServer(nif);
-            search.setResponseListener(new ResponseListener() {
-                @Override
-                public void onReceiveResponse(final @Nonnull SsdpResponseMessage message) {
-                    executeParallel(new Runnable() {
-                        @Override
-                        public void run() {
-                            onReceiveSsdp(message);
-                        }
-                    });
-                }
-            });
-            mSearchList.add(search);
-            final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);
-            notify.setNotifyListener(new NotifyListener() {
-                @Override
-                public void onReceiveNotify(final @Nonnull SsdpRequestMessage message) {
-                    executeParallel(new Runnable() {
-                        @Override
-                        public void run() {
-                            onReceiveSsdp(message);
-                        }
-                    });
-                }
-            });
-            mNotifyList.add(notify);
-        }
         mEventReceiver = new EventReceiver();
         mEventReceiver.setEventMessageListener(new EventMessageListener() {
             @Override
@@ -351,6 +343,30 @@ public class ControlPoint {
                 return service != null && executeSequential(new EventNotifyTask(request, service));
             }
         });
+    }
+
+    @Nonnull
+    private static List<SsdpSearchServer> setUpSsdpSearchServers(
+            final @Nonnull Collection<NetworkInterface> interfaces, final @Nonnull ResponseListener listener) {
+        final List<SsdpSearchServer> list = new ArrayList<>(interfaces.size());
+        for (final NetworkInterface nif : interfaces) {
+            final SsdpSearchServer search = new SsdpSearchServer(nif);
+            search.setResponseListener(listener);
+            list.add(search);
+        }
+        return list;
+    }
+
+    @Nonnull
+    private static List<SsdpNotifyReceiver> setUpSsdpNotifyReceivers(
+            final @Nonnull Collection<NetworkInterface> interfaces, final @Nonnull NotifyListener listener) {
+        final List<SsdpNotifyReceiver> list = new ArrayList<>();
+        for (final NetworkInterface nif : interfaces) {
+            final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);
+            notify.setNotifyListener(listener);
+            list.add(notify);
+        }
+        return list;
     }
 
     @Nonnull

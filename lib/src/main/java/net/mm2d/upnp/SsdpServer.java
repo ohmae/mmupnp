@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
+// TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
 abstract class SsdpServer {
     private static final String TAG = SsdpServer.class.getSimpleName();
     /**
@@ -39,8 +40,7 @@ abstract class SsdpServer {
      * SSDPに使用するポート番号
      */
     public static final int SSDP_PORT = 1900;
-    private static final InetSocketAddress SSDP_SO_ADDR =
-            new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
+    private static final InetSocketAddress SSDP_SO_ADDR = new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
     private static final InetAddress SSDP_INET_ADDR = SSDP_SO_ADDR.getAddress();
     @Nonnull
     private final NetworkInterface mInterface;
@@ -48,7 +48,7 @@ abstract class SsdpServer {
     private final InterfaceAddress mInterfaceAddress;
     private final int mBindPort;
     private MulticastSocket mSocket;
-    private ReceiveThread mThread;
+    private ReceiveTask mReceiveTask;
 
     /**
      * 使用するインターフェースを指定してインスタンス作成。
@@ -64,24 +64,23 @@ abstract class SsdpServer {
     /**
      * 使用するインターフェースとポート指定してインスタンス作成。
      *
-     * @param ni       使用するインターフェース
-     * @param bindPort 使用するポート
+     * @param networkInterface 使用するインターフェース
+     * @param bindPort         使用するポート
      */
-    public SsdpServer(@Nonnull NetworkInterface ni, int bindPort) {
+    public SsdpServer(@Nonnull NetworkInterface networkInterface, int bindPort) {
+        mInterfaceAddress = findInet4Address(networkInterface);
         mBindPort = bindPort;
-        mInterface = ni;
-        InterfaceAddress addr = null;
-        final List<InterfaceAddress> ifas = mInterface.getInterfaceAddresses();
-        for (final InterfaceAddress ifa : ifas) {
-            if (ifa.getAddress() instanceof Inet4Address) {
-                addr = ifa;
-                break;
+        mInterface = networkInterface;
+    }
+
+    private static InterfaceAddress findInet4Address(NetworkInterface networkInterface) {
+        final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
+        for (final InterfaceAddress address : addressList) {
+            if (address.getAddress() instanceof Inet4Address) {
+                return address;
             }
         }
-        if (addr == null) {
-            throw new IllegalArgumentException("ni does not have IPv4 address.");
-        }
-        mInterfaceAddress = addr;
+        throw new IllegalArgumentException("ni does not have IPv4 address.");
     }
 
     /**
@@ -121,11 +120,11 @@ abstract class SsdpServer {
      * 受信スレッドの開始を行う。
      */
     public void start() {
-        if (mThread != null) {
-            stop(false);
+        if (mReceiveTask != null) {
+            stop();
         }
-        mThread = new ReceiveThread();
-        mThread.start();
+        mReceiveTask = new ReceiveTask(this, mSocket, mBindPort);
+        mReceiveTask.start();
     }
 
     /**
@@ -143,19 +142,12 @@ abstract class SsdpServer {
      *
      * @param join trueの時スレッドのJoin待ちを行う。
      */
-    // TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
     public void stop(boolean join) {
-        if (mThread == null) {
+        if (mReceiveTask == null) {
             return;
         }
-        mThread.shutdownRequest();
-        if (join) {
-            try {
-                mThread.join(1000);
-            } catch (final InterruptedException ignored) {
-            }
-            mThread = null;
-        }
+        mReceiveTask.shutdownRequest(join);
+        mReceiveTask = null;
     }
 
     /**
@@ -196,70 +188,116 @@ abstract class SsdpServer {
      */
     protected abstract void onReceive(@Nonnull InetAddress sourceAddress, @Nonnull byte[] data, int length);
 
-    /**
-     * Joinを行う。
-     *
-     * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
-     *
-     * @throws IOException Joinコールにより発生
-     */
-    private void joinGroup() throws IOException {
-        if (mBindPort != 0) {
-            mSocket.joinGroup(SSDP_INET_ADDR);
-        }
-    }
+    private static class ReceiveTask implements Runnable {
+        private static final String TAG = ReceiveTask.class.getSimpleName();
+        private final SsdpServer mSsdpServer;
+        private final MulticastSocket mSocket;
+        private final int mBindPort;
 
-    /**
-     * Leaveを行う。
-     *
-     * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
-     *
-     * @throws IOException Leaveコールにより発生
-     */
-    private void leaveGroup() throws IOException {
-        if (mBindPort != 0) {
-            mSocket.leaveGroup(SSDP_INET_ADDR);
-        }
-    }
-
-    private class ReceiveThread extends Thread {
         private volatile boolean mShutdownRequest;
+        private final Object mThreadLock = new Object();
+        private Thread mThread;
 
         /**
          * インスタンス作成
          */
-        public ReceiveThread() {
-            super("ReceiveThread");
+        ReceiveTask(SsdpServer ssdpServer, MulticastSocket socket, int port) {
+            mSsdpServer = ssdpServer;
+            mSocket = socket;
+            mBindPort = port;
+        }
+
+        /**
+         * スレッドを作成して処理を開始する。
+         */
+        void start() {
+            mShutdownRequest = false;
+            synchronized (mThreadLock) {
+                mThread = new Thread(this, TAG);
+                mThread.start();
+            }
         }
 
         /**
          * 割り込みを行い、スレッドを終了させる。
          *
          * <p>現在はSocketを使用しているため割り込みは効果がない。
+         *
+         * @param join Threadのjoin待ちを行う場合はtrue
          */
-        public void shutdownRequest() {
+        void shutdownRequest(boolean join) {
             mShutdownRequest = true;
-            interrupt();
+            synchronized (mThreadLock) {
+                if (mThread == null) {
+                    return;
+                }
+                mThread.interrupt();
+                if (join) {
+                    try {
+                        mThread.join(1000);
+                    } catch (final InterruptedException ignored) {
+                    }
+                }
+                mThread = null;
+            }
         }
 
         @Override
         public void run() {
+            if (mShutdownRequest) {
+                return;
+            }
             try {
                 joinGroup();
-                final byte[] buf = new byte[1500];
-                while (!mShutdownRequest) {
-                    try {
-                        final DatagramPacket dp = new DatagramPacket(buf, buf.length);
-                        mSocket.receive(dp);
-                        if (mShutdownRequest) {
-                            break;
-                        }
-                        onReceive(dp.getAddress(), dp.getData(), dp.getLength());
-                    } catch (final SocketTimeoutException ignored) {
-                    }
-                }
+                receiveLoop();
                 leaveGroup();
             } catch (final IOException ignored) {
+            }
+        }
+
+        /**
+         * 受信処理を行う。
+         *
+         * @throws IOException 入出力処理で例外発生
+         */
+        private void receiveLoop() throws IOException {
+            final byte[] buf = new byte[1500];
+            while (!mShutdownRequest) {
+                try {
+                    final DatagramPacket dp = new DatagramPacket(buf, buf.length);
+                    mSocket.receive(dp);
+                    if (mShutdownRequest) {
+                        break;
+                    }
+                    mSsdpServer.onReceive(dp.getAddress(), dp.getData(), dp.getLength());
+                } catch (final SocketTimeoutException ignored) {
+                }
+            }
+        }
+
+        /**
+         * Joinを行う。
+         *
+         * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
+         *
+         * @throws IOException Joinコールにより発生
+         */
+        private void joinGroup() throws IOException {
+            if (mBindPort != 0) {
+                mSocket.joinGroup(SSDP_INET_ADDR);
+            }
+        }
+
+        /**
+         * Leaveを行う。
+         *
+         * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
+         *
+         * @throws IOException Leaveコールにより発生
+         */
+        private void leaveGroup() throws IOException {
+            if (mBindPort != 0) {
+                mSocket.leaveGroup(SSDP_INET_ADDR);
             }
         }
     }

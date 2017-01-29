@@ -26,10 +26,11 @@ class SubscribeKeeper implements Runnable {
     private static final String TAG = SubscribeKeeper.class.getSimpleName();
     private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
 
-    private final Map<String, SubscribeService> mServiceMap;
-
-    private Thread mThread;
+    private final Object mThreadLock = new Object();
     private volatile boolean mShutdownRequest = false;
+    private Thread mThread;
+
+    private final Map<String, SubscribeService> mServiceMap;
 
     SubscribeKeeper() {
         mServiceMap = new HashMap<>();
@@ -40,8 +41,10 @@ class SubscribeKeeper implements Runnable {
      */
     void start() {
         mShutdownRequest = false;
-        mThread = new Thread(this, TAG);
-        mThread.start();
+        synchronized (mThreadLock) {
+            mThread = new Thread(this, TAG);
+            mThread.start();
+        }
     }
 
     /**
@@ -49,9 +52,11 @@ class SubscribeKeeper implements Runnable {
      */
     void shutdownRequest() {
         mShutdownRequest = true;
-        if (mThread != null) {
-            mThread.interrupt();
-            mThread = null;
+        synchronized (mThreadLock) {
+            if (mThread != null) {
+                mThread.interrupt();
+                mThread = null;
+            }
         }
     }
 
@@ -167,7 +172,7 @@ class SubscribeKeeper implements Runnable {
      */
     private synchronized void removeExpiredService() {
         final long now = System.currentTimeMillis();
-        List<SubscribeService> list = new ArrayList<>(mServiceMap.values());
+        final List<SubscribeService> list = new ArrayList<>(mServiceMap.values());
         for (SubscribeService s : list) {
             if (s.isExpired(now)) {
                 final Service service = s.getService();
@@ -186,17 +191,23 @@ class SubscribeKeeper implements Runnable {
         if (mServiceMap.size() == 0) {
             return;
         }
+        final long sleep = findMostRecentTime() - System.currentTimeMillis();
+        wait(Math.max(sleep, MIN_INTERVAL));// ビジーループを回避するため最小値を設ける
+    }
+
+    /**
+     * スキャンすべき時刻の内最も小さな時刻を返す。
+     *
+     * @return 直近のスキャン時刻
+     */
+    private long findMostRecentTime() {
         long recent = Long.MAX_VALUE;
         for (SubscribeService s : mServiceMap.values()) {
-            final long wait = s.getNextTime();
+            final long wait = s.getNextScanTime();
             if (recent > wait) {
                 recent = wait;
             }
         }
-        long sleep = recent - System.currentTimeMillis();
-        if (sleep < MIN_INTERVAL) { // ビジーループを回避するためMIN_INTERVALの間はwaitする
-            sleep = MIN_INTERVAL;
-        }
-        wait(sleep);
+        return recent;
     }
 }
