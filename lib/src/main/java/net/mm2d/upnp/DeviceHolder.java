@@ -24,8 +24,8 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class DeviceInspector implements Runnable {
-    private static final String TAG = DeviceInspector.class.getSimpleName();
+class DeviceHolder implements Runnable {
+    private static final String TAG = DeviceHolder.class.getSimpleName();
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
 
     private final Object mThreadLock = new Object();
@@ -42,7 +42,7 @@ class DeviceInspector implements Runnable {
      *
      * @param cp ControlPoint
      */
-    DeviceInspector(@Nonnull ControlPoint cp) {
+    DeviceHolder(@Nonnull ControlPoint cp) {
         mDeviceMap = new LinkedHashMap<>();
         mControlPoint = cp;
     }
