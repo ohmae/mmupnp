@@ -26,10 +26,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -117,8 +115,6 @@ public class ControlPoint {
     @Nonnull
     private final Collection<SsdpNotifyReceiver> mNotifyList;
     @Nonnull
-    private final Map<String, Device> mDeviceMap;
-    @Nonnull
     private final Map<String, Device.Builder> mLoadingDeviceMap;
     @Nonnull
     private final EventReceiver mEventReceiver;
@@ -152,8 +148,8 @@ public class ControlPoint {
 
     private void onReceiveSsdp(@Nonnull SsdpMessage message) {
         final String uuid = message.getUuid();
-        synchronized (mDeviceMap) {
-            final Device device = mDeviceMap.get(uuid);
+        synchronized (mDeviceInspector) {
+            final Device device = mDeviceInspector.get(uuid);
             if (device == null) {
                 if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
                     if (mLoadingDeviceMap.get(uuid) != null) {
@@ -176,7 +172,6 @@ public class ControlPoint {
                     lostDevice(device);
                 } else {
                     device.setSsdpMessage(message);
-                    mDeviceInspector.update();
                 }
             }
         }
@@ -197,14 +192,14 @@ public class ControlPoint {
                 DeviceParser.loadDescription(client, mDeviceBuilder);
                 final Device device = mDeviceBuilder.build();
                 device.loadIconBinary(client, mIconFilter);
-                synchronized (mDeviceMap) {
+                synchronized (mDeviceInspector) {
                     if (mLoadingDeviceMap.get(uuid) != null) {
                         mLoadingDeviceMap.remove(uuid);
                         discoverDevice(device);
                     }
                 }
-            } catch (final IOException | SAXException | ParserConfigurationException e) {
-                synchronized (mDeviceMap) {
+            } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
+                synchronized (mDeviceInspector) {
                     mLoadingDeviceMap.remove(uuid);
                 }
             } finally {
@@ -325,7 +320,6 @@ public class ControlPoint {
                 });
             }
         });
-        mDeviceMap = Collections.synchronizedMap(new LinkedHashMap<String, Device>());
         mLoadingDeviceMap = new HashMap<>();
         mDiscoveryListeners = new ArrayList<>();
         mNotifyEventListeners = new ArrayList<>();
@@ -337,8 +331,7 @@ public class ControlPoint {
         mEventReceiver = new EventReceiver();
         mEventReceiver.setEventMessageListener(new EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull HttpRequest request) {
-                final String sid = request.getHeader(Http.SID);
+            public boolean onEventReceived(@Nonnull String sid, @Nonnull HttpRequest request) {
                 final Service service = getSubscribeService(sid);
                 return service != null && executeSequential(new EventNotifyTask(request, service));
             }
@@ -560,11 +553,10 @@ public class ControlPoint {
             server.close();
         }
         mEventReceiver.close();
-        final List<Device> list = new ArrayList<>(mDeviceMap.values());
+        final List<Device> list = getDeviceList();
         for (final Device device : list) {
             lostDevice(device);
         }
-        mDeviceMap.clear();
         mDeviceInspector.clear();
     }
 
@@ -657,8 +649,7 @@ public class ControlPoint {
     }
 
     private void discoverDevice(final @Nonnull Device device) {
-        synchronized (mDeviceMap) {
-            mDeviceMap.put(device.getUuid(), device);
+        synchronized (mDeviceInspector) {
             mDeviceInspector.add(device);
         }
         executeSequential(new Runnable() {
@@ -689,12 +680,12 @@ public class ControlPoint {
      * @see DeviceInspector
      */
     void lostDevice(final @Nonnull Device device, boolean notifyInspector) {
-        synchronized (mDeviceMap) {
+        synchronized (mDeviceInspector) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
                 unregisterSubscribeService(s);
             }
-            mDeviceMap.remove(device.getUuid());
+            mDeviceInspector.remove(device);
             if (notifyInspector) {
                 mDeviceInspector.remove(device);
             }
@@ -717,7 +708,7 @@ public class ControlPoint {
      * @return デバイスの数
      */
     public int getDeviceListSize() {
-        return mDeviceMap.size();
+        return mDeviceInspector.size();
     }
 
     /**
@@ -730,8 +721,8 @@ public class ControlPoint {
      */
     @Nonnull
     public List<Device> getDeviceList() {
-        synchronized (mDeviceMap) {
-            return new ArrayList<>(mDeviceMap.values());
+        synchronized (mDeviceInspector) {
+            return mDeviceInspector.getDeviceList();
         }
     }
 
@@ -745,8 +736,8 @@ public class ControlPoint {
      * @see Device
      */
     @Nullable
-    public Device getDevice(@Nullable String udn) {
-        return mDeviceMap.get(udn);
+    public Device getDevice(@Nonnull String udn) {
+        return mDeviceInspector.get(udn);
     }
 
     /**

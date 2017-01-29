@@ -43,10 +43,11 @@ class EventReceiver {
         /**
          * イベント受信時にコール。
          *
+         * @param sid     Subscribe ID
          * @param request 受信したHTTPメッセージ
          * @return HTTPメッセージが正常であればtrue
          */
-        boolean onEventReceived(@Nonnull HttpRequest request);
+        boolean onEventReceived(@Nonnull String sid, @Nonnull HttpRequest request);
     }
 
     private ServerSocket mServerSocket;
@@ -158,11 +159,12 @@ class EventReceiver {
         /**
          * イベントリスナーのコール
          *
+         * @param sid     Subscribe ID
          * @param request 受信したHTTPメッセージ
          * @return HTTPメッセージが正常であればtrue
          */
-        private boolean notifyEvent(@Nonnull HttpRequest request) {
-            return mListener != null && mListener.onEventReceived(request);
+        private boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
+            return mListener != null && mListener.onEventReceived(sid, request);
         }
 
         @Override
@@ -226,8 +228,8 @@ class EventReceiver {
             IoUtils.closeQuietly(mSocket);
         }
 
-        private boolean notifyEvent(@Nonnull HttpRequest request) {
-            return mServer.notifyEvent(request);
+        private boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
+            return mServer.notifyEvent(sid, request);
         }
 
         @Override
@@ -251,7 +253,7 @@ class EventReceiver {
                         || !nts.equals(Http.UPNP_PROPCHANGE)) {
                     RESPONSE_FAIL.writeData(os);
                 } else {
-                    if (notifyEvent(request)) {
+                    if (notifyEvent(sid, request)) {
                         RESPONSE_OK.writeData(os);
                     } else {
                         RESPONSE_FAIL.writeData(os);

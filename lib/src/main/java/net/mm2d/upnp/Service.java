@@ -207,7 +207,8 @@ public class Service {
     private final ControlPoint mControlPoint;
     @Nonnull
     private final Device mDevice;
-    private String mDescription;
+    @Nonnull
+    private final String mDescription;
     @Nonnull
     private final String mServiceType;
     @Nonnull
@@ -388,7 +389,7 @@ public class Service {
      *
      * @return ServiceDescription
      */
-    @Nullable
+    @Nonnull
     public String getDescription() {
         return mDescription;
     }

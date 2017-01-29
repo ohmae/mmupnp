@@ -18,7 +18,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Subscribeの期限が切れないように定期的にrenewを実行するクラス。
+ * Subscribe状態となったServiceを管理するクラス。
+ *
+ * <p>指定すればSubscribeの期限が切れないように定期的にrenewを実行する。
+ * また、期限が切れたサービスは削除される。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */

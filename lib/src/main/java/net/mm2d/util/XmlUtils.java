@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class XmlUtils {
-    private static DocumentBuilder[] sDocumentBuilders = new DocumentBuilder[2];
+    private static final DocumentBuilder[] sDocumentBuilders = new DocumentBuilder[2];
 
     @Nonnull
     private static DocumentBuilder newDocumentBuilder(boolean awareness) throws ParserConfigurationException {

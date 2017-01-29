@@ -307,6 +307,9 @@ public class Device {
             if (mUdn == null) {
                 throw new IllegalStateException("UDN must be set.");
             }
+            if (!mUdn.equals(getUuid())) {
+                throw new IllegalStateException("uuid and udn does not match! uuid=" + getUuid() + " udn=" + mUdn);
+            }
             return new Device(this);
         }
     }
@@ -416,6 +419,10 @@ public class Device {
      * @param message SSDPパケット
      */
     void setSsdpMessage(@Nonnull SsdpMessage message) {
+        final String uuid = message.getUuid();
+        if (!getUdn().equals(uuid)) {
+            throw new IllegalArgumentException("uuid and udn does not match! uuid=" + uuid + " udn=" + mUdn);
+        }
         mSsdpMessage = message;
     }
 
@@ -427,19 +434,6 @@ public class Device {
     @Nonnull
     SsdpMessage getSsdpMessage() {
         return mSsdpMessage;
-    }
-
-    /**
-     * SSDPパケットに記述されたUUIDを返す。
-     *
-     * <p>本来はDeviceDescriptionに記述されたUDNと同一の値となるはずであるが
-     * 異なる場合もエラーとしては扱っていないため、同一性は保証されない。
-     *
-     * @return SSDPパケットに記述されたUUID
-     */
-    @Nullable
-    public String getUuid() {
-        return mSsdpMessage.getUuid();
     }
 
     /**

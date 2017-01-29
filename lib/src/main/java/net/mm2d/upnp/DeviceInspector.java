@@ -8,16 +8,19 @@
 package net.mm2d.upnp;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
- * Deviceの有効期限を確認し、有効期限が切れたDeviceをLost扱いするクラス。
+ * ControlPointで発見したDeviceを保持するクラス。
+ *
+ * <p>Deviceの有効期限を確認し、有効期限が切れたDeviceをLostとして通知する。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -32,13 +35,7 @@ class DeviceInspector implements Runnable {
     @Nonnull
     private final ControlPoint mControlPoint;
     @Nonnull
-    private final List<Device> mDeviceList;
-    private final Comparator<Device> mComparator = new Comparator<Device>() {
-        @Override
-        public int compare(Device d1, Device d2) {
-            return (int) (d1.getExpireTime() - d2.getExpireTime());
-        }
-    };
+    private final Map<String, Device> mDeviceMap;
 
     /**
      * インスタンス作成。
@@ -46,10 +43,13 @@ class DeviceInspector implements Runnable {
      * @param cp ControlPoint
      */
     DeviceInspector(@Nonnull ControlPoint cp) {
-        mDeviceList = new ArrayList<>();
+        mDeviceMap = new LinkedHashMap<>();
         mControlPoint = cp;
     }
 
+    /**
+     * スレッドを開始する。
+     */
     void start() {
         mShutdownRequest = false;
         synchronized (mThreadLock) {
@@ -72,21 +72,18 @@ class DeviceInspector implements Runnable {
     }
 
     /**
-     * Deviceの有効期限変化時にコールする。
-     */
-    synchronized void update() {
-        Collections.sort(mDeviceList, mComparator);
-    }
-
-    /**
      * Device追加。
      *
      * @param device 追加されるDevice
      */
     synchronized void add(@Nonnull Device device) {
-        mDeviceList.add(device);
-        Collections.sort(mDeviceList, mComparator);
+        mDeviceMap.put(device.getUdn(), device);
         notifyAll();
+    }
+
+    @Nullable
+    synchronized Device get(@Nonnull String udn) {
+        return mDeviceMap.get(udn);
     }
 
     /**
@@ -95,41 +92,80 @@ class DeviceInspector implements Runnable {
      * @param device 削除されるDevice。
      */
     synchronized void remove(@Nonnull Device device) {
-        mDeviceList.remove(device);
+        mDeviceMap.remove(device.getUdn());
     }
 
     /**
      * 登録されたDeviceをクリア。
      */
     synchronized void clear() {
-        mDeviceList.clear();
+        mDeviceMap.clear();
+    }
+
+    /**
+     * 現在保持しているDeviceの順序を保持したリストを作成して返す。
+     *
+     * @return Deviceのリスト
+     */
+    synchronized List<Device> getDeviceList() {
+        final List<Device> list = new ArrayList<>(mDeviceMap.size());
+        for (final Device device : mDeviceMap.values()) {
+            list.add(device);
+        }
+        return list;
+    }
+
+    /**
+     * 保持しているDeviceの数を返す。
+     *
+     * @return Deviceの数
+     */
+    synchronized int size() {
+        return mDeviceMap.size();
     }
 
     @Override
     public synchronized void run() {
         try {
             while (!mShutdownRequest) {
-                while (mDeviceList.size() == 0) {
+                while (mDeviceMap.size() == 0) {
                     wait();
                 }
-                final long now = System.currentTimeMillis();
-                final Iterator<Device> i = mDeviceList.iterator();
-                while (i.hasNext()) {
-                    final Device device = i.next();
-                    if (device.getExpireTime() < now) {
-                        i.remove();
-                        mControlPoint.lostDevice(device, false);
-                    } else {
-                        break;
-                    }
-                }
-                if (mDeviceList.size() != 0) {
-                    final Device device = mDeviceList.get(0);
-                    final long sleep = device.getExpireTime() - now + MARGIN_TIME;
-                    wait(sleep);
-                }
+                expireDevice();
+                waitNextExpireTime();
             }
         } catch (final InterruptedException ignored) {
         }
+    }
+
+    private void expireDevice() {
+        final long now = System.currentTimeMillis();
+        final Iterator<Device> i = mDeviceMap.values().iterator();
+        while (i.hasNext()) {
+            final Device device = i.next();
+            if (device.getExpireTime() < now) {
+                i.remove();
+                mControlPoint.lostDevice(device, false);
+            }
+        }
+    }
+
+    private void waitNextExpireTime() throws InterruptedException {
+        if (mDeviceMap.size() == 0) {
+            return;
+        }
+        final long sleep = findMostRecentExpireTime() - System.currentTimeMillis() + MARGIN_TIME;
+        wait(Math.max(sleep, MARGIN_TIME)); // 負の値となる可能性を排除
+    }
+
+    private long findMostRecentExpireTime() {
+        long recent = Long.MAX_VALUE;
+        for (final Device device : mDeviceMap.values()) {
+            final long expireTime = device.getExpireTime();
+            if (recent > expireTime) {
+                recent = expireTime;
+            }
+        }
+        return recent;
     }
 }

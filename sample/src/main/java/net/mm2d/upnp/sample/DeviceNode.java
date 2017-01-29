@@ -33,10 +33,7 @@ public class DeviceNode extends UpnpNode {
     @Override
     public String getDetailText() {
         final Device device = (Device) getUserObject();
-        return "uuid: " +
-                device.getUuid() +
-                '\n' +
-                "UDN:  " +
+        return "UDN:  " +
                 device.getUdn() +
                 '\n' +
                 "DeviceType: " +
