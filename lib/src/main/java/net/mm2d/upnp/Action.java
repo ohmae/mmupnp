@@ -55,6 +55,7 @@ public class Action {
     public static class Builder {
         private Service mService;
         private String mName;
+        @Nonnull
         private final List<Argument.Builder> mArgumentList;
 
         /**

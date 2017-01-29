@@ -115,9 +115,10 @@ public final class Http {
         HTTP_GATEWAY_TIMEOUT(504, "Gateway Time-out"),
         HTTP_VERSION(505, "HTTP Version not supported"),;
         private final int mCode;
+        @Nonnull
         private final String mPhrase;
 
-        Status(int code, String phrase) {
+        Status(int code, @Nonnull String phrase) {
             mCode = code;
             mPhrase = phrase;
         }

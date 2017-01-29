@@ -107,6 +107,7 @@ class DeviceInspector implements Runnable {
      *
      * @return Deviceのリスト
      */
+    @Nonnull
     synchronized List<Device> getDeviceList() {
         final List<Device> list = new ArrayList<>(mDeviceMap.size());
         for (final Device device : mDeviceMap.values()) {
