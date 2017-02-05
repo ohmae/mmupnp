@@ -31,9 +31,24 @@ There is no way to make Device. If you need it, please select another library.
 
 ## How to use
 
+I placed maven repository on gh-pages.
+```
+repositories {
+    maven {
+        url 'https://ohmae.github.com/mmupnp/maven'
+    }
+}
+
+dependencies {
+    compile 'net.mm2d.mmupnp:mmupnp:1.0.6'
+}
+```
+
+## Documents
+
 I described Javadoc comments. Please refer to it for more information.
 - Javadoc in Japanese
- - http://ohmae.github.io/mmupnp/javadoc/
+ - https://ohmae.github.io/mmupnp/javadoc/
 
 ### Initialize and Start
 ```
