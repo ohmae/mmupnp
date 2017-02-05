@@ -44,12 +44,6 @@ dependencies {
 }
 ```
 
-## Documents
-
-I described Javadoc comments. Please refer to it for more information.
-- Javadoc in Japanese
- - https://ohmae.github.io/mmupnp/javadoc/
-
 ### Initialize and Start
 ```
 ControlPoint cp = new ControlPoint();
@@ -67,7 +61,6 @@ NetworkInterface ni = NetworkInterface.getByName("eth0");
 ControlPoint cp = new ControlPoint(ni);
 ```
 
-
 ### M-SEARCH
 Call ControlPoint#search() or ControlPoint#search(String).
 ```
@@ -77,7 +70,6 @@ cp.search();                   // Default ST is ssdp:all
 cp.search("upnp:rootdevice"); // To use specific ST. In this case "upnp:rootdevice"
 ```
 These methods send one M-SEARCH packet to all interfaces.
-
 
 ### Invoke Action
 For example, to invoke "Browse" (ContentDirectory) action...
@@ -125,6 +117,12 @@ cp.terminate();
 ```
 It is not possible to re-initialize.
 When you want to reset, try again from the constructor call.
+
+### Documents
+
+I described Javadoc comments. Please refer to it for more information.
+- Javadoc in Japanese
+ - https://ohmae.github.io/mmupnp/javadoc/
 
 ## Author
 大前 良介 (OHMAE Ryosuke)
