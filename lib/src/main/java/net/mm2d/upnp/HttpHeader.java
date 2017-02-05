@@ -36,23 +36,34 @@ public class HttpHeader {
     }
 
     /**
-     * ヘッダのエントリー情報
+     * ヘッダのエントリー情報。
      */
     public static class Entry {
-        private String mKey;
+        private final String mKey;
         private String mName;
         private String mValue;
 
         /**
-         * インスタンス作成
+         * インスタンス作成。
          *
-         * @param name ヘッダ名
+         * @param name  ヘッダ名
          * @param value 値
          */
         public Entry(@Nonnull String name, @Nonnull String value) {
             mKey = toKey(name);
             mName = name;
             mValue = value;
+        }
+
+        /**
+         * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
+         *
+         * @param original コピー元
+         */
+        public Entry(Entry original) {
+            mKey = original.mKey;
+            mName = original.mName;
+            mValue = original.mValue;
         }
 
         /**
@@ -68,9 +79,12 @@ public class HttpHeader {
          * ヘッダ名を設定する。
          *
          * @param name ヘッダ名
+         * @throws IllegalArgumentException keyとしての値が一致しないものに更新しようとした場合
          */
-        public void setName(@Nonnull String name) {
-            mKey = toKey(name);
+        private void setName(@Nonnull String name) {
+            if (!mKey.equals(toKey(name))) {
+                throw new IllegalArgumentException();
+            }
             mName = name;
         }
 
@@ -89,7 +103,7 @@ public class HttpHeader {
          *
          * @param value 値
          */
-        public void setValue(@Nonnull String value) {
+        private void setValue(@Nonnull String value) {
             mValue = value;
         }
 
@@ -121,7 +135,27 @@ public class HttpHeader {
     }
 
     private EntrySet mEntrySet;
-    private final List<Entry> mList = new LinkedList<>();
+    private final List<Entry> mList;
+
+    /**
+     * インスタンス初期化。
+     */
+    public HttpHeader() {
+        mList = new LinkedList<>();
+    }
+
+    /**
+     * 引数のHeaderと同一の内容を持つHeaderを作成する。
+     *
+     * @param original コピー元
+     */
+    public HttpHeader(HttpHeader original) {
+        // EntryはmutableなのでDeep copyが必要
+        mList = new LinkedList<>();
+        for (Entry entry : original.mList) {
+            mList.add(new Entry(entry));
+        }
+    }
 
     /**
      * ヘッダエントリー数を返す。
@@ -190,7 +224,7 @@ public class HttpHeader {
      * ヘッダの重複は大文字小文字の区別を行わない。
      * 置換された場合、ヘッダ名も引数のもので置き換えられる。
      *
-     * @param name ヘッダ名
+     * @param name  ヘッダ名
      * @param value ヘッダの値
      * @return 重複があった場合、既に登録されていた値。
      */
@@ -214,7 +248,7 @@ public class HttpHeader {
      *
      * <p>該当ヘッダ名の検索も大文字小文字の区別を行わない。
      *
-     * @param name ヘッダ名
+     * @param name  ヘッダ名
      * @param value 含まれるか
      * @return 指定ヘッダにvalueが含まれる場合true
      */

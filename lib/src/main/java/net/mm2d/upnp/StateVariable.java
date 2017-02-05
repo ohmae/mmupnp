@@ -23,8 +23,8 @@ public class StateVariable {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription(IconFilter)
-     * @see Service#loadDescription(HttpClient)
+     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, String, Service.Builder)
      */
     public static class Builder {
         private Service mService;

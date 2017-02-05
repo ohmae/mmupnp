@@ -17,7 +17,9 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -63,6 +65,35 @@ public abstract class HttpMessage {
     }
 
     /**
+     * インスタンス作成
+     *
+     * @param socket 受信したsocket
+     */
+    public HttpMessage(Socket socket) {
+        this();
+        mAddress = socket.getInetAddress();
+        mPort = socket.getPort();
+    }
+
+    /**
+     * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
+     *
+     * @param original コピー元
+     */
+    public HttpMessage(HttpMessage original) {
+        mAddress = original.mAddress;
+        mPort = original.mPort;
+        mHeaders = new HttpHeader(original.mHeaders);
+        mVersion = original.mVersion;
+        if (original.mBodyBinary != null) {
+            mBodyBinary = Arrays.copyOf(original.mBodyBinary, original.mBodyBinary.length);
+        } else {
+            mBodyBinary = null;
+        }
+        mBody = original.mBody;
+    }
+
+    /**
      * 宛先アドレス情報を返す。
      *
      * @return 宛先アドレス情報。
@@ -77,7 +108,7 @@ public abstract class HttpMessage {
      *
      * @param address 宛先アドレス。
      */
-    public void setAddress(@Nullable InetAddress address) {
+    protected void setAddress(@Nullable InetAddress address) {
         mAddress = address;
     }
 
@@ -95,7 +126,7 @@ public abstract class HttpMessage {
      *
      * @param port 宛先ポート番号
      */
-    public void setPort(int port) {
+    protected void setPort(int port) {
         mPort = port;
     }
 
@@ -165,7 +196,7 @@ public abstract class HttpMessage {
     /**
      * ヘッダを設定する。
      *
-     * @param name ヘッダ名
+     * @param name  ヘッダ名
      * @param value 値
      */
     public void setHeader(@Nonnull String name, @Nonnull String value) {
@@ -245,7 +276,7 @@ public abstract class HttpMessage {
     /**
      * メッセージボディを設定する。
      *
-     * @param body メッセージボディ
+     * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
     public void setBody(@Nullable String body, boolean withContentLength) {
@@ -294,7 +325,7 @@ public abstract class HttpMessage {
     /**
      * メッセージボディを設定する。
      *
-     * @param body メッセージボディ
+     * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
     public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {
@@ -479,6 +510,7 @@ public abstract class HttpMessage {
         }
     }
 
+    @Nullable
     private static String readLine(@Nonnull InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {

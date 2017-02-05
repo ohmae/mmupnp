@@ -11,6 +11,7 @@ import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
@@ -29,6 +30,26 @@ public class HttpRequest extends HttpMessage {
      */
     public HttpRequest() {
         super();
+    }
+
+    /**
+     * インスタンス作成
+     *
+     * @param socket 受信したsocket
+     */
+    public HttpRequest(Socket socket) {
+        super(socket);
+    }
+
+    /**
+     * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
+     *
+     * @param original コピー元
+     */
+    public HttpRequest(HttpRequest original) {
+        super(original);
+        mMethod = original.mMethod;
+        mUri = original.mUri;
     }
 
     @Override
@@ -73,7 +94,7 @@ public class HttpRequest extends HttpMessage {
     /**
      * 接続先URLを設定する。
      *
-     * @param url 接続先URL
+     * @param url            接続先URL
      * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
@@ -81,7 +102,8 @@ public class HttpRequest extends HttpMessage {
         if (!TextUtils.equals(url.getProtocol(), "http")) {
             throw new IOException("unsupported protocol." + url.getProtocol());
         }
-        setAddress(InetAddress.getByName(url.getHost()));
+        final String host = url.getHost();
+        setAddress(InetAddress.getByName(host));
         int port = url.getPort();
         if (port < 0) {
             port = 80;
@@ -89,7 +111,11 @@ public class HttpRequest extends HttpMessage {
         setPort(port);
         setUri(url.getFile());
         if (withHostHeader) {
-            setHeader(Http.HOST, getAddressString());
+            if (port != Http.DEFAULT_PORT) {
+                setHeader(Http.HOST, host + ":" + port);
+            } else {
+                setHeader(Http.HOST, host);
+            }
         }
     }
 

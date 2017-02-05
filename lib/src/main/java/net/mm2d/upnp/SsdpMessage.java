@@ -11,11 +11,11 @@ import net.mm2d.util.TextUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -66,8 +66,6 @@ public abstract class SsdpMessage {
     @Nullable
     private final String mLocation;
     @Nullable
-    private final InetAddress mPacketAddress;
-    @Nullable
     private final InterfaceAddress mInterfaceAddress;
 
     /**
@@ -101,23 +99,22 @@ public abstract class SsdpMessage {
         mType = "";
         mNts = "";
         mLocation = "";
-        mPacketAddress = null;
         mInterfaceAddress = null;
     }
 
     /**
      * 受信した情報からインスタンス作成
      *
-     * @param ifa 受信したInterfaceAddress
-     * @param dp 受信したDatagramPacket
+     * @param address 受信したInterfaceAddress
+     * @param data    受信したデータ
+     * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpMessage(@Nonnull InterfaceAddress ifa, @Nonnull DatagramPacket dp)
+    public SsdpMessage(@Nonnull InterfaceAddress address, @Nonnull byte[] data, int length)
             throws IOException {
         mMessage = newMessage();
-        mInterfaceAddress = ifa;
-        mPacketAddress = dp.getAddress();
-        mMessage.readData(new ByteArrayInputStream(dp.getData(), 0, dp.getLength()));
+        mInterfaceAddress = address;
+        mMessage.readData(new ByteArrayInputStream(data, 0, length));
         mMaxAge = parseCacheControl(mMessage);
         final String[] result = parseUsn(mMessage);
         mUuid = result[0];
@@ -151,31 +148,31 @@ public abstract class SsdpMessage {
         }
         final int pos = usn.indexOf("::");
         if (pos < 0) {
-            return new String[] {
+            return new String[]{
                     usn, ""
             };
         }
-        return new String[] {
+        return new String[]{
                 usn.substring(0, pos), usn.substring(pos + 2)
         };
     }
 
     /**
-     * Locationに記述のアドレスとパケットの送信元アドレスが一致しているかを返す。
+     * Locationに記述のアドレスとパケットの送信元アドレスに不一致がないか検査する
      *
-     * @return 一致している場合true
+     * @param sourceAddress 送信元アドレス
+     * @return Locationに問題がある場合true
      */
-    public boolean hasValidLocation() {
+    public boolean hasInvalidLocation(@Nonnull InetAddress sourceAddress) {
         if (TextUtils.isEmpty(mLocation)) {
-            return false;
+            return true;
         }
-        final String packetAddress = mPacketAddress.getHostAddress();
         try {
-            final String locationAddress = new URL(mLocation).getHost();
-            return packetAddress.equals(locationAddress);
-        } catch (final MalformedURLException ignored) {
+            final InetAddress locationAddress = InetAddress.getByName(new URL(mLocation).getHost());
+            return !sourceAddress.equals(locationAddress);
+        } catch (MalformedURLException | UnknownHostException ignored) {
         }
-        return false;
+        return true;
     }
 
     /**
@@ -202,7 +199,7 @@ public abstract class SsdpMessage {
     /**
      * ヘッダの値を設定する。
      *
-     * @param name ヘッダ名
+     * @param name  ヘッダ名
      * @param value 値
      */
     public void setHeader(@Nonnull String name, @Nonnull String value) {

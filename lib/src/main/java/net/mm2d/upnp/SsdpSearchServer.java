@@ -10,8 +10,7 @@ package net.mm2d.upnp;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InterfaceAddress;
+import java.net.InetAddress;
 import java.net.NetworkInterface;
 
 import javax.annotation.Nonnull;
@@ -93,10 +92,10 @@ class SsdpSearchServer extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(@Nonnull InterfaceAddress addr, @Nonnull DatagramPacket dp) {
+    protected void onReceive(@Nonnull InetAddress sourceAddress, @Nonnull byte[] data, int length) {
         try {
-            final SsdpResponseMessage message = new SsdpResponseMessage(addr, dp);
-            if (!message.hasValidLocation()) {
+            final SsdpResponseMessage message = new SsdpResponseMessage(getInterfaceAddress(), data, length);
+            if (message.hasInvalidLocation(sourceAddress)) {
                 return;
             }
             if (mListener != null) {

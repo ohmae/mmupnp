@@ -68,12 +68,7 @@ public final class Http {
     public static final String GET = "GET";
     public static final String POST = "POST";
 
-    public static final String USER_AGENT_VALUE = Property.OS_VERSION
-            + " " + Property.UPNP_VERSION
-            + " " + Property.LIB_VERSION;
-    public static final String SERVER_VALUE = Property.OS_VERSION
-            + " " + Property.UPNP_VERSION
-            + " " + Property.LIB_VERSION;
+    public static final int DEFAULT_PORT = 80;
 
     /**
      * HTTPのステータスコードを表現するEnum
@@ -120,9 +115,10 @@ public final class Http {
         HTTP_GATEWAY_TIMEOUT(504, "Gateway Time-out"),
         HTTP_VERSION(505, "HTTP Version not supported"),;
         private final int mCode;
+        @Nonnull
         private final String mPhrase;
 
-        Status(int code, String phrase) {
+        Status(int code, @Nonnull String phrase) {
             mCode = code;
             mPhrase = phrase;
         }
@@ -176,6 +172,13 @@ public final class Http {
         RFC_1036_FORMAT.setTimeZone(tz);
         ASC_TIME_FORMAT = new SimpleDateFormat("E MMM d HH:mm:ss yyyy", locale);
         ASC_TIME_FORMAT.setTimeZone(tz);
+    }
+
+    /**
+     * インスタンス化禁止
+     */
+    private Http() {
+        throw new AssertionError();
     }
 
     /**

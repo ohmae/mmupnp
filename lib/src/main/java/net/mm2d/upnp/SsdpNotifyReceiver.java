@@ -11,8 +11,7 @@ import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 
@@ -60,24 +59,24 @@ class SsdpNotifyReceiver extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(@Nonnull InterfaceAddress addr, @Nonnull DatagramPacket dp) {
+    protected void onReceive(@Nonnull InetAddress sourceAddress, @Nonnull byte[] data, int length) {
         // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
         // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
         // 受け取っても無駄なので破棄する。
-        if (!isSameSegment(addr, dp)) {
-            Log.w(TAG, "Invalid segment packet received:" + dp.getAddress().toString()
-                    + " " + addr.toString());
+        if (!isSameSegment(getInterfaceAddress(), sourceAddress)) {
+            Log.w(TAG, "Invalid segment packet received:" + sourceAddress.toString()
+                    + " " + getInterfaceAddress().toString());
             return;
         }
         try {
-            final SsdpRequestMessage message = new SsdpRequestMessage(addr, dp);
+            final SsdpRequestMessage message = new SsdpRequestMessage(getInterfaceAddress(), data, length);
             // M-SEARCHパケットは無視する
             if (TextUtils.equals(message.getMethod(), SsdpMessage.M_SEARCH)) {
                 return;
             }
             // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
             if (!TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)
-                    && !message.hasValidLocation()) {
+                    && message.hasInvalidLocation(sourceAddress)) {
                 return;
             }
             if (mListener != null) {
@@ -87,12 +86,11 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
     }
 
-    private static boolean isSameSegment(@Nonnull InterfaceAddress ifa,
-            @Nonnull DatagramPacket dp) {
-        final InetSocketAddress sa = (InetSocketAddress) dp.getSocketAddress();
-        final byte[] a = ifa.getAddress().getAddress();
-        final byte[] b = sa.getAddress().getAddress();
-        final int pref = ifa.getNetworkPrefixLength();
+    private static boolean isSameSegment(@Nonnull InterfaceAddress interfaceAddress,
+                                         @Nonnull InetAddress sourceAddress) {
+        final byte[] a = interfaceAddress.getAddress().getAddress();
+        final byte[] b = sourceAddress.getAddress();
+        final int pref = interfaceAddress.getNetworkPrefixLength();
         final int bytes = pref / 8;
         final int bits = pref % 8;
         for (int i = 0; i < bytes; i++) {

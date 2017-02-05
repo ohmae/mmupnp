@@ -8,7 +8,6 @@
 package net.mm2d.upnp;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
@@ -20,22 +19,23 @@ import javax.annotation.Nonnull;
  */
 public class SsdpRequestMessage extends SsdpMessage {
     /**
-     * インスタンス作成
+     * インスタンス作成。
      */
     public SsdpRequestMessage() {
         super();
     }
 
     /**
-     * 受信した情報からインスタンス作成
+     * 受信した情報からインスタンス作成。
      *
-     * @param ifa 受信したInterfaceAddress
-     * @param dp 受信したDatagramPacket
+     * @param address 受信したInterfaceAddress
+     * @param data    受信したデータ
+     * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpRequestMessage(@Nonnull InterfaceAddress ifa, @Nonnull DatagramPacket dp)
+    public SsdpRequestMessage(@Nonnull InterfaceAddress address, @Nonnull byte[] data, int length)
             throws IOException {
-        super(ifa, dp);
+        super(address, data, length);
     }
 
     @Override

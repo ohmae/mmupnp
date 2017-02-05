@@ -28,54 +28,57 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class XmlUtils {
-    private static DocumentBuilder sDocumentBuilder;
+    private static final DocumentBuilder[] sDocumentBuilders = new DocumentBuilder[2];
 
     @Nonnull
-    private static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
+    private static DocumentBuilder newDocumentBuilder(boolean awareness) throws ParserConfigurationException {
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
+        factory.setNamespaceAware(awareness);
         return factory.newDocumentBuilder();
     }
 
     @Nonnull
-    private static synchronized DocumentBuilder getDocumentBuilder()
+    private static synchronized DocumentBuilder getDocumentBuilder(boolean awareness)
             throws ParserConfigurationException {
-        if (sDocumentBuilder == null) {
-            sDocumentBuilder = newDocumentBuilder();
+        final int index = awareness ? 1 : 0;
+        if (sDocumentBuilders[index] == null) {
+            sDocumentBuilders[index] = newDocumentBuilder(awareness);
         }
-        return sDocumentBuilder;
+        return sDocumentBuilders[index];
     }
 
     /**
      * 空のDocumentを作成する。
      *
+     * @param awareness trueのときXML namespaceに対応
      * @return Document
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     @Nonnull
-    public static synchronized Document newDocument() throws ParserConfigurationException {
-        return getDocumentBuilder().newDocument();
+    public static synchronized Document newDocument(boolean awareness) throws ParserConfigurationException {
+        return getDocumentBuilder(awareness).newDocument();
     }
 
     /**
      * 引数のStringをもとにしたDocumentを作成する。
      *
-     * @param xml XML文字列
+     * @param awareness trueのときXML namespaceに対応
+     * @param xml       XML文字列
      * @return Document
-     * @throws SAXException 構文解析エラーが発生した
-     * @throws IOException 入出力エラーが発生した
+     * @throws SAXException                 構文解析エラーが発生した
+     * @throws IOException                  入出力エラーが発生した
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     @Nonnull
-    public static synchronized Document newDocument(@Nonnull String xml)
+    public static synchronized Document newDocument(boolean awareness, @Nonnull String xml)
             throws SAXException, IOException, ParserConfigurationException {
-        return getDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+        return getDocumentBuilder(awareness).parse(new InputSource(new StringReader(xml)));
     }
 
     /**
      * ノード以下にある特定の名前を持つ最初のエレメントノードを返す
      *
-     * @param parent 親ノード
+     * @param parent    親ノード
      * @param localName 検索するローカル名
      * @return 見つかったエレメントノード、見つからなければnull
      */
@@ -93,5 +96,4 @@ public class XmlUtils {
         }
         return null;
     }
-
 }

@@ -19,8 +19,8 @@ public class Argument {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription(IconFilter)
-     * @see Service#loadDescription(HttpClient)
+     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, String, Service.Builder)
      * @see Action.Builder
      */
     public static class Builder {

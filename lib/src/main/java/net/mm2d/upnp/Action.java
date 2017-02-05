@@ -49,12 +49,13 @@ public class Action {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see Device#loadDescription(IconFilter)
-     * @see Service#loadDescription(HttpClient)
+     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, String, Service.Builder)
      */
     public static class Builder {
         private Service mService;
         private String mName;
+        @Nonnull
         private final List<Argument.Builder> mArgumentList;
 
         /**
@@ -146,9 +147,8 @@ public class Action {
         mService = builder.mService;
         mName = builder.mName;
         mArgumentMap = new LinkedHashMap<>(builder.mArgumentList.size());
-        for (final Argument.Builder b : builder.mArgumentList) {
-            b.setAction(this);
-            final Argument argument = b.build();
+        for (final Argument.Builder argumentBuilder : builder.mArgumentList) {
+            final Argument argument = argumentBuilder.setAction(this).build();
             mArgumentMap.put(argument.getName(), argument);
         }
     }
@@ -231,7 +231,7 @@ public class Action {
         request.setMethod(Http.POST);
         request.setUrl(url, true);
         request.setHeader(Http.SOAPACTION, getSoapActionName());
-        request.setHeader(Http.USER_AGENT, Http.USER_AGENT_VALUE);
+        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
         request.setHeader(Http.CONNECTION, Http.CLOSE);
         request.setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT);
         request.setBody(soap, true);
@@ -251,7 +251,7 @@ public class Action {
     @Nonnull
     private String makeSoap(@Nonnull Map<String, String> arguments) throws IOException {
         try {
-            final Document doc = XmlUtils.newDocument();
+            final Document doc = XmlUtils.newDocument(true);
             final Element envelope = doc.createElementNS(SOAP_NS, "s:Envelope");
             doc.appendChild(envelope);
             final Attr style = doc.createAttributeNS(SOAP_NS, "s:encodingStyle");
@@ -294,7 +294,7 @@ public class Action {
             throws IOException, SAXException, ParserConfigurationException {
         final Map<String, String> result = new HashMap<>();
         final String responseTag = mName + "Response";
-        final Document doc = XmlUtils.newDocument(xml);
+        final Document doc = XmlUtils.newDocument(true, xml);
         final Element envelope = doc.getDocumentElement();
         final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
         if (body == null) {

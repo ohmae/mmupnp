@@ -145,7 +145,7 @@ public class ActionInvokeTest {
         mAction.invoke(new HashMap<String, String>());
         final HttpRequest request = mMockFactory.getHttpRequest();
 
-        final Document doc = XmlUtils.newDocument(request.getBody());
+        final Document doc = XmlUtils.newDocument(true, request.getBody());
         final Element envelope = doc.getDocumentElement();
 
         assertThat(envelope.getLocalName(), is("Envelope"));
@@ -169,7 +169,7 @@ public class ActionInvokeTest {
         mAction.invoke(new HashMap<String, String>());
         final HttpRequest request = mMockFactory.getHttpRequest();
 
-        final Document doc = XmlUtils.newDocument(request.getBody());
+        final Document doc = XmlUtils.newDocument(true, request.getBody());
         final Element envelope = doc.getDocumentElement();
         final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
         final Element action = XmlUtils.findChildElementByLocalName(body, ACTION_NAME);
@@ -194,7 +194,7 @@ public class ActionInvokeTest {
         mAction.invoke(arg);
         final HttpRequest request = mMockFactory.getHttpRequest();
 
-        final Document doc = XmlUtils.newDocument(request.getBody());
+        final Document doc = XmlUtils.newDocument(true, request.getBody());
         final Element envelope = doc.getDocumentElement();
         final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
         final Element action = XmlUtils.findChildElementByLocalName(body, ACTION_NAME);
