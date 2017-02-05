@@ -303,7 +303,7 @@ public class Service {
      * The highest supported version of the service type shall be specified.
      * </ul>
      * <p>The service type suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be
-     * <= 64 characters, not counting the version suffix and separating colon.
+     * &lt;= 64 characters, not counting the version suffix and separating colon.
      *
      * @return serviceType
      */
@@ -319,19 +319,19 @@ public class Service {
      * <ul>
      * <li>For standard services defined by a UPnP Forum working committee, shall begin with "urn:upnp-org:serviceId:"
      * followed by a service ID suffix i.e. urn:upnp-org:serviceId:serviceID.
-     * If this instance of the specified service type (i.e. the <serviceType> element above) corresponds to one of
-     * the services defined by the specified device type (i.e. the <deviceType> element above), then the value of
+     * If this instance of the specified service type (i.e. the &lt;serviceType&gt; element above) corresponds to one of
+     * the services defined by the specified device type (i.e. the &lt;deviceType&gt; element above), then the value of
      * the service ID suffix shall be the service ID defined by the device type for this instance of the service.
      * Otherwise, the value of the service ID suffix is vendor defined. (Note that upnp-org is used instead of
      * schemas-upnp- org in this case because an XML schema is not defined for each service ID.)
      * <li>For non-standard services specified by UPnP vendors, shall begin with “urn:”, followed by a Vendor Domain
      * Name, followed by ":serviceId:", followed by a service ID suffix, i.e., "urn:domain- name:serviceId:serviceID".
-     * If this instance of the specified service type (i.e. the <serviceType> element above) corresponds to one of
-     * the services defined by the specified device type (i.e. the <deviceType> element above), then the value of
+     * If this instance of the specified service type (i.e. the &lt;serviceType&gt; element above) corresponds to one of
+     * the services defined by the specified device type (i.e. the &lt;deviceType&gt; element above), then the value of
      * the service ID suffix shall be the service ID defined by the device type for this instance of the service.
      * Period characters in the Vendor Domain Name shall be replaced with hyphens in accordance with RFC 2141.
      * </ul>
-     * <p>The service ID suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be <= 64
+     * <p>The service ID suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be &lt;= 64
      * characters.
      *
      * @return serviceId

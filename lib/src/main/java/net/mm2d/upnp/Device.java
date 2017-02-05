@@ -619,7 +619,7 @@ public class Device {
      * Period characters in the Vendor Domain Name shall be replaced with hyphens in accordance with RFC 2141.
      * The highest supported version of the device type shall be specified.
      * </ul>
-     * <p>The device type suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be <= 64
+     * <p>The device type suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be &lt;= 64
      * chars, not counting the version suffix and separating colon.
      *
      * @return deviceTypeタグの値
@@ -635,7 +635,7 @@ public class Device {
      * <p>値が存在しない場合nullが返る。
      *
      * <p>Required. Short description for end user. Is allowed to be localized (see ACCEPT- LANGUAGE and
-     * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be < 64 characters.
+     * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be &lt; 64 characters.
      *
      * @return friendlyNameタグの値
      */
@@ -650,7 +650,7 @@ public class Device {
      * <p>値が存在しない場合nullが返る。
      *
      * <p>Required. Manufacturer's name. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header
-     * fields). Specified by UPnP vendor. String. Should be < 64 characters.
+     * fields). Specified by UPnP vendor. String. Should be &lt; 64 characters.
      *
      * @return manufacturerタグの値
      */
@@ -680,7 +680,7 @@ public class Device {
      * <p>値が存在しない場合nullが返る。
      *
      * <p>Required. Model name. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT- LANGUAGE header fields).
-     * Specified by UPnP vendor. String. Should be < 32 characters.
+     * Specified by UPnP vendor. String. Should be &lt; 32 characters.
      *
      * @return modelNameタグの値
      */
@@ -710,7 +710,7 @@ public class Device {
      * <p>値が存在しない場合nullが返る。
      *
      * <p>Recommended. Long description for end user. Is allowed to be localized (see ACCEPT- LANGUAGE and
-     * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be < 128 characters.
+         * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be &lt; 128 characters.
      *
      * @return modelDescriptionタグの値
      */
@@ -725,7 +725,7 @@ public class Device {
      * <p>値が存在しない場合nullが返る。
      *
      * <p>Recommended. Model number. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields).
-     * Specified by UPnP vendor. String. Should be < 32 characters.
+     * Specified by UPnP vendor. String. Should be &lt; 32 characters.
      *
      * @return modelNumberタグの値
      */
@@ -740,7 +740,7 @@ public class Device {
      * <p>値が存在しない場合nullが返る。
      *
      * <p>Recommended. Serial number. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields).
-     * Specified by UPnP vendor. String. Should be < 64 characters.
+     * Specified by UPnP vendor. String. Should be &lt; 64 characters.
      *
      * @return serialNumberタグの値
      */
