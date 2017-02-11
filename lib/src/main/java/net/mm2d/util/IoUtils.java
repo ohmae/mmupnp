@@ -17,7 +17,7 @@ import java.nio.channels.Selector;
 import javax.annotation.Nullable;
 
 /**
- * IO関係のよく使用する機能を実装する。
+ * IO関係のユーティリティメソッドを提供する。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */

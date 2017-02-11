@@ -12,7 +12,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 
 /**
- * Text関係のよく使う機能を実装する。
+ * Text関係のユーティリティメソッドを提供する。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */

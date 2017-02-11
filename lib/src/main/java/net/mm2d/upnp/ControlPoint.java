@@ -11,6 +11,7 @@ import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.Log;
+import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
@@ -19,14 +20,10 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,7 +160,7 @@ public class ControlPoint {
                 } else {
                     deviceBuilder = new Device.Builder(ControlPoint.this, message);
                     mLoadingDeviceMap.put(message.getUuid(), deviceBuilder);
-                    if (!executeParallel(new DeviceLoader(deviceBuilder))) {
+                    if (!executeInParallel(new DeviceLoader(deviceBuilder))) {
                         mLoadingDeviceMap.remove(message.getUuid());
                     }
                 }
@@ -293,7 +290,7 @@ public class ControlPoint {
     public ControlPoint(@Nullable Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
         if (interfaces == null || interfaces.isEmpty()) {
-            interfaces = getAvailableInterfaces();
+            interfaces = NetworkUtils.getAvailableInet4Interfaces();
         }
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
@@ -301,7 +298,7 @@ public class ControlPoint {
         mSearchList = setUpSsdpSearchServers(interfaces, new ResponseListener() {
             @Override
             public void onReceiveResponse(final @Nonnull SsdpResponseMessage message) {
-                executeParallel(new Runnable() {
+                executeInParallel(new Runnable() {
                     @Override
                     public void run() {
                         onReceiveSsdp(message);
@@ -312,7 +309,7 @@ public class ControlPoint {
         mNotifyList = setUpSsdpNotifyReceivers(interfaces, new NotifyListener() {
             @Override
             public void onReceiveNotify(final @Nonnull SsdpRequestMessage message) {
-                executeParallel(new Runnable() {
+                executeInParallel(new Runnable() {
                     @Override
                     public void run() {
                         onReceiveSsdp(message);
@@ -333,7 +330,7 @@ public class ControlPoint {
             @Override
             public boolean onEventReceived(@Nonnull String sid, @Nonnull HttpRequest request) {
                 final Service service = getSubscribeService(sid);
-                return service != null && executeSequential(new EventNotifyTask(request, service));
+                return service != null && executeInSequential(new EventNotifyTask(request, service));
             }
         });
     }
@@ -362,38 +359,7 @@ public class ControlPoint {
         return list;
     }
 
-    @Nonnull
-    private Collection<NetworkInterface> getAvailableInterfaces() {
-        final Collection<NetworkInterface> list = new ArrayList<>();
-        final Enumeration<NetworkInterface> nis;
-        try {
-            nis = NetworkInterface.getNetworkInterfaces();
-        } catch (final SocketException e) {
-            return list;
-        }
-        while (nis.hasMoreElements()) {
-            final NetworkInterface ni = nis.nextElement();
-            try {
-                if (ni.isLoopback()
-                        || ni.isPointToPoint()
-                        || ni.isVirtual()
-                        || !ni.isUp()) {
-                    continue;
-                }
-                final List<InterfaceAddress> ifas = ni.getInterfaceAddresses();
-                for (final InterfaceAddress a : ifas) {
-                    if (a.getAddress() instanceof Inet4Address) {
-                        list.add(ni);
-                        break;
-                    }
-                }
-            } catch (final SocketException ignored) {
-            }
-        }
-        return list;
-    }
-
-    private boolean executeParallel(@Nonnull Runnable command) {
+    private boolean executeInParallel(@Nonnull Runnable command) {
         if (mCachedThreadPool.isShutdown()) {
             return false;
         }
@@ -405,7 +371,7 @@ public class ControlPoint {
         return true;
     }
 
-    private boolean executeSequential(@Nonnull Runnable command) {
+    private boolean executeInSequential(@Nonnull Runnable command) {
         if (mNotifyExecutor.isShutdown()) {
             return false;
         }
@@ -528,7 +494,7 @@ public class ControlPoint {
         mStarted = false;
         List<Service> serviceList = mSubscribeHolder.getServiceList();
         for (final Service service : serviceList) {
-            executeParallel(new Runnable() {
+            executeInParallel(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -652,7 +618,7 @@ public class ControlPoint {
         synchronized (mDeviceHolder) {
             mDeviceHolder.add(device);
         }
-        executeSequential(new Runnable() {
+        executeInSequential(new Runnable() {
             @Override
             public void run() {
                 synchronized (mDiscoveryListeners) {
@@ -690,7 +656,7 @@ public class ControlPoint {
                 mDeviceHolder.remove(device);
             }
         }
-        executeSequential(new Runnable() {
+        executeInSequential(new Runnable() {
             @Override
             public void run() {
                 synchronized (mDiscoveryListeners) {
