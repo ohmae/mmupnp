@@ -323,9 +323,7 @@ class EventReceiver {
 
         private void receiveAndReply(@Nonnull InputStream is, @Nonnull OutputStream os) throws IOException {
             final HttpRequest request = new HttpRequest(mSocket);
-            if (!request.readData(is)) {
-                return;
-            }
+            request.readData(is);
             final String nt = request.getHeader(Http.NT);
             final String nts = request.getHeader(Http.NTS);
             final String sid = request.getHeader(Http.SID);

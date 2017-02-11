@@ -95,7 +95,7 @@ public class DeviceParser {
                 continue;
             }
             final String tag = node.getLocalName();
-            if (tag == null) {
+            if (TextUtils.isEmpty(tag)) {
                 continue;
             }
             switch (tag) {
@@ -140,7 +140,7 @@ public class DeviceParser {
                 continue;
             }
             final String tag = node.getLocalName();
-            if (tag == null) {
+            if (TextUtils.isEmpty(tag)) {
                 continue;
             }
             final String text = node.getTextContent();
@@ -168,7 +168,7 @@ public class DeviceParser {
     }
 
     @Nonnull
-    private static List<Service.Builder> parseServiceList(@Nonnull Node listNode) throws IOException {
+    private static List<Service.Builder> parseServiceList(@Nonnull Node listNode) {
         final List<Service.Builder> builderList = new ArrayList<>();
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -191,7 +191,7 @@ public class DeviceParser {
                 continue;
             }
             final String tag = node.getLocalName();
-            if (tag == null) {
+            if (TextUtils.isEmpty(tag)) {
                 continue;
             }
             final String text = node.getTextContent();

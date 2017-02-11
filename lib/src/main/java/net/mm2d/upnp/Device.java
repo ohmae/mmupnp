@@ -710,7 +710,7 @@ public class Device {
      * <p>値が存在しない場合nullが返る。
      *
      * <p>Recommended. Long description for end user. Is allowed to be localized (see ACCEPT- LANGUAGE and
-         * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be &lt; 128 characters.
+     * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be &lt; 128 characters.
      *
      * @return modelDescriptionタグの値
      */
