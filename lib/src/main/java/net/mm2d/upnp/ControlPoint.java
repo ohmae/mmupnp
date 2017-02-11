@@ -12,11 +12,9 @@ import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.Log;
 import net.mm2d.util.NetworkUtils;
+import net.mm2d.util.Pair;
 import net.mm2d.util.TextUtils;
-import net.mm2d.util.XmlUtils;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -206,51 +204,20 @@ public class ControlPoint {
     }
 
     private class EventNotifyTask implements Runnable {
-        private final HttpRequest mRequest;
         private final Service mService;
-        private long mSeq;
+        private final long mSeq;
+        private final List<Pair<String, String>> mProperties;
 
-        public EventNotifyTask(@Nonnull HttpRequest request, @Nonnull Service service) {
-            mRequest = request;
+        public EventNotifyTask(@Nonnull Service service, long seq, @Nonnull List<Pair<String, String>> properties) {
             mService = service;
-            final String seq = mRequest.getHeader(Http.SEQ);
-            if (TextUtils.isEmpty(seq)) {
-                mSeq = 0;
-                return;
-            }
-            try {
-                mSeq = Long.parseLong(seq);
-            } catch (final NumberFormatException e) {
-                mSeq = 0;
-            }
+            mSeq = seq;
+            mProperties = properties;
         }
 
         @Override
         public void run() {
-            final String xml = mRequest.getBody();
-            if (TextUtils.isEmpty(xml)) {
-                return;
-            }
-            try {
-                final Document doc = XmlUtils.newDocument(true, xml);
-                Node node = doc.getDocumentElement().getFirstChild();
-                for (; node != null; node = node.getNextSibling()) {
-                    if (node.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    if (TextUtils.equals(node.getLocalName(), "property")) {
-                        Node c = node.getFirstChild();
-                        for (; c != null; c = c.getNextSibling()) {
-                            if (c.getNodeType() != Node.ELEMENT_NODE) {
-                                continue;
-                            }
-                            final String name = c.getLocalName();
-                            final String value = c.getTextContent();
-                            notifyEvent(name, value);
-                        }
-                    }
-                }
-            } catch (IOException | SAXException | ParserConfigurationException ignored) {
+            for (Pair<String, String> pair : mProperties) {
+                notifyEvent(pair.getKey(), pair.getValue());
             }
         }
 
@@ -328,9 +295,9 @@ public class ControlPoint {
         mEventReceiver = new EventReceiver();
         mEventReceiver.setEventMessageListener(new EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull String sid, @Nonnull HttpRequest request) {
+            public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<Pair<String, String>> properties) {
                 final Service service = getSubscribeService(sid);
-                return service != null && executeInSequential(new EventNotifyTask(request, service));
+                return service != null && executeInSequential(new EventNotifyTask(service, seq, properties));
             }
         });
     }

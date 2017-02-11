@@ -9,21 +9,28 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.IoUtils;
 import net.mm2d.util.Log;
+import net.mm2d.util.Pair;
+import net.mm2d.util.TextParseUtils;
 import net.mm2d.util.TextUtils;
+import net.mm2d.util.XmlUtils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * イベント購読によって通知されるEventを受信するクラス。
@@ -43,15 +50,16 @@ class EventReceiver {
         /**
          * イベント受信時にコール。
          *
-         * @param sid     Subscribe ID
-         * @param request 受信したHTTPメッセージ
+         * @param sid        Subscribe ID
+         * @param seq        SEQヘッダの値
+         * @param properties プロパティ
          * @return HTTPメッセージが正常であればtrue
          */
-        boolean onEventReceived(@Nonnull String sid, @Nonnull HttpRequest request);
+        boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<Pair<String, String>> properties);
     }
 
     private ServerSocket mServerSocket;
-    private ServerThread mServerThread;
+    private ServerTask mServerTask;
     private EventMessageListener mListener;
 
     /**
@@ -67,8 +75,8 @@ class EventReceiver {
      */
     public void setEventMessageListener(@Nullable EventMessageListener listener) {
         mListener = listener;
-        if (mServerThread != null) {
-            mServerThread.setEventMessageListener(listener);
+        if (mServerTask != null) {
+            mServerTask.setEventMessageListener(listener);
         }
     }
 
@@ -79,9 +87,9 @@ class EventReceiver {
      */
     public void open() throws IOException {
         mServerSocket = new ServerSocket(0);
-        mServerThread = new ServerThread(mServerSocket);
-        mServerThread.setEventMessageListener(mListener);
-        mServerThread.start();
+        mServerTask = new ServerTask(mServerSocket);
+        mServerTask.setEventMessageListener(mListener);
+        mServerTask.start();
     }
 
     /**
@@ -97,16 +105,49 @@ class EventReceiver {
      * 受信スレッドを終了させる。
      */
     public void close() {
-        mServerThread.shutdownRequest();
-        mServerThread = null;
+        mServerTask.shutdownRequest();
+        mServerTask = null;
     }
 
-    private static class ServerThread extends Thread {
+    @Nonnull
+    private static List<Pair<String, String>> parsePropertyPairs(@Nonnull HttpRequest request) {
+        final String xml = request.getBody();
+        if (TextUtils.isEmpty(xml)) {
+            return Collections.emptyList();
+        }
+        try {
+            final Document doc = XmlUtils.newDocument(true, xml);
+            final Node propertyNode = XmlUtils.findChildElementByLocalName(
+                    doc.getDocumentElement(), "property");
+            if (propertyNode == null) {
+                return Collections.emptyList();
+            }
+            final List<Pair<String, String>> list = new ArrayList<>();
+            Node node = propertyNode.getFirstChild();
+            for (; node != null; node = node.getNextSibling()) {
+                if (node.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+                final String name = node.getLocalName();
+                final String value = node.getTextContent();
+                if (TextUtils.isEmpty(name) || TextUtils.isEmpty(value)) {
+                    continue;
+                }
+                list.add(new Pair<>(name, value));
+            }
+            return list;
+        } catch (IOException | SAXException | ParserConfigurationException ignored) {
+        }
+        return Collections.emptyList();
+    }
+
+    private static class ServerTask implements Runnable {
         private volatile boolean mShutdownRequest = false;
         @Nonnull
         private final ServerSocket mServerSocket;
         @Nonnull
-        private final List<ClientThread> mClientList;
+        private final List<ClientTask> mClientList;
+        private Thread mThread;
         private EventMessageListener mListener;
 
         /**
@@ -114,10 +155,17 @@ class EventReceiver {
          *
          * @param sock サーバソケット
          */
-        public ServerThread(@Nonnull ServerSocket sock) {
-            super("EventReceiver::ServerThread");
+        ServerTask(@Nonnull ServerSocket sock) {
             mServerSocket = sock;
-            mClientList = Collections.synchronizedList(new LinkedList<ClientThread>());
+            mClientList = Collections.synchronizedList(new LinkedList<ClientTask>());
+        }
+
+        /**
+         * スレッドを作成し開始する。
+         */
+        void start() {
+            mThread = new Thread(this, "EventReceiver::ServerTask");
+            mThread.start();
         }
 
         /**
@@ -126,12 +174,15 @@ class EventReceiver {
          * <p>クライアントからの接続がある場合は、
          * それらの受信スレッドを終了させ、クライアントソケットのクローズも行う。
          */
-        public void shutdownRequest() {
+        void shutdownRequest() {
             mShutdownRequest = true;
-            interrupt();
+            if (mThread != null) {
+                mThread.interrupt();
+                mThread = null;
+            }
             IoUtils.closeQuietly(mServerSocket);
             synchronized (mClientList) {
-                for (final ClientThread client : mClientList) {
+                for (final ClientTask client : mClientList) {
                     client.shutdownRequest();
                 }
                 mClientList.clear();
@@ -143,7 +194,7 @@ class EventReceiver {
          *
          * @param client 終了したClientスレッド
          */
-        public void notifyClientFinish(@Nonnull ClientThread client) {
+        void notifyClientFinished(@Nonnull ClientTask client) {
             mClientList.remove(client);
         }
 
@@ -152,7 +203,7 @@ class EventReceiver {
          *
          * @param listener リスナー
          */
-        public void setEventMessageListener(@Nullable EventMessageListener listener) {
+        void setEventMessageListener(@Nullable EventMessageListener listener) {
             mListener = listener;
         }
 
@@ -164,7 +215,15 @@ class EventReceiver {
          * @return HTTPメッセージが正常であればtrue
          */
         private boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
-            return mListener != null && mListener.onEventReceived(sid, request);
+            if (mListener == null) {
+                return false;
+            }
+            List<Pair<String, String>> list = parsePropertyPairs(request);
+            if (list.isEmpty()) {
+                return false;
+            }
+            long seq = TextParseUtils.parseLongSafely(request.getHeader(Http.SEQ), 0);
+            return mListener.onEventReceived(sid, seq, list);
         }
 
         @Override
@@ -173,7 +232,7 @@ class EventReceiver {
                 while (!mShutdownRequest) {
                     final Socket sock = mServerSocket.accept();
                     sock.setSoTimeout(Property.DEFAULT_TIMEOUT);
-                    final ClientThread client = new ClientThread(this, sock);
+                    final ClientTask client = new ClientTask(this, sock);
                     mClientList.add(client);
                     client.start();
                 }
@@ -184,11 +243,7 @@ class EventReceiver {
         }
     }
 
-    private static class ClientThread extends Thread {
-        @Nonnull
-        private final ServerThread mServer;
-        @Nonnull
-        private final Socket mSocket;
+    private static class ClientTask implements Runnable {
         private static final HttpResponse RESPONSE_OK = new HttpResponse();
         private static final HttpResponse RESPONSE_BAD = new HttpResponse();
         private static final HttpResponse RESPONSE_FAIL = new HttpResponse();
@@ -208,23 +263,39 @@ class EventReceiver {
             RESPONSE_FAIL.setHeader(Http.CONTENT_LENGTH, "0");
         }
 
+        @Nonnull
+        private final ServerTask mServer;
+        @Nonnull
+        private final Socket mSocket;
+        private Thread mThread;
+
         /**
          * インスタンス作成
          *
          * @param server サーバスレッド
          * @param sock   クライアントソケット
          */
-        public ClientThread(@Nonnull ServerThread server, @Nonnull Socket sock) {
-            super("EventReceiver::ClientThread");
+        ClientTask(@Nonnull ServerTask server, @Nonnull Socket sock) {
             mServer = server;
             mSocket = sock;
         }
 
         /**
+         * スレッドを作成し開始する。
+         */
+        void start() {
+            mThread = new Thread(this, "EventReceiver::ClientTask");
+            mThread.start();
+        }
+
+        /**
          * スレッドを終了させ、ソケットのクローズを行う。
          */
-        public void shutdownRequest() {
-            interrupt();
+        void shutdownRequest() {
+            if (mThread != null) {
+                mThread.interrupt();
+                mThread = null;
+            }
             IoUtils.closeQuietly(mSocket);
         }
 
@@ -237,35 +308,39 @@ class EventReceiver {
             InputStream is = null;
             OutputStream os = null;
             try {
-                is = new BufferedInputStream(mSocket.getInputStream());
-                os = new BufferedOutputStream(mSocket.getOutputStream());
-                final HttpRequest request = new HttpRequest(mSocket);
-                if (!request.readData(is)) {
-                    return;
-                }
-                final String nt = request.getHeader(Http.NT);
-                final String nts = request.getHeader(Http.NTS);
-                final String sid = request.getHeader(Http.SID);
-                if (TextUtils.isEmpty(nt) || TextUtils.isEmpty(nts)) {
-                    RESPONSE_BAD.writeData(os);
-                } else if (TextUtils.isEmpty(sid)
-                        || !nt.equals(Http.UPNP_EVENT)
-                        || !nts.equals(Http.UPNP_PROPCHANGE)) {
-                    RESPONSE_FAIL.writeData(os);
-                } else {
-                    if (notifyEvent(sid, request)) {
-                        RESPONSE_OK.writeData(os);
-                    } else {
-                        RESPONSE_FAIL.writeData(os);
-                    }
-                }
+                is = mSocket.getInputStream();
+                os = mSocket.getOutputStream();
+                receiveAndReply(is, os);
             } catch (final IOException e) {
                 Log.w(TAG, e);
             } finally {
                 IoUtils.closeQuietly(is);
                 IoUtils.closeQuietly(os);
                 IoUtils.closeQuietly(mSocket);
-                mServer.notifyClientFinish(this);
+                mServer.notifyClientFinished(this);
+            }
+        }
+
+        private void receiveAndReply(@Nonnull InputStream is, @Nonnull OutputStream os) throws IOException {
+            final HttpRequest request = new HttpRequest(mSocket);
+            if (!request.readData(is)) {
+                return;
+            }
+            final String nt = request.getHeader(Http.NT);
+            final String nts = request.getHeader(Http.NTS);
+            final String sid = request.getHeader(Http.SID);
+            if (TextUtils.isEmpty(nt) || TextUtils.isEmpty(nts)) {
+                RESPONSE_BAD.writeData(os);
+            } else if (TextUtils.isEmpty(sid)
+                    || !nt.equals(Http.UPNP_EVENT)
+                    || !nts.equals(Http.UPNP_PROPCHANGE)) {
+                RESPONSE_FAIL.writeData(os);
+            } else {
+                if (notifyEvent(sid, request)) {
+                    RESPONSE_OK.writeData(os);
+                } else {
+                    RESPONSE_FAIL.writeData(os);
+                }
             }
         }
     }
