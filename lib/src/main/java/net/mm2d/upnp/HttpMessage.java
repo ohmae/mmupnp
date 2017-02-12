@@ -447,8 +447,12 @@ public abstract class HttpMessage {
      */
     public void readData(@Nonnull InputStream is) throws IOException {
         readStartLine(is);
-        readHeader(is);
-        setBodyBinary(isChunked() ? readChunkedBody(is) : readBody(is));
+        readHeaders(is);
+        if (isChunked()) {
+            readChunkedBody(is);
+        } else {
+            readBody(is);
+        }
     }
 
     private void readStartLine(@Nonnull InputStream is) throws IOException {
@@ -463,7 +467,7 @@ public abstract class HttpMessage {
         }
     }
 
-    private void readHeader(@Nonnull InputStream is) throws IOException {
+    private void readHeaders(@Nonnull InputStream is) throws IOException {
         while (true) {
             final String line = readLine(is);
             if (line == null) {
@@ -476,7 +480,7 @@ public abstract class HttpMessage {
         }
     }
 
-    private byte[] readBody(@Nonnull InputStream is) throws IOException {
+    private void readBody(@Nonnull InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int length = getContentLength();
         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -486,10 +490,10 @@ public abstract class HttpMessage {
             baos.write(buffer, 0, size);
             length -= size;
         }
-        return baos.toByteArray();
+        setBodyBinary(baos.toByteArray());
     }
 
-    private byte[] readChunkedBody(@Nonnull InputStream is) throws IOException {
+    private void readChunkedBody(@Nonnull InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {
             int length = readChunkSize(is);
@@ -506,7 +510,7 @@ public abstract class HttpMessage {
             }
             readLine(is);
         }
-        return baos.toByteArray();
+        setBodyBinary(baos.toByteArray());
     }
 
     private int readChunkSize(@Nonnull InputStream is) throws IOException {

@@ -60,7 +60,7 @@ public class HttpHeader {
          *
          * @param original コピー元
          */
-        public Entry(Entry original) {
+        public Entry(@Nonnull Entry original) {
             mKey = original.mKey;
             mName = original.mName;
             mValue = original.mValue;
@@ -115,6 +115,29 @@ public class HttpHeader {
         @Nonnull
         public String getValue() {
             return mValue;
+        }
+
+        @Override
+        public int hashCode() {
+            return mName.hashCode() + mValue.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || !(obj instanceof Entry)) {
+                return false;
+            }
+            Entry entry = (Entry) obj;
+            return mName.equals(entry.mName)
+                    && mValue.equals(entry.mValue);
+        }
+
+        @Override
+        public String toString() {
+            return mName + ": " + mValue;
         }
     }
 
