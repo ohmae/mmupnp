@@ -128,7 +128,7 @@ class ServiceParser {
                 continue;
             }
             final String tag = node.getLocalName();
-            if (tag == null) {
+            if (TextUtils.isEmpty(tag)) {
                 continue;
             }
             final String text = node.getTextContent();
@@ -160,7 +160,7 @@ class ServiceParser {
                 continue;
             }
             final String tag = node.getLocalName();
-            if (tag == null) {
+            if (TextUtils.isEmpty(tag)) {
                 continue;
             }
             switch (tag) {
@@ -207,7 +207,7 @@ class ServiceParser {
                 continue;
             }
             final String tag = node.getLocalName();
-            if (tag == null) {
+            if (TextUtils.isEmpty(tag)) {
                 continue;
             }
             final String text = node.getTextContent();

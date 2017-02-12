@@ -443,48 +443,64 @@ public abstract class HttpMessage {
      * 指定されたInputStreamからデータの読み出しを行う。
      *
      * @param is 入力元
-     * @return 成功した場合true
      * @throws IOException 入出力エラー
      */
-    public boolean readData(@Nonnull InputStream is) throws IOException {
+    public void readData(@Nonnull InputStream is) throws IOException {
+        readStartLine(is);
+        readHeaders(is);
+        if (isChunked()) {
+            readChunkedBody(is);
+        } else {
+            readBody(is);
+        }
+    }
+
+    private void readStartLine(@Nonnull InputStream is) throws IOException {
         final String startLine = readLine(is);
         if (TextUtils.isEmpty(startLine)) {
-            return false;
+            throw new IOException("Illegal start line:" + startLine);
         }
         try {
             setStartLine(startLine);
         } catch (final IllegalArgumentException e) {
             throw new IOException("Illegal start line:" + startLine);
         }
+    }
+
+    private void readHeaders(@Nonnull InputStream is) throws IOException {
         while (true) {
             final String line = readLine(is);
             if (line == null) {
-                return false;
+                throw new IOException("Illegal haeder");
             }
             if (line.isEmpty()) {
                 break;
             }
             setHeaderLine(line);
         }
+    }
+
+    private void readBody(@Nonnull InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if (isChunked()) {
-            while (true) {
-                int length = readChunkSize(is);
-                if (length == 0) {
-                    readLine(is);
-                    break;
-                }
-                final byte[] buffer = new byte[BUFFER_SIZE];
-                while (length > 0) {
-                    int size = length > buffer.length ? buffer.length : length;
-                    size = is.read(buffer, 0, size);
-                    baos.write(buffer, 0, size);
-                    length -= size;
-                }
+        int length = getContentLength();
+        final byte[] buffer = new byte[BUFFER_SIZE];
+        while (length > 0) {
+            int size = length > buffer.length ? buffer.length : length;
+            size = is.read(buffer, 0, size);
+            baos.write(buffer, 0, size);
+            length -= size;
+        }
+        setBodyBinary(baos.toByteArray());
+    }
+
+    private void readChunkedBody(@Nonnull InputStream is) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while (true) {
+            int length = readChunkSize(is);
+            if (length == 0) {
                 readLine(is);
+                break;
             }
-        } else {
-            int length = getContentLength();
             final byte[] buffer = new byte[BUFFER_SIZE];
             while (length > 0) {
                 int size = length > buffer.length ? buffer.length : length;
@@ -492,9 +508,9 @@ public abstract class HttpMessage {
                 baos.write(buffer, 0, size);
                 length -= size;
             }
+            readLine(is);
         }
         setBodyBinary(baos.toByteArray());
-        return true;
     }
 
     private int readChunkSize(@Nonnull InputStream is) throws IOException {
@@ -506,7 +522,7 @@ public abstract class HttpMessage {
         try {
             return Integer.parseInt(chunkSize, 16);
         } catch (final NumberFormatException e) {
-            throw new IOException("Chunk format error!");
+            throw new IOException("Chunk format error!", e);
         }
     }
 

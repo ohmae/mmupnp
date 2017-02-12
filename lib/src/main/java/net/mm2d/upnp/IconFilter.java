@@ -51,7 +51,7 @@ public interface IconFilter {
      * Iconの情報がない場合はコールされない。
      *
      * @param list Deviceに記述されたIconのリスト、nullやemptyでコールされることはない。
-     * @return ダウンロードするIconのリスト、nullを返してはならない、
+     * @return ダウンロードするIconのリスト、nullを返してはならない。
      * 取得すべきiconがない場合はemptyListを返す必要がある。
      */
     @Nonnull

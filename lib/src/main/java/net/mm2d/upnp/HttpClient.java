@@ -113,11 +113,9 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    public HttpResponse post(@Nonnull HttpRequest request, int redirectDepth) throws IOException {
-        if (!isClosed()) {
-            if (!canReuse(request)) {
-                closeSocket();
-            }
+    private HttpResponse post(@Nonnull HttpRequest request, int redirectDepth) throws IOException {
+        if (!isClosed() && !canReuse(request)) {
+            closeSocket();
         }
         try {
             if (isClosed()) {
@@ -128,7 +126,7 @@ public class HttpClient {
                     request.writeData(mOutputStream);
                 } catch (final IOException e) {
                     // コネクションを再利用した場合は
-                    // 既に切断されていた可能性があるためリトライを行う
+                    // peerから既に切断されていた可能性があるためリトライを行う
                     closeSocket();
                     openSocket(request);
                     request.writeData(mOutputStream);
@@ -153,7 +151,7 @@ public class HttpClient {
         }
     }
 
-    private boolean isRedirection(Http.Status status) {
+    private static boolean isRedirection(Http.Status status) {
         switch (status) {
             case HTTP_MOVED_PERM:
             case HTTP_FOUND:

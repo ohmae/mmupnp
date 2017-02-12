@@ -160,7 +160,7 @@ public class SubscribeHolderTest {
         subscribeHolder.add(service, true);
         verify(service, never()).renewSubscribe();
 
-        Thread.sleep(100L);
+        Thread.sleep(150L);
         verify(service).renewSubscribe();
 
         subscribeHolder.shutdownRequest();
