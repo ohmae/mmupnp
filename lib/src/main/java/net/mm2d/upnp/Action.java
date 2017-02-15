@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -189,6 +190,17 @@ public class Action {
         return mArgumentList;
     }
 
+    /**
+     * 指定名に合致するArgumentを返す。
+     *
+     * @param name Argument名
+     * @return Argument
+     */
+    @Nullable
+    public Argument findArgument(@Nonnull String name) {
+        return mArgumentMap.get(name);
+    }
+
     @Nonnull
     private String getSoapActionName() {
         return '"' + mService.getServiceType() + '#' + mName + '"';
@@ -313,7 +325,7 @@ public class Action {
             }
             final String tag = node.getLocalName();
             final String text = node.getTextContent();
-            final Argument arg = mArgumentMap.get(tag);
+            final Argument arg = findArgument(tag);
             if (arg == null) {
                 Log.d(TAG, "invalid argument:" + tag + "->" + text);
                 continue;

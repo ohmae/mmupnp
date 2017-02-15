@@ -7,15 +7,15 @@
 
 package net.mm2d.upnp;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class ActionTest {
@@ -90,10 +90,34 @@ public class ActionTest {
                         .setDirection("in")
                         .setRelatedStateVariable(stateVariable))
                 .build();
+
         assertThat(action.getArgumentList().size(), is(1));
         final Argument argument = action.getArgumentList().get(0);
         assertThat(argument.getAction(), is(action));
         assertThat(argument.getName(), is(argumentName));
+        assertThat(argument.isInputDirection(), is(true));
+        assertThat(argument.getRelatedStateVariable(), is(stateVariable));
+    }
+
+    @Test
+    public void findArgument_名前指定でArugumentが取得でできる() {
+        final String argumentName = "argumentName";
+        final StateVariable stateVariable = mock(StateVariable.class);
+        final String name = "name";
+        final Service service = mock(Service.class);
+        final Action action = new Action.Builder()
+                .setService(service)
+                .setName(name)
+                .addArgumentBuilder(new Argument.Builder()
+                        .setName(argumentName)
+                        .setDirection("in")
+                        .setRelatedStateVariable(stateVariable))
+                .build();
+        final Argument argument = action.findArgument(argumentName);
+
+        assertThat(argument.getAction(), is(action));
+        assertThat(argument.getName(), is(argumentName));
+        assertThat(argument.isInputDirection(), is(true));
         assertThat(argument.getRelatedStateVariable(), is(stateVariable));
     }
 }
