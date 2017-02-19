@@ -273,9 +273,11 @@ public class Action {
      *
      * <p>第二引数として第三引数で使用するNamespaceを指定する。不要であればnullを指定する。
      * StringPairのリストであり、keyとしてprefixを、valueとしてURIを指定する。
+     * key/valueともにnullを指定することはできない。
      * この引数によって与えたNamespaceはAction Elementに追加される。
      *
      * <p>第三引数として渡したStringPairのリストは純粋にSOAP XMLのAction Elementの子要素として追加される。
+     * keyとして引数名、valueとして値を指定する。keyはnullであってはならない。valueがnullの場合は空の引数指定となる。
      * この際Argumentの値との関係性はチェックされずすべてがそのまま追加される。
      * ただし、Namespaceとして登録されないprefixを持っているなどXMLとして不正な引数を与えると失敗する。
      *
