@@ -590,6 +590,7 @@ public class Service {
 
     private boolean renewSubscribeInner() throws IOException {
         final HttpClient client = createHttpClient();
+        //noinspection ConstantConditions
         final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
