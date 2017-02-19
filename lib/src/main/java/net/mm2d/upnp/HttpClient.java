@@ -228,6 +228,13 @@ public class HttpClient {
         closeSocket();
     }
 
+    /**
+     * 単純なHTTP GETにより文字列を取得する。
+     *
+     * @param url 取得先URL
+     * @return 取得できた文字列
+     * @throws IOException 取得に問題があった場合
+     */
     @Nonnull
     public String downloadString(@Nonnull URL url) throws IOException {
         final String body = download(url).getBody();
@@ -237,6 +244,13 @@ public class HttpClient {
         return body;
     }
 
+    /**
+     * 単純なHTTP GETによりバイナリを取得する。
+     *
+     * @param url 取得先URL
+     * @return 取得できたバイナリ
+     * @throws IOException 取得に問題があった場合
+     */
     @Nonnull
     public byte[] downloadBinary(@Nonnull URL url) throws IOException {
         final byte[] body = download(url).getBodyBinary();
@@ -246,6 +260,13 @@ public class HttpClient {
         return body;
     }
 
+    /**
+     * 単純なHTTP GETを実行する。
+     *
+     * @param url 取得先URL
+     * @return HTTPレスポンス
+     * @throws IOException 取得に問題があった場合
+     */
     @Nonnull
     public HttpResponse download(@Nonnull URL url) throws IOException {
         final HttpRequest request = makeHttpRequest(url);
