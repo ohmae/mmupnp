@@ -470,9 +470,6 @@ public abstract class HttpMessage {
     private void readHeaders(@Nonnull InputStream is) throws IOException {
         while (true) {
             final String line = readLine(is);
-            if (line == null) {
-                throw new IOException("Illegal header");
-            }
             if (line.isEmpty()) {
                 break;
             }
@@ -526,14 +523,14 @@ public abstract class HttpMessage {
         }
     }
 
-    @Nullable
+    @Nonnull
     private static String readLine(@Nonnull InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {
             final int b = is.read();
             if (b < 0) {
                 if (baos.size() == 0) {
-                    return null;
+                    throw new IOException("can't read from InputStream");
                 }
                 break;
             }
