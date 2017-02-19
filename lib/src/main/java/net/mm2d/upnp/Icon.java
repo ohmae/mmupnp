@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
-
 import java.io.IOException;
 import java.net.URL;
 
@@ -278,17 +276,7 @@ public class Icon {
      */
     public void loadBinary(@Nonnull HttpClient client) throws IOException {
         final URL url = mDevice.getAbsoluteUrl(mUrl);
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.GET);
-        request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-        final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.i(TAG, response.toString());
-            throw new IOException(response.getStartLine());
-        }
-        mBinary = response.getBodyBinary();
+        mBinary = client.downloadBinary(url);
     }
 
     /**

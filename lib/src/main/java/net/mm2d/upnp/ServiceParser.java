@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
@@ -59,17 +58,7 @@ class ServiceParser {
                                 @Nonnull Service.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         final URL url = Device.getAbsoluteUrl(location, builder.getScpdUrl());
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.GET);
-        request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-        final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
-            Log.i(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
-            throw new IOException(response.getStartLine());
-        }
-        final String description = response.getBody();
+        final String description = client.downloadString(url);
         builder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
         builder.setActionBuilderList(parseActionList(doc.getElementsByTagName("action")));

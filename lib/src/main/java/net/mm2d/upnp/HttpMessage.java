@@ -471,7 +471,7 @@ public abstract class HttpMessage {
         while (true) {
             final String line = readLine(is);
             if (line == null) {
-                throw new IOException("Illegal haeder");
+                throw new IOException("Illegal header");
             }
             if (line.isEmpty()) {
                 break;

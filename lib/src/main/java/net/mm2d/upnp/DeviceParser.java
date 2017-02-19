@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
@@ -59,26 +58,10 @@ public class DeviceParser {
             @Nonnull Device.Builder deviceBuilder)
             throws IOException, SAXException, ParserConfigurationException {
         final String location = deviceBuilder.getLocation();
-        parseDescription(deviceBuilder, downloadString(client, location));
+        parseDescription(deviceBuilder, client.downloadString(new URL(location)));
         for (final Service.Builder serviceBuilder : deviceBuilder.getServiceBuilderList()) {
             ServiceParser.loadDescription(client, location, serviceBuilder);
         }
-    }
-
-    @Nonnull
-    private static String downloadString(@Nonnull HttpClient client, @Nonnull String location) throws IOException {
-        final URL url = new URL(location);
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.GET);
-        request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-        final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
-            Log.i(TAG, response.toString());
-            throw new IOException(response.getStartLine());
-        }
-        return response.getBody();
     }
 
     private static void parseDescription(@Nonnull Device.Builder deviceBuilder, @Nonnull String description)

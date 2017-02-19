@@ -8,6 +8,8 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.IoUtils;
+import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,6 +37,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpClient {
+    private static final String TAG = HttpClient.class.getSimpleName();
     private static final int REDIRECT_MAX = 2;
     private Socket mSocket;
     private boolean mKeepAlive;
@@ -204,5 +207,36 @@ public class HttpClient {
      */
     public void close() {
         closeSocket();
+    }
+
+    @Nonnull
+    public String downloadString(@Nonnull URL url) throws IOException {
+        return download(url).getBody();
+    }
+
+    @Nonnull
+    public byte[] downloadBinary(@Nonnull URL url) throws IOException {
+        return download(url).getBodyBinary();
+    }
+
+    @Nonnull
+    public HttpResponse download(@Nonnull URL url) throws IOException {
+        final HttpRequest request = makeHttpRequest(url);
+        final HttpResponse response = post(request);
+        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
+            Log.i(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
+            throw new IOException(response.getStartLine());
+        }
+        return response;
+    }
+
+    @Nonnull
+    private static HttpRequest makeHttpRequest(@Nonnull URL url) throws IOException {
+        final HttpRequest request = new HttpRequest();
+        request.setMethod(Http.GET);
+        request.setUrl(url, true);
+        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
+        return request;
     }
 }
