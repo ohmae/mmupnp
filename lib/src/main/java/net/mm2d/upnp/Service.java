@@ -11,11 +11,9 @@ import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -456,6 +454,7 @@ public class Service {
         sb.append("<http://");
         final SsdpMessage ssdp = mDevice.getSsdpMessage();
         final InterfaceAddress ifa = ssdp.getInterfaceAddress();
+        //noinspection ConstantConditions : 受信したデータの場合はnullではない
         sb.append(ifa.getAddress().getHostAddress());
         final int port = mControlPoint.getEventPort();
         if (port != Http.DEFAULT_PORT) {
@@ -574,7 +573,7 @@ public class Service {
             return subscribe();
         }
         final HttpClient client = createHttpClient();
-        final HttpRequest request = makeRenewSubscribeRequest();
+        final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
@@ -592,11 +591,11 @@ public class Service {
         return true;
     }
 
-    private HttpRequest makeRenewSubscribeRequest() throws IOException {
+    private HttpRequest makeRenewSubscribeRequest(@Nonnull String subscriptionId) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
         request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, mSubscriptionId);
+        request.setHeader(Http.SID, subscriptionId);
         request.setHeader(Http.TIMEOUT, "Second-300");
         request.setHeader(Http.CONTENT_LENGTH, "0");
         return request;
@@ -613,7 +612,7 @@ public class Service {
             return false;
         }
         final HttpClient client = new HttpClient(false);
-        final HttpRequest request = makeUnsubscribeRequest();
+        final HttpRequest request = makeUnsubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, "unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
@@ -627,11 +626,11 @@ public class Service {
         return true;
     }
 
-    private HttpRequest makeUnsubscribeRequest() throws IOException {
+    private HttpRequest makeUnsubscribeRequest(@Nonnull String subscriptionId) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.UNSUBSCRIBE);
         request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, mSubscriptionId);
+        request.setHeader(Http.SID, subscriptionId);
         request.setHeader(Http.CONTENT_LENGTH, "0");
         return request;
     }

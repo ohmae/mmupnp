@@ -64,7 +64,7 @@ public abstract class SsdpMessage {
     @Nullable
     private final String mNts;
     @Nullable
-    private final String mLocation;
+    private String mLocation;
     @Nullable
     private final InterfaceAddress mInterfaceAddress;
 
@@ -98,7 +98,7 @@ public abstract class SsdpMessage {
         mUuid = "";
         mType = "";
         mNts = "";
-        mLocation = "";
+        mLocation = null;
         mInterfaceAddress = null;
     }
 
@@ -158,13 +158,13 @@ public abstract class SsdpMessage {
     }
 
     /**
-     * Locationに記述のアドレスとパケットの送信元アドレスに不一致がないか検査する
+     * Locationに正常なURLが記述されており、記述のアドレスとパケットの送信元アドレスに不一致がないか検査する。
      *
      * @param sourceAddress 送信元アドレス
-     * @return Locationに問題がある場合true
+     * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
      */
     public boolean hasInvalidLocation(@Nonnull InetAddress sourceAddress) {
-        if (TextUtils.isEmpty(mLocation)) {
+        if (!isHttpUrl(mLocation)) {
             return true;
         }
         try {
@@ -173,6 +173,11 @@ public abstract class SsdpMessage {
         } catch (MalformedURLException | UnknownHostException ignored) {
         }
         return true;
+    }
+
+    private static boolean isHttpUrl(String url) {
+        return url != null && url.length() > 6
+                && url.substring(0, 7).equalsIgnoreCase("http://");
     }
 
     /**
