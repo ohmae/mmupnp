@@ -9,7 +9,7 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.IoUtils;
 import net.mm2d.util.Log;
-import net.mm2d.util.Pair;
+import net.mm2d.util.StringPair;
 import net.mm2d.util.TextParseUtils;
 import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
@@ -55,7 +55,7 @@ class EventReceiver {
          * @param properties プロパティ
          * @return HTTPメッセージが正常であればtrue
          */
-        boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<Pair<String, String>> properties);
+        boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties);
     }
 
     private ServerSocket mServerSocket;
@@ -110,7 +110,7 @@ class EventReceiver {
     }
 
     @Nonnull
-    private static List<Pair<String, String>> parsePropertyPairs(@Nonnull HttpRequest request) {
+    private static List<StringPair> parsePropertyPairs(@Nonnull HttpRequest request) {
         final String xml = request.getBody();
         if (TextUtils.isEmpty(xml)) {
             return Collections.emptyList();
@@ -122,7 +122,7 @@ class EventReceiver {
             if (propertyNode == null) {
                 return Collections.emptyList();
             }
-            final List<Pair<String, String>> list = new ArrayList<>();
+            final List<StringPair> list = new ArrayList<>();
             Node node = propertyNode.getFirstChild();
             for (; node != null; node = node.getNextSibling()) {
                 if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -133,7 +133,7 @@ class EventReceiver {
                 if (TextUtils.isEmpty(name) || TextUtils.isEmpty(value)) {
                     continue;
                 }
-                list.add(new Pair<>(name, value));
+                list.add(new StringPair(name, value));
             }
             return list;
         } catch (IOException | SAXException | ParserConfigurationException ignored) {
@@ -218,7 +218,7 @@ class EventReceiver {
             if (mListener == null) {
                 return false;
             }
-            List<Pair<String, String>> list = parsePropertyPairs(request);
+            List<StringPair> list = parsePropertyPairs(request);
             if (list.isEmpty()) {
                 return false;
             }

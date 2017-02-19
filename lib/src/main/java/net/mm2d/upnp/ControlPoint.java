@@ -12,7 +12,7 @@ import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.Log;
 import net.mm2d.util.NetworkUtils;
-import net.mm2d.util.Pair;
+import net.mm2d.util.StringPair;
 import net.mm2d.util.TextUtils;
 
 import org.xml.sax.SAXException;
@@ -206,9 +206,9 @@ public class ControlPoint {
     private class EventNotifyTask implements Runnable {
         private final Service mService;
         private final long mSeq;
-        private final List<Pair<String, String>> mProperties;
+        private final List<StringPair> mProperties;
 
-        public EventNotifyTask(@Nonnull Service service, long seq, @Nonnull List<Pair<String, String>> properties) {
+        public EventNotifyTask(@Nonnull Service service, long seq, @Nonnull List<StringPair> properties) {
             mService = service;
             mSeq = seq;
             mProperties = properties;
@@ -216,7 +216,7 @@ public class ControlPoint {
 
         @Override
         public void run() {
-            for (Pair<String, String> pair : mProperties) {
+            for (StringPair pair : mProperties) {
                 notifyEvent(pair.getKey(), pair.getValue());
             }
         }
@@ -295,7 +295,7 @@ public class ControlPoint {
         mEventReceiver = new EventReceiver();
         mEventReceiver.setEventMessageListener(new EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<Pair<String, String>> properties) {
+            public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties) {
                 final Service service = getSubscribeService(sid);
                 return service != null && executeInSequential(new EventNotifyTask(service, seq, properties));
             }
