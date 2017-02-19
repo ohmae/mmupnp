@@ -236,7 +236,7 @@ public class ActionInvokeTest {
     }
 
     @Test
-    public void invoke_argumentListにない結果が含まれていたら無視() throws Exception {
+    public void invoke_argumentListにない結果が含まれていても結果に含まれる() throws Exception {
         mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
                 + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" + "<s:Body>"
                 + "<u:" + ACTION_NAME + "Response xmlns:u=\"" + SERVICE_TYPE + "\">"
@@ -246,6 +246,6 @@ public class ActionInvokeTest {
         mMockFactory.setResponse(mHttpResponse);
         final Map<String, String> result = mAction.invoke(new HashMap<String, String>());
         assertThat(result.get(OUT_ARG_NAME1), is(OUT_ARG_VALUE1));
-        assertThat(result.containsKey(OUT_ARG_NAME2), is(false));
+        assertThat(result.containsKey(OUT_ARG_NAME2), is(true));
     }
 }

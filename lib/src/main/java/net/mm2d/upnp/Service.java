@@ -529,21 +529,15 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean subscribe(boolean keepRenew) throws IOException {
-        if (getSubscriptionId() != null) {
+        if (!TextUtils.isEmpty(getSubscriptionId())) {
             if (renewSubscribe()) {
                 mControlPoint.registerSubscribeService(this, keepRenew);
                 return true;
             }
             return false;
         }
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.SUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.NT, Http.UPNP_EVENT);
-        request.setHeader(Http.CALLBACK, getCallback());
-        request.setHeader(Http.TIMEOUT, "Second-300");
-        request.setHeader(Http.CONTENT_LENGTH, "0");
         final HttpClient client = createHttpClient();
+        final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, "subscribe request:" + request.toString() + "\nresponse:" + response.toString());
@@ -563,6 +557,17 @@ public class Service {
         return true;
     }
 
+    private HttpRequest makeSubscribeRequest() throws IOException {
+        final HttpRequest request = new HttpRequest();
+        request.setMethod(Http.SUBSCRIBE);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.NT, Http.UPNP_EVENT);
+        request.setHeader(Http.CALLBACK, getCallback());
+        request.setHeader(Http.TIMEOUT, "Second-300");
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
+    }
+
     /**
      * RenewSubscribeを実行する
      *
@@ -570,16 +575,14 @@ public class Service {
      * @throws IOException 通信エラー
      */
     boolean renewSubscribe() throws IOException {
-        if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
+        if (TextUtils.isEmpty(mEventSubUrl)) {
             return false;
         }
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.SUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, mSubscriptionId);
-        request.setHeader(Http.TIMEOUT, "Second-300");
-        request.setHeader(Http.CONTENT_LENGTH, "0");
+        if (TextUtils.isEmpty(mSubscriptionId)) {
+            return subscribe();
+        }
         final HttpClient client = createHttpClient();
+        final HttpRequest request = makeRenewSubscribeRequest();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
@@ -597,6 +600,16 @@ public class Service {
         return true;
     }
 
+    private HttpRequest makeRenewSubscribeRequest() throws IOException {
+        final HttpRequest request = new HttpRequest();
+        request.setMethod(Http.SUBSCRIBE);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.SID, mSubscriptionId);
+        request.setHeader(Http.TIMEOUT, "Second-300");
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
+    }
+
     /**
      * Unsubscribeを実行する
      *
@@ -607,12 +620,8 @@ public class Service {
         if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.UNSUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, mSubscriptionId);
-        request.setHeader(Http.CONTENT_LENGTH, "0");
         final HttpClient client = new HttpClient(false);
+        final HttpRequest request = makeUnsubscribeRequest();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, "unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
@@ -624,6 +633,15 @@ public class Service {
         mSubscriptionTimeout = 0;
         mSubscriptionExpiryTime = 0;
         return true;
+    }
+
+    private HttpRequest makeUnsubscribeRequest() throws IOException {
+        final HttpRequest request = new HttpRequest();
+        request.setMethod(Http.UNSUBSCRIBE);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.SID, mSubscriptionId);
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
     }
 
     /**
