@@ -120,22 +120,26 @@ class ServiceParser {
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
-            final String text = node.getTextContent();
-            switch (tag) {
-                case "name":
-                    builder.setName(text);
-                    break;
-                case "direction":
-                    builder.setDirection(text);
-                    break;
-                case "relatedStateVariable":
-                    builder.setRelatedStateVariableName(text);
-                    break;
-                default:
-                    break;
-            }
+            final String value = node.getTextContent();
+            setField(builder, tag, value);
         }
         return builder;
+    }
+
+    private static void setField(@Nonnull Argument.Builder builder, @Nonnull String tag, @Nonnull String value) {
+        switch (tag) {
+            case "name":
+                builder.setName(value);
+                break;
+            case "direction":
+                builder.setDirection(value);
+                break;
+            case "relatedStateVariable":
+                builder.setRelatedStateVariableName(value);
+                break;
+            default:
+                break;
+        }
     }
 
     @Nonnull
@@ -199,20 +203,24 @@ class ServiceParser {
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
-            final String text = node.getTextContent();
-            switch (tag) {
-                case "step":
-                    builder.setStep(text);
-                    break;
-                case "minimum":
-                    builder.setMinimum(text);
-                    break;
-                case "maximum":
-                    builder.setMaximum(text);
-                    break;
-                default:
-                    break;
-            }
+            final String value = node.getTextContent();
+            setField(builder, tag, value);
+        }
+    }
+
+    private static void setField(@Nonnull StateVariable.Builder builder, @Nonnull String tag, @Nonnull String value) {
+        switch (tag) {
+            case "step":
+                builder.setStep(value);
+                break;
+            case "minimum":
+                builder.setMinimum(value);
+                break;
+            case "maximum":
+                builder.setMaximum(value);
+                break;
+            default:
+                break;
         }
     }
 }
