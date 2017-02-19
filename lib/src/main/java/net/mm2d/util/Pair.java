@@ -8,10 +8,12 @@
 package net.mm2d.util;
 
 /**
- * Key/Valueのペアを保持するクラス。
+ * Key/Valueのペアを保持するImmutableなクラス。
  *
  * @param <K> Keyの型
  * @param <V> Valueの型
+ *
+ * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Pair<K, V> {
     private final K mKey;
