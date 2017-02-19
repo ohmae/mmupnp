@@ -467,10 +467,8 @@ public class Service {
 
     private static long parseTimeout(@Nonnull HttpResponse response) {
         final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
-        if (TextUtils.isEmpty(timeout)) {
-            return DEFAULT_SUBSCRIPTION_TIMEOUT;
-        }
-        if (timeout.contains("infinite")) { // UPnP2.0でdeprecated扱い、有限な値にする。
+        if (TextUtils.isEmpty(timeout) || timeout.contains("infinite")) {
+            // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。
             return DEFAULT_SUBSCRIPTION_TIMEOUT;
         }
         final String prefix = "second-";
@@ -520,13 +518,20 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean subscribe(boolean keepRenew) throws IOException {
-        if (!TextUtils.isEmpty(getSubscriptionId())) {
-            if (renewSubscribe()) {
+        if (TextUtils.isEmpty(mEventSubUrl)) {
+            return false;
+        }
+        if (!TextUtils.isEmpty(mSubscriptionId)) {
+            if (renewSubscribeInner()) {
                 mControlPoint.registerSubscribeService(this, keepRenew);
                 return true;
             }
             return false;
         }
+        return subscribeInner(keepRenew);
+    }
+
+    private boolean subscribeInner(boolean keepRenew) throws IOException {
         final HttpClient client = createHttpClient();
         final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
@@ -534,6 +539,14 @@ public class Service {
             Log.w(TAG, "subscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
+        if (parseSubscribeResponse(response)) {
+            mControlPoint.registerSubscribeService(this, keepRenew);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean parseSubscribeResponse(@Nonnull HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
@@ -544,10 +557,10 @@ public class Service {
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
         mSubscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
-        mControlPoint.registerSubscribeService(this, keepRenew);
         return true;
     }
 
+    @Nonnull
     private HttpRequest makeSubscribeRequest() throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
@@ -570,8 +583,12 @@ public class Service {
             return false;
         }
         if (TextUtils.isEmpty(mSubscriptionId)) {
-            return subscribe();
+            return subscribeInner(false);
         }
+        return renewSubscribeInner();
+    }
+
+    private boolean renewSubscribeInner() throws IOException {
         final HttpClient client = createHttpClient();
         final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
@@ -579,6 +596,10 @@ public class Service {
             Log.w(TAG, "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
+        return parseRenewSubscribeResponse(response);
+    }
+
+    private boolean parseRenewSubscribeResponse(@Nonnull HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
@@ -591,6 +612,7 @@ public class Service {
         return true;
     }
 
+    @Nonnull
     private HttpRequest makeRenewSubscribeRequest(@Nonnull String subscriptionId) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
