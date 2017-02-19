@@ -81,6 +81,10 @@ class SsdpSearchServer extends SsdpServer {
         if (TextUtils.isEmpty(st)) {
             st = ST_ALL;
         }
+        send(makeSearchMessage(st));
+    }
+
+    private SsdpRequestMessage makeSearchMessage(@Nonnull String st) {
         final SsdpRequestMessage message = new SsdpRequestMessage();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
@@ -88,7 +92,7 @@ class SsdpSearchServer extends SsdpServer {
         message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER);
         message.setHeader(Http.MX, "1");
         message.setHeader(Http.ST, st);
-        send(message);
+        return message;
     }
 
     @Override
