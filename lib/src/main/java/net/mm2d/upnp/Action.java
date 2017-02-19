@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Attr;
@@ -132,8 +133,12 @@ public class Action {
         }
     }
 
+    private static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
+    private static final String XMLNS_PREFIX = "xmlns:";
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
+    @Nonnull
+    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
     @Nonnull
     private final Service mService;
     @Nonnull
@@ -141,8 +146,6 @@ public class Action {
     @Nonnull
     private final Map<String, Argument> mArgumentMap;
     private List<Argument> mArgumentList;
-    @Nonnull
-    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     private Action(@Nonnull Builder builder) {
         mService = builder.mService;
@@ -228,21 +231,122 @@ public class Action {
     /**
      * Actionを実行する。
      *
-     * <p>実行引数及び実行結果はArgument名をkeyとし、値をvalueとしたMapでやり取りする。
+     * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
      * 値はすべてStringで表現する。
-     * Argument(StateVariable)のDataTypeに応じた値チェックは行われない。
-     * 引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が反映される。
-     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
-     * 実行後エラー応答があった場合のパースには未対応であり、IOExceptionが発生するのみ。
+     * Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われない。
      *
-     * @param arguments 引数
+     * <p>引数として渡したMapの中にArgumentに記載のない値を設定していても無視される。
+     *
+     * <p>引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
+     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     * 実行後エラー応答があった場合のパースには未対応であり、IOExceptionが発生するのみである。
+     *
+     * <p>実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
+     * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
+     *
+     * @param argumentValues 引数への入力値
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
      */
     @Nonnull
-    public Map<String, String> invoke(@Nonnull Map<String, String> arguments)
+    public Map<String, String> invoke(@Nonnull Map<String, String> argumentValues)
             throws IOException {
-        final String soap = makeSoap(arguments);
+        final List<StringPair> arguments = makeArguments(argumentValues);
+        final String soap = makeSoap(null, arguments);
+        return invokeInner(soap);
+    }
+
+    /**
+     * Actionを実行する。【試験的実装】
+     *
+     * <p>※試験的実装であり、将来的に変更、削除される可能性が高い
+     *
+     * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
+     * 値はすべてStringで表現する。
+     * Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われない。
+     *
+     * <p>第一引数として渡したMapの中にArgumentに記載のない値を設定していても無視される。
+     *
+     * <p>引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
+     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     * 実行後エラー応答があった場合のパースには未対応であり、IOExceptionが発生するのみである。
+     *
+     * <p>第二引数として第三引数で使用するNamespaceを指定する。不要であればnullを指定する。
+     * StringPairのリストであり、keyとしてprefixを、valueとしてURIを指定する。
+     * この引数によって与えたNamespaceはAction Elementに追加される。
+     *
+     * <p>第三引数として渡したStringPairのリストは純粋にSOAP XMLのAction Elementの子要素として追加される。
+     * この際Argumentの値との関係性はチェックされずすべてがそのまま追加される。
+     * ただし、Namespaceとして登録されないprefixを持っているなどXMLとして不正な引数を与えると失敗する。
+     *
+     * <p>実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
+     * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
+     *
+     * @param argumentValues  引数への入力値
+     * @param customNamespace カスタム引数のNamespace情報、不要な場合null
+     * @param customArguments カスタム引数
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     */
+    @Nonnull
+    public Map<String, String> invoke(@Nonnull Map<String, String> argumentValues,
+                                      @Nullable List<StringPair> customNamespace,
+                                      @Nonnull List<StringPair> customArguments)
+            throws IOException {
+        final List<StringPair> arguments = makeArguments(argumentValues);
+        arguments.addAll(customArguments);
+        final String soap = makeSoap(customNamespace, arguments);
+        return invokeInner(soap);
+    }
+
+    /**
+     * 入力をもとに引数リストを作成する。
+     *
+     * @param argumentValues 引数への入力値
+     * @return 引数リスト
+     */
+    @Nonnull
+    private List<StringPair> makeArguments(@Nonnull Map<String, String> argumentValues) {
+        final List<StringPair> list = new ArrayList<>();
+        for (final Entry<String, Argument> entry : mArgumentMap.entrySet()) {
+            final Argument argument = entry.getValue();
+            if (!argument.isInputDirection()) {
+                continue;
+            }
+            list.add(new StringPair(argument.getName(), selectArgumentValue(argument, argumentValues)));
+        }
+        return list;
+    }
+
+    /**
+     * Argumentの値を選択する。
+     *
+     * <p>入力に値があればそれを採用し、なければデフォルト値を採用する。
+     * どちらもなければnullが返る。
+     *
+     * @param argument       Argument
+     * @param argumentValues 引数への入力値
+     * @return 選択されたArgumentの値
+     */
+    @Nullable
+    private static String selectArgumentValue(
+            @Nonnull Argument argument, @Nonnull Map<String, String> argumentValues) {
+        final String value = argumentValues.get(argument.getName());
+        if (value != null) {
+            return value;
+        }
+        return argument.getRelatedStateVariable().getDefaultValue();
+    }
+
+    /**
+     * Actionの実行を行う。
+     *
+     * @param soap 送信するSOAP XML文字列
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     */
+    @Nonnull
+    private Map<String, String> invokeInner(@Nonnull String soap) throws IOException {
         final URL url = mService.getAbsoluteUrl(mService.getControlUrl());
         final HttpRequest request = makeHttpRequest(url, soap);
         final HttpClient client = createHttpClient();
@@ -282,15 +386,16 @@ public class Action {
     /**
      * SOAP ActionのXML文字列を作成する。
      *
-     * @param arguments 引数の入力
+     * @param arguments 引数
      * @return SOAP ActionのXML文字列
      * @throws IOException 通信で問題が発生した場合
      */
     @Nonnull
-    private String makeSoap(@Nonnull Map<String, String> arguments) throws IOException {
+    private String makeSoap(@Nullable List<StringPair> namespaces, @Nonnull List<StringPair> arguments) throws IOException {
         try {
             final Document document = XmlUtils.newDocument(true);
             final Element action = makeUpToActionElement(document);
+            setNamespace(action, namespaces);
             setArgument(document, action, arguments);
             return formatXmlString(document);
         } catch (DOMException
@@ -298,6 +403,15 @@ public class Action {
                 | TransformerException
                 | ParserConfigurationException e) {
             throw new IOException(e);
+        }
+    }
+
+    private static void setNamespace(@Nonnull Element action, @Nullable List<StringPair> namespace) {
+        if (namespace == null) {
+            return;
+        }
+        for (StringPair pair : namespace) {
+            action.setAttributeNS(XMLNS_URI, XMLNS_PREFIX + pair.getKey(), pair.getValue());
         }
     }
 
@@ -324,42 +438,20 @@ public class Action {
     /**
      * Actionの引数をXMLへ組み込む
      *
-     * @param document XML Document
-     * @param action   actionのElement
-     * @param input    引数としての入力
+     * @param document  XML Document
+     * @param action    actionのElement
+     * @param arguments 引数
      */
-    private void setArgument(@Nonnull Document document, @Nonnull Element action, @Nonnull Map<String, String> input) {
-        for (final Entry<String, Argument> entry : mArgumentMap.entrySet()) {
-            final Argument argument = entry.getValue();
-            if (!argument.isInputDirection()) {
-                continue;
-            }
-            final Element param = document.createElement(argument.getName());
-            final String value = selectArgumentValue(argument, input);
+    private static void setArgument(
+            @Nonnull Document document, @Nonnull Element action, @Nonnull List<StringPair> arguments) {
+        for (final StringPair pair : arguments) {
+            final Element param = document.createElement(pair.getKey());
+            final String value = pair.getValue();
             if (value != null) {
                 param.setTextContent(value);
             }
             action.appendChild(param);
         }
-    }
-
-    /**
-     * Argumentの値を選択する。
-     *
-     * <p>入力に値があればそれを採用し、なければデフォルト値を採用する。
-     * どちらもなければnullが返る。
-     *
-     * @param argument Argument
-     * @param input    引数としての入力
-     * @return 選択されたArgumentの値
-     */
-    @Nullable
-    private static String selectArgumentValue(@Nonnull Argument argument, @Nonnull Map<String, String> input) {
-        final String value = input.get(argument.getName());
-        if (value != null) {
-            return value;
-        }
-        return argument.getRelatedStateVariable().getDefaultValue();
     }
 
     /**

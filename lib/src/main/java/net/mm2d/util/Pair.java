@@ -31,7 +31,7 @@ public class Pair<K, V> {
     }
 
     /**
-     * Keyの値を取り出す。
+     * Keyの値を返す。
      *
      * @return Keyの値
      */
@@ -40,7 +40,7 @@ public class Pair<K, V> {
     }
 
     /**
-     * Valueの値を取り出す。
+     * Valueの値を返す。
      *
      * @return Valueの値
      */
