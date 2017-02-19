@@ -453,8 +453,7 @@ public class Service {
     @Nonnull
     private String getCallback() {
         final StringBuilder sb = new StringBuilder();
-        sb.append('<');
-        sb.append("http://");
+        sb.append("<http://");
         final SsdpMessage ssdp = mDevice.getSsdpMessage();
         final InterfaceAddress ifa = ssdp.getInterfaceAddress();
         sb.append(ifa.getAddress().getHostAddress());
@@ -463,14 +462,7 @@ public class Service {
             sb.append(':');
             sb.append(String.valueOf(port));
         }
-        sb.append('/');
-        try {
-            sb.append(URLEncoder.encode(mDevice.getUdn(), "UTF-8"));
-            sb.append('/');
-            sb.append(URLEncoder.encode(mServiceId, "UTF-8"));
-        } catch (UnsupportedEncodingException ignored) {
-        }
-        sb.append('>');
+        sb.append("/>");
         return sb.toString();
     }
 
