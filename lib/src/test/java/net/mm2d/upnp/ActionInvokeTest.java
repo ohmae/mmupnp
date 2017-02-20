@@ -1,6 +1,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
+import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
 
 import org.junit.Before;
@@ -190,6 +191,7 @@ public class ActionInvokeTest {
         final Map<String, String> arg = new HashMap<>();
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
+
         mAction.invoke(arg);
         final HttpRequest request = mMockFactory.getHttpRequest();
 
@@ -206,6 +208,79 @@ public class ActionInvokeTest {
         assertThat(elements.get(1).getLocalName(), is(IN_ARG_NAME_2));
         assertThat(elements.get(1).getTextContent(), is(value2));
     }
+
+    @Test
+    public void invoke_リクエストSOAPの引数確認_カスタム引数指定NSなし() throws Exception {
+        final String value1 = "value1";
+        final String value2 = "value2";
+        final String name = "name";
+        final String value = "value";
+        mMockFactory.setResponse(mHttpResponse);
+        final Map<String, String> arg = new HashMap<>();
+        arg.put(IN_ARG_NAME_1, value1);
+        arg.put(IN_ARG_NAME_2, value2);
+        final List<StringPair> custom = new ArrayList<>();
+        custom.add(new StringPair(name, value));
+
+        mAction.invoke(arg, null, custom);
+        final HttpRequest request = mMockFactory.getHttpRequest();
+
+        final Document doc = XmlUtils.newDocument(true, request.getBody());
+        final Element envelope = doc.getDocumentElement();
+        final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
+        final Element action = XmlUtils.findChildElementByLocalName(body, ACTION_NAME);
+
+        final List<Element> elements = createChildElementList(action);
+        assertThat(elements.size(), is(3));
+        assertThat(elements.get(0).getLocalName(), is(IN_ARG_NAME_1));
+        assertThat(elements.get(0).getTextContent(), is(value1));
+
+        assertThat(elements.get(1).getLocalName(), is(IN_ARG_NAME_2));
+        assertThat(elements.get(1).getTextContent(), is(value2));
+
+        assertThat(elements.get(2).getLocalName(), is(name));
+        assertThat(elements.get(2).getTextContent(), is(value));
+    }
+
+    @Test
+    public void invoke_リクエストSOAPの引数確認_カスタム引数指定NSあり() throws Exception {
+        final String value1 = "value1";
+        final String value2 = "value2";
+        final String prefix = "custom";
+        final String urn = "urn:schemas-custom-com:custom";
+        final String name = "name";
+        final String value = "value";
+        mMockFactory.setResponse(mHttpResponse);
+        final Map<String, String> arg = new HashMap<>();
+        arg.put(IN_ARG_NAME_1, value1);
+        arg.put(IN_ARG_NAME_2, value2);
+
+        final List<StringPair> ns = new ArrayList<>();
+        ns.add(new StringPair(prefix, urn));
+
+        final List<StringPair> custom = new ArrayList<>();
+        custom.add(new StringPair(prefix + ":" + name, value));
+
+        mAction.invoke(arg, ns, custom);
+        final HttpRequest request = mMockFactory.getHttpRequest();
+
+        final Document doc = XmlUtils.newDocument(true, request.getBody());
+        final Element envelope = doc.getDocumentElement();
+        final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
+        final Element action = XmlUtils.findChildElementByLocalName(body, ACTION_NAME);
+
+        final List<Element> elements = createChildElementList(action);
+        assertThat(elements.size(), is(3));
+        assertThat(elements.get(0).getLocalName(), is(IN_ARG_NAME_1));
+        assertThat(elements.get(0).getTextContent(), is(value1));
+
+        assertThat(elements.get(1).getLocalName(), is(IN_ARG_NAME_2));
+        assertThat(elements.get(1).getTextContent(), is(value2));
+
+        assertThat(elements.get(2).getLocalName(), is(name));
+        assertThat(elements.get(2).getTextContent(), is(value));
+    }
+
 
     @Test
     public void invoke_200以外のレスポンスでIOExceptionが発生() throws Exception {

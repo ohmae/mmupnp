@@ -100,6 +100,7 @@ public class ControlPoint {
                            @Nonnull String variable, @Nonnull String value);
     }
 
+    @Nonnull
     private IconFilter mIconFilter = IconFilter.NONE;
     @Nonnull
     private final List<DiscoveryListener> mDiscoveryListeners;
