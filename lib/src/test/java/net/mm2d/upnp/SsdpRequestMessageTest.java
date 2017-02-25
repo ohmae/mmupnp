@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 public class SsdpRequestMessageTest {
 
     private static SsdpRequestMessage makeFromResource(String name) throws IOException {
-        final byte[] data = TestUtils.getResourceData(name);
+        final byte[] data = TestUtils.getResourceAsByteArray(name);
         return new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
     }
 
@@ -49,7 +49,7 @@ public class SsdpRequestMessageTest {
             message.getMessage().writeData(baos);
             final byte[] actual = baos.toByteArray();
 
-            final byte[] expected = TestUtils.getResourceData("ssdp-search-request.bin");
+            final byte[] expected = TestUtils.getResourceAsByteArray("ssdp-search-request.bin");
 
             assertThat(new String(actual), is(new String(expected)));
         }
@@ -62,7 +62,7 @@ public class SsdpRequestMessageTest {
             message.getMessage().writeData(baos);
             final byte[] actual = baos.toByteArray();
 
-            final byte[] expected = TestUtils.getResourceData("ssdp-notify-alive0.bin");
+            final byte[] expected = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
 
             assertThat(new String(actual), is(new String(expected)));
         }
@@ -105,7 +105,7 @@ public class SsdpRequestMessageTest {
 
         @Theory
         public void getUuid_記述の値であること(SsdpRequestMessage message) {
-            assertThat(message.getUuid(), is("uuid:11111111-1111-1111-1111-111111111111"));
+            assertThat(message.getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         }
 
         @Theory
@@ -138,7 +138,7 @@ public class SsdpRequestMessageTest {
 
         @Theory
         public void getLocation_Locationの値が取れること(SsdpRequestMessage message) {
-            assertThat(message.getLocation(), is("http://192.0.2.2:12345/description.xml"));
+            assertThat(message.getLocation(), is("http://192.0.2.2:12345/device.xml"));
         }
     }
 

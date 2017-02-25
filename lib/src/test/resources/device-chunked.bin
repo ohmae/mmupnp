@@ -1,0 +1,79 @@
+HTTP/1.1 200 OK
+SERVER: Windows/10.0 UPnP/1.0 mmupnp/1.0
+DATE: Sun, 01 Jan 2017 00:00:00 GMT
+Connection: close
+Transfer-Encoding: chunked
+
+400
+<?xml version="1.0"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+    <specVersion>
+        <major>1</major>
+        <minor>0</minor>
+    </specVersion>
+    <device>
+        <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
+        <friendlyName>mmupnp</friendlyName>
+        <manufacturer>mm2d.net</manufacturer>
+        <manufacturerURL>http://www.mm2d.net/</manufacturerURL>
+        <modelName>mmupnp</modelName>
+        <modelDescription>mmupnp test server</modelDescription>
+        <modelURL>http://www.mm2d.net/</modelURL>
+        <serialNumber>0123456789ABC</serialNumber>
+        <UDN>uuid:01234567-89ab-cdef-0123-456789abcdef</UDN>
+        <presentationURL>http://192.0.2.2:12346/</presentationURL>
+        <iconList>
+            <icon>
+                <mimetype>image/jpeg</mimetype>
+                <width>120</width>
+                <height>120</height>
+                <depth>24</depth>
+                <url>/icon/icon120.jpg</url>
+            </icon>
+            <icon>
+                <mi
+400
+metype>image/jpeg</mimetype>
+                <width>48</width>
+                <height>48</height>
+                <depth>24</depth>
+                <url>/icon/icon48.jpg</url>
+            </icon>
+            <icon>
+                <mimetype>image/png</mimetype>
+                <width>120</width>
+                <height>120</height>
+                <depth>24</depth>
+                <url>/icon/icon120.png</url>
+            </icon>
+            <icon>
+                <mimetype>image/png</mimetype>
+                <width>48</width>
+                <height>48</height>
+                <depth>24</depth>
+                <url>/icon/icon48.png</url>
+            </icon>
+        </iconList>
+        <serviceList>
+            <service>
+                <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>
+                <SCPDURL>/cms.xml</SCPDURL>
+                <controlURL>/cms/control</controlURL>
+                <event
+1d3
+SubURL>/cms/event</eventSubURL>
+            </service>
+            <service>
+                <serviceType>urn:schemas-upnp-org:service:ContentDirectory:1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:ContentDirectory</serviceId>
+                <SCPDURL>/cds.xml</SCPDURL>
+                <controlURL>/cds/control</controlURL>
+                <eventSubURL>/cds/event</eventSubURL>
+            </service>
+        </serviceList>
+    </device>
+</root>
+
+0
+

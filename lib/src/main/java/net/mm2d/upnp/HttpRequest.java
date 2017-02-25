@@ -106,16 +106,12 @@ public class HttpRequest extends HttpMessage {
         setAddress(InetAddress.getByName(host));
         int port = url.getPort();
         if (port < 0) {
-            port = 80;
+            port = Http.DEFAULT_PORT;
         }
         setPort(port);
         setUri(url.getFile());
         if (withHostHeader) {
-            if (port != Http.DEFAULT_PORT) {
-                setHeader(Http.HOST, host + ":" + port);
-            } else {
-                setHeader(Http.HOST, host);
-            }
+            setHeader(Http.HOST, getAddressString());
         }
     }
 

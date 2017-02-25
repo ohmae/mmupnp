@@ -1,0 +1,23 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body>
+<u:BrowseResponse xmlns:u="urn:schemas-upnp-org:service:ContentDirectory:1">
+<Result>&lt;DIDL-Lite xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot; xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:upnp=&quot;urn:schemas-upnp-org:metadata-1-0/upnp/&quot; xmlns:sec=&quot;http://www.sec.co.kr/&quot; xmlns:dlna=&quot;urn:schemas-dlna-org:metadata-1-0/&quot;&gt;&lt;container id=&quot;21&quot;  parentID=&quot;0&quot;  restricted=&quot;1&quot;&gt;
+&lt;dc:title&gt;Music&lt;/dc:title&gt;
+&lt;upnp:class&gt;object.container&lt;/upnp:class&gt;
+&lt;/container&gt;
+&lt;container id=&quot;32&quot;  parentID=&quot;0&quot;  restricted=&quot;1&quot;&gt;
+&lt;dc:title&gt;Photo&lt;/dc:title&gt;
+&lt;upnp:class&gt;object.container.storageFolder&lt;/upnp:class&gt;
+&lt;upnp:storageUsed&gt;-1&lt;/upnp:storageUsed&gt;
+&lt;/container&gt;
+&lt;container id=&quot;33&quot;  parentID=&quot;0&quot;  restricted=&quot;1&quot;&gt;
+&lt;dc:title&gt;Video&lt;/dc:title&gt;
+&lt;upnp:class&gt;object.container.storageFolder&lt;/upnp:class&gt;
+&lt;upnp:storageUsed&gt;-1&lt;/upnp:storageUsed&gt;
+&lt;/container&gt;
+&lt;/DIDL-Lite&gt;</Result>
+<NumberReturned>3</NumberReturned>
+<TotalMatches>3</TotalMatches>
+<UpdateID>1</UpdateID>
+</u:BrowseResponse>
+</s:Body>
+</s:Envelope>

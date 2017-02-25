@@ -7,22 +7,36 @@
 
 package net.mm2d.util;
 
-import net.mm2d.upnp.SsdpRequestMessageTest;
-
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 import javax.annotation.Nonnull;
 
 public class TestUtils {
     @Nonnull
-    public static File getResourceFile(String name) {
-        return new File(TestUtils.class.getClassLoader().getResource(name).getFile());
+    public static File getResourceAsFile(String name) {
+        return new File(getClassLoader().getResource(name).getFile());
     }
 
     @Nonnull
-    public static byte[] getResourceData(String name) throws IOException {
-        return Files.readAllBytes(getResourceFile(name).toPath());
+    public static InputStream getResourceAsStream(String name) {
+        return getClassLoader().getResourceAsStream(name);
+    }
+
+    @Nonnull
+    public static byte[] getResourceAsByteArray(String name) throws IOException {
+        return Files.readAllBytes(getResourceAsFile(name).toPath());
+    }
+
+    @Nonnull
+    public static String getResourceAsString(String name) throws IOException {
+        return new String(Files.readAllBytes(getResourceAsFile(name).toPath()));
+    }
+
+    @Nonnull
+    private static ClassLoader getClassLoader() {
+        return TestUtils.class.getClassLoader();
     }
 }

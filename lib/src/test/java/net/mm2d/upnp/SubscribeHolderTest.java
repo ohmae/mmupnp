@@ -109,16 +109,16 @@ public class SubscribeHolderTest {
         assertThat(subscribeHolder.getService(id2), is(nullValue()));
     }
 
-    @Test(timeout = 1000L)
+    @Test(timeout = 10000L)
     public void expire_時間経過で削除される() throws InterruptedException {
         final long now = System.currentTimeMillis();
         final String id1 = "id1";
         final Service service1 = mock(Service.class);
-        doReturn(now + 100).when(service1).getSubscriptionExpiryTime();
+        doReturn(now + 500).when(service1).getSubscriptionExpiryTime();
         doReturn(id1).when(service1).getSubscriptionId();
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
-        doReturn(now + 200).when(service2).getSubscriptionExpiryTime();
+        doReturn(now + 1000).when(service2).getSubscriptionExpiryTime();
         doReturn(id2).when(service2).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
         subscribeHolder.start();
@@ -129,12 +129,12 @@ public class SubscribeHolderTest {
         assertThat(subscribeHolder.getService(id1), is(service1));
         assertThat(subscribeHolder.getService(id2), is(service2));
 
-        Thread.sleep(150L);
+        Thread.sleep(700L);
 
         assertThat(subscribeHolder.getService(id1), is(nullValue()));
         assertThat(subscribeHolder.getService(id2), is(service2));
 
-        Thread.sleep(100L);
+        Thread.sleep(500L);
 
         assertThat(subscribeHolder.getService(id1), is(nullValue()));
         assertThat(subscribeHolder.getService(id2), is(nullValue()));
@@ -142,7 +142,7 @@ public class SubscribeHolderTest {
         subscribeHolder.shutdownRequest();
     }
 
-    @Test(timeout = 1000L)
+    @Test(timeout = 10000L)
     public void renew_定期的にrenewが実行される() throws Exception {
         final long now = System.currentTimeMillis();
         final String id = "id";
@@ -158,14 +158,14 @@ public class SubscribeHolderTest {
         subscribeHolder.add(service, true);
         verify(service, never()).renewSubscribe();
 
-        Thread.sleep(150L);
-        verify(service).renewSubscribe();
+        Thread.sleep(200L);
+        verify(service, atLeastOnce()).renewSubscribe();
 
         subscribeHolder.shutdownRequest();
     }
 
 
-    @Test(timeout = 1000L)
+    @Test(timeout = 10000L)
     public void renew_失敗したら削除される() throws Exception {
         final long now = System.currentTimeMillis();
         final String id = "id";
@@ -179,7 +179,7 @@ public class SubscribeHolderTest {
         subscribeHolder.start();
 
         subscribeHolder.add(service, true);
-        Thread.sleep(250L);
+        Thread.sleep(400L);
         assertThat(subscribeHolder.getService(id), is(nullValue()));
 
         subscribeHolder.shutdownRequest();

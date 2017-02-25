@@ -4,5 +4,5 @@ NTS: ssdp:byebye
 SERVER: Linux/2.6 UPnP/1.0 mmupnp/1.0
 Date: Sun, 01 Jan 2017 00:00:00 GMT
 NT: urn:schemas-upnp-org:device:MediaServer:1
-USN: uuid:11111111-1111-1111-1111-111111111111::urn:schemas-upnp-org:device:MediaServer:1
+USN: uuid:01234567-89ab-cdef-0123-456789abcdef::urn:schemas-upnp-org:device:MediaServer:1
 

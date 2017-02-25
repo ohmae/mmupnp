@@ -158,5 +158,6 @@ public class HttpHeaderTest {
 
         header2.put(name2, value1);
         assertThat(header1.get(name2), is(value2));
+        assertThat(header2.get(name2), is(value1));
     }
 }

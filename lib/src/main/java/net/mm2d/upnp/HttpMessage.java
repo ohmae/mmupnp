@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * HTTPのメッセージを表現するクラスの親クラス。
  *
  * <p>ResponseとRequestでStart Lineのフォーマットが異なるため
- * その部分の実装は小クラスに任せている。
+ * その部分の実装はサブクラスに任せている。
  *
  * <p>UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
  * 長大なデータのやり取りは想定していない。
@@ -40,9 +40,11 @@ import javax.annotation.Nullable;
 public abstract class HttpMessage {
     private static final String TAG = HttpMessage.class.getSimpleName();
     private static final int BUFFER_SIZE = 1500;
+    private static final int DEFAULT_CHUNK_SIZE = 1024;
     private static final int CR = 0x0d;
     private static final int LF = 0x0a;
-    private static final String CRLF = "\r\n";
+    private static final byte[] CRLF = new byte[] {(byte)CR, (byte)LF};
+    private static final String EOL = "\r\n";
     private static final String CHARSET = "utf-8";
 
     @Nullable
@@ -140,7 +142,7 @@ public abstract class HttpMessage {
         if (mAddress == null) {
             throw new IllegalStateException("address must be set");
         }
-        if (mPort == 80 || mPort <= 0) {
+        if (mPort == Http.DEFAULT_PORT || mPort <= 0) {
             return mAddress.getHostAddress();
         }
         return mAddress.getHostAddress() + ":" + String.valueOf(mPort);
@@ -276,32 +278,57 @@ public abstract class HttpMessage {
     /**
      * メッセージボディを設定する。
      *
-     * @param body              メッセージボディ
-     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     * @param body メッセージボディ
      */
-    public void setBody(@Nullable String body, boolean withContentLength) {
-        setBody(body);
-        if (withContentLength) {
-            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
-            setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
-        }
+    public void setBody(@Nullable String body) {
+        setBody(body, false);
     }
 
     /**
      * メッセージボディを設定する。
      *
+     * @param body              メッセージボディ
+     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     */
+    public void setBody(@Nullable String body, boolean withContentLength) {
+        setBodyInner(body, null, withContentLength);
+    }
+
+    /**
+     * メッセージボディを設定する。
+     *
+     * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
+     *
      * @param body メッセージボディ
      */
-    public void setBody(@Nullable String body) {
-        mBody = body;
-        if (TextUtils.isEmpty(body)) {
-            mBodyBinary = null;
+    public void setBodyBinary(@Nullable byte[] body) {
+        setBodyBinary(body, false);
+    }
+
+    /**
+     * メッセージボディを設定する。
+     *
+     * @param body              メッセージボディ
+     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     */
+    public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {
+        setBodyInner(null, body, withContentLength);
+    }
+
+    private void setBodyInner(@Nullable String string, @Nullable byte[] binary, boolean withContentLength) {
+        mBody = string;
+        if (TextUtils.isEmpty(string)) {
+            mBodyBinary = binary;
         } else {
             try {
-                mBodyBinary = body.getBytes(CHARSET);
-            } catch (final UnsupportedEncodingException e) {
+                mBodyBinary = string.getBytes(CHARSET);
+            } catch (UnsupportedEncodingException e) {
                 Log.w(TAG, e);
             }
+        }
+        if (withContentLength) {
+            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
+            setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
         }
     }
 
@@ -320,32 +347,6 @@ public abstract class HttpMessage {
             }
         }
         return mBody;
-    }
-
-    /**
-     * メッセージボディを設定する。
-     *
-     * @param body              メッセージボディ
-     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
-     */
-    public void setBodyBinary(@Nullable byte[] body, boolean withContentLength) {
-        setBodyBinary(body);
-        if (withContentLength) {
-            final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
-            setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
-        }
-    }
-
-    /**
-     * メッセージボディを設定する。
-     *
-     * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
-     *
-     * @param body メッセージボディ
-     */
-    public void setBodyBinary(@Nullable byte[] body) {
-        mBodyBinary = body;
-        mBody = null;
     }
 
     /**
@@ -375,14 +376,14 @@ public abstract class HttpMessage {
     public String getHeaderString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
-        sb.append(CRLF);
+        sb.append(EOL);
         for (final HttpHeader.Entry entry : mHeaders.entrySet()) {
             sb.append(entry.getName());
             sb.append(": ");
             sb.append(entry.getValue());
-            sb.append(CRLF);
+            sb.append(EOL);
         }
-        sb.append(CRLF);
+        sb.append(EOL);
         return sb.toString();
     }
 
@@ -410,16 +411,16 @@ public abstract class HttpMessage {
     public String getMessageString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
-        sb.append(CRLF);
+        sb.append(EOL);
         for (final HttpHeader.Entry entry : mHeaders.entrySet()) {
             sb.append(entry.getName());
             sb.append(": ");
             sb.append(entry.getValue());
-            sb.append(CRLF);
+            sb.append(EOL);
         }
-        sb.append(CRLF);
+        sb.append(EOL);
         final String body = getBody();
-        if (body != null) {
+        if (!TextUtils.isEmpty(body)) {
             sb.append(body);
         }
         return sb.toString();
@@ -434,9 +435,31 @@ public abstract class HttpMessage {
     public void writeData(@Nonnull OutputStream os) throws IOException {
         os.write(getHeaderBytes());
         if (mBodyBinary != null) {
-            os.write(mBodyBinary);
+            if (isChunked()) {
+                writeChunkedBody(os);
+            } else {
+                os.write(mBodyBinary);
+            }
         }
         os.flush();
+    }
+
+    private void writeChunkedBody(@Nonnull OutputStream os) throws IOException {
+        int offset = 0;
+        while (offset < mBodyBinary.length) {
+            final int size = Math.min(DEFAULT_CHUNK_SIZE, mBodyBinary.length - offset);
+            writeChunkSize(os, size);
+            os.write(mBodyBinary, offset, size);
+            os.write(CRLF);
+            offset += size;
+        }
+        writeChunkSize(os, 0);
+        os.write(CRLF);
+    }
+
+    private void writeChunkSize(@Nonnull OutputStream os, int size) throws IOException {
+        os.write(Integer.toHexString(size).getBytes(CHARSET));
+        os.write(CRLF);
     }
 
     /**
