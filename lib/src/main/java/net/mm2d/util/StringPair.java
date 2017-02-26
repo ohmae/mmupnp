@@ -12,8 +12,8 @@ package net.mm2d.util;
  *
  * <p>{@code Pair<String, String>}のエイリアス
  *
- * @see Pair
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @see Pair
  */
 public class StringPair extends Pair<String, String> {
     /**

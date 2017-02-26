@@ -19,8 +19,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Icon {
-    private static final String TAG = Icon.class.getSimpleName();
-
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
@@ -33,7 +31,6 @@ public class Icon {
         private int mWidth;
         private int mDepth;
         private String mUrl;
-        private byte[] mBinary;
 
         /**
          * インスタンス作成
@@ -126,22 +123,6 @@ public class Icon {
         }
 
         /**
-         * バイナリデータを登録する。
-         *
-         * <p>DeviceDescriptionからの読み込みの場合、
-         * Iconのインスタンスを作成した後読み込みを実行するため。
-         * このメソッドは使用しない。
-         *
-         * @param binary バイナリ
-         * @return Builder
-         */
-        @Nonnull
-        public Builder setBinary(@Nullable byte[] binary) {
-            mBinary = binary;
-            return this;
-        }
-
-        /**
          * Iconのインスタンスを作成する。
          *
          * @return Iconのインスタンス
@@ -195,7 +176,6 @@ public class Icon {
         mWidth = builder.mWidth;
         mDepth = builder.mDepth;
         mUrl = builder.mUrl;
-        mBinary = builder.mBinary;
     }
 
     /**

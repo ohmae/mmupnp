@@ -12,7 +12,6 @@ package net.mm2d.util;
  *
  * @param <K> Keyの型
  * @param <V> Valueの型
- *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Pair<K, V> {

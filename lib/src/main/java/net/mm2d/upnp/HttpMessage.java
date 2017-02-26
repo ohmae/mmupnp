@@ -43,7 +43,7 @@ public abstract class HttpMessage {
     private static final int DEFAULT_CHUNK_SIZE = 1024;
     private static final int CR = 0x0d;
     private static final int LF = 0x0a;
-    private static final byte[] CRLF = new byte[] {(byte)CR, (byte)LF};
+    private static final byte[] CRLF = new byte[]{(byte) CR, (byte) LF};
     private static final String EOL = "\r\n";
     private static final String CHARSET = "utf-8";
 

@@ -15,11 +15,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Calendar;
@@ -28,12 +24,12 @@ import java.util.TimeZone;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class HttpResponseTest {
     private static final Date DATE;
+
     static {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -45,27 +41,28 @@ public class HttpResponseTest {
     @Test
     public void readData_読み出しができること() throws IOException {
         final HttpResponse response = new HttpResponse();
-        response.readData(TestUtils.getResourceAsStream("device-length.bin"));
+        response.readData(TestUtils.getResourceAsStream("cds-length.bin"));
 
         assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
         assertThat(Http.parseDate(response.getHeader(Http.DATE)), is(DATE));
-        assertThat(response.getBody(), is(TestUtils.getResourceAsString("device.xml")));
+        assertThat(response.getBody(), is(TestUtils.getResourceAsString("cds.xml")));
     }
 
     @Test
     public void readData_Chunk読み出しができること() throws IOException {
         final HttpResponse response = new HttpResponse();
-        response.readData(TestUtils.getResourceAsStream("device-chunked.bin"));
+        response.readData(TestUtils.getResourceAsStream("cds-chunked.bin"));
 
         assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
         assertThat(Http.parseDate(response.getHeader(Http.DATE)), is(DATE));
-        assertThat(response.getBody(), is(TestUtils.getResourceAsString("device.xml")));
+        assertThat(response.getBody(), is(TestUtils.getResourceAsString("cds.xml")));
     }
+
     @Test
     public void writeData_書き出しができること() throws IOException {
-        final String data = TestUtils.getResourceAsString("device.xml");
+        final String data = TestUtils.getResourceAsString("cds.xml");
         final HttpResponse response = new HttpResponse();
         response.setStatus(Http.Status.HTTP_OK);
         response.setHeader(Http.SERVER, Property.SERVER_VALUE);
@@ -86,7 +83,7 @@ public class HttpResponseTest {
 
     @Test
     public void writeData_Chunk書き出しができること() throws IOException {
-        final String data = TestUtils.getResourceAsString("device.xml");
+        final String data = TestUtils.getResourceAsString("cds.xml");
         final HttpResponse response = new HttpResponse();
         response.setStatus(Http.Status.HTTP_OK);
         response.setHeader(Http.SERVER, Property.SERVER_VALUE);

@@ -20,6 +20,7 @@ import org.junit.runners.JUnit4;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InterfaceAddress;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -76,6 +77,16 @@ public class SsdpRequestMessageTest {
 
             assertThat(message.getType(), is("urn:schemas-upnp-org:service:ContentDirectory:1"));
 
+        }
+
+        @Test
+        public void getExpireTime() throws IOException {
+            final long beforeTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(300);
+            final SsdpRequestMessage message = makeFromResource("ssdp-notify-alive2.bin");
+            final long afterTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(300);
+
+            assertThat(message.getExpireTime(), greaterThanOrEqualTo(beforeTime));
+            assertThat(message.getExpireTime(), lessThanOrEqualTo(afterTime));
         }
     }
 

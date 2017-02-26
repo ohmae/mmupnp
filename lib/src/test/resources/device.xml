@@ -12,6 +12,7 @@
         <modelName>mmupnp</modelName>
         <modelDescription>mmupnp test server</modelDescription>
         <modelURL>http://www.mm2d.net/</modelURL>
+        <modelNumber>ABCDEFG</modelNumber>
         <serialNumber>0123456789ABC</serialNumber>
         <UDN>uuid:01234567-89ab-cdef-0123-456789abcdef</UDN>
         <presentationURL>http://192.0.2.2:12346/</presentationURL>
@@ -59,6 +60,13 @@
                 <SCPDURL>/cds.xml</SCPDURL>
                 <controlURL>/cds/control</controlURL>
                 <eventSubURL>/cds/event</eventSubURL>
+            </service>
+            <service>
+                <serviceType>urn:schemas-mm2d-net:service:X_mmupnp:1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:X_mmupnp</serviceId>
+                <SCPDURL>/mmupnp.xml</SCPDURL>
+                <controlURL>/mmupnp/control</controlURL>
+                <eventSubURL>/mmupnp/event</eventSubURL>
             </service>
         </serviceList>
     </device>

@@ -34,13 +34,6 @@ public class DeviceParser {
     private static final String TAG = DeviceParser.class.getSimpleName();
 
     /**
-     * インスタンス化禁止
-     */
-    private DeviceParser() {
-        throw new AssertionError();
-    }
-
-    /**
      * DeviceDescriptionを読み込む。
      *
      * <p>Descriptionのパースを行い、Builderに登録する。

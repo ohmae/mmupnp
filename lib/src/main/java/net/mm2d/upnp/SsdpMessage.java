@@ -62,7 +62,7 @@ public abstract class SsdpMessage {
     @Nonnull
     private final String mType;
     @Nullable
-    private final String mNts;
+    private String mNts;
     @Nullable
     private String mLocation;
     @Nullable
@@ -120,6 +120,10 @@ public abstract class SsdpMessage {
         mUuid = result[0];
         mType = result[1];
         mExpireTime = TimeUnit.SECONDS.toMillis(mMaxAge) + System.currentTimeMillis();
+        updateHeader();
+    }
+
+    void updateHeader() {
         mLocation = mMessage.getHeader(Http.LOCATION);
         mNts = mMessage.getHeader(Http.NTS);
     }

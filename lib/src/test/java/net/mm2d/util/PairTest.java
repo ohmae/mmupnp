@@ -69,4 +69,20 @@ public class PairTest {
 
         assertThat(pair1.equals(null), is(false));
     }
+
+    @Test
+    public void hashCode_equalsが真なら同一() {
+        final Pair<String, String> pair1 = new Pair<>("1", "2");
+        final Pair<String, String> pair2 = new Pair<>("1", "2");
+
+        assertThat(pair1.hashCode(), is(pair2.hashCode()));
+    }
+
+    @Test
+    public void toString_両方の値が含まれる() {
+        final Pair<String, String> pair1 = new Pair<>("1", "2");
+
+        assertThat(pair1.toString(), containsString("1"));
+        assertThat(pair1.toString(), containsString("2"));
+    }
 }

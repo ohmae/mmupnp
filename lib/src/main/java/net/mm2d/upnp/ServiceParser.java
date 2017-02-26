@@ -35,13 +35,6 @@ class ServiceParser {
     private static final String TAG = ServiceParser.class.getSimpleName();
 
     /**
-     * インスタンス化禁止
-     */
-    private ServiceParser() {
-        throw new AssertionError();
-    }
-
-    /**
      * SCPDURLからDescriptionを取得し、パースする。
      *
      * <p>可能であればKeepAliveを行う。

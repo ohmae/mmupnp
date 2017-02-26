@@ -521,7 +521,7 @@ public class Device {
     private static String jointAbsolutePath(@Nonnull String baseUrl, @Nonnull String path) {
         final int pos = baseUrl.indexOf('/', "http://".length());
         if (pos < 0) {
-            return baseUrl + "/" + path;
+            return baseUrl + path;
         }
         return baseUrl.substring(0, pos) + path;
     }

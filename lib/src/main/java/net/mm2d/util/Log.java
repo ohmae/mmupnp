@@ -133,7 +133,8 @@ public class Log {
 //        }
 //    }
 
-    private static Print sPrint = new DefaultPrint();
+    public static final Print DEFAULT_PRINT = new DefaultPrint();
+    private static Print sPrint = DEFAULT_PRINT;
     private static int sLogLevel = VERBOSE;
 
     /**

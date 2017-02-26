@@ -25,8 +25,7 @@ import java.net.URL;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class HttpRequestTest {

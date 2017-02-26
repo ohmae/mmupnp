@@ -634,7 +634,7 @@ public class Service {
         if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
-        final HttpClient client = new HttpClient(false);
+        final HttpClient client = createHttpClient();
         final HttpRequest request = makeUnsubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {

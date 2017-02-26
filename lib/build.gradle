@@ -7,6 +7,8 @@ apply plugin: 'maven'
 archivesBaseName = 'mmupnp'
 sourceCompatibility = 1.7
 
+test.maxParallelForks = 4
+
 repositories {
     mavenCentral()
 }
