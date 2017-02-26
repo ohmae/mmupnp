@@ -67,6 +67,7 @@ public final class Http {
     public static final String UNSUBSCRIBE = "UNSUBSCRIBE";
     public static final String GET = "GET";
     public static final String POST = "POST";
+    public static final String NOTIFY = "NOTIFY";
 
     public static final int DEFAULT_PORT = 80;
 
