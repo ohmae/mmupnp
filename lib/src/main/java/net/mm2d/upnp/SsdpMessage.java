@@ -145,7 +145,7 @@ public abstract class SsdpMessage {
     }
 
     @Nonnull
-    private static String[] parseUsn(@Nonnull HttpMessage message) throws IOException {
+    private static String[] parseUsn(@Nonnull HttpMessage message) {
         final String usn = message.getHeader(Http.USN);
         if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
             return new String[]{"", ""};

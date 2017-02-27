@@ -436,7 +436,7 @@ public abstract class HttpMessage {
         os.write(getHeaderBytes());
         if (mBodyBinary != null) {
             if (isChunked()) {
-                writeChunkedBody(os);
+                writeChunkedBody(os, mBodyBinary);
             } else {
                 os.write(mBodyBinary);
             }
@@ -444,12 +444,12 @@ public abstract class HttpMessage {
         os.flush();
     }
 
-    private void writeChunkedBody(@Nonnull OutputStream os) throws IOException {
+    private void writeChunkedBody(@Nonnull OutputStream os, @Nonnull byte[] binary) throws IOException {
         int offset = 0;
-        while (offset < mBodyBinary.length) {
-            final int size = Math.min(DEFAULT_CHUNK_SIZE, mBodyBinary.length - offset);
+        while (offset < binary.length) {
+            final int size = Math.min(DEFAULT_CHUNK_SIZE, binary.length - offset);
             writeChunkSize(os, size);
-            os.write(mBodyBinary, offset, size);
+            os.write(binary, offset, size);
             os.write(CRLF);
             offset += size;
         }
