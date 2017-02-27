@@ -54,8 +54,9 @@ public final class Http {
      */
     public static final String NT = "NT";
     /**
-     * Notification Sub Type ...ならNSTのような気が？
+     * Notification Sub Type
      */
+    // ...ならNSTでは？
     public static final String NTS = "NTS";
     /**
      * Subscription Identifier
