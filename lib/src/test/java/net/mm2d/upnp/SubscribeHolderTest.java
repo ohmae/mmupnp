@@ -118,7 +118,7 @@ public class SubscribeHolderTest {
         doReturn(id1).when(service1).getSubscriptionId();
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
-        doReturn(now + 3000).when(service2).getSubscriptionExpiryTime();
+        doReturn(now + 2000).when(service2).getSubscriptionExpiryTime();
         doReturn(id2).when(service2).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
         subscribeHolder.start();
@@ -134,7 +134,7 @@ public class SubscribeHolderTest {
         assertThat(subscribeHolder.getService(id1), is(nullValue()));
         assertThat(subscribeHolder.getService(id2), is(service2));
 
-        Thread.sleep(2500L);
+        Thread.sleep(1500L);
 
         assertThat(subscribeHolder.getService(id1), is(nullValue()));
         assertThat(subscribeHolder.getService(id2), is(nullValue()));
