@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * SSDPメッセージを表現するクラス。
+ * SSDP(Simple Service Discovery Protocol)メッセージを表現するクラス。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -148,17 +148,13 @@ public abstract class SsdpMessage {
     private static String[] parseUsn(@Nonnull HttpMessage message) throws IOException {
         final String usn = message.getHeader(Http.USN);
         if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
-            throw new IOException("");
+            return new String[]{"", ""};
         }
         final int pos = usn.indexOf("::");
         if (pos < 0) {
-            return new String[]{
-                    usn, ""
-            };
+            return new String[]{usn, ""};
         }
-        return new String[]{
-                usn.substring(0, pos), usn.substring(pos + 2)
-        };
+        return new String[]{usn.substring(0, pos), usn.substring(pos + 2)};
     }
 
     /**

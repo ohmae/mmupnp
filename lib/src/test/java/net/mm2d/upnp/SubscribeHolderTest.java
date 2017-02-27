@@ -114,11 +114,11 @@ public class SubscribeHolderTest {
         final long now = System.currentTimeMillis();
         final String id1 = "id1";
         final Service service1 = mock(Service.class);
-        doReturn(now + 500).when(service1).getSubscriptionExpiryTime();
+        doReturn(now + 1000).when(service1).getSubscriptionExpiryTime();
         doReturn(id1).when(service1).getSubscriptionId();
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
-        doReturn(now + 1000).when(service2).getSubscriptionExpiryTime();
+        doReturn(now + 3000).when(service2).getSubscriptionExpiryTime();
         doReturn(id2).when(service2).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
         subscribeHolder.start();
@@ -129,12 +129,12 @@ public class SubscribeHolderTest {
         assertThat(subscribeHolder.getService(id1), is(service1));
         assertThat(subscribeHolder.getService(id2), is(service2));
 
-        Thread.sleep(700L);
+        Thread.sleep(1500L);
 
         assertThat(subscribeHolder.getService(id1), is(nullValue()));
         assertThat(subscribeHolder.getService(id2), is(service2));
 
-        Thread.sleep(500L);
+        Thread.sleep(2500L);
 
         assertThat(subscribeHolder.getService(id1), is(nullValue()));
         assertThat(subscribeHolder.getService(id2), is(nullValue()));
@@ -149,7 +149,7 @@ public class SubscribeHolderTest {
         final Service service = mock(Service.class);
         doReturn(Long.MAX_VALUE).when(service).getSubscriptionExpiryTime();
         doReturn(now).when(service).getSubscriptionStart();
-        doReturn(100L).when(service).getSubscriptionTimeout();
+        doReturn(1000L).when(service).getSubscriptionTimeout();
         doReturn(true).when(service).renewSubscribe();
         doReturn(id).when(service).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
@@ -158,7 +158,7 @@ public class SubscribeHolderTest {
         subscribeHolder.add(service, true);
         verify(service, never()).renewSubscribe();
 
-        Thread.sleep(200L);
+        Thread.sleep(2000L);
         verify(service, atLeastOnce()).renewSubscribe();
 
         subscribeHolder.shutdownRequest();
@@ -172,14 +172,14 @@ public class SubscribeHolderTest {
         final Service service = mock(Service.class);
         doReturn(Long.MAX_VALUE).when(service).getSubscriptionExpiryTime();
         doReturn(now).when(service).getSubscriptionStart();
-        doReturn(100L).when(service).getSubscriptionTimeout();
+        doReturn(1000L).when(service).getSubscriptionTimeout();
         doReturn(false).when(service).renewSubscribe();
         doReturn(id).when(service).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
         subscribeHolder.start();
 
         subscribeHolder.add(service, true);
-        Thread.sleep(400L);
+        Thread.sleep(3000L);
         assertThat(subscribeHolder.getService(id), is(nullValue()));
 
         subscribeHolder.shutdownRequest();

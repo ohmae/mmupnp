@@ -55,10 +55,10 @@ abstract class SsdpServer {
      *
      * <p>使用するポートは自動割当となる。
      *
-     * @param ni 使用するインターフェース
+     * @param networkInterface 使用するインターフェース
      */
-    public SsdpServer(@Nonnull NetworkInterface ni) {
-        this(ni, 0);
+    public SsdpServer(@Nonnull NetworkInterface networkInterface) {
+        this(networkInterface, 0);
     }
 
     /**
@@ -102,9 +102,14 @@ abstract class SsdpServer {
         if (mSocket == null) {
             close();
         }
-        mSocket = new MulticastSocket(mBindPort);
+        mSocket = createMulticastSocket(mBindPort);
         mSocket.setNetworkInterface(mInterface);
         mSocket.setTimeToLive(4);
+    }
+
+    // VisibleForTesting
+    MulticastSocket createMulticastSocket(int port) throws IOException {
+        return new MulticastSocket(port);
     }
 
     /**

@@ -60,6 +60,21 @@ public class SsdpResponseMessageTest {
         }
 
         @Theory
+        public void getStatus(SsdpResponseMessage message) {
+            assertThat(message.getStatus(), is(Http.Status.HTTP_OK));
+        }
+
+        @Theory
+        public void getStatusCode(SsdpResponseMessage message) {
+            assertThat(message.getStatusCode(), is(200));
+        }
+
+        @Theory
+        public void getReasonPhrase(SsdpResponseMessage message) {
+            assertThat(message.getReasonPhrase(), is("OK"));
+        }
+
+        @Theory
         public void getUuid_記述の値であること(SsdpResponseMessage message) {
             assertThat(message.getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         }

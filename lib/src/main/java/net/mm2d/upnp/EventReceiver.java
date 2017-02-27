@@ -92,6 +92,7 @@ class EventReceiver {
         mServerTask.start();
     }
 
+    // VisibleForTesting
     ServerSocket createServerSocket() throws IOException {
         return new ServerSocket(0);
     }

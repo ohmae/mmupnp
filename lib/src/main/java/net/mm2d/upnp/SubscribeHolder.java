@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  */
 class SubscribeHolder implements Runnable {
     private static final String TAG = SubscribeHolder.class.getSimpleName();
-    private static final long MIN_INTERVAL = TimeUnit.MILLISECONDS.toMillis(100);
+    private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
 
     private final Object mThreadLock = new Object();
     private volatile boolean mShutdownRequest = false;
