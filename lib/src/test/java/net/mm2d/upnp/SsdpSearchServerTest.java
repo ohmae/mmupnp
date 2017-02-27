@@ -142,7 +142,6 @@ public class SsdpSearchServerTest {
         assertThat(result[0].getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
 
-
     private static InterfaceAddress findInet4Address(NetworkInterface networkInterface) {
         final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
         for (final InterfaceAddress address : addressList) {
