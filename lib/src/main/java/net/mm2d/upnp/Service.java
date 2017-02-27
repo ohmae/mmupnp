@@ -11,11 +11,9 @@ import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -453,33 +451,24 @@ public class Service {
     @Nonnull
     private String getCallback() {
         final StringBuilder sb = new StringBuilder();
-        sb.append('<');
-        sb.append("http://");
+        sb.append("<http://");
         final SsdpMessage ssdp = mDevice.getSsdpMessage();
         final InterfaceAddress ifa = ssdp.getInterfaceAddress();
+        //noinspection ConstantConditions : 受信したデータの場合はnullではない
         sb.append(ifa.getAddress().getHostAddress());
         final int port = mControlPoint.getEventPort();
         if (port != Http.DEFAULT_PORT) {
             sb.append(':');
             sb.append(String.valueOf(port));
         }
-        sb.append('/');
-        try {
-            sb.append(URLEncoder.encode(mDevice.getUdn(), "UTF-8"));
-            sb.append('/');
-            sb.append(URLEncoder.encode(mServiceId, "UTF-8"));
-        } catch (UnsupportedEncodingException ignored) {
-        }
-        sb.append('>');
+        sb.append("/>");
         return sb.toString();
     }
 
     private static long parseTimeout(@Nonnull HttpResponse response) {
         final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
-        if (TextUtils.isEmpty(timeout)) {
-            return DEFAULT_SUBSCRIPTION_TIMEOUT;
-        }
-        if (timeout.contains("infinite")) { // UPnP2.0でdeprecated扱い、有限な値にする。
+        if (TextUtils.isEmpty(timeout) || timeout.contains("infinite")) {
+            // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。
             return DEFAULT_SUBSCRIPTION_TIMEOUT;
         }
         final String prefix = "second-";
@@ -529,26 +518,35 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean subscribe(boolean keepRenew) throws IOException {
-        if (getSubscriptionId() != null) {
-            if (renewSubscribe()) {
+        if (TextUtils.isEmpty(mEventSubUrl)) {
+            return false;
+        }
+        if (!TextUtils.isEmpty(mSubscriptionId)) {
+            if (renewSubscribeInner()) {
                 mControlPoint.registerSubscribeService(this, keepRenew);
                 return true;
             }
             return false;
         }
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.SUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.NT, Http.UPNP_EVENT);
-        request.setHeader(Http.CALLBACK, getCallback());
-        request.setHeader(Http.TIMEOUT, "Second-300");
-        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return subscribeInner(keepRenew);
+    }
+
+    private boolean subscribeInner(boolean keepRenew) throws IOException {
         final HttpClient client = createHttpClient();
+        final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, "subscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
+        if (parseSubscribeResponse(response)) {
+            mControlPoint.registerSubscribeService(this, keepRenew);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean parseSubscribeResponse(@Nonnull HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
@@ -559,8 +557,19 @@ public class Service {
         mSubscriptionStart = System.currentTimeMillis();
         mSubscriptionTimeout = timeout;
         mSubscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
-        mControlPoint.registerSubscribeService(this, keepRenew);
         return true;
+    }
+
+    @Nonnull
+    private HttpRequest makeSubscribeRequest() throws IOException {
+        final HttpRequest request = new HttpRequest();
+        request.setMethod(Http.SUBSCRIBE);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.NT, Http.UPNP_EVENT);
+        request.setHeader(Http.CALLBACK, getCallback());
+        request.setHeader(Http.TIMEOUT, "Second-300");
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
     }
 
     /**
@@ -570,21 +579,28 @@ public class Service {
      * @throws IOException 通信エラー
      */
     boolean renewSubscribe() throws IOException {
-        if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
+        if (TextUtils.isEmpty(mEventSubUrl)) {
             return false;
         }
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.SUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, mSubscriptionId);
-        request.setHeader(Http.TIMEOUT, "Second-300");
-        request.setHeader(Http.CONTENT_LENGTH, "0");
+        if (TextUtils.isEmpty(mSubscriptionId)) {
+            return subscribeInner(false);
+        }
+        return renewSubscribeInner();
+    }
+
+    private boolean renewSubscribeInner() throws IOException {
         final HttpClient client = createHttpClient();
+        //noinspection ConstantConditions
+        final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
+        return parseRenewSubscribeResponse(response);
+    }
+
+    private boolean parseRenewSubscribeResponse(@Nonnull HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
@@ -597,6 +613,17 @@ public class Service {
         return true;
     }
 
+    @Nonnull
+    private HttpRequest makeRenewSubscribeRequest(@Nonnull String subscriptionId) throws IOException {
+        final HttpRequest request = new HttpRequest();
+        request.setMethod(Http.SUBSCRIBE);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.SID, subscriptionId);
+        request.setHeader(Http.TIMEOUT, "Second-300");
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
+    }
+
     /**
      * Unsubscribeを実行する
      *
@@ -607,12 +634,8 @@ public class Service {
         if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.UNSUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, mSubscriptionId);
-        request.setHeader(Http.CONTENT_LENGTH, "0");
-        final HttpClient client = new HttpClient(false);
+        final HttpClient client = createHttpClient();
+        final HttpRequest request = makeUnsubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w(TAG, "unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
@@ -624,6 +647,15 @@ public class Service {
         mSubscriptionTimeout = 0;
         mSubscriptionExpiryTime = 0;
         return true;
+    }
+
+    private HttpRequest makeUnsubscribeRequest(@Nonnull String subscriptionId) throws IOException {
+        final HttpRequest request = new HttpRequest();
+        request.setMethod(Http.UNSUBSCRIBE);
+        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.SID, subscriptionId);
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
     }
 
     /**

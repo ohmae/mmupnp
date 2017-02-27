@@ -41,12 +41,33 @@ public final class Http {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_TYPE_DEFAULT = "text/xml; charset=\"utf-8\"";
     public static final String USER_AGENT = "User-Agent";
+    /**
+     * Mandatory request
+     */
     public static final String MAN = "MAN";
+    /**
+     * Maximum wait time in seconds 1-5
+     */
     public static final String MX = "MX";
+    /**
+     * Notification Type
+     */
     public static final String NT = "NT";
+    /**
+     * Notification Sub Type ...ならNSTのような気が？
+     */
     public static final String NTS = "NTS";
+    /**
+     * Subscription Identifier
+     */
     public static final String SID = "SID";
+    /**
+     * Sequence number 32-bit unsigned
+     */
     public static final String SEQ = "SEQ";
+    /**
+     * Search Target
+     */
     public static final String ST = "ST";
     public static final String STATEVAR = "STATEVAR";
     public static final String ACCEPTED_STATEVAR = "ACCEPTED-STATEVAR";
@@ -54,6 +75,9 @@ public final class Http {
     public static final String DATE = "DATE";
     public static final String EXT = "EXT";
     public static final String LOCATION = "LOCATION";
+    /**
+     * Unique Service Name
+     */
     public static final String USN = "USN";
     public static final String BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG";
     public static final String CONFIGID_UPNP_ORG = "CONFIGID.UPNP.ORG";
@@ -67,6 +91,7 @@ public final class Http {
     public static final String UNSUBSCRIBE = "UNSUBSCRIBE";
     public static final String GET = "GET";
     public static final String POST = "POST";
+    public static final String NOTIFY = "NOTIFY";
 
     public static final int DEFAULT_PORT = 80;
 

@@ -458,15 +458,10 @@ public class Device {
     /**
      * URL情報を正規化して返す。
      *
-     * <p>"http://"から始まっていればそのまま利用する。
-     * "/"から始まっていればLocationホストの絶対パスとして
-     * Locationの"://"以降の最初の"/"までと結合する。
-     * それ以外の場合はLocationからの相対パスであり、
-     * Locationからクエリーを除去し、最後の"/"までと結合する。
-     *
      * @param url URLパス情報
      * @return 正規化したURL
      * @throws MalformedURLException 不正なURL
+     * @see #getAbsoluteUrl(String, String)
      */
     @Nonnull
     URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
@@ -476,11 +471,27 @@ public class Device {
     /**
      * URL情報を正規化して返す。
      *
-     * <p>"http://"から始まっていればそのまま利用する。
+     * <p>URLとして渡される情報は以下のバリエーションがある
+     * <ul>
+     * <li>"http://"から始まる完全なURL
+     * <li>"/"から始まる絶対パス
+     * <li>"/"以外から始まる相対パス
+     * </ul>
+     *
+     * <p>一方、Locationの情報としては以下のバリエーションを考慮する
+     * <ul>
+     * <li>"http://10.0.0.1:1000/" ホスト名のみ
+     * <li>"http://10.0.0.1:1000" ホスト名のみだが末尾の"/"がない。
+     * <li>"http://10.0.0.1:1000/hoge/fuga" ファイル名で終わる
+     * <li>"http://10.0.0.1:1000/hoge/fuga/" ディレクトリ名で終わる
+     * <li>"http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar" 上記に対してクエリーが付いている
+     * </ul>
+     *
+     * <p>URLが"http://"から始まっていればそのまま利用する。
      * "/"から始まっていればLocationホストの絶対パスとして
      * Locationの"://"以降の最初の"/"までと結合する。
      * それ以外の場合はLocationからの相対パスであり、
-     * Locationからクエリーを除去し、最後の"/"までと結合する。
+     * Locationから抽出したディレクトリ名と結合する。
      *
      * @param location SSDPパケットに記述されたLocation情報
      * @param url      URLパス情報
@@ -489,25 +500,41 @@ public class Device {
      */
     @Nonnull
     static URL getAbsoluteUrl(@Nonnull String location, @Nonnull String url) throws MalformedURLException {
-        if (url.startsWith("http://")) {
+        if (url.length() > 6 && url.substring(0, 7).equalsIgnoreCase("http://")) {
             return new URL(url);
         }
-        String baseUrl = location;
+        final String baseUrl = removeQuery(location);
         if (url.startsWith("/")) {
-            int pos = baseUrl.indexOf("://");
-            pos = baseUrl.indexOf("/", pos + 3);
-            return new URL(baseUrl.substring(0, pos) + url);
+            return new URL(jointAbsolutePath(baseUrl, url));
         }
-        int pos = baseUrl.indexOf("?");
+        return new URL(jointRelativePath(baseUrl, url));
+    }
+
+    private static String removeQuery(@Nonnull String url) {
+        final int pos = url.indexOf('?');
         if (pos > 0) {
-            baseUrl = baseUrl.substring(0, pos);
+            return url.substring(0, pos);
         }
+        return url;
+    }
+
+    private static String jointAbsolutePath(@Nonnull String baseUrl, @Nonnull String path) {
+        final int pos = baseUrl.indexOf('/', "http://".length());
+        if (pos < 0) {
+            return baseUrl + path;
+        }
+        return baseUrl.substring(0, pos) + path;
+    }
+
+    private static String jointRelativePath(@Nonnull String baseUrl, @Nonnull String path) {
         if (baseUrl.endsWith("/")) {
-            return new URL(baseUrl + url);
+            return baseUrl + path;
         }
-        pos = baseUrl.lastIndexOf("/");
-        baseUrl = baseUrl.substring(0, pos + 1);
-        return new URL(baseUrl + url);
+        final int pos = baseUrl.lastIndexOf('/');
+        if (pos > "http://".length()) {
+            return baseUrl.substring(0, pos + 1) + path;
+        }
+        return baseUrl + "/" + path;
     }
 
     /**
@@ -561,8 +588,9 @@ public class Device {
      *
      * @return Locationヘッダの値
      */
-    @Nullable
+    @Nonnull
     public String getLocation() {
+        //noinspection ConstantConditions : Deviceに設定される場合はnonnullであることが保証されている。
         return mSsdpMessage.getLocation();
     }
 

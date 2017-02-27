@@ -1,13 +1,7 @@
-
 package net.mm2d.upnp;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import net.mm2d.util.Log;
+import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
 
 import org.junit.Before;
@@ -27,6 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class ActionInvokeTest {
@@ -191,6 +191,7 @@ public class ActionInvokeTest {
         final Map<String, String> arg = new HashMap<>();
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
+
         mAction.invoke(arg);
         final HttpRequest request = mMockFactory.getHttpRequest();
 
@@ -207,6 +208,79 @@ public class ActionInvokeTest {
         assertThat(elements.get(1).getLocalName(), is(IN_ARG_NAME_2));
         assertThat(elements.get(1).getTextContent(), is(value2));
     }
+
+    @Test
+    public void invoke_リクエストSOAPの引数確認_カスタム引数指定NSなし() throws Exception {
+        final String value1 = "value1";
+        final String value2 = "value2";
+        final String name = "name";
+        final String value = "value";
+        mMockFactory.setResponse(mHttpResponse);
+        final Map<String, String> arg = new HashMap<>();
+        arg.put(IN_ARG_NAME_1, value1);
+        arg.put(IN_ARG_NAME_2, value2);
+        final List<StringPair> custom = new ArrayList<>();
+        custom.add(new StringPair(name, value));
+
+        mAction.invoke(arg, null, custom);
+        final HttpRequest request = mMockFactory.getHttpRequest();
+
+        final Document doc = XmlUtils.newDocument(true, request.getBody());
+        final Element envelope = doc.getDocumentElement();
+        final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
+        final Element action = XmlUtils.findChildElementByLocalName(body, ACTION_NAME);
+
+        final List<Element> elements = createChildElementList(action);
+        assertThat(elements.size(), is(3));
+        assertThat(elements.get(0).getLocalName(), is(IN_ARG_NAME_1));
+        assertThat(elements.get(0).getTextContent(), is(value1));
+
+        assertThat(elements.get(1).getLocalName(), is(IN_ARG_NAME_2));
+        assertThat(elements.get(1).getTextContent(), is(value2));
+
+        assertThat(elements.get(2).getLocalName(), is(name));
+        assertThat(elements.get(2).getTextContent(), is(value));
+    }
+
+    @Test
+    public void invoke_リクエストSOAPの引数確認_カスタム引数指定NSあり() throws Exception {
+        final String value1 = "value1";
+        final String value2 = "value2";
+        final String prefix = "custom";
+        final String urn = "urn:schemas-custom-com:custom";
+        final String name = "name";
+        final String value = "value";
+        mMockFactory.setResponse(mHttpResponse);
+        final Map<String, String> arg = new HashMap<>();
+        arg.put(IN_ARG_NAME_1, value1);
+        arg.put(IN_ARG_NAME_2, value2);
+
+        final List<StringPair> ns = new ArrayList<>();
+        ns.add(new StringPair(prefix, urn));
+
+        final List<StringPair> custom = new ArrayList<>();
+        custom.add(new StringPair(prefix + ":" + name, value));
+
+        mAction.invoke(arg, ns, custom);
+        final HttpRequest request = mMockFactory.getHttpRequest();
+
+        final Document doc = XmlUtils.newDocument(true, request.getBody());
+        final Element envelope = doc.getDocumentElement();
+        final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
+        final Element action = XmlUtils.findChildElementByLocalName(body, ACTION_NAME);
+
+        final List<Element> elements = createChildElementList(action);
+        assertThat(elements.size(), is(3));
+        assertThat(elements.get(0).getLocalName(), is(IN_ARG_NAME_1));
+        assertThat(elements.get(0).getTextContent(), is(value1));
+
+        assertThat(elements.get(1).getLocalName(), is(IN_ARG_NAME_2));
+        assertThat(elements.get(1).getTextContent(), is(value2));
+
+        assertThat(elements.get(2).getLocalName(), is(name));
+        assertThat(elements.get(2).getTextContent(), is(value));
+    }
+
 
     @Test
     public void invoke_200以外のレスポンスでIOExceptionが発生() throws Exception {
@@ -237,7 +311,7 @@ public class ActionInvokeTest {
     }
 
     @Test
-    public void invoke_argumentListにない結果が含まれていたら無視() throws Exception {
+    public void invoke_argumentListにない結果が含まれていても結果に含まれる() throws Exception {
         mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
                 + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" + "<s:Body>"
                 + "<u:" + ACTION_NAME + "Response xmlns:u=\"" + SERVICE_TYPE + "\">"
@@ -247,6 +321,6 @@ public class ActionInvokeTest {
         mMockFactory.setResponse(mHttpResponse);
         final Map<String, String> result = mAction.invoke(new HashMap<String, String>());
         assertThat(result.get(OUT_ARG_NAME1), is(OUT_ARG_VALUE1));
-        assertThat(result.containsKey(OUT_ARG_NAME2), is(false));
+        assertThat(result.containsKey(OUT_ARG_NAME2), is(true));
     }
 }

@@ -11,8 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.io.IOException;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -20,7 +18,7 @@ import static org.mockito.Mockito.*;
 @RunWith(JUnit4.class)
 public class SubscribeServiceTest {
     @Test
-    public void getService_Serviceが取得できる() {
+    public void getService_Serviceが取得できる() throws Exception {
         final Service service = mock(Service.class);
         final SubscribeService subscribeService = new SubscribeService(service, false);
 
@@ -28,7 +26,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void getNextScanTime_keepでないときserviceのgetSubscriptionExpiryTimeと等しい() {
+    public void getNextScanTime_keepでないときserviceのgetSubscriptionExpiryTimeと等しい() throws Exception {
         final long expiryTime = 10000L;
         final Service service = mock(Service.class);
         doReturn(expiryTime).when(service).getSubscriptionExpiryTime();
@@ -38,7 +36,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void getNextScanTime_keepである時serviceのgetSubscriptionStartとの差はgetSubscriptionTimeoutより小さい() {
+    public void getNextScanTime_keepである時serviceのgetSubscriptionStartとの差はgetSubscriptionTimeoutより小さい() throws Exception {
         final long start = 10000L;
         final long timeout = 1000L;
         final Service service = mock(Service.class);
@@ -52,7 +50,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void getNextScanTime_keepである時failしてもserviceのgetSubscriptionStartとの差はgetSubscriptionTimeoutより小さい() throws IOException {
+    public void getNextScanTime_keepである時failしてもserviceのgetSubscriptionStartとの差はgetSubscriptionTimeoutより小さい() throws Exception {
         final long start = 10000L;
         final long timeout = 1000L;
         final Service service = mock(Service.class);
@@ -69,7 +67,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void getNextScanTime_keepである時failCountが0のときより1のほうが大きな値になる() throws IOException {
+    public void getNextScanTime_keepである時failCountが0のときより1のほうが大きな値になる() throws Exception {
         final long start = 10000L;
         final long timeout = 1000L;
         final Service service = mock(Service.class);
@@ -86,7 +84,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void isFailed_2回連続失敗でtrue() throws IOException {
+    public void isFailed_2回連続失敗でtrue() throws Exception {
         final Service service = mock(Service.class);
         doReturn(0L).when(service).getSubscriptionTimeout();
         doReturn(0L).when(service).getSubscriptionStart();
@@ -103,7 +101,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void isFailed_連続しない2回失敗ではfalse() throws IOException {
+    public void isFailed_連続しない2回失敗ではfalse() throws Exception {
         final Service service = mock(Service.class);
         doReturn(0L).when(service).getSubscriptionTimeout();
         doReturn(0L).when(service).getSubscriptionStart();
@@ -125,7 +123,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void isExpired_期限が切れるとtrue() {
+    public void isExpired_期限が切れるとtrue() throws Exception {
         final long expiryTime = 10000L;
         final Service service = mock(Service.class);
         doReturn(expiryTime).when(service).getSubscriptionExpiryTime();
@@ -136,7 +134,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void renewSubscribe_keepがfalseならrenewSubscribeを呼ばない() throws IOException {
+    public void renewSubscribe_keepがfalseならrenewSubscribeを呼ばない() throws Exception {
         final long start = 10000L;
         final long timeout = 1000L;
         final Service service = mock(Service.class);
@@ -151,7 +149,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void renewSubscribe_keepがtrueでも時間の前ではrenewSubscribeを呼ばない() throws IOException {
+    public void renewSubscribe_keepがtrueでも時間の前ではrenewSubscribeを呼ばない() throws Exception {
         final long start = 10000L;
         final long timeout = 1000L;
         final Service service = mock(Service.class);
@@ -166,7 +164,7 @@ public class SubscribeServiceTest {
     }
 
     @Test
-    public void renewSubscribe_keepがtrueで時間を過ぎていたらrenewSubscribeを呼ぶ() throws IOException {
+    public void renewSubscribe_keepがtrueで時間を過ぎていたらrenewSubscribeを呼ぶ() throws Exception {
         final long start = 10000L;
         final long timeout = 1000L;
         final Service service = mock(Service.class);
@@ -178,5 +176,22 @@ public class SubscribeServiceTest {
         final long time = subscribeService.getNextScanTime();
         assertThat(subscribeService.renewSubscribe(time), is(true));
         verify(service, times(1)).renewSubscribe();
+    }
+
+    @Test
+    public void hashCode_Serviceと同一() throws Exception {
+        final Service service = mock(Service.class);
+        final SubscribeService subscribeService = new SubscribeService(service, false);
+
+        assertThat(subscribeService.hashCode(), is(service.hashCode()));
+    }
+
+    @Test
+    public void equals_Serviceが同一であれば真() throws Exception {
+        final Service service = mock(Service.class);
+        final SubscribeService subscribeService1 = new SubscribeService(service, false);
+        final SubscribeService subscribeService2 = new SubscribeService(service, false);
+
+        assertThat(subscribeService1.equals(subscribeService2), is(true));
     }
 }

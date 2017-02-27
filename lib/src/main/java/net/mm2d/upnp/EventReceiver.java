@@ -9,7 +9,7 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.IoUtils;
 import net.mm2d.util.Log;
-import net.mm2d.util.Pair;
+import net.mm2d.util.StringPair;
 import net.mm2d.util.TextParseUtils;
 import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
@@ -46,7 +46,7 @@ class EventReceiver {
     /**
      * イベントデータの受信を受け取るリスナー。
      */
-    public interface EventMessageListener {
+    interface EventMessageListener {
         /**
          * イベント受信時にコール。
          *
@@ -55,7 +55,7 @@ class EventReceiver {
          * @param properties プロパティ
          * @return HTTPメッセージが正常であればtrue
          */
-        boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<Pair<String, String>> properties);
+        boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties);
     }
 
     private ServerSocket mServerSocket;
@@ -65,7 +65,7 @@ class EventReceiver {
     /**
      * インスタンス作成。
      */
-    public EventReceiver() {
+    EventReceiver() {
     }
 
     /**
@@ -73,7 +73,7 @@ class EventReceiver {
      *
      * @param listener リスナー
      */
-    public void setEventMessageListener(@Nullable EventMessageListener listener) {
+    void setEventMessageListener(@Nullable EventMessageListener listener) {
         mListener = listener;
         if (mServerTask != null) {
             mServerTask.setEventMessageListener(listener);
@@ -85,11 +85,16 @@ class EventReceiver {
      *
      * @throws IOException ソケットの作成に失敗
      */
-    public void open() throws IOException {
-        mServerSocket = new ServerSocket(0);
+    void open() throws IOException {
+        mServerSocket = createServerSocket();
         mServerTask = new ServerTask(mServerSocket);
         mServerTask.setEventMessageListener(mListener);
         mServerTask.start();
+    }
+
+    // VisibleForTesting
+    ServerSocket createServerSocket() throws IOException {
+        return new ServerSocket(0);
     }
 
     /**
@@ -97,43 +102,51 @@ class EventReceiver {
      *
      * @return サーバソケットのポート番号
      */
-    public int getLocalPort() {
+    int getLocalPort() {
         return mServerSocket.getLocalPort();
     }
 
     /**
      * 受信スレッドを終了させる。
      */
-    public void close() {
+    void close() {
         mServerTask.shutdownRequest();
         mServerTask = null;
     }
 
     @Nonnull
-    private static List<Pair<String, String>> parsePropertyPairs(@Nonnull HttpRequest request) {
+    private static List<StringPair> parsePropertyPairs(@Nonnull HttpRequest request) {
         final String xml = request.getBody();
         if (TextUtils.isEmpty(xml)) {
             return Collections.emptyList();
         }
         try {
             final Document doc = XmlUtils.newDocument(true, xml);
-            final Node propertyNode = XmlUtils.findChildElementByLocalName(
-                    doc.getDocumentElement(), "property");
-            if (propertyNode == null) {
+            final Node propertySetNode = doc.getDocumentElement();
+            if (!propertySetNode.getLocalName().equals("propertyset")) {
                 return Collections.emptyList();
             }
-            final List<Pair<String, String>> list = new ArrayList<>();
-            Node node = propertyNode.getFirstChild();
-            for (; node != null; node = node.getNextSibling()) {
-                if (node.getNodeType() != Node.ELEMENT_NODE) {
+            final List<StringPair> list = new ArrayList<>();
+            Node propertyNode = propertySetNode.getFirstChild();
+            for (; propertyNode != null; propertyNode = propertyNode.getNextSibling()) {
+                if (propertyNode.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
                 }
-                final String name = node.getLocalName();
-                final String value = node.getTextContent();
-                if (TextUtils.isEmpty(name) || TextUtils.isEmpty(value)) {
+                if (!propertyNode.getLocalName().equals("property")) {
                     continue;
                 }
-                list.add(new Pair<>(name, value));
+                Node node = propertyNode.getFirstChild();
+                for (; node != null; node = node.getNextSibling()) {
+                    if (node.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+                    final String name = node.getLocalName();
+                    final String value = node.getTextContent();
+                    if (TextUtils.isEmpty(name)) {
+                        continue;
+                    }
+                    list.add(new StringPair(name, value));
+                }
             }
             return list;
         } catch (IOException | SAXException | ParserConfigurationException ignored) {
@@ -203,7 +216,7 @@ class EventReceiver {
          *
          * @param listener リスナー
          */
-        void setEventMessageListener(@Nullable EventMessageListener listener) {
+        synchronized void setEventMessageListener(@Nullable EventMessageListener listener) {
             mListener = listener;
         }
 
@@ -214,11 +227,11 @@ class EventReceiver {
          * @param request 受信したHTTPメッセージ
          * @return HTTPメッセージが正常であればtrue
          */
-        private boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
+        private synchronized boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
             if (mListener == null) {
                 return false;
             }
-            List<Pair<String, String>> list = parsePropertyPairs(request);
+            List<StringPair> list = parsePropertyPairs(request);
             if (list.isEmpty()) {
                 return false;
             }

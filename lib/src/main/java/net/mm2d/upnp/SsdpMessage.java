@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * SSDPメッセージを表現するクラス。
+ * SSDP(Simple Service Discovery Protocol)メッセージを表現するクラス。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -62,9 +62,9 @@ public abstract class SsdpMessage {
     @Nonnull
     private final String mType;
     @Nullable
-    private final String mNts;
+    private String mNts;
     @Nullable
-    private final String mLocation;
+    private String mLocation;
     @Nullable
     private final InterfaceAddress mInterfaceAddress;
 
@@ -98,7 +98,7 @@ public abstract class SsdpMessage {
         mUuid = "";
         mType = "";
         mNts = "";
-        mLocation = "";
+        mLocation = null;
         mInterfaceAddress = null;
     }
 
@@ -120,6 +120,10 @@ public abstract class SsdpMessage {
         mUuid = result[0];
         mType = result[1];
         mExpireTime = TimeUnit.SECONDS.toMillis(mMaxAge) + System.currentTimeMillis();
+        updateHeader();
+    }
+
+    void updateHeader() {
         mLocation = mMessage.getHeader(Http.LOCATION);
         mNts = mMessage.getHeader(Http.NTS);
     }
@@ -141,30 +145,26 @@ public abstract class SsdpMessage {
     }
 
     @Nonnull
-    private static String[] parseUsn(@Nonnull HttpMessage message) throws IOException {
+    private static String[] parseUsn(@Nonnull HttpMessage message) {
         final String usn = message.getHeader(Http.USN);
         if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
-            throw new IOException("");
+            return new String[]{"", ""};
         }
         final int pos = usn.indexOf("::");
         if (pos < 0) {
-            return new String[]{
-                    usn, ""
-            };
+            return new String[]{usn, ""};
         }
-        return new String[]{
-                usn.substring(0, pos), usn.substring(pos + 2)
-        };
+        return new String[]{usn.substring(0, pos), usn.substring(pos + 2)};
     }
 
     /**
-     * Locationに記述のアドレスとパケットの送信元アドレスに不一致がないか検査する
+     * Locationに正常なURLが記述されており、記述のアドレスとパケットの送信元アドレスに不一致がないか検査する。
      *
      * @param sourceAddress 送信元アドレス
-     * @return Locationに問題がある場合true
+     * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
      */
     public boolean hasInvalidLocation(@Nonnull InetAddress sourceAddress) {
-        if (TextUtils.isEmpty(mLocation)) {
+        if (!isHttpUrl(mLocation)) {
             return true;
         }
         try {
@@ -173,6 +173,11 @@ public abstract class SsdpMessage {
         } catch (MalformedURLException | UnknownHostException ignored) {
         }
         return true;
+    }
+
+    private static boolean isHttpUrl(String url) {
+        return url != null && url.length() > 6
+                && url.substring(0, 7).equalsIgnoreCase("http://");
     }
 
     /**

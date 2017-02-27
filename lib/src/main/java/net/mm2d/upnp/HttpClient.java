@@ -8,6 +8,8 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.IoUtils;
+import net.mm2d.util.Log;
+import net.mm2d.util.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,6 +37,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpClient {
+    private static final String TAG = HttpClient.class.getSimpleName();
     private static final int REDIRECT_MAX = 2;
     private Socket mSocket;
     private boolean mKeepAlive;
@@ -114,44 +117,62 @@ public class HttpClient {
      */
     @Nonnull
     private HttpResponse post(@Nonnull HttpRequest request, int redirectDepth) throws IOException {
-        if (!isClosed() && !canReuse(request)) {
-            closeSocket();
-        }
+        confirmReuseSocket(request);
+        final HttpResponse response;
         try {
-            if (isClosed()) {
-                openSocket(request);
-                request.writeData(mOutputStream);
-            } else {
-                try {
-                    request.writeData(mOutputStream);
-                } catch (final IOException e) {
-                    // コネクションを再利用した場合は
-                    // peerから既に切断されていた可能性があるためリトライを行う
-                    closeSocket();
-                    openSocket(request);
-                    request.writeData(mOutputStream);
-                }
-            }
-            final HttpResponse response = new HttpResponse(mSocket);
+            writeData(request);
+            response = new HttpResponse(mSocket);
             response.readData(mInputStream);
-            if (!isKeepAlive() || !response.isKeepAlive()) {
-                closeSocket();
-            }
-            if (redirectDepth < REDIRECT_MAX
-                    && isRedirection(response.getStatus())) {
-                String location = response.getHeader(Http.LOCATION);
-                if (location != null) {
-                    return redirect(request, location, redirectDepth);
-                }
-            }
-            return response;
         } catch (final IOException e) {
             closeSocket();
             throw e;
         }
+        if (!isKeepAlive() || !response.isKeepAlive()) {
+            closeSocket();
+        }
+        return redirectIfNeed(request, response, redirectDepth);
     }
 
-    private static boolean isRedirection(Http.Status status) {
+    private void confirmReuseSocket(@Nonnull HttpRequest request) {
+        if (!isClosed() && !canReuse(request)) {
+            closeSocket();
+        }
+    }
+
+    private void writeData(@Nonnull HttpRequest request) throws IOException {
+        if (isClosed()) {
+            openSocket(request);
+            request.writeData(mOutputStream);
+        } else {
+            try {
+                request.writeData(mOutputStream);
+            } catch (final IOException e) {
+                // コネクションを再利用した場合はpeerから既に切断されていた可能性があるためリトライを行う
+                closeSocket();
+                openSocket(request);
+                request.writeData(mOutputStream);
+            }
+        }
+    }
+
+    @Nonnull
+    private HttpResponse redirectIfNeed(
+            @Nonnull HttpRequest request, @Nonnull HttpResponse response, int redirectDepth)
+            throws IOException {
+        if (isRedirection(response) && redirectDepth < REDIRECT_MAX) {
+            final String location = response.getHeader(Http.LOCATION);
+            if (location != null) {
+                return redirect(request, location, redirectDepth);
+            }
+        }
+        return response;
+    }
+
+    private static boolean isRedirection(@Nonnull HttpResponse response) {
+        final Http.Status status = response.getStatus();
+        if (status == null) {
+            return false;
+        }
         switch (status) {
             case HTTP_MOVED_PERM:
             case HTTP_FOUND:
@@ -164,9 +185,10 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirect(@Nonnull HttpRequest request, @Nonnull String location, int redirectDepth)
+    private HttpResponse redirect(
+            @Nonnull HttpRequest request, @Nonnull String location, int redirectDepth)
             throws IOException {
-        HttpRequest newRequest = new HttpRequest(request);
+        final HttpRequest newRequest = new HttpRequest(request);
         newRequest.setUrl(new URL(location), true);
         newRequest.setHeader(Http.CONNECTION, Http.CLOSE);
         return new HttpClient(false).post(newRequest, redirectDepth + 1);
@@ -204,5 +226,65 @@ public class HttpClient {
      */
     public void close() {
         closeSocket();
+    }
+
+    /**
+     * 単純なHTTP GETにより文字列を取得する。
+     *
+     * @param url 取得先URL
+     * @return 取得できた文字列
+     * @throws IOException 取得に問題があった場合
+     */
+    @Nonnull
+    public String downloadString(@Nonnull URL url) throws IOException {
+        final String body = download(url).getBody();
+        if (body == null) {
+            throw new IOException("body is null");
+        }
+        return body;
+    }
+
+    /**
+     * 単純なHTTP GETによりバイナリを取得する。
+     *
+     * @param url 取得先URL
+     * @return 取得できたバイナリ
+     * @throws IOException 取得に問題があった場合
+     */
+    @Nonnull
+    public byte[] downloadBinary(@Nonnull URL url) throws IOException {
+        final byte[] body = download(url).getBodyBinary();
+        if (body == null) {
+            throw new IOException("body is null");
+        }
+        return body;
+    }
+
+    /**
+     * 単純なHTTP GETを実行する。
+     *
+     * @param url 取得先URL
+     * @return HTTPレスポンス
+     * @throws IOException 取得に問題があった場合
+     */
+    @Nonnull
+    public HttpResponse download(@Nonnull URL url) throws IOException {
+        final HttpRequest request = makeHttpRequest(url);
+        final HttpResponse response = post(request);
+        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
+            Log.i(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
+            throw new IOException(response.getStartLine());
+        }
+        return response;
+    }
+
+    @Nonnull
+    private static HttpRequest makeHttpRequest(@Nonnull URL url) throws IOException {
+        final HttpRequest request = new HttpRequest();
+        request.setMethod(Http.GET);
+        request.setUrl(url, true);
+        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
+        return request;
     }
 }

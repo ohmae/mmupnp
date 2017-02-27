@@ -7,15 +7,25 @@
 
 package net.mm2d.util;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import net.mm2d.util.Log.Print;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import javax.annotation.Nullable;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class LogTest {
@@ -227,6 +237,49 @@ public class LogTest {
 
     @Test
     public void v_Tagがnullでも問題ない() {
-        Log.e(null, "");
+        Log.setPrint(Log.DEFAULT_PRINT);
+        Log.v(null, "");
+    }
+
+    @Test
+    public void println_ログレベルの文字列が含まれる() {
+        Log.setPrint(Log.DEFAULT_PRINT);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream defaultOut = System.out;
+        System.setOut(new PrintStream(baos));
+
+        Log.v("tag", "message");
+        assertThat(new String(baos.toByteArray()), containsString(" V "));
+        baos.reset();
+
+        Log.d("tag", "message");
+        assertThat(new String(baos.toByteArray()), containsString(" D "));
+        baos.reset();
+
+        Log.i("tag", "message");
+        assertThat(new String(baos.toByteArray()), containsString(" I "));
+        baos.reset();
+
+        Log.w("tag", "message");
+        assertThat(new String(baos.toByteArray()), containsString(" W "));
+        baos.reset();
+
+        Log.e("tag", "message");
+        assertThat(new String(baos.toByteArray()), containsString(" E "));
+        baos.reset();
+
+        System.setOut(defaultOut);
+    }
+
+    @Test
+    public void print() {
+        final Print print = new Print() {
+            @Override
+            public void println(int level, @Nullable String tag, @Nullable String message) {
+
+            }
+        };
+        Log.setPrint(print);
+        Log.v(null, "");
     }
 }

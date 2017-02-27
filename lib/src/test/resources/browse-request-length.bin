@@ -1,0 +1,21 @@
+POST /cds/control HTTP/1.1
+HOST: 192.0.2.2:12345
+SOAPACTION: "urn:schemas-upnp-org:service:ContentDirectory:1#Browse"
+User-Agent: Windows/10.0 UPnP/1.0 mmupnp/1.0
+Connection: close
+Content-Type: text/xml; charset="utf-8"
+Content-Length: 545
+
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+    <s:Body>
+        <u:Browse xmlns:u="urn:schemas-upnp-org:service:ContentDirectory:1">
+            <ObjectID>0</ObjectID>
+            <BrowseFlag>BrowseDirectChildren</BrowseFlag>
+            <Filter>*</Filter>
+            <StartingIndex>0</StartingIndex>
+            <RequestedCount>0</RequestedCount>
+            <SortCriteria/>
+        </u:Browse>
+    </s:Body>
+</s:Envelope>

@@ -72,6 +72,18 @@ public class HttpHeaderTest {
     }
 
     @Test
+    public void get_大文字小文字に関係なく上書きできる() {
+        final String name1 = "name1";
+        final String value1 = "value1";
+        final String value2 = "value2";
+        final HttpHeader header = new HttpHeader();
+        header.put(name1, value1);
+        header.put(name1.toUpperCase(), value2);
+
+        assertThat(header.get(name1), is(value2));
+    }
+
+    @Test
     public void remove_大文字小文字関係なく削除できる() {
         final String name1 = "name1";
         final String name2 = "name2";
@@ -158,5 +170,6 @@ public class HttpHeaderTest {
 
         header2.put(name2, value1);
         assertThat(header1.get(name2), is(value2));
+        assertThat(header2.get(name2), is(value1));
     }
 }

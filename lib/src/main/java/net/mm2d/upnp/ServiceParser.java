@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
@@ -36,13 +35,6 @@ class ServiceParser {
     private static final String TAG = ServiceParser.class.getSimpleName();
 
     /**
-     * インスタンス化禁止
-     */
-    private ServiceParser() {
-        throw new AssertionError();
-    }
-
-    /**
      * SCPDURLからDescriptionを取得し、パースする。
      *
      * <p>可能であればKeepAliveを行う。
@@ -59,17 +51,7 @@ class ServiceParser {
                                 @Nonnull Service.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         final URL url = Device.getAbsoluteUrl(location, builder.getScpdUrl());
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.GET);
-        request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-        final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
-            Log.i(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
-            throw new IOException(response.getStartLine());
-        }
-        final String description = response.getBody();
+        final String description = client.downloadString(url);
         builder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
         builder.setActionBuilderList(parseActionList(doc.getElementsByTagName("action")));
@@ -131,22 +113,26 @@ class ServiceParser {
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
-            final String text = node.getTextContent();
-            switch (tag) {
-                case "name":
-                    builder.setName(text);
-                    break;
-                case "direction":
-                    builder.setDirection(text);
-                    break;
-                case "relatedStateVariable":
-                    builder.setRelatedStateVariableName(text);
-                    break;
-                default:
-                    break;
-            }
+            final String value = node.getTextContent();
+            setField(builder, tag, value);
         }
         return builder;
+    }
+
+    private static void setField(@Nonnull Argument.Builder builder, @Nonnull String tag, @Nonnull String value) {
+        switch (tag) {
+            case "name":
+                builder.setName(value);
+                break;
+            case "direction":
+                builder.setDirection(value);
+                break;
+            case "relatedStateVariable":
+                builder.setRelatedStateVariableName(value);
+                break;
+            default:
+                break;
+        }
     }
 
     @Nonnull
@@ -210,20 +196,24 @@ class ServiceParser {
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
-            final String text = node.getTextContent();
-            switch (tag) {
-                case "step":
-                    builder.setStep(text);
-                    break;
-                case "minimum":
-                    builder.setMinimum(text);
-                    break;
-                case "maximum":
-                    builder.setMaximum(text);
-                    break;
-                default:
-                    break;
-            }
+            final String value = node.getTextContent();
+            setField(builder, tag, value);
+        }
+    }
+
+    private static void setField(@Nonnull StateVariable.Builder builder, @Nonnull String tag, @Nonnull String value) {
+        switch (tag) {
+            case "step":
+                builder.setStep(value);
+                break;
+            case "minimum":
+                builder.setMinimum(value);
+                break;
+            case "maximum":
+                builder.setMaximum(value);
+                break;
+            default:
+                break;
         }
     }
 }

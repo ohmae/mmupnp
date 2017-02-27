@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
-
 import java.io.IOException;
 import java.net.URL;
 
@@ -21,8 +19,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Icon {
-    private static final String TAG = Icon.class.getSimpleName();
-
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
@@ -35,7 +31,6 @@ public class Icon {
         private int mWidth;
         private int mDepth;
         private String mUrl;
-        private byte[] mBinary;
 
         /**
          * インスタンス作成
@@ -128,22 +123,6 @@ public class Icon {
         }
 
         /**
-         * バイナリデータを登録する。
-         *
-         * <p>DeviceDescriptionからの読み込みの場合、
-         * Iconのインスタンスを作成した後読み込みを実行するため。
-         * このメソッドは使用しない。
-         *
-         * @param binary バイナリ
-         * @return Builder
-         */
-        @Nonnull
-        public Builder setBinary(@Nullable byte[] binary) {
-            mBinary = binary;
-            return this;
-        }
-
-        /**
          * Iconのインスタンスを作成する。
          *
          * @return Iconのインスタンス
@@ -197,7 +176,6 @@ public class Icon {
         mWidth = builder.mWidth;
         mDepth = builder.mDepth;
         mUrl = builder.mUrl;
-        mBinary = builder.mBinary;
     }
 
     /**
@@ -278,17 +256,7 @@ public class Icon {
      */
     public void loadBinary(@Nonnull HttpClient client) throws IOException {
         final URL url = mDevice.getAbsoluteUrl(mUrl);
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.GET);
-        request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-        final HttpResponse response = client.post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.i(TAG, response.toString());
-            throw new IOException(response.getStartLine());
-        }
-        mBinary = response.getBodyBinary();
+        mBinary = client.downloadBinary(url);
     }
 
     /**

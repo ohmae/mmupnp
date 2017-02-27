@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2017 大前良介(OHMAE Ryosuke)
+ * Copyright(C)  2017 大前良介(OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
@@ -68,5 +68,21 @@ public class PairTest {
         final Pair<String, String> pair1 = new Pair<>("1", "2");
 
         assertThat(pair1.equals(null), is(false));
+    }
+
+    @Test
+    public void hashCode_equalsが真なら同一() {
+        final Pair<String, String> pair1 = new Pair<>("1", "2");
+        final Pair<String, String> pair2 = new Pair<>("1", "2");
+
+        assertThat(pair1.hashCode(), is(pair2.hashCode()));
+    }
+
+    @Test
+    public void toString_両方の値が含まれる() {
+        final Pair<String, String> pair1 = new Pair<>("1", "2");
+
+        assertThat(pair1.toString(), containsString("1"));
+        assertThat(pair1.toString(), containsString("2"));
     }
 }
