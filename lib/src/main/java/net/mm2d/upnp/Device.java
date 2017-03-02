@@ -94,7 +94,7 @@ public class Device {
          * @param ssdpMessage SSDPパケット
          * @return Builder
          */
-        public Builder setSsdpMessage(@Nonnull SsdpMessage ssdpMessage) {
+        public Builder updateSsdpMessage(@Nonnull SsdpMessage ssdpMessage) {
             mSsdpMessage = ssdpMessage;
             return this;
         }
@@ -418,7 +418,7 @@ public class Device {
      *
      * @param message SSDPパケット
      */
-    void setSsdpMessage(@Nonnull SsdpMessage message) {
+    void updateSsdpMessage(@Nonnull SsdpMessage message) {
         final String uuid = message.getUuid();
         if (!getUdn().equals(uuid)) {
             throw new IllegalArgumentException("uuid and udn does not match! uuid=" + uuid + " udn=" + mUdn);

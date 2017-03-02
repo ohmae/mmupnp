@@ -103,9 +103,9 @@ public class ControlPoint {
     @Nonnull
     private IconFilter mIconFilter = IconFilter.NONE;
     @Nonnull
-    private final List<DiscoveryListener> mDiscoveryListeners;
+    private final DiscoveryListenerList mDiscoveryListenerList;
     @Nonnull
-    private final List<NotifyEventListener> mNotifyEventListeners;
+    private final NotifyEventListenerList mNotifyEventListenerList;
     @Nonnull
     private final Collection<SsdpSearchServer> mSearchList;
     @Nonnull
@@ -148,14 +148,12 @@ public class ControlPoint {
             final Device device = mDeviceHolder.get(uuid);
             if (device == null) {
                 if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
-                    if (mLoadingDeviceMap.get(uuid) != null) {
-                        mLoadingDeviceMap.remove(uuid);
-                    }
+                    mLoadingDeviceMap.remove(uuid);
                     return;
                 }
                 Device.Builder deviceBuilder = mLoadingDeviceMap.get(uuid);
                 if (deviceBuilder != null) {
-                    deviceBuilder.setSsdpMessage(message);
+                    deviceBuilder.updateSsdpMessage(message);
                 } else {
                     deviceBuilder = new Device.Builder(ControlPoint.this, message);
                     mLoadingDeviceMap.put(message.getUuid(), deviceBuilder);
@@ -167,7 +165,7 @@ public class ControlPoint {
                 if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
                     lostDevice(device);
                 } else {
-                    device.setSsdpMessage(message);
+                    device.updateSsdpMessage(message);
                 }
             }
         }
@@ -228,11 +226,7 @@ public class ControlPoint {
                 Log.w(TAG, "illegal notify argument:" + name + " " + value);
                 return;
             }
-            synchronized (mNotifyEventListeners) {
-                for (final NotifyEventListener l : mNotifyEventListeners) {
-                    l.onNotifyEvent(mService, mSeq, variable.getName(), value);
-                }
-            }
+            mNotifyEventListenerList.onNotifyEvent(mService, mSeq, variable.getName(), value);
         }
     }
 
@@ -286,8 +280,8 @@ public class ControlPoint {
             }
         });
         mLoadingDeviceMap = new HashMap<>();
-        mDiscoveryListeners = new ArrayList<>();
-        mNotifyEventListeners = new ArrayList<>();
+        mDiscoveryListenerList = new DiscoveryListenerList();
+        mNotifyEventListenerList = new NotifyEventListenerList();
         mNotifyExecutor = Executors.newSingleThreadExecutor();
         mCachedThreadPool = Executors.newCachedThreadPool();
         mDeviceHolder = new DeviceHolder(this);
@@ -510,7 +504,7 @@ public class ControlPoint {
      *
      * @param st SearchパケットのSTフィールド
      */
-    public void search(@Nullable String st) {
+    public void search(final @Nullable String st) {
         if (!mStarted) {
             throw new IllegalStateException("ControlPoint is not started.");
         }
@@ -526,7 +520,7 @@ public class ControlPoint {
      * @see IconFilter#NONE
      * @see IconFilter#ALL
      */
-    public void setIconFilter(@Nonnull IconFilter filter) {
+    public void setIconFilter(final @Nonnull IconFilter filter) {
         mIconFilter = filter;
     }
 
@@ -536,12 +530,8 @@ public class ControlPoint {
      * @param listener リスナー
      * @see DiscoveryListener
      */
-    public void addDiscoveryListener(@Nonnull DiscoveryListener listener) {
-        synchronized (mDiscoveryListeners) {
-            if (!mDiscoveryListeners.contains(listener)) {
-                mDiscoveryListeners.add(listener);
-            }
-        }
+    public void addDiscoveryListener(final @Nonnull DiscoveryListener listener) {
+        mDiscoveryListenerList.add(listener);
     }
 
     /**
@@ -550,10 +540,8 @@ public class ControlPoint {
      * @param listener リスナー
      * @see DiscoveryListener
      */
-    public void removeDiscoveryListener(@Nonnull DiscoveryListener listener) {
-        synchronized (mDiscoveryListeners) {
-            mDiscoveryListeners.remove(listener);
-        }
+    public void removeDiscoveryListener(final @Nonnull DiscoveryListener listener) {
+        mDiscoveryListenerList.remove(listener);
     }
 
     /**
@@ -562,12 +550,8 @@ public class ControlPoint {
      * @param listener リスナー
      * @see NotifyEventListener
      */
-    public void addNotifyEventListener(@Nonnull NotifyEventListener listener) {
-        synchronized (mNotifyEventListeners) {
-            if (!mNotifyEventListeners.contains(listener)) {
-                mNotifyEventListeners.add(listener);
-            }
-        }
+    public void addNotifyEventListener(final @Nonnull NotifyEventListener listener) {
+        mNotifyEventListenerList.add(listener);
     }
 
     /**
@@ -576,10 +560,8 @@ public class ControlPoint {
      * @param listener リスナー
      * @see NotifyEventListener
      */
-    public void removeNotifyEventListener(@Nonnull NotifyEventListener listener) {
-        synchronized (mNotifyEventListeners) {
-            mNotifyEventListeners.remove(listener);
-        }
+    public void removeNotifyEventListener(final @Nonnull NotifyEventListener listener) {
+        mNotifyEventListenerList.remove(listener);
     }
 
     private void discoverDevice(final @Nonnull Device device) {
@@ -589,16 +571,12 @@ public class ControlPoint {
         executeInSequential(new Runnable() {
             @Override
             public void run() {
-                synchronized (mDiscoveryListeners) {
-                    for (final DiscoveryListener l : mDiscoveryListeners) {
-                        l.onDiscover(device);
-                    }
-                }
+                mDiscoveryListenerList.onDiscover(device);
             }
         });
     }
 
-    void lostDevice(@Nonnull Device device) {
+    void lostDevice(final @Nonnull Device device) {
         lostDevice(device, true);
     }
 
@@ -627,11 +605,7 @@ public class ControlPoint {
         executeInSequential(new Runnable() {
             @Override
             public void run() {
-                synchronized (mDiscoveryListeners) {
-                    for (final DiscoveryListener l : mDiscoveryListeners) {
-                        l.onLost(device);
-                    }
-                }
+                mDiscoveryListenerList.onLost(device);
             }
         });
     }

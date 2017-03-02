@@ -85,7 +85,7 @@ public class DeviceTest {
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getSsdpMessage(), is(message));
     }
@@ -117,7 +117,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -136,7 +136,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -155,7 +155,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -174,7 +174,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga/");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -193,7 +193,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
