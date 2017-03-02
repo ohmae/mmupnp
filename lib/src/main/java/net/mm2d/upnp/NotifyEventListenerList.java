@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class NotifyEventListenerList  implements NotifyEventListener {
+class NotifyEventListenerList implements NotifyEventListener {
     private final List<NotifyEventListener> mList = new ArrayList<>();
 
     synchronized void add(final @Nonnull NotifyEventListener l) {

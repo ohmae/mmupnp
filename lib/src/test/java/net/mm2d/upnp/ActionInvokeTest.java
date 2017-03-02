@@ -1,7 +1,6 @@
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
-import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
 
 import org.junit.Before;
@@ -16,6 +15,7 @@ import org.w3c.dom.NodeList;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,10 +219,8 @@ public class ActionInvokeTest {
         final Map<String, String> arg = new HashMap<>();
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
-        final List<StringPair> custom = new ArrayList<>();
-        custom.add(new StringPair(name, value));
 
-        mAction.invoke(arg, null, custom);
+        mAction.invoke(arg, null, Collections.singletonMap(name, value));
         final HttpRequest request = mMockFactory.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -255,13 +253,9 @@ public class ActionInvokeTest {
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
-        final List<StringPair> ns = new ArrayList<>();
-        ns.add(new StringPair(prefix, urn));
-
-        final List<StringPair> custom = new ArrayList<>();
-        custom.add(new StringPair(prefix + ":" + name, value));
-
-        mAction.invoke(arg, ns, custom);
+        mAction.invoke(arg,
+                Collections.singletonMap(prefix, urn),
+                Collections.singletonMap(prefix + ":" + name, value));
         final HttpRequest request = mMockFactory.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());

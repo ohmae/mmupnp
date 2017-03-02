@@ -292,11 +292,11 @@ public class Action {
      */
     @Nonnull
     public Map<String, String> invoke(@Nonnull Map<String, String> argumentValues,
-                                      @Nullable List<StringPair> customNamespace,
-                                      @Nonnull List<StringPair> customArguments)
+                                      @Nullable Map<String, String> customNamespace,
+                                      @Nonnull Map<String, String> customArguments)
             throws IOException {
         final List<StringPair> arguments = makeArguments(argumentValues);
-        arguments.addAll(customArguments);
+        appendArgument(arguments, customArguments);
         final String soap = makeSoap(customNamespace, arguments);
         return invokeInner(soap);
     }
@@ -318,6 +318,18 @@ public class Action {
             list.add(new StringPair(argument.getName(), selectArgumentValue(argument, argumentValues)));
         }
         return list;
+    }
+
+    /**
+     * StringPairのリストに変換した引数にカスタム引数を追加する。
+     *
+     * @param base      引数の追加先
+     * @param arguments 追加するカスタム引数
+     */
+    private void appendArgument(@Nonnull List<StringPair> base, @Nonnull Map<String, String> arguments) {
+        for (final Entry<String, String> entry : arguments.entrySet()) {
+            base.add(new StringPair(entry.getKey(), entry.getValue()));
+        }
     }
 
     /**
@@ -393,7 +405,8 @@ public class Action {
      * @throws IOException 通信で問題が発生した場合
      */
     @Nonnull
-    private String makeSoap(@Nullable List<StringPair> namespaces, @Nonnull List<StringPair> arguments) throws IOException {
+    private String makeSoap(@Nullable Map<String, String> namespaces, @Nonnull List<StringPair> arguments)
+            throws IOException {
         try {
             final Document document = XmlUtils.newDocument(true);
             final Element action = makeUpToActionElement(document);
@@ -408,12 +421,12 @@ public class Action {
         }
     }
 
-    private static void setNamespace(@Nonnull Element action, @Nullable List<StringPair> namespace) {
+    private static void setNamespace(@Nonnull Element action, @Nullable Map<String, String> namespace) {
         if (namespace == null) {
             return;
         }
-        for (StringPair pair : namespace) {
-            action.setAttributeNS(XMLNS_URI, XMLNS_PREFIX + pair.getKey(), pair.getValue());
+        for (Entry<String, String> entry : namespace.entrySet()) {
+            action.setAttributeNS(XMLNS_URI, XMLNS_PREFIX + entry.getKey(), entry.getValue());
         }
     }
 

@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class DiscoveryListenerList  implements DiscoveryListener {
+class DiscoveryListenerList implements DiscoveryListener {
     private final List<DiscoveryListener> mList = new ArrayList<>();
 
     synchronized void add(final @Nonnull DiscoveryListener l) {
