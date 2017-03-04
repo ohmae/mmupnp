@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -118,9 +119,10 @@ public class ControlPoint {
     private final ExecutorService mCachedThreadPool;
     @Nonnull
     private final ExecutorService mNotifyExecutor;
-    private boolean mInitialized = false;
-    private boolean mStarted = false;
-    private boolean mTerminated = false;
+    @Nonnull
+    private final AtomicBoolean mInitialized = new AtomicBoolean();
+    @Nonnull
+    private final AtomicBoolean mStarted = new AtomicBoolean();
     @Nonnull
     private final DeviceHolder mDeviceHolder;
     @Nonnull
@@ -359,16 +361,11 @@ public class ControlPoint {
      * @see #initialize()
      */
     public void initialize() {
-        if (mInitialized) {
+        if (mInitialized.getAndSet(true)) {
             return;
-        }
-        if (mTerminated) {
-            throw new IllegalStateException(
-                    "ControlPoint is already terminated, cannot re-initialize.");
         }
         mDeviceHolder.start();
         mSubscribeHolder.start();
-        mInitialized = true;
     }
 
     /**
@@ -382,13 +379,12 @@ public class ControlPoint {
      * @see #initialize()
      */
     public void terminate() {
-        if (mStarted) {
+        if (mStarted.get()) {
             stop();
         }
-        if (!mInitialized || mTerminated) {
+        if (!mInitialized.getAndSet(false)) {
             return;
         }
-        mTerminated = true;
         mNotifyExecutor.shutdownNow();
         mCachedThreadPool.shutdown();
         try {
@@ -413,13 +409,12 @@ public class ControlPoint {
      * @see #initialize()
      */
     public void start() {
-        if (!mInitialized) {
+        if (!mInitialized.get()) {
             initialize();
         }
-        if (mStarted) {
+        if (mStarted.getAndSet(true)) {
             return;
         }
-        mStarted = true;
         try {
             mEventReceiver.open();
         } catch (final IOException e1) {
@@ -453,10 +448,9 @@ public class ControlPoint {
      * @see #start()
      */
     public void stop() {
-        if (!mStarted) {
+        if (!mStarted.getAndSet(false)) {
             return;
         }
-        mStarted = false;
         List<Service> serviceList = mSubscribeHolder.getServiceList();
         for (final Service service : serviceList) {
             executeInParallel(new Runnable() {
@@ -508,7 +502,7 @@ public class ControlPoint {
      * @param st SearchパケットのSTフィールド
      */
     public void search(final @Nullable String st) {
-        if (!mStarted) {
+        if (!mStarted.get()) {
             throw new IllegalStateException("ControlPoint is not started.");
         }
         for (final SsdpSearchServer server : mSearchList) {
