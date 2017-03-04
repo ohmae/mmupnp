@@ -34,12 +34,12 @@ public class HttpResponse extends HttpMessage {
      *
      * @param socket 受信したsocket
      */
-    public HttpResponse(Socket socket) {
+    public HttpResponse(final @Nonnull Socket socket) {
         super(socket);
     }
 
     @Override
-    public void setStartLine(@Nonnull String line) throws IllegalArgumentException {
+    public void setStartLine(final @Nonnull String line) throws IllegalArgumentException {
         setStatusLine(line);
     }
 
@@ -51,7 +51,7 @@ public class HttpResponse extends HttpMessage {
      * @param line ステータスライン
      * @see #setStartLine(String)
      */
-    public void setStatusLine(@Nonnull String line) throws IllegalArgumentException {
+    public void setStatusLine(final @Nonnull String line) throws IllegalArgumentException {
         final String[] params = line.split(" ");
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -95,7 +95,7 @@ public class HttpResponse extends HttpMessage {
      * @param code ステータスコード
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    public void setStatusCode(int code) {
+    public void setStatusCode(final int code) {
         mStatus = Http.Status.valueOf(code);
         if (mStatus == null) {
             throw new IllegalArgumentException("unexpected status code:" + code);
@@ -121,7 +121,7 @@ public class HttpResponse extends HttpMessage {
      * @param reasonPhrase レスポンスフレーズ
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    public void setReasonPhrase(@Nonnull String reasonPhrase) {
+    public void setReasonPhrase(final @Nonnull String reasonPhrase) {
         mReasonPhrase = reasonPhrase;
     }
 
@@ -130,7 +130,7 @@ public class HttpResponse extends HttpMessage {
      *
      * @param status ステータス
      */
-    public void setStatus(@Nonnull Http.Status status) {
+    public void setStatus(final @Nonnull Http.Status status) {
         mStatus = status;
         mStatusCode = status.getCode();
         mReasonPhrase = status.getPhrase();

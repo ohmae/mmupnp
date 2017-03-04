@@ -23,7 +23,7 @@ public class HttpClientFactory {
      * @see HttpClient#HttpClient(boolean)
      */
     @Nonnull
-    public HttpClient createHttpClient(boolean keepAlive) {
+    public HttpClient createHttpClient(final boolean keepAlive) {
         return new HttpClient(keepAlive);
     }
 }

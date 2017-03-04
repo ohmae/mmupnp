@@ -45,7 +45,7 @@ public class Icon {
          * @return Builder
          */
         @Nonnull
-        public Builder setDevice(@Nonnull Device device) {
+        public Builder setDevice(final @Nonnull Device device) {
             mDevice = device;
             return this;
         }
@@ -57,7 +57,7 @@ public class Icon {
          * @return Builder
          */
         @Nonnull
-        public Builder setMimeType(@Nonnull String mimeType) {
+        public Builder setMimeType(final @Nonnull String mimeType) {
             mMimeType = mimeType;
             return this;
         }
@@ -69,7 +69,7 @@ public class Icon {
          * @return Builder
          */
         @Nonnull
-        public Builder setHeight(@Nonnull String height) {
+        public Builder setHeight(final @Nonnull String height) {
             try {
                 mHeight = Integer.parseInt(height);
             } catch (final NumberFormatException e) {
@@ -85,7 +85,7 @@ public class Icon {
          * @return Builder
          */
         @Nonnull
-        public Builder setWidth(@Nonnull String width) {
+        public Builder setWidth(final @Nonnull String width) {
             try {
                 mWidth = Integer.parseInt(width);
             } catch (final NumberFormatException e) {
@@ -101,7 +101,7 @@ public class Icon {
          * @return Builder
          */
         @Nonnull
-        public Builder setDepth(@Nonnull String depth) {
+        public Builder setDepth(final @Nonnull String depth) {
             try {
                 mDepth = Integer.parseInt(depth);
             } catch (final NumberFormatException e) {
@@ -117,7 +117,7 @@ public class Icon {
          * @return Builder
          */
         @Nonnull
-        public Builder setUrl(@Nonnull String url) {
+        public Builder setUrl(final @Nonnull String url) {
             mUrl = url;
             return this;
         }
@@ -169,7 +169,7 @@ public class Icon {
      *
      * @param builder Builder
      */
-    private Icon(@Nonnull Builder builder) {
+    private Icon(final @Nonnull Builder builder) {
         mDevice = builder.mDevice;
         mMimeType = builder.mMimeType;
         mHeight = builder.mHeight;
@@ -254,7 +254,7 @@ public class Icon {
      * @param client 通信に使用する{@link HttpClient}
      * @throws IOException 通信エラー
      */
-    public void loadBinary(@Nonnull HttpClient client) throws IOException {
+    public void loadBinary(final @Nonnull HttpClient client) throws IOException {
         final URL url = mDevice.getAbsoluteUrl(mUrl);
         mBinary = client.downloadBinary(url);
     }

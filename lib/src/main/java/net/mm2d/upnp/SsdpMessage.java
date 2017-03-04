@@ -110,7 +110,8 @@ public abstract class SsdpMessage {
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpMessage(@Nonnull InterfaceAddress address, @Nonnull byte[] data, int length)
+    public SsdpMessage(final @Nonnull InterfaceAddress address,
+                       final @Nonnull byte[] data, final int length)
             throws IOException {
         mMessage = newMessage();
         mInterfaceAddress = address;
@@ -128,7 +129,7 @@ public abstract class SsdpMessage {
         mNts = mMessage.getHeader(Http.NTS);
     }
 
-    private static int parseCacheControl(@Nonnull HttpMessage message) {
+    private static int parseCacheControl(final @Nonnull HttpMessage message) {
         final String age = TextUtils.toLowerCase(message.getHeader(Http.CACHE_CONTROL));
         if (TextUtils.isEmpty(age) || !age.startsWith("max-age")) {
             return DEFAULT_MAX_AGE;
@@ -145,7 +146,7 @@ public abstract class SsdpMessage {
     }
 
     @Nonnull
-    private static String[] parseUsn(@Nonnull HttpMessage message) {
+    private static String[] parseUsn(final @Nonnull HttpMessage message) {
         final String usn = message.getHeader(Http.USN);
         if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
             return new String[]{"", ""};
@@ -163,7 +164,7 @@ public abstract class SsdpMessage {
      * @param sourceAddress 送信元アドレス
      * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
      */
-    public boolean hasInvalidLocation(@Nonnull InetAddress sourceAddress) {
+    public boolean hasInvalidLocation(final @Nonnull InetAddress sourceAddress) {
         if (!isHttpUrl(mLocation)) {
             return true;
         }
@@ -197,7 +198,7 @@ public abstract class SsdpMessage {
      * @return 値
      */
     @Nullable
-    public String getHeader(@Nonnull String name) {
+    public String getHeader(final @Nonnull String name) {
         return mMessage.getHeader(name);
     }
 
@@ -207,7 +208,7 @@ public abstract class SsdpMessage {
      * @param name  ヘッダ名
      * @param value 値
      */
-    public void setHeader(@Nonnull String name, @Nonnull String value) {
+    public void setHeader(final @Nonnull String name, final @Nonnull String value) {
         mMessage.setHeader(name, value);
     }
 

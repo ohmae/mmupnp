@@ -37,7 +37,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @param socket 受信したsocket
      */
-    public HttpRequest(Socket socket) {
+    public HttpRequest(final @Nonnull Socket socket) {
         super(socket);
     }
 
@@ -46,14 +46,14 @@ public class HttpRequest extends HttpMessage {
      *
      * @param original コピー元
      */
-    public HttpRequest(HttpRequest original) {
+    public HttpRequest(final @Nonnull HttpRequest original) {
         super(original);
         mMethod = original.mMethod;
         mUri = original.mUri;
     }
 
     @Override
-    public void setStartLine(@Nonnull String line) throws IllegalArgumentException {
+    public void setStartLine(final @Nonnull String line) throws IllegalArgumentException {
         setRequestLine(line);
     }
 
@@ -65,7 +65,7 @@ public class HttpRequest extends HttpMessage {
      * @param line リクエストライン
      * @see #setStartLine(String)
      */
-    public void setRequestLine(@Nonnull String line) throws IllegalArgumentException {
+    public void setRequestLine(final @Nonnull String line) throws IllegalArgumentException {
         final String[] params = line.split(" ");
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -87,7 +87,7 @@ public class HttpRequest extends HttpMessage {
      * @param url 接続先URL
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(@Nonnull URL url) throws IOException {
+    public void setUrl(final @Nonnull URL url) throws IOException {
         setUrl(url, false);
     }
 
@@ -98,7 +98,7 @@ public class HttpRequest extends HttpMessage {
      * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(@Nonnull URL url, boolean withHostHeader) throws IOException {
+    public void setUrl(final @Nonnull URL url, final boolean withHostHeader) throws IOException {
         if (!TextUtils.equals(url.getProtocol(), "http")) {
             throw new IOException("unsupported protocol." + url.getProtocol());
         }
@@ -130,7 +130,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @param method リクエストメソッド
      */
-    public void setMethod(@Nonnull String method) {
+    public void setMethod(final @Nonnull String method) {
         mMethod = method;
     }
 
@@ -149,7 +149,7 @@ public class HttpRequest extends HttpMessage {
      *
      * @param uri URI
      */
-    public void setUri(@Nonnull String uri) {
+    public void setUri(final @Nonnull String uri) {
         mUri = uri;
     }
 }

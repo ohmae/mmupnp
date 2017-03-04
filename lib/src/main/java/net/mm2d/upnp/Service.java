@@ -59,7 +59,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setDevice(@Nonnull Device device) {
+        public Builder setDevice(final @Nonnull Device device) {
             mDevice = device;
             return this;
         }
@@ -71,7 +71,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setServiceType(@Nonnull String serviceType) {
+        public Builder setServiceType(final @Nonnull String serviceType) {
             mServiceType = serviceType;
             return this;
         }
@@ -83,7 +83,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setServiceId(@Nonnull String serviceId) {
+        public Builder setServiceId(final @Nonnull String serviceId) {
             mServiceId = serviceId;
             return this;
         }
@@ -95,7 +95,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setScpdUrl(@Nonnull String scpdUrl) {
+        public Builder setScpdUrl(final @Nonnull String scpdUrl) {
             mScpdUrl = scpdUrl;
             return this;
         }
@@ -111,7 +111,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setControlUrl(@Nonnull String controlUrl) {
+        public Builder setControlUrl(final @Nonnull String controlUrl) {
             mControlUrl = controlUrl;
             return this;
         }
@@ -123,7 +123,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setEventSubUrl(@Nonnull String eventSubUrl) {
+        public Builder setEventSubUrl(final @Nonnull String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
             return this;
         }
@@ -145,7 +145,7 @@ public class Service {
          * @param actionBuilderList Serviceで定義されている全ActionのBuilder
          * @return Builder
          */
-        public Builder setActionBuilderList(List<Action.Builder> actionBuilderList) {
+        public Builder setActionBuilderList(final @Nonnull List<Action.Builder> actionBuilderList) {
             mActionBuilderList = actionBuilderList;
             return this;
         }
@@ -156,7 +156,7 @@ public class Service {
          * @param variableBuilderList Serviceで定義されている全StateVariableのBuilder
          * @return Builder
          */
-        public Builder setVariableBuilderList(List<StateVariable.Builder> variableBuilderList) {
+        public Builder setVariableBuilderList(final @Nonnull List<StateVariable.Builder> variableBuilderList) {
             mVariableBuilderList = variableBuilderList;
             return this;
         }
@@ -233,7 +233,7 @@ public class Service {
     @Nonnull
     private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
-    private Service(@Nonnull Builder builder) {
+    private Service(final @Nonnull Builder builder) {
         mDevice = builder.mDevice;
         mControlPoint = mDevice.getControlPoint();
         mServiceType = builder.mServiceType;
@@ -281,7 +281,7 @@ public class Service {
      * @see Device#getAbsoluteUrl(String)
      */
     @Nonnull
-    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
+    URL getAbsoluteUrl(final @Nonnull String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
 
@@ -417,7 +417,7 @@ public class Service {
      * @return 該当するAction、見つからない場合null
      */
     @Nullable
-    public Action findAction(@Nonnull String name) {
+    public Action findAction(final @Nonnull String name) {
         return mActionMap.get(name);
     }
 
@@ -444,7 +444,7 @@ public class Service {
      * @return 該当するStateVariable、見つからない場合null
      */
     @Nullable
-    public StateVariable findStateVariable(@Nullable String name) {
+    public StateVariable findStateVariable(final @Nullable String name) {
         return mStateVariableMap.get(name);
     }
 
@@ -465,7 +465,7 @@ public class Service {
         return sb.toString();
     }
 
-    private static long parseTimeout(@Nonnull HttpResponse response) {
+    private static long parseTimeout(final @Nonnull HttpResponse response) {
         final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
         if (TextUtils.isEmpty(timeout) || timeout.contains("infinite")) {
             // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。
@@ -491,7 +491,7 @@ public class Service {
      *
      * @param factory ファクトリークラス
      */
-    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
+    void setHttpClientFactory(final @Nonnull HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }
 
@@ -517,7 +517,7 @@ public class Service {
      * @return 成功時true
      * @throws IOException 通信エラー
      */
-    public boolean subscribe(boolean keepRenew) throws IOException {
+    public boolean subscribe(final boolean keepRenew) throws IOException {
         if (TextUtils.isEmpty(mEventSubUrl)) {
             return false;
         }
@@ -531,7 +531,7 @@ public class Service {
         return subscribeInner(keepRenew);
     }
 
-    private boolean subscribeInner(boolean keepRenew) throws IOException {
+    private boolean subscribeInner(final boolean keepRenew) throws IOException {
         final HttpClient client = createHttpClient();
         final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
@@ -546,7 +546,7 @@ public class Service {
         return false;
     }
 
-    private boolean parseSubscribeResponse(@Nonnull HttpResponse response) {
+    private boolean parseSubscribeResponse(final @Nonnull HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
@@ -600,7 +600,7 @@ public class Service {
         return parseRenewSubscribeResponse(response);
     }
 
-    private boolean parseRenewSubscribeResponse(@Nonnull HttpResponse response) {
+    private boolean parseRenewSubscribeResponse(final @Nonnull HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
@@ -614,7 +614,7 @@ public class Service {
     }
 
     @Nonnull
-    private HttpRequest makeRenewSubscribeRequest(@Nonnull String subscriptionId) throws IOException {
+    private HttpRequest makeRenewSubscribeRequest(final @Nonnull String subscriptionId) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
         request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
@@ -649,7 +649,7 @@ public class Service {
         return true;
     }
 
-    private HttpRequest makeUnsubscribeRequest(@Nonnull String subscriptionId) throws IOException {
+    private HttpRequest makeUnsubscribeRequest(final @Nonnull String subscriptionId) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.UNSUBSCRIBE);
         request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
@@ -711,7 +711,7 @@ public class Service {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null || !(obj instanceof Service)) {
             return false;
         }

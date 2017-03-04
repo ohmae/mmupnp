@@ -7,6 +7,8 @@
 
 package net.mm2d.util;
 
+import javax.annotation.Nullable;
+
 /**
  * Key/Valueのペアを保持するImmutableなクラス。
  *
@@ -15,7 +17,9 @@ package net.mm2d.util;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Pair<K, V> {
+    @Nullable
     private final K mKey;
+    @Nullable
     private final V mValue;
 
     /**
@@ -24,7 +28,7 @@ public class Pair<K, V> {
      * @param key   Keyの値
      * @param value Valueの値
      */
-    public Pair(K key, V value) {
+    public Pair(final @Nullable K key, @Nullable final V value) {
         mKey = key;
         mValue = value;
     }
@@ -34,6 +38,7 @@ public class Pair<K, V> {
      *
      * @return Keyの値
      */
+    @Nullable
     public K getKey() {
         return mKey;
     }
@@ -43,6 +48,7 @@ public class Pair<K, V> {
      *
      * @return Valueの値
      */
+    @Nullable
     public V getValue() {
         return mValue;
     }
@@ -70,7 +76,6 @@ public class Pair<K, V> {
 
     @Override
     public String toString() {
-        return "key:" + mKey.toString()
-                + " value:" + mValue.toString();
+        return "key:" + mKey + " value:" + mValue;
     }
 }

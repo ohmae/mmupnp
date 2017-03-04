@@ -69,7 +69,7 @@ class SubscribeHolder implements Runnable {
      * @param service   登録するService
      * @param keepRenew 期限が切れる前にrenewSubscribeを続ける場合true
      */
-    synchronized void add(@Nonnull Service service, boolean keepRenew) {
+    synchronized void add(final @Nonnull Service service, final boolean keepRenew) {
         if (service.getSubscriptionId() == null) {
             return;
         }
@@ -83,7 +83,7 @@ class SubscribeHolder implements Runnable {
      *
      * @param service 削除するサービス
      */
-    synchronized void remove(@Nonnull Service service) {
+    synchronized void remove(final @Nonnull Service service) {
         mServiceMap.remove(service.getSubscriptionId());
         notifyAll();
     }

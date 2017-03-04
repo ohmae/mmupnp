@@ -30,7 +30,7 @@ public class IoUtils {
      *
      * @param closeable close処理をするCloseable
      */
-    public static void closeQuietly(@Nullable Closeable closeable) {
+    public static void closeQuietly(final @Nullable Closeable closeable) {
         if (closeable == null) {
             return;
         }
@@ -48,7 +48,7 @@ public class IoUtils {
      *
      * @param socket close処理をするSocket
      */
-    public static void closeQuietly(@Nullable Socket socket) {
+    public static void closeQuietly(final @Nullable Socket socket) {
         if (socket == null) {
             return;
         }
@@ -66,7 +66,7 @@ public class IoUtils {
      *
      * @param datagramSocket close処理をするDatagramSocket
      */
-    public static void closeQuietly(@Nullable DatagramSocket datagramSocket) {
+    public static void closeQuietly(final @Nullable DatagramSocket datagramSocket) {
         if (datagramSocket == null) {
             return;
         }
@@ -81,7 +81,7 @@ public class IoUtils {
      *
      * @param serverSocket close処理をするServerSocket
      */
-    public static void closeQuietly(@Nullable ServerSocket serverSocket) {
+    public static void closeQuietly(final @Nullable ServerSocket serverSocket) {
         if (serverSocket == null) {
             return;
         }
@@ -99,7 +99,7 @@ public class IoUtils {
      *
      * @param selector close処理をするSelector
      */
-    public static void closeQuietly(@Nullable Selector selector) {
+    public static void closeQuietly(final @Nullable Selector selector) {
         if (selector == null) {
             return;
         }

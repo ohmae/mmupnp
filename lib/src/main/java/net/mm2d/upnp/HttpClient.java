@@ -59,7 +59,7 @@ public class HttpClient {
      * @param keepAlive keep-alive通信を行う場合true
      * @see #setKeepAlive(boolean)
      */
-    public HttpClient(boolean keepAlive) {
+    public HttpClient(final boolean keepAlive) {
         setKeepAlive(keepAlive);
     }
 
@@ -87,7 +87,7 @@ public class HttpClient {
      *
      * @param keepAlive keep-aliveを行う場合true
      */
-    public void setKeepAlive(boolean keepAlive) {
+    public void setKeepAlive(final boolean keepAlive) {
         mKeepAlive = keepAlive;
     }
 
@@ -101,7 +101,7 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    public HttpResponse post(@Nonnull HttpRequest request) throws IOException {
+    public HttpResponse post(final @Nonnull HttpRequest request) throws IOException {
         return post(request, 0);
     }
 
@@ -116,7 +116,7 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    private HttpResponse post(@Nonnull HttpRequest request, int redirectDepth) throws IOException {
+    private HttpResponse post(final @Nonnull HttpRequest request, final int redirectDepth) throws IOException {
         confirmReuseSocket(request);
         final HttpResponse response;
         try {
@@ -133,13 +133,13 @@ public class HttpClient {
         return redirectIfNeed(request, response, redirectDepth);
     }
 
-    private void confirmReuseSocket(@Nonnull HttpRequest request) {
+    private void confirmReuseSocket(final @Nonnull HttpRequest request) {
         if (!isClosed() && !canReuse(request)) {
             closeSocket();
         }
     }
 
-    private void writeData(@Nonnull HttpRequest request) throws IOException {
+    private void writeData(final @Nonnull HttpRequest request) throws IOException {
         if (isClosed()) {
             openSocket(request);
             request.writeData(mOutputStream);
@@ -156,8 +156,9 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirectIfNeed(
-            @Nonnull HttpRequest request, @Nonnull HttpResponse response, int redirectDepth)
+    private HttpResponse redirectIfNeed(final @Nonnull HttpRequest request,
+                                        final @Nonnull HttpResponse response,
+                                        final int redirectDepth)
             throws IOException {
         if (isRedirection(response) && redirectDepth < REDIRECT_MAX) {
             final String location = response.getHeader(Http.LOCATION);
@@ -168,7 +169,7 @@ public class HttpClient {
         return response;
     }
 
-    private static boolean isRedirection(@Nonnull HttpResponse response) {
+    private static boolean isRedirection(final @Nonnull HttpResponse response) {
         final Http.Status status = response.getStatus();
         if (status == null) {
             return false;
@@ -185,8 +186,8 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirect(
-            @Nonnull HttpRequest request, @Nonnull String location, int redirectDepth)
+    private HttpResponse redirect(final @Nonnull HttpRequest request,
+                                  final @Nonnull String location, final int redirectDepth)
             throws IOException {
         final HttpRequest newRequest = new HttpRequest(request);
         newRequest.setUrl(new URL(location), true);
@@ -194,7 +195,7 @@ public class HttpClient {
         return new HttpClient(false).post(newRequest, redirectDepth + 1);
     }
 
-    private boolean canReuse(@Nonnull HttpRequest request) {
+    private boolean canReuse(final @Nonnull HttpRequest request) {
         return mSocket.isConnected()
                 && mSocket.getInetAddress().equals(request.getAddress())
                 && mSocket.getPort() == request.getPort();
@@ -204,7 +205,7 @@ public class HttpClient {
         return mSocket == null;
     }
 
-    private void openSocket(@Nonnull HttpRequest request) throws IOException {
+    private void openSocket(final @Nonnull HttpRequest request) throws IOException {
         mSocket = new Socket();
         mSocket.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT);
         mSocket.setSoTimeout(Property.DEFAULT_TIMEOUT);
@@ -252,7 +253,7 @@ public class HttpClient {
      * @throws IOException 取得に問題があった場合
      */
     @Nonnull
-    public byte[] downloadBinary(@Nonnull URL url) throws IOException {
+    public byte[] downloadBinary(final @Nonnull URL url) throws IOException {
         final byte[] body = download(url).getBodyBinary();
         if (body == null) {
             throw new IOException("body is null");
@@ -268,7 +269,7 @@ public class HttpClient {
      * @throws IOException 取得に問題があった場合
      */
     @Nonnull
-    public HttpResponse download(@Nonnull URL url) throws IOException {
+    public HttpResponse download(final @Nonnull URL url) throws IOException {
         final HttpRequest request = makeHttpRequest(url);
         final HttpResponse response = post(request);
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
@@ -279,7 +280,7 @@ public class HttpClient {
     }
 
     @Nonnull
-    private static HttpRequest makeHttpRequest(@Nonnull URL url) throws IOException {
+    private static HttpRequest makeHttpRequest(final @Nonnull URL url) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
         request.setUrl(url, true);

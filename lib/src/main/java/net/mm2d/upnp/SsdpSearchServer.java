@@ -77,11 +77,8 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param st STの値
      */
-    void search(@Nullable String st) {
-        if (TextUtils.isEmpty(st)) {
-            st = ST_ALL;
-        }
-        send(makeSearchMessage(st));
+    void search(final @Nullable String st) {
+        send(makeSearchMessage(TextUtils.isEmpty(st) ? ST_ALL : st));
     }
 
     private SsdpRequestMessage makeSearchMessage(final @Nonnull String st) {

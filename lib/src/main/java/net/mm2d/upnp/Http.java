@@ -214,7 +214,7 @@ public final class Http {
      * @return パース結果、失敗した場合null
      */
     @Nullable
-    public static synchronized Date parseDate(@Nullable String string) {
+    public static synchronized Date parseDate(final @Nullable String string) {
         if (TextUtils.isEmpty(string)) {
             return null;
         }
@@ -240,7 +240,7 @@ public final class Http {
      * @return RFC1123形式の日付文字列
      */
     @Nonnull
-    public static synchronized String formatDate(long date) {
+    public static synchronized String formatDate(final long date) {
         return formatDate(new Date(date));
     }
 
@@ -251,7 +251,7 @@ public final class Http {
      * @return RFC1123形式の日付文字列
      */
     @Nonnull
-    public static synchronized String formatDate(@Nonnull Date date) {
+    public static synchronized String formatDate(final @Nonnull Date date) {
         return RFC_1123_FORMAT.format(date);
     }
 

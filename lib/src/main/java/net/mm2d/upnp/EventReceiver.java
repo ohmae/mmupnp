@@ -73,7 +73,7 @@ class EventReceiver {
      *
      * @param listener リスナー
      */
-    void setEventMessageListener(@Nullable EventMessageListener listener) {
+    void setEventMessageListener(final @Nullable EventMessageListener listener) {
         mListener = listener;
         if (mServerTask != null) {
             mServerTask.setEventMessageListener(listener);
@@ -115,7 +115,7 @@ class EventReceiver {
     }
 
     @Nonnull
-    private static List<StringPair> parsePropertyPairs(@Nonnull HttpRequest request) {
+    private static List<StringPair> parsePropertyPairs(final @Nonnull HttpRequest request) {
         final String xml = request.getBody();
         if (TextUtils.isEmpty(xml)) {
             return Collections.emptyList();
@@ -207,7 +207,7 @@ class EventReceiver {
          *
          * @param client 終了したClientスレッド
          */
-        void notifyClientFinished(@Nonnull ClientTask client) {
+        void notifyClientFinished(final @Nonnull ClientTask client) {
             mClientList.remove(client);
         }
 
@@ -216,7 +216,7 @@ class EventReceiver {
          *
          * @param listener リスナー
          */
-        synchronized void setEventMessageListener(@Nullable EventMessageListener listener) {
+        synchronized void setEventMessageListener(final @Nullable EventMessageListener listener) {
             mListener = listener;
         }
 
@@ -227,7 +227,8 @@ class EventReceiver {
          * @param request 受信したHTTPメッセージ
          * @return HTTPメッセージが正常であればtrue
          */
-        private synchronized boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
+        private synchronized boolean notifyEvent(
+                final @Nonnull String sid, final @Nonnull HttpRequest request) {
             if (mListener == null) {
                 return false;
             }
@@ -312,7 +313,7 @@ class EventReceiver {
             IoUtils.closeQuietly(mSocket);
         }
 
-        private boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
+        private boolean notifyEvent(final @Nonnull String sid, final @Nonnull HttpRequest request) {
             return mServer.notifyEvent(sid, request);
         }
 
@@ -334,7 +335,8 @@ class EventReceiver {
             }
         }
 
-        private void receiveAndReply(@Nonnull InputStream is, @Nonnull OutputStream os) throws IOException {
+        private void receiveAndReply(final @Nonnull InputStream is, final @Nonnull OutputStream os)
+                throws IOException {
             final HttpRequest request = new HttpRequest(mSocket);
             request.readData(is);
             final String nt = request.getHeader(Http.NT);

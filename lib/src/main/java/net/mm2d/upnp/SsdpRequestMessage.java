@@ -33,7 +33,8 @@ public class SsdpRequestMessage extends SsdpMessage {
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpRequestMessage(@Nonnull InterfaceAddress address, @Nonnull byte[] data, int length)
+    public SsdpRequestMessage(final @Nonnull InterfaceAddress address,
+                              final @Nonnull byte[] data, final int length)
             throws IOException {
         super(address, data, length);
     }
@@ -65,7 +66,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      *
      * @param method リクエストメソッド
      */
-    public void setMethod(@Nonnull String method) {
+    public void setMethod(final @Nonnull String method) {
         getMessage().setMethod(method);
     }
 
@@ -84,7 +85,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      *
      * @param uri URI文字列
      */
-    public void setUri(@Nonnull String uri) {
+    public void setUri(final @Nonnull String uri) {
         getMessage().setUri(uri);
     }
 }

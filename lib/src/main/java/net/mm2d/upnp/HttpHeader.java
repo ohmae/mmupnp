@@ -31,7 +31,7 @@ public class HttpHeader {
      * @return Key
      */
     @Nonnull
-    private static String toKey(@Nonnull String name) {
+    private static String toKey(final @Nonnull String name) {
         return TextUtils.toLowerCase(name);
     }
 
@@ -49,7 +49,7 @@ public class HttpHeader {
          * @param name  ヘッダ名
          * @param value 値
          */
-        public Entry(@Nonnull String name, @Nonnull String value) {
+        public Entry(final @Nonnull String name, final @Nonnull String value) {
             mKey = toKey(name);
             mName = name;
             mValue = value;
@@ -60,7 +60,7 @@ public class HttpHeader {
          *
          * @param original コピー元
          */
-        public Entry(@Nonnull Entry original) {
+        public Entry(final @Nonnull Entry original) {
             mKey = original.mKey;
             mName = original.mName;
             mValue = original.mValue;
@@ -81,7 +81,7 @@ public class HttpHeader {
          * @param name ヘッダ名
          * @throws IllegalArgumentException keyとしての値が一致しないものに更新しようとした場合
          */
-        private void setName(@Nonnull String name) {
+        private void setName(final @Nonnull String name) {
             if (!mKey.equals(toKey(name))) {
                 throw new IllegalArgumentException();
             }
@@ -103,7 +103,7 @@ public class HttpHeader {
          *
          * @param value 値
          */
-        private void setValue(@Nonnull String value) {
+        private void setValue(final @Nonnull String value) {
             mValue = value;
         }
 
@@ -123,7 +123,7 @@ public class HttpHeader {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (obj == this) {
                 return true;
             }
@@ -172,7 +172,7 @@ public class HttpHeader {
      *
      * @param original コピー元
      */
-    public HttpHeader(HttpHeader original) {
+    public HttpHeader(final HttpHeader original) {
         // EntryはmutableなのでDeep copyが必要
         mList = new LinkedList<>();
         for (Entry entry : original.mList) {
@@ -207,7 +207,7 @@ public class HttpHeader {
      * @return ヘッダの値
      */
     @Nullable
-    public String get(@Nonnull String name) {
+    public String get(final @Nonnull String name) {
         final String key = toKey(name);
         for (final Entry entry : mList) {
             if (entry.getKey().equals(key)) {
@@ -226,7 +226,7 @@ public class HttpHeader {
      * @return 削除されたヘッダがあった場合、ヘッダの値、なかった場合null
      */
     @Nullable
-    public String remove(@Nonnull String name) {
+    public String remove(final @Nonnull String name) {
         final String key = toKey(name);
         final Iterator<Entry> i = mList.iterator();
         while (i.hasNext()) {
@@ -252,7 +252,7 @@ public class HttpHeader {
      * @return 重複があった場合、既に登録されていた値。
      */
     @Nullable
-    public String put(@Nonnull String name, @Nonnull String value) {
+    public String put(final @Nonnull String name, final @Nonnull String value) {
         final String key = toKey(name);
         for (final Entry entry : mList) {
             if (entry.getKey().equals(key)) {
@@ -275,7 +275,7 @@ public class HttpHeader {
      * @param value 含まれるか
      * @return 指定ヘッダにvalueが含まれる場合true
      */
-    public boolean containsValue(@Nonnull String name, @Nonnull String value) {
+    public boolean containsValue(final @Nonnull String name, final @Nonnull String value) {
         final String v = TextUtils.toLowerCase(get(name));
         return v != null && v.contains(TextUtils.toLowerCase(value));
     }

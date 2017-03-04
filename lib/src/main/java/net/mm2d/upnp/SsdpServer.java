@@ -23,6 +23,7 @@ import java.net.SocketTimeoutException;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * SSDPパケットの受信を行うクラスの親クラス。
@@ -190,17 +191,21 @@ abstract class SsdpServer {
 
     private static class ReceiveTask implements Runnable {
         private static final String TAG = ReceiveTask.class.getSimpleName();
+        @Nonnull
         private final SsdpServer mSsdpServer;
+        @Nonnull
         private final MulticastSocket mSocket;
         private final int mBindPort;
 
         private volatile boolean mShutdownRequest;
+        @Nullable
         private Thread mThread;
 
         /**
          * インスタンス作成
          */
-        ReceiveTask(SsdpServer ssdpServer, MulticastSocket socket, int port) {
+        ReceiveTask(final @Nonnull SsdpServer ssdpServer,
+                    final @Nonnull MulticastSocket socket, final int port) {
             mSsdpServer = ssdpServer;
             mSocket = socket;
             mBindPort = port;

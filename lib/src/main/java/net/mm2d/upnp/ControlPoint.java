@@ -583,7 +583,7 @@ public class ControlPoint {
      * <p>DeviceInspectorからコールするためにパッケージデフォルトとする
      * 他からはコールしないこと。
      *
-     * @param device          喪失してデバイス
+     * @param device 喪失してデバイス
      * @see Device
      * @see DeviceHolder
      */
