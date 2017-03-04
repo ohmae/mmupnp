@@ -46,9 +46,8 @@ public class DeviceParser {
      * @throws SAXException                 XMLのパースに失敗
      * @throws ParserConfigurationException XMLパーサが利用できない場合
      */
-    static void loadDescription(
-            @Nonnull HttpClient client,
-            @Nonnull Device.Builder deviceBuilder)
+    static void loadDescription(final @Nonnull HttpClient client,
+                                final @Nonnull Device.Builder deviceBuilder)
             throws IOException, SAXException, ParserConfigurationException {
         final String location = deviceBuilder.getLocation();
         parseDescription(deviceBuilder, client.downloadString(new URL(location)));
@@ -57,7 +56,8 @@ public class DeviceParser {
         }
     }
 
-    private static void parseDescription(@Nonnull Device.Builder deviceBuilder, @Nonnull String description)
+    private static void parseDescription(final @Nonnull Device.Builder deviceBuilder,
+                                         final @Nonnull String description)
             throws IOException, SAXException, ParserConfigurationException {
         deviceBuilder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
@@ -92,7 +92,8 @@ public class DeviceParser {
         }
     }
 
-    private static void setField(@Nonnull Device.Builder builder, @Nonnull String tag, @Nonnull String value) {
+    private static void setField(final @Nonnull Device.Builder builder,
+                                 final @Nonnull String tag, final @Nonnull String value) {
         switch (tag) {
             case "UDN":
                 builder.setUdn(value);
@@ -133,7 +134,7 @@ public class DeviceParser {
     }
 
     @Nonnull
-    private static List<Icon.Builder> parseIconList(@Nonnull Node listNode) {
+    private static List<Icon.Builder> parseIconList(final @Nonnull Node listNode) {
         final List<Icon.Builder> builderList = new ArrayList<>();
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -148,7 +149,7 @@ public class DeviceParser {
     }
 
     @Nonnull
-    private static Icon.Builder parseIcon(@Nonnull Element element) {
+    private static Icon.Builder parseIcon(final @Nonnull Element element) {
         final Icon.Builder builder = new Icon.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -165,7 +166,9 @@ public class DeviceParser {
         return builder;
     }
 
-    private static void setField(@Nonnull Icon.Builder builder, @Nonnull String tag, @Nonnull String value) {
+    private static void setField(final @Nonnull Icon.Builder builder,
+                                 final @Nonnull String tag,
+                                 final @Nonnull String value) {
         switch (tag) {
             case "mimetype":
                 builder.setMimeType(value);
@@ -188,7 +191,7 @@ public class DeviceParser {
     }
 
     @Nonnull
-    private static List<Service.Builder> parseServiceList(@Nonnull Node listNode) {
+    private static List<Service.Builder> parseServiceList(final @Nonnull Node listNode) {
         final List<Service.Builder> builderList = new ArrayList<>();
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -203,7 +206,7 @@ public class DeviceParser {
     }
 
     @Nonnull
-    private static Service.Builder parseService(@Nonnull Element element) {
+    private static Service.Builder parseService(final @Nonnull Element element) {
         final Service.Builder builder = new Service.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -220,7 +223,9 @@ public class DeviceParser {
         return builder;
     }
 
-    private static void setField(@Nonnull Service.Builder builder, @Nonnull String tag, @Nonnull String value) {
+    private static void setField(final @Nonnull Service.Builder builder,
+                                 final @Nonnull String tag,
+                                 final @Nonnull String value) {
         switch (tag) {
             case "serviceType":
                 builder.setServiceType(value);

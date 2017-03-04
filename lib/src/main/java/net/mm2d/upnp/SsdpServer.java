@@ -35,11 +35,11 @@ abstract class SsdpServer {
     /**
      * SSDPに使用するアドレス。
      */
-    public static final String SSDP_ADDR = "239.255.255.250";
+    static final String SSDP_ADDR = "239.255.255.250";
     /**
      * SSDPに使用するポート番号
      */
-    public static final int SSDP_PORT = 1900;
+    static final int SSDP_PORT = 1900;
     private static final InetSocketAddress SSDP_SO_ADDR = new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
     private static final InetAddress SSDP_INET_ADDR = SSDP_SO_ADDR.getAddress();
     @Nonnull
@@ -57,7 +57,7 @@ abstract class SsdpServer {
      *
      * @param networkInterface 使用するインターフェース
      */
-    public SsdpServer(@Nonnull NetworkInterface networkInterface) {
+    SsdpServer(final @Nonnull NetworkInterface networkInterface) {
         this(networkInterface, 0);
     }
 
@@ -67,13 +67,13 @@ abstract class SsdpServer {
      * @param networkInterface 使用するインターフェース
      * @param bindPort         使用するポート
      */
-    public SsdpServer(@Nonnull NetworkInterface networkInterface, int bindPort) {
+    SsdpServer(final @Nonnull NetworkInterface networkInterface, final int bindPort) {
         mInterfaceAddress = findInet4Address(networkInterface);
         mBindPort = bindPort;
         mInterface = networkInterface;
     }
 
-    private static InterfaceAddress findInet4Address(NetworkInterface networkInterface) {
+    private static InterfaceAddress findInet4Address(final @Nonnull NetworkInterface networkInterface) {
         final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
         for (final InterfaceAddress address : addressList) {
             if (address.getAddress() instanceof Inet4Address) {
@@ -98,7 +98,7 @@ abstract class SsdpServer {
      *
      * @throws IOException ソケット作成に失敗
      */
-    public void open() throws IOException {
+    void open() throws IOException {
         if (mSocket == null) {
             close();
         }
@@ -108,14 +108,14 @@ abstract class SsdpServer {
     }
 
     // VisibleForTesting
-    MulticastSocket createMulticastSocket(int port) throws IOException {
+    MulticastSocket createMulticastSocket(final int port) throws IOException {
         return new MulticastSocket(port);
     }
 
     /**
      * ソケットのクローズを行う
      */
-    public void close() {
+    void close() {
         stop(false);
         IoUtils.closeQuietly(mSocket);
         mSocket = null;
@@ -124,7 +124,7 @@ abstract class SsdpServer {
     /**
      * 受信スレッドの開始を行う。
      */
-    public void start() {
+    void start() {
         if (mReceiveTask != null) {
             stop();
         }
@@ -135,7 +135,7 @@ abstract class SsdpServer {
     /**
      * 受信スレッドの停止を行う。
      */
-    public void stop() {
+    void stop() {
         stop(false);
     }
 
@@ -147,7 +147,7 @@ abstract class SsdpServer {
      *
      * @param join trueの時スレッドのJoin待ちを行う。
      */
-    public void stop(boolean join) {
+    void stop(final boolean join) {
         if (mReceiveTask == null) {
             return;
         }
@@ -160,7 +160,7 @@ abstract class SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    public void send(@Nonnull SsdpMessage message) {
+    void send(final @Nonnull SsdpMessage message) {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.getMessage().writeData(baos);
@@ -175,13 +175,8 @@ abstract class SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    public void send(@Nonnull byte[] message) {
-        try {
-            final DatagramPacket dp = new DatagramPacket(message, message.length, SSDP_SO_ADDR);
-            mSocket.send(dp);
-        } catch (final IOException e) {
-            Log.w(TAG, e);
-        }
+    private void send(final @Nonnull byte[] message) throws IOException {
+        mSocket.send(new DatagramPacket(message, message.length, SSDP_SO_ADDR));
     }
 
     /**
@@ -200,7 +195,6 @@ abstract class SsdpServer {
         private final int mBindPort;
 
         private volatile boolean mShutdownRequest;
-        private final Object mThreadLock = new Object();
         private Thread mThread;
 
         /**
@@ -215,12 +209,10 @@ abstract class SsdpServer {
         /**
          * スレッドを作成して処理を開始する。
          */
-        void start() {
+        synchronized void start() {
             mShutdownRequest = false;
-            synchronized (mThreadLock) {
-                mThread = new Thread(this, TAG);
-                mThread.start();
-            }
+            mThread = new Thread(this, TAG);
+            mThread.start();
         }
 
         /**
@@ -230,21 +222,19 @@ abstract class SsdpServer {
          *
          * @param join Threadのjoin待ちを行う場合はtrue
          */
-        void shutdownRequest(boolean join) {
+        synchronized void shutdownRequest(final boolean join) {
             mShutdownRequest = true;
-            synchronized (mThreadLock) {
-                if (mThread == null) {
-                    return;
-                }
-                mThread.interrupt();
-                if (join) {
-                    try {
-                        mThread.join(1000);
-                    } catch (final InterruptedException ignored) {
-                    }
-                }
-                mThread = null;
+            if (mThread == null) {
+                return;
             }
+            mThread.interrupt();
+            if (join) {
+                try {
+                    mThread.join(1000);
+                } catch (final InterruptedException ignored) {
+                }
+            }
+            mThread = null;
         }
 
         @Override

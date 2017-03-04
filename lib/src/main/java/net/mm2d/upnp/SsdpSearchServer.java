@@ -25,11 +25,11 @@ class SsdpSearchServer extends SsdpServer {
     /**
      * ST(SearchType) 全機器。
      */
-    public static final String ST_ALL = "ssdp:all";
+    static final String ST_ALL = "ssdp:all";
     /**
      * ST(SearchType) rootdevice。
      */
-    public static final String ST_ROOTDEVICE = "upnp:rootdevice";
+    static final String ST_ROOTDEVICE = "upnp:rootdevice";
 
     /**
      * M-SEARCHによるレスポンス受信を受け取るリスナー。
@@ -50,7 +50,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    public SsdpSearchServer(@Nonnull NetworkInterface ni) {
+    SsdpSearchServer(final @Nonnull NetworkInterface ni) {
         super(ni);
     }
 
@@ -59,7 +59,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param listener リスナー
      */
-    public void setResponseListener(@Nullable ResponseListener listener) {
+    void setResponseListener(final @Nullable ResponseListener listener) {
         mListener = listener;
     }
 
@@ -68,7 +68,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * <p>STはssdp:allで実行する。
      */
-    public void search() {
+    void search() {
         search(null);
     }
 
@@ -77,14 +77,14 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param st STの値
      */
-    public void search(@Nullable String st) {
+    void search(@Nullable String st) {
         if (TextUtils.isEmpty(st)) {
             st = ST_ALL;
         }
         send(makeSearchMessage(st));
     }
 
-    private SsdpRequestMessage makeSearchMessage(@Nonnull String st) {
+    private SsdpRequestMessage makeSearchMessage(final @Nonnull String st) {
         final SsdpRequestMessage message = new SsdpRequestMessage();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
@@ -96,7 +96,8 @@ class SsdpSearchServer extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(@Nonnull InetAddress sourceAddress, @Nonnull byte[] data, int length) {
+    protected void onReceive(final @Nonnull InetAddress sourceAddress,
+                             final @Nonnull byte[] data, final int length) {
         try {
             final SsdpResponseMessage message = new SsdpResponseMessage(getInterfaceAddress(), data, length);
             if (message.hasInvalidLocation(sourceAddress)) {

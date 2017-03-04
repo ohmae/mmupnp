@@ -29,7 +29,7 @@ class SsdpNotifyReceiver extends SsdpServer {
     /**
      * NOTIFY受信を受け取るリスナー。
      */
-    public interface NotifyListener {
+    interface NotifyListener {
         /**
          * NOTIFY受信時にコール。
          *
@@ -45,7 +45,7 @@ class SsdpNotifyReceiver extends SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    public SsdpNotifyReceiver(@Nonnull NetworkInterface ni) {
+     SsdpNotifyReceiver(@Nonnull NetworkInterface ni) {
         super(ni, SSDP_PORT);
     }
 
@@ -54,7 +54,7 @@ class SsdpNotifyReceiver extends SsdpServer {
      *
      * @param listener リスナー
      */
-    public void setNotifyListener(@Nullable NotifyListener listener) {
+     void setNotifyListener(@Nullable NotifyListener listener) {
         mListener = listener;
     }
 
