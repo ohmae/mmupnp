@@ -26,6 +26,8 @@ import static org.mockito.Mockito.*;
 @RunWith(JUnit4.class)
 public class ServiceTest {
     private static final String SID = "11234567-89ab-cdef-0123-456789abcdef";
+    private static final String INTERFACE_ADDRESS = "192.0.2.3";
+    private static final int EVENT_PORT = 100;
     private HttpClient mHttpClient;
     private SsdpMessage mSsdpMessage;
     private ControlPoint mControlPoint;
@@ -55,9 +57,10 @@ public class ServiceTest {
                 .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-        doReturn(InetAddress.getByName("192.0.2.3")).when(interfaceAddress).getAddress();
+        doReturn(InetAddress.getByName(INTERFACE_ADDRESS)).when(interfaceAddress).getAddress();
         mSsdpMessage = new SsdpRequestMessage(interfaceAddress, data, data.length);
         mControlPoint = mock(ControlPoint.class);
+        doReturn(EVENT_PORT).when(mControlPoint).getEventPort();
         final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
         DeviceParser.loadDescription(mHttpClient, builder);
         mDevice = builder.build();
@@ -165,6 +168,15 @@ public class ServiceTest {
 
         final HttpRequest request = factory.getHttpRequest();
         assertThat(request.getUri(), is(mCds.getEventSubUrl()));
+        verify(mControlPoint).registerSubscribeService(mCds, false);
+
+        final String callback = factory.getHttpRequest().getHeader(Http.CALLBACK);
+        assertThat(callback.charAt(0), is('<'));
+        assertThat(callback.charAt(callback.length() - 1), is('>'));
+        final URL url = new URL(callback.substring(1, callback.length()-2));
+        assertThat(url.getHost(), is(INTERFACE_ADDRESS));
+        assertThat(url.getPort(), is(EVENT_PORT));
+        System.out.println();
     }
 
     @Test
@@ -176,6 +188,7 @@ public class ServiceTest {
 
         final HttpRequest request = factory.getHttpRequest();
         assertThat(request.getUri(), is(mCds.getEventSubUrl()));
+        verify(mControlPoint).registerSubscribeService(mCds, true);
     }
 
     @Test
@@ -200,6 +213,7 @@ public class ServiceTest {
 
         final HttpRequest request = factory.getHttpRequest();
         assertThat(request.getUri(), is(mCds.getEventSubUrl()));
+        verify(mControlPoint).unregisterSubscribeService(mCds);
     }
 
     @Test

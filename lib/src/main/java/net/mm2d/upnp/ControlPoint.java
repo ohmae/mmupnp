@@ -261,6 +261,8 @@ public class ControlPoint {
         mLoadingDeviceMap = new HashMap<>();
         mNotifyExecutor = Executors.newSingleThreadExecutor();
         mCachedThreadPool = Executors.newCachedThreadPool();
+        mDiscoveryListenerList = new DiscoveryListenerList();
+        mNotifyEventListenerList = new NotifyEventListenerList();
 
         mSearchList = new SsdpSearchServerList(interfaces, new ResponseListener() {
             @Override
@@ -284,8 +286,6 @@ public class ControlPoint {
                 });
             }
         });
-        mDiscoveryListenerList = new DiscoveryListenerList();
-        mNotifyEventListenerList = new NotifyEventListenerList();
         mDeviceHolder = new DeviceHolder(this);
         mSubscribeHolder = new SubscribeHolder();
         mEventReceiver = new EventReceiver(new EventMessageListener() {

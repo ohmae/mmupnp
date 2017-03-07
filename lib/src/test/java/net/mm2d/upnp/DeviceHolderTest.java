@@ -86,8 +86,8 @@ public class DeviceHolderTest {
 
     @Test(timeout = 20000L)
     public void expireDevice_時間経過後に削除される() throws Exception {
-
-        final DeviceHolder holder = new DeviceHolder(mock(ControlPoint.class));
+        final ControlPoint cp = mock(ControlPoint.class);
+        final DeviceHolder holder = new DeviceHolder(cp);
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         doReturn(System.currentTimeMillis() + 100L).when(device).getExpireTime();
@@ -101,6 +101,7 @@ public class DeviceHolderTest {
         Thread.sleep(11000L); // 内部で10秒のマージンを持っているため十分な時間を開ける
 
         assertThat(holder.size(), is(0));
+        verify(cp).lostDevice(device);
         holder.shutdownRequest();
     }
 }
