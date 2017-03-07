@@ -130,7 +130,7 @@ public class HttpClient {
         if (!isKeepAlive() || !response.isKeepAlive()) {
             closeSocket();
         }
-        return redirectIfNeed(request, response, redirectDepth);
+        return redirectIfNeeded(request, response, redirectDepth);
     }
 
     private void confirmReuseSocket(final @Nonnull HttpRequest request) {
@@ -156,20 +156,20 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirectIfNeed(final @Nonnull HttpRequest request,
-                                        final @Nonnull HttpResponse response,
-                                        final int redirectDepth)
+    private HttpResponse redirectIfNeeded(final @Nonnull HttpRequest request,
+                                          final @Nonnull HttpResponse response,
+                                          final int redirectDepth)
             throws IOException {
-        if (isRedirection(response) && redirectDepth < REDIRECT_MAX) {
+        if (needToRedirect(response) && redirectDepth < REDIRECT_MAX) {
             final String location = response.getHeader(Http.LOCATION);
-            if (location != null) {
+            if (TextUtils.isEmpty(location)) {
                 return redirect(request, location, redirectDepth);
             }
         }
         return response;
     }
 
-    private static boolean isRedirection(final @Nonnull HttpResponse response) {
+    private static boolean needToRedirect(final @Nonnull HttpResponse response) {
         final Http.Status status = response.getStatus();
         if (status == null) {
             return false;

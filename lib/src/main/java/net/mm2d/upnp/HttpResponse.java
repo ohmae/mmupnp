@@ -18,8 +18,10 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpResponse extends HttpMessage {
+    @Nullable
     private Http.Status mStatus;
     private int mStatusCode;
+    @Nonnull
     private String mReasonPhrase = "";
 
     /**

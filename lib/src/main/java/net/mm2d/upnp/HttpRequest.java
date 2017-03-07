@@ -22,7 +22,9 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpRequest extends HttpMessage {
+    @Nonnull
     private String mMethod = "GET";
+    @Nonnull
     private String mUri = "";
 
     /**
