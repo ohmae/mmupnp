@@ -214,11 +214,7 @@ public class Action {
         return mName + "Response";
     }
 
-    /**
-     * HttpClientのファクトリークラスを変更する。
-     *
-     * @param factory ファクトリークラス
-     */
+    // VisibleForTesting
     void setHttpClientFactory(final @Nonnull HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }

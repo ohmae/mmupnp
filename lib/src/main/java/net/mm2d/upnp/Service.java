@@ -486,11 +486,7 @@ public class Service {
         return DEFAULT_SUBSCRIPTION_TIMEOUT;
     }
 
-    /**
-     * HttpClientのファクトリークラスを変更する。
-     *
-     * @param factory ファクトリークラス
-     */
+    // VisibleForTesting
     void setHttpClientFactory(final @Nonnull HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }

@@ -108,9 +108,9 @@ public class ControlPoint {
     @Nonnull
     private final NotifyEventListenerList mNotifyEventListenerList;
     @Nonnull
-    private final Collection<SsdpSearchServer> mSearchList;
+    private final SsdpSearchServerList mSearchList;
     @Nonnull
-    private final Collection<SsdpNotifyReceiver> mNotifyList;
+    private final SsdpNotifyReceiverList mNotifyList;
     @Nonnull
     private final Map<String, Device.Builder> mLoadingDeviceMap;
     @Nonnull
@@ -130,11 +130,7 @@ public class ControlPoint {
     @Nonnull
     private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
-    /**
-     * HttpClientのファクトリークラスを変更する。
-     *
-     * @param factory ファクトリークラス
-     */
+    // VisibleForTesting
     void setHttpClientFactory(final @Nonnull HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }
@@ -262,7 +258,11 @@ public class ControlPoint {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
         }
-        mSearchList = setUpSsdpSearchServers(interfaces, new ResponseListener() {
+        mLoadingDeviceMap = new HashMap<>();
+        mNotifyExecutor = Executors.newSingleThreadExecutor();
+        mCachedThreadPool = Executors.newCachedThreadPool();
+
+        mSearchList = new SsdpSearchServerList(interfaces, new ResponseListener() {
             @Override
             public void onReceiveResponse(final @Nonnull SsdpResponseMessage message) {
                 executeInParallel(new Runnable() {
@@ -273,7 +273,7 @@ public class ControlPoint {
                 });
             }
         });
-        mNotifyList = setUpSsdpNotifyReceivers(interfaces, new NotifyListener() {
+        mNotifyList = new SsdpNotifyReceiverList(interfaces, new NotifyListener() {
             @Override
             public void onReceiveNotify(final @Nonnull SsdpRequestMessage message) {
                 executeInParallel(new Runnable() {
@@ -284,46 +284,17 @@ public class ControlPoint {
                 });
             }
         });
-        mLoadingDeviceMap = new HashMap<>();
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();
-        mNotifyExecutor = Executors.newSingleThreadExecutor();
-        mCachedThreadPool = Executors.newCachedThreadPool();
         mDeviceHolder = new DeviceHolder(this);
         mSubscribeHolder = new SubscribeHolder();
-
-        mEventReceiver = new EventReceiver();
-        mEventReceiver.setEventMessageListener(new EventMessageListener() {
+        mEventReceiver = new EventReceiver(new EventMessageListener() {
             @Override
             public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties) {
                 final Service service = getSubscribeService(sid);
                 return service != null && executeInSequential(new EventNotifyTask(service, seq, properties));
             }
         });
-    }
-
-    @Nonnull
-    private static List<SsdpSearchServer> setUpSsdpSearchServers(
-            final @Nonnull Collection<NetworkInterface> interfaces, final @Nonnull ResponseListener listener) {
-        final List<SsdpSearchServer> list = new ArrayList<>(interfaces.size());
-        for (final NetworkInterface nif : interfaces) {
-            final SsdpSearchServer search = new SsdpSearchServer(nif);
-            search.setResponseListener(listener);
-            list.add(search);
-        }
-        return list;
-    }
-
-    @Nonnull
-    private static List<SsdpNotifyReceiver> setUpSsdpNotifyReceivers(
-            final @Nonnull Collection<NetworkInterface> interfaces, final @Nonnull NotifyListener listener) {
-        final List<SsdpNotifyReceiver> list = new ArrayList<>();
-        for (final NetworkInterface nif : interfaces) {
-            final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);
-            notify.setNotifyListener(listener);
-            list.add(notify);
-        }
-        return list;
     }
 
     private boolean executeInParallel(final @Nonnull Runnable command) {
@@ -420,22 +391,8 @@ public class ControlPoint {
         } catch (final IOException e1) {
             Log.w(TAG, e1);
         }
-        for (final SsdpServer server : mSearchList) {
-            try {
-                server.open();
-                server.start();
-            } catch (final IOException e) {
-                Log.w(TAG, e);
-            }
-        }
-        for (final SsdpServer server : mNotifyList) {
-            try {
-                server.open();
-                server.start();
-            } catch (final IOException e) {
-                Log.w(TAG, e);
-            }
-        }
+        mSearchList.openAndStart();
+        mNotifyList.openAndStart();
     }
 
     /**
@@ -465,18 +422,10 @@ public class ControlPoint {
             });
         }
         mSubscribeHolder.clear();
-        for (final SsdpServer server : mSearchList) {
-            server.stop();
-        }
-        for (final SsdpServer server : mNotifyList) {
-            server.stop();
-        }
-        for (final SsdpServer server : mSearchList) {
-            server.close();
-        }
-        for (final SsdpServer server : mNotifyList) {
-            server.close();
-        }
+        mSearchList.stop();
+        mNotifyList.stop();
+        mSearchList.close();
+        mNotifyList.close();
         mEventReceiver.close();
         final List<Device> list = getDeviceList();
         for (final Device device : list) {
@@ -505,9 +454,7 @@ public class ControlPoint {
         if (!mStarted.get()) {
             throw new IllegalStateException("ControlPoint is not started.");
         }
-        for (final SsdpSearchServer server : mSearchList) {
-            server.search(st);
-        }
+        mSearchList.search(st);
     }
 
     /**

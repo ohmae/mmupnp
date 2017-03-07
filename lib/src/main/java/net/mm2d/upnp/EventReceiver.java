@@ -60,24 +60,14 @@ class EventReceiver {
 
     private ServerSocket mServerSocket;
     private ServerTask mServerTask;
-    private EventMessageListener mListener;
+    @Nullable
+    private final EventMessageListener mListener;
 
     /**
      * インスタンス作成。
      */
-    EventReceiver() {
-    }
-
-    /**
-     * イベント受信リスナーを登録する。
-     *
-     * @param listener リスナー
-     */
-    void setEventMessageListener(final @Nullable EventMessageListener listener) {
+    EventReceiver(final @Nullable EventMessageListener listener) {
         mListener = listener;
-        if (mServerTask != null) {
-            mServerTask.setEventMessageListener(listener);
-        }
     }
 
     /**
