@@ -280,12 +280,12 @@ public class HttpClient {
     }
 
     @Nonnull
-    private static HttpRequest makeHttpRequest(final @Nonnull URL url) throws IOException {
+    private HttpRequest makeHttpRequest(final @Nonnull URL url) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
         request.setUrl(url, true);
         request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
+        request.setHeader(Http.CONNECTION, isKeepAlive() ? Http.KEEP_ALIVE : Http.CLOSE);
         return request;
     }
 }
