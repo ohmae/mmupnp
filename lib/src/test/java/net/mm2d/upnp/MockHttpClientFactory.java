@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
-public class MockHttpClientFactory extends HttpClientFactory {
+class MockHttpClientFactory extends HttpClientFactory {
     private HttpRequest mHttpRequest;
     private HttpResponse mHttpResponse;
 

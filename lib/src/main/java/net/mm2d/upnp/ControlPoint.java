@@ -19,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -240,7 +239,8 @@ public class ControlPoint {
      * @param interfaces 使用するインターフェース、指定しない場合は自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
-    public ControlPoint(final @Nonnull NetworkInterface... interfaces) {
+    public ControlPoint(final @Nonnull NetworkInterface... interfaces)
+            throws IllegalStateException {
         this(Arrays.asList(interfaces));
     }
 
@@ -250,11 +250,23 @@ public class ControlPoint {
      * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
-    public ControlPoint(@Nullable Collection<NetworkInterface> interfaces)
+    public ControlPoint(final @Nullable Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
+        this(getDefaultInterfacesIfEmpty(interfaces), new ControlPointFactory());
+    }
+
+    @Nonnull
+    private static Collection<NetworkInterface> getDefaultInterfacesIfEmpty(
+            final @Nullable Collection<NetworkInterface> interfaces) {
         if (interfaces == null || interfaces.isEmpty()) {
-            interfaces = NetworkUtils.getAvailableInet4Interfaces();
+            return NetworkUtils.getAvailableInet4Interfaces();
         }
+        return interfaces;
+    }
+
+    // VisibleForTesting
+    ControlPoint(final @Nonnull Collection<NetworkInterface> interfaces,
+                 final @Nonnull ControlPointFactory factory) {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
         }
@@ -264,7 +276,7 @@ public class ControlPoint {
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();
 
-        mSearchList = new SsdpSearchServerList(interfaces, new ResponseListener() {
+        mSearchList = factory.createSsdpSearchServerList(interfaces, new ResponseListener() {
             @Override
             public void onReceiveResponse(final @Nonnull SsdpResponseMessage message) {
                 executeInParallel(new Runnable() {
@@ -275,7 +287,7 @@ public class ControlPoint {
                 });
             }
         });
-        mNotifyList = new SsdpNotifyReceiverList(interfaces, new NotifyListener() {
+        mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, new NotifyListener() {
             @Override
             public void onReceiveNotify(final @Nonnull SsdpRequestMessage message) {
                 executeInParallel(new Runnable() {
@@ -288,7 +300,7 @@ public class ControlPoint {
         });
         mDeviceHolder = new DeviceHolder(this);
         mSubscribeHolder = new SubscribeHolder();
-        mEventReceiver = new EventReceiver(new EventMessageListener() {
+        mEventReceiver = factory.createEventReceiver(new EventMessageListener() {
             @Override
             public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties) {
                 final Service service = getSubscribeService(sid);
@@ -508,7 +520,8 @@ public class ControlPoint {
         mNotifyEventListenerList.remove(listener);
     }
 
-    private void discoverDevice(final @Nonnull Device device) {
+    // VisibleForTesting
+    void discoverDevice(final @Nonnull Device device) {
         mDeviceHolder.add(device);
         executeInSequential(new Runnable() {
             @Override
