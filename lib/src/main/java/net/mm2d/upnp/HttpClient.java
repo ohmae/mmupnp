@@ -162,7 +162,7 @@ public class HttpClient {
             throws IOException {
         if (needToRedirect(response) && redirectDepth < REDIRECT_MAX) {
             final String location = response.getHeader(Http.LOCATION);
-            if (TextUtils.isEmpty(location)) {
+            if (!TextUtils.isEmpty(location)) {
                 return redirect(request, location, redirectDepth);
             }
         }
