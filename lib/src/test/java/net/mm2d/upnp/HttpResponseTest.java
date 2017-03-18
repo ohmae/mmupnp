@@ -33,7 +33,7 @@ public class HttpResponseTest {
     static {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(TimeZone.getTimeZone("GMT"));
-        cal.set(2017, 0, 1, 0, 0, 0);
+        cal.set(2017, Calendar.JANUARY, 1, 0, 0, 0);
         cal.set(Calendar.MILLISECOND, 0);
         DATE = cal.getTime();
     }
