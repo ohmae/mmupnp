@@ -109,11 +109,7 @@ class DeviceHolder implements Runnable {
      */
     @Nonnull
     synchronized List<Device> getDeviceList() {
-        final List<Device> list = new ArrayList<>(mDeviceMap.size());
-        for (final Device device : mDeviceMap.values()) {
-            list.add(device);
-        }
-        return list;
+        return new ArrayList<>(mDeviceMap.values());
     }
 
     /**
