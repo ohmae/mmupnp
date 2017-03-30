@@ -101,7 +101,7 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    public HttpResponse post(final @Nonnull HttpRequest request) throws IOException {
+    public HttpResponse post(@Nonnull final HttpRequest request) throws IOException {
         return post(request, 0);
     }
 
@@ -116,7 +116,7 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    private HttpResponse post(final @Nonnull HttpRequest request, final int redirectDepth) throws IOException {
+    private HttpResponse post(@Nonnull final HttpRequest request, final int redirectDepth) throws IOException {
         confirmReuseSocket(request);
         final HttpResponse response;
         try {
@@ -133,13 +133,13 @@ public class HttpClient {
         return redirectIfNeeded(request, response, redirectDepth);
     }
 
-    private void confirmReuseSocket(final @Nonnull HttpRequest request) {
+    private void confirmReuseSocket(@Nonnull final HttpRequest request) {
         if (!isClosed() && !canReuse(request)) {
             closeSocket();
         }
     }
 
-    private void writeData(final @Nonnull HttpRequest request) throws IOException {
+    private void writeData(@Nonnull final HttpRequest request) throws IOException {
         if (isClosed()) {
             openSocket(request);
             request.writeData(mOutputStream);
@@ -156,8 +156,8 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirectIfNeeded(final @Nonnull HttpRequest request,
-                                          final @Nonnull HttpResponse response,
+    private HttpResponse redirectIfNeeded(@Nonnull final HttpRequest request,
+                                          @Nonnull final HttpResponse response,
                                           final int redirectDepth)
             throws IOException {
         if (needToRedirect(response) && redirectDepth < REDIRECT_MAX) {
@@ -169,7 +169,7 @@ public class HttpClient {
         return response;
     }
 
-    private static boolean needToRedirect(final @Nonnull HttpResponse response) {
+    private static boolean needToRedirect(@Nonnull final HttpResponse response) {
         final Http.Status status = response.getStatus();
         if (status == null) {
             return false;
@@ -186,8 +186,8 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirect(final @Nonnull HttpRequest request,
-                                  final @Nonnull String location, final int redirectDepth)
+    private HttpResponse redirect(@Nonnull final HttpRequest request,
+                                  @Nonnull final String location, final int redirectDepth)
             throws IOException {
         final HttpRequest newRequest = new HttpRequest(request);
         newRequest.setUrl(new URL(location), true);
@@ -195,7 +195,7 @@ public class HttpClient {
         return new HttpClient(false).post(newRequest, redirectDepth + 1);
     }
 
-    private boolean canReuse(final @Nonnull HttpRequest request) {
+    private boolean canReuse(@Nonnull final HttpRequest request) {
         return mSocket.isConnected()
                 && mSocket.getInetAddress().equals(request.getAddress())
                 && mSocket.getPort() == request.getPort();
@@ -205,7 +205,7 @@ public class HttpClient {
         return mSocket == null;
     }
 
-    private void openSocket(final @Nonnull HttpRequest request) throws IOException {
+    private void openSocket(@Nonnull final HttpRequest request) throws IOException {
         mSocket = new Socket();
         mSocket.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT);
         mSocket.setSoTimeout(Property.DEFAULT_TIMEOUT);
@@ -237,7 +237,7 @@ public class HttpClient {
      * @throws IOException 取得に問題があった場合
      */
     @Nonnull
-    public String downloadString(@Nonnull URL url) throws IOException {
+    public String downloadString(@Nonnull final URL url) throws IOException {
         final String body = download(url).getBody();
         if (body == null) {
             throw new IOException("body is null");
@@ -253,7 +253,7 @@ public class HttpClient {
      * @throws IOException 取得に問題があった場合
      */
     @Nonnull
-    public byte[] downloadBinary(final @Nonnull URL url) throws IOException {
+    public byte[] downloadBinary(@Nonnull final URL url) throws IOException {
         final byte[] body = download(url).getBodyBinary();
         if (body == null) {
             throw new IOException("body is null");
@@ -269,7 +269,7 @@ public class HttpClient {
      * @throws IOException 取得に問題があった場合
      */
     @Nonnull
-    public HttpResponse download(final @Nonnull URL url) throws IOException {
+    public HttpResponse download(@Nonnull final URL url) throws IOException {
         final HttpRequest request = makeHttpRequest(url);
         final HttpResponse response = post(request);
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
@@ -280,7 +280,7 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpRequest makeHttpRequest(final @Nonnull URL url) throws IOException {
+    private HttpRequest makeHttpRequest(@Nonnull final URL url) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
         request.setUrl(url, true);

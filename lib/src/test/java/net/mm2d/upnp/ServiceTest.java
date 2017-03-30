@@ -173,7 +173,7 @@ public class ServiceTest {
         final String callback = factory.getHttpRequest().getHeader(Http.CALLBACK);
         assertThat(callback.charAt(0), is('<'));
         assertThat(callback.charAt(callback.length() - 1), is('>'));
-        final URL url = new URL(callback.substring(1, callback.length()-2));
+        final URL url = new URL(callback.substring(1, callback.length() - 2));
         assertThat(url.getHost(), is(INTERFACE_ADDRESS));
         assertThat(url.getPort(), is(EVENT_PORT));
         System.out.println();

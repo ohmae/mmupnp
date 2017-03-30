@@ -34,7 +34,7 @@ public class NetworkUtils {
     public static List<NetworkInterface> getAvailableInet4Interfaces() {
         final List<NetworkInterface> resultList = new ArrayList<>();
         final List<NetworkInterface> allList = getNetworkInterfaceList();
-        for (NetworkInterface ni : allList) {
+        for (final NetworkInterface ni : allList) {
             if (isAvailableInet4Interface(ni)) {
                 resultList.add(ni);
             }
@@ -91,7 +91,7 @@ public class NetworkUtils {
      * @param netIf 検査するNetworkInterface
      * @return true:外部と通信可能なIPv4アドレスを持つ。false:それ以外
      */
-    private static boolean isAvailableInet4Interface(final @Nonnull NetworkInterface netIf) {
+    private static boolean isAvailableInet4Interface(@Nonnull final NetworkInterface netIf) {
         return isConnectedToNetwork(netIf) && hasInet4Address(netIf);
     }
 
@@ -101,7 +101,7 @@ public class NetworkUtils {
      * @param netIf 検査するNetworkInterface
      * @return true:ネットワークに接続している。false:それ以外
      */
-    private static boolean isConnectedToNetwork(final @Nonnull NetworkInterface netIf) {
+    private static boolean isConnectedToNetwork(@Nonnull final NetworkInterface netIf) {
         try {
             return !netIf.isLoopback() && netIf.isUp();
         } catch (final SocketException ignored) {
@@ -115,7 +115,7 @@ public class NetworkUtils {
      * @param netIf 検査するNetworkInterface
      * @return true:IPv4アドレスを持つ。false:それ以外
      */
-    private static boolean hasInet4Address(final @Nonnull NetworkInterface netIf) {
+    private static boolean hasInet4Address(@Nonnull final NetworkInterface netIf) {
         final List<InterfaceAddress> addresses = netIf.getInterfaceAddresses();
         for (final InterfaceAddress address : addresses) {
             if (address.getAddress() instanceof Inet4Address) {

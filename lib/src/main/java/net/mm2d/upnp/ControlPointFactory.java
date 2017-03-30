@@ -23,18 +23,18 @@ import javax.annotation.Nonnull;
  */
 class ControlPointFactory {
     SsdpSearchServerList createSsdpSearchServerList(
-            @Nonnull Collection<NetworkInterface> interfaces,
-            @Nonnull ResponseListener listener) {
+            @Nonnull final Collection<NetworkInterface> interfaces,
+            @Nonnull final ResponseListener listener) {
         return new SsdpSearchServerList(interfaces, listener);
     }
 
     SsdpNotifyReceiverList createSsdpNotifyReceiverList(
-            @Nonnull Collection<NetworkInterface> interfaces,
-            @Nonnull NotifyListener listener) {
+            @Nonnull final Collection<NetworkInterface> interfaces,
+            @Nonnull final NotifyListener listener) {
         return new SsdpNotifyReceiverList(interfaces, listener);
     }
 
-    EventReceiver createEventReceiver(@Nonnull EventMessageListener listener) {
+    EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
         return new EventReceiver(listener);
     }
 }

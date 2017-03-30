@@ -22,25 +22,25 @@ import javax.annotation.Nonnull;
 class DiscoveryListenerList implements DiscoveryListener {
     private final List<DiscoveryListener> mList = new ArrayList<>();
 
-    synchronized void add(final @Nonnull DiscoveryListener l) {
+    synchronized void add(@Nonnull final DiscoveryListener l) {
         if (!mList.contains(l)) {
             mList.add(l);
         }
     }
 
-    synchronized void remove(final @Nonnull DiscoveryListener l) {
+    synchronized void remove(@Nonnull final DiscoveryListener l) {
         mList.remove(l);
     }
 
     @Override
-    public synchronized void onDiscover(final @Nonnull Device device) {
+    public synchronized void onDiscover(@Nonnull final Device device) {
         for (final DiscoveryListener l : mList) {
             l.onDiscover(device);
         }
     }
 
     @Override
-    public synchronized void onLost(final @Nonnull Device device) {
+    public synchronized void onLost(@Nonnull final Device device) {
         for (final DiscoveryListener l : mList) {
             l.onLost(device);
         }

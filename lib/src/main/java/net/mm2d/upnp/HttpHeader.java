@@ -31,7 +31,7 @@ public class HttpHeader {
      * @return Key
      */
     @Nonnull
-    private static String toKey(final @Nonnull String name) {
+    private static String toKey(@Nonnull final String name) {
         return TextUtils.toLowerCase(name);
     }
 
@@ -49,7 +49,7 @@ public class HttpHeader {
          * @param name  ヘッダ名
          * @param value 値
          */
-        public Entry(final @Nonnull String name, final @Nonnull String value) {
+        public Entry(@Nonnull final String name, @Nonnull final String value) {
             mKey = toKey(name);
             mName = name;
             mValue = value;
@@ -60,7 +60,7 @@ public class HttpHeader {
          *
          * @param original コピー元
          */
-        public Entry(final @Nonnull Entry original) {
+        public Entry(@Nonnull final Entry original) {
             mKey = original.mKey;
             mName = original.mName;
             mValue = original.mValue;
@@ -81,7 +81,7 @@ public class HttpHeader {
          * @param name ヘッダ名
          * @throws IllegalArgumentException keyとしての値が一致しないものに更新しようとした場合
          */
-        private void setName(final @Nonnull String name) {
+        private void setName(@Nonnull final String name) {
             if (!mKey.equals(toKey(name))) {
                 throw new IllegalArgumentException();
             }
@@ -103,7 +103,7 @@ public class HttpHeader {
          *
          * @param value 値
          */
-        private void setValue(final @Nonnull String value) {
+        private void setValue(@Nonnull final String value) {
             mValue = value;
         }
 
@@ -130,7 +130,7 @@ public class HttpHeader {
             if (obj == null || !(obj instanceof Entry)) {
                 return false;
             }
-            Entry entry = (Entry) obj;
+            final Entry entry = (Entry) obj;
             return mName.equals(entry.mName)
                     && mValue.equals(entry.mValue);
         }
@@ -175,7 +175,7 @@ public class HttpHeader {
     public HttpHeader(final HttpHeader original) {
         // EntryはmutableなのでDeep copyが必要
         mList = new LinkedList<>();
-        for (Entry entry : original.mList) {
+        for (final Entry entry : original.mList) {
             mList.add(new Entry(entry));
         }
     }
@@ -207,7 +207,7 @@ public class HttpHeader {
      * @return ヘッダの値
      */
     @Nullable
-    public String get(final @Nonnull String name) {
+    public String get(@Nonnull final String name) {
         final String key = toKey(name);
         for (final Entry entry : mList) {
             if (entry.getKey().equals(key)) {
@@ -226,7 +226,7 @@ public class HttpHeader {
      * @return 削除されたヘッダがあった場合、ヘッダの値、なかった場合null
      */
     @Nullable
-    public String remove(final @Nonnull String name) {
+    public String remove(@Nonnull final String name) {
         final String key = toKey(name);
         final Iterator<Entry> i = mList.iterator();
         while (i.hasNext()) {
@@ -252,7 +252,7 @@ public class HttpHeader {
      * @return 重複があった場合、既に登録されていた値。
      */
     @Nullable
-    public String put(final @Nonnull String name, final @Nonnull String value) {
+    public String put(@Nonnull final String name, @Nonnull final String value) {
         final String key = toKey(name);
         for (final Entry entry : mList) {
             if (entry.getKey().equals(key)) {
@@ -275,7 +275,7 @@ public class HttpHeader {
      * @param value 含まれるか
      * @return 指定ヘッダにvalueが含まれる場合true
      */
-    public boolean containsValue(final @Nonnull String name, final @Nonnull String value) {
+    public boolean containsValue(@Nonnull final String name, @Nonnull final String value) {
         final String v = TextUtils.toLowerCase(get(name));
         return v != null && v.contains(TextUtils.toLowerCase(value));
     }

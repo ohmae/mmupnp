@@ -69,7 +69,7 @@ class SubscribeHolder implements Runnable {
      * @param service   登録するService
      * @param keepRenew 期限が切れる前にrenewSubscribeを続ける場合true
      */
-    synchronized void add(final @Nonnull Service service, final boolean keepRenew) {
+    synchronized void add(@Nonnull final Service service, final boolean keepRenew) {
         if (service.getSubscriptionId() == null) {
             return;
         }
@@ -83,7 +83,7 @@ class SubscribeHolder implements Runnable {
      *
      * @param service 削除するサービス
      */
-    synchronized void remove(final @Nonnull Service service) {
+    synchronized void remove(@Nonnull final Service service) {
         mServiceMap.remove(service.getSubscriptionId());
         notifyAll();
     }
@@ -96,7 +96,7 @@ class SubscribeHolder implements Runnable {
     @Nonnull
     synchronized List<Service> getServiceList() {
         final List<Service> list = new ArrayList<>(mServiceMap.size());
-        for (Map.Entry<String, SubscribeService> entry : mServiceMap.entrySet()) {
+        for (final Map.Entry<String, SubscribeService> entry : mServiceMap.entrySet()) {
             list.add(entry.getValue().getService());
         }
         return list;
@@ -109,8 +109,8 @@ class SubscribeHolder implements Runnable {
      * @return 該当するService
      */
     @Nullable
-    Service getService(final @Nonnull String subscriptionId) {
-        SubscribeService c = mServiceMap.get(subscriptionId);
+    Service getService(@Nonnull final String subscriptionId) {
+        final SubscribeService c = mServiceMap.get(subscriptionId);
         if (c == null) {
             return null;
         }
@@ -162,7 +162,7 @@ class SubscribeHolder implements Runnable {
      *
      * @param serviceList renewのトリガをかけるServiceのコレクション
      */
-    private void renewSubscribe(final @Nonnull Collection<SubscribeService> serviceList) {
+    private void renewSubscribe(@Nonnull final Collection<SubscribeService> serviceList) {
         for (final SubscribeService s : serviceList) {
             if (!s.renewSubscribe(System.currentTimeMillis()) && s.isFailed()) {
                 remove(s.getService());
@@ -176,7 +176,7 @@ class SubscribeHolder implements Runnable {
     private synchronized void removeExpiredService() {
         final long now = System.currentTimeMillis();
         final List<SubscribeService> list = new ArrayList<>(mServiceMap.values());
-        for (SubscribeService s : list) {
+        for (final SubscribeService s : list) {
             if (s.isExpired(now)) {
                 final Service service = s.getService();
                 remove(service);
@@ -205,7 +205,7 @@ class SubscribeHolder implements Runnable {
      */
     private long findMostRecentTime() {
         long recent = Long.MAX_VALUE;
-        for (SubscribeService s : mServiceMap.values()) {
+        for (final SubscribeService s : mServiceMap.values()) {
             final long wait = s.getNextScanTime();
             if (recent > wait) {
                 recent = wait;

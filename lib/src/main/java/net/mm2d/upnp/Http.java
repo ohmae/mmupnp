@@ -144,7 +144,7 @@ public final class Http {
         @Nonnull
         private final String mPhrase;
 
-        Status(int code, @Nonnull String phrase) {
+        Status(final int code, @Nonnull final String phrase) {
             mCode = code;
             mPhrase = phrase;
         }
@@ -175,7 +175,7 @@ public final class Http {
          * @return 該当するStatus
          */
         @Nullable
-        public static Status valueOf(int code) {
+        public static Status valueOf(final int code) {
             for (final Status c : values()) {
                 if (c.getCode() == code) {
                     return c;
@@ -214,7 +214,7 @@ public final class Http {
      * @return パース結果、失敗した場合null
      */
     @Nullable
-    public static synchronized Date parseDate(final @Nullable String string) {
+    public static synchronized Date parseDate(@Nullable final String string) {
         if (TextUtils.isEmpty(string)) {
             return null;
         }
@@ -251,7 +251,7 @@ public final class Http {
      * @return RFC1123形式の日付文字列
      */
     @Nonnull
-    public static synchronized String formatDate(final @Nonnull Date date) {
+    public static synchronized String formatDate(@Nonnull final Date date) {
         return RFC_1123_FORMAT.format(date);
     }
 

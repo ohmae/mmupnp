@@ -29,8 +29,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Device {
-    private static final String TAG = Device.class.getSimpleName();
-
     /**
      * DeviceのBuilder。
      *
@@ -68,7 +66,7 @@ public class Device {
          * @param controlPoint ControlPoint
          * @param ssdpMessage  SSDPパケット
          */
-        public Builder(@Nonnull ControlPoint controlPoint, @Nonnull SsdpMessage ssdpMessage) {
+        public Builder(@Nonnull final ControlPoint controlPoint, @Nonnull final SsdpMessage ssdpMessage) {
             mControlPoint = controlPoint;
             final String location = ssdpMessage.getLocation();
             if (location == null) {
@@ -107,7 +105,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder updateSsdpMessage(@Nonnull SsdpMessage ssdpMessage) {
+        public Builder updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
             final String location = ssdpMessage.getLocation();
             if (location == null) {
                 throw new IllegalArgumentException();
@@ -124,7 +122,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setDescription(@Nonnull String description) {
+        public Builder setDescription(@Nonnull final String description) {
             mDescription = description;
             return this;
         }
@@ -136,7 +134,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setUdn(@Nonnull String udn) {
+        public Builder setUdn(@Nonnull final String udn) {
             mUdn = udn;
             return this;
         }
@@ -148,7 +146,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setDeviceType(@Nonnull String deviceType) {
+        public Builder setDeviceType(@Nonnull final String deviceType) {
             mDeviceType = deviceType;
             return this;
         }
@@ -160,7 +158,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setFriendlyName(@Nonnull String friendlyName) {
+        public Builder setFriendlyName(@Nonnull final String friendlyName) {
             mFriendlyName = friendlyName;
             return this;
         }
@@ -172,7 +170,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setManufacture(@Nonnull String manufacture) {
+        public Builder setManufacture(@Nonnull final String manufacture) {
             mManufacture = manufacture;
             return this;
         }
@@ -184,7 +182,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setManufactureUrl(@Nonnull String manufactureUrl) {
+        public Builder setManufactureUrl(@Nonnull final String manufactureUrl) {
             mManufactureUrl = manufactureUrl;
             return this;
         }
@@ -196,7 +194,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setModelName(@Nonnull String modelName) {
+        public Builder setModelName(@Nonnull final String modelName) {
             mModelName = modelName;
             return this;
         }
@@ -208,7 +206,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setModelUrl(@Nonnull String modelUrl) {
+        public Builder setModelUrl(@Nonnull final String modelUrl) {
             mModelUrl = modelUrl;
             return this;
         }
@@ -220,7 +218,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setModelDescription(@Nonnull String modelDescription) {
+        public Builder setModelDescription(@Nonnull final String modelDescription) {
             mModelDescription = modelDescription;
             return this;
         }
@@ -232,7 +230,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setModelNumber(@Nonnull String modelNumber) {
+        public Builder setModelNumber(@Nonnull final String modelNumber) {
             mModelNumber = modelNumber;
             return this;
         }
@@ -244,7 +242,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setSerialNumber(@Nonnull String serialNumber) {
+        public Builder setSerialNumber(@Nonnull final String serialNumber) {
             mSerialNumber = serialNumber;
             return this;
         }
@@ -256,7 +254,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setPresentationUrl(@Nonnull String presentationUrl) {
+        public Builder setPresentationUrl(@Nonnull final String presentationUrl) {
             mPresentationUrl = presentationUrl;
             return this;
         }
@@ -268,7 +266,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setIconBuilderList(@Nonnull List<Icon.Builder> iconBuilderList) {
+        public Builder setIconBuilderList(@Nonnull final List<Icon.Builder> iconBuilderList) {
             mIconBuilderList = iconBuilderList;
             return this;
         }
@@ -280,7 +278,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setServiceBuilderList(@Nonnull List<Service.Builder> serviceBuilderList) {
+        public Builder setServiceBuilderList(@Nonnull final List<Service.Builder> serviceBuilderList) {
             mServiceBuilderList = serviceBuilderList;
             return this;
         }
@@ -307,7 +305,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder putTag(@Nonnull String namespace, @Nonnull String tag, @Nonnull String value) {
+        public Builder putTag(@Nonnull final String namespace, @Nonnull final String tag, @Nonnull final String value) {
             Map<String, String> map = mTagMap.get(namespace);
             if (map == null) {
                 map = new HashMap<>();
@@ -384,7 +382,7 @@ public class Device {
      *
      * @param builder ビルダー
      */
-    private Device(@Nonnull Builder builder) {
+    private Device(@Nonnull final Builder builder) {
         mControlPoint = builder.mControlPoint;
         mSsdpMessage = builder.mSsdpMessage;
         mLocation = builder.mLocation;
@@ -405,7 +403,7 @@ public class Device {
             mIconList = Collections.emptyList();
         } else {
             mIconList = new ArrayList<>(builder.mIconBuilderList.size());
-            for (Icon.Builder iconBuilder : builder.mIconBuilderList) {
+            for (final Icon.Builder iconBuilder : builder.mIconBuilderList) {
                 mIconList.add(iconBuilder.setDevice(this).build());
             }
         }
@@ -413,7 +411,7 @@ public class Device {
             mServiceList = Collections.emptyList();
         } else {
             mServiceList = new ArrayList<>(builder.mServiceBuilderList.size());
-            for (Service.Builder serviceBuilder : builder.mServiceBuilderList) {
+            for (final Service.Builder serviceBuilder : builder.mServiceBuilderList) {
                 mServiceList.add(serviceBuilder.setDevice(this).build());
             }
         }
@@ -425,7 +423,7 @@ public class Device {
      * @param client 通信に使用するHttpClient
      * @param filter 読み込むIconを選別するFilter
      */
-    void loadIconBinary(@Nonnull HttpClient client, @Nonnull IconFilter filter) {
+    void loadIconBinary(@Nonnull final HttpClient client, @Nonnull final IconFilter filter) {
         if (mIconList.isEmpty()) {
             return;
         }
@@ -456,7 +454,7 @@ public class Device {
      *
      * @param message SSDPパケット
      */
-    void updateSsdpMessage(@Nonnull SsdpMessage message) {
+    void updateSsdpMessage(@Nonnull final SsdpMessage message) {
         final String uuid = message.getUuid();
         if (!getUdn().equals(uuid)) {
             throw new IllegalArgumentException("uuid and udn does not match! uuid=" + uuid + " udn=" + mUdn);
@@ -507,7 +505,7 @@ public class Device {
      * @see #getAbsoluteUrl(String, String)
      */
     @Nonnull
-    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
+    URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
         return getAbsoluteUrl(getLocation(), url);
     }
 
@@ -542,7 +540,8 @@ public class Device {
      * @throws MalformedURLException 不正なURL
      */
     @Nonnull
-    static URL getAbsoluteUrl(@Nonnull String location, @Nonnull String url) throws MalformedURLException {
+    static URL getAbsoluteUrl(@Nonnull final String location, @Nonnull final String url)
+            throws MalformedURLException {
         if (url.length() > 6 && url.substring(0, 7).equalsIgnoreCase("http://")) {
             return new URL(url);
         }
@@ -553,7 +552,7 @@ public class Device {
         return new URL(jointRelativePath(baseUrl, url));
     }
 
-    private static String removeQuery(@Nonnull String url) {
+    private static String removeQuery(@Nonnull final String url) {
         final int pos = url.indexOf('?');
         if (pos > 0) {
             return url.substring(0, pos);
@@ -561,7 +560,7 @@ public class Device {
         return url;
     }
 
-    private static String jointAbsolutePath(@Nonnull String baseUrl, @Nonnull String path) {
+    private static String jointAbsolutePath(@Nonnull final String baseUrl, @Nonnull final String path) {
         final int pos = baseUrl.indexOf('/', "http://".length());
         if (pos < 0) {
             return baseUrl + path;
@@ -569,7 +568,7 @@ public class Device {
         return baseUrl.substring(0, pos) + path;
     }
 
-    private static String jointRelativePath(@Nonnull String baseUrl, @Nonnull String path) {
+    private static String jointRelativePath(@Nonnull final String baseUrl, @Nonnull final String path) {
         if (baseUrl.endsWith("/")) {
             return baseUrl + path;
         }
@@ -594,7 +593,7 @@ public class Device {
      * @return タグの値
      */
     @Nullable
-    public String getValue(@Nonnull String name) {
+    public String getValue(@Nonnull final String name) {
         for (final Entry<String, Map<String, String>> entry : mTagMap.entrySet()) {
             final String value = entry.getValue().get(name);
             if (value != null) {
@@ -618,7 +617,7 @@ public class Device {
      * @return タグの値
      */
     @Nullable
-    public String getValue(@Nonnull String name, @Nonnull String namespace) {
+    public String getValue(@Nonnull final String name, @Nonnull final String namespace) {
         final Map<String, String> map = mTagMap.get(namespace);
         if (map == null) {
             return null;
@@ -867,7 +866,7 @@ public class Device {
      * @see Service
      */
     @Nullable
-    public Service findServiceById(@Nonnull String id) {
+    public Service findServiceById(@Nonnull final String id) {
         for (final Service service : mServiceList) {
             if (service.getServiceId().equals(id)) {
                 return service;
@@ -886,7 +885,7 @@ public class Device {
      * @see Service
      */
     @Nullable
-    public Service findServiceByType(@Nonnull String type) {
+    public Service findServiceByType(@Nonnull final String type) {
         for (final Service service : mServiceList) {
             if (service.getServiceType().equals(type)) {
                 return service;
@@ -912,7 +911,7 @@ public class Device {
      * @see Action
      */
     @Nullable
-    public Action findAction(@Nonnull String name) {
+    public Action findAction(@Nonnull final String name) {
         for (final Service service : mServiceList) {
             final Action action = service.findAction(name);
             if (action != null) {
@@ -928,7 +927,7 @@ public class Device {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == this) {
             return true;
         }

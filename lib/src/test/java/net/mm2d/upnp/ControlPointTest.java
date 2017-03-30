@@ -133,7 +133,7 @@ public class ControlPointTest {
             mCp.discoverDevice(device);
             Thread.sleep(1);
 
-            verify(l,never()).onDiscover(device);
+            verify(l, never()).onDiscover(device);
         }
 
         @Test
@@ -150,7 +150,7 @@ public class ControlPointTest {
             mCp.discoverDevice(device);
             Thread.sleep(1);
 
-            verify(l,never()).onDiscover(device);
+            verify(l, never()).onDiscover(device);
         }
 
 

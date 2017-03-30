@@ -130,7 +130,7 @@ public class ControlPoint {
     private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     // VisibleForTesting
-    void setHttpClientFactory(final @Nonnull HttpClientFactory factory) {
+    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }
 
@@ -139,7 +139,7 @@ public class ControlPoint {
         return mHttpClientFactory.createHttpClient(true);
     }
 
-    private void onReceiveSsdp(final @Nonnull SsdpMessage message) {
+    private void onReceiveSsdp(@Nonnull final SsdpMessage message) {
         synchronized (mDeviceHolder) {
             final Device device = mDeviceHolder.get(message.getUuid());
             if (device == null) {
@@ -154,7 +154,7 @@ public class ControlPoint {
         }
     }
 
-    private void onReceiveNewSsdp(final @Nonnull SsdpMessage message) {
+    private void onReceiveNewSsdp(@Nonnull final SsdpMessage message) {
         final String uuid = message.getUuid();
         if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
             mLoadingDeviceMap.remove(uuid);
@@ -175,7 +175,7 @@ public class ControlPoint {
     private class DeviceLoader implements Runnable {
         private final Device.Builder mDeviceBuilder;
 
-        DeviceLoader(@Nonnull Device.Builder builder) {
+        DeviceLoader(@Nonnull final Device.Builder builder) {
             mDeviceBuilder = builder;
         }
 
@@ -207,7 +207,7 @@ public class ControlPoint {
         private final long mSeq;
         private final List<StringPair> mProperties;
 
-        EventNotifyTask(final @Nonnull Service service, final long seq, final @Nonnull List<StringPair> properties) {
+        EventNotifyTask(@Nonnull final Service service, final long seq, @Nonnull final List<StringPair> properties) {
             mService = service;
             mSeq = seq;
             mProperties = properties;
@@ -215,12 +215,12 @@ public class ControlPoint {
 
         @Override
         public void run() {
-            for (StringPair pair : mProperties) {
+            for (final StringPair pair : mProperties) {
                 notifyEvent(pair.getKey(), pair.getValue());
             }
         }
 
-        private void notifyEvent(final @Nullable String name, final @Nullable String value) {
+        private void notifyEvent(@Nullable final String name, @Nullable final String value) {
             final StateVariable variable = mService.findStateVariable(name);
             if (variable == null || !variable.isSendEvents() || value == null) {
                 Log.w(TAG, "illegal notify argument:" + name + " " + value);
@@ -239,7 +239,7 @@ public class ControlPoint {
      * @param interfaces 使用するインターフェース、指定しない場合は自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
-    public ControlPoint(final @Nonnull NetworkInterface... interfaces)
+    public ControlPoint(@Nonnull final NetworkInterface... interfaces)
             throws IllegalStateException {
         this(Arrays.asList(interfaces));
     }
@@ -250,14 +250,14 @@ public class ControlPoint {
      * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
-    public ControlPoint(final @Nullable Collection<NetworkInterface> interfaces)
+    public ControlPoint(@Nullable final Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
         this(getDefaultInterfacesIfEmpty(interfaces), new ControlPointFactory());
     }
 
     @Nonnull
     private static Collection<NetworkInterface> getDefaultInterfacesIfEmpty(
-            final @Nullable Collection<NetworkInterface> interfaces) {
+            @Nullable final Collection<NetworkInterface> interfaces) {
         if (interfaces == null || interfaces.isEmpty()) {
             return NetworkUtils.getAvailableInet4Interfaces();
         }
@@ -265,8 +265,8 @@ public class ControlPoint {
     }
 
     // VisibleForTesting
-    ControlPoint(final @Nonnull Collection<NetworkInterface> interfaces,
-                 final @Nonnull ControlPointFactory factory) {
+    ControlPoint(@Nonnull final Collection<NetworkInterface> interfaces,
+                 @Nonnull final ControlPointFactory factory) {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
         }
@@ -278,7 +278,7 @@ public class ControlPoint {
 
         mSearchList = factory.createSsdpSearchServerList(interfaces, new ResponseListener() {
             @Override
-            public void onReceiveResponse(final @Nonnull SsdpResponseMessage message) {
+            public void onReceiveResponse(@Nonnull final SsdpResponseMessage message) {
                 executeInParallel(new Runnable() {
                     @Override
                     public void run() {
@@ -289,7 +289,7 @@ public class ControlPoint {
         });
         mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, new NotifyListener() {
             @Override
-            public void onReceiveNotify(final @Nonnull SsdpRequestMessage message) {
+            public void onReceiveNotify(@Nonnull final SsdpRequestMessage message) {
                 executeInParallel(new Runnable() {
                     @Override
                     public void run() {
@@ -302,14 +302,15 @@ public class ControlPoint {
         mSubscribeHolder = new SubscribeHolder();
         mEventReceiver = factory.createEventReceiver(new EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties) {
+            public boolean onEventReceived(
+                    @Nonnull final String sid, final long seq, @Nonnull final List<StringPair> properties) {
                 final Service service = getSubscribeService(sid);
                 return service != null && executeInSequential(new EventNotifyTask(service, seq, properties));
             }
         });
     }
 
-    private boolean executeInParallel(final @Nonnull Runnable command) {
+    private boolean executeInParallel(@Nonnull final Runnable command) {
         if (mCachedThreadPool.isShutdown()) {
             return false;
         }
@@ -321,7 +322,7 @@ public class ControlPoint {
         return true;
     }
 
-    private boolean executeInSequential(final @Nonnull Runnable command) {
+    private boolean executeInSequential(@Nonnull final Runnable command) {
         if (mNotifyExecutor.isShutdown()) {
             return false;
         }
@@ -420,7 +421,7 @@ public class ControlPoint {
         if (!mStarted.getAndSet(false)) {
             return;
         }
-        List<Service> serviceList = mSubscribeHolder.getServiceList();
+        final List<Service> serviceList = mSubscribeHolder.getServiceList();
         for (final Service service : serviceList) {
             executeInParallel(new Runnable() {
                 @Override
@@ -462,7 +463,7 @@ public class ControlPoint {
      *
      * @param st SearchパケットのSTフィールド
      */
-    public void search(final @Nullable String st) {
+    public void search(@Nullable final String st) {
         if (!mStarted.get()) {
             throw new IllegalStateException("ControlPoint is not started.");
         }
@@ -476,7 +477,7 @@ public class ControlPoint {
      * @see IconFilter#NONE
      * @see IconFilter#ALL
      */
-    public void setIconFilter(final @Nonnull IconFilter filter) {
+    public void setIconFilter(@Nonnull final IconFilter filter) {
         mIconFilter = filter;
     }
 
@@ -486,7 +487,7 @@ public class ControlPoint {
      * @param listener リスナー
      * @see DiscoveryListener
      */
-    public void addDiscoveryListener(final @Nonnull DiscoveryListener listener) {
+    public void addDiscoveryListener(@Nonnull final DiscoveryListener listener) {
         mDiscoveryListenerList.add(listener);
     }
 
@@ -496,7 +497,7 @@ public class ControlPoint {
      * @param listener リスナー
      * @see DiscoveryListener
      */
-    public void removeDiscoveryListener(final @Nonnull DiscoveryListener listener) {
+    public void removeDiscoveryListener(@Nonnull final DiscoveryListener listener) {
         mDiscoveryListenerList.remove(listener);
     }
 
@@ -506,7 +507,7 @@ public class ControlPoint {
      * @param listener リスナー
      * @see NotifyEventListener
      */
-    public void addNotifyEventListener(final @Nonnull NotifyEventListener listener) {
+    public void addNotifyEventListener(@Nonnull final NotifyEventListener listener) {
         mNotifyEventListenerList.add(listener);
     }
 
@@ -516,12 +517,12 @@ public class ControlPoint {
      * @param listener リスナー
      * @see NotifyEventListener
      */
-    public void removeNotifyEventListener(final @Nonnull NotifyEventListener listener) {
+    public void removeNotifyEventListener(@Nonnull final NotifyEventListener listener) {
         mNotifyEventListenerList.remove(listener);
     }
 
     // VisibleForTesting
-    void discoverDevice(final @Nonnull Device device) {
+    void discoverDevice(@Nonnull final Device device) {
         mDeviceHolder.add(device);
         executeInSequential(new Runnable() {
             @Override
@@ -541,7 +542,7 @@ public class ControlPoint {
      * @see Device
      * @see DeviceHolder
      */
-    void lostDevice(final @Nonnull Device device) {
+    void lostDevice(@Nonnull final Device device) {
         synchronized (mDeviceHolder) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
@@ -589,7 +590,7 @@ public class ControlPoint {
      * @see Device
      */
     @Nullable
-    public Device getDevice(final @Nonnull String udn) {
+    public Device getDevice(@Nonnull final String udn) {
         return mDeviceHolder.get(udn);
     }
 
@@ -613,7 +614,7 @@ public class ControlPoint {
      * @see Service
      */
     @Nullable
-    Service getSubscribeService(final @Nonnull String subscriptionId) {
+    Service getSubscribeService(@Nonnull final String subscriptionId) {
         return mSubscribeHolder.getService(subscriptionId);
     }
 
@@ -626,7 +627,7 @@ public class ControlPoint {
      * @see Service
      * @see Service#subscribe()
      */
-    void registerSubscribeService(final @Nonnull Service service, final boolean keep) {
+    void registerSubscribeService(@Nonnull final Service service, final boolean keep) {
         mSubscribeHolder.add(service, keep);
     }
 
@@ -637,7 +638,7 @@ public class ControlPoint {
      * @see Service
      * @see Service#unsubscribe()
      */
-    void unregisterSubscribeService(final @Nonnull Service service) {
+    void unregisterSubscribeService(@Nonnull final Service service) {
         mSubscribeHolder.remove(service);
     }
 }

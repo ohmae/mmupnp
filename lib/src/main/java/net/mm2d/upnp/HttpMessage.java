@@ -71,7 +71,7 @@ public abstract class HttpMessage {
      *
      * @param socket 受信したsocket
      */
-    public HttpMessage(final @Nonnull Socket socket) {
+    public HttpMessage(@Nonnull final Socket socket) {
         this();
         mAddress = socket.getInetAddress();
         mPort = socket.getPort();
@@ -82,7 +82,7 @@ public abstract class HttpMessage {
      *
      * @param original コピー元
      */
-    public HttpMessage(final @Nonnull HttpMessage original) {
+    public HttpMessage(@Nonnull final HttpMessage original) {
         mAddress = original.mAddress;
         mPort = original.mPort;
         mHeaders = new HttpHeader(original.mHeaders);
@@ -110,7 +110,7 @@ public abstract class HttpMessage {
      *
      * @param address 宛先アドレス。
      */
-    protected void setAddress(final @Nullable InetAddress address) {
+    protected void setAddress(@Nullable final InetAddress address) {
         mAddress = address;
     }
 
@@ -191,7 +191,7 @@ public abstract class HttpMessage {
      *
      * @param version HTTPバージョン
      */
-    public void setVersion(final @Nonnull String version) {
+    public void setVersion(@Nonnull final String version) {
         mVersion = version;
     }
 
@@ -201,7 +201,7 @@ public abstract class HttpMessage {
      * @param name  ヘッダ名
      * @param value 値
      */
-    public void setHeader(final @Nonnull String name, final @Nonnull String value) {
+    public void setHeader(@Nonnull final String name, @Nonnull final String value) {
         mHeaders.put(name, value);
     }
 
@@ -210,7 +210,7 @@ public abstract class HttpMessage {
      *
      * @param line ヘッダの1行
      */
-    public void setHeaderLine(final @Nonnull String line) {
+    public void setHeaderLine(@Nonnull final String line) {
         final int pos = line.indexOf(':');
         if (pos < 0) {
             return;
@@ -227,7 +227,7 @@ public abstract class HttpMessage {
      * @return ヘッダの値
      */
     @Nullable
-    public String getHeader(final @Nonnull String name) {
+    public String getHeader(@Nonnull final String name) {
         return mHeaders.get(name);
     }
 
@@ -280,7 +280,7 @@ public abstract class HttpMessage {
      *
      * @param body メッセージボディ
      */
-    public void setBody(final @Nullable String body) {
+    public void setBody(@Nullable final String body) {
         setBody(body, false);
     }
 
@@ -290,7 +290,7 @@ public abstract class HttpMessage {
      * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
-    public void setBody(final @Nullable String body, final boolean withContentLength) {
+    public void setBody(@Nullable final String body, final boolean withContentLength) {
         setBodyInner(body, null, withContentLength);
     }
 
@@ -301,7 +301,7 @@ public abstract class HttpMessage {
      *
      * @param body メッセージボディ
      */
-    public void setBodyBinary(final @Nullable byte[] body) {
+    public void setBodyBinary(@Nullable final byte[] body) {
         setBodyBinary(body, false);
     }
 
@@ -311,12 +311,12 @@ public abstract class HttpMessage {
      * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
-    public void setBodyBinary(final @Nullable byte[] body, final boolean withContentLength) {
+    public void setBodyBinary(@Nullable final byte[] body, final boolean withContentLength) {
         setBodyInner(null, body, withContentLength);
     }
 
-    private void setBodyInner(final @Nullable String string,
-                              final @Nullable byte[] binary,
+    private void setBodyInner(@Nullable final String string,
+                              @Nullable final byte[] binary,
                               final boolean withContentLength) {
         mBody = string;
         if (TextUtils.isEmpty(string)) {
@@ -324,7 +324,7 @@ public abstract class HttpMessage {
         } else {
             try {
                 mBodyBinary = string.getBytes(CHARSET);
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 Log.w(TAG, e);
             }
         }
@@ -434,7 +434,7 @@ public abstract class HttpMessage {
      * @param os 出力先
      * @throws IOException 入出力エラー
      */
-    public void writeData(final @Nonnull OutputStream os) throws IOException {
+    public void writeData(@Nonnull final OutputStream os) throws IOException {
         os.write(getHeaderBytes());
         if (mBodyBinary != null) {
             if (isChunked()) {
@@ -446,7 +446,7 @@ public abstract class HttpMessage {
         os.flush();
     }
 
-    private void writeChunkedBody(final @Nonnull OutputStream os, final @Nonnull byte[] binary)
+    private void writeChunkedBody(@Nonnull final OutputStream os, @Nonnull final byte[] binary)
             throws IOException {
         int offset = 0;
         while (offset < binary.length) {
@@ -460,7 +460,7 @@ public abstract class HttpMessage {
         os.write(CRLF);
     }
 
-    private void writeChunkSize(final @Nonnull OutputStream os, final int size) throws IOException {
+    private void writeChunkSize(@Nonnull final OutputStream os, final int size) throws IOException {
         os.write(Integer.toHexString(size).getBytes(CHARSET));
         os.write(CRLF);
     }
@@ -471,7 +471,7 @@ public abstract class HttpMessage {
      * @param is 入力元
      * @throws IOException 入出力エラー
      */
-    public void readData(final @Nonnull InputStream is) throws IOException {
+    public void readData(@Nonnull final InputStream is) throws IOException {
         readStartLine(is);
         readHeaders(is);
         if (isChunked()) {
@@ -481,7 +481,7 @@ public abstract class HttpMessage {
         }
     }
 
-    private void readStartLine(final @Nonnull InputStream is) throws IOException {
+    private void readStartLine(@Nonnull final InputStream is) throws IOException {
         final String startLine = readLine(is);
         if (TextUtils.isEmpty(startLine)) {
             throw new IOException("Illegal start line:" + startLine);
@@ -493,7 +493,7 @@ public abstract class HttpMessage {
         }
     }
 
-    private void readHeaders(final @Nonnull InputStream is) throws IOException {
+    private void readHeaders(@Nonnull final InputStream is) throws IOException {
         while (true) {
             final String line = readLine(is);
             if (line.isEmpty()) {
@@ -503,7 +503,7 @@ public abstract class HttpMessage {
         }
     }
 
-    private void readBody(final @Nonnull InputStream is) throws IOException {
+    private void readBody(@Nonnull final InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int length = getContentLength();
         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -516,7 +516,7 @@ public abstract class HttpMessage {
         setBodyBinary(baos.toByteArray());
     }
 
-    private void readChunkedBody(final @Nonnull InputStream is) throws IOException {
+    private void readChunkedBody(@Nonnull final InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {
             int length = readChunkSize(is);
@@ -536,7 +536,7 @@ public abstract class HttpMessage {
         setBodyBinary(baos.toByteArray());
     }
 
-    private int readChunkSize(final @Nonnull InputStream is) throws IOException {
+    private int readChunkSize(@Nonnull final InputStream is) throws IOException {
         final String line = readLine(is);
         if (TextUtils.isEmpty(line)) {
             throw new IOException("Can not read chunk size!");
@@ -550,7 +550,7 @@ public abstract class HttpMessage {
     }
 
     @Nonnull
-    private static String readLine(final @Nonnull InputStream is) throws IOException {
+    private static String readLine(@Nonnull final InputStream is) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {
             final int b = is.read();

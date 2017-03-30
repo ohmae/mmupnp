@@ -29,8 +29,8 @@ class SsdpSearchServerList {
     @Nonnull
     private final List<SsdpSearchServer> mList;
 
-    SsdpSearchServerList(final @Nonnull Collection<NetworkInterface> interfaces,
-                         final @Nonnull ResponseListener listener) {
+    SsdpSearchServerList(@Nonnull final Collection<NetworkInterface> interfaces,
+                         @Nonnull final ResponseListener listener) {
         mList = new ArrayList<>(interfaces.size());
         for (final NetworkInterface nif : interfaces) {
             final SsdpSearchServer search = new SsdpSearchServer(nif);
@@ -40,7 +40,7 @@ class SsdpSearchServerList {
     }
 
     void openAndStart() {
-        for (SsdpSearchServer server : mList) {
+        for (final SsdpSearchServer server : mList) {
             try {
                 server.open();
                 server.start();
@@ -51,18 +51,18 @@ class SsdpSearchServerList {
     }
 
     void stop() {
-        for (SsdpSearchServer server : mList) {
+        for (final SsdpSearchServer server : mList) {
             server.stop();
         }
     }
 
     void close() {
-        for (SsdpSearchServer server : mList) {
+        for (final SsdpSearchServer server : mList) {
             server.close();
         }
     }
 
-    void search(final @Nullable String st) {
+    void search(@Nullable final String st) {
         for (final SsdpSearchServer server : mList) {
             server.search(st);
         }

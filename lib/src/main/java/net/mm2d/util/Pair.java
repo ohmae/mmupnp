@@ -28,7 +28,7 @@ public class Pair<K, V> {
      * @param key   Keyの値
      * @param value Valueの値
      */
-    public Pair(final @Nullable K key, @Nullable final V value) {
+    public Pair(@Nullable final K key, @Nullable final V value) {
         mKey = key;
         mValue = value;
     }
@@ -60,7 +60,7 @@ public class Pair<K, V> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == this) {
             return true;
         }

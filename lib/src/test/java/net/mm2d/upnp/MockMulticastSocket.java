@@ -14,9 +14,6 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 
-/**
- * Created by ryosuke on 2017/02/27.
- */
 public class MockMulticastSocket extends MulticastSocket {
     private DatagramPacket mDatagramPacket;
     private InetAddress mInetAddress;

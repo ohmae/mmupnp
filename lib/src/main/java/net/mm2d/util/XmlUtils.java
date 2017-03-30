@@ -72,7 +72,7 @@ public class XmlUtils {
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     @Nonnull
-    public static synchronized Document newDocument(final boolean awareness, final @Nonnull String xml)
+    public static synchronized Document newDocument(final boolean awareness, @Nonnull final String xml)
             throws SAXException, IOException, ParserConfigurationException {
         return getDocumentBuilder(awareness).parse(new InputSource(new StringReader(xml)));
     }
@@ -86,7 +86,7 @@ public class XmlUtils {
      */
     @Nullable
     public static Element findChildElementByLocalName(
-            final @Nonnull Node parent, final @Nonnull String localName) {
+            @Nonnull final Node parent, @Nonnull final String localName) {
         Node child = parent.getFirstChild();
         for (; child != null; child = child.getNextSibling()) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {

@@ -36,12 +36,12 @@ public class HttpResponse extends HttpMessage {
      *
      * @param socket 受信したsocket
      */
-    public HttpResponse(final @Nonnull Socket socket) {
+    public HttpResponse(@Nonnull final Socket socket) {
         super(socket);
     }
 
     @Override
-    public void setStartLine(final @Nonnull String line) throws IllegalArgumentException {
+    public void setStartLine(@Nonnull final String line) throws IllegalArgumentException {
         setStatusLine(line);
     }
 
@@ -53,7 +53,7 @@ public class HttpResponse extends HttpMessage {
      * @param line ステータスライン
      * @see #setStartLine(String)
      */
-    public void setStatusLine(final @Nonnull String line) throws IllegalArgumentException {
+    public void setStatusLine(@Nonnull final String line) throws IllegalArgumentException {
         final String[] params = line.split(" ");
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -123,7 +123,7 @@ public class HttpResponse extends HttpMessage {
      * @param reasonPhrase レスポンスフレーズ
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    public void setReasonPhrase(final @Nonnull String reasonPhrase) {
+    public void setReasonPhrase(@Nonnull final String reasonPhrase) {
         mReasonPhrase = reasonPhrase;
     }
 
@@ -132,7 +132,7 @@ public class HttpResponse extends HttpMessage {
      *
      * @param status ステータス
      */
-    public void setStatus(final @Nonnull Http.Status status) {
+    public void setStatus(@Nonnull final Http.Status status) {
         mStatus = status;
         mStatusCode = status.getCode();
         mReasonPhrase = status.getPhrase();

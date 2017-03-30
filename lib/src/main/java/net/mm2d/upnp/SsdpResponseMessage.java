@@ -27,8 +27,8 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpResponseMessage(final @Nonnull InterfaceAddress address,
-                               final @Nonnull byte[] data, final int length)
+    public SsdpResponseMessage(@Nonnull final InterfaceAddress address,
+                               @Nonnull final byte[] data, final int length)
             throws IOException {
         super(address, data, length);
     }
@@ -82,7 +82,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @param reasonPhrase レスポンスフレーズ
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    public void setReasonPhrase(final @Nonnull String reasonPhrase) {
+    public void setReasonPhrase(@Nonnull final String reasonPhrase) {
         getMessage().setReasonPhrase(reasonPhrase);
     }
 
@@ -91,7 +91,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      *
      * @param status ステータス
      */
-    public void setStatus(final @Nonnull Http.Status status) {
+    public void setStatus(@Nonnull final Http.Status status) {
         getMessage().setStatus(status);
     }
 

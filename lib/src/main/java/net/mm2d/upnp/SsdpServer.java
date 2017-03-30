@@ -58,7 +58,7 @@ abstract class SsdpServer {
      *
      * @param networkInterface 使用するインターフェース
      */
-    SsdpServer(final @Nonnull NetworkInterface networkInterface) {
+    SsdpServer(@Nonnull final NetworkInterface networkInterface) {
         this(networkInterface, 0);
     }
 
@@ -68,13 +68,13 @@ abstract class SsdpServer {
      * @param networkInterface 使用するインターフェース
      * @param bindPort         使用するポート
      */
-    SsdpServer(final @Nonnull NetworkInterface networkInterface, final int bindPort) {
+    SsdpServer(@Nonnull final NetworkInterface networkInterface, final int bindPort) {
         mInterfaceAddress = findInet4Address(networkInterface);
         mBindPort = bindPort;
         mInterface = networkInterface;
     }
 
-    private static InterfaceAddress findInet4Address(final @Nonnull NetworkInterface networkInterface) {
+    private static InterfaceAddress findInet4Address(@Nonnull final NetworkInterface networkInterface) {
         final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
         for (final InterfaceAddress address : addressList) {
             if (address.getAddress() instanceof Inet4Address) {
@@ -161,7 +161,7 @@ abstract class SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    void send(final @Nonnull SsdpMessage message) {
+    void send(@Nonnull final SsdpMessage message) {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.getMessage().writeData(baos);
@@ -176,7 +176,7 @@ abstract class SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    private void send(final @Nonnull byte[] message) throws IOException {
+    private void send(@Nonnull final byte[] message) throws IOException {
         mSocket.send(new DatagramPacket(message, message.length, SSDP_SO_ADDR));
     }
 
@@ -204,8 +204,8 @@ abstract class SsdpServer {
         /**
          * インスタンス作成
          */
-        ReceiveTask(final @Nonnull SsdpServer ssdpServer,
-                    final @Nonnull MulticastSocket socket, final int port) {
+        ReceiveTask(@Nonnull final SsdpServer ssdpServer,
+                    @Nonnull final MulticastSocket socket, final int port) {
             mSsdpServer = ssdpServer;
             mSocket = socket;
             mBindPort = port;

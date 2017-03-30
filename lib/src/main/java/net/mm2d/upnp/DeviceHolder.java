@@ -42,7 +42,7 @@ class DeviceHolder implements Runnable {
      *
      * @param cp ControlPoint
      */
-    DeviceHolder(final @Nonnull ControlPoint cp) {
+    DeviceHolder(@Nonnull final ControlPoint cp) {
         mDeviceMap = new LinkedHashMap<>();
         mControlPoint = cp;
     }
@@ -76,13 +76,13 @@ class DeviceHolder implements Runnable {
      *
      * @param device 追加されるDevice
      */
-    synchronized void add(final @Nonnull Device device) {
+    synchronized void add(@Nonnull final Device device) {
         mDeviceMap.put(device.getUdn(), device);
         notifyAll();
     }
 
     @Nullable
-    synchronized Device get(final @Nonnull String udn) {
+    synchronized Device get(@Nonnull final String udn) {
         return mDeviceMap.get(udn);
     }
 
@@ -91,7 +91,7 @@ class DeviceHolder implements Runnable {
      *
      * @param device 削除されるDevice。
      */
-    synchronized void remove(final @Nonnull Device device) {
+    synchronized void remove(@Nonnull final Device device) {
         mDeviceMap.remove(device.getUdn());
     }
 

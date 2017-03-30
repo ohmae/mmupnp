@@ -24,7 +24,7 @@ public class StringPair extends Pair<String, String> {
      * @param key   Keyの値
      * @param value Valueの値
      */
-    public StringPair(final @Nullable String key, final @Nullable String value) {
+    public StringPair(@Nullable final String key, @Nullable final String value) {
         super(key, value);
     }
 }

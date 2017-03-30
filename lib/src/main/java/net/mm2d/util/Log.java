@@ -77,7 +77,7 @@ public class Log {
         private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         @Override
-        public void println(final int level, final @Nullable String tag, final @Nullable String message) {
+        public void println(final int level, @Nullable final String tag, @Nullable final String message) {
             synchronized (FORMAT) {
                 final StringBuilder sb = new StringBuilder();
                 sb.append(FORMAT.format(new Date(System.currentTimeMillis())));
@@ -142,7 +142,7 @@ public class Log {
      *
      * @param print 出力処理
      */
-    public static void setPrint(final @Nonnull Print print) {
+    public static void setPrint(@Nonnull final Print print) {
         sPrint = print;
     }
 
@@ -164,7 +164,7 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void v(final @Nullable String tag, final @Nullable String message) {
+    public static void v(@Nullable final String tag, @Nullable final String message) {
         log(VERBOSE, tag, message);
     }
 
@@ -177,7 +177,7 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void v(final @Nullable String tag, final @Nullable String message, final @Nullable Throwable tr) {
+    public static void v(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
         log(VERBOSE, tag, message, tr);
     }
 
@@ -187,7 +187,7 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void d(final @Nullable String tag, final @Nullable String message) {
+    public static void d(@Nullable final String tag, @Nullable final String message) {
         log(DEBUG, tag, message);
     }
 
@@ -200,7 +200,7 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void d(final @Nullable String tag, final @Nullable String message, final @Nullable Throwable tr) {
+    public static void d(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
         log(DEBUG, tag, message, tr);
     }
 
@@ -210,7 +210,7 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void i(final @Nullable String tag, final @Nullable String message) {
+    public static void i(@Nullable final String tag, @Nullable final String message) {
         log(INFO, tag, message);
     }
 
@@ -223,7 +223,7 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void i(final @Nullable String tag, final @Nullable String message, final @Nullable Throwable tr) {
+    public static void i(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
         log(INFO, tag, message, tr);
     }
 
@@ -233,7 +233,7 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void w(final @Nullable String tag, final @Nullable String message) {
+    public static void w(@Nullable final String tag, @Nullable final String message) {
         log(WARN, tag, message);
     }
 
@@ -245,7 +245,7 @@ public class Log {
      * @param tag タグ
      * @param tr  Throwable
      */
-    public static void w(final @Nullable String tag, final @Nullable Throwable tr) {
+    public static void w(@Nullable final String tag, @Nullable final Throwable tr) {
         log(WARN, tag, tr);
     }
 
@@ -258,7 +258,7 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void w(final @Nullable String tag, final @Nullable String message, final @Nullable Throwable tr) {
+    public static void w(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
         log(WARN, tag, message, tr);
     }
 
@@ -268,7 +268,7 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void e(final @Nullable String tag, final @Nullable String message) {
+    public static void e(@Nullable final String tag, @Nullable final String message) {
         log(ERROR, tag, message);
     }
 
@@ -281,27 +281,27 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void e(final @Nullable String tag, final @Nullable String message, final @Nullable Throwable tr) {
+    public static void e(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
         log(ERROR, tag, message, tr);
     }
 
-    private static void log(final int level, final @Nullable String tag, final @Nullable Throwable tr) {
+    private static void log(final int level, @Nullable final String tag, @Nullable final Throwable tr) {
         println(level, tag, null, tr);
     }
 
-    private static void log(final int level, final @Nullable String tag, final @Nullable String message) {
+    private static void log(final int level, @Nullable final String tag, @Nullable final String message) {
         println(level, tag, message, null);
     }
 
     private static void log(
-            final int level, final @Nullable String tag,
-            final @Nullable String message, final @Nullable Throwable tr) {
+            final int level, @Nullable final String tag,
+            @Nullable final String message, @Nullable final Throwable tr) {
         println(level, tag, message, tr);
     }
 
     private static void println(
             final int level, @Nullable String tag,
-            final @Nullable String message, final @Nullable Throwable tr) {
+            @Nullable final String message, @Nullable final Throwable tr) {
         if (level < sLogLevel) {
             return;
         }
@@ -323,7 +323,7 @@ public class Log {
     }
 
     @Nonnull
-    private static String getStackTraceString(final @Nonnull Throwable tr) {
+    private static String getStackTraceString(@Nonnull final Throwable tr) {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter(sw);
         tr.printStackTrace(pw);

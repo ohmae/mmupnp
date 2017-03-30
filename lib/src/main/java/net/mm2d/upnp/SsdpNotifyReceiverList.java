@@ -27,8 +27,9 @@ class SsdpNotifyReceiverList {
     private static final String TAG = SsdpNotifyReceiverList.class.getSimpleName();
     @Nonnull
     private final List<SsdpNotifyReceiver> mList;
-    SsdpNotifyReceiverList(final @Nonnull Collection<NetworkInterface> interfaces,
-                           final @Nonnull NotifyListener listener) {
+
+    SsdpNotifyReceiverList(@Nonnull final Collection<NetworkInterface> interfaces,
+                           @Nonnull final NotifyListener listener) {
         mList = new ArrayList<>(interfaces.size());
         for (final NetworkInterface nif : interfaces) {
             final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);
@@ -38,10 +39,10 @@ class SsdpNotifyReceiverList {
     }
 
     void openAndStart() {
-        for (SsdpNotifyReceiver receiver : mList) {
+        for (final SsdpNotifyReceiver receiver : mList) {
             try {
-            receiver.open();
-            receiver.start();
+                receiver.open();
+                receiver.start();
             } catch (final IOException e) {
                 Log.w(TAG, e);
             }
@@ -49,13 +50,13 @@ class SsdpNotifyReceiverList {
     }
 
     void stop() {
-        for (SsdpNotifyReceiver receiver : mList) {
+        for (final SsdpNotifyReceiver receiver : mList) {
             receiver.stop();
         }
     }
 
     void close() {
-        for (SsdpNotifyReceiver receiver : mList) {
+        for (final SsdpNotifyReceiver receiver : mList) {
             receiver.close();
         }
     }

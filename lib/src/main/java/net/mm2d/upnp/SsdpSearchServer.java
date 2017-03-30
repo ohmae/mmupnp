@@ -50,7 +50,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    SsdpSearchServer(final @Nonnull NetworkInterface ni) {
+    SsdpSearchServer(@Nonnull final NetworkInterface ni) {
         super(ni);
     }
 
@@ -59,7 +59,7 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param listener リスナー
      */
-    void setResponseListener(final @Nullable ResponseListener listener) {
+    void setResponseListener(@Nullable final ResponseListener listener) {
         mListener = listener;
     }
 
@@ -77,11 +77,11 @@ class SsdpSearchServer extends SsdpServer {
      *
      * @param st STの値
      */
-    void search(final @Nullable String st) {
+    void search(@Nullable final String st) {
         send(makeSearchMessage(TextUtils.isEmpty(st) ? ST_ALL : st));
     }
 
-    private SsdpRequestMessage makeSearchMessage(final @Nonnull String st) {
+    private SsdpRequestMessage makeSearchMessage(@Nonnull final String st) {
         final SsdpRequestMessage message = new SsdpRequestMessage();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
@@ -93,8 +93,8 @@ class SsdpSearchServer extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(final @Nonnull InetAddress sourceAddress,
-                             final @Nonnull byte[] data, final int length) {
+    protected void onReceive(@Nonnull final InetAddress sourceAddress,
+                             @Nonnull final byte[] data, final int length) {
         try {
             final SsdpResponseMessage message = new SsdpResponseMessage(getInterfaceAddress(), data, length);
             if (message.hasInvalidLocation(sourceAddress)) {

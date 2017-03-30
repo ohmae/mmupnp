@@ -20,22 +20,23 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class NotifyEventListenerList implements NotifyEventListener {
+    @Nonnull
     private final List<NotifyEventListener> mList = new ArrayList<>();
 
-    synchronized void add(final @Nonnull NotifyEventListener l) {
+    synchronized void add(@Nonnull final NotifyEventListener l) {
         if (!mList.contains(l)) {
             mList.add(l);
         }
     }
 
-    synchronized void remove(final @Nonnull NotifyEventListener l) {
+    synchronized void remove(@Nonnull final NotifyEventListener l) {
         mList.remove(l);
     }
 
     @Override
     public synchronized void onNotifyEvent(
-            final @Nonnull Service service, final long seq,
-            final @Nonnull String variable, final @Nonnull String value) {
+            @Nonnull final Service service, final long seq,
+            @Nonnull final String variable, @Nonnull final String value) {
         for (final NotifyEventListener l : mList) {
             l.onNotifyEvent(service, seq, variable, value);
         }

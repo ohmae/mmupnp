@@ -52,7 +52,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setService(final @Nonnull Service service) {
+        public Builder setService(@Nonnull final Service service) {
             mService = service;
             return this;
         }
@@ -66,7 +66,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setSendEvents(final @Nonnull String sendEvents) {
+        public Builder setSendEvents(@Nonnull final String sendEvents) {
             mSendEvents = !"no".equalsIgnoreCase(sendEvents);
             return this;
         }
@@ -81,7 +81,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setMulticast(final @Nonnull String multicast) {
+        public Builder setMulticast(@Nonnull final String multicast) {
             mMulticast = "yes".equalsIgnoreCase(multicast);
             return this;
         }
@@ -93,7 +93,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setName(final @Nonnull String name) {
+        public Builder setName(@Nonnull final String name) {
             mName = name;
             return this;
         }
@@ -105,7 +105,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setDataType(final @Nonnull String dataType) {
+        public Builder setDataType(@Nonnull final String dataType) {
             mDataType = dataType;
             return this;
         }
@@ -117,7 +117,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder addAllowedValue(final @Nonnull String value) {
+        public Builder addAllowedValue(@Nonnull final String value) {
             mAllowedValueList.add(value);
             return this;
         }
@@ -129,7 +129,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setDefaultValue(final @Nonnull String defaultValue) {
+        public Builder setDefaultValue(@Nonnull final String defaultValue) {
             mDefaultValue = defaultValue;
             return this;
         }
@@ -141,7 +141,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setMinimum(final @Nonnull String minimum) {
+        public Builder setMinimum(@Nonnull final String minimum) {
             mMinimum = minimum;
             return this;
         }
@@ -153,7 +153,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setMaximum(final @Nonnull String maximum) {
+        public Builder setMaximum(@Nonnull final String maximum) {
             mMaximum = maximum;
             return this;
         }
@@ -165,7 +165,7 @@ public class StateVariable {
          * @return Builder
          */
         @Nonnull
-        public Builder setStep(final @Nonnull String step) {
+        public Builder setStep(@Nonnull final String step) {
             mStep = step;
             return this;
         }
@@ -209,7 +209,7 @@ public class StateVariable {
     @Nullable
     private final String mStep;
 
-    private StateVariable(final @Nonnull Builder builder) {
+    private StateVariable(@Nonnull final Builder builder) {
         mService = builder.mService;
         mSendEvents = builder.mSendEvents;
         mMulticast = builder.mMulticast;

@@ -45,7 +45,7 @@ class SsdpNotifyReceiver extends SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    SsdpNotifyReceiver(@Nonnull NetworkInterface ni) {
+    SsdpNotifyReceiver(@Nonnull final NetworkInterface ni) {
         super(ni, SSDP_PORT);
     }
 
@@ -54,13 +54,13 @@ class SsdpNotifyReceiver extends SsdpServer {
      *
      * @param listener リスナー
      */
-    void setNotifyListener(final @Nullable NotifyListener listener) {
+    void setNotifyListener(@Nullable final NotifyListener listener) {
         mListener = listener;
     }
 
     @Override
-    protected void onReceive(final @Nonnull InetAddress sourceAddress,
-                             final @Nonnull byte[] data, final int length) {
+    protected void onReceive(@Nonnull final InetAddress sourceAddress,
+                             @Nonnull final byte[] data, final int length) {
         // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
         // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
         // 受け取っても無駄なので破棄する。
@@ -87,8 +87,8 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
     }
 
-    private static boolean isSameSegment(final @Nonnull InterfaceAddress interfaceAddress,
-                                         final @Nonnull InetAddress sourceAddress) {
+    private static boolean isSameSegment(@Nonnull final InterfaceAddress interfaceAddress,
+                                         @Nonnull final InetAddress sourceAddress) {
         final byte[] a = interfaceAddress.getAddress().getAddress();
         final byte[] b = sourceAddress.getAddress();
         final int pref = interfaceAddress.getNetworkPrefixLength();
