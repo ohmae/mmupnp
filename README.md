@@ -40,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.mm2d.mmupnp:mmupnp:1.0.11'
+    compile 'net.mm2d.mmupnp:mmupnp:1.1.0'
 }
 ```
 
