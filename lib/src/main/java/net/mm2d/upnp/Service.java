@@ -253,7 +253,7 @@ public class Service {
                 final String name = argumentBuilder.getRelatedStateVariableName();
                 final StateVariable variable = mStateVariableMap.get(name);
                 if (variable == null) {
-                    throw new IllegalArgumentException();
+                    throw new IllegalStateException("There is no StateVariable " + name);
                 }
                 argumentBuilder.setRelatedStateVariable(variable);
             }
