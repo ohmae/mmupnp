@@ -1,5 +1,5 @@
 group 'net.mm2d.mmupnp'
-version '1.1.0'
+version versionName
 
 apply plugin: 'java'
 apply plugin: 'maven'
@@ -27,10 +27,10 @@ javadoc {
 }
 
 dependencies {
-    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.29'
+    compile 'com.google.code.findbugs:jsr305:3.0.1'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.mockito:mockito-core:2.2.29'
 }
 
 uploadArchives {
