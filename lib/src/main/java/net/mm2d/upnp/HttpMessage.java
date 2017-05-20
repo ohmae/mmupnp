@@ -508,8 +508,11 @@ public abstract class HttpMessage {
         int length = getContentLength();
         final byte[] buffer = new byte[BUFFER_SIZE];
         while (length > 0) {
-            int size = length > buffer.length ? buffer.length : length;
-            size = is.read(buffer, 0, size);
+            final int stroke = length > buffer.length ? buffer.length : length;
+            final int size = is.read(buffer, 0, stroke);
+            if (size < 0) {
+                throw new IOException("can't read from InputStream");
+            }
             baos.write(buffer, 0, size);
             length -= size;
         }
@@ -526,8 +529,11 @@ public abstract class HttpMessage {
             }
             final byte[] buffer = new byte[BUFFER_SIZE];
             while (length > 0) {
-                int size = length > buffer.length ? buffer.length : length;
-                size = is.read(buffer, 0, size);
+                final int stroke = length > buffer.length ? buffer.length : length;
+                final int size = is.read(buffer, 0, stroke);
+                if (size < 0) {
+                    throw new IOException("can't read from InputStream");
+                }
                 baos.write(buffer, 0, size);
                 length -= size;
             }
