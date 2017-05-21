@@ -67,7 +67,7 @@ public class Log {
          * @param tag     タグ
          * @param message メッセージ
          */
-        void println(int level, @Nullable String tag, @Nullable String message);
+        void println(int level, @Nonnull String tag, @Nonnull String message);
     }
 
     /**
@@ -77,7 +77,7 @@ public class Log {
         private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         @Override
-        public void println(final int level, @Nullable final String tag, @Nullable final String message) {
+        public void println(final int level, @Nonnull final String tag, @Nonnull final String message) {
             synchronized (FORMAT) {
                 final StringBuilder sb = new StringBuilder();
                 sb.append(FORMAT.format(new Date(System.currentTimeMillis())));
@@ -107,31 +107,6 @@ public class Log {
             }
         }
     }
-
-// for Android Logcat
-//    private static class AndroidPrint implements Print {
-//        @Override
-//        public void println(int level, String tag, String message) {
-//          switch(level) {
-//              default:
-//              case VERBOSE:
-//                  android.util.Log.v(tag, message);
-//                  break;
-//              case DEBUG:
-//                  android.util.Log.d(tag, message);
-//                  break;
-//              case INFO:
-//                  android.util.Log.i(tag, message);
-//                  break;
-//              case WARN:
-//                  android.util.Log.w(tag, message);
-//                  break;
-//              case ERROR:
-//                  android.util.Log.e(tag, message);
-//                  break;
-//          }
-//        }
-//    }
 
     public static final Print DEFAULT_PRINT = new DefaultPrint();
     private static Print sPrint = DEFAULT_PRINT;
@@ -165,7 +140,7 @@ public class Log {
      * @param message メッセージ
      */
     public static void v(@Nullable final String tag, @Nullable final String message) {
-        log(VERBOSE, tag, message);
+        println(VERBOSE, tag, message, null);
     }
 
     /**
@@ -178,7 +153,7 @@ public class Log {
      * @param tr      Throwable
      */
     public static void v(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
-        log(VERBOSE, tag, message, tr);
+        println(VERBOSE, tag, message, tr);
     }
 
     /**
@@ -188,7 +163,7 @@ public class Log {
      * @param message メッセージ
      */
     public static void d(@Nullable final String tag, @Nullable final String message) {
-        log(DEBUG, tag, message);
+        println(DEBUG, tag, message, null);
     }
 
     /**
@@ -201,7 +176,7 @@ public class Log {
      * @param tr      Throwable
      */
     public static void d(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
-        log(DEBUG, tag, message, tr);
+        println(DEBUG, tag, message, tr);
     }
 
     /**
@@ -211,7 +186,7 @@ public class Log {
      * @param message メッセージ
      */
     public static void i(@Nullable final String tag, @Nullable final String message) {
-        log(INFO, tag, message);
+        println(INFO, tag, message, null);
     }
 
     /**
@@ -224,7 +199,7 @@ public class Log {
      * @param tr      Throwable
      */
     public static void i(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
-        log(INFO, tag, message, tr);
+        println(INFO, tag, message, tr);
     }
 
     /**
@@ -234,7 +209,7 @@ public class Log {
      * @param message メッセージ
      */
     public static void w(@Nullable final String tag, @Nullable final String message) {
-        log(WARN, tag, message);
+        println(WARN, tag, message, null);
     }
 
     /**
@@ -246,7 +221,7 @@ public class Log {
      * @param tr  Throwable
      */
     public static void w(@Nullable final String tag, @Nullable final Throwable tr) {
-        log(WARN, tag, tr);
+        println(WARN, tag, null, tr);
     }
 
     /**
@@ -259,7 +234,7 @@ public class Log {
      * @param tr      Throwable
      */
     public static void w(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
-        log(WARN, tag, message, tr);
+        println(WARN, tag, message, tr);
     }
 
     /**
@@ -269,7 +244,7 @@ public class Log {
      * @param message メッセージ
      */
     public static void e(@Nullable final String tag, @Nullable final String message) {
-        log(ERROR, tag, message);
+        println(ERROR, tag, message, null);
     }
 
     /**
@@ -282,44 +257,43 @@ public class Log {
      * @param tr      Throwable
      */
     public static void e(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
-        log(ERROR, tag, message, tr);
-    }
-
-    private static void log(final int level, @Nullable final String tag, @Nullable final Throwable tr) {
-        println(level, tag, null, tr);
-    }
-
-    private static void log(final int level, @Nullable final String tag, @Nullable final String message) {
-        println(level, tag, message, null);
-    }
-
-    private static void log(
-            final int level, @Nullable final String tag,
-            @Nullable final String message, @Nullable final Throwable tr) {
-        println(level, tag, message, tr);
+        println(ERROR, tag, message, tr);
     }
 
     private static void println(
-            final int level, @Nullable String tag,
+            final int level, @Nullable final String tag,
             @Nullable final String message, @Nullable final Throwable tr) {
         if (level < sLogLevel) {
             return;
         }
-        if (tag == null) {
-            try {
-                // println -> log -> v/d/i/w/e -> ログコール場所
-                tag = new Throwable().getStackTrace()[3].toString();
-            } catch (final Exception ignored) { // 念のため
-                tag = "tag";
+        sPrint.println(level, makeTag(tag), makeMessage(message, tr));
+    }
+
+    @Nonnull
+    private static String makeTag(@Nullable final String tag) {
+        if (tag != null) {
+            return tag;
+        }
+        try {
+            // makeTag -> println -> v/d/i/w/e -> ログコール場所
+            return new Throwable().getStackTrace()[3].toString();
+        } catch (final Exception ignored) { // 念のため
+            return "tag";
+        }
+    }
+
+    @Nonnull
+    private static String makeMessage(@Nullable final String message, @Nullable final Throwable tr) {
+        if (message == null) {
+            if (tr == null) {
+                return "";
             }
+            return getStackTraceString(tr);
         }
         if (tr == null) {
-            sPrint.println(level, tag, message);
-        } else if (message == null) {
-            sPrint.println(level, tag, getStackTraceString(tr));
-        } else {
-            sPrint.println(level, tag, message + "\n" + getStackTraceString(tr));
+            return message;
         }
+        return message + "\n" + getStackTraceString(tr);
     }
 
     @Nonnull

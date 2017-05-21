@@ -236,9 +236,15 @@ public class LogTest {
     }
 
     @Test
-    public void v_Tagがnullでも問題ない() {
+    public void v_Tagがnullの場合メソッド名が使われる() {
         Log.setPrint(Log.DEFAULT_PRINT);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream defaultOut = System.out;
+        System.setOut(new PrintStream(baos));
         Log.v(null, "");
+
+        assertThat(new String(baos.toByteArray()), containsString("v_Tagがnullの場合メソッド名が使われる"));
+        System.setOut(defaultOut);
     }
 
     @Test
