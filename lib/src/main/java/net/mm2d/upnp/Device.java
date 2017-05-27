@@ -542,41 +542,14 @@ public class Device {
     @Nonnull
     static URL getAbsoluteUrl(@Nonnull final String location, @Nonnull final String url)
             throws MalformedURLException {
-        if (url.length() > 6 && url.substring(0, 7).equalsIgnoreCase("http://")) {
+        if (Http.isHttpUrl(url)) {
             return new URL(url);
         }
-        final String baseUrl = removeQuery(location);
+        final String baseUrl = Http.removeQuery(location);
         if (url.startsWith("/")) {
-            return new URL(jointAbsolutePath(baseUrl, url));
+            return new URL(Http.makeUrlWithAbsolutePath(baseUrl, url));
         }
-        return new URL(jointRelativePath(baseUrl, url));
-    }
-
-    private static String removeQuery(@Nonnull final String url) {
-        final int pos = url.indexOf('?');
-        if (pos > 0) {
-            return url.substring(0, pos);
-        }
-        return url;
-    }
-
-    private static String jointAbsolutePath(@Nonnull final String baseUrl, @Nonnull final String path) {
-        final int pos = baseUrl.indexOf('/', "http://".length());
-        if (pos < 0) {
-            return baseUrl + path;
-        }
-        return baseUrl.substring(0, pos) + path;
-    }
-
-    private static String jointRelativePath(@Nonnull final String baseUrl, @Nonnull final String path) {
-        if (baseUrl.endsWith("/")) {
-            return baseUrl + path;
-        }
-        final int pos = baseUrl.lastIndexOf('/');
-        if (pos > "http://".length()) {
-            return baseUrl.substring(0, pos + 1) + path;
-        }
-        return baseUrl + "/" + path;
+        return new URL(Http.makeUrlWithRelativePath(baseUrl, url));
     }
 
     /**

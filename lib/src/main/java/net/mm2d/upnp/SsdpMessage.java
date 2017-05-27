@@ -165,7 +165,7 @@ public abstract class SsdpMessage {
      * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
      */
     public boolean hasInvalidLocation(@Nonnull final InetAddress sourceAddress) {
-        if (!isHttpUrl(mLocation)) {
+        if (!Http.isHttpUrl(mLocation)) {
             return true;
         }
         try {
@@ -174,11 +174,6 @@ public abstract class SsdpMessage {
         } catch (MalformedURLException | UnknownHostException ignored) {
         }
         return true;
-    }
-
-    private static boolean isHttpUrl(final String url) {
-        return url != null && url.length() > 6
-                && url.substring(0, 7).equalsIgnoreCase("http://");
     }
 
     /**

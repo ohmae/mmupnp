@@ -185,6 +185,7 @@ public final class Http {
         }
     }
 
+    private static final String HTTP_SCHEME = "http://";
     private static final DateFormat RFC_1123_FORMAT;
     private static final DateFormat RFC_1036_FORMAT;
     private static final DateFormat ASC_TIME_FORMAT;
@@ -263,5 +264,66 @@ public final class Http {
     @Nonnull
     public static synchronized String getCurrentData() {
         return formatDate(System.currentTimeMillis());
+    }
+
+    /**
+     * HTTPのURLか否かを返す。
+     *
+     * @param url URL
+     * @return HTTPのURLのときtrue
+     */
+    public static boolean isHttpUrl(final String url) {
+        return url != null && url.length() > HTTP_SCHEME.length()
+                && url.substring(0, HTTP_SCHEME.length()).equalsIgnoreCase(HTTP_SCHEME);
+    }
+
+    /**
+     * URLについているqueryを削除して返す。
+     *
+     * @param url URL
+     * @return queryを削除した
+     */
+    @Nonnull
+    static String removeQuery(@Nonnull final String url) {
+        final int pos = url.indexOf('?');
+        if (pos > 0) {
+            return url.substring(0, pos);
+        }
+        return url;
+    }
+
+    /**
+     * BaseURLと絶対パスからURLを作成する。
+     *
+     * @param baseUrl BaseURL
+     * @param path    絶対パス
+     * @return 結合されたURL
+     */
+    @Nonnull
+    static String makeUrlWithAbsolutePath(@Nonnull final String baseUrl, @Nonnull final String path) {
+        final int pos = baseUrl.indexOf('/', HTTP_SCHEME.length());
+        if (pos < 0) {
+            return baseUrl + path;
+        }
+        return baseUrl.substring(0, pos) + path;
+    }
+
+    /**
+     * BaseURLと相対パスからURLを作成する。
+     *
+     * @param baseUrl BaseURL
+     * @param path    相対パス
+     * @return 結合されたURL
+     */
+    @Nonnull
+    static String makeUrlWithRelativePath(@Nonnull final String baseUrl, @Nonnull final String path) {
+        if (baseUrl.endsWith("/")) {
+            return baseUrl + path;
+        }
+        final int pos = baseUrl.lastIndexOf('/');
+        if (pos > HTTP_SCHEME.length()) {
+            return baseUrl.substring(0, pos + 1) + path;
+        }
+        return baseUrl + "/" + path;
     }
 }
