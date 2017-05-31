@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * SSDPレスポンスメッセージを表現するクラス。
@@ -100,7 +99,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      *
      * @return ステータス
      */
-    @Nullable
+    @Nonnull
     public Http.Status getStatus() {
         return getMessage().getStatus();
     }

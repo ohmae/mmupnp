@@ -39,8 +39,11 @@ public class HttpHeader {
      * ヘッダのエントリー情報。
      */
     public static class Entry {
+        @Nonnull
         private final String mKey;
+        @Nonnull
         private String mName;
+        @Nonnull
         private String mValue;
 
         /**
@@ -71,6 +74,7 @@ public class HttpHeader {
          *
          * @return Key
          */
+        @Nonnull
         private String getKey() {
             return mKey;
         }

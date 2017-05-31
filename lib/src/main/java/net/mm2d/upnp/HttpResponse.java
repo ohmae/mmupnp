@@ -7,10 +7,11 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.Http.Status;
+
 import java.net.Socket;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * HTTPレスポンスメッセージを表現するクラス。
@@ -18,8 +19,8 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpResponse extends HttpMessage {
-    @Nullable
-    private Http.Status mStatus;
+    @Nonnull
+    private Http.Status mStatus = Status.HTTP_INVALID;
     private int mStatusCode;
     @Nonnull
     private String mReasonPhrase = "";
@@ -69,7 +70,7 @@ public class HttpResponse extends HttpMessage {
         final StringBuilder sb = new StringBuilder();
         sb.append(getVersion());
         sb.append(' ');
-        if (mStatus != null) {
+        if (mStatus != Status.HTTP_INVALID) {
             sb.append(String.valueOf(mStatus.getCode()));
             sb.append(' ');
             sb.append(mStatus.getPhrase());
@@ -98,8 +99,8 @@ public class HttpResponse extends HttpMessage {
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
     public void setStatusCode(final int code) {
-        mStatus = Http.Status.valueOf(code);
-        if (mStatus == null) {
+        mStatus = Status.valueOf(code);
+        if (mStatus == Status.HTTP_INVALID) {
             throw new IllegalArgumentException("unexpected status code:" + code);
         }
         mStatusCode = code;
@@ -143,7 +144,7 @@ public class HttpResponse extends HttpMessage {
      *
      * @return ステータス
      */
-    @Nullable
+    @Nonnull
     public Http.Status getStatus() {
         return mStatus;
     }

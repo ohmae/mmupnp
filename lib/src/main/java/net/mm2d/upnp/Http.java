@@ -100,6 +100,7 @@ public final class Http {
      * HTTPのステータスコードを表現するEnum
      */
     public enum Status {
+        HTTP_INVALID(0, "Invalid"),
         HTTP_CONTINUE(100, "Continue"),
         HTTP_SWITCH_PROTOCOL(101, "Switching Protocols"),
         HTTP_OK(200, "OK"),
@@ -174,14 +175,14 @@ public final class Http {
          * @param code ステータスコード
          * @return 該当するStatus
          */
-        @Nullable
+        @Nonnull
         public static Status valueOf(final int code) {
             for (final Status c : values()) {
                 if (c.getCode() == code) {
                     return c;
                 }
             }
-            return null;
+            return HTTP_INVALID;
         }
     }
 

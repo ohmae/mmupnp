@@ -171,9 +171,6 @@ public class HttpClient {
 
     private static boolean needToRedirect(@Nonnull final HttpResponse response) {
         final Http.Status status = response.getStatus();
-        if (status == null) {
-            return false;
-        }
         switch (status) {
             case HTTP_MOVED_PERM:
             case HTTP_FOUND:
