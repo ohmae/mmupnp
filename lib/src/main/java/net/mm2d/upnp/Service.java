@@ -100,6 +100,7 @@ public class Service {
             return this;
         }
 
+        @Nullable
         public String getScpdUrl() {
             return mScpdUrl;
         }

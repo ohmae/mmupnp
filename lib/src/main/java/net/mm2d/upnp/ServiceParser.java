@@ -48,7 +48,11 @@ class ServiceParser {
                                 @Nonnull final String location,
                                 @Nonnull final Service.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
-        final URL url = Device.getAbsoluteUrl(location, builder.getScpdUrl());
+        final String scpdUrl = builder.getScpdUrl();
+        if (scpdUrl == null) {
+            throw new IOException();
+        }
+        final URL url = Device.getAbsoluteUrl(location, scpdUrl);
         final String description = client.downloadString(url);
         builder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
