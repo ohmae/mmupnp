@@ -25,23 +25,23 @@ public class MockMulticastSocket extends MulticastSocket {
     }
 
     @Override
-    public void setTimeToLive(int ttl) throws IOException {
+    public void setTimeToLive(final int ttl) throws IOException {
     }
 
     @Override
-    public void joinGroup(InetAddress mcastaddr) throws IOException {
+    public void joinGroup(final InetAddress mcastaddr) throws IOException {
     }
 
     @Override
-    public void leaveGroup(InetAddress mcastaddr) throws IOException {
+    public void leaveGroup(final InetAddress mcastaddr) throws IOException {
     }
 
     @Override
-    public void setNetworkInterface(NetworkInterface netIf) throws SocketException {
+    public void setNetworkInterface(final NetworkInterface netIf) throws SocketException {
     }
 
     @Override
-    public void send(DatagramPacket p) throws IOException {
+    public void send(final DatagramPacket p) throws IOException {
         mDatagramPacket = p;
     }
 
@@ -49,24 +49,24 @@ public class MockMulticastSocket extends MulticastSocket {
         return mDatagramPacket;
     }
 
-    public void setReceiveData(InetAddress address, byte[] data, long wait) {
+    public void setReceiveData(final InetAddress address, final byte[] data, final long wait) {
         mInetAddress = address;
         mReceiveData = data;
         mWait = wait;
     }
 
     @Override
-    public synchronized void receive(DatagramPacket p) throws IOException {
+    public synchronized void receive(final DatagramPacket p) throws IOException {
         if (mReceiveData == null) {
             try {
                 Thread.sleep(100000L);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 throw new IOException();
             }
         }
         try {
             Thread.sleep(mWait);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             throw new IOException();
         }
         System.arraycopy(mReceiveData, 0, p.getData(), 0, mReceiveData.length);

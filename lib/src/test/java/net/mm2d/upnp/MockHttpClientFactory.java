@@ -15,7 +15,7 @@ class MockHttpClientFactory extends HttpClientFactory {
     private HttpRequest mHttpRequest;
     private HttpResponse mHttpResponse;
 
-    public void setResponse(HttpResponse response) {
+    public void setResponse(final HttpResponse response) {
         mHttpResponse = response;
     }
 
@@ -25,11 +25,11 @@ class MockHttpClientFactory extends HttpClientFactory {
 
     @Override
     @Nonnull
-    public HttpClient createHttpClient(boolean keepAlive) {
+    public HttpClient createHttpClient(final boolean keepAlive) {
         return new HttpClient() {
             @Nonnull
             @Override
-            public HttpResponse post(@Nonnull HttpRequest request) throws IOException {
+            public HttpResponse post(@Nonnull final HttpRequest request) throws IOException {
                 mHttpRequest = request;
                 return mHttpResponse;
             }

@@ -28,8 +28,6 @@ public class ServiceTest {
     private static final String SID = "11234567-89ab-cdef-0123-456789abcdef";
     private static final String INTERFACE_ADDRESS = "192.0.2.3";
     private static final int EVENT_PORT = 100;
-    private HttpClient mHttpClient;
-    private SsdpMessage mSsdpMessage;
     private ControlPoint mControlPoint;
     private Device mDevice;
     private Service mCms;
@@ -38,31 +36,31 @@ public class ServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        mHttpClient = mock(HttpClient.class);
+        final HttpClient httpClient = mock(HttpClient.class);
         doReturn(TestUtils.getResourceAsString("device.xml"))
-                .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
+                .when(httpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
         doReturn(TestUtils.getResourceAsString("cds.xml"))
-                .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/cds.xml"));
+                .when(httpClient).downloadString(new URL("http://192.0.2.2:12345/cds.xml"));
         doReturn(TestUtils.getResourceAsString("cms.xml"))
-                .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/cms.xml"));
+                .when(httpClient).downloadString(new URL("http://192.0.2.2:12345/cms.xml"));
         doReturn(TestUtils.getResourceAsString("mmupnp.xml"))
-                .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/mmupnp.xml"));
+                .when(httpClient).downloadString(new URL("http://192.0.2.2:12345/mmupnp.xml"));
         doReturn(TestUtils.getResourceAsByteArray("icon/icon120.jpg"))
-                .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon120.jpg"));
+                .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon120.jpg"));
         doReturn(TestUtils.getResourceAsByteArray("icon/icon48.jpg"))
-                .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.jpg"));
+                .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.jpg"));
         doReturn(TestUtils.getResourceAsByteArray("icon/icon120.png"))
-                .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon120.png"));
+                .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon120.png"));
         doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
-                .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
+                .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         doReturn(InetAddress.getByName(INTERFACE_ADDRESS)).when(interfaceAddress).getAddress();
-        mSsdpMessage = new SsdpRequestMessage(interfaceAddress, data, data.length);
+        final SsdpMessage ssdpMessage = new SsdpRequestMessage(interfaceAddress, data, data.length);
         mControlPoint = mock(ControlPoint.class);
         doReturn(EVENT_PORT).when(mControlPoint).getEventPort();
-        final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
-        DeviceParser.loadDescription(mHttpClient, builder);
+        final Device.Builder builder = new Device.Builder(mControlPoint, ssdpMessage);
+        DeviceParser.loadDescription(httpClient, builder);
         mDevice = builder.build();
         mCms = mDevice.findServiceById("urn:upnp-org:serviceId:ConnectionManager");
         mCds = mDevice.findServiceById("urn:upnp-org:serviceId:ContentDirectory");

@@ -16,22 +16,22 @@ import javax.annotation.Nonnull;
 
 public class TestUtils {
     @Nonnull
-    public static File getResourceAsFile(String name) {
+    public static File getResourceAsFile(final String name) {
         return new File(getClassLoader().getResource(name).getFile());
     }
 
     @Nonnull
-    public static InputStream getResourceAsStream(String name) {
+    public static InputStream getResourceAsStream(final String name) {
         return getClassLoader().getResourceAsStream(name);
     }
 
     @Nonnull
-    public static byte[] getResourceAsByteArray(String name) throws IOException {
+    public static byte[] getResourceAsByteArray(final String name) throws IOException {
         return Files.readAllBytes(getResourceAsFile(name).toPath());
     }
 
     @Nonnull
-    public static String getResourceAsString(String name) throws IOException {
+    public static String getResourceAsString(final String name) throws IOException {
         return new String(Files.readAllBytes(getResourceAsFile(name).toPath()));
     }
 

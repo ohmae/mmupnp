@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 @RunWith(Enclosed.class)
 public class SsdpRequestMessageTest {
 
-    private static SsdpRequestMessage makeFromResource(String name) throws IOException {
+    private static SsdpRequestMessage makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
         return new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
     }
@@ -105,22 +105,22 @@ public class SsdpRequestMessageTest {
         }
 
         @Theory
-        public void getMethod_NOTIFYであること(SsdpRequestMessage message) {
+        public void getMethod_NOTIFYであること(final SsdpRequestMessage message) {
             assertThat(message.getMethod(), is(SsdpMessage.NOTIFY));
         }
 
         @Theory
-        public void getUri_アスタリスクであること(SsdpRequestMessage message) {
+        public void getUri_アスタリスクであること(final SsdpRequestMessage message) {
             assertThat(message.getUri(), is("*"));
         }
 
         @Theory
-        public void getUuid_記述の値であること(SsdpRequestMessage message) {
+        public void getUuid_記述の値であること(final SsdpRequestMessage message) {
             assertThat(message.getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         }
 
         @Theory
-        public void getHeader_HOST_SSDPのアドレスであること(SsdpRequestMessage message) {
+        public void getHeader_HOST_SSDPのアドレスであること(final SsdpRequestMessage message) {
             assertThat(message.getHeader(Http.HOST), is(SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT)));
         }
     }
@@ -138,17 +138,17 @@ public class SsdpRequestMessageTest {
         }
 
         @Theory
-        public void getNts_NTSがAliveであること(SsdpRequestMessage message) {
+        public void getNts_NTSがAliveであること(final SsdpRequestMessage message) {
             assertThat(message.getNts(), is(SsdpMessage.SSDP_ALIVE));
         }
 
         @Theory
-        public void getMaxAge_CACHE_CONTROLの値が取れること(SsdpRequestMessage message) {
+        public void getMaxAge_CACHE_CONTROLの値が取れること(final SsdpRequestMessage message) {
             assertThat(message.getMaxAge(), is(300));
         }
 
         @Theory
-        public void getLocation_Locationの値が取れること(SsdpRequestMessage message) {
+        public void getLocation_Locationの値が取れること(final SsdpRequestMessage message) {
             assertThat(message.getLocation(), is("http://192.0.2.2:12345/device.xml"));
         }
     }
@@ -165,7 +165,7 @@ public class SsdpRequestMessageTest {
         }
 
         @Theory
-        public void getNts_NTSがByebyeであること(SsdpRequestMessage message) {
+        public void getNts_NTSがByebyeであること(final SsdpRequestMessage message) {
             assertThat(message.getNts(), is(SsdpMessage.SSDP_BYEBYE));
         }
     }

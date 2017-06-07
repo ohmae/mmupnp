@@ -113,7 +113,7 @@ public class ActionInvokeTest {
         mAction.setHttpClientFactory(new HttpClientFactory() {
             @Override
             @Nonnull
-            public HttpClient createHttpClient(boolean keepAlive) {
+            public HttpClient createHttpClient(final boolean keepAlive) {
                 return client;
             }
         });
@@ -134,7 +134,7 @@ public class ActionInvokeTest {
                 is(String.valueOf(request.getBodyBinary().length)));
     }
 
-    private List<Element> createChildElementList(Element parent) {
+    private List<Element> createChildElementList(final Element parent) {
         final List<Element> elements = new ArrayList<>();
         final NodeList children = parent.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {

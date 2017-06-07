@@ -99,7 +99,7 @@ public class EventReceiverTest {
         final Result result = new Result();
         final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties) {
+            public boolean onEventReceived(@Nonnull final String sid, final long seq, @Nonnull final List<StringPair> properties) {
                 result.sid = sid;
                 result.seq = seq;
                 result.properties = properties;
@@ -116,13 +116,13 @@ public class EventReceiverTest {
                     private int count;
 
                     @Override
-                    public Socket answer(InvocationOnMock invocation) throws Throwable {
+                    public Socket answer(final InvocationOnMock invocation) throws Throwable {
                         if (count++ == 0) {
                             return socket;
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (InterruptedException e) {
+                        } catch (final InterruptedException e) {
                         }
                         throw new IOException();
                     }
@@ -151,7 +151,7 @@ public class EventReceiverTest {
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
         final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties) {
+            public boolean onEventReceived(@Nonnull final String sid, final long seq, @Nonnull final List<StringPair> properties) {
                 return false;
             }
         }) {
@@ -165,13 +165,13 @@ public class EventReceiverTest {
                     private int count;
 
                     @Override
-                    public Socket answer(InvocationOnMock invocation) throws Throwable {
+                    public Socket answer(final InvocationOnMock invocation) throws Throwable {
                         if (count++ == 0) {
                             return socket;
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (InterruptedException e) {
+                        } catch (final InterruptedException e) {
                         }
                         throw new IOException();
                     }
@@ -204,13 +204,13 @@ public class EventReceiverTest {
                     private int count;
 
                     @Override
-                    public Socket answer(InvocationOnMock invocation) throws Throwable {
+                    public Socket answer(final InvocationOnMock invocation) throws Throwable {
                         if (count++ == 0) {
                             return socket;
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (InterruptedException e) {
+                        } catch (final InterruptedException e) {
                         }
                         throw new IOException();
                     }
@@ -243,13 +243,13 @@ public class EventReceiverTest {
                     private int count;
 
                     @Override
-                    public Socket answer(InvocationOnMock invocation) throws Throwable {
+                    public Socket answer(final InvocationOnMock invocation) throws Throwable {
                         if (count++ == 0) {
                             return socket;
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (InterruptedException e) {
+                        } catch (final InterruptedException e) {
                         }
                         throw new IOException();
                     }
@@ -273,10 +273,10 @@ public class EventReceiverTest {
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
         final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties) {
+            public boolean onEventReceived(@Nonnull final String sid, final long seq, @Nonnull final List<StringPair> properties) {
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                 }
                 return false;
             }
@@ -291,13 +291,13 @@ public class EventReceiverTest {
                     private int count;
 
                     @Override
-                    public Socket answer(InvocationOnMock invocation) throws Throwable {
+                    public Socket answer(final InvocationOnMock invocation) throws Throwable {
                         if (count++ == 0) {
                             return socket;
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (InterruptedException e) {
+                        } catch (final InterruptedException e) {
                         }
                         throw new IOException();
                     }

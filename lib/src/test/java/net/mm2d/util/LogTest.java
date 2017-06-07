@@ -281,7 +281,7 @@ public class LogTest {
     public void print() {
         final Print print = new Print() {
             @Override
-            public void println(int level, @Nullable String tag, @Nullable String message) {
+            public void println(final int level, @Nullable final String tag, @Nullable final String message) {
 
             }
         };

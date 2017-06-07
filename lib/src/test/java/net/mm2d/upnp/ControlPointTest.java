@@ -65,20 +65,23 @@ public class ControlPointTest {
         public void setUp() throws Exception {
             mCp = spy(new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
                     new ControlPointFactory() {
+                        @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
-                                @Nonnull Collection<NetworkInterface> interfaces, @Nonnull ResponseListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final ResponseListener listener) {
                             return mock(SsdpSearchServerList.class);
                         }
 
+                        @Nonnull
                         @Override
                         SsdpNotifyReceiverList createSsdpNotifyReceiverList(
-                                @Nonnull Collection<NetworkInterface> interfaces, @Nonnull NotifyListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final NotifyListener listener) {
                             return mock(SsdpNotifyReceiverList.class);
                         }
 
+                        @Nonnull
                         @Override
-                        EventReceiver createEventReceiver(@Nonnull EventMessageListener listener) {
+                        EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
                             return mock(EventReceiver.class);
                         }
                     }));
@@ -190,20 +193,23 @@ public class ControlPointTest {
 
             mCp = spy(new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
                     new ControlPointFactory() {
+                        @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
-                                @Nonnull Collection<NetworkInterface> interfaces, @Nonnull ResponseListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final ResponseListener listener) {
                             return mock(SsdpSearchServerList.class);
                         }
 
+                        @Nonnull
                         @Override
                         SsdpNotifyReceiverList createSsdpNotifyReceiverList(
-                                @Nonnull Collection<NetworkInterface> interfaces, @Nonnull NotifyListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final NotifyListener listener) {
                             return mock(SsdpNotifyReceiverList.class);
                         }
 
+                        @Nonnull
                         @Override
-                        EventReceiver createEventReceiver(@Nonnull EventMessageListener listener) {
+                        EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
                             mEventMessageListener = listener;
                             return mEventReceiver;
                         }
