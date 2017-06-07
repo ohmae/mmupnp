@@ -145,7 +145,7 @@ public class Log {
      *
      * @param append 追加する場合true
      */
-    public static void setAppendCaller(boolean append) {
+    public static void setAppendCaller(final boolean append) {
         sAppendCaller = append;
     }
 
@@ -398,7 +398,7 @@ public class Log {
     }
 
     @Nonnull
-    private static String makeTag(@Nullable final String tag, @Nullable StackTraceElement element) {
+    private static String makeTag(@Nullable final String tag, @Nullable final StackTraceElement element) {
         if (tag != null) {
             return tag;
         }

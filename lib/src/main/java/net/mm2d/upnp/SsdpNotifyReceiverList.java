@@ -24,7 +24,6 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpNotifyReceiverList {
-    private static final String TAG = SsdpNotifyReceiverList.class.getSimpleName();
     @Nonnull
     private final List<SsdpNotifyReceiver> mList;
 
@@ -44,7 +43,7 @@ class SsdpNotifyReceiverList {
                 receiver.open();
                 receiver.start();
             } catch (final IOException e) {
-                Log.w(TAG, e);
+                Log.w(e);
             }
         }
     }

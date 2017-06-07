@@ -40,8 +40,6 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ControlPoint {
-    private static final String TAG = ControlPoint.class.getSimpleName();
-
     /**
      * 機器発見イベント通知用リスナー。
      *
@@ -226,7 +224,7 @@ public class ControlPoint {
         private void notifyEvent(@Nullable final String name, @Nullable final String value) {
             final StateVariable variable = mService.findStateVariable(name);
             if (variable == null || !variable.isSendEvents() || value == null) {
-                Log.w(TAG, "illegal notify argument:" + name + " " + value);
+                Log.w("illegal notify argument:" + name + " " + value);
                 return;
             }
             mNotifyEventListenerList.onNotifyEvent(mService, mSeq, variable.getName(), value);
@@ -380,7 +378,7 @@ public class ControlPoint {
                 mCachedThreadPool.shutdownNow();
             }
         } catch (final InterruptedException e) {
-            Log.w(TAG, e);
+            Log.w(e);
         }
         mSubscribeHolder.shutdownRequest();
         mDeviceHolder.shutdownRequest();
@@ -404,8 +402,8 @@ public class ControlPoint {
         }
         try {
             mEventReceiver.open();
-        } catch (final IOException e1) {
-            Log.w(TAG, e1);
+        } catch (final IOException e) {
+            Log.w(e);
         }
         mSearchList.openAndStart();
         mNotifyList.openAndStart();
@@ -432,7 +430,7 @@ public class ControlPoint {
                     try {
                         service.unsubscribe();
                     } catch (final IOException e) {
-                        Log.w(TAG, e);
+                        Log.w(e);
                     }
                 }
             });

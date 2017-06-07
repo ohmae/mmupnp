@@ -24,8 +24,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpNotifyReceiver extends SsdpServer {
-    private static final String TAG = SsdpNotifyReceiver.class.getSimpleName();
-
     /**
      * NOTIFY受信を受け取るリスナー。
      */
@@ -66,7 +64,7 @@ class SsdpNotifyReceiver extends SsdpServer {
         // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
         // 受け取っても無駄なので破棄する。
         if (!isSameSegment(getInterfaceAddress(), sourceAddress)) {
-            Log.w(TAG, "Invalid segment packet received:" + sourceAddress.toString()
+            Log.w("Invalid segment packet received:" + sourceAddress.toString()
                     + " " + getInterfaceAddress().toString());
             return;
         }

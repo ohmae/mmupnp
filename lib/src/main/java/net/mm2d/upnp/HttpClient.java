@@ -38,7 +38,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpClient {
-    private static final String TAG = HttpClient.class.getSimpleName();
     private static final int REDIRECT_MAX = 2;
     @Nullable
     private Socket mSocket;
@@ -275,7 +274,7 @@ public class HttpClient {
         final HttpRequest request = makeHttpRequest(url);
         final HttpResponse response = post(request);
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
-            Log.i(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.i("request:" + request.toString() + "\nresponse:" + response.toString());
             throw new IOException(response.getStartLine());
         }
         return response;

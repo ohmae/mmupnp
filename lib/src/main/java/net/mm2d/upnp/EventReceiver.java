@@ -41,8 +41,6 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class EventReceiver {
-    private static final String TAG = EventReceiver.class.getSimpleName();
-
     /**
      * イベントデータの受信を受け取るリスナー。
      */
@@ -326,7 +324,7 @@ class EventReceiver {
                 os = mSocket.getOutputStream();
                 receiveAndReply(is, os);
             } catch (final IOException e) {
-                Log.w(TAG, e);
+                Log.w(e);
             } finally {
                 IoUtils.closeQuietly(is);
                 IoUtils.closeQuietly(os);

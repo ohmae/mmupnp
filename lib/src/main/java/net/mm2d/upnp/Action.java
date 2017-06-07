@@ -46,8 +46,6 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Action {
-    private static final String TAG = Action.class.getSimpleName();
-
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
@@ -365,7 +363,7 @@ public class Action {
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
-            Log.w(TAG, response.toString());
+            Log.w(response.toString());
             throw new IOException(response.getStartLine());
         }
         try {
@@ -512,7 +510,7 @@ public class Action {
             final String text = node.getTextContent();
             if (findArgument(tag) == null) {
                 // Optionalな情報としてArgumentに記述されていないタグが含まれる可能性があるためログ出力に留める
-                Log.d(TAG, "invalid argument:" + tag + "->" + text);
+                Log.d("invalid argument:" + tag + "->" + text);
             }
             result.put(tag, text);
         }

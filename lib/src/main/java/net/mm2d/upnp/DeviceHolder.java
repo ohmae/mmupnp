@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class DeviceHolder implements Runnable {
-    private static final String TAG = DeviceHolder.class.getSimpleName();
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
 
     @Nonnull
@@ -55,7 +54,7 @@ class DeviceHolder implements Runnable {
     void start() {
         mShutdownRequest = false;
         synchronized (mThreadLock) {
-            mThread = new Thread(this, TAG);
+            mThread = new Thread(this, getClass().getSimpleName());
             mThread.start();
         }
     }

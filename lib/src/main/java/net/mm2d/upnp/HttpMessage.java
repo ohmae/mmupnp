@@ -38,7 +38,6 @@ import javax.annotation.Nullable;
  * @see HttpRequest
  */
 public abstract class HttpMessage {
-    private static final String TAG = HttpMessage.class.getSimpleName();
     private static final int BUFFER_SIZE = 1500;
     private static final int DEFAULT_CHUNK_SIZE = 1024;
     private static final int CR = 0x0d;
@@ -269,7 +268,7 @@ public abstract class HttpMessage {
             try {
                 return Integer.parseInt(len);
             } catch (final NumberFormatException e) {
-                Log.w(TAG, e);
+                Log.w(e);
             }
         }
         return 0;
@@ -325,7 +324,7 @@ public abstract class HttpMessage {
             try {
                 mBodyBinary = string.getBytes(CHARSET);
             } catch (final UnsupportedEncodingException e) {
-                Log.w(TAG, e);
+                Log.w(e);
             }
         }
         if (withContentLength) {
@@ -345,7 +344,7 @@ public abstract class HttpMessage {
             try {
                 mBody = new String(mBodyBinary, CHARSET);
             } catch (final UnsupportedEncodingException e) {
-                Log.w(TAG, e);
+                Log.w(e);
             }
         }
         return mBody;
@@ -399,7 +398,7 @@ public abstract class HttpMessage {
         try {
             return getHeaderString().getBytes(CHARSET);
         } catch (final UnsupportedEncodingException e) {
-            Log.w(TAG, e);
+            Log.w(e);
         }
         return new byte[0];
     }

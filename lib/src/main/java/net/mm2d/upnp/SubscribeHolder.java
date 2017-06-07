@@ -26,7 +26,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SubscribeHolder implements Runnable {
-    private static final String TAG = SubscribeHolder.class.getSimpleName();
     private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
 
     private final Object mThreadLock = new Object();
@@ -45,7 +44,7 @@ class SubscribeHolder implements Runnable {
     void start() {
         mShutdownRequest = false;
         synchronized (mThreadLock) {
-            mThread = new Thread(this, TAG);
+            mThread = new Thread(this, getClass().getSimpleName());
             mThread.start();
         }
     }

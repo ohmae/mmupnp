@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
  */
 // TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
 abstract class SsdpServer {
-    private static final String TAG = SsdpServer.class.getSimpleName();
     /**
      * SSDPに使用するアドレス。
      */
@@ -112,7 +111,7 @@ abstract class SsdpServer {
     }
 
     @Nonnull
-    // VisibleForTesting
+        // VisibleForTesting
     MulticastSocket createMulticastSocket(final int port) throws IOException {
         return new MulticastSocket(port);
     }
@@ -171,7 +170,7 @@ abstract class SsdpServer {
             message.getMessage().writeData(baos);
             send(baos.toByteArray());
         } catch (final IOException e) {
-            Log.w(TAG, e);
+            Log.w(e);
         }
     }
 
@@ -194,7 +193,6 @@ abstract class SsdpServer {
     protected abstract void onReceive(@Nonnull InetAddress sourceAddress, @Nonnull byte[] data, int length);
 
     private static class ReceiveTask implements Runnable {
-        private static final String TAG = ReceiveTask.class.getSimpleName();
         @Nonnull
         private final SsdpServer mSsdpServer;
         @Nonnull
@@ -220,7 +218,7 @@ abstract class SsdpServer {
          */
         synchronized void start() {
             mShutdownRequest = false;
-            mThread = new Thread(this, TAG);
+            mThread = new Thread(this, getClass().getSimpleName());
             mThread.start();
         }
 

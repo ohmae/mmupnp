@@ -30,8 +30,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Service {
-    private static final String TAG = Service.class.getSimpleName();
-
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      */
@@ -482,7 +480,7 @@ public class Service {
             final int second = Integer.parseInt(secondSection);
             return TimeUnit.SECONDS.toMillis(second);
         } catch (final NumberFormatException e) {
-            Log.w(TAG, e);
+            Log.w(e);
         }
         return DEFAULT_SUBSCRIPTION_TIMEOUT;
     }
@@ -533,7 +531,7 @@ public class Service {
         final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "subscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w("subscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         if (parseSubscribeResponse(response)) {
@@ -547,7 +545,7 @@ public class Service {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
-            Log.w(TAG, "subscribe response:" + response.toString());
+            Log.w("subscribe response:" + response.toString());
             return false;
         }
         mSubscriptionId = sid;
@@ -591,7 +589,7 @@ public class Service {
         final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w("renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         return parseRenewSubscribeResponse(response);
@@ -601,7 +599,7 @@ public class Service {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
-            Log.w(TAG, "renewSubscribe response:" + response.toString());
+            Log.w("renewSubscribe response:" + response.toString());
             return false;
         }
         mSubscriptionStart = System.currentTimeMillis();
@@ -635,7 +633,7 @@ public class Service {
         final HttpRequest request = makeUnsubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w("unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         mControlPoint.unregisterSubscribeService(this);

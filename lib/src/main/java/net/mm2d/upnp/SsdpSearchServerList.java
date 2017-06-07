@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpSearchServerList {
-    private static final String TAG = SsdpSearchServerList.class.getSimpleName();
     @Nonnull
     private final List<SsdpSearchServer> mList;
 
@@ -45,7 +44,7 @@ class SsdpSearchServerList {
                 server.open();
                 server.start();
             } catch (final IOException e) {
-                Log.w(TAG, e);
+                Log.w(e);
             }
         }
     }
