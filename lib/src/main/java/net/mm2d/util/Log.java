@@ -24,9 +24,8 @@ import javax.annotation.Nullable;
  * また、{@link #setLogLevel(int)}によりログレベルを動的に変更することが可能で
  * 指定したレベル以下のログを表示させないようにすることができる。
  *
- * <p>TAGにnullを指定することもできる。
- * nullを指定した場合はStackTraceから呼び出し元の場所をTAGとして使用する。
- * コストが大きいため常時出力されるログには使用しないこと。
+ * <p>TAGを省略することも可能、nullを指定した場合も同様に動作する。
+ * 省略もしくはnullを指定した場合、StackTraceから呼び出し元のクラスをTAGとして使用する。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -78,32 +77,35 @@ public class Log {
 
         @Override
         public void println(final int level, @Nonnull final String tag, @Nonnull final String message) {
+            final String[] lines = message.split("\n");
+            final String prefix = getDateString() + levelToString(level) + "[" + tag + "] ";
+            for (final String line : lines) {
+                System.out.println(prefix + line);
+            }
+        }
+
+        @Nonnull
+        private String getDateString() {
             synchronized (FORMAT) {
-                final StringBuilder sb = new StringBuilder();
-                sb.append(FORMAT.format(new Date(System.currentTimeMillis())));
-                switch (level) {
-                    default:
-                    case VERBOSE:
-                        sb.append(" V ");
-                        break;
-                    case DEBUG:
-                        sb.append(" D ");
-                        break;
-                    case INFO:
-                        sb.append(" I ");
-                        break;
-                    case WARN:
-                        sb.append(" W ");
-                        break;
-                    case ERROR:
-                        sb.append(" E ");
-                        break;
-                }
-                sb.append("[");
-                sb.append(tag);
-                sb.append("] ");
-                sb.append(message);
-                System.out.println(sb.toString());
+                return FORMAT.format(new Date(System.currentTimeMillis()));
+            }
+        }
+
+        @Nonnull
+        private String levelToString(final int level) {
+            switch (level) {
+                case VERBOSE:
+                    return " V ";
+                case DEBUG:
+                    return " D ";
+                case INFO:
+                    return " I ";
+                case WARN:
+                    return " W ";
+                case ERROR:
+                    return " E ";
+                default:
+                    return "   ";
             }
         }
     }
@@ -112,6 +114,7 @@ public class Log {
     @Nonnull
     private static Print sPrint = DEFAULT_PRINT;
     private static int sLogLevel = VERBOSE;
+    private static boolean sAppendCaller = false;
 
     /**
      * 出力処理を変更する。
@@ -127,11 +130,32 @@ public class Log {
      *
      * <p>設定した値以上のログを出力する。
      * ERRORを指定した場合はERRORとASSERTのレベルのログが出力される。
+     * <p>デフォルト値はVERBOSE
      *
      * @param level ログレベル。
      */
     public static void setLogLevel(final int level) {
         sLogLevel = level;
+    }
+
+    /**
+     * 呼び出し元の情報をログに追加する。
+     *
+     * <p>デフォルト値はfalse
+     *
+     * @param append 追加する場合true
+     */
+    public static void setAppendCaller(boolean append) {
+        sAppendCaller = append;
+    }
+
+    /**
+     * VERBOSEレベルでのログ出力を行う。
+     *
+     * @param message メッセージ
+     */
+    public static void v(@Nullable final String message) {
+        println(VERBOSE, null, message, null);
     }
 
     /**
@@ -142,6 +166,17 @@ public class Log {
      */
     public static void v(@Nullable final String tag, @Nullable final String message) {
         println(VERBOSE, tag, message, null);
+    }
+
+    /**
+     * VERBOSEレベルでのログ出力を行う。
+     *
+     * <p>引数のThrowableを元にスタックトレースを表示する。
+     *
+     * @param tr Throwable
+     */
+    public static void v(@Nullable final Throwable tr) {
+        println(VERBOSE, null, null, tr);
     }
 
     /**
@@ -160,11 +195,31 @@ public class Log {
     /**
      * DEBUGレベルでのログ出力を行う。
      *
+     * @param message メッセージ
+     */
+    public static void d(@Nullable final String message) {
+        println(DEBUG, null, message, null);
+    }
+
+    /**
+     * DEBUGレベルでのログ出力を行う。
+     *
      * @param tag     タグ
      * @param message メッセージ
      */
     public static void d(@Nullable final String tag, @Nullable final String message) {
         println(DEBUG, tag, message, null);
+    }
+
+    /**
+     * DEBUGレベルでのログ出力を行う。
+     *
+     * <p>引数のThrowableを元にスタックトレースを表示する。
+     *
+     * @param tr Throwable
+     */
+    public static void d(@Nullable final Throwable tr) {
+        println(DEBUG, null, null, tr);
     }
 
     /**
@@ -183,11 +238,31 @@ public class Log {
     /**
      * INFOレベルでのログ出力を行う。
      *
+     * @param message メッセージ
+     */
+    public static void i(@Nullable final String message) {
+        println(INFO, null, message, null);
+    }
+
+    /**
+     * INFOレベルでのログ出力を行う。
+     *
      * @param tag     タグ
      * @param message メッセージ
      */
     public static void i(@Nullable final String tag, @Nullable final String message) {
         println(INFO, tag, message, null);
+    }
+
+    /**
+     * INFOレベルでのログ出力を行う。
+     *
+     * <p>引数のThrowableを元にスタックトレースを表示する。
+     *
+     * @param tr Throwable
+     */
+    public static void i(@Nullable final Throwable tr) {
+        println(INFO, null, null, tr);
     }
 
     /**
@@ -206,6 +281,15 @@ public class Log {
     /**
      * WARNレベルでのログ出力を行う。
      *
+     * @param message メッセージ
+     */
+    public static void w(@Nullable final String message) {
+        println(WARN, null, message, null);
+    }
+
+    /**
+     * WARNレベルでのログ出力を行う。
+     *
      * @param tag     タグ
      * @param message メッセージ
      */
@@ -216,7 +300,18 @@ public class Log {
     /**
      * WARNレベルでのログ出力を行う。
      *
-     * <p>引数のThrowableのスタックトレースをメッセージとして表示する。
+     * <p>引数のThrowableを元にスタックトレースを表示する。
+     *
+     * @param tr Throwable
+     */
+    public static void w(@Nullable final Throwable tr) {
+        println(WARN, null, null, tr);
+    }
+
+    /**
+     * WARNレベルでのログ出力を行う。
+     *
+     * <p>引数のThrowableを元にスタックトレースを表示する。
      *
      * @param tag タグ
      * @param tr  Throwable
@@ -241,11 +336,31 @@ public class Log {
     /**
      * ERRORレベルでのログ出力を行う。
      *
+     * @param message メッセージ
+     */
+    public static void e(@Nullable final String message) {
+        println(ERROR, null, message, null);
+    }
+
+    /**
+     * ERRORレベルでのログ出力を行う。
+     *
      * @param tag     タグ
      * @param message メッセージ
      */
     public static void e(@Nullable final String tag, @Nullable final String message) {
         println(ERROR, tag, message, null);
+    }
+
+    /**
+     * ERRORレベルでのログ出力を行う。
+     *
+     * <p>引数のThrowableを元にスタックトレースを表示する。
+     *
+     * @param tr Throwable
+     */
+    public static void e(@Nullable final Throwable tr) {
+        println(ERROR, null, null, tr);
     }
 
     /**
@@ -267,20 +382,58 @@ public class Log {
         if (level < sLogLevel) {
             return;
         }
-        sPrint.println(level, makeTag(tag), makeMessage(message, tr));
+        if (!sAppendCaller) {
+            sPrint.println(level, makeTag(tag, null), makeMessage(message, tr));
+            return;
+        }
+        final StackTraceElement[] trace = new Throwable().getStackTrace();
+        // println -> v/d/i/w/e -> ログコール場所
+        if (trace.length < 3) {
+            sPrint.println(level, makeTag(tag, null), makeMessage(message, tr));
+            return;
+        }
+        final StackTraceElement element = trace[2];
+        sPrint.println(level, makeTag(tag, element), element.toString() + " : " + makeMessage(message, tr));
+
     }
 
     @Nonnull
-    private static String makeTag(@Nullable final String tag) {
+    private static String makeTag(@Nullable final String tag, @Nullable StackTraceElement element) {
         if (tag != null) {
             return tag;
         }
-        try {
-            // makeTag -> println -> v/d/i/w/e -> ログコール場所
-            return new Throwable().getStackTrace()[3].toString();
-        } catch (final Exception ignored) { // 念のため
+        if (element != null) {
+            return makeTag(element);
+        }
+        final StackTraceElement[] trace = new Throwable().getStackTrace();
+        // makeTag -> println -> v/d/i/w/e -> ログコール場所
+        if (trace.length < 4) {
             return "tag";
         }
+        return makeTag(trace[3]);
+    }
+
+    @Nonnull
+    private static String makeTag(@Nonnull final StackTraceElement element) {
+        final String className = extractSimpleClassName(element);
+        if (className.length() > 23) {
+            return className.substring(0, 23);
+        }
+        return className;
+    }
+
+    @Nonnull
+    private static String extractSimpleClassName(@Nonnull final StackTraceElement element) {
+        String className = element.getClassName();
+        final int dollar = className.lastIndexOf('$');
+        if (dollar >= 0) {
+            className = className.substring(0, dollar);
+        }
+        final int dot = className.lastIndexOf('.');
+        if (dot >= 0) {
+            return className.substring(dot + 1);
+        }
+        return className;
     }
 
     @Nonnull
