@@ -109,7 +109,7 @@ class SubscribeHolder implements Runnable {
      * @return 該当するService
      */
     @Nullable
-    Service getService(@Nonnull final String subscriptionId) {
+    synchronized Service getService(@Nonnull final String subscriptionId) {
         final SubscribeService c = mServiceMap.get(subscriptionId);
         if (c == null) {
             return null;

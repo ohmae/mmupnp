@@ -38,6 +38,7 @@ class SsdpNotifyReceiver extends SsdpServer {
         void onReceiveNotify(@Nonnull SsdpRequestMessage message);
     }
 
+    @Nullable
     private NotifyListener mListener;
 
     /**

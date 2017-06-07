@@ -48,7 +48,9 @@ abstract class SsdpServer {
     @Nonnull
     private final InterfaceAddress mInterfaceAddress;
     private final int mBindPort;
+    @Nullable
     private MulticastSocket mSocket;
+    @Nullable
     private ReceiveTask mReceiveTask;
 
     /**
@@ -74,6 +76,7 @@ abstract class SsdpServer {
         mInterface = networkInterface;
     }
 
+    @Nonnull
     private static InterfaceAddress findInet4Address(@Nonnull final NetworkInterface networkInterface) {
         final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
         for (final InterfaceAddress address : addressList) {
@@ -108,6 +111,7 @@ abstract class SsdpServer {
         mSocket.setTimeToLive(4);
     }
 
+    @Nonnull
     // VisibleForTesting
     MulticastSocket createMulticastSocket(final int port) throws IOException {
         return new MulticastSocket(port);

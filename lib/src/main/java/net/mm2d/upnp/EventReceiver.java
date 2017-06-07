@@ -58,7 +58,9 @@ class EventReceiver {
         boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties);
     }
 
+    @Nullable
     private ServerSocket mServerSocket;
+    @Nullable
     private ServerTask mServerTask;
     @Nullable
     private final EventMessageListener mListener;
@@ -93,6 +95,9 @@ class EventReceiver {
      * @return サーバソケットのポート番号
      */
     int getLocalPort() {
+        if (mServerSocket == null) {
+            return 0;
+        }
         return mServerSocket.getLocalPort();
     }
 
@@ -100,8 +105,10 @@ class EventReceiver {
      * 受信スレッドを終了させる。
      */
     void close() {
-        mServerTask.shutdownRequest();
-        mServerTask = null;
+        if (mServerTask != null) {
+            mServerTask.shutdownRequest();
+            mServerTask = null;
+        }
     }
 
     @Nonnull
@@ -150,7 +157,9 @@ class EventReceiver {
         private final ServerSocket mServerSocket;
         @Nonnull
         private final List<ClientTask> mClientList;
+        @Nullable
         private Thread mThread;
+        @Nullable
         private EventMessageListener mListener;
 
         /**
@@ -271,6 +280,7 @@ class EventReceiver {
         private final ServerTask mServer;
         @Nonnull
         private final Socket mSocket;
+        @Nullable
         private Thread mThread;
 
         /**

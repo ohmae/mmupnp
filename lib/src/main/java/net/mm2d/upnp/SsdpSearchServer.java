@@ -43,6 +43,7 @@ class SsdpSearchServer extends SsdpServer {
         void onReceiveResponse(@Nonnull SsdpResponseMessage message);
     }
 
+    @Nullable
     private ResponseListener mListener;
 
     /**

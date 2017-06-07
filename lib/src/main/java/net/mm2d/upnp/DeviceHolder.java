@@ -28,8 +28,10 @@ class DeviceHolder implements Runnable {
     private static final String TAG = DeviceHolder.class.getSimpleName();
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
 
+    @Nonnull
     private final Object mThreadLock = new Object();
     private volatile boolean mShutdownRequest = false;
+    @Nullable
     private Thread mThread;
 
     @Nonnull

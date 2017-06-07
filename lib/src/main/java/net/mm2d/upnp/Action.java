@@ -145,6 +145,7 @@ public class Action {
     private final String mName;
     @Nonnull
     private final Map<String, Argument> mArgumentMap;
+    @Nullable
     private List<Argument> mArgumentList;
 
     private Action(@Nonnull final Builder builder) {

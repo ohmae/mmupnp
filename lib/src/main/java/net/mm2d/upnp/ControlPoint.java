@@ -173,6 +173,7 @@ public class ControlPoint {
     }
 
     private class DeviceLoader implements Runnable {
+        @Nonnull
         private final Device.Builder mDeviceBuilder;
 
         DeviceLoader(@Nonnull final Device.Builder builder) {
@@ -203,8 +204,10 @@ public class ControlPoint {
     }
 
     private class EventNotifyTask implements Runnable {
+        @Nonnull
         private final Service mService;
         private final long mSeq;
+        @Nonnull
         private final List<StringPair> mProperties;
 
         EventNotifyTask(@Nonnull final Service service, final long seq, @Nonnull final List<StringPair> properties) {

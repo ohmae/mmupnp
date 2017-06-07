@@ -20,6 +20,7 @@ import java.net.Socket;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * HTTP通信を行うクライアントソケット。
@@ -39,9 +40,12 @@ import javax.annotation.Nonnull;
 public class HttpClient {
     private static final String TAG = HttpClient.class.getSimpleName();
     private static final int REDIRECT_MAX = 2;
+    @Nullable
     private Socket mSocket;
     private boolean mKeepAlive;
+    @Nullable
     private InputStream mInputStream;
+    @Nullable
     private OutputStream mOutputStream;
 
     /**
@@ -193,7 +197,8 @@ public class HttpClient {
     }
 
     private boolean canReuse(@Nonnull final HttpRequest request) {
-        return mSocket.isConnected()
+        return mSocket != null
+                && mSocket.isConnected()
                 && mSocket.getInetAddress().equals(request.getAddress())
                 && mSocket.getPort() == request.getPort();
     }

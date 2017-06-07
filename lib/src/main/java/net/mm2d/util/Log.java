@@ -109,6 +109,7 @@ public class Log {
     }
 
     public static final Print DEFAULT_PRINT = new DefaultPrint();
+    @Nonnull
     private static Print sPrint = DEFAULT_PRINT;
     private static int sLogLevel = VERBOSE;
 

@@ -361,14 +361,21 @@ public class Device {
     private final String mDeviceType;
     @Nonnull
     private final String mFriendlyName;
+    @Nullable
     private final String mManufacture;
+    @Nullable
     private final String mManufactureUrl;
     @Nonnull
     private final String mModelName;
+    @Nullable
     private final String mModelUrl;
+    @Nullable
     private final String mModelDescription;
+    @Nullable
     private final String mModelNumber;
+    @Nullable
     private final String mSerialNumber;
+    @Nullable
     private final String mPresentationUrl;
     @Nonnull
     private final Map<String, Map<String, String>> mTagMap;

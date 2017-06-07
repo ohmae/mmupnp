@@ -176,7 +176,7 @@ public class HttpHeader {
      *
      * @param original コピー元
      */
-    public HttpHeader(final HttpHeader original) {
+    public HttpHeader(@Nonnull final HttpHeader original) {
         // EntryはmutableなのでDeep copyが必要
         mList = new LinkedList<>();
         for (final Entry entry : original.mList) {

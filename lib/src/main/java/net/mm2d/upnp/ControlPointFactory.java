@@ -22,18 +22,21 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class ControlPointFactory {
+    @Nonnull
     SsdpSearchServerList createSsdpSearchServerList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
         return new SsdpSearchServerList(interfaces, listener);
     }
 
+    @Nonnull
     SsdpNotifyReceiverList createSsdpNotifyReceiverList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
         return new SsdpNotifyReceiverList(interfaces, listener);
     }
 
+    @Nonnull
     EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
         return new EventReceiver(listener);
     }
