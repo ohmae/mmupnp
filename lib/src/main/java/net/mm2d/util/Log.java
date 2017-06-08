@@ -425,13 +425,13 @@ public class Log {
     @Nonnull
     private static String extractSimpleClassName(@Nonnull final StackTraceElement element) {
         String className = element.getClassName();
-        final int dollar = className.lastIndexOf('$');
-        if (dollar >= 0) {
-            className = className.substring(0, dollar);
-        }
         final int dot = className.lastIndexOf('.');
         if (dot >= 0) {
-            return className.substring(dot + 1);
+            className = className.substring(dot + 1);
+        }
+        final int dollar = className.indexOf('$');
+        if (dollar >= 0) {
+            return className.substring(0, dollar);
         }
         return className;
     }
