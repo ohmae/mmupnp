@@ -123,9 +123,7 @@ public class HttpClient {
         confirmReuseSocket(request);
         final HttpResponse response;
         try {
-            writeData(request);
-            response = new HttpResponse(mSocket);
-            response.readData(mInputStream);
+            response = doRequest(request);
         } catch (final IOException e) {
             closeSocket();
             throw e;
@@ -137,25 +135,33 @@ public class HttpClient {
     }
 
     private void confirmReuseSocket(@Nonnull final HttpRequest request) {
-        if (!isClosed() && !canReuse(request)) {
+        if (!canReuse(request)) {
             closeSocket();
         }
     }
 
-    private void writeData(@Nonnull final HttpRequest request) throws IOException {
+    private HttpResponse doRequest(@Nonnull final HttpRequest request) throws IOException {
         if (isClosed()) {
             openSocket(request);
-            request.writeData(mOutputStream);
+            return writeAndRead(request);
         } else {
             try {
-                request.writeData(mOutputStream);
+                return writeAndRead(request);
             } catch (final IOException e) {
                 // コネクションを再利用した場合はpeerから既に切断されていた可能性があるためリトライを行う
+                Log.w("retry:" + e.getMessage());
                 closeSocket();
                 openSocket(request);
-                request.writeData(mOutputStream);
+                return writeAndRead(request);
             }
         }
+    }
+
+    private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
+        request.writeData(mOutputStream);
+        final HttpResponse response = new HttpResponse(mSocket);
+        response.readData(mInputStream);
+        return response;
     }
 
     @Nonnull
