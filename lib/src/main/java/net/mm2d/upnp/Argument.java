@@ -43,7 +43,7 @@ public class Argument {
          * @return Builder
          */
         @Nonnull
-        public Builder setAction(@Nonnull Action action) {
+        public Builder setAction(@Nonnull final Action action) {
             mAction = action;
             return this;
         }
@@ -55,7 +55,7 @@ public class Argument {
          * @return Builder
          */
         @Nonnull
-        public Builder setName(@Nonnull String name) {
+        public Builder setName(@Nonnull final String name) {
             mName = name;
             return this;
         }
@@ -69,7 +69,7 @@ public class Argument {
          * @return Builder
          */
         @Nonnull
-        public Builder setDirection(@Nonnull String direction) {
+        public Builder setDirection(@Nonnull final String direction) {
             mInputDirection = "in".equalsIgnoreCase(direction);
             return this;
         }
@@ -81,7 +81,7 @@ public class Argument {
          * @return Builder
          */
         @Nonnull
-        public Builder setRelatedStateVariableName(@Nonnull String name) {
+        public Builder setRelatedStateVariableName(@Nonnull final String name) {
             mRelatedStateVariableName = name;
             return this;
         }
@@ -103,7 +103,7 @@ public class Argument {
          * @return Builder
          */
         @Nonnull
-        public Builder setRelatedStateVariable(@Nonnull StateVariable variable) {
+        public Builder setRelatedStateVariable(@Nonnull final StateVariable variable) {
             mRelatedStateVariable = variable;
             return this;
         }
@@ -137,7 +137,7 @@ public class Argument {
     @Nonnull
     private final StateVariable mRelatedStateVariable;
 
-    private Argument(@Nonnull Builder builder) {
+    private Argument(@Nonnull final Builder builder) {
         mAction = builder.mAction;
         mName = builder.mName;
         mInputDirection = builder.mInputDirection;

@@ -61,7 +61,7 @@ public class DeviceTest {
     public void loadIconBinary_NONE() throws Exception {
         mDevice.loadIconBinary(mHttpClient, IconFilter.NONE);
         final List<Icon> list = mDevice.getIconList();
-        for (Icon icon : list) {
+        for (final Icon icon : list) {
             assertThat(icon.getBinary(), is(nullValue()));
         }
     }
@@ -70,7 +70,7 @@ public class DeviceTest {
     public void loadIconBinary_ALL() throws Exception {
         mDevice.loadIconBinary(mHttpClient, IconFilter.ALL);
         final List<Icon> list = mDevice.getIconList();
-        for (Icon icon : list) {
+        for (final Icon icon : list) {
             assertThat(icon.getBinary(), is(notNullValue()));
         }
     }
@@ -85,7 +85,7 @@ public class DeviceTest {
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getSsdpMessage(), is(message));
     }
@@ -117,7 +117,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -136,7 +136,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -155,7 +155,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -174,7 +174,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga/");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -193,7 +193,7 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar");
         message.updateHeader();
-        mDevice.setSsdpMessage(message);
+        mDevice.updateSsdpMessage(message);
 
         assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
@@ -280,7 +280,7 @@ public class DeviceTest {
     @Test
     public void getIconList() throws Exception {
         final List<Icon> list = mDevice.getIconList();
-        for (Icon icon : list) {
+        for (final Icon icon : list) {
             assertThat(icon.getMimeType(), is(anyOf(is("image/jpeg"), is("image/png"))));
             assertThat(icon.getWidth(), is(anyOf(is(48), is(120))));
             assertThat(icon.getHeight(), is(anyOf(is(48), is(120))));

@@ -134,111 +134,177 @@ public class LogTest {
         Log.setLogLevel(Log.VERBOSE);
         print = mock(Print.class);
         Log.setPrint(print);
+        Log.v(message);
+        Log.v(throwable);
         Log.v(tag, message);
         Log.v(tag, message, throwable);
+        Log.d(message);
+        Log.d(throwable);
         Log.d(tag, message);
         Log.d(tag, message, throwable);
+        Log.i(message);
+        Log.i(throwable);
         Log.i(tag, message);
         Log.i(tag, message, throwable);
+        Log.w(message);
+        Log.w(throwable);
         Log.w(tag, message);
         Log.w(tag, message, throwable);
         Log.w(tag, throwable);
+        Log.e(message);
+        Log.e(throwable);
         Log.e(tag, message);
         Log.e(tag, message, throwable);
-        verify(print, times(11)).println(anyInt(), anyString(), anyString());
+        verify(print, times(21)).println(anyInt(), anyString(), anyString());
 
         Log.setLogLevel(Log.DEBUG);
         print = mock(Print.class);
         Log.setPrint(print);
+        Log.v(message);
+        Log.v(throwable);
         Log.v(tag, message);
         Log.v(tag, message, throwable);
         verify(print, never()).println(anyInt(), anyString(), anyString());
+        Log.d(message);
+        Log.d(throwable);
         Log.d(tag, message);
         Log.d(tag, message, throwable);
+        Log.i(message);
+        Log.i(throwable);
         Log.i(tag, message);
         Log.i(tag, message, throwable);
+        Log.w(message);
+        Log.w(throwable);
         Log.w(tag, message);
         Log.w(tag, message, throwable);
         Log.w(tag, throwable);
+        Log.e(message);
+        Log.e(throwable);
         Log.e(tag, message);
         Log.e(tag, message, throwable);
-        verify(print, times(9)).println(anyInt(), anyString(), anyString());
+        verify(print, times(17)).println(anyInt(), anyString(), anyString());
 
         Log.setLogLevel(Log.INFO);
         print = mock(Print.class);
         Log.setPrint(print);
+        Log.v(message);
+        Log.v(throwable);
         Log.v(tag, message);
         Log.v(tag, message, throwable);
+        Log.d(message);
+        Log.d(throwable);
         Log.d(tag, message);
         Log.d(tag, message, throwable);
         verify(print, never()).println(anyInt(), anyString(), anyString());
 
+        Log.i(message);
+        Log.i(throwable);
         Log.i(tag, message);
         Log.i(tag, message, throwable);
+        Log.w(message);
+        Log.w(throwable);
         Log.w(tag, message);
         Log.w(tag, message, throwable);
         Log.w(tag, throwable);
+        Log.e(message);
+        Log.e(throwable);
         Log.e(tag, message);
         Log.e(tag, message, throwable);
-        verify(print, times(7)).println(anyInt(), anyString(), anyString());
+        verify(print, times(13)).println(anyInt(), anyString(), anyString());
 
         Log.setLogLevel(Log.WARN);
         print = mock(Print.class);
         Log.setPrint(print);
+        Log.v(message);
+        Log.v(throwable);
         Log.v(tag, message);
         Log.v(tag, message, throwable);
+        Log.d(message);
+        Log.d(throwable);
         Log.d(tag, message);
         Log.d(tag, message, throwable);
+        Log.i(message);
+        Log.i(throwable);
         Log.i(tag, message);
         Log.i(tag, message, throwable);
         verify(print, never()).println(anyInt(), anyString(), anyString());
 
+        Log.w(message);
+        Log.w(throwable);
         Log.w(tag, message);
         Log.w(tag, message, throwable);
         Log.w(tag, throwable);
+        Log.e(message);
+        Log.e(throwable);
         Log.e(tag, message);
         Log.e(tag, message, throwable);
-        verify(print, times(5)).println(anyInt(), anyString(), anyString());
+        verify(print, times(9)).println(anyInt(), anyString(), anyString());
 
         Log.setLogLevel(Log.ERROR);
         print = mock(Print.class);
         Log.setPrint(print);
+        Log.v(message);
+        Log.v(throwable);
         Log.v(tag, message);
         Log.v(tag, message, throwable);
+        Log.d(message);
+        Log.d(throwable);
         Log.d(tag, message);
         Log.d(tag, message, throwable);
+        Log.i(message);
+        Log.i(throwable);
         Log.i(tag, message);
         Log.i(tag, message, throwable);
+        Log.w(message);
+        Log.w(throwable);
         Log.w(tag, message);
         Log.w(tag, message, throwable);
         Log.w(tag, throwable);
         verify(print, never()).println(anyInt(), anyString(), anyString());
 
+        Log.e(message);
+        Log.e(throwable);
         Log.e(tag, message);
         Log.e(tag, message, throwable);
-        verify(print, times(2)).println(anyInt(), anyString(), anyString());
+        verify(print, times(4)).println(anyInt(), anyString(), anyString());
 
         Log.setLogLevel(Log.ASSERT);
         print = mock(Print.class);
         Log.setPrint(print);
+        Log.v(message);
+        Log.v(throwable);
         Log.v(tag, message);
         Log.v(tag, message, throwable);
+        Log.d(message);
+        Log.d(throwable);
         Log.d(tag, message);
         Log.d(tag, message, throwable);
+        Log.i(message);
+        Log.i(throwable);
         Log.i(tag, message);
         Log.i(tag, message, throwable);
+        Log.w(message);
+        Log.w(throwable);
         Log.w(tag, message);
         Log.w(tag, message, throwable);
         Log.w(tag, throwable);
+        Log.e(message);
+        Log.e(throwable);
         Log.e(tag, message);
         Log.e(tag, message, throwable);
         verify(print, never()).println(anyInt(), anyString(), anyString());
     }
 
     @Test
-    public void v_Tagがnullでも問題ない() {
+    public void v_Tagがnullの場合メソッド名が使われる() {
         Log.setPrint(Log.DEFAULT_PRINT);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream defaultOut = System.out;
+        System.setOut(new PrintStream(baos));
         Log.v(null, "");
+
+        assertThat(new String(baos.toByteArray()), containsString("LogTest"));
+        System.setOut(defaultOut);
     }
 
     @Test
@@ -275,7 +341,7 @@ public class LogTest {
     public void print() {
         final Print print = new Print() {
             @Override
-            public void println(int level, @Nullable String tag, @Nullable String message) {
+            public void println(final int level, @Nullable final String tag, @Nullable final String message) {
 
             }
         };

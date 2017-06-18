@@ -29,7 +29,7 @@ public interface IconFilter {
     IconFilter NONE = new IconFilter() {
         @Override
         @Nonnull
-        public List<Icon> filter(@Nonnull List<Icon> list) {
+        public List<Icon> filter(@Nonnull final List<Icon> list) {
             return Collections.emptyList();
         }
     };
@@ -39,7 +39,7 @@ public interface IconFilter {
     IconFilter ALL = new IconFilter() {
         @Override
         @Nonnull
-        public List<Icon> filter(@Nonnull List<Icon> list) {
+        public List<Icon> filter(@Nonnull final List<Icon> list) {
             return list;
         }
     };

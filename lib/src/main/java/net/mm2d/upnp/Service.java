@@ -30,8 +30,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Service {
-    private static final String TAG = Service.class.getSimpleName();
-
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      */
@@ -59,7 +57,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setDevice(@Nonnull Device device) {
+        public Builder setDevice(@Nonnull final Device device) {
             mDevice = device;
             return this;
         }
@@ -71,7 +69,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setServiceType(@Nonnull String serviceType) {
+        public Builder setServiceType(@Nonnull final String serviceType) {
             mServiceType = serviceType;
             return this;
         }
@@ -83,7 +81,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setServiceId(@Nonnull String serviceId) {
+        public Builder setServiceId(@Nonnull final String serviceId) {
             mServiceId = serviceId;
             return this;
         }
@@ -95,11 +93,12 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setScpdUrl(@Nonnull String scpdUrl) {
+        public Builder setScpdUrl(@Nonnull final String scpdUrl) {
             mScpdUrl = scpdUrl;
             return this;
         }
 
+        @Nullable
         public String getScpdUrl() {
             return mScpdUrl;
         }
@@ -111,7 +110,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setControlUrl(@Nonnull String controlUrl) {
+        public Builder setControlUrl(@Nonnull final String controlUrl) {
             mControlUrl = controlUrl;
             return this;
         }
@@ -123,7 +122,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setEventSubUrl(@Nonnull String eventSubUrl) {
+        public Builder setEventSubUrl(@Nonnull final String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
             return this;
         }
@@ -134,7 +133,7 @@ public class Service {
          * @param description Description XML全内容
          * @return Builder
          */
-        public Builder setDescription(String description) {
+        public Builder setDescription(@Nonnull final String description) {
             mDescription = description;
             return this;
         }
@@ -145,7 +144,7 @@ public class Service {
          * @param actionBuilderList Serviceで定義されている全ActionのBuilder
          * @return Builder
          */
-        public Builder setActionBuilderList(List<Action.Builder> actionBuilderList) {
+        public Builder setActionBuilderList(@Nonnull final List<Action.Builder> actionBuilderList) {
             mActionBuilderList = actionBuilderList;
             return this;
         }
@@ -156,7 +155,7 @@ public class Service {
          * @param variableBuilderList Serviceで定義されている全StateVariableのBuilder
          * @return Builder
          */
-        public Builder setVariableBuilderList(List<StateVariable.Builder> variableBuilderList) {
+        public Builder setVariableBuilderList(@Nonnull final List<StateVariable.Builder> variableBuilderList) {
             mVariableBuilderList = variableBuilderList;
             return this;
         }
@@ -233,7 +232,7 @@ public class Service {
     @Nonnull
     private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
-    private Service(@Nonnull Builder builder) {
+    private Service(@Nonnull final Builder builder) {
         mDevice = builder.mDevice;
         mControlPoint = mDevice.getControlPoint();
         mServiceType = builder.mServiceType;
@@ -243,7 +242,7 @@ public class Service {
         mEventSubUrl = builder.mEventSubUrl;
         mDescription = builder.mDescription;
         mStateVariableMap = new LinkedHashMap<>();
-        for (StateVariable.Builder variableBuilder : builder.mVariableBuilderList) {
+        for (final StateVariable.Builder variableBuilder : builder.mVariableBuilderList) {
             final StateVariable variable = variableBuilder.setService(this).build();
             mStateVariableMap.put(variable.getName(), variable);
         }
@@ -253,7 +252,7 @@ public class Service {
                 final String name = argumentBuilder.getRelatedStateVariableName();
                 final StateVariable variable = mStateVariableMap.get(name);
                 if (variable == null) {
-                    throw new IllegalArgumentException();
+                    throw new IllegalStateException("There is no StateVariable " + name);
                 }
                 argumentBuilder.setRelatedStateVariable(variable);
             }
@@ -281,7 +280,7 @@ public class Service {
      * @see Device#getAbsoluteUrl(String)
      */
     @Nonnull
-    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
+    URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
 
@@ -417,7 +416,7 @@ public class Service {
      * @return 該当するAction、見つからない場合null
      */
     @Nullable
-    public Action findAction(@Nonnull String name) {
+    public Action findAction(@Nonnull final String name) {
         return mActionMap.get(name);
     }
 
@@ -444,7 +443,7 @@ public class Service {
      * @return 該当するStateVariable、見つからない場合null
      */
     @Nullable
-    public StateVariable findStateVariable(@Nullable String name) {
+    public StateVariable findStateVariable(@Nullable final String name) {
         return mStateVariableMap.get(name);
     }
 
@@ -465,7 +464,7 @@ public class Service {
         return sb.toString();
     }
 
-    private static long parseTimeout(@Nonnull HttpResponse response) {
+    private static long parseTimeout(@Nonnull final HttpResponse response) {
         final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
         if (TextUtils.isEmpty(timeout) || timeout.contains("infinite")) {
             // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。
@@ -481,17 +480,13 @@ public class Service {
             final int second = Integer.parseInt(secondSection);
             return TimeUnit.SECONDS.toMillis(second);
         } catch (final NumberFormatException e) {
-            Log.w(TAG, e);
+            Log.w(e);
         }
         return DEFAULT_SUBSCRIPTION_TIMEOUT;
     }
 
-    /**
-     * HttpClientのファクトリークラスを変更する。
-     *
-     * @param factory ファクトリークラス
-     */
-    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
+    // VisibleForTesting
+    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }
 
@@ -517,7 +512,7 @@ public class Service {
      * @return 成功時true
      * @throws IOException 通信エラー
      */
-    public boolean subscribe(boolean keepRenew) throws IOException {
+    public boolean subscribe(final boolean keepRenew) throws IOException {
         if (TextUtils.isEmpty(mEventSubUrl)) {
             return false;
         }
@@ -531,12 +526,12 @@ public class Service {
         return subscribeInner(keepRenew);
     }
 
-    private boolean subscribeInner(boolean keepRenew) throws IOException {
+    private boolean subscribeInner(final boolean keepRenew) throws IOException {
         final HttpClient client = createHttpClient();
         final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "subscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w("subscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         if (parseSubscribeResponse(response)) {
@@ -546,11 +541,11 @@ public class Service {
         return false;
     }
 
-    private boolean parseSubscribeResponse(@Nonnull HttpResponse response) {
+    private boolean parseSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout == 0) {
-            Log.w(TAG, "subscribe response:" + response.toString());
+            Log.w("subscribe response:" + response.toString());
             return false;
         }
         mSubscriptionId = sid;
@@ -594,17 +589,17 @@ public class Service {
         final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w("renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         return parseRenewSubscribeResponse(response);
     }
 
-    private boolean parseRenewSubscribeResponse(@Nonnull HttpResponse response) {
+    private boolean parseRenewSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
-            Log.w(TAG, "renewSubscribe response:" + response.toString());
+            Log.w("renewSubscribe response:" + response.toString());
             return false;
         }
         mSubscriptionStart = System.currentTimeMillis();
@@ -614,7 +609,7 @@ public class Service {
     }
 
     @Nonnull
-    private HttpRequest makeRenewSubscribeRequest(@Nonnull String subscriptionId) throws IOException {
+    private HttpRequest makeRenewSubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.SUBSCRIBE);
         request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
@@ -638,7 +633,7 @@ public class Service {
         final HttpRequest request = makeUnsubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w(TAG, "unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.w("unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         mControlPoint.unregisterSubscribeService(this);
@@ -649,7 +644,7 @@ public class Service {
         return true;
     }
 
-    private HttpRequest makeUnsubscribeRequest(@Nonnull String subscriptionId) throws IOException {
+    private HttpRequest makeUnsubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.UNSUBSCRIBE);
         request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
@@ -711,11 +706,11 @@ public class Service {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null || !(obj instanceof Service)) {
             return false;
         }
-        Service service = (Service) obj;
+        final Service service = (Service) obj;
         return mDevice.equals(service.getDevice()) && mServiceId.equals(service.getServiceId());
     }
 }

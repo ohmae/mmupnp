@@ -25,11 +25,12 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class DeviceHolder implements Runnable {
-    private static final String TAG = DeviceHolder.class.getSimpleName();
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
 
+    @Nonnull
     private final Object mThreadLock = new Object();
     private volatile boolean mShutdownRequest = false;
+    @Nullable
     private Thread mThread;
 
     @Nonnull
@@ -42,7 +43,7 @@ class DeviceHolder implements Runnable {
      *
      * @param cp ControlPoint
      */
-    DeviceHolder(@Nonnull ControlPoint cp) {
+    DeviceHolder(@Nonnull final ControlPoint cp) {
         mDeviceMap = new LinkedHashMap<>();
         mControlPoint = cp;
     }
@@ -53,7 +54,7 @@ class DeviceHolder implements Runnable {
     void start() {
         mShutdownRequest = false;
         synchronized (mThreadLock) {
-            mThread = new Thread(this, TAG);
+            mThread = new Thread(this, getClass().getSimpleName());
             mThread.start();
         }
     }
@@ -76,13 +77,13 @@ class DeviceHolder implements Runnable {
      *
      * @param device 追加されるDevice
      */
-    synchronized void add(@Nonnull Device device) {
+    synchronized void add(@Nonnull final Device device) {
         mDeviceMap.put(device.getUdn(), device);
         notifyAll();
     }
 
     @Nullable
-    synchronized Device get(@Nonnull String udn) {
+    synchronized Device get(@Nonnull final String udn) {
         return mDeviceMap.get(udn);
     }
 
@@ -91,7 +92,7 @@ class DeviceHolder implements Runnable {
      *
      * @param device 削除されるDevice。
      */
-    synchronized void remove(@Nonnull Device device) {
+    synchronized void remove(@Nonnull final Device device) {
         mDeviceMap.remove(device.getUdn());
     }
 
@@ -109,11 +110,7 @@ class DeviceHolder implements Runnable {
      */
     @Nonnull
     synchronized List<Device> getDeviceList() {
-        final List<Device> list = new ArrayList<>(mDeviceMap.size());
-        for (final Device device : mDeviceMap.values()) {
-            list.add(device);
-        }
-        return list;
+        return new ArrayList<>(mDeviceMap.values());
     }
 
     /**
@@ -146,7 +143,7 @@ class DeviceHolder implements Runnable {
             final Device device = i.next();
             if (device.getExpireTime() < now) {
                 i.remove();
-                mControlPoint.lostDevice(device, false);
+                mControlPoint.lostDevice(device);
             }
         }
     }

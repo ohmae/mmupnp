@@ -64,8 +64,9 @@ public class SsdpSearchServerTest {
         final MockMulticastSocket socket = new MockMulticastSocket();
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpSearchServer server = new SsdpSearchServer(networkInterface) {
+            @Nonnull
             @Override
-            MulticastSocket createMulticastSocket(int port) throws IOException {
+            MulticastSocket createMulticastSocket(final int port) throws IOException {
                 return socket;
             }
         };
@@ -88,8 +89,9 @@ public class SsdpSearchServerTest {
         final MockMulticastSocket socket = new MockMulticastSocket();
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpSearchServer server = new SsdpSearchServer(networkInterface) {
+            @Nonnull
             @Override
-            MulticastSocket createMulticastSocket(int port) throws IOException {
+            MulticastSocket createMulticastSocket(final int port) throws IOException {
                 return socket;
             }
         };
@@ -120,15 +122,16 @@ public class SsdpSearchServerTest {
         final MockMulticastSocket socket = new MockMulticastSocket();
         socket.setReceiveData(address.getAddress(), baos.toByteArray(), 0);
         final SsdpSearchServer server = new SsdpSearchServer(networkInterface) {
+            @Nonnull
             @Override
-            MulticastSocket createMulticastSocket(int port) throws IOException {
+            MulticastSocket createMulticastSocket(final int port) throws IOException {
                 return socket;
             }
         };
         final SsdpResponseMessage result[] = new SsdpResponseMessage[1];
         server.setResponseListener(new SsdpSearchServer.ResponseListener() {
             @Override
-            public void onReceiveResponse(@Nonnull SsdpResponseMessage message) {
+            public void onReceiveResponse(@Nonnull final SsdpResponseMessage message) {
                 result[0] = message;
             }
         });
@@ -142,7 +145,7 @@ public class SsdpSearchServerTest {
         assertThat(result[0].getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
 
-    private static InterfaceAddress findInet4Address(NetworkInterface networkInterface) {
+    private static InterfaceAddress findInet4Address(final NetworkInterface networkInterface) {
         final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
         for (final InterfaceAddress address : addressList) {
             if (address.getAddress() instanceof Inet4Address) {

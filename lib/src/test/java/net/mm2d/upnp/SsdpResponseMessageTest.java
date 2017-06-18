@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 @RunWith(Enclosed.class)
 public class SsdpResponseMessageTest {
 
-    private static SsdpResponseMessage makeFromResource(String name) throws IOException {
+    private static SsdpResponseMessage makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
         return new SsdpResponseMessage(mock(InterfaceAddress.class), data, data.length);
     }
@@ -60,32 +60,32 @@ public class SsdpResponseMessageTest {
         }
 
         @Theory
-        public void getStatus(SsdpResponseMessage message) {
+        public void getStatus(final SsdpResponseMessage message) {
             assertThat(message.getStatus(), is(Http.Status.HTTP_OK));
         }
 
         @Theory
-        public void getStatusCode(SsdpResponseMessage message) {
+        public void getStatusCode(final SsdpResponseMessage message) {
             assertThat(message.getStatusCode(), is(200));
         }
 
         @Theory
-        public void getReasonPhrase(SsdpResponseMessage message) {
+        public void getReasonPhrase(final SsdpResponseMessage message) {
             assertThat(message.getReasonPhrase(), is("OK"));
         }
 
         @Theory
-        public void getUuid_記述の値であること(SsdpResponseMessage message) {
+        public void getUuid_記述の値であること(final SsdpResponseMessage message) {
             assertThat(message.getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         }
 
         @Theory
-        public void getMaxAge_CACHE_CONTROLの値が取れること(SsdpResponseMessage message) {
+        public void getMaxAge_CACHE_CONTROLの値が取れること(final SsdpResponseMessage message) {
             assertThat(message.getMaxAge(), is(300));
         }
 
         @Theory
-        public void getLocation_Locationの値が取れること(SsdpResponseMessage message) {
+        public void getLocation_Locationの値が取れること(final SsdpResponseMessage message) {
             assertThat(message.getLocation(), is("http://192.0.2.2:12345/device.xml"));
         }
     }

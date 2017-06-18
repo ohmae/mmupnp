@@ -46,8 +46,6 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Action {
-    private static final String TAG = Action.class.getSimpleName();
-
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
@@ -74,7 +72,7 @@ public class Action {
          * @return Builder
          */
         @Nonnull
-        public Builder setService(@Nonnull Service service) {
+        public Builder setService(@Nonnull final Service service) {
             mService = service;
             return this;
         }
@@ -86,7 +84,7 @@ public class Action {
          * @return Builder
          */
         @Nonnull
-        public Builder setName(@Nonnull String name) {
+        public Builder setName(@Nonnull final String name) {
             mName = name;
             return this;
         }
@@ -100,7 +98,7 @@ public class Action {
          * @return Builder
          */
         @Nonnull
-        public Builder addArgumentBuilder(@Nonnull Argument.Builder argument) {
+        public Builder addArgumentBuilder(@Nonnull final Argument.Builder argument) {
             mArgumentList.add(argument);
             return this;
         }
@@ -145,9 +143,10 @@ public class Action {
     private final String mName;
     @Nonnull
     private final Map<String, Argument> mArgumentMap;
+    @Nullable
     private List<Argument> mArgumentList;
 
-    private Action(@Nonnull Builder builder) {
+    private Action(@Nonnull final Builder builder) {
         mService = builder.mService;
         mName = builder.mName;
         mArgumentMap = new LinkedHashMap<>(builder.mArgumentList.size());
@@ -200,7 +199,7 @@ public class Action {
      * @return Argument
      */
     @Nullable
-    public Argument findArgument(@Nonnull String name) {
+    public Argument findArgument(@Nonnull final String name) {
         return mArgumentMap.get(name);
     }
 
@@ -214,12 +213,8 @@ public class Action {
         return mName + "Response";
     }
 
-    /**
-     * HttpClientのファクトリークラスを変更する。
-     *
-     * @param factory ファクトリークラス
-     */
-    void setHttpClientFactory(@Nonnull HttpClientFactory factory) {
+    // VisibleForTesting
+    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
         mHttpClientFactory = factory;
     }
 
@@ -249,7 +244,7 @@ public class Action {
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
      */
     @Nonnull
-    public Map<String, String> invoke(@Nonnull Map<String, String> argumentValues)
+    public Map<String, String> invoke(@Nonnull final Map<String, String> argumentValues)
             throws IOException {
         final List<StringPair> arguments = makeArguments(argumentValues);
         final String soap = makeSoap(null, arguments);
@@ -291,12 +286,12 @@ public class Action {
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
      */
     @Nonnull
-    public Map<String, String> invoke(@Nonnull Map<String, String> argumentValues,
-                                      @Nullable List<StringPair> customNamespace,
-                                      @Nonnull List<StringPair> customArguments)
+    public Map<String, String> invoke(@Nonnull final Map<String, String> argumentValues,
+                                      @Nullable final Map<String, String> customNamespace,
+                                      @Nonnull final Map<String, String> customArguments)
             throws IOException {
         final List<StringPair> arguments = makeArguments(argumentValues);
-        arguments.addAll(customArguments);
+        appendArgument(arguments, customArguments);
         final String soap = makeSoap(customNamespace, arguments);
         return invokeInner(soap);
     }
@@ -308,7 +303,7 @@ public class Action {
      * @return 引数リスト
      */
     @Nonnull
-    private List<StringPair> makeArguments(@Nonnull Map<String, String> argumentValues) {
+    private List<StringPair> makeArguments(@Nonnull final Map<String, String> argumentValues) {
         final List<StringPair> list = new ArrayList<>();
         for (final Entry<String, Argument> entry : mArgumentMap.entrySet()) {
             final Argument argument = entry.getValue();
@@ -318,6 +313,19 @@ public class Action {
             list.add(new StringPair(argument.getName(), selectArgumentValue(argument, argumentValues)));
         }
         return list;
+    }
+
+    /**
+     * StringPairのリストに変換した引数にカスタム引数を追加する。
+     *
+     * @param base      引数の追加先
+     * @param arguments 追加するカスタム引数
+     */
+    private void appendArgument(@Nonnull final List<StringPair> base,
+                                @Nonnull final Map<String, String> arguments) {
+        for (final Entry<String, String> entry : arguments.entrySet()) {
+            base.add(new StringPair(entry.getKey(), entry.getValue()));
+        }
     }
 
     /**
@@ -331,8 +339,8 @@ public class Action {
      * @return 選択されたArgumentの値
      */
     @Nullable
-    private static String selectArgumentValue(
-            @Nonnull Argument argument, @Nonnull Map<String, String> argumentValues) {
+    private static String selectArgumentValue(@Nonnull final Argument argument,
+                                              @Nonnull final Map<String, String> argumentValues) {
         final String value = argumentValues.get(argument.getName());
         if (value != null) {
             return value;
@@ -348,13 +356,14 @@ public class Action {
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
      */
     @Nonnull
-    private Map<String, String> invokeInner(@Nonnull String soap) throws IOException {
+    private Map<String, String> invokeInner(@Nonnull final String soap)
+            throws IOException {
         final URL url = mService.getAbsoluteUrl(mService.getControlUrl());
         final HttpRequest request = makeHttpRequest(url, soap);
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
-            Log.w(TAG, response.toString());
+            Log.w(response.toString());
             throw new IOException(response.getStartLine());
         }
         try {
@@ -373,7 +382,8 @@ public class Action {
      * @throws IOException 通信で問題が発生した場合
      */
     @Nonnull
-    private HttpRequest makeHttpRequest(@Nonnull URL url, @Nonnull String soap) throws IOException {
+    private HttpRequest makeHttpRequest(@Nonnull final URL url, @Nonnull final String soap)
+            throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.POST);
         request.setUrl(url, true);
@@ -393,7 +403,9 @@ public class Action {
      * @throws IOException 通信で問題が発生した場合
      */
     @Nonnull
-    private String makeSoap(@Nullable List<StringPair> namespaces, @Nonnull List<StringPair> arguments) throws IOException {
+    private String makeSoap(@Nullable final Map<String, String> namespaces,
+                            @Nonnull final List<StringPair> arguments)
+            throws IOException {
         try {
             final Document document = XmlUtils.newDocument(true);
             final Element action = makeUpToActionElement(document);
@@ -408,12 +420,13 @@ public class Action {
         }
     }
 
-    private static void setNamespace(@Nonnull Element action, @Nullable List<StringPair> namespace) {
+    private static void setNamespace(@Nonnull final Element action,
+                                     @Nullable final Map<String, String> namespace) {
         if (namespace == null) {
             return;
         }
-        for (StringPair pair : namespace) {
-            action.setAttributeNS(XMLNS_URI, XMLNS_PREFIX + pair.getKey(), pair.getValue());
+        for (final Entry<String, String> entry : namespace.entrySet()) {
+            action.setAttributeNS(XMLNS_URI, XMLNS_PREFIX + entry.getKey(), entry.getValue());
         }
     }
 
@@ -424,7 +437,7 @@ public class Action {
      * @return ActionElement
      */
     @Nonnull
-    private Element makeUpToActionElement(@Nonnull Document document) {
+    private Element makeUpToActionElement(@Nonnull final Document document) {
         final Element envelope = document.createElementNS(SOAP_NS, "s:Envelope");
         document.appendChild(envelope);
         final Attr style = document.createAttributeNS(SOAP_NS, "s:encodingStyle");
@@ -444,8 +457,9 @@ public class Action {
      * @param action    actionのElement
      * @param arguments 引数
      */
-    private static void setArgument(
-            @Nonnull Document document, @Nonnull Element action, @Nonnull List<StringPair> arguments) {
+    private static void setArgument(@Nonnull final Document document,
+                                    @Nonnull final Element action,
+                                    @Nonnull final List<StringPair> arguments) {
         for (final StringPair pair : arguments) {
             final Element param = document.createElement(pair.getKey());
             final String value = pair.getValue();
@@ -464,7 +478,8 @@ public class Action {
      * @throws TransformerException 変換処理に問題が発生した場合
      */
     @Nonnull
-    private static String formatXmlString(@Nonnull Document document) throws TransformerException {
+    private static String formatXmlString(@Nonnull final Document document)
+            throws TransformerException {
         final TransformerFactory tf = TransformerFactory.newInstance();
         final Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -483,7 +498,7 @@ public class Action {
      * @throws IOException                  入力値に問題がある場合
      */
     @Nonnull
-    private Map<String, String> parseResponse(@Nonnull String xml)
+    private Map<String, String> parseResponse(@Nonnull final String xml)
             throws ParserConfigurationException, IOException, SAXException {
         final Map<String, String> result = new HashMap<>();
         Node node = findResponseElement(xml).getFirstChild();
@@ -495,7 +510,7 @@ public class Action {
             final String text = node.getTextContent();
             if (findArgument(tag) == null) {
                 // Optionalな情報としてArgumentに記述されていないタグが含まれる可能性があるためログ出力に留める
-                Log.d(TAG, "invalid argument:" + tag + "->" + text);
+                Log.d("invalid argument:" + tag + "->" + text);
             }
             result.put(tag, text);
         }
@@ -512,7 +527,7 @@ public class Action {
      * @throws IOException                  入力値に問題がある場合
      */
     @Nonnull
-    private Element findResponseElement(@Nonnull String xml)
+    private Element findResponseElement(@Nonnull final String xml)
             throws ParserConfigurationException, SAXException, IOException {
         final String responseTag = getResponseTagName();
         final Document doc = XmlUtils.newDocument(true, xml);

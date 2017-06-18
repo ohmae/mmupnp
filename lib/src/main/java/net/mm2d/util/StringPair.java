@@ -7,6 +7,8 @@
 
 package net.mm2d.util;
 
+import javax.annotation.Nullable;
+
 /**
  * StringのKey/Valueのペアを保持するImmutableなクラス。
  *
@@ -22,7 +24,7 @@ public class StringPair extends Pair<String, String> {
      * @param key   Keyの値
      * @param value Valueの値
      */
-    public StringPair(String key, String value) {
+    public StringPair(@Nullable final String key, @Nullable final String value) {
         super(key, value);
     }
 }

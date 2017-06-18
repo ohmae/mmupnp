@@ -20,6 +20,7 @@ import java.net.Socket;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * HTTP通信を行うクライアントソケット。
@@ -27,21 +28,24 @@ import javax.annotation.Nonnull;
  * <p>UPnPの通信でよく利用される小さなデータのやり取りに特化したもの。
  * 長大なデータのやり取りは想定していない。
  * 手軽に利用できることを優先し、効率などはあまり考慮されていない。
+ * 原則同一のサーバに対する一連の通信ごとにインスタンスを作成する想定。
  *
  * <p>相手の応答がkeep-alive可能な応答であった場合はコネクションを切断せず、
  * 継続して利用するという、消極的なkeep-alive機能も提供する。
  *
- * <p>keep-alive状態であっても、post時に維持したコネクションと同一のホスト・ポートでない場合は
- * 切断、再接続を行う。
+ * <p>keep-alive状態であっても、post時に維持したコネクションと
+ * 同一のホスト・ポートでない場合は切断、再接続を行う。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class HttpClient {
-    private static final String TAG = HttpClient.class.getSimpleName();
     private static final int REDIRECT_MAX = 2;
+    @Nullable
     private Socket mSocket;
     private boolean mKeepAlive;
+    @Nullable
     private InputStream mInputStream;
+    @Nullable
     private OutputStream mOutputStream;
 
     /**
@@ -59,7 +63,7 @@ public class HttpClient {
      * @param keepAlive keep-alive通信を行う場合true
      * @see #setKeepAlive(boolean)
      */
-    public HttpClient(boolean keepAlive) {
+    public HttpClient(final boolean keepAlive) {
         setKeepAlive(keepAlive);
     }
 
@@ -87,7 +91,7 @@ public class HttpClient {
      *
      * @param keepAlive keep-aliveを行う場合true
      */
-    public void setKeepAlive(boolean keepAlive) {
+    public void setKeepAlive(final boolean keepAlive) {
         mKeepAlive = keepAlive;
     }
 
@@ -101,7 +105,7 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    public HttpResponse post(@Nonnull HttpRequest request) throws IOException {
+    public HttpResponse post(@Nonnull final HttpRequest request) throws IOException {
         return post(request, 0);
     }
 
@@ -116,13 +120,11 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    private HttpResponse post(@Nonnull HttpRequest request, int redirectDepth) throws IOException {
+    private HttpResponse post(@Nonnull final HttpRequest request, final int redirectDepth) throws IOException {
         confirmReuseSocket(request);
         final HttpResponse response;
         try {
-            writeData(request);
-            response = new HttpResponse(mSocket);
-            response.readData(mInputStream);
+            response = doRequest(request);
         } catch (final IOException e) {
             closeSocket();
             throw e;
@@ -130,49 +132,57 @@ public class HttpClient {
         if (!isKeepAlive() || !response.isKeepAlive()) {
             closeSocket();
         }
-        return redirectIfNeed(request, response, redirectDepth);
+        return redirectIfNeeded(request, response, redirectDepth);
     }
 
-    private void confirmReuseSocket(@Nonnull HttpRequest request) {
-        if (!isClosed() && !canReuse(request)) {
+    private void confirmReuseSocket(@Nonnull final HttpRequest request) {
+        if (!canReuse(request)) {
             closeSocket();
         }
     }
 
-    private void writeData(@Nonnull HttpRequest request) throws IOException {
+    private HttpResponse doRequest(@Nonnull final HttpRequest request) throws IOException {
         if (isClosed()) {
             openSocket(request);
-            request.writeData(mOutputStream);
+            return writeAndRead(request);
         } else {
             try {
-                request.writeData(mOutputStream);
+                return writeAndRead(request);
             } catch (final IOException e) {
-                // コネクションを再利用した場合はpeerから既に切断されていた可能性があるためリトライを行う
+                // コネクションを再利用した場合はpeerから既に切断されていた可能性がある。
+                // KeepAliveできないサーバである可能性があるのでKeepAliveを無効にしてリトライ
+                Log.w("retry:" + e.getMessage());
+                setKeepAlive(false);
                 closeSocket();
                 openSocket(request);
-                request.writeData(mOutputStream);
+                return writeAndRead(request);
             }
         }
     }
 
+    private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
+        request.writeData(mOutputStream);
+        final HttpResponse response = new HttpResponse(mSocket);
+        response.readData(mInputStream);
+        return response;
+    }
+
     @Nonnull
-    private HttpResponse redirectIfNeed(
-            @Nonnull HttpRequest request, @Nonnull HttpResponse response, int redirectDepth)
+    private HttpResponse redirectIfNeeded(@Nonnull final HttpRequest request,
+                                          @Nonnull final HttpResponse response,
+                                          final int redirectDepth)
             throws IOException {
-        if (isRedirection(response) && redirectDepth < REDIRECT_MAX) {
+        if (needToRedirect(response) && redirectDepth < REDIRECT_MAX) {
             final String location = response.getHeader(Http.LOCATION);
-            if (location != null) {
+            if (!TextUtils.isEmpty(location)) {
                 return redirect(request, location, redirectDepth);
             }
         }
         return response;
     }
 
-    private static boolean isRedirection(@Nonnull HttpResponse response) {
+    private static boolean needToRedirect(@Nonnull final HttpResponse response) {
         final Http.Status status = response.getStatus();
-        if (status == null) {
-            return false;
-        }
         switch (status) {
             case HTTP_MOVED_PERM:
             case HTTP_FOUND:
@@ -185,8 +195,8 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirect(
-            @Nonnull HttpRequest request, @Nonnull String location, int redirectDepth)
+    private HttpResponse redirect(@Nonnull final HttpRequest request,
+                                  @Nonnull final String location, final int redirectDepth)
             throws IOException {
         final HttpRequest newRequest = new HttpRequest(request);
         newRequest.setUrl(new URL(location), true);
@@ -194,8 +204,9 @@ public class HttpClient {
         return new HttpClient(false).post(newRequest, redirectDepth + 1);
     }
 
-    private boolean canReuse(@Nonnull HttpRequest request) {
-        return mSocket.isConnected()
+    private boolean canReuse(@Nonnull final HttpRequest request) {
+        return mSocket != null
+                && mSocket.isConnected()
                 && mSocket.getInetAddress().equals(request.getAddress())
                 && mSocket.getPort() == request.getPort();
     }
@@ -204,7 +215,7 @@ public class HttpClient {
         return mSocket == null;
     }
 
-    private void openSocket(@Nonnull HttpRequest request) throws IOException {
+    private void openSocket(@Nonnull final HttpRequest request) throws IOException {
         mSocket = new Socket();
         mSocket.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT);
         mSocket.setSoTimeout(Property.DEFAULT_TIMEOUT);
@@ -236,7 +247,7 @@ public class HttpClient {
      * @throws IOException 取得に問題があった場合
      */
     @Nonnull
-    public String downloadString(@Nonnull URL url) throws IOException {
+    public String downloadString(@Nonnull final URL url) throws IOException {
         final String body = download(url).getBody();
         if (body == null) {
             throw new IOException("body is null");
@@ -252,7 +263,7 @@ public class HttpClient {
      * @throws IOException 取得に問題があった場合
      */
     @Nonnull
-    public byte[] downloadBinary(@Nonnull URL url) throws IOException {
+    public byte[] downloadBinary(@Nonnull final URL url) throws IOException {
         final byte[] body = download(url).getBodyBinary();
         if (body == null) {
             throw new IOException("body is null");
@@ -268,23 +279,23 @@ public class HttpClient {
      * @throws IOException 取得に問題があった場合
      */
     @Nonnull
-    public HttpResponse download(@Nonnull URL url) throws IOException {
+    public HttpResponse download(@Nonnull final URL url) throws IOException {
         final HttpRequest request = makeHttpRequest(url);
         final HttpResponse response = post(request);
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
-            Log.i(TAG, "request:" + request.toString() + "\nresponse:" + response.toString());
+            Log.i("request:" + request.toString() + "\nresponse:" + response.toString());
             throw new IOException(response.getStartLine());
         }
         return response;
     }
 
     @Nonnull
-    private static HttpRequest makeHttpRequest(@Nonnull URL url) throws IOException {
+    private HttpRequest makeHttpRequest(@Nonnull final URL url) throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.GET);
         request.setUrl(url, true);
         request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
+        request.setHeader(Http.CONNECTION, isKeepAlive() ? Http.KEEP_ALIVE : Http.CLOSE);
         return request;
     }
 }

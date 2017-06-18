@@ -24,12 +24,10 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class SsdpNotifyReceiver extends SsdpServer {
-    private static final String TAG = SsdpNotifyReceiver.class.getSimpleName();
-
     /**
      * NOTIFY受信を受け取るリスナー。
      */
-    public interface NotifyListener {
+    interface NotifyListener {
         /**
          * NOTIFY受信時にコール。
          *
@@ -38,6 +36,7 @@ class SsdpNotifyReceiver extends SsdpServer {
         void onReceiveNotify(@Nonnull SsdpRequestMessage message);
     }
 
+    @Nullable
     private NotifyListener mListener;
 
     /**
@@ -45,7 +44,7 @@ class SsdpNotifyReceiver extends SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    public SsdpNotifyReceiver(@Nonnull NetworkInterface ni) {
+    SsdpNotifyReceiver(@Nonnull final NetworkInterface ni) {
         super(ni, SSDP_PORT);
     }
 
@@ -54,17 +53,18 @@ class SsdpNotifyReceiver extends SsdpServer {
      *
      * @param listener リスナー
      */
-    public void setNotifyListener(@Nullable NotifyListener listener) {
+    void setNotifyListener(@Nullable final NotifyListener listener) {
         mListener = listener;
     }
 
     @Override
-    protected void onReceive(@Nonnull InetAddress sourceAddress, @Nonnull byte[] data, int length) {
+    protected void onReceive(@Nonnull final InetAddress sourceAddress,
+                             @Nonnull final byte[] data, final int length) {
         // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
         // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
         // 受け取っても無駄なので破棄する。
         if (!isSameSegment(getInterfaceAddress(), sourceAddress)) {
-            Log.w(TAG, "Invalid segment packet received:" + sourceAddress.toString()
+            Log.w("Invalid segment packet received:" + sourceAddress.toString()
                     + " " + getInterfaceAddress().toString());
             return;
         }
@@ -86,8 +86,8 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
     }
 
-    private static boolean isSameSegment(@Nonnull InterfaceAddress interfaceAddress,
-                                         @Nonnull InetAddress sourceAddress) {
+    private static boolean isSameSegment(@Nonnull final InterfaceAddress interfaceAddress,
+                                         @Nonnull final InetAddress sourceAddress) {
         final byte[] a = interfaceAddress.getAddress().getAddress();
         final byte[] b = sourceAddress.getAddress();
         final int pref = interfaceAddress.getNetworkPrefixLength();

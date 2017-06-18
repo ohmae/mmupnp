@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class HttpClientFactory {
+class HttpClientFactory {
     /**
      * HttpClientを作成する。
      *
@@ -23,7 +23,7 @@ public class HttpClientFactory {
      * @see HttpClient#HttpClient(boolean)
      */
     @Nonnull
-    public HttpClient createHttpClient(boolean keepAlive) {
+    public HttpClient createHttpClient(final boolean keepAlive) {
         return new HttpClient(keepAlive);
     }
 }

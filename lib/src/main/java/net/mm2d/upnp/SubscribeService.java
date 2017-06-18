@@ -31,7 +31,7 @@ class SubscribeService {
      * @param service   Service
      * @param keepRenew 定期的にrenewを実行する場合true
      */
-    SubscribeService(@Nonnull Service service, boolean keepRenew) {
+    SubscribeService(@Nonnull final Service service, final boolean keepRenew) {
         mService = service;
         mKeepRenew = keepRenew;
         mFailCount = 0;
@@ -100,7 +100,7 @@ class SubscribeService {
      * @param now 現在時刻
      * @return 有効期限切れの場合true
      */
-    boolean isExpired(long now) {
+    boolean isExpired(final long now) {
         return mService.getSubscriptionExpiryTime() < now;
     }
 
@@ -110,7 +110,7 @@ class SubscribeService {
      * @param now 現在時刻
      * @return 実行に失敗した場合false
      */
-    boolean renewSubscribe(long now) {
+    boolean renewSubscribe(final long now) {
         if (!mKeepRenew || calculateRenewTime() > now) {
             return true;
         }
@@ -141,7 +141,7 @@ class SubscribeService {
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (object == null || !(object instanceof SubscribeService)) {
             return false;
         }

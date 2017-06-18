@@ -26,14 +26,14 @@ public class NetworkUtilsTest {
     @Test
     public void getAvailableInet4Interfaces() throws Exception {
         final List<NetworkInterface> list = NetworkUtils.getAvailableInet4Interfaces();
-        for (NetworkInterface ni : list) {
+        for (final NetworkInterface ni : list) {
             assertThat(ni.isLoopback(), is(false));
             assertThat(ni.isUp(), is(true));
             assertThat(hasInet4Address(ni), is(true));
         }
     }
 
-    private static boolean hasInet4Address(@Nonnull NetworkInterface netIf) {
+    private static boolean hasInet4Address(@Nonnull final NetworkInterface netIf) {
         final List<InterfaceAddress> addresses = netIf.getInterfaceAddresses();
         for (final InterfaceAddress address : addresses) {
             if (address.getAddress() instanceof Inet4Address) {

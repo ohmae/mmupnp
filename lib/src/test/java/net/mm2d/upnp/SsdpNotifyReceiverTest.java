@@ -43,15 +43,16 @@ public class SsdpNotifyReceiverTest {
         final MockMulticastSocket socket = new MockMulticastSocket();
         socket.setReceiveData(address.getAddress(), baos.toByteArray(), 0);
         final SsdpNotifyReceiver receiver = new SsdpNotifyReceiver(networkInterface) {
+            @Nonnull
             @Override
-            MulticastSocket createMulticastSocket(int port) throws IOException {
+            MulticastSocket createMulticastSocket(final int port) throws IOException {
                 return socket;
             }
         };
         final SsdpRequestMessage result[] = new SsdpRequestMessage[1];
         receiver.setNotifyListener(new SsdpNotifyReceiver.NotifyListener() {
             @Override
-            public void onReceiveNotify(@Nonnull SsdpRequestMessage message) {
+            public void onReceiveNotify(@Nonnull final SsdpRequestMessage message) {
                 result[0] = message;
             }
         });
@@ -64,7 +65,7 @@ public class SsdpNotifyReceiverTest {
         assertThat(result[0].getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
 
-    private static InterfaceAddress findInet4Address(NetworkInterface networkInterface) {
+    private static InterfaceAddress findInet4Address(final NetworkInterface networkInterface) {
         final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
         for (final InterfaceAddress address : addressList) {
             if (address.getAddress() instanceof Inet4Address) {

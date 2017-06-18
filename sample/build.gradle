@@ -1,5 +1,5 @@
 group 'net.mm2d.mmupnp'
-version '1.0.9'
+version versionName
 
 apply plugin: 'java'
 
@@ -15,5 +15,5 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     compile project(':lib')
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'junit:junit:4.12'
 }

@@ -29,8 +29,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Device {
-    private static final String TAG = Device.class.getSimpleName();
-
     /**
      * DeviceのBuilder。
      *
@@ -39,7 +37,10 @@ public class Device {
     public static class Builder {
         @Nonnull
         private final ControlPoint mControlPoint;
+        @Nonnull
         private SsdpMessage mSsdpMessage;
+        @Nonnull
+        private String mLocation;
         private String mDescription;
         private String mUdn;
         private String mDeviceType;
@@ -52,8 +53,10 @@ public class Device {
         private String mModelNumber;
         private String mSerialNumber;
         private String mPresentationUrl;
-        private List<Icon.Builder> mIconBuilderList;
-        private List<Service.Builder> mServiceBuilderList;
+        @Nonnull
+        private List<Icon.Builder> mIconBuilderList = Collections.emptyList();
+        @Nonnull
+        private List<Service.Builder> mServiceBuilderList = Collections.emptyList();
         @Nonnull
         private final Map<String, Map<String, String>> mTagMap;
 
@@ -63,8 +66,13 @@ public class Device {
          * @param controlPoint ControlPoint
          * @param ssdpMessage  SSDPパケット
          */
-        public Builder(@Nonnull ControlPoint controlPoint, @Nonnull SsdpMessage ssdpMessage) {
+        public Builder(@Nonnull final ControlPoint controlPoint, @Nonnull final SsdpMessage ssdpMessage) {
             mControlPoint = controlPoint;
+            final String location = ssdpMessage.getLocation();
+            if (location == null) {
+                throw new IllegalArgumentException();
+            }
+            mLocation = location;
             mSsdpMessage = ssdpMessage;
             mTagMap = new LinkedHashMap<>();
             mTagMap.put("", new HashMap<String, String>());
@@ -75,8 +83,9 @@ public class Device {
          *
          * @return SSDPに記述されたLocationの値
          */
+        @Nonnull
         public String getLocation() {
-            return mSsdpMessage.getLocation();
+            return mLocation;
         }
 
         /**
@@ -84,6 +93,7 @@ public class Device {
          *
          * @return SSDPに記述されたUUID
          */
+        @Nonnull
         public String getUuid() {
             return mSsdpMessage.getUuid();
         }
@@ -94,7 +104,13 @@ public class Device {
          * @param ssdpMessage SSDPパケット
          * @return Builder
          */
-        public Builder setSsdpMessage(@Nonnull SsdpMessage ssdpMessage) {
+        @Nonnull
+        public Builder updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
+            final String location = ssdpMessage.getLocation();
+            if (location == null) {
+                throw new IllegalArgumentException();
+            }
+            mLocation = location;
             mSsdpMessage = ssdpMessage;
             return this;
         }
@@ -105,7 +121,8 @@ public class Device {
          * @param description DescriptionXML
          * @return Builder
          */
-        public Builder setDescription(@Nonnull String description) {
+        @Nonnull
+        public Builder setDescription(@Nonnull final String description) {
             mDescription = description;
             return this;
         }
@@ -116,7 +133,8 @@ public class Device {
          * @param udn UDN
          * @return Builder
          */
-        public Builder setUdn(@Nonnull String udn) {
+        @Nonnull
+        public Builder setUdn(@Nonnull final String udn) {
             mUdn = udn;
             return this;
         }
@@ -127,7 +145,8 @@ public class Device {
          * @param deviceType DeviceType
          * @return Builder
          */
-        public Builder setDeviceType(@Nonnull String deviceType) {
+        @Nonnull
+        public Builder setDeviceType(@Nonnull final String deviceType) {
             mDeviceType = deviceType;
             return this;
         }
@@ -138,7 +157,8 @@ public class Device {
          * @param friendlyName FriendlyName
          * @return Builder
          */
-        public Builder setFriendlyName(@Nonnull String friendlyName) {
+        @Nonnull
+        public Builder setFriendlyName(@Nonnull final String friendlyName) {
             mFriendlyName = friendlyName;
             return this;
         }
@@ -149,7 +169,8 @@ public class Device {
          * @param manufacture Manufacture
          * @return Builder
          */
-        public Builder setManufacture(@Nonnull String manufacture) {
+        @Nonnull
+        public Builder setManufacture(@Nonnull final String manufacture) {
             mManufacture = manufacture;
             return this;
         }
@@ -160,7 +181,8 @@ public class Device {
          * @param manufactureUrl ManufactureUrl
          * @return Builder
          */
-        public Builder setManufactureUrl(@Nonnull String manufactureUrl) {
+        @Nonnull
+        public Builder setManufactureUrl(@Nonnull final String manufactureUrl) {
             mManufactureUrl = manufactureUrl;
             return this;
         }
@@ -171,7 +193,8 @@ public class Device {
          * @param modelName ModelName
          * @return Builder
          */
-        public Builder setModelName(@Nonnull String modelName) {
+        @Nonnull
+        public Builder setModelName(@Nonnull final String modelName) {
             mModelName = modelName;
             return this;
         }
@@ -182,7 +205,8 @@ public class Device {
          * @param modelUrl ModelUrl
          * @return Builder
          */
-        public Builder setModelUrl(@Nonnull String modelUrl) {
+        @Nonnull
+        public Builder setModelUrl(@Nonnull final String modelUrl) {
             mModelUrl = modelUrl;
             return this;
         }
@@ -193,7 +217,8 @@ public class Device {
          * @param modelDescription ModelDescription
          * @return Builder
          */
-        public Builder setModelDescription(@Nonnull String modelDescription) {
+        @Nonnull
+        public Builder setModelDescription(@Nonnull final String modelDescription) {
             mModelDescription = modelDescription;
             return this;
         }
@@ -204,7 +229,8 @@ public class Device {
          * @param modelNumber ModelNumber
          * @return Builder
          */
-        public Builder setModelNumber(@Nonnull String modelNumber) {
+        @Nonnull
+        public Builder setModelNumber(@Nonnull final String modelNumber) {
             mModelNumber = modelNumber;
             return this;
         }
@@ -215,7 +241,8 @@ public class Device {
          * @param serialNumber SerialNumber
          * @return Builder
          */
-        public Builder setSerialNumber(@Nonnull String serialNumber) {
+        @Nonnull
+        public Builder setSerialNumber(@Nonnull final String serialNumber) {
             mSerialNumber = serialNumber;
             return this;
         }
@@ -226,7 +253,8 @@ public class Device {
          * @param presentationUrl PresentationUrl
          * @return Builder
          */
-        public Builder setPresentationUrl(@Nonnull String presentationUrl) {
+        @Nonnull
+        public Builder setPresentationUrl(@Nonnull final String presentationUrl) {
             mPresentationUrl = presentationUrl;
             return this;
         }
@@ -237,7 +265,8 @@ public class Device {
          * @param iconBuilderList 全IconのBuilder
          * @return Builder
          */
-        public Builder setIconBuilderList(@Nonnull List<Icon.Builder> iconBuilderList) {
+        @Nonnull
+        public Builder setIconBuilderList(@Nonnull final List<Icon.Builder> iconBuilderList) {
             mIconBuilderList = iconBuilderList;
             return this;
         }
@@ -248,7 +277,8 @@ public class Device {
          * @param serviceBuilderList 全ServiceのBuilder
          * @return Builder
          */
-        public Builder setServiceBuilderList(@Nonnull List<Service.Builder> serviceBuilderList) {
+        @Nonnull
+        public Builder setServiceBuilderList(@Nonnull final List<Service.Builder> serviceBuilderList) {
             mServiceBuilderList = serviceBuilderList;
             return this;
         }
@@ -258,6 +288,7 @@ public class Device {
          *
          * @return 全ServiceのBuilder
          */
+        @Nonnull
         public List<Service.Builder> getServiceBuilderList() {
             return mServiceBuilderList;
         }
@@ -273,7 +304,8 @@ public class Device {
          * @param value     タグの値
          * @return Builder
          */
-        public Builder putTag(@Nonnull String namespace, @Nonnull String tag, @Nonnull String value) {
+        @Nonnull
+        public Builder putTag(@Nonnull final String namespace, @Nonnull final String tag, @Nonnull final String value) {
             Map<String, String> map = mTagMap.get(namespace);
             if (map == null) {
                 map = new HashMap<>();
@@ -288,6 +320,7 @@ public class Device {
          *
          * @return Deviceのインスタンス
          */
+        @Nonnull
         public Device build() {
             if (mDescription == null) {
                 throw new IllegalStateException("description must be set.");
@@ -319,6 +352,8 @@ public class Device {
     @Nonnull
     private SsdpMessage mSsdpMessage;
     @Nonnull
+    private String mLocation;
+    @Nonnull
     private final String mDescription;
     @Nonnull
     private final String mUdn;
@@ -326,14 +361,21 @@ public class Device {
     private final String mDeviceType;
     @Nonnull
     private final String mFriendlyName;
+    @Nullable
     private final String mManufacture;
+    @Nullable
     private final String mManufactureUrl;
     @Nonnull
     private final String mModelName;
+    @Nullable
     private final String mModelUrl;
+    @Nullable
     private final String mModelDescription;
+    @Nullable
     private final String mModelNumber;
+    @Nullable
     private final String mSerialNumber;
+    @Nullable
     private final String mPresentationUrl;
     @Nonnull
     private final Map<String, Map<String, String>> mTagMap;
@@ -347,9 +389,10 @@ public class Device {
      *
      * @param builder ビルダー
      */
-    private Device(@Nonnull Builder builder) {
+    private Device(@Nonnull final Builder builder) {
         mControlPoint = builder.mControlPoint;
         mSsdpMessage = builder.mSsdpMessage;
+        mLocation = builder.mLocation;
         mUdn = builder.mUdn;
         mDeviceType = builder.mDeviceType;
         mFriendlyName = builder.mFriendlyName;
@@ -363,19 +406,19 @@ public class Device {
         mPresentationUrl = builder.mPresentationUrl;
         mDescription = builder.mDescription;
         mTagMap = builder.mTagMap;
-        if (builder.mIconBuilderList == null) {
+        if (builder.mIconBuilderList.isEmpty()) {
             mIconList = Collections.emptyList();
         } else {
             mIconList = new ArrayList<>(builder.mIconBuilderList.size());
-            for (Icon.Builder iconBuilder : builder.mIconBuilderList) {
+            for (final Icon.Builder iconBuilder : builder.mIconBuilderList) {
                 mIconList.add(iconBuilder.setDevice(this).build());
             }
         }
-        if (builder.mServiceBuilderList == null) {
+        if (builder.mServiceBuilderList.isEmpty()) {
             mServiceList = Collections.emptyList();
         } else {
             mServiceList = new ArrayList<>(builder.mServiceBuilderList.size());
-            for (Service.Builder serviceBuilder : builder.mServiceBuilderList) {
+            for (final Service.Builder serviceBuilder : builder.mServiceBuilderList) {
                 mServiceList.add(serviceBuilder.setDevice(this).build());
             }
         }
@@ -387,7 +430,7 @@ public class Device {
      * @param client 通信に使用するHttpClient
      * @param filter 読み込むIconを選別するFilter
      */
-    void loadIconBinary(@Nonnull HttpClient client, @Nonnull IconFilter filter) {
+    void loadIconBinary(@Nonnull final HttpClient client, @Nonnull final IconFilter filter) {
         if (mIconList.isEmpty()) {
             return;
         }
@@ -418,11 +461,16 @@ public class Device {
      *
      * @param message SSDPパケット
      */
-    void setSsdpMessage(@Nonnull SsdpMessage message) {
+    void updateSsdpMessage(@Nonnull final SsdpMessage message) {
         final String uuid = message.getUuid();
         if (!getUdn().equals(uuid)) {
             throw new IllegalArgumentException("uuid and udn does not match! uuid=" + uuid + " udn=" + mUdn);
         }
+        final String location = message.getLocation();
+        if (location == null) {
+            throw new IllegalArgumentException();
+        }
+        mLocation = location;
         mSsdpMessage = message;
     }
 
@@ -464,7 +512,7 @@ public class Device {
      * @see #getAbsoluteUrl(String, String)
      */
     @Nonnull
-    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException {
+    URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
         return getAbsoluteUrl(getLocation(), url);
     }
 
@@ -499,42 +547,16 @@ public class Device {
      * @throws MalformedURLException 不正なURL
      */
     @Nonnull
-    static URL getAbsoluteUrl(@Nonnull String location, @Nonnull String url) throws MalformedURLException {
-        if (url.length() > 6 && url.substring(0, 7).equalsIgnoreCase("http://")) {
+    static URL getAbsoluteUrl(@Nonnull final String location, @Nonnull final String url)
+            throws MalformedURLException {
+        if (Http.isHttpUrl(url)) {
             return new URL(url);
         }
-        final String baseUrl = removeQuery(location);
+        final String baseUrl = Http.removeQuery(location);
         if (url.startsWith("/")) {
-            return new URL(jointAbsolutePath(baseUrl, url));
+            return new URL(Http.makeUrlWithAbsolutePath(baseUrl, url));
         }
-        return new URL(jointRelativePath(baseUrl, url));
-    }
-
-    private static String removeQuery(@Nonnull String url) {
-        final int pos = url.indexOf('?');
-        if (pos > 0) {
-            return url.substring(0, pos);
-        }
-        return url;
-    }
-
-    private static String jointAbsolutePath(@Nonnull String baseUrl, @Nonnull String path) {
-        final int pos = baseUrl.indexOf('/', "http://".length());
-        if (pos < 0) {
-            return baseUrl + path;
-        }
-        return baseUrl.substring(0, pos) + path;
-    }
-
-    private static String jointRelativePath(@Nonnull String baseUrl, @Nonnull String path) {
-        if (baseUrl.endsWith("/")) {
-            return baseUrl + path;
-        }
-        final int pos = baseUrl.lastIndexOf('/');
-        if (pos > "http://".length()) {
-            return baseUrl.substring(0, pos + 1) + path;
-        }
-        return baseUrl + "/" + path;
+        return new URL(Http.makeUrlWithRelativePath(baseUrl, url));
     }
 
     /**
@@ -551,7 +573,7 @@ public class Device {
      * @return タグの値
      */
     @Nullable
-    public String getValue(@Nonnull String name) {
+    public String getValue(@Nonnull final String name) {
         for (final Entry<String, Map<String, String>> entry : mTagMap.entrySet()) {
             final String value = entry.getValue().get(name);
             if (value != null) {
@@ -575,7 +597,7 @@ public class Device {
      * @return タグの値
      */
     @Nullable
-    public String getValue(@Nonnull String name, @Nonnull String namespace) {
+    public String getValue(@Nonnull final String name, @Nonnull final String namespace) {
         final Map<String, String> map = mTagMap.get(namespace);
         if (map == null) {
             return null;
@@ -590,8 +612,7 @@ public class Device {
      */
     @Nonnull
     public String getLocation() {
-        //noinspection ConstantConditions : Deviceに設定される場合はnonnullであることが保証されている。
-        return mSsdpMessage.getLocation();
+        return mLocation;
     }
 
     /**
@@ -825,7 +846,7 @@ public class Device {
      * @see Service
      */
     @Nullable
-    public Service findServiceById(@Nonnull String id) {
+    public Service findServiceById(@Nonnull final String id) {
         for (final Service service : mServiceList) {
             if (service.getServiceId().equals(id)) {
                 return service;
@@ -844,7 +865,7 @@ public class Device {
      * @see Service
      */
     @Nullable
-    public Service findServiceByType(@Nonnull String type) {
+    public Service findServiceByType(@Nonnull final String type) {
         for (final Service service : mServiceList) {
             if (service.getServiceType().equals(type)) {
                 return service;
@@ -870,7 +891,7 @@ public class Device {
      * @see Action
      */
     @Nullable
-    public Action findAction(@Nonnull String name) {
+    public Action findAction(@Nonnull final String name) {
         for (final Service service : mServiceList) {
             final Action action = service.findAction(name);
             if (action != null) {
@@ -886,7 +907,7 @@ public class Device {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == this) {
             return true;
         }

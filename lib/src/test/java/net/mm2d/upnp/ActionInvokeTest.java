@@ -1,7 +1,13 @@
+/*
+ * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/MIT
+ */
+
 package net.mm2d.upnp;
 
 import net.mm2d.util.Log;
-import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
 
 import org.junit.Before;
@@ -16,6 +22,7 @@ import org.w3c.dom.NodeList;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +113,7 @@ public class ActionInvokeTest {
         mAction.setHttpClientFactory(new HttpClientFactory() {
             @Override
             @Nonnull
-            public HttpClient createHttpClient(boolean keepAlive) {
+            public HttpClient createHttpClient(final boolean keepAlive) {
                 return client;
             }
         });
@@ -127,7 +134,7 @@ public class ActionInvokeTest {
                 is(String.valueOf(request.getBodyBinary().length)));
     }
 
-    private List<Element> createChildElementList(Element parent) {
+    private List<Element> createChildElementList(final Element parent) {
         final List<Element> elements = new ArrayList<>();
         final NodeList children = parent.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
@@ -219,10 +226,8 @@ public class ActionInvokeTest {
         final Map<String, String> arg = new HashMap<>();
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
-        final List<StringPair> custom = new ArrayList<>();
-        custom.add(new StringPair(name, value));
 
-        mAction.invoke(arg, null, custom);
+        mAction.invoke(arg, null, Collections.singletonMap(name, value));
         final HttpRequest request = mMockFactory.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -255,13 +260,9 @@ public class ActionInvokeTest {
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
-        final List<StringPair> ns = new ArrayList<>();
-        ns.add(new StringPair(prefix, urn));
-
-        final List<StringPair> custom = new ArrayList<>();
-        custom.add(new StringPair(prefix + ":" + name, value));
-
-        mAction.invoke(arg, ns, custom);
+        mAction.invoke(arg,
+                Collections.singletonMap(prefix, urn),
+                Collections.singletonMap(prefix + ":" + name, value));
         final HttpRequest request = mMockFactory.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());

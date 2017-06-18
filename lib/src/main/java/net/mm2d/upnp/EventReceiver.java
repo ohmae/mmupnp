@@ -41,8 +41,6 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 class EventReceiver {
-    private static final String TAG = EventReceiver.class.getSimpleName();
-
     /**
      * イベントデータの受信を受け取るリスナー。
      */
@@ -58,26 +56,18 @@ class EventReceiver {
         boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties);
     }
 
+    @Nullable
     private ServerSocket mServerSocket;
+    @Nullable
     private ServerTask mServerTask;
-    private EventMessageListener mListener;
+    @Nullable
+    private final EventMessageListener mListener;
 
     /**
      * インスタンス作成。
      */
-    EventReceiver() {
-    }
-
-    /**
-     * イベント受信リスナーを登録する。
-     *
-     * @param listener リスナー
-     */
-    void setEventMessageListener(@Nullable EventMessageListener listener) {
+    EventReceiver(@Nullable final EventMessageListener listener) {
         mListener = listener;
-        if (mServerTask != null) {
-            mServerTask.setEventMessageListener(listener);
-        }
     }
 
     /**
@@ -103,6 +93,9 @@ class EventReceiver {
      * @return サーバソケットのポート番号
      */
     int getLocalPort() {
+        if (mServerSocket == null) {
+            return 0;
+        }
         return mServerSocket.getLocalPort();
     }
 
@@ -110,12 +103,14 @@ class EventReceiver {
      * 受信スレッドを終了させる。
      */
     void close() {
-        mServerTask.shutdownRequest();
-        mServerTask = null;
+        if (mServerTask != null) {
+            mServerTask.shutdownRequest();
+            mServerTask = null;
+        }
     }
 
     @Nonnull
-    private static List<StringPair> parsePropertyPairs(@Nonnull HttpRequest request) {
+    private static List<StringPair> parsePropertyPairs(@Nonnull final HttpRequest request) {
         final String xml = request.getBody();
         if (TextUtils.isEmpty(xml)) {
             return Collections.emptyList();
@@ -160,7 +155,9 @@ class EventReceiver {
         private final ServerSocket mServerSocket;
         @Nonnull
         private final List<ClientTask> mClientList;
+        @Nullable
         private Thread mThread;
+        @Nullable
         private EventMessageListener mListener;
 
         /**
@@ -168,7 +165,7 @@ class EventReceiver {
          *
          * @param sock サーバソケット
          */
-        ServerTask(@Nonnull ServerSocket sock) {
+        ServerTask(@Nonnull final ServerSocket sock) {
             mServerSocket = sock;
             mClientList = Collections.synchronizedList(new LinkedList<ClientTask>());
         }
@@ -207,7 +204,7 @@ class EventReceiver {
          *
          * @param client 終了したClientスレッド
          */
-        void notifyClientFinished(@Nonnull ClientTask client) {
+        void notifyClientFinished(@Nonnull final ClientTask client) {
             mClientList.remove(client);
         }
 
@@ -216,7 +213,7 @@ class EventReceiver {
          *
          * @param listener リスナー
          */
-        synchronized void setEventMessageListener(@Nullable EventMessageListener listener) {
+        synchronized void setEventMessageListener(@Nullable final EventMessageListener listener) {
             mListener = listener;
         }
 
@@ -227,15 +224,16 @@ class EventReceiver {
          * @param request 受信したHTTPメッセージ
          * @return HTTPメッセージが正常であればtrue
          */
-        private synchronized boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
+        private synchronized boolean notifyEvent(
+                @Nonnull final String sid, @Nonnull final HttpRequest request) {
             if (mListener == null) {
                 return false;
             }
-            List<StringPair> list = parsePropertyPairs(request);
+            final List<StringPair> list = parsePropertyPairs(request);
             if (list.isEmpty()) {
                 return false;
             }
-            long seq = TextParseUtils.parseLongSafely(request.getHeader(Http.SEQ), 0);
+            final long seq = TextParseUtils.parseLongSafely(request.getHeader(Http.SEQ), 0);
             return mListener.onEventReceived(sid, seq, list);
         }
 
@@ -280,6 +278,7 @@ class EventReceiver {
         private final ServerTask mServer;
         @Nonnull
         private final Socket mSocket;
+        @Nullable
         private Thread mThread;
 
         /**
@@ -288,7 +287,7 @@ class EventReceiver {
          * @param server サーバスレッド
          * @param sock   クライアントソケット
          */
-        ClientTask(@Nonnull ServerTask server, @Nonnull Socket sock) {
+        ClientTask(@Nonnull final ServerTask server, @Nonnull final Socket sock) {
             mServer = server;
             mSocket = sock;
         }
@@ -312,7 +311,7 @@ class EventReceiver {
             IoUtils.closeQuietly(mSocket);
         }
 
-        private boolean notifyEvent(@Nonnull String sid, @Nonnull HttpRequest request) {
+        private boolean notifyEvent(@Nonnull final String sid, @Nonnull final HttpRequest request) {
             return mServer.notifyEvent(sid, request);
         }
 
@@ -325,7 +324,7 @@ class EventReceiver {
                 os = mSocket.getOutputStream();
                 receiveAndReply(is, os);
             } catch (final IOException e) {
-                Log.w(TAG, e);
+                Log.w(e);
             } finally {
                 IoUtils.closeQuietly(is);
                 IoUtils.closeQuietly(os);
@@ -334,7 +333,8 @@ class EventReceiver {
             }
         }
 
-        private void receiveAndReply(@Nonnull InputStream is, @Nonnull OutputStream os) throws IOException {
+        private void receiveAndReply(@Nonnull final InputStream is, @Nonnull final OutputStream os)
+                throws IOException {
             final HttpRequest request = new HttpRequest(mSocket);
             request.readData(is);
             final String nt = request.getHeader(Http.NT);

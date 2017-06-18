@@ -134,7 +134,7 @@ public class MainWindow extends JFrame {
         final NotifyEventListener eventListener = new NotifyEventListener() {
             @Override
             public void onNotifyEvent(@Nonnull Service service, long seq,
-                    @Nonnull String variable, @Nonnull String value) {
+                                      @Nonnull String variable, @Nonnull String value) {
                 mEvent.setText(mEvent.getText() + service.getServiceType() + " : " + seq + " : "
                         + variable + " : " + value + "\n");
             }
