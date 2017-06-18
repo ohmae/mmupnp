@@ -28,12 +28,13 @@ import javax.annotation.Nullable;
  * <p>UPnPの通信でよく利用される小さなデータのやり取りに特化したもの。
  * 長大なデータのやり取りは想定していない。
  * 手軽に利用できることを優先し、効率などはあまり考慮されていない。
+ * 原則同一のサーバに対する一連の通信ごとにインスタンスを作成する想定。
  *
  * <p>相手の応答がkeep-alive可能な応答であった場合はコネクションを切断せず、
  * 継続して利用するという、消極的なkeep-alive機能も提供する。
  *
- * <p>keep-alive状態であっても、post時に維持したコネクションと同一のホスト・ポートでない場合は
- * 切断、再接続を行う。
+ * <p>keep-alive状態であっても、post時に維持したコネクションと
+ * 同一のホスト・ポートでない場合は切断、再接続を行う。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -148,8 +149,10 @@ public class HttpClient {
             try {
                 return writeAndRead(request);
             } catch (final IOException e) {
-                // コネクションを再利用した場合はpeerから既に切断されていた可能性があるためリトライを行う
+                // コネクションを再利用した場合はpeerから既に切断されていた可能性がある。
+                // KeepAliveできないサーバである可能性があるのでKeepAliveを無効にしてリトライ
                 Log.w("retry:" + e.getMessage());
+                setKeepAlive(false);
                 closeSocket();
                 openSocket(request);
                 return writeAndRead(request);
