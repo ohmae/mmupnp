@@ -280,7 +280,7 @@ public class Service {
      * @see Device#getAbsoluteUrl(String)
      */
     @Nonnull
-    URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
+    public URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
 

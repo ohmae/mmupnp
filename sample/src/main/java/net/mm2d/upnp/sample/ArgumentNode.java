@@ -16,14 +16,19 @@ import java.util.List;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ArgumentNode extends UpnpNode {
-    public ArgumentNode(Argument argument) {
+    public ArgumentNode(final Argument argument) {
         super(argument);
         setAllowsChildren(false);
     }
 
     @Override
+    public Argument getUserObject() {
+        return (Argument) super.getUserObject();
+    }
+
+    @Override
     public String getDetailText() {
-        final Argument arg = (Argument) getUserObject();
+        final Argument arg = getUserObject();
         final StringBuilder sb = new StringBuilder();
         sb.append("Name: ");
         sb.append(arg.getName());
@@ -56,7 +61,6 @@ public class ArgumentNode extends UpnpNode {
 
     @Override
     public String toString() {
-        final Argument o = (Argument) getUserObject();
-        return o.getName();
+        return getUserObject().getName();
     }
 }

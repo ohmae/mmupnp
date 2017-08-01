@@ -12,10 +12,12 @@ import net.mm2d.util.Log;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import java.awt.Component;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import javax.swing.JFrame;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,11 +40,11 @@ public class UpnpNode extends DefaultMutableTreeNode {
         super();
     }
 
-    public UpnpNode(Object userObject) {
+    public UpnpNode(final Object userObject) {
         super(userObject);
     }
 
-    public UpnpNode(Object userObject, boolean allowsChildren) {
+    public UpnpNode(final Object userObject, final boolean allowsChildren) {
         super(userObject, allowsChildren);
     }
 
@@ -50,7 +52,7 @@ public class UpnpNode extends DefaultMutableTreeNode {
         return "";
     }
 
-    protected String formatXml(String xml) {
+    protected String formatXml(final String xml) {
         try {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -72,5 +74,8 @@ public class UpnpNode extends DefaultMutableTreeNode {
 
     public String getDetailXml() {
         return "";
+    }
+
+    public void showContextMenu(final JFrame frame, final Component invoker, final int x, final int y) {
     }
 }

@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.sample;
 
-import net.mm2d.upnp.Action;
 import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
@@ -15,24 +14,16 @@ import net.mm2d.upnp.Device;
 import net.mm2d.upnp.IconFilter;
 import net.mm2d.upnp.Service;
 import net.mm2d.util.Log;
-import net.mm2d.util.TextUtils;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.HashMap;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.swing.JButton;
@@ -42,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
@@ -49,9 +41,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
@@ -59,7 +48,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class MainWindow extends JFrame {
     private static final String TAG = "MainWindow";
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -73,164 +62,163 @@ public class MainWindow extends JFrame {
     private final JTree mTree;
     private final JTextArea mDetail1;
     private final JTextArea mDetail2;
-    private final JTextArea mEvent;
+    private final JTextArea mEventArea;
     private final UpnpNode mRootNode;
 
-    private void parseResult(@Nonnull String xml)
-            throws IOException, SAXException, ParserConfigurationException {
-        final StringBuilder sb = new StringBuilder();
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        final DocumentBuilder db = dbf.newDocumentBuilder();
-        final Document doc = db.parse(new InputSource(new StringReader(xml)));
-        Node n = doc.getDocumentElement().getFirstChild();
-        for (; n != null; n = n.getNextSibling()) {
-            if (n.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("item".equals(n.getLocalName())
-                    || "container".equals(n.getLocalName())) {
-                Node i = n.getFirstChild();
-                for (; i != null; i = i.getNextSibling()) {
-                    if (i.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    if ("title".equals(i.getLocalName())) {
-                        sb.append(i.getTextContent());
-                        sb.append('\n');
-                    }
-                }
-            }
+    private final DiscoveryListener mDiscoveryListener = new DiscoveryListener() {
+        @Override
+        public void onDiscover(@Nonnull final Device device) {
+            update();
         }
-        mDetail2.setText(sb.toString());
+
+        @Override
+        public void onLost(@Nonnull final Device device) {
+            update();
+        }
+
+        private void update() {
+            final List<Device> deviceList = mControlPoint.getDeviceList();
+            mRootNode.removeAllChildren();
+            for (final Device device : deviceList) {
+                mRootNode.add(new DeviceNode(device));
+            }
+            final DefaultTreeModel model = (DefaultTreeModel) mTree.getModel();
+            model.reload();
+        }
+    };
+
+    private final NotifyEventListener mEventListener = new NotifyEventListener() {
+        @Override
+        public void onNotifyEvent(@Nonnull final Service service, final long seq,
+                                  @Nonnull final String variable, @Nonnull final String value) {
+            mEventArea.setText(mEventArea.getText() + service.getServiceType() + " : " + seq + " : "
+                    + variable + " : " + value + "\n");
+        }
+    };
+
+
+    private final TreeSelectionListener mSelectionListener = new TreeSelectionListener() {
+        @Override
+        public void valueChanged(final TreeSelectionEvent event) {
+            final UpnpNode node = (UpnpNode) mTree.getLastSelectedPathComponent();
+            mDetail1.setText(node.getDetailText());
+            mDetail2.setText(node.getDetailXml());
+        }
+    };
+
+    private ControlPoint initControlPoint() {
+        final ControlPoint controlPoint = new ControlPoint();
+        controlPoint.setIconFilter(IconFilter.ALL);
+        controlPoint.initialize();
+        controlPoint.addDiscoveryListener(mDiscoveryListener);
+        controlPoint.addNotifyEventListener(mEventListener);
+        return controlPoint;
     }
 
-    public MainWindow() {
-        super();
-        mControlPoint = new ControlPoint();
-        mControlPoint.setIconFilter(IconFilter.ALL);
-        mControlPoint.initialize();
-        mControlPoint.addDiscoveryListener(new DiscoveryListener() {
+    private JButton makeStartButton() {
+        final JButton button = new JButton("START");
+        button.addActionListener(new ActionListener() {
             @Override
-            public void onDiscover(@Nonnull Device device) {
-                update();
-            }
-
-            @Override
-            public void onLost(@Nonnull Device device) {
-                update();
-            }
-
-            private void update() {
-                final List<Device> deviceList = mControlPoint.getDeviceList();
-                mRootNode.removeAllChildren();
-                for (final Device device : deviceList) {
-                    mRootNode.add(new DeviceNode(device));
-                }
-                final DefaultTreeModel model = (DefaultTreeModel) mTree.getModel();
-                model.reload();
-            }
-        });
-        final NotifyEventListener eventListener = new NotifyEventListener() {
-            @Override
-            public void onNotifyEvent(@Nonnull Service service, long seq,
-                                      @Nonnull String variable, @Nonnull String value) {
-                mEvent.setText(mEvent.getText() + service.getServiceType() + " : " + seq + " : "
-                        + variable + " : " + value + "\n");
-            }
-        };
-        mControlPoint.addNotifyEventListener(eventListener);
-        setTitle("UPnP");
-        setSize(800, 800);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        final JPanel contentPane = new JPanel();
-        contentPane.setLayout(new FlowLayout());
-        final JButton button1 = new JButton("START");
-        contentPane.add(button1);
-        final JButton button2 = new JButton("STOP");
-        contentPane.add(button2);
-        final JButton button3 = new JButton("M-SEARCH");
-        contentPane.add(button3);
-        getContentPane().add(contentPane, BorderLayout.NORTH);
-        mRootNode = new UpnpNode("Device");
-        mRootNode.setAllowsChildren(true);
-        mTree = new JTree(mRootNode, true);
-        mTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        final TreeSelectionListener selectionListener = new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent event) {
-                final UpnpNode node = (UpnpNode) mTree.getLastSelectedPathComponent();
-                mDetail1.setText(node.getDetailText());
-                mDetail2.setText(node.getDetailXml());
-                if (node.getUserObject() instanceof Action) {
-                    final Action action = (Action) node.getUserObject();
-                    if (!action.getName().equals("Browse")) {
-                        return;
-                    }
-                    final Map<String, String> arg = new HashMap<>();
-                    arg.put("ObjectID", "0");
-                    arg.put("BrowseFlag", "BrowseDirectChildren");
-                    arg.put("Filter", "*");
-                    arg.put("StartingIndex", "0");
-                    arg.put("RequestedCount", "0");
-                    arg.put("SortCriteria", "");
-                    try {
-                        final Map<String, String> result = action.invoke(arg);
-                        final String res = result.get("Result");
-                        if (TextUtils.isEmpty(res)) {
-                            return;
-                        }
-                        parseResult(res);
-                    } catch (IOException | SAXException | ParserConfigurationException e) {
-                        Log.w(TAG, e);
-                    }
-                } else if (node.getUserObject() instanceof Service) {
-                    final Service service = (Service) node.getUserObject();
-                    try {
-                        service.subscribe(true);
-                    } catch (final IOException e) {
-                        Log.w(TAG, e);
-                    }
-                }
-            }
-        };
-        mTree.addTreeSelectionListener(selectionListener);
-        mDetail1 = new JTextArea();
-        mDetail1.setEditable(false);
-        mDetail1.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        mDetail2 = new JTextArea();
-        mDetail2.setEditable(false);
-        mDetail2.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        final JSplitPane detail = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                new JScrollPane(mDetail1), new JScrollPane(mDetail2));
-        detail.setDividerLocation(250);
-        final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                new JScrollPane(mTree), detail);
-        split.setDividerLocation(300);
-        getContentPane().add(split, BorderLayout.CENTER);
-        mEvent = new JTextArea();
-        mEvent.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        final JScrollPane s = new JScrollPane(mEvent);
-        s.setPreferredSize(new Dimension(100, 100));
-        getContentPane().add(s, BorderLayout.SOUTH);
-        button1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 mControlPoint.start();
             }
         });
-        button2.addActionListener(new ActionListener() {
+        return button;
+    }
+
+    private JButton makeStopButton() {
+        final JButton button = new JButton("STOP");
+        button.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 mControlPoint.stop();
             }
         });
-        button3.addActionListener(new ActionListener() {
+        return button;
+    }
+
+    private JButton makeSearchButton() {
+        final JButton button = new JButton("M-SEARCH");
+        button.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 mControlPoint.search();
             }
         });
+        return button;
+    }
+
+    private JPanel makeControlPanel() {
+        final JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout());
+        panel.add(makeStartButton());
+        panel.add(makeStopButton());
+        panel.add(makeSearchButton());
+        return panel;
+    }
+
+    private JTextArea makeTextArea() {
+        final JTextArea area = new JTextArea();
+        area.setTabSize(2);
+        area.setEditable(false);
+        area.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        return area;
+    }
+
+    private JTree makeTree() {
+        final JTree tree = new JTree(mRootNode, true);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.addMouseListener(mTreeMouseListener);
+        tree.addTreeSelectionListener(mSelectionListener);
+        return tree;
+    }
+
+    private final MouseListener mTreeMouseListener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(final MouseEvent e) {
+            if (!SwingUtilities.isRightMouseButton(e)) {
+                return;
+            }
+            final int x = e.getX();
+            final int y = e.getY();
+            final int row = mTree.getRowForLocation(x, y);
+            if (row < 0) {
+                return;
+            }
+            mTree.setSelectionRow(row);
+            final UpnpNode node = (UpnpNode) mTree.getLastSelectedPathComponent();
+            if (node == null) {
+                return;
+            }
+            node.showContextMenu(MainWindow.this, mTree, x, y);
+        }
+    };
+
+    public MainWindow() {
+        super();
+        mControlPoint = initControlPoint();
+        setTitle("UPnP");
+        setSize(800, 800);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().add(makeControlPanel(), BorderLayout.NORTH);
+        mRootNode = new UpnpNode("Device");
+        mRootNode.setAllowsChildren(true);
+        mTree = makeTree();
+        mDetail1 = makeTextArea();
+        mDetail2 = makeTextArea();
+        mEventArea = makeTextArea();
+
+        final JSplitPane detail = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                new JScrollPane(mDetail1), new JScrollPane(mDetail2));
+        detail.setDividerLocation(250);
+        final JSplitPane main = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                new JScrollPane(mTree), detail);
+        main.setDividerLocation(300);
+
+        final JSplitPane content = new JSplitPane(JSplitPane.VERTICAL_SPLIT, main, new JScrollPane(mEventArea));
+        content.setDividerLocation(600);
+
+        getContentPane().add(content, BorderLayout.CENTER);
         setVisible(true);
     }
 }

@@ -11,13 +11,20 @@ import net.mm2d.upnp.Action;
 import net.mm2d.upnp.Argument;
 import net.mm2d.upnp.StateVariable;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ActionNode extends UpnpNode {
-    public ActionNode(Action action) {
+    public ActionNode(final Action action) {
         super(action);
         final List<Argument> arguments = action.getArgumentList();
         for (final Argument argument : arguments) {
@@ -26,8 +33,13 @@ public class ActionNode extends UpnpNode {
     }
 
     @Override
+    public Action getUserObject() {
+        return (Action) super.getUserObject();
+    }
+
+    @Override
     public String getDetailText() {
-        final Action action = (Action) getUserObject();
+        final Action action = getUserObject();
         final StringBuilder sb = new StringBuilder();
         sb.append("Name: ");
         sb.append(action.getName());
@@ -47,7 +59,20 @@ public class ActionNode extends UpnpNode {
 
     @Override
     public String toString() {
-        final Action o = (Action) getUserObject();
-        return o.getName();
+        return getUserObject().getName();
+    }
+
+    @Override
+    public void showContextMenu(final JFrame frame, final Component invoker, final int x, final int y) {
+        final JPopupMenu menu = new JPopupMenu();
+        final JMenuItem invoke = new JMenuItem("Invoke Action");
+        invoke.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                new ActionWindow(getUserObject()).show(frame.getX() + x, frame.getY() + y);
+            }
+        });
+        menu.add(invoke);
+        menu.show(invoker, x, y);
     }
 }
