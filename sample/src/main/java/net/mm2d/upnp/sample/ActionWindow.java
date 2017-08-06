@@ -14,6 +14,7 @@ import net.mm2d.upnp.StateVariable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -22,17 +23,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
 import javax.swing.text.JTextComponent;
 
 /**
@@ -142,34 +145,82 @@ public class ActionWindow extends JFrame {
         getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
         mAction = action;
         for (final Argument argument : action.getArgumentList()) {
-            if (mMap.size() != 0) {
-                panel.add(new JSeparator(SwingConstants.HORIZONTAL));
-            }
-            final StateVariable variable = argument.getRelatedStateVariable();
-            panel.add(new JLabel("(" + variable.getDataType() + ") " + argument.getName()));
-            final List<String> allowedValueList = variable.getAllowedValueList();
-            if (!allowedValueList.isEmpty()) {
-                final JComboBox<String> comboBox = new JComboBox<>(allowedValueList.toArray(new String[allowedValueList.size()]));
-                mMap.put(argument, new ComboBoxContainer(comboBox));
-                panel.add(comboBox);
-                if (variable.getDefaultValue() != null) {
-                    comboBox.setSelectedItem(variable.getDefaultValue());
-                }
-                continue;
-            }
-            final JTextArea area = new JTextArea();
-            area.setBorder(new BevelBorder(BevelBorder.LOWERED));
-            area.setLineWrap(true);
-            if (!argument.isInputDirection()) {
-                area.setBackground(new Color(0xeeeeee));
-            }
-            if (variable.getDefaultValue() != null) {
-                area.setText(variable.getDefaultValue());
-            }
-            mMap.put(argument, new TextContainer(area));
-            panel.add(area);
+            panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panel.add(makeArgumentPanel(argument));
         }
     }
+
+    private JPanel makeArgumentPanel(final Argument argument) {
+        final StateVariable variable = argument.getRelatedStateVariable();
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(new JLabel("(" + variable.getDataType() + ") " + argument.getName()), BorderLayout.NORTH);
+
+        if (!variable.getAllowedValueList().isEmpty()) {
+            panel.add(makeComboBox(argument), BorderLayout.CENTER);
+            return panel;
+        }
+
+        final DataType type = DataType.of(variable.getDataType());
+        if (type.isMultiLine()) {
+            panel.add(makeTextArea(argument), BorderLayout.CENTER);
+            return panel;
+        }
+
+        panel.add(makeTextField(argument), BorderLayout.CENTER);
+        return panel;
+    }
+
+    @Nonnull
+    private JComponent makeComboBox(final Argument argument) {
+        final StateVariable variable = argument.getRelatedStateVariable();
+        final List<String> allowedValueList = variable.getAllowedValueList();
+        final JComboBox<String> comboBox = new JComboBox<>(allowedValueList.toArray(new String[allowedValueList.size()]));
+        if (variable.getDefaultValue() != null) {
+            comboBox.setSelectedItem(variable.getDefaultValue());
+        }
+        mMap.put(argument, new ComboBoxContainer(comboBox));
+        return comboBox;
+    }
+
+    @Nonnull
+    private JComponent makeTextArea(final Argument argument) {
+        final StateVariable variable = argument.getRelatedStateVariable();
+        final DataType type = DataType.of(variable.getDataType());
+
+        final JTextArea area = new JTextArea();
+        area.setLineWrap(true);
+        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        if (!argument.isInputDirection()) {
+            area.setBackground(new Color(0xeeeeee));
+        }
+        if (variable.getDefaultValue() != null) {
+            area.setText(variable.getDefaultValue());
+        } else if (argument.isInputDirection()) {
+            area.setText(type.getDefault());
+        }
+        mMap.put(argument, new TextContainer(area));
+        return new JScrollPane(area);
+    }
+
+    @Nonnull
+    private JComponent makeTextField(final Argument argument) {
+        final StateVariable variable = argument.getRelatedStateVariable();
+        final DataType type = DataType.of(variable.getDataType());
+
+        final JTextField field = new JTextField();
+        if (!argument.isInputDirection()) {
+            field.setBackground(new Color(0xeeeeee));
+        }
+        if (variable.getDefaultValue() != null) {
+            field.setText(variable.getDefaultValue());
+        } else if (argument.isInputDirection()) {
+            field.setText(type.getDefault());
+        }
+        mMap.put(argument, new TextContainer(field));
+        return field;
+    }
+
 
     public void show(final int x, final int y) {
         setSize(400, 800);

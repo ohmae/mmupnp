@@ -263,6 +263,9 @@ public class StateVariable {
     /**
      * DataTypeを返す。
      *
+     * <p>UPnPでは以下のデータタイプが定義されている。
+     * これらのどれにも当てはまらない場合もチェックは行われない。
+     *
      * <p>UPnP
      * <table><caption>DataType一覧</caption>
      * <tr><th>ui1</th>
@@ -280,7 +283,7 @@ public class StateVariable {
      * <tr><th>i4</th>
      * <td>4 Byte int. Same format as int. shall be between -2147483648 and 2147483647.</td></tr>
      * <tr><th>i8</th>
-     * <td>8 Byte int. Same format as int. shall be between -.9,223,372,036,854,775,808 and
+     * <td>8 Byte int. Same format as int. shall be between -9,223,372,036,854,775,808 and
      * 9,223,372,036,854,775,807, from .(263) to 263 - 1.</td></tr>
      * <tr><th>int</th>
      * <td>Fixed point, integer number. Is allowed to have leading sign. Is allowed to have leading

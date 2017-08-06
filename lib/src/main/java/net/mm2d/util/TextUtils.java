@@ -23,7 +23,7 @@ public class TextUtils {
      * @param string 検査する文字列
      * @return 引数がnullもしくは空の場合にtrue
      */
-    public static boolean isEmpty(@Nullable final String string) {
+    public static boolean isEmpty(@Nullable final CharSequence string) {
         return string == null || string.length() == 0;
     }
 
@@ -34,7 +34,7 @@ public class TextUtils {
      * @param b 比較対象
      * @return 2つの引数が等しいときtrue、2つともnullの場合もtrueを返す。
      */
-    public static boolean equals(@Nullable final String a, @Nullable final String b) {
+    public static boolean equals(@Nullable final CharSequence a, @Nullable final CharSequence b) {
         return a == null ? b == null : a.equals(b);
     }
 

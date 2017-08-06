@@ -161,7 +161,7 @@ public class MainWindow extends JFrame {
         final JTextArea area = new JTextArea();
         area.setTabSize(2);
         area.setEditable(false);
-        area.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         return area;
     }
 
