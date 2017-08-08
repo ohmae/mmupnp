@@ -73,7 +73,7 @@ public class Log {
      * System.outへ出力するデフォルトの出力処理
      */
     private static class DefaultPrint implements Print {
-        private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
         @Override
         public void println(final int level, @Nonnull final String tag, @Nonnull final String message) {
