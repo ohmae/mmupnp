@@ -121,6 +121,7 @@ public class MainWindow extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 mControlPoint.start();
+                mControlPoint.search();
             }
         });
         return button;
