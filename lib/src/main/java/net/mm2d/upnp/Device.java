@@ -53,6 +53,7 @@ public class Device {
         private String mModelNumber;
         private String mSerialNumber;
         private String mPresentationUrl;
+        private String mUrlBase;
         @Nonnull
         private final List<Icon.Builder> mIconBuilderList = new ArrayList<>();
         @Nonnull
@@ -260,6 +261,35 @@ public class Device {
         }
 
         /**
+         * URLBaseの値を登録する。
+         *
+         * URLBaseは1.1以降Deprecated
+         *
+         * @param urlBase URLBaseの値
+         * @return Builder
+         */
+        @Nonnull
+        public Builder setUrlBase(final String urlBase) {
+            mUrlBase = urlBase;
+            return this;
+        }
+
+        /**
+         * URLのベースとして使用する値を返す。
+         *
+         * URLBaseの値が存在する場合はURLBase、存在しない場合はLocationの値を利用する。
+         *
+         * @return URLのベースとして使用する値
+         */
+        @Nonnull
+        public String getBaseUrl() {
+            if (mUrlBase != null) {
+                return mUrlBase;
+            }
+            return mLocation;
+        }
+
+        /**
          * IconのBuilderを登録する。
          *
          * @param builder IconのBuilder
@@ -377,6 +407,8 @@ public class Device {
     private final String mSerialNumber;
     @Nullable
     private final String mPresentationUrl;
+    @Nullable
+    private final String mUrlBase;
     @Nonnull
     private final Map<String, Map<String, String>> mTagMap;
     @Nonnull
@@ -404,6 +436,7 @@ public class Device {
         mModelNumber = builder.mModelNumber;
         mSerialNumber = builder.mSerialNumber;
         mPresentationUrl = builder.mPresentationUrl;
+        mUrlBase = builder.mUrlBase;
         mDescription = builder.mDescription;
         mTagMap = builder.mTagMap;
         if (builder.mIconBuilderList.isEmpty()) {
@@ -513,7 +546,7 @@ public class Device {
      */
     @Nonnull
     URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
-        return getAbsoluteUrl(getLocation(), url);
+        return getAbsoluteUrl(getBaseUrl(), url);
     }
 
     /**
@@ -526,7 +559,7 @@ public class Device {
      * <li>"/"以外から始まる相対パス
      * </ul>
      *
-     * <p>一方、Locationの情報としては以下のバリエーションを考慮する
+     * <p>一方、baseUrlの情報としては以下のバリエーションを考慮する
      * <ul>
      * <li>"http://10.0.0.1:1000/" ホスト名のみ
      * <li>"http://10.0.0.1:1000" ホスト名のみだが末尾の"/"がない。
@@ -536,27 +569,27 @@ public class Device {
      * </ul>
      *
      * <p>URLが"http://"から始まっていればそのまま利用する。
-     * "/"から始まっていればLocationホストの絶対パスとして
-     * Locationの"://"以降の最初の"/"までと結合する。
+     * "/"から始まっていればbaseUrlホストの絶対パスとして
+     * baseUrlの"://"以降の最初の"/"までと結合する。
      * それ以外の場合はLocationからの相対パスであり、
-     * Locationから抽出したディレクトリ名と結合する。
+     * baseUrlから抽出したディレクトリ名と結合する。
      *
-     * @param location SSDPパケットに記述されたLocation情報
-     * @param url      URLパス情報
+     * @param baseUrl URLパスのベースとなる値
+     * @param url     URLパス情報
      * @return 正規化したURL
      * @throws MalformedURLException 不正なURL
      */
     @Nonnull
-    static URL getAbsoluteUrl(@Nonnull final String location, @Nonnull final String url)
+    static URL getAbsoluteUrl(@Nonnull final String baseUrl, @Nonnull final String url)
             throws MalformedURLException {
         if (Http.isHttpUrl(url)) {
             return new URL(url);
         }
-        final String baseUrl = Http.removeQuery(location);
+        final String base = Http.removeQuery(baseUrl);
         if (url.startsWith("/")) {
-            return new URL(Http.makeUrlWithAbsolutePath(baseUrl, url));
+            return new URL(Http.makeUrlWithAbsolutePath(base, url));
         }
-        return new URL(Http.makeUrlWithRelativePath(baseUrl, url));
+        return new URL(Http.makeUrlWithRelativePath(base, url));
     }
 
     /**
@@ -612,6 +645,21 @@ public class Device {
      */
     @Nonnull
     public String getLocation() {
+        return mLocation;
+    }
+
+    /**
+     * URLのベースとして使用する値を返す。
+     *
+     * URLBaseの値が存在する場合はURLBase、存在しない場合はLocationの値を利用する。
+     *
+     * @return URLのベースとして使用する値
+     */
+    @Nonnull
+    public String getBaseUrl() {
+        if (mUrlBase != null) {
+            return mUrlBase;
+        }
         return mLocation;
     }
 

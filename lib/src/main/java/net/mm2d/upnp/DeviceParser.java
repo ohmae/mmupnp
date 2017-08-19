@@ -36,31 +36,35 @@ public class DeviceParser {
      * また、内部で記述されているicon/serviceのDescriptionの取得、パースも行い、
      * それぞれのBuilderも作成する。
      *
-     * @param client        通信に使用するHttpClient
-     * @param deviceBuilder DeviceのBuilder
+     * @param client  通信に使用するHttpClient
+     * @param builder DeviceのBuilder
      * @throws IOException                  通信上での何らかの問題
      * @throws SAXException                 XMLのパースに失敗
      * @throws ParserConfigurationException XMLパーサが利用できない場合
      */
     static void loadDescription(@Nonnull final HttpClient client,
-                                @Nonnull final Device.Builder deviceBuilder)
+                                @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
-        final String location = deviceBuilder.getLocation();
-        parseDescription(deviceBuilder, client.downloadString(new URL(location)));
-        for (final Service.Builder serviceBuilder : deviceBuilder.getServiceBuilderList()) {
-            ServiceParser.loadDescription(client, location, serviceBuilder);
+        parseDescription(builder, client.downloadString(new URL(builder.getLocation())));
+        for (final Service.Builder serviceBuilder : builder.getServiceBuilderList()) {
+            ServiceParser.loadDescription(client, builder.getBaseUrl(), serviceBuilder);
         }
     }
 
-    private static void parseDescription(@Nonnull final Device.Builder deviceBuilder,
+    private static void parseDescription(@Nonnull final Device.Builder builder,
                                          @Nonnull final String description)
             throws IOException, SAXException, ParserConfigurationException {
-        deviceBuilder.setDescription(description);
+        builder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
         final Node deviceNode = XmlUtils.findChildElementByLocalName(doc.getDocumentElement(), "device");
         if (deviceNode == null) {
             return;
         }
+        parseDevice(builder, deviceNode);
+    }
+
+    private static void parseDevice(@Nonnull final Device.Builder builder,
+                                    @Nonnull final Node deviceNode) {
         Node node = deviceNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -72,17 +76,17 @@ public class DeviceParser {
             }
             switch (tag) {
                 case "iconList":
-                    parseIconList(deviceBuilder, node);
+                    parseIconList(builder, node);
                     break;
                 case "serviceList":
-                    parseServiceList(deviceBuilder, node);
+                    parseServiceList(builder, node);
                     break;
                 default:
                     String namespace = node.getNamespaceURI();
                     namespace = namespace == null ? "" : namespace;
                     final String value = node.getTextContent();
-                    deviceBuilder.putTag(namespace, tag, value);
-                    setField(deviceBuilder, tag, value);
+                    builder.putTag(namespace, tag, value);
+                    setField(builder, tag, value);
                     break;
             }
         }
@@ -123,6 +127,9 @@ public class DeviceParser {
                 break;
             case "presentationURL":
                 builder.setPresentationUrl(value);
+                break;
+            case "URLBase":
+                builder.setUrlBase(value);
                 break;
             default:
                 break;

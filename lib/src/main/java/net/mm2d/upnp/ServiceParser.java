@@ -35,22 +35,22 @@ class ServiceParser {
      *
      * <p>可能であればKeepAliveを行う。
      *
-     * @param client   通信に使用するHttpClient
-     * @param location SSDPパケットに記述されたlocation
-     * @param builder  ServiceのBuilder
+     * @param client  通信に使用するHttpClient
+     * @param baseUrl URLのベースとして使用する値
+     * @param builder ServiceのBuilder
      * @throws IOException                  通信エラー
      * @throws SAXException                 XMLパースエラー
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     static void loadDescription(@Nonnull final HttpClient client,
-                                @Nonnull final String location,
+                                @Nonnull final String baseUrl,
                                 @Nonnull final Service.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         final String scpdUrl = builder.getScpdUrl();
         if (scpdUrl == null) {
             throw new IOException();
         }
-        final URL url = Device.getAbsoluteUrl(location, scpdUrl);
+        final URL url = Device.getAbsoluteUrl(baseUrl, scpdUrl);
         final String description = client.downloadString(url);
         builder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
