@@ -41,8 +41,10 @@ public class Service {
         private String mControlUrl;
         private String mEventSubUrl;
         private String mDescription;
-        private List<Action.Builder> mActionBuilderList;
-        private List<StateVariable.Builder> mVariableBuilderList;
+        @Nonnull
+        private final List<Action.Builder> mActionBuilderList = new ArrayList<>();
+        @Nonnull
+        private final List<StateVariable.Builder> mVariableBuilderList = new ArrayList<>();
 
         /**
          * インスタンス作成
@@ -139,24 +141,24 @@ public class Service {
         }
 
         /**
-         * 全ActionのBuilderを登録する。
+         * ActionのBuilderを登録する。
          *
-         * @param actionBuilderList Serviceで定義されている全ActionのBuilder
+         * @param builder Serviceで定義されているActionのBuilder
          * @return Builder
          */
-        public Builder setActionBuilderList(@Nonnull final List<Action.Builder> actionBuilderList) {
-            mActionBuilderList = actionBuilderList;
+        public Builder addActionBuilder(@Nonnull final Action.Builder builder) {
+            mActionBuilderList.add(builder);
             return this;
         }
 
         /**
-         * 全StateVariableのBuilderを登録する。
+         * StateVariableのBuilderを登録する。
          *
-         * @param variableBuilderList Serviceで定義されている全StateVariableのBuilder
+         * @param builder Serviceで定義されているStateVariableのBuilder
          * @return Builder
          */
-        public Builder setVariableBuilderList(@Nonnull final List<StateVariable.Builder> variableBuilderList) {
-            mVariableBuilderList = variableBuilderList;
+        public Builder addVariableBuilder(@Nonnull final StateVariable.Builder builder) {
+            mVariableBuilderList.add(builder);
             return this;
         }
 
@@ -188,12 +190,6 @@ public class Service {
             }
             if (mDescription == null) {
                 throw new IllegalStateException("description must be set.");
-            }
-            if (mActionBuilderList == null) {
-                mActionBuilderList = Collections.emptyList();
-            }
-            if (mVariableBuilderList == null) {
-                mVariableBuilderList = Collections.emptyList();
             }
             return new Service(this);
         }

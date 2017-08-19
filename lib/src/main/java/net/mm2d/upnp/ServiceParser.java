@@ -18,8 +18,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.xml.parsers.ParserConfigurationException;
@@ -56,26 +54,20 @@ class ServiceParser {
         final String description = client.downloadString(url);
         builder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
-        builder.setActionBuilderList(parseActionList(doc.getElementsByTagName("action")));
-        builder.setVariableBuilderList(parseStateVariableList(doc.getElementsByTagName("stateVariable")));
+        parseActionList(builder, doc.getElementsByTagName("action"));
+        parseStateVariableList(builder, doc.getElementsByTagName("stateVariable"));
     }
 
-    @Nonnull
-    private static List<Action.Builder> parseActionList(@Nonnull final NodeList nodeList) {
-        final List<Action.Builder> builderList = new ArrayList<>();
+    private static void parseActionList(@Nonnull final Service.Builder builder, @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
-            builderList.add(parseAction((Element) nodeList.item(i)));
+            builder.addActionBuilder(parseAction((Element) nodeList.item(i)));
         }
-        return builderList;
     }
 
-    @Nonnull
-    private static List<StateVariable.Builder> parseStateVariableList(@Nonnull final NodeList nodeList) {
-        final List<StateVariable.Builder> builderList = new ArrayList<>();
+    private static void parseStateVariableList(@Nonnull final Service.Builder builder, @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
-            builderList.add(parseStateVariable((Element) nodeList.item(i)));
+            builder.addVariableBuilder(parseStateVariable((Element) nodeList.item(i)));
         }
-        return builderList;
     }
 
     @Nonnull

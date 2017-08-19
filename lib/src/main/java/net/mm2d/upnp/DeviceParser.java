@@ -17,8 +17,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.xml.parsers.ParserConfigurationException;
@@ -74,10 +72,10 @@ public class DeviceParser {
             }
             switch (tag) {
                 case "iconList":
-                    deviceBuilder.setIconBuilderList(parseIconList(node));
+                    parseIconList(deviceBuilder, node);
                     break;
                 case "serviceList":
-                    deviceBuilder.setServiceBuilderList(parseServiceList(node));
+                    parseServiceList(deviceBuilder, node);
                     break;
                 default:
                     String namespace = node.getNamespaceURI();
@@ -131,22 +129,18 @@ public class DeviceParser {
         }
     }
 
-    @Nonnull
-    private static List<Icon.Builder> parseIconList(@Nonnull final Node listNode) {
-        final List<Icon.Builder> builderList = new ArrayList<>();
+    private static void parseIconList(@Nonnull final Device.Builder deviceBuilder, @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
             if (TextUtils.equals(node.getLocalName(), "icon")) {
-                builderList.add(parseIcon((Element) node));
+                deviceBuilder.addIconBuilder(parseIcon((Element) node));
             }
         }
-        return builderList;
     }
 
-    @Nonnull
     private static Icon.Builder parseIcon(@Nonnull final Element element) {
         final Icon.Builder builder = new Icon.Builder();
         Node node = element.getFirstChild();
@@ -188,19 +182,17 @@ public class DeviceParser {
         }
     }
 
-    @Nonnull
-    private static List<Service.Builder> parseServiceList(@Nonnull final Node listNode) {
-        final List<Service.Builder> builderList = new ArrayList<>();
+    private static void parseServiceList(@Nonnull final Device.Builder deviceBuilder,
+                                         @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
             if (TextUtils.equals(node.getLocalName(), "service")) {
-                builderList.add(parseService((Element) node));
+                deviceBuilder.addServiceBuilder(parseService((Element) node));
             }
         }
-        return builderList;
     }
 
     @Nonnull

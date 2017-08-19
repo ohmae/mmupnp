@@ -54,9 +54,9 @@ public class Device {
         private String mSerialNumber;
         private String mPresentationUrl;
         @Nonnull
-        private List<Icon.Builder> mIconBuilderList = Collections.emptyList();
+        private final List<Icon.Builder> mIconBuilderList = new ArrayList<>();
         @Nonnull
-        private List<Service.Builder> mServiceBuilderList = Collections.emptyList();
+        private final List<Service.Builder> mServiceBuilderList = new ArrayList<>();
         @Nonnull
         private final Map<String, Map<String, String>> mTagMap;
 
@@ -260,26 +260,26 @@ public class Device {
         }
 
         /**
-         * 全IconのBuilderを登録する。
+         * IconのBuilderを登録する。
          *
-         * @param iconBuilderList 全IconのBuilder
+         * @param builder IconのBuilder
          * @return Builder
          */
         @Nonnull
-        public Builder setIconBuilderList(@Nonnull final List<Icon.Builder> iconBuilderList) {
-            mIconBuilderList = iconBuilderList;
+        public Builder addIconBuilder(@Nonnull final Icon.Builder builder) {
+            mIconBuilderList.add(builder);
             return this;
         }
 
         /**
-         * 全ServiceのBuilderを登録する。
+         * ServiceのBuilderを登録する。
          *
-         * @param serviceBuilderList 全ServiceのBuilder
+         * @param builder ServiceのBuilder
          * @return Builder
          */
         @Nonnull
-        public Builder setServiceBuilderList(@Nonnull final List<Service.Builder> serviceBuilderList) {
-            mServiceBuilderList = serviceBuilderList;
+        public Builder addServiceBuilder(@Nonnull final Service.Builder builder) {
+            mServiceBuilderList.add(builder);
             return this;
         }
 
