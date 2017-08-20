@@ -17,3 +17,14 @@ dependencies {
     compile project(':lib')
     testCompile 'junit:junit:4.12'
 }
+
+task executableJar(type: Jar, dependsOn: jar)  {
+    archiveName = "mmupnp-sample.jar"
+    manifest {
+        attributes 'Main-Class' : "net.mm2d.upnp.sample.MainWindow"
+    }
+
+    from configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}
+    from "$buildDir/classes/main"
+    from "$buildDir/resources/main"
+}
