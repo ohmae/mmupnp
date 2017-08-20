@@ -20,9 +20,8 @@ Therefore, this library restricts the use of such statement.
 - This library support only ControlPoint functions.
 There is no way to make Device. If you need it, please select another library.
 - Some functions that are not widely used are not implemented.
- - Multicast eventing
- - Embedded device
- - IPv6
+  - Multicast eventing
+  - IPv6
 
 ## Example of use
 - DMS Explorer --
@@ -122,7 +121,7 @@ When you want to reset, try again from the constructor call.
 
 I described Javadoc comments. Please refer to it for more information.
 - Javadoc in Japanese
- - https://ohmae.github.io/mmupnp/javadoc/
+  - https://ohmae.github.io/mmupnp/javadoc/
 
 ## Author
 大前 良介 (OHMAE Ryosuke)

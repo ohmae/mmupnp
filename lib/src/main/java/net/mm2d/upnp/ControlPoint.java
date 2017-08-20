@@ -192,6 +192,7 @@ public class ControlPoint {
                     }
                 }
             } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
+                Log.w(e);
                 synchronized (mDeviceHolder) {
                     mLoadingDeviceMap.remove(uuid);
                 }

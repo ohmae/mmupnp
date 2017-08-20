@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -29,9 +28,11 @@ import javax.swing.JPopupMenu;
 public class DeviceNode extends UpnpNode {
     public DeviceNode(final Device device) {
         super(device);
-        final List<Service> services = device.getServiceList();
-        for (final Service service : services) {
+        for (final Service service : device.getServiceList()) {
             add(new ServiceNode(service));
+        }
+        for (final Device embeddedDevice : device.getDeviceList()) {
+            add(new DeviceNode(embeddedDevice));
         }
     }
 
