@@ -28,8 +28,9 @@ class SsdpSearchServerList {
     @Nonnull
     private final List<SsdpSearchServer> mList;
 
-    SsdpSearchServerList(@Nonnull final Collection<NetworkInterface> interfaces,
-                         @Nonnull final ResponseListener listener) {
+    SsdpSearchServerList(
+            @Nonnull final Collection<NetworkInterface> interfaces,
+            @Nonnull final ResponseListener listener) {
         mList = new ArrayList<>(interfaces.size());
         for (final NetworkInterface nif : interfaces) {
             final SsdpSearchServer search = new SsdpSearchServer(nif);

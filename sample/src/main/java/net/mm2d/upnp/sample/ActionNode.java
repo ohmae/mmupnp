@@ -63,7 +63,11 @@ public class ActionNode extends UpnpNode {
     }
 
     @Override
-    public void showContextMenu(final JFrame frame, final Component invoker, final int x, final int y) {
+    public void showContextMenu(
+            final JFrame frame,
+            final Component invoker,
+            final int x,
+            final int y) {
         final JPopupMenu menu = new JPopupMenu();
         final JMenuItem invoke = new JMenuItem("Invoke Action");
         invoke.addActionListener(new ActionListener() {

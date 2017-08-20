@@ -27,8 +27,9 @@ class SsdpNotifyReceiverList {
     @Nonnull
     private final List<SsdpNotifyReceiver> mList;
 
-    SsdpNotifyReceiverList(@Nonnull final Collection<NetworkInterface> interfaces,
-                           @Nonnull final NotifyListener listener) {
+    SsdpNotifyReceiverList(
+            @Nonnull final Collection<NetworkInterface> interfaces,
+            @Nonnull final NotifyListener listener) {
         mList = new ArrayList<>(interfaces.size());
         for (final NetworkInterface nif : interfaces) {
             final SsdpNotifyReceiver notify = new SsdpNotifyReceiver(nif);

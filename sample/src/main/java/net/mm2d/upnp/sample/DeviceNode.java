@@ -89,7 +89,11 @@ public class DeviceNode extends UpnpNode {
     }
 
     @Override
-    public void showContextMenu(final JFrame frame, final Component invoker, final int x, final int y) {
+    public void showContextMenu(
+            final JFrame frame,
+            final Component invoker,
+            final int x,
+            final int y) {
         final JPopupMenu menu = new JPopupMenu();
         final JMenuItem open = new JMenuItem("Open Device Description");
         open.addActionListener(new ActionListener() {

@@ -120,7 +120,9 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    private HttpResponse post(@Nonnull final HttpRequest request, final int redirectDepth) throws IOException {
+    private HttpResponse post(
+            @Nonnull final HttpRequest request,
+            final int redirectDepth) throws IOException {
         confirmReuseSocket(request);
         final HttpResponse response;
         try {
@@ -168,9 +170,10 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirectIfNeeded(@Nonnull final HttpRequest request,
-                                          @Nonnull final HttpResponse response,
-                                          final int redirectDepth)
+    private HttpResponse redirectIfNeeded(
+            @Nonnull final HttpRequest request,
+            @Nonnull final HttpResponse response,
+            final int redirectDepth)
             throws IOException {
         if (needToRedirect(response) && redirectDepth < REDIRECT_MAX) {
             final String location = response.getHeader(Http.LOCATION);
@@ -195,8 +198,10 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirect(@Nonnull final HttpRequest request,
-                                  @Nonnull final String location, final int redirectDepth)
+    private HttpResponse redirect(
+            @Nonnull final HttpRequest request,
+            @Nonnull final String location,
+            final int redirectDepth)
             throws IOException {
         final HttpRequest newRequest = new HttpRequest(request);
         newRequest.setUrl(new URL(location), true);

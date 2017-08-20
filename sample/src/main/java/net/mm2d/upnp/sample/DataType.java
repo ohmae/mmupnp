@@ -165,7 +165,12 @@ public enum DataType {
     private final boolean mInteger;
     private final boolean mMultiLine;
 
-    DataType(@Nonnull final String symbol, @Nonnull final String defaultValue, final boolean number, final boolean integer, final boolean multiLine) {
+    DataType(
+            @Nonnull final String symbol,
+            @Nonnull final String defaultValue,
+            final boolean number,
+            final boolean integer,
+            final boolean multiLine) {
         mSymbol = symbol;
         mDefault = defaultValue;
         mNumber = number;

@@ -70,7 +70,9 @@ public class Device {
          * @param controlPoint ControlPoint
          * @param ssdpMessage  SSDPパケット
          */
-        public Builder(@Nonnull final ControlPoint controlPoint, @Nonnull final SsdpMessage ssdpMessage) {
+        public Builder(
+                @Nonnull final ControlPoint controlPoint,
+                @Nonnull final SsdpMessage ssdpMessage) {
             mControlPoint = controlPoint;
             final String location = ssdpMessage.getLocation();
             if (location == null) {
@@ -387,7 +389,10 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder putTag(@Nonnull final String namespace, @Nonnull final String tag, @Nonnull final String value) {
+        public Builder putTag(
+                @Nonnull final String namespace,
+                @Nonnull final String tag,
+                @Nonnull final String value) {
             Map<String, String> map = mTagMap.get(namespace);
             if (map == null) {
                 map = new HashMap<>();
@@ -491,7 +496,9 @@ public class Device {
      * @param parent  親Device、EmbeddedDeviceの場合に指定
      * @param builder ビルダー
      */
-    private Device(@Nullable final Device parent, @Nonnull final Builder builder) {
+    private Device(
+            @Nullable final Device parent,
+            @Nonnull final Builder builder) {
         mParent = parent;
         mControlPoint = builder.mControlPoint;
         mSsdpMessage = builder.mSsdpMessage;
@@ -563,7 +570,9 @@ public class Device {
      * @param client 通信に使用するHttpClient
      * @param filter 読み込むIconを選別するFilter
      */
-    void loadIconBinary(@Nonnull final HttpClient client, @Nonnull final IconFilter filter) {
+    void loadIconBinary(
+            @Nonnull final HttpClient client,
+            @Nonnull final IconFilter filter) {
         if (mIconList.isEmpty()) {
             return;
         }
@@ -683,7 +692,9 @@ public class Device {
      * @throws MalformedURLException 不正なURL
      */
     @Nonnull
-    static URL getAbsoluteUrl(@Nonnull final String baseUrl, @Nonnull final String url)
+    static URL getAbsoluteUrl(
+            @Nonnull final String baseUrl,
+            @Nonnull final String url)
             throws MalformedURLException {
         if (Http.isHttpUrl(url)) {
             return new URL(url);
@@ -733,7 +744,9 @@ public class Device {
      * @return タグの値
      */
     @Nullable
-    public String getValue(@Nonnull final String name, @Nonnull final String namespace) {
+    public String getValue(
+            @Nonnull final String name,
+            @Nonnull final String namespace) {
         final Map<String, String> map = mTagMap.get(namespace);
         if (map == null) {
             return null;

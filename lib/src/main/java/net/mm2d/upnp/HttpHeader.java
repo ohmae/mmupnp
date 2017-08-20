@@ -52,7 +52,9 @@ public class HttpHeader {
          * @param name  ヘッダ名
          * @param value 値
          */
-        public Entry(@Nonnull final String name, @Nonnull final String value) {
+        public Entry(
+                @Nonnull final String name,
+                @Nonnull final String value) {
             mKey = toKey(name);
             mName = name;
             mValue = value;
@@ -256,7 +258,9 @@ public class HttpHeader {
      * @return 重複があった場合、既に登録されていた値。
      */
     @Nullable
-    public String put(@Nonnull final String name, @Nonnull final String value) {
+    public String put(
+            @Nonnull final String name,
+            @Nonnull final String value) {
         final String key = toKey(name);
         for (final Entry entry : mList) {
             if (entry.getKey().equals(key)) {
@@ -279,7 +283,9 @@ public class HttpHeader {
      * @param value 含まれるか
      * @return 指定ヘッダにvalueが含まれる場合true
      */
-    public boolean containsValue(@Nonnull final String name, @Nonnull final String value) {
+    public boolean containsValue(
+            @Nonnull final String name,
+            @Nonnull final String value) {
         final String v = TextUtils.toLowerCase(get(name));
         return v != null && v.contains(TextUtils.toLowerCase(value));
     }

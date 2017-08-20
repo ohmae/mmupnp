@@ -37,7 +37,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
@@ -95,8 +94,11 @@ public class MainWindow extends JFrame {
 
     private final NotifyEventListener mEventListener = new NotifyEventListener() {
         @Override
-        public void onNotifyEvent(@Nonnull final Service service, final long seq,
-                                  @Nonnull final String variable, @Nonnull final String value) {
+        public void onNotifyEvent(
+                @Nonnull final Service service,
+                final long seq,
+                @Nonnull final String variable,
+                @Nonnull final String value) {
             mEventArea.setText(mEventArea.getText() + service.getServiceType() + " : " + seq + " : "
                     + variable + " : " + value + "\n");
         }
@@ -195,7 +197,14 @@ public class MainWindow extends JFrame {
             }
 
             @Override
-            public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+            public Component getTreeCellRendererComponent(
+                    final JTree tree,
+                    final Object value,
+                    final boolean sel,
+                    final boolean expanded,
+                    final boolean leaf,
+                    final int row,
+                    final boolean hasFocus) {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 if (value instanceof DeviceNode) {
                     setIcon(mDeviceIcon);

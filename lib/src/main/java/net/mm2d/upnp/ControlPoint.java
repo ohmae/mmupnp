@@ -94,8 +94,11 @@ public class ControlPoint {
          * @param value    値
          * @see Service
          */
-        void onNotifyEvent(@Nonnull Service service, long seq,
-                           @Nonnull String variable, @Nonnull String value);
+        void onNotifyEvent(
+                @Nonnull Service service,
+                long seq,
+                @Nonnull String variable,
+                @Nonnull String value);
     }
 
     @Nonnull
@@ -209,7 +212,10 @@ public class ControlPoint {
         @Nonnull
         private final List<StringPair> mProperties;
 
-        EventNotifyTask(@Nonnull final Service service, final long seq, @Nonnull final List<StringPair> properties) {
+        EventNotifyTask(
+                @Nonnull final Service service,
+                final long seq,
+                @Nonnull final List<StringPair> properties) {
             mService = service;
             mSeq = seq;
             mProperties = properties;
@@ -222,7 +228,9 @@ public class ControlPoint {
             }
         }
 
-        private void notifyEvent(@Nullable final String name, @Nullable final String value) {
+        private void notifyEvent(
+                @Nullable final String name,
+                @Nullable final String value) {
             final StateVariable variable = mService.findStateVariable(name);
             if (variable == null || !variable.isSendEvents() || value == null) {
                 Log.w("illegal notify argument:" + name + " " + value);
@@ -267,8 +275,9 @@ public class ControlPoint {
     }
 
     // VisibleForTesting
-    ControlPoint(@Nonnull final Collection<NetworkInterface> interfaces,
-                 @Nonnull final ControlPointFactory factory) {
+    ControlPoint(
+            @Nonnull final Collection<NetworkInterface> interfaces,
+            @Nonnull final ControlPointFactory factory) {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
         }
@@ -305,7 +314,9 @@ public class ControlPoint {
         mEventReceiver = factory.createEventReceiver(new EventMessageListener() {
             @Override
             public boolean onEventReceived(
-                    @Nonnull final String sid, final long seq, @Nonnull final List<StringPair> properties) {
+                    @Nonnull final String sid,
+                    final long seq,
+                    @Nonnull final List<StringPair> properties) {
                 final Service service = getSubscribeService(sid);
                 return service != null && executeInSequential(new EventNotifyTask(service, seq, properties));
             }
@@ -629,7 +640,9 @@ public class ControlPoint {
      * @see Service
      * @see Service#subscribe()
      */
-    void registerSubscribeService(@Nonnull final Service service, final boolean keep) {
+    void registerSubscribeService(
+            @Nonnull final Service service,
+            final boolean keep) {
         mSubscribeHolder.add(service, keep);
     }
 

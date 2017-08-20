@@ -31,7 +31,9 @@ class SubscribeService {
      * @param service   Service
      * @param keepRenew 定期的にrenewを実行する場合true
      */
-    SubscribeService(@Nonnull final Service service, final boolean keepRenew) {
+    SubscribeService(
+            @Nonnull final Service service,
+            final boolean keepRenew) {
         mService = service;
         mKeepRenew = keepRenew;
         mFailCount = 0;

@@ -44,7 +44,9 @@ public class UpnpNode extends DefaultMutableTreeNode {
         super(userObject);
     }
 
-    public UpnpNode(final Object userObject, final boolean allowsChildren) {
+    public UpnpNode(
+            final Object userObject,
+            final boolean allowsChildren) {
         super(userObject, allowsChildren);
     }
 
@@ -76,6 +78,10 @@ public class UpnpNode extends DefaultMutableTreeNode {
         return "";
     }
 
-    public void showContextMenu(final JFrame frame, final Component invoker, final int x, final int y) {
+    public void showContextMenu(
+            final JFrame frame,
+            final Component invoker,
+            final int x,
+            final int y) {
     }
 }

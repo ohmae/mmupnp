@@ -286,9 +286,10 @@ public class Action {
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
      */
     @Nonnull
-    public Map<String, String> invoke(@Nonnull final Map<String, String> argumentValues,
-                                      @Nullable final Map<String, String> customNamespace,
-                                      @Nonnull final Map<String, String> customArguments)
+    public Map<String, String> invoke(
+            @Nonnull final Map<String, String> argumentValues,
+            @Nullable final Map<String, String> customNamespace,
+            @Nonnull final Map<String, String> customArguments)
             throws IOException {
         final List<StringPair> arguments = makeArguments(argumentValues);
         appendArgument(arguments, customArguments);
@@ -321,8 +322,9 @@ public class Action {
      * @param base      引数の追加先
      * @param arguments 追加するカスタム引数
      */
-    private void appendArgument(@Nonnull final List<StringPair> base,
-                                @Nonnull final Map<String, String> arguments) {
+    private void appendArgument(
+            @Nonnull final List<StringPair> base,
+            @Nonnull final Map<String, String> arguments) {
         for (final Entry<String, String> entry : arguments.entrySet()) {
             base.add(new StringPair(entry.getKey(), entry.getValue()));
         }
@@ -339,8 +341,9 @@ public class Action {
      * @return 選択されたArgumentの値
      */
     @Nullable
-    private static String selectArgumentValue(@Nonnull final Argument argument,
-                                              @Nonnull final Map<String, String> argumentValues) {
+    private static String selectArgumentValue(
+            @Nonnull final Argument argument,
+            @Nonnull final Map<String, String> argumentValues) {
         final String value = argumentValues.get(argument.getName());
         if (value != null) {
             return value;
@@ -382,7 +385,9 @@ public class Action {
      * @throws IOException 通信で問題が発生した場合
      */
     @Nonnull
-    private HttpRequest makeHttpRequest(@Nonnull final URL url, @Nonnull final String soap)
+    private HttpRequest makeHttpRequest(
+            @Nonnull final URL url,
+            @Nonnull final String soap)
             throws IOException {
         final HttpRequest request = new HttpRequest();
         request.setMethod(Http.POST);
@@ -403,8 +408,9 @@ public class Action {
      * @throws IOException 通信で問題が発生した場合
      */
     @Nonnull
-    private String makeSoap(@Nullable final Map<String, String> namespaces,
-                            @Nonnull final List<StringPair> arguments)
+    private String makeSoap(
+            @Nullable final Map<String, String> namespaces,
+            @Nonnull final List<StringPair> arguments)
             throws IOException {
         try {
             final Document document = XmlUtils.newDocument(true);
@@ -420,8 +426,9 @@ public class Action {
         }
     }
 
-    private static void setNamespace(@Nonnull final Element action,
-                                     @Nullable final Map<String, String> namespace) {
+    private static void setNamespace(
+            @Nonnull final Element action,
+            @Nullable final Map<String, String> namespace) {
         if (namespace == null) {
             return;
         }
@@ -457,9 +464,10 @@ public class Action {
      * @param action    actionのElement
      * @param arguments 引数
      */
-    private static void setArgument(@Nonnull final Document document,
-                                    @Nonnull final Element action,
-                                    @Nonnull final List<StringPair> arguments) {
+    private static void setArgument(
+            @Nonnull final Document document,
+            @Nonnull final Element action,
+            @Nonnull final List<StringPair> arguments) {
         for (final StringPair pair : arguments) {
             final Element param = document.createElement(pair.getKey());
             final String value = pair.getValue();

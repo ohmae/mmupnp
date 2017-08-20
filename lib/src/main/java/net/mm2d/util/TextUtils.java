@@ -34,7 +34,9 @@ public class TextUtils {
      * @param b 比較対象
      * @return 2つの引数が等しいときtrue、2つともnullの場合もtrueを返す。
      */
-    public static boolean equals(@Nullable final CharSequence a, @Nullable final CharSequence b) {
+    public static boolean equals(
+            @Nullable final CharSequence a,
+            @Nullable final CharSequence b) {
         return a == null ? b == null : a.equals(b);
     }
 

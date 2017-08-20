@@ -35,8 +35,10 @@ class NotifyEventListenerList implements NotifyEventListener {
 
     @Override
     public synchronized void onNotifyEvent(
-            @Nonnull final Service service, final long seq,
-            @Nonnull final String variable, @Nonnull final String value) {
+            @Nonnull final Service service,
+            final long seq,
+            @Nonnull final String variable,
+            @Nonnull final String value) {
         for (final NotifyEventListener l : mList) {
             l.onNotifyEvent(service, seq, variable, value);
         }

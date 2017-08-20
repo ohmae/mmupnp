@@ -123,7 +123,9 @@ public class ActionWindow extends JFrame {
         }
     }
 
-    private void setResult(final String name, final String value) {
+    private void setResult(
+            final String name,
+            final String value) {
         for (final Map.Entry<Argument, Container> entry : mMap.entrySet()) {
             if (entry.getKey().isInputDirection()) {
                 continue;
@@ -222,7 +224,9 @@ public class ActionWindow extends JFrame {
     }
 
 
-    public void show(final int x, final int y) {
+    public void show(
+            final int x,
+            final int y) {
         setSize(400, 800);
         setLocation(x, y);
         setVisible(true);

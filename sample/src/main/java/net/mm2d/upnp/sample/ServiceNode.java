@@ -72,7 +72,11 @@ public class ServiceNode extends UpnpNode {
     }
 
     @Override
-    public void showContextMenu(final JFrame frame, final Component invoker, final int x, final int y) {
+    public void showContextMenu(
+            final JFrame frame,
+            final Component invoker,
+            final int x,
+            final int y) {
         final JPopupMenu menu = new JPopupMenu();
         final JMenuItem open = new JMenuItem("Open Service Description");
         open.addActionListener(new ActionListener() {

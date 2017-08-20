@@ -69,7 +69,9 @@ abstract class SsdpServer {
      * @param networkInterface 使用するインターフェース
      * @param bindPort         使用するポート
      */
-    SsdpServer(@Nonnull final NetworkInterface networkInterface, final int bindPort) {
+    SsdpServer(
+            @Nonnull final NetworkInterface networkInterface,
+            final int bindPort) {
         mInterfaceAddress = findInet4Address(networkInterface);
         mBindPort = bindPort;
         mInterface = networkInterface;
@@ -190,7 +192,10 @@ abstract class SsdpServer {
      * @param data          受信したデータ
      * @param length        受信したデータの長さ
      */
-    protected abstract void onReceive(@Nonnull InetAddress sourceAddress, @Nonnull byte[] data, int length);
+    protected abstract void onReceive(
+            @Nonnull InetAddress sourceAddress,
+            @Nonnull byte[] data,
+            int length);
 
     private static class ReceiveTask implements Runnable {
         @Nonnull
@@ -206,8 +211,10 @@ abstract class SsdpServer {
         /**
          * インスタンス作成
          */
-        ReceiveTask(@Nonnull final SsdpServer ssdpServer,
-                    @Nonnull final MulticastSocket socket, final int port) {
+        ReceiveTask(
+                @Nonnull final SsdpServer ssdpServer,
+                @Nonnull final MulticastSocket socket,
+                final int port) {
             mSsdpServer = ssdpServer;
             mSocket = socket;
             mBindPort = port;

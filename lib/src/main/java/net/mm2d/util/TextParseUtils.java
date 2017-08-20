@@ -24,7 +24,9 @@ public class TextParseUtils {
      * @param defaultValue デフォルト値
      * @return パース結果
      */
-    public static int parseIntSafely(@Nullable final String value, final int defaultValue) {
+    public static int parseIntSafely(
+            @Nullable final String value,
+            final int defaultValue) {
         return parseIntSafely(value, 10, defaultValue);
     }
 
@@ -38,7 +40,10 @@ public class TextParseUtils {
      * @param defaultValue デフォルト値
      * @return パース結果
      */
-    public static int parseIntSafely(@Nullable final String value, final int radix, final int defaultValue) {
+    public static int parseIntSafely(
+            @Nullable final String value,
+            final int radix,
+            final int defaultValue) {
         if (TextUtils.isEmpty(value)) {
             return defaultValue;
         }
@@ -58,7 +63,9 @@ public class TextParseUtils {
      * @param defaultValue デフォルト値
      * @return パース結果
      */
-    public static long parseLongSafely(@Nullable final String value, final long defaultValue) {
+    public static long parseLongSafely(
+            @Nullable final String value,
+            final long defaultValue) {
         return parseLongSafely(value, 10, defaultValue);
     }
 
@@ -72,7 +79,10 @@ public class TextParseUtils {
      * @param defaultValue デフォルト値
      * @return パース結果
      */
-    public static long parseLongSafely(@Nullable final String value, final int radix, final long defaultValue) {
+    public static long parseLongSafely(
+            @Nullable final String value,
+            final int radix,
+            final long defaultValue) {
         if (TextUtils.isEmpty(value)) {
             return defaultValue;
         }

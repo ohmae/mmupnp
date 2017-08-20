@@ -41,15 +41,17 @@ public class DeviceParser {
      * @throws SAXException                 XMLのパースに失敗
      * @throws ParserConfigurationException XMLパーサが利用できない場合
      */
-    static void loadDescription(@Nonnull final HttpClient client,
-                                @Nonnull final Device.Builder builder)
+    static void loadDescription(
+            @Nonnull final HttpClient client,
+            @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         parseDescription(builder, client.downloadString(new URL(builder.getLocation())));
         loadServices(client, builder);
     }
 
-    private static void loadServices(@Nonnull final HttpClient client,
-                                     @Nonnull final Device.Builder builder)
+    private static void loadServices(
+            @Nonnull final HttpClient client,
+            @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         for (final Service.Builder serviceBuilder : builder.getServiceBuilderList()) {
             ServiceParser.loadDescription(client, builder.getBaseUrl(), serviceBuilder);
@@ -59,8 +61,9 @@ public class DeviceParser {
         }
     }
 
-    private static void parseDescription(@Nonnull final Device.Builder builder,
-                                         @Nonnull final String description)
+    private static void parseDescription(
+            @Nonnull final Device.Builder builder,
+            @Nonnull final String description)
             throws IOException, SAXException, ParserConfigurationException {
         builder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
@@ -71,8 +74,9 @@ public class DeviceParser {
         parseDevice(builder, deviceNode);
     }
 
-    private static void parseDevice(@Nonnull final Device.Builder builder,
-                                    @Nonnull final Node deviceNode) {
+    private static void parseDevice(
+            @Nonnull final Device.Builder builder,
+            @Nonnull final Node deviceNode) {
         Node node = deviceNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -103,8 +107,10 @@ public class DeviceParser {
         }
     }
 
-    private static void setField(@Nonnull final Device.Builder builder,
-                                 @Nonnull final String tag, @Nonnull final String value) {
+    private static void setField(
+            @Nonnull final Device.Builder builder,
+            @Nonnull final String tag,
+            @Nonnull final String value) {
         switch (tag) {
             case "UDN":
                 builder.setUdn(value);
@@ -150,7 +156,9 @@ public class DeviceParser {
         }
     }
 
-    private static void parseIconList(@Nonnull final Device.Builder builder, @Nonnull final Node listNode) {
+    private static void parseIconList(
+            @Nonnull final Device.Builder builder,
+            @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -179,9 +187,10 @@ public class DeviceParser {
         return builder;
     }
 
-    private static void setField(@Nonnull final Icon.Builder builder,
-                                 @Nonnull final String tag,
-                                 @Nonnull final String value) {
+    private static void setField(
+            @Nonnull final Icon.Builder builder,
+            @Nonnull final String tag,
+            @Nonnull final String value) {
         switch (tag) {
             case "mimetype":
                 builder.setMimeType(value);
@@ -203,8 +212,9 @@ public class DeviceParser {
         }
     }
 
-    private static void parseServiceList(@Nonnull final Device.Builder builder,
-                                         @Nonnull final Node listNode) {
+    private static void parseServiceList(
+            @Nonnull final Device.Builder builder,
+            @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -234,9 +244,10 @@ public class DeviceParser {
         return builder;
     }
 
-    private static void setField(@Nonnull final Service.Builder builder,
-                                 @Nonnull final String tag,
-                                 @Nonnull final String value) {
+    private static void setField(
+            @Nonnull final Service.Builder builder,
+            @Nonnull final String tag,
+            @Nonnull final String value) {
         switch (tag) {
             case "serviceType":
                 builder.setServiceType(value);
@@ -258,8 +269,9 @@ public class DeviceParser {
         }
     }
 
-    private static void parseDeviceList(@Nonnull final Device.Builder builder,
-                                        @Nonnull final Node listNode) {
+    private static void parseDeviceList(
+            @Nonnull final Device.Builder builder,
+            @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
