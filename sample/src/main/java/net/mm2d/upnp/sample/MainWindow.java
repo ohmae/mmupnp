@@ -63,6 +63,54 @@ public class MainWindow extends JFrame {
         new MainWindow();
     }
 
+    private static class MyTreeCellRenderer extends DefaultTreeCellRenderer {
+        private final Icon mDeviceIcon;
+        private final Icon mServiceIcon;
+        private final Icon mVariableListIcon;
+        private final Icon mVariableIcon;
+        private final Icon mArgumentIcon;
+        private final Icon mActionIcon;
+
+        MyTreeCellRenderer() {
+            mDeviceIcon = UIManager.getIcon("FileView.computerIcon");
+            mServiceIcon = UIManager.getIcon("FileView.directoryIcon");
+            mVariableListIcon = UIManager.getIcon("FileView.hardDriveIcon");
+            mVariableIcon = UIManager.getIcon("FileView.fileIcon");
+            mArgumentIcon = UIManager.getIcon("FileView.fileIcon");
+            mActionIcon = UIManager.getIcon("FileView.floppyDriveIcon");
+        }
+
+        @Override
+        public Component getTreeCellRendererComponent(
+                final JTree tree,
+                final Object value,
+                final boolean sel,
+                final boolean expanded,
+                final boolean leaf,
+                final int row,
+                final boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            if (value instanceof DeviceNode) {
+                setIcon(mDeviceIcon);
+            } else if (value instanceof ServiceNode) {
+                setIcon(mServiceIcon);
+                final ServiceNode node = (ServiceNode) value;
+                if (node.isSubscribing()) {
+                    setForeground(Color.BLUE);
+                }
+            } else if (value instanceof StateVariableListNode) {
+                setIcon(mVariableListIcon);
+            } else if (value instanceof StateVariableNode) {
+                setIcon(mVariableIcon);
+            } else if (value instanceof ArgumentNode) {
+                setIcon(mArgumentIcon);
+            } else if (value instanceof ActionNode) {
+                setIcon(mActionIcon);
+            }
+            return this;
+        }
+    }
+
     private final ControlPoint mControlPoint;
     private final JTree mTree;
     private final JTextArea mDetail1;
@@ -179,53 +227,7 @@ public class MainWindow extends JFrame {
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addMouseListener(mTreeMouseListener);
         tree.addTreeSelectionListener(mSelectionListener);
-        tree.setCellRenderer(new DefaultTreeCellRenderer() {
-            private final Icon mDeviceIcon;
-            private final Icon mServiceIcon;
-            private final Icon mVariableListIcon;
-            private final Icon mVariableIcon;
-            private final Icon mArgumentIcon;
-            private final Icon mActionIcon;
-
-            {
-                mDeviceIcon = UIManager.getIcon("FileView.computerIcon");
-                mServiceIcon = UIManager.getIcon("FileView.directoryIcon");
-                mVariableListIcon = UIManager.getIcon("FileView.hardDriveIcon");
-                mVariableIcon = UIManager.getIcon("FileView.fileIcon");
-                mArgumentIcon = UIManager.getIcon("FileView.fileIcon");
-                mActionIcon = UIManager.getIcon("FileView.floppyDriveIcon");
-            }
-
-            @Override
-            public Component getTreeCellRendererComponent(
-                    final JTree tree,
-                    final Object value,
-                    final boolean sel,
-                    final boolean expanded,
-                    final boolean leaf,
-                    final int row,
-                    final boolean hasFocus) {
-                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                if (value instanceof DeviceNode) {
-                    setIcon(mDeviceIcon);
-                } else if (value instanceof ServiceNode) {
-                    setIcon(mServiceIcon);
-                    final ServiceNode node = (ServiceNode) value;
-                    if (node.isSubscribing()) {
-                        setForeground(Color.BLUE);
-                    }
-                } else if (value instanceof StateVariableListNode) {
-                    setIcon(mVariableListIcon);
-                } else if (value instanceof StateVariableNode) {
-                    setIcon(mVariableIcon);
-                } else if (value instanceof ArgumentNode) {
-                    setIcon(mArgumentIcon);
-                } else if (value instanceof ActionNode) {
-                    setIcon(mActionIcon);
-                }
-                return this;
-            }
-        });
+        tree.setCellRenderer(new MyTreeCellRenderer());
         return tree;
     }
 
