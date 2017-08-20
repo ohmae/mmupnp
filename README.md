@@ -24,9 +24,15 @@ There is no way to make Device. If you need it, please select another library.
   - IPv6
 
 ## Example of use
+Android App
 - DMS Explorer --
 [[Google Play](https://play.google.com/store/apps/details?id=net.mm2d.dmsexplorer)]
 [[Source Code](https://github.com/ohmae/DmsExplorer)]
+
+Sample App
+
+|![](docs/img/1.png)|![](docs/img/2.png)|
+|-|-|
 
 ## How to use
 
