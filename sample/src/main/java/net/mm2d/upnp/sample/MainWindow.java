@@ -61,12 +61,6 @@ public class MainWindow extends JFrame {
                 | UnsupportedLookAndFeelException e) {
             Log.w(TAG, e);
         }
-        UIDefaults defaultTable = UIManager.getLookAndFeelDefaults();
-        for (Object obj : defaultTable.keySet()) {
-            if (obj.toString().toLowerCase().contains("icon")) {
-                System.out.println(obj.toString());
-            }
-        }
         new MainWindow();
     }
 
