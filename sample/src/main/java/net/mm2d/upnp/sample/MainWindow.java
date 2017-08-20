@@ -16,6 +16,8 @@ import net.mm2d.upnp.Service;
 import net.mm2d.util.Log;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -26,6 +28,7 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -34,11 +37,13 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -49,11 +54,18 @@ public class MainWindow extends JFrame {
     private static final String TAG = "MainWindow";
 
     public static void main(final String[] args) {
+        Log.setLogLevel(Log.VERBOSE);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
             Log.w(TAG, e);
+        }
+        UIDefaults defaultTable = UIManager.getLookAndFeelDefaults();
+        for (Object obj : defaultTable.keySet()) {
+            if (obj.toString().toLowerCase().contains("icon")) {
+                System.out.println(obj.toString());
+            }
         }
         new MainWindow();
     }
@@ -171,6 +183,46 @@ public class MainWindow extends JFrame {
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addMouseListener(mTreeMouseListener);
         tree.addTreeSelectionListener(mSelectionListener);
+        tree.setCellRenderer(new DefaultTreeCellRenderer() {
+            private final Icon mDeviceIcon;
+            private final Icon mServiceIcon;
+            private final Icon mVariableListIcon;
+            private final Icon mVariableIcon;
+            private final Icon mArgumentIcon;
+            private final Icon mActionIcon;
+
+            {
+                mDeviceIcon = UIManager.getIcon("FileView.computerIcon");
+                mServiceIcon = UIManager.getIcon("FileView.directoryIcon");
+                mVariableListIcon = UIManager.getIcon("FileView.hardDriveIcon");
+                mVariableIcon = UIManager.getIcon("FileView.fileIcon");
+                mArgumentIcon = UIManager.getIcon("FileView.fileIcon");
+                mActionIcon = UIManager.getIcon("FileView.floppyDriveIcon");
+            }
+
+            @Override
+            public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                if (value instanceof DeviceNode) {
+                    setIcon(mDeviceIcon);
+                } else if (value instanceof ServiceNode) {
+                    setIcon(mServiceIcon);
+                    final ServiceNode node = (ServiceNode) value;
+                    if (node.isSubscribing()) {
+                        setForeground(Color.BLUE);
+                    }
+                } else if (value instanceof StateVariableListNode) {
+                    setIcon(mVariableListIcon);
+                } else if (value instanceof StateVariableNode) {
+                    setIcon(mVariableIcon);
+                } else if (value instanceof ArgumentNode) {
+                    setIcon(mArgumentIcon);
+                } else if (value instanceof ActionNode) {
+                    setIcon(mActionIcon);
+                }
+                return this;
+            }
+        });
         return tree;
     }
 

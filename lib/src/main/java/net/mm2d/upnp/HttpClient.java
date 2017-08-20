@@ -282,7 +282,8 @@ public class HttpClient {
     public HttpResponse download(@Nonnull final URL url) throws IOException {
         final HttpRequest request = makeHttpRequest(url);
         final HttpResponse response = post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
+        // response bodyがemptyであることは正常
+        if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
             Log.i("request:" + request.toString() + "\nresponse:" + response.toString());
             throw new IOException(response.getStartLine());
         }

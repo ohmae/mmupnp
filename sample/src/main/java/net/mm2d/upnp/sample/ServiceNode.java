@@ -9,7 +9,6 @@ package net.mm2d.upnp.sample;
 
 import net.mm2d.upnp.Action;
 import net.mm2d.upnp.Service;
-import net.mm2d.upnp.StateVariable;
 
 import java.awt.Component;
 import java.awt.Desktop;
@@ -35,12 +34,7 @@ public class ServiceNode extends UpnpNode {
         for (final Action action : actions) {
             add(new ActionNode(action));
         }
-        final UpnpNode node = new UpnpNode("StateVariable");
-        add(node);
-        final List<StateVariable> variables = service.getStateVariableList();
-        for (final StateVariable variable : variables) {
-            node.add(new StateVariableNode(variable));
-        }
+        add(new StateVariableListNode(service.getStateVariableList()));
     }
 
     @Override
@@ -123,5 +117,9 @@ public class ServiceNode extends UpnpNode {
             menu.add(subscribe);
         }
         menu.show(invoker, x, y);
+    }
+
+    public boolean isSubscribing() {
+        return mSubscribing;
     }
 }

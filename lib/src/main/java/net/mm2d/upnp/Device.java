@@ -43,6 +43,7 @@ public class Device {
         private String mLocation;
         private String mDescription;
         private String mUdn;
+        private String mUpc;
         private String mDeviceType;
         private String mFriendlyName;
         private String mManufacture;
@@ -58,6 +59,8 @@ public class Device {
         private final List<Icon.Builder> mIconBuilderList = new ArrayList<>();
         @Nonnull
         private final List<Service.Builder> mServiceBuilderList = new ArrayList<>();
+        @Nonnull
+        private final List<Device.Builder> mDeviceBuilderList = new ArrayList<>();
         @Nonnull
         private final Map<String, Map<String, String>> mTagMap;
 
@@ -77,6 +80,18 @@ public class Device {
             mSsdpMessage = ssdpMessage;
             mTagMap = new LinkedHashMap<>();
             mTagMap.put("", new HashMap<String, String>());
+        }
+
+        /**
+         * EmbeddedDevice用のBuilderを作成する。
+         *
+         * @return EmbeddedDevice用のBuilder
+         */
+        public Builder createEmbeddedDeviceBuilder() {
+            final Builder builder = new Builder(mControlPoint, mSsdpMessage);
+            builder.setDescription(mDescription);
+            builder.setUrlBase(mUrlBase);
+            return builder;
         }
 
         /**
@@ -113,6 +128,9 @@ public class Device {
             }
             mLocation = location;
             mSsdpMessage = ssdpMessage;
+            for (final Builder builder : mDeviceBuilderList) {
+                builder.updateSsdpMessage(ssdpMessage);
+            }
             return this;
         }
 
@@ -137,6 +155,18 @@ public class Device {
         @Nonnull
         public Builder setUdn(@Nonnull final String udn) {
             mUdn = udn;
+            return this;
+        }
+
+        /**
+         * UPCの値を登録する。
+         *
+         * @param upc UPC
+         * @return Builder
+         */
+        @Nonnull
+        public Builder setUpc(@Nonnull final String upc) {
+            mUpc = upc;
             return this;
         }
 
@@ -314,13 +344,35 @@ public class Device {
         }
 
         /**
-         * 全ServiceのBuilderを返す。
+         * Embedded DeviceのBuilderを登録する。
          *
-         * @return 全ServiceのBuilder
+         * @param builder Embedded DeviceのBuilder
+         * @return Builder
+         */
+        @Nonnull
+        public Builder addEmbeddedDeviceBuilder(@Nonnull final Builder builder) {
+            mDeviceBuilderList.add(builder);
+            return this;
+        }
+
+        /**
+         * ServiceのBuilderのリストを返す。
+         *
+         * @return ServiceのBuilderのリスト
          */
         @Nonnull
         public List<Service.Builder> getServiceBuilderList() {
             return mServiceBuilderList;
+        }
+
+        /**
+         * Embedded DeviceのBuilderのリストを返す。
+         *
+         * @return Embedded DeviceのBuilderのリスト
+         */
+        @Nonnull
+        public List<Device.Builder> getEmbeddedDeviceBuilderList() {
+            return mDeviceBuilderList;
         }
 
         /**
@@ -352,6 +404,17 @@ public class Device {
          */
         @Nonnull
         public Device build() {
+            return build(null);
+        }
+
+        /**
+         * Deviceのインスタンスを作成する。
+         *
+         * @param parent 親Device、EmbeddedDeviceの場合に指定
+         * @return Deviceのインスタンス
+         */
+        @Nonnull
+        Device build(@Nullable final Device parent) {
             if (mDescription == null) {
                 throw new IllegalStateException("description must be set.");
             }
@@ -373,10 +436,12 @@ public class Device {
             if (!mUdn.equals(getUuid())) {
                 throw new IllegalStateException("uuid and udn does not match! uuid=" + getUuid() + " udn=" + mUdn);
             }
-            return new Device(this);
+            return new Device(parent, this);
         }
     }
 
+    @Nullable
+    private final Device mParent;
     @Nonnull
     private final ControlPoint mControlPoint;
     @Nonnull
@@ -387,6 +452,8 @@ public class Device {
     private final String mDescription;
     @Nonnull
     private final String mUdn;
+    @Nullable
+    private final String mUpc;
     @Nonnull
     private final String mDeviceType;
     @Nonnull
@@ -415,17 +482,22 @@ public class Device {
     private final List<Icon> mIconList;
     @Nonnull
     private final List<Service> mServiceList;
+    @Nonnull
+    private final List<Device> mDeviceList;
 
     /**
      * ControlPointに紐付いたインスタンスを作成。
      *
+     * @param parent  親Device、EmbeddedDeviceの場合に指定
      * @param builder ビルダー
      */
-    private Device(@Nonnull final Builder builder) {
+    private Device(@Nullable final Device parent, @Nonnull final Builder builder) {
+        mParent = parent;
         mControlPoint = builder.mControlPoint;
         mSsdpMessage = builder.mSsdpMessage;
         mLocation = builder.mLocation;
         mUdn = builder.mUdn;
+        mUpc = builder.mUpc;
         mDeviceType = builder.mDeviceType;
         mFriendlyName = builder.mFriendlyName;
         mManufacture = builder.mManufacture;
@@ -439,22 +511,50 @@ public class Device {
         mUrlBase = builder.mUrlBase;
         mDescription = builder.mDescription;
         mTagMap = builder.mTagMap;
-        if (builder.mIconBuilderList.isEmpty()) {
-            mIconList = Collections.emptyList();
-        } else {
-            mIconList = new ArrayList<>(builder.mIconBuilderList.size());
-            for (final Icon.Builder iconBuilder : builder.mIconBuilderList) {
-                mIconList.add(iconBuilder.setDevice(this).build());
-            }
+        mIconList = buildIconList(this, builder.mIconBuilderList);
+        mServiceList = buildServiceList(this, builder.mServiceBuilderList);
+        mDeviceList = buildDeviceList(this, builder.mDeviceBuilderList);
+    }
+
+    @Nonnull
+    private static List<Icon> buildIconList(
+            @Nonnull final Device device,
+            @Nonnull final List<Icon.Builder> builderList) {
+        if (builderList.isEmpty()) {
+            return Collections.emptyList();
         }
-        if (builder.mServiceBuilderList.isEmpty()) {
-            mServiceList = Collections.emptyList();
-        } else {
-            mServiceList = new ArrayList<>(builder.mServiceBuilderList.size());
-            for (final Service.Builder serviceBuilder : builder.mServiceBuilderList) {
-                mServiceList.add(serviceBuilder.setDevice(this).build());
-            }
+        final List<Icon> list = new ArrayList<>(builderList.size());
+        for (final Icon.Builder builder : builderList) {
+            list.add(builder.setDevice(device).build());
         }
+        return list;
+    }
+
+    @Nonnull
+    private static List<Service> buildServiceList(
+            @Nonnull final Device device,
+            @Nonnull final List<Service.Builder> builderList) {
+        if (builderList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final List<Service> list = new ArrayList<>(builderList.size());
+        for (final Service.Builder builder : builderList) {
+            list.add(builder.setDevice(device).build());
+        }
+        return list;
+    }
+
+    private static List<Device> buildDeviceList(
+            @Nonnull final Device parent,
+            @Nonnull final List<Device.Builder> builderList) {
+        if (builderList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final List<Device> list = new ArrayList<>(builderList.size());
+        for (final Device.Builder builder : builderList) {
+            list.add(builder.build(parent));
+        }
+        return list;
     }
 
     /**
@@ -505,6 +605,9 @@ public class Device {
         }
         mLocation = location;
         mSsdpMessage = message;
+        for (final Device device : mDeviceList) {
+            device.updateSsdpMessage(message);
+        }
     }
 
     /**
@@ -683,8 +786,6 @@ public class Device {
     /**
      * UDNタグの値を返す。
      *
-     * <p>値が存在しない場合nullが返る。
-     *
      * <p>Required. Unique Device Name. Universally-unique identifier for the device, whether root or embedded.
      * shall be the same over time for a specific device instance (i.e., shall survive reboots).
      * shall match the field value of the NT header field in device discovery messages. shall match the prefix of
@@ -700,9 +801,22 @@ public class Device {
     }
 
     /**
-     * deviceTypeタグの値を返す。
+     * UPCタグの値を返す。
      *
      * <p>値が存在しない場合nullが返る。
+     *
+     * <p>Allowed. Universal Product Code. 12-digit, all-numeric code that identifies the consumer package.
+     * Managed by the Uniform Code Council. Specified by UPnP vendor. Single UPC.
+     *
+     * @return UPCタグの値
+     */
+    @Nullable
+    public String getUpc() {
+        return mUpc;
+    }
+
+    /**
+     * deviceTypeタグの値を返す。
      *
      * <p>Required. UPnP device type. Single URI.
      * <ul>
@@ -728,8 +842,6 @@ public class Device {
 
     /**
      * friendlyNameタグの値を返す。
-     *
-     * <p>値が存在しない場合nullが返る。
      *
      * <p>Required. Short description for end user. Is allowed to be localized (see ACCEPT- LANGUAGE and
      * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be &lt; 64 characters.
@@ -773,8 +885,6 @@ public class Device {
 
     /**
      * modelNameタグの値を返す。
-     *
-     * <p>値が存在しない場合nullが返る。
      *
      * <p>Required. Model name. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT- LANGUAGE header fields).
      * Specified by UPnP vendor. String. Should be &lt; 32 characters.
@@ -944,6 +1054,77 @@ public class Device {
             final Action action = service.findAction(name);
             if (action != null) {
                 return action;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Embedded Deviceであることを返す。
+     *
+     * @return Embedded Deviceの時true
+     */
+    public boolean isEmbeddedDevice() {
+        return mParent != null;
+    }
+
+    /**
+     * Embedded Deviceの場合に親のDeviceを返す。
+     *
+     * @return 親のDevice、root deviceの時null
+     */
+    @Nullable
+    public Device getParent() {
+        return mParent;
+    }
+
+    /**
+     * Embedded Deviceのリストを返す。
+     *
+     * @return Embedded Deviceのリスト
+     */
+    @Nonnull
+    public List<Device> getDeviceList() {
+        return Collections.unmodifiableList(mDeviceList);
+    }
+
+    /**
+     * 指定DeviceTypeのEmbedded Deviceを探す。
+     *
+     * <p>見つからない場合nullが返る。
+     *
+     * @param deviceType DeviceType
+     * @return Embedded Device
+     */
+    @Nullable
+    public Device findDeviceByType(@Nonnull final String deviceType) {
+        for (final Device device : mDeviceList) {
+            if (deviceType.equals(device.getDeviceType())) {
+                return device;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 指定DeviceTypeのEmbedded Deviceを再帰的に探す。
+     *
+     * <p>孫要素以降についても再帰的に探索する。
+     * 同一のDeviceTypeが存在する場合は記述順が先にあるものが優先される。
+     * <p>見つからない場合nullが返る。
+     *
+     * @param deviceType DeviceType
+     * @return Embedded Device
+     */
+    @Nullable
+    public Device findDeviceByTypeRecursively(@Nonnull final String deviceType) {
+        for (final Device device : mDeviceList) {
+            if (deviceType.equals(device.getDeviceType())) {
+                return device;
+            }
+            final Device result = device.findDeviceByTypeRecursively(deviceType);
+            if (result != null) {
+                return result;
             }
         }
         return null;

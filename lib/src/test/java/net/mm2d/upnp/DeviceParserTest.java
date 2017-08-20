@@ -85,4 +85,32 @@ public class DeviceParserTest {
         assertThat(device.getIconList(), hasSize(4));
         assertThat(device.getServiceList(), hasSize(0));
     }
+
+    @Test
+    public void loadDescription_with_embedded_device() throws Exception {
+        doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
+                .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
+
+        final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+        DeviceParser.loadDescription(mHttpClient, builder);
+        final Device device = builder.build();
+
+        assertThat(device.isEmbeddedDevice(), is(false));
+        assertThat(device.getParent(), is(nullValue()));
+        // 無限ループしない
+        assertThat(device.findDeviceByTypeRecursively(""), is(nullValue()));
+        assertThat(device.getDeviceList(), hasSize(1));
+        final Device device1 = device.findDeviceByType("urn:schemas-upnp-org:device:WANDevice:1");
+        assertThat(device1.getDeviceList(), hasSize(1));
+        assertThat(device1.findServiceById("urn:upnp-org:serviceId:WANCommonIFC1"), is(notNullValue()));
+        assertThat(device1.getParent(), is(device));
+        assertThat(device1.isEmbeddedDevice(), is(true));
+
+        final Device device2 = device.findDeviceByTypeRecursively("urn:schemas-upnp-org:device:WANConnectionDevice:1");
+        assertThat(device2.findServiceById("urn:upnp-org:serviceId:WANIPConn1"), is(notNullValue()));
+
+        assertThat(device2.getUpc(), is("000000000000"));
+        assertThat(device2.getParent(), is(device1));
+        assertThat(device2.isEmbeddedDevice(), is(true));
+    }
 }

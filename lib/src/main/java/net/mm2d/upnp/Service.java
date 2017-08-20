@@ -237,24 +237,47 @@ public class Service {
         mControlUrl = builder.mControlUrl;
         mEventSubUrl = builder.mEventSubUrl;
         mDescription = builder.mDescription;
-        mStateVariableMap = new LinkedHashMap<>();
-        for (final StateVariable.Builder variableBuilder : builder.mVariableBuilderList) {
-            final StateVariable variable = variableBuilder.setService(this).build();
-            mStateVariableMap.put(variable.getName(), variable);
+        mStateVariableMap = buildStateVariableMap(this, builder.mVariableBuilderList);
+        mActionMap = buildActionMap(this, mStateVariableMap, builder.mActionBuilderList);
+    }
+
+    @Nonnull
+    private static Map<String, StateVariable> buildStateVariableMap(
+            @Nonnull final Service service,
+            @Nonnull final List<StateVariable.Builder> builderList) {
+        if (builderList.isEmpty()) {
+            return Collections.emptyMap();
         }
-        mActionMap = new LinkedHashMap<>();
-        for (final Action.Builder actionBuilder : builder.mActionBuilderList) {
+        final Map<String, StateVariable> map = new LinkedHashMap<>(builderList.size());
+        for (final StateVariable.Builder variableBuilder : builderList) {
+            final StateVariable variable = variableBuilder.setService(service).build();
+            map.put(variable.getName(), variable);
+        }
+        return map;
+    }
+
+    @Nonnull
+    private static Map<String, Action> buildActionMap(
+            @Nonnull final Service service,
+            @Nonnull final Map<String, StateVariable> variableMap,
+            @Nonnull final List<Action.Builder> builderList) {
+        if (builderList.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        final Map<String, Action> mActionMap = new LinkedHashMap<>(builderList.size());
+        for (final Action.Builder actionBuilder : builderList) {
             for (final Argument.Builder argumentBuilder : actionBuilder.getArgumentBuilderList()) {
                 final String name = argumentBuilder.getRelatedStateVariableName();
-                final StateVariable variable = mStateVariableMap.get(name);
+                final StateVariable variable = variableMap.get(name);
                 if (variable == null) {
                     throw new IllegalStateException("There is no StateVariable " + name);
                 }
                 argumentBuilder.setRelatedStateVariable(variable);
             }
-            final Action action = actionBuilder.setService(this).build();
+            final Action action = actionBuilder.setService(service).build();
             mActionMap.put(action.getName(), action);
         }
+        return mActionMap;
     }
 
     /**

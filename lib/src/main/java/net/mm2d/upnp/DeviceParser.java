@@ -11,7 +11,6 @@ import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -46,8 +45,17 @@ public class DeviceParser {
                                 @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         parseDescription(builder, client.downloadString(new URL(builder.getLocation())));
+        loadServices(client, builder);
+    }
+
+    private static void loadServices(@Nonnull final HttpClient client,
+                                     @Nonnull final Device.Builder builder)
+            throws IOException, SAXException, ParserConfigurationException {
         for (final Service.Builder serviceBuilder : builder.getServiceBuilderList()) {
             ServiceParser.loadDescription(client, builder.getBaseUrl(), serviceBuilder);
+        }
+        for (final Device.Builder deviceBuilder : builder.getEmbeddedDeviceBuilderList()) {
+            loadServices(client, deviceBuilder);
         }
     }
 
@@ -58,7 +66,7 @@ public class DeviceParser {
         final Document doc = XmlUtils.newDocument(true, description);
         final Node deviceNode = XmlUtils.findChildElementByLocalName(doc.getDocumentElement(), "device");
         if (deviceNode == null) {
-            return;
+            throw new IllegalStateException();
         }
         parseDevice(builder, deviceNode);
     }
@@ -81,6 +89,9 @@ public class DeviceParser {
                 case "serviceList":
                     parseServiceList(builder, node);
                     break;
+                case "deviceList":
+                    parseDeviceList(builder, node);
+                    break;
                 default:
                     String namespace = node.getNamespaceURI();
                     namespace = namespace == null ? "" : namespace;
@@ -97,6 +108,9 @@ public class DeviceParser {
         switch (tag) {
             case "UDN":
                 builder.setUdn(value);
+                break;
+            case "UPC":
+                builder.setUpc(value);
                 break;
             case "deviceType":
                 builder.setDeviceType(value);
@@ -136,21 +150,21 @@ public class DeviceParser {
         }
     }
 
-    private static void parseIconList(@Nonnull final Device.Builder deviceBuilder, @Nonnull final Node listNode) {
+    private static void parseIconList(@Nonnull final Device.Builder builder, @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
             if (TextUtils.equals(node.getLocalName(), "icon")) {
-                deviceBuilder.addIconBuilder(parseIcon((Element) node));
+                builder.addIconBuilder(parseIcon(node));
             }
         }
     }
 
-    private static Icon.Builder parseIcon(@Nonnull final Element element) {
+    private static Icon.Builder parseIcon(@Nonnull final Node iconNode) {
         final Icon.Builder builder = new Icon.Builder();
-        Node node = element.getFirstChild();
+        Node node = iconNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
@@ -189,7 +203,7 @@ public class DeviceParser {
         }
     }
 
-    private static void parseServiceList(@Nonnull final Device.Builder deviceBuilder,
+    private static void parseServiceList(@Nonnull final Device.Builder builder,
                                          @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -197,15 +211,15 @@ public class DeviceParser {
                 continue;
             }
             if (TextUtils.equals(node.getLocalName(), "service")) {
-                deviceBuilder.addServiceBuilder(parseService((Element) node));
+                builder.addServiceBuilder(parseService(node));
             }
         }
     }
 
     @Nonnull
-    private static Service.Builder parseService(@Nonnull final Element element) {
+    private static Service.Builder parseService(@Nonnull final Node serviceNode) {
         final Service.Builder builder = new Service.Builder();
-        Node node = element.getFirstChild();
+        Node node = serviceNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
@@ -241,6 +255,21 @@ public class DeviceParser {
                 break;
             default:
                 break;
+        }
+    }
+
+    private static void parseDeviceList(@Nonnull final Device.Builder builder,
+                                        @Nonnull final Node listNode) {
+        Node node = listNode.getFirstChild();
+        for (; node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            if (TextUtils.equals(node.getLocalName(), "device")) {
+                final Device.Builder embeddedBuilder = builder.createEmbeddedDeviceBuilder();
+                parseDevice(embeddedBuilder, node);
+                builder.addEmbeddedDeviceBuilder(embeddedBuilder);
+            }
         }
     }
 }
