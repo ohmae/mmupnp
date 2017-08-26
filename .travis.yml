@@ -1,4 +1,4 @@
 language: java
 script:
-  - ./gradlew lib:check
-  - ./gradlew lib:assemble
+  - ./gradlew check
+  - ./gradlew assemble
