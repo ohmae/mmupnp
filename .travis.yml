@@ -1,4 +1,5 @@
 language: java
 script:
-  - gradle lib:check
-  - gradle lib:assemble
+  - chmod +x ./gradlew
+  - ./gradlew lib:check
+  - ./gradlew lib:assemble
