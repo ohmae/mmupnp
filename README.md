@@ -1,3 +1,6 @@
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE)
+[![Build Status](https://travis-ci.org/ohmae/mmupnp.svg?branch=master)](https://travis-ci.org/ohmae/mmupnp)
+
 # mmupnp
 Universal Plug and Play (UPnP) ControlPoint library for Java.
 

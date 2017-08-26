@@ -1,6 +1,10 @@
 language: java
+
 before_install:
   - chmod +x gradlew
+
 script:
   - ./gradlew lib:check
-  - ./gradlew lib:assemble
+
+notifications:
+  emails: false
