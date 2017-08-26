@@ -1,3 +1,4 @@
 language: java
-./gradlew lib:check
-./gradlew lib:assemble
+script:
+  - ./gradlew lib:check
+  - ./gradlew lib:assemble
