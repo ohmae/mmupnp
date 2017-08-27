@@ -13,3 +13,7 @@ after_success:
 
 notifications:
   emails: false
+
+branches:
+  except:
+    - gh-pages
