@@ -241,7 +241,7 @@ public class ControlPointTest {
             final String value = "value";
             mEventMessageListener.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName, value)));
 
-            Thread.sleep(100);
+            Thread.sleep(200);
 
             verify(l).onNotifyEvent(service, 0, variableName, value);
         }
