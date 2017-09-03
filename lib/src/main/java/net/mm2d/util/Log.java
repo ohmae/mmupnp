@@ -409,7 +409,8 @@ public class Log {
         println(ERROR, tag, message, tr);
     }
 
-    private static void println(
+    // VisibleForTesting
+    static void println(
             final int level,
             @Nullable final String tag,
             @Nullable final String message,
