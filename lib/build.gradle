@@ -38,6 +38,15 @@ uploadArchives {
     repositories {
         mavenDeployer {
             repository(url: 'file:build/maven')
+            pom.project {
+                licenses {
+                    license {
+                        name 'The MIT License'
+                        url 'https://opensource.org/licenses/MIT'
+                        distribution 'repo'
+                    }
+                }
+            }
         }
     }
 }
