@@ -268,9 +268,20 @@ public class Service {
         for (final Action.Builder actionBuilder : builderList) {
             for (final Argument.Builder argumentBuilder : actionBuilder.getArgumentBuilderList()) {
                 final String name = argumentBuilder.getRelatedStateVariableName();
-                final StateVariable variable = variableMap.get(name);
+                if (name == null) {
+                    throw new IllegalStateException("relatedStateVariable name is null");
+                }
+                StateVariable variable = variableMap.get(name);
                 if (variable == null) {
-                    throw new IllegalStateException("There is no StateVariable " + name);
+                    // for AN-WLTU1
+                    final String trimmedName = name.trim();
+                    variable = variableMap.get(trimmedName);
+                    if (variable == null) {
+                        throw new IllegalStateException("There is no StateVariable " + name);
+                    }
+                    Log.w("Invalid description. relatedStateVariable name has unnecessary blanks ["
+                            + name + "] on " + service.getServiceId());
+                    argumentBuilder.setRelatedStateVariableName(trimmedName);
                 }
                 argumentBuilder.setRelatedStateVariable(variable);
             }
