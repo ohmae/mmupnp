@@ -334,6 +334,14 @@ public class LogTest {
         assertThat(new String(baos.toByteArray()), containsString(" E "));
         baos.reset();
 
+        Log.e("tag", "message");
+        assertThat(new String(baos.toByteArray()), containsString(" E "));
+        baos.reset();
+
+        Log.println(Log.ASSERT, "tag", "message", null);
+        assertThat(new String(baos.toByteArray()), containsString("   "));
+        baos.reset();
+
         System.setOut(defaultOut);
     }
 
@@ -342,10 +350,29 @@ public class LogTest {
         final Print print = new Print() {
             @Override
             public void println(final int level, @Nullable final String tag, @Nullable final String message) {
-
             }
         };
         Log.setPrint(print);
         Log.v(null, "");
+    }
+
+    @Test
+    public void  setAppendCaller() throws Exception {
+        Log.setPrint(Log.DEFAULT_PRINT);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream defaultOut = System.out;
+        System.setOut(new PrintStream(baos));
+        Log.setAppendCaller(true);
+
+        Log.v("tag", "");
+        assertThat(new String(baos.toByteArray()), containsString("LogTest"));
+        baos.reset();
+
+        Log.setAppendCaller(false);
+
+        Log.v("tag", "");
+        assertThat(new String(baos.toByteArray()), not(containsString("LogTest")));
+        baos.reset();
+        System.setOut(defaultOut);
     }
 }

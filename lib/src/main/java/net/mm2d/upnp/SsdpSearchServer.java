@@ -94,8 +94,10 @@ class SsdpSearchServer extends SsdpServer {
     }
 
     @Override
-    protected void onReceive(@Nonnull final InetAddress sourceAddress,
-                             @Nonnull final byte[] data, final int length) {
+    protected void onReceive(
+            @Nonnull final InetAddress sourceAddress,
+            @Nonnull final byte[] data,
+            final int length) {
         try {
             final SsdpResponseMessage message = new SsdpResponseMessage(getInterfaceAddress(), data, length);
             if (message.hasInvalidLocation(sourceAddress)) {

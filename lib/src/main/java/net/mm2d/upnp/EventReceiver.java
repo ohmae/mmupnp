@@ -53,7 +53,10 @@ class EventReceiver {
          * @param properties プロパティ
          * @return HTTPメッセージが正常であればtrue
          */
-        boolean onEventReceived(@Nonnull String sid, long seq, @Nonnull List<StringPair> properties);
+        boolean onEventReceived(
+                @Nonnull String sid,
+                long seq,
+                @Nonnull List<StringPair> properties);
     }
 
     @Nullable
@@ -225,7 +228,8 @@ class EventReceiver {
          * @return HTTPメッセージが正常であればtrue
          */
         private synchronized boolean notifyEvent(
-                @Nonnull final String sid, @Nonnull final HttpRequest request) {
+                @Nonnull final String sid,
+                @Nonnull final HttpRequest request) {
             if (mListener == null) {
                 return false;
             }
@@ -287,7 +291,9 @@ class EventReceiver {
          * @param server サーバスレッド
          * @param sock   クライアントソケット
          */
-        ClientTask(@Nonnull final ServerTask server, @Nonnull final Socket sock) {
+        ClientTask(
+                @Nonnull final ServerTask server,
+                @Nonnull final Socket sock) {
             mServer = server;
             mSocket = sock;
         }
@@ -311,7 +317,9 @@ class EventReceiver {
             IoUtils.closeQuietly(mSocket);
         }
 
-        private boolean notifyEvent(@Nonnull final String sid, @Nonnull final HttpRequest request) {
+        private boolean notifyEvent(
+                @Nonnull final String sid,
+                @Nonnull final HttpRequest request) {
             return mServer.notifyEvent(sid, request);
         }
 
@@ -333,7 +341,9 @@ class EventReceiver {
             }
         }
 
-        private void receiveAndReply(@Nonnull final InputStream is, @Nonnull final OutputStream os)
+        private void receiveAndReply(
+                @Nonnull final InputStream is,
+                @Nonnull final OutputStream os)
                 throws IOException {
             final HttpRequest request = new HttpRequest(mSocket);
             request.readData(is);

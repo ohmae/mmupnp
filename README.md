@@ -1,4 +1,11 @@
 # mmupnp
+[![license](https://img.shields.io/github/license/ohmae/mmupnp.svg)](./LICENSE)
+[![GitHub release](https://img.shields.io/github/release/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/releases)
+[![GitHub issues](https://img.shields.io/github/issues/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/issues)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/issues)
+[![Build Status](https://travis-ci.org/ohmae/mmupnp.svg?branch=develop)](https://travis-ci.org/ohmae/mmupnp)
+[![codecov](https://codecov.io/gh/ohmae/mmupnp/branch/develop/graph/badge.svg)](https://codecov.io/gh/ohmae/mmupnp)
+
 Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## Feature
@@ -20,14 +27,19 @@ Therefore, this library restricts the use of such statement.
 - This library support only ControlPoint functions.
 There is no way to make Device. If you need it, please select another library.
 - Some functions that are not widely used are not implemented.
- - Multicast eventing
- - Embedded device
- - IPv6
+  - Multicast eventing
+  - IPv6
 
 ## Example of use
+Android App
 - DMS Explorer --
 [[Google Play](https://play.google.com/store/apps/details?id=net.mm2d.dmsexplorer)]
 [[Source Code](https://github.com/ohmae/DmsExplorer)]
+
+Sample App
+
+|![](docs/img/1.png)|![](docs/img/2.png)|
+|-|-|
 
 ## How to use
 
@@ -40,7 +52,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.mm2d.mmupnp:mmupnp:1.1.5'
+    compile 'net.mm2d.mmupnp:mmupnp:1.2.1'
 }
 ```
 
@@ -122,7 +134,7 @@ When you want to reset, try again from the constructor call.
 
 I described Javadoc comments. Please refer to it for more information.
 - Javadoc in Japanese
- - https://ohmae.github.io/mmupnp/javadoc/
+  - https://ohmae.github.io/mmupnp/javadoc/
 
 ## Author
 大前 良介 (OHMAE Ryosuke)

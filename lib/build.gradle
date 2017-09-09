@@ -3,6 +3,7 @@ version versionName
 
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'jacoco'
 
 archivesBaseName = 'mmupnp'
 sourceCompatibility = 1.7
@@ -30,13 +31,22 @@ dependencies {
     compile 'com.google.code.findbugs:jsr305:3.0.1'
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompile 'org.mockito:mockito-core:2.2.29'
+    testCompile 'org.mockito:mockito-core:2.9.0'
 }
 
 uploadArchives {
     repositories {
         mavenDeployer {
             repository(url: 'file:build/maven')
+            pom.project {
+                licenses {
+                    license {
+                        name 'The MIT License'
+                        url 'https://opensource.org/licenses/MIT'
+                        distribution 'repo'
+                    }
+                }
+            }
         }
     }
 }
@@ -48,4 +58,11 @@ task sourcesJar(type: Jar, dependsOn:classes) {
 
 artifacts {
     archives sourcesJar
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
 }

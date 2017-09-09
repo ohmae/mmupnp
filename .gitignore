@@ -1,6 +1,5 @@
 /.settings
 /bin
-/docs
 *.iml
 *.class
 .classpath

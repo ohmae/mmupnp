@@ -18,8 +18,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,45 +35,48 @@ class ServiceParser {
      *
      * <p>可能であればKeepAliveを行う。
      *
-     * @param client   通信に使用するHttpClient
-     * @param location SSDPパケットに記述されたlocation
-     * @param builder  ServiceのBuilder
+     * @param client  通信に使用するHttpClient
+     * @param baseUrl URLのベースとして使用する値
+     * @param builder ServiceのBuilder
      * @throws IOException                  通信エラー
      * @throws SAXException                 XMLパースエラー
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
-    static void loadDescription(@Nonnull final HttpClient client,
-                                @Nonnull final String location,
-                                @Nonnull final Service.Builder builder)
+    static void loadDescription(
+            @Nonnull final HttpClient client,
+            @Nonnull final String baseUrl,
+            @Nonnull final Service.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         final String scpdUrl = builder.getScpdUrl();
         if (scpdUrl == null) {
             throw new IOException();
         }
-        final URL url = Device.getAbsoluteUrl(location, scpdUrl);
+        final URL url = Device.getAbsoluteUrl(baseUrl, scpdUrl);
         final String description = client.downloadString(url);
         builder.setDescription(description);
+        if (TextUtils.isEmpty(description)) {
+            // 空であっても必須パラメータはそろっているため正常として扱う。
+            return;
+        }
         final Document doc = XmlUtils.newDocument(true, description);
-        builder.setActionBuilderList(parseActionList(doc.getElementsByTagName("action")));
-        builder.setVariableBuilderList(parseStateVariableList(doc.getElementsByTagName("stateVariable")));
+        parseActionList(builder, doc.getElementsByTagName("action"));
+        parseStateVariableList(builder, doc.getElementsByTagName("stateVariable"));
     }
 
-    @Nonnull
-    private static List<Action.Builder> parseActionList(@Nonnull final NodeList nodeList) {
-        final List<Action.Builder> builderList = new ArrayList<>();
+    private static void parseActionList(
+            @Nonnull final Service.Builder builder,
+            @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
-            builderList.add(parseAction((Element) nodeList.item(i)));
+            builder.addActionBuilder(parseAction((Element) nodeList.item(i)));
         }
-        return builderList;
     }
 
-    @Nonnull
-    private static List<StateVariable.Builder> parseStateVariableList(@Nonnull final NodeList nodeList) {
-        final List<StateVariable.Builder> builderList = new ArrayList<>();
+    private static void parseStateVariableList(
+            @Nonnull final Service.Builder builder,
+            @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
-            builderList.add(parseStateVariable((Element) nodeList.item(i)));
+            builder.addVariableBuilder(parseStateVariable((Element) nodeList.item(i)));
         }
-        return builderList;
     }
 
     @Nonnull
@@ -121,8 +122,10 @@ class ServiceParser {
         return builder;
     }
 
-    private static void setField(@Nonnull final Argument.Builder builder,
-                                 @Nonnull final String tag, @Nonnull final String value) {
+    private static void setField(
+            @Nonnull final Argument.Builder builder,
+            @Nonnull final String tag,
+            @Nonnull final String value) {
         switch (tag) {
             case "name":
                 builder.setName(value);
@@ -176,7 +179,8 @@ class ServiceParser {
     }
 
     private static void parseAllowedValueList(
-            @Nonnull final StateVariable.Builder builder, @Nonnull final Element element) {
+            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final Element element) {
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -189,7 +193,8 @@ class ServiceParser {
     }
 
     private static void parseAllowedValueRange(
-            @Nonnull final StateVariable.Builder builder, @Nonnull final Element element) {
+            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final Element element) {
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -204,8 +209,10 @@ class ServiceParser {
         }
     }
 
-    private static void setField(@Nonnull final StateVariable.Builder builder,
-                                 @Nonnull final String tag, @Nonnull final String value) {
+    private static void setField(
+            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final String tag,
+            @Nonnull final String value) {
         switch (tag) {
             case "step":
                 builder.setStep(value);

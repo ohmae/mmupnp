@@ -95,7 +95,7 @@ public class ControlPointTest {
             final Device device = mock(Device.class);
             doReturn(uuid).when(device).getUdn();
             mCp.discoverDevice(device);
-            Thread.sleep(1);
+            Thread.sleep(100);
 
             assertThat(mCp.getDevice(uuid), is(device));
             assertThat(mCp.getDeviceList(), hasItem(device));
@@ -113,9 +113,9 @@ public class ControlPointTest {
             doReturn(uuid).when(device).getUdn();
             doReturn(Collections.singletonList(service)).when(device).getServiceList();
             mCp.discoverDevice(device);
-            Thread.sleep(1);
+            Thread.sleep(100);
             mCp.lostDevice(device);
-            Thread.sleep(1);
+            Thread.sleep(100);
 
             assertThat(mCp.getDevice(uuid), is(nullValue()));
             assertThat(mCp.getDeviceListSize(), is(0));
@@ -134,7 +134,7 @@ public class ControlPointTest {
             final Device device = mock(Device.class);
             doReturn(uuid).when(device).getUdn();
             mCp.discoverDevice(device);
-            Thread.sleep(1);
+            Thread.sleep(100);
 
             verify(l, never()).onDiscover(device);
         }
@@ -151,7 +151,7 @@ public class ControlPointTest {
             final Device device = mock(Device.class);
             doReturn(uuid).when(device).getUdn();
             mCp.discoverDevice(device);
-            Thread.sleep(1);
+            Thread.sleep(100);
 
             verify(l, never()).onDiscover(device);
         }
@@ -241,7 +241,7 @@ public class ControlPointTest {
             final String value = "value";
             mEventMessageListener.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName, value)));
 
-            Thread.sleep(1);
+            Thread.sleep(200);
 
             verify(l).onNotifyEvent(service, 0, variableName, value);
         }
@@ -266,7 +266,7 @@ public class ControlPointTest {
 
             final String value = "value";
             mEventMessageListener.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName, value)));
-            Thread.sleep(1);
+            Thread.sleep(100);
 
             verify(l, never()).onNotifyEvent(service, 0, variableName, value);
         }

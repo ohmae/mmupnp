@@ -33,8 +33,10 @@ public class SsdpRequestMessage extends SsdpMessage {
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpRequestMessage(@Nonnull final InterfaceAddress address,
-                              @Nonnull final byte[] data, final int length)
+    public SsdpRequestMessage(
+            @Nonnull final InterfaceAddress address,
+            @Nonnull final byte[] data,
+            final int length)
             throws IOException {
         super(address, data, length);
     }

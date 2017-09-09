@@ -41,8 +41,10 @@ public class Service {
         private String mControlUrl;
         private String mEventSubUrl;
         private String mDescription;
-        private List<Action.Builder> mActionBuilderList;
-        private List<StateVariable.Builder> mVariableBuilderList;
+        @Nonnull
+        private final List<Action.Builder> mActionBuilderList = new ArrayList<>();
+        @Nonnull
+        private final List<StateVariable.Builder> mVariableBuilderList = new ArrayList<>();
 
         /**
          * インスタンス作成
@@ -139,24 +141,24 @@ public class Service {
         }
 
         /**
-         * 全ActionのBuilderを登録する。
+         * ActionのBuilderを登録する。
          *
-         * @param actionBuilderList Serviceで定義されている全ActionのBuilder
+         * @param builder Serviceで定義されているActionのBuilder
          * @return Builder
          */
-        public Builder setActionBuilderList(@Nonnull final List<Action.Builder> actionBuilderList) {
-            mActionBuilderList = actionBuilderList;
+        public Builder addActionBuilder(@Nonnull final Action.Builder builder) {
+            mActionBuilderList.add(builder);
             return this;
         }
 
         /**
-         * 全StateVariableのBuilderを登録する。
+         * StateVariableのBuilderを登録する。
          *
-         * @param variableBuilderList Serviceで定義されている全StateVariableのBuilder
+         * @param builder Serviceで定義されているStateVariableのBuilder
          * @return Builder
          */
-        public Builder setVariableBuilderList(@Nonnull final List<StateVariable.Builder> variableBuilderList) {
-            mVariableBuilderList = variableBuilderList;
+        public Builder addVariableBuilder(@Nonnull final StateVariable.Builder builder) {
+            mVariableBuilderList.add(builder);
             return this;
         }
 
@@ -188,12 +190,6 @@ public class Service {
             }
             if (mDescription == null) {
                 throw new IllegalStateException("description must be set.");
-            }
-            if (mActionBuilderList == null) {
-                mActionBuilderList = Collections.emptyList();
-            }
-            if (mVariableBuilderList == null) {
-                mVariableBuilderList = Collections.emptyList();
             }
             return new Service(this);
         }
@@ -241,24 +237,58 @@ public class Service {
         mControlUrl = builder.mControlUrl;
         mEventSubUrl = builder.mEventSubUrl;
         mDescription = builder.mDescription;
-        mStateVariableMap = new LinkedHashMap<>();
-        for (final StateVariable.Builder variableBuilder : builder.mVariableBuilderList) {
-            final StateVariable variable = variableBuilder.setService(this).build();
-            mStateVariableMap.put(variable.getName(), variable);
+        mStateVariableMap = buildStateVariableMap(this, builder.mVariableBuilderList);
+        mActionMap = buildActionMap(this, mStateVariableMap, builder.mActionBuilderList);
+    }
+
+    @Nonnull
+    private static Map<String, StateVariable> buildStateVariableMap(
+            @Nonnull final Service service,
+            @Nonnull final List<StateVariable.Builder> builderList) {
+        if (builderList.isEmpty()) {
+            return Collections.emptyMap();
         }
-        mActionMap = new LinkedHashMap<>();
-        for (final Action.Builder actionBuilder : builder.mActionBuilderList) {
+        final Map<String, StateVariable> map = new LinkedHashMap<>(builderList.size());
+        for (final StateVariable.Builder variableBuilder : builderList) {
+            final StateVariable variable = variableBuilder.setService(service).build();
+            map.put(variable.getName(), variable);
+        }
+        return map;
+    }
+
+    @Nonnull
+    private static Map<String, Action> buildActionMap(
+            @Nonnull final Service service,
+            @Nonnull final Map<String, StateVariable> variableMap,
+            @Nonnull final List<Action.Builder> builderList) {
+        if (builderList.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        final Map<String, Action> mActionMap = new LinkedHashMap<>(builderList.size());
+        for (final Action.Builder actionBuilder : builderList) {
             for (final Argument.Builder argumentBuilder : actionBuilder.getArgumentBuilderList()) {
                 final String name = argumentBuilder.getRelatedStateVariableName();
-                final StateVariable variable = mStateVariableMap.get(name);
+                if (name == null) {
+                    throw new IllegalStateException("relatedStateVariable name is null");
+                }
+                StateVariable variable = variableMap.get(name);
                 if (variable == null) {
-                    throw new IllegalStateException("There is no StateVariable " + name);
+                    // for AN-WLTU1
+                    final String trimmedName = name.trim();
+                    variable = variableMap.get(trimmedName);
+                    if (variable == null) {
+                        throw new IllegalStateException("There is no StateVariable " + name);
+                    }
+                    Log.w("Invalid description. relatedStateVariable name has unnecessary blanks ["
+                            + name + "] on " + service.getServiceId());
+                    argumentBuilder.setRelatedStateVariableName(trimmedName);
                 }
                 argumentBuilder.setRelatedStateVariable(variable);
             }
-            final Action action = actionBuilder.setService(this).build();
+            final Action action = actionBuilder.setService(service).build();
             mActionMap.put(action.getName(), action);
         }
+        return mActionMap;
     }
 
     /**
@@ -280,7 +310,7 @@ public class Service {
      * @see Device#getAbsoluteUrl(String)
      */
     @Nonnull
-    URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
+    public URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
         return mDevice.getAbsoluteUrl(url);
     }
 

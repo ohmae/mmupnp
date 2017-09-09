@@ -1,0 +1,19 @@
+language: java
+sudo: false
+
+before_install:
+  - chmod +x gradlew
+
+script:
+  - ./gradlew lib:check
+  - ./gradlew jacocoTestReport
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+notifications:
+  email: false
+
+branches:
+  except:
+    - gh-pages

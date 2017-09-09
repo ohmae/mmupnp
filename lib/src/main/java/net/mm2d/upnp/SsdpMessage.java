@@ -110,8 +110,10 @@ public abstract class SsdpMessage {
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpMessage(@Nonnull final InterfaceAddress address,
-                       @Nonnull final byte[] data, final int length)
+    public SsdpMessage(
+            @Nonnull final InterfaceAddress address,
+            @Nonnull final byte[] data,
+            final int length)
             throws IOException {
         mMessage = newMessage();
         mInterfaceAddress = address;
@@ -203,7 +205,9 @@ public abstract class SsdpMessage {
      * @param name  ヘッダ名
      * @param value 値
      */
-    public void setHeader(@Nonnull final String name, @Nonnull final String value) {
+    public void setHeader(
+            @Nonnull final String name,
+            @Nonnull final String value) {
         mMessage.setHeader(name, value);
     }
 

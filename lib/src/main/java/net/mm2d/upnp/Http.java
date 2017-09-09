@@ -145,7 +145,9 @@ public final class Http {
         @Nonnull
         private final String mPhrase;
 
-        Status(final int code, @Nonnull final String phrase) {
+        Status(
+                final int code,
+                @Nonnull final String phrase) {
             mCode = code;
             mPhrase = phrase;
         }
@@ -301,7 +303,9 @@ public final class Http {
      * @return 結合されたURL
      */
     @Nonnull
-    static String makeUrlWithAbsolutePath(@Nonnull final String baseUrl, @Nonnull final String path) {
+    static String makeUrlWithAbsolutePath(
+            @Nonnull final String baseUrl,
+            @Nonnull final String path) {
         final int pos = baseUrl.indexOf('/', HTTP_SCHEME.length());
         if (pos < 0) {
             return baseUrl + path;
@@ -317,7 +321,9 @@ public final class Http {
      * @return 結合されたURL
      */
     @Nonnull
-    static String makeUrlWithRelativePath(@Nonnull final String baseUrl, @Nonnull final String path) {
+    static String makeUrlWithRelativePath(
+            @Nonnull final String baseUrl,
+            @Nonnull final String path) {
         if (baseUrl.endsWith("/")) {
             return baseUrl + path;
         }

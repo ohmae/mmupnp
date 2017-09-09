@@ -15,14 +15,19 @@ import java.util.List;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class StateVariableNode extends UpnpNode {
-    public StateVariableNode(StateVariable variable) {
+    public StateVariableNode(final StateVariable variable) {
         super(variable);
         setAllowsChildren(false);
     }
 
     @Override
+    public StateVariable getUserObject() {
+        return (StateVariable) super.getUserObject();
+    }
+
+    @Override
     public String getDetailText() {
-        final StateVariable o = (StateVariable) getUserObject();
+        final StateVariable o = getUserObject();
         final StringBuilder sb = new StringBuilder();
         sb.append("Name: ");
         sb.append(o.getName());
@@ -50,7 +55,6 @@ public class StateVariableNode extends UpnpNode {
 
     @Override
     public String toString() {
-        final StateVariable o = (StateVariable) getUserObject();
-        return o.getName();
+        return getUserObject().getName();
     }
 }

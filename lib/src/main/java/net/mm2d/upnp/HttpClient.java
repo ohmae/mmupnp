@@ -120,7 +120,9 @@ public class HttpClient {
      * @throws IOException 通信エラー
      */
     @Nonnull
-    private HttpResponse post(@Nonnull final HttpRequest request, final int redirectDepth) throws IOException {
+    private HttpResponse post(
+            @Nonnull final HttpRequest request,
+            final int redirectDepth) throws IOException {
         confirmReuseSocket(request);
         final HttpResponse response;
         try {
@@ -168,9 +170,10 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirectIfNeeded(@Nonnull final HttpRequest request,
-                                          @Nonnull final HttpResponse response,
-                                          final int redirectDepth)
+    private HttpResponse redirectIfNeeded(
+            @Nonnull final HttpRequest request,
+            @Nonnull final HttpResponse response,
+            final int redirectDepth)
             throws IOException {
         if (needToRedirect(response) && redirectDepth < REDIRECT_MAX) {
             final String location = response.getHeader(Http.LOCATION);
@@ -195,8 +198,10 @@ public class HttpClient {
     }
 
     @Nonnull
-    private HttpResponse redirect(@Nonnull final HttpRequest request,
-                                  @Nonnull final String location, final int redirectDepth)
+    private HttpResponse redirect(
+            @Nonnull final HttpRequest request,
+            @Nonnull final String location,
+            final int redirectDepth)
             throws IOException {
         final HttpRequest newRequest = new HttpRequest(request);
         newRequest.setUrl(new URL(location), true);
@@ -282,7 +287,8 @@ public class HttpClient {
     public HttpResponse download(@Nonnull final URL url) throws IOException {
         final HttpRequest request = makeHttpRequest(url);
         final HttpResponse response = post(request);
-        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(response.getBody())) {
+        // response bodyがemptyであることは正常
+        if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
             Log.i("request:" + request.toString() + "\nresponse:" + response.toString());
             throw new IOException(response.getStartLine());
         }

@@ -200,7 +200,9 @@ public abstract class HttpMessage {
      * @param name  ヘッダ名
      * @param value 値
      */
-    public void setHeader(@Nonnull final String name, @Nonnull final String value) {
+    public void setHeader(
+            @Nonnull final String name,
+            @Nonnull final String value) {
         mHeaders.put(name, value);
     }
 
@@ -289,7 +291,9 @@ public abstract class HttpMessage {
      * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
-    public void setBody(@Nullable final String body, final boolean withContentLength) {
+    public void setBody(
+            @Nullable final String body,
+            final boolean withContentLength) {
         setBodyInner(body, null, withContentLength);
     }
 
@@ -310,13 +314,16 @@ public abstract class HttpMessage {
      * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
-    public void setBodyBinary(@Nullable final byte[] body, final boolean withContentLength) {
+    public void setBodyBinary(
+            @Nullable final byte[] body,
+            final boolean withContentLength) {
         setBodyInner(null, body, withContentLength);
     }
 
-    private void setBodyInner(@Nullable final String string,
-                              @Nullable final byte[] binary,
-                              final boolean withContentLength) {
+    private void setBodyInner(
+            @Nullable final String string,
+            @Nullable final byte[] binary,
+            final boolean withContentLength) {
         mBody = string;
         if (TextUtils.isEmpty(string)) {
             mBodyBinary = binary;
@@ -445,7 +452,9 @@ public abstract class HttpMessage {
         os.flush();
     }
 
-    private void writeChunkedBody(@Nonnull final OutputStream os, @Nonnull final byte[] binary)
+    private void writeChunkedBody(
+            @Nonnull final OutputStream os,
+            @Nonnull final byte[] binary)
             throws IOException {
         int offset = 0;
         while (offset < binary.length) {
@@ -459,7 +468,9 @@ public abstract class HttpMessage {
         os.write(CRLF);
     }
 
-    private void writeChunkSize(@Nonnull final OutputStream os, final int size) throws IOException {
+    private void writeChunkSize(
+            @Nonnull final OutputStream os,
+            final int size) throws IOException {
         os.write(Integer.toHexString(size).getBytes(CHARSET));
         os.write(CRLF);
     }

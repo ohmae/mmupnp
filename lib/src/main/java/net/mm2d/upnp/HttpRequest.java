@@ -100,7 +100,9 @@ public class HttpRequest extends HttpMessage {
      * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(@Nonnull final URL url, final boolean withHostHeader) throws IOException {
+    public void setUrl(
+            @Nonnull final URL url,
+            final boolean withHostHeader) throws IOException {
         if (!TextUtils.equals(url.getProtocol(), "http")) {
             throw new IOException("unsupported protocol." + url.getProtocol());
         }

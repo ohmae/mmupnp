@@ -66,17 +66,23 @@ public class Log {
          * @param tag     タグ
          * @param message メッセージ
          */
-        void println(int level, @Nonnull String tag, @Nonnull String message);
+        void println(
+                int level,
+                @Nonnull String tag,
+                @Nonnull String message);
     }
 
     /**
      * System.outへ出力するデフォルトの出力処理
      */
     private static class DefaultPrint implements Print {
-        private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
         @Override
-        public void println(final int level, @Nonnull final String tag, @Nonnull final String message) {
+        public void println(
+                final int level,
+                @Nonnull final String tag,
+                @Nonnull final String message) {
             final String[] lines = message.split("\n");
             final String prefix = getDateString() + levelToString(level) + "[" + tag + "] ";
             for (final String line : lines) {
@@ -164,7 +170,9 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void v(@Nullable final String tag, @Nullable final String message) {
+    public static void v(
+            @Nullable final String tag,
+            @Nullable final String message) {
         println(VERBOSE, tag, message, null);
     }
 
@@ -188,7 +196,10 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void v(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
+    public static void v(
+            @Nullable final String tag,
+            @Nullable final String message,
+            @Nullable final Throwable tr) {
         println(VERBOSE, tag, message, tr);
     }
 
@@ -207,7 +218,9 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void d(@Nullable final String tag, @Nullable final String message) {
+    public static void d(
+            @Nullable final String tag,
+            @Nullable final String message) {
         println(DEBUG, tag, message, null);
     }
 
@@ -231,7 +244,10 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void d(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
+    public static void d(
+            @Nullable final String tag,
+            @Nullable final String message,
+            @Nullable final Throwable tr) {
         println(DEBUG, tag, message, tr);
     }
 
@@ -250,7 +266,9 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void i(@Nullable final String tag, @Nullable final String message) {
+    public static void i(
+            @Nullable final String tag,
+            @Nullable final String message) {
         println(INFO, tag, message, null);
     }
 
@@ -274,7 +292,10 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void i(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
+    public static void i(
+            @Nullable final String tag,
+            @Nullable final String message,
+            @Nullable final Throwable tr) {
         println(INFO, tag, message, tr);
     }
 
@@ -293,7 +314,9 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void w(@Nullable final String tag, @Nullable final String message) {
+    public static void w(
+            @Nullable final String tag,
+            @Nullable final String message) {
         println(WARN, tag, message, null);
     }
 
@@ -316,7 +339,9 @@ public class Log {
      * @param tag タグ
      * @param tr  Throwable
      */
-    public static void w(@Nullable final String tag, @Nullable final Throwable tr) {
+    public static void w(
+            @Nullable final String tag,
+            @Nullable final Throwable tr) {
         println(WARN, tag, null, tr);
     }
 
@@ -329,7 +354,10 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void w(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
+    public static void w(
+            @Nullable final String tag,
+            @Nullable final String message,
+            @Nullable final Throwable tr) {
         println(WARN, tag, message, tr);
     }
 
@@ -348,7 +376,9 @@ public class Log {
      * @param tag     タグ
      * @param message メッセージ
      */
-    public static void e(@Nullable final String tag, @Nullable final String message) {
+    public static void e(
+            @Nullable final String tag,
+            @Nullable final String message) {
         println(ERROR, tag, message, null);
     }
 
@@ -372,13 +402,19 @@ public class Log {
      * @param message メッセージ
      * @param tr      Throwable
      */
-    public static void e(@Nullable final String tag, @Nullable final String message, @Nullable final Throwable tr) {
+    public static void e(
+            @Nullable final String tag,
+            @Nullable final String message,
+            @Nullable final Throwable tr) {
         println(ERROR, tag, message, tr);
     }
 
-    private static void println(
-            final int level, @Nullable final String tag,
-            @Nullable final String message, @Nullable final Throwable tr) {
+    // VisibleForTesting
+    static void println(
+            final int level,
+            @Nullable final String tag,
+            @Nullable final String message,
+            @Nullable final Throwable tr) {
         if (level < sLogLevel) {
             return;
         }
@@ -398,7 +434,9 @@ public class Log {
     }
 
     @Nonnull
-    private static String makeTag(@Nullable final String tag, @Nullable final StackTraceElement element) {
+    private static String makeTag(
+            @Nullable final String tag,
+            @Nullable final StackTraceElement element) {
         if (tag != null) {
             return tag;
         }
@@ -437,7 +475,9 @@ public class Log {
     }
 
     @Nonnull
-    private static String makeMessage(@Nullable final String message, @Nullable final Throwable tr) {
+    private static String makeMessage(
+            @Nullable final String message,
+            @Nullable final Throwable tr) {
         if (message == null) {
             if (tr == null) {
                 return "";

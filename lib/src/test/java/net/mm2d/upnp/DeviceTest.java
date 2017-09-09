@@ -27,7 +27,7 @@ public class DeviceTest {
     private HttpClient mHttpClient;
     private SsdpMessage mSsdpMessage;
     private ControlPoint mControlPoint;
-    private Device mDevice;
+    private Device.Builder mBuilder;
 
     @Before
     public void setUp() throws Exception {
@@ -52,15 +52,15 @@ public class DeviceTest {
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         mSsdpMessage = new SsdpRequestMessage(interfaceAddress, data, data.length);
         mControlPoint = mock(ControlPoint.class);
-        final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
-        DeviceParser.loadDescription(mHttpClient, builder);
-        mDevice = builder.build();
+        mBuilder = new Device.Builder(mControlPoint, mSsdpMessage);
+        DeviceParser.loadDescription(mHttpClient, mBuilder);
     }
 
     @Test
     public void loadIconBinary_NONE() throws Exception {
-        mDevice.loadIconBinary(mHttpClient, IconFilter.NONE);
-        final List<Icon> list = mDevice.getIconList();
+        final Device device = mBuilder.build();
+        device.loadIconBinary(mHttpClient, IconFilter.NONE);
+        final List<Icon> list = device.getIconList();
         for (final Icon icon : list) {
             assertThat(icon.getBinary(), is(nullValue()));
         }
@@ -68,8 +68,9 @@ public class DeviceTest {
 
     @Test
     public void loadIconBinary_ALL() throws Exception {
-        mDevice.loadIconBinary(mHttpClient, IconFilter.ALL);
-        final List<Icon> list = mDevice.getIconList();
+        final Device device = mBuilder.build();
+        device.loadIconBinary(mHttpClient, IconFilter.ALL);
+        final List<Icon> list = device.getIconList();
         for (final Icon icon : list) {
             assertThat(icon.getBinary(), is(notNullValue()));
         }
@@ -77,36 +78,42 @@ public class DeviceTest {
 
     @Test
     public void getControlPoint() throws Exception {
-        assertThat(mDevice.getControlPoint(), is(mControlPoint));
+        final Device device = mBuilder.build();
+        assertThat(device.getControlPoint(), is(mControlPoint));
     }
 
     @Test
     public void setSsdpMessage() throws Exception {
+        final Device device = mBuilder.build();
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
-        mDevice.updateSsdpMessage(message);
+        device.updateSsdpMessage(message);
 
-        assertThat(mDevice.getSsdpMessage(), is(message));
+        assertThat(device.getSsdpMessage(), is(message));
     }
 
     @Test
     public void getSsdpMessage() throws Exception {
-        assertThat(mDevice.getSsdpMessage(), is(mSsdpMessage));
+        final Device device = mBuilder.build();
+        assertThat(device.getSsdpMessage(), is(mSsdpMessage));
     }
 
     @Test
     public void getExpireTime() throws Exception {
-        assertThat(mDevice.getExpireTime(), is(mSsdpMessage.getExpireTime()));
+        final Device device = mBuilder.build();
+        assertThat(device.getExpireTime(), is(mSsdpMessage.getExpireTime()));
     }
 
     @Test
     public void getDescription() throws Exception {
-        assertThat(mDevice.getDescription(), is(TestUtils.getResourceAsString("device.xml")));
+        final Device device = mBuilder.build();
+        assertThat(device.getDescription(), is(TestUtils.getResourceAsString("device.xml")));
     }
 
     @Test
     public void getAbsoluteUrl_locationがホスト名のみ() throws Exception {
+        final Device device = mBuilder.build();
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
@@ -117,15 +124,16 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/");
         message.updateHeader();
-        mDevice.updateSsdpMessage(message);
+        device.updateSsdpMessage(message);
 
-        assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/fuga")));
+        assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/fuga")));
     }
 
     @Test
     public void getAbsoluteUrl_locationがホスト名のみで末尾のスラッシュなし() throws Exception {
+        final Device device = mBuilder.build();
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
@@ -136,15 +144,16 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000");
         message.updateHeader();
-        mDevice.updateSsdpMessage(message);
+        device.updateSsdpMessage(message);
 
-        assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/fuga")));
+        assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/fuga")));
     }
 
     @Test
     public void getAbsoluteUrl_locationがファイル名で終わる() throws Exception {
+        final Device device = mBuilder.build();
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
@@ -155,15 +164,16 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga");
         message.updateHeader();
-        mDevice.updateSsdpMessage(message);
+        device.updateSsdpMessage(message);
 
-        assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
     }
 
     @Test
     public void getAbsoluteUrl_locationがディレクトリ名で終わる() throws Exception {
+        final Device device = mBuilder.build();
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
@@ -174,15 +184,16 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga/");
         message.updateHeader();
-        mDevice.updateSsdpMessage(message);
+        device.updateSsdpMessage(message);
 
-        assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga/fuga")));
+        assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga/fuga")));
     }
 
     @Test
     public void getAbsoluteUrl_locationにクエリーがついている() throws Exception {
+        final Device device = mBuilder.build();
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
         final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
         final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
@@ -193,93 +204,139 @@ public class DeviceTest {
 
         message.setHeader(Http.LOCATION, "http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar");
         message.updateHeader();
-        mDevice.updateSsdpMessage(message);
+        device.updateSsdpMessage(message);
 
-        assertThat(mDevice.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-        assertThat(mDevice.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+    }
+
+    @Test
+    public void getBaseUrl_URLBaseがなければLocationの値() throws Exception {
+        final String location = "http://10.0.0.1:1000/";
+        final Device device = mBuilder.build();
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
+        final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
+        final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
+        message.setHeader(Http.LOCATION, location);
+        message.updateHeader();
+        device.updateSsdpMessage(message);
+
+        assertThat(device.getBaseUrl(), is(location));
+    }
+
+    @Test
+    public void getBaseUrl_URLBaseがあればURLBaseの値() throws Exception {
+        final String location = "http://10.0.0.1:1000/";
+        final String urlBase = "http://10.0.0.1:1001/";
+        mBuilder.setUrlBase(urlBase);
+        final Device device = mBuilder.build();
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
+        final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
+        final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
+        message.setHeader(Http.LOCATION, location);
+        message.updateHeader();
+        device.updateSsdpMessage(message);
+
+        assertThat(device.getBaseUrl(), is(urlBase));
     }
 
     @Test
     public void getValue() throws Exception {
-        assertThat(mDevice.getValue("deviceType"),
+        final Device device = mBuilder.build();
+        assertThat(device.getValue("deviceType"),
                 is("urn:schemas-upnp-org:device:MediaServer:1"));
     }
 
     @Test
     public void getValue_with_ns() throws Exception {
-        assertThat(mDevice.getValue("deviceType", "urn:schemas-upnp-org:device-1-0"),
+        final Device device = mBuilder.build();
+        assertThat(device.getValue("deviceType", "urn:schemas-upnp-org:device-1-0"),
                 is("urn:schemas-upnp-org:device:MediaServer:1"));
     }
 
     @Test
     public void getLocation() throws Exception {
-        assertThat(mDevice.getLocation(), is(mSsdpMessage.getLocation()));
+        final Device device = mBuilder.build();
+        assertThat(device.getLocation(), is(mSsdpMessage.getLocation()));
     }
 
     @Test
     public void getIpAddress() throws Exception {
-        assertThat(mDevice.getIpAddress(), is("192.0.2.2"));
+        final Device device = mBuilder.build();
+        assertThat(device.getIpAddress(), is("192.0.2.2"));
     }
 
     @Test
     public void getUdn() throws Exception {
-        assertThat(mDevice.getUdn(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
+        final Device device = mBuilder.build();
+        assertThat(device.getUdn(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
 
     @Test
     public void getDeviceType() throws Exception {
-        assertThat(mDevice.getDeviceType(), is("urn:schemas-upnp-org:device:MediaServer:1"));
+        final Device device = mBuilder.build();
+        assertThat(device.getDeviceType(), is("urn:schemas-upnp-org:device:MediaServer:1"));
     }
 
     @Test
     public void getFriendlyName() throws Exception {
-        assertThat(mDevice.getFriendlyName(), is("mmupnp"));
+        final Device device = mBuilder.build();
+        assertThat(device.getFriendlyName(), is("mmupnp"));
     }
 
     @Test
     public void getManufacture() throws Exception {
-        assertThat(mDevice.getManufacture(), is("mm2d.net"));
+        final Device device = mBuilder.build();
+        assertThat(device.getManufacture(), is("mm2d.net"));
     }
 
     @Test
     public void getManufactureUrl() throws Exception {
-        assertThat(mDevice.getManufactureUrl(), is("http://www.mm2d.net/"));
+        final Device device = mBuilder.build();
+        assertThat(device.getManufactureUrl(), is("http://www.mm2d.net/"));
     }
 
     @Test
     public void getModelName() throws Exception {
-        assertThat(mDevice.getModelName(), is("mmupnp"));
+        final Device device = mBuilder.build();
+        assertThat(device.getModelName(), is("mmupnp"));
     }
 
     @Test
     public void getModelUrl() throws Exception {
-        assertThat(mDevice.getModelUrl(), is("http://www.mm2d.net/"));
+        final Device device = mBuilder.build();
+        assertThat(device.getModelUrl(), is("http://www.mm2d.net/"));
     }
 
     @Test
     public void getModelDescription() throws Exception {
-        assertThat(mDevice.getModelDescription(), is("mmupnp test server"));
+        final Device device = mBuilder.build();
+        assertThat(device.getModelDescription(), is("mmupnp test server"));
     }
 
     @Test
     public void getModelNumber() throws Exception {
-        assertThat(mDevice.getModelNumber(), is("ABCDEFG"));
+        final Device device = mBuilder.build();
+        assertThat(device.getModelNumber(), is("ABCDEFG"));
     }
 
     @Test
     public void getSerialNumber() throws Exception {
-        assertThat(mDevice.getSerialNumber(), is("0123456789ABC"));
+        final Device device = mBuilder.build();
+        assertThat(device.getSerialNumber(), is("0123456789ABC"));
     }
 
     @Test
     public void getPresentationUrl() throws Exception {
-        assertThat(mDevice.getPresentationUrl(), is("http://192.0.2.2:12346/"));
+        final Device device = mBuilder.build();
+        assertThat(device.getPresentationUrl(), is("http://192.0.2.2:12346/"));
     }
 
     @Test
     public void getIconList() throws Exception {
-        final List<Icon> list = mDevice.getIconList();
+        final Device device = mBuilder.build();
+        final List<Icon> list = device.getIconList();
         for (final Icon icon : list) {
             assertThat(icon.getMimeType(), is(anyOf(is("image/jpeg"), is("image/png"))));
             assertThat(icon.getWidth(), is(anyOf(is(48), is(120))));
@@ -295,49 +352,56 @@ public class DeviceTest {
 
     @Test
     public void getServiceList() throws Exception {
-        assertThat(mDevice.getServiceList(), hasSize(3));
+        final Device device = mBuilder.build();
+        assertThat(device.getServiceList(), hasSize(3));
     }
 
     @Test
     public void findServiceById() throws Exception {
-        final Service cds = mDevice.findServiceById("urn:upnp-org:serviceId:ContentDirectory");
+        final Device device = mBuilder.build();
+        final Service cds = device.findServiceById("urn:upnp-org:serviceId:ContentDirectory");
 
         assertThat(cds, is(notNullValue()));
-        assertThat(cds.getDevice(), is(mDevice));
+        assertThat(cds.getDevice(), is(device));
     }
 
     @Test
     public void findServiceByType() throws Exception {
-        final Service cds = mDevice.findServiceByType("urn:schemas-upnp-org:service:ContentDirectory:1");
+        final Device device = mBuilder.build();
+        final Service cds = device.findServiceByType("urn:schemas-upnp-org:service:ContentDirectory:1");
 
         assertThat(cds, is(notNullValue()));
-        assertThat(cds.getDevice(), is(mDevice));
+        assertThat(cds.getDevice(), is(device));
     }
 
     @Test
     public void findAction() throws Exception {
-        final Action browse = mDevice.findAction("Browse");
+        final Device device = mBuilder.build();
+        final Action browse = device.findAction("Browse");
 
         assertThat(browse, is(notNullValue()));
-        assertThat(browse.getService().getDevice(), is(mDevice));
+        assertThat(browse.getService().getDevice(), is(device));
 
-        final Action hogehoge = mDevice.findAction("hogehoge");
+        final Action hogehoge = device.findAction("hogehoge");
 
         assertThat(hogehoge, is(nullValue()));
     }
 
     @Test
     public void toString_Nullでない() throws Exception {
-        assertThat(mDevice.toString(), is(notNullValue()));
+        final Device device = mBuilder.build();
+        assertThat(device.toString(), is(notNullValue()));
     }
 
     @Test
     public void hashCode_Exceptionが発生しない() throws Exception {
-        mDevice.hashCode();
+        final Device device = mBuilder.build();
+        device.hashCode();
     }
 
     @Test
     public void equals_null比較可能() throws Exception {
-        assertThat(mDevice.equals(null), is(false));
+        final Device device = mBuilder.build();
+        assertThat(device.equals(null), is(false));
     }
 }
