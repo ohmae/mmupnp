@@ -38,7 +38,7 @@ class ControlPointDiFactory {
 
     @Nonnull
     ExecutorService createIoExecutor() {
-        return Executors.newSingleThreadExecutor();
+        return Executors.newCachedThreadPool();
     }
 
     @Nonnull
