@@ -13,15 +13,44 @@ import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 
 import java.net.NetworkInterface;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.Nonnull;
 
 /**
- * ControlPointのテストを用意にするためのDependency injection
+ * ControlPointのテストを容易にするためのDependency injection
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class ControlPointFactory {
+class ControlPointDiFactory {
+    @Nonnull
+    Map<String, Device.Builder> createLoadingDeviceMap() {
+        return new HashMap<>();
+    }
+
+    @Nonnull
+    ExecutorService createNotifyExecutor() {
+        return Executors.newSingleThreadExecutor();
+    }
+
+    @Nonnull
+    ExecutorService createIoExecutor() {
+        return Executors.newSingleThreadExecutor();
+    }
+
+    @Nonnull
+    DeviceHolder createDeviceHolder(@Nonnull final ControlPoint cp) {
+        return new DeviceHolder(cp);
+    }
+
+    @Nonnull
+    SubscribeHolder createSubscribeHolder() {
+        return new SubscribeHolder();
+    }
+
     @Nonnull
     SsdpSearchServerList createSsdpSearchServerList(
             @Nonnull final Collection<NetworkInterface> interfaces,

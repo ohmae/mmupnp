@@ -51,9 +51,23 @@ public class DeviceParserTest {
     }
 
     @Test
-    public void loadDescription1() throws Exception {
+    public void loadDescription() throws Exception {
         doReturn(TestUtils.getResourceAsString("device.xml"))
                 .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
+
+        final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+        DeviceParser.loadDescription(mHttpClient, builder);
+        final Device device = builder.build();
+        assertThat(device.getIconList(), hasSize(4));
+        assertThat(device.getServiceList(), hasSize(3));
+    }
+
+    @Test
+    public void loadDescription_特別対応() throws Exception {
+        doReturn(TestUtils.getResourceAsString("device.xml"))
+                .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
+        doReturn(TestUtils.getResourceAsString("mmupnp-with-mistake.xml"))
+                .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/mmupnp.xml"));
 
         final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
         DeviceParser.loadDescription(mHttpClient, builder);

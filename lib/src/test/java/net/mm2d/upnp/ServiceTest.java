@@ -190,12 +190,24 @@ public class ServiceTest {
     }
 
     @Test
-    public void renewSubscribe() throws Exception {
+    public void renewSubscribe1() throws Exception {
         final MockHttpClientFactory factory = new MockHttpClientFactory();
         factory.setResponse(createSubscribeResponse());
         mCds.setHttpClientFactory(factory);
         mCds.subscribe();
         mCds.renewSubscribe();
+
+        final HttpRequest request = factory.getHttpRequest();
+        assertThat(request.getUri(), is(mCds.getEventSubUrl()));
+    }
+
+    @Test
+    public void renewSubscribe2() throws Exception {
+        final MockHttpClientFactory factory = new MockHttpClientFactory();
+        factory.setResponse(createSubscribeResponse());
+        mCds.setHttpClientFactory(factory);
+        mCds.subscribe();
+        mCds.subscribe();
 
         final HttpRequest request = factory.getHttpRequest();
         assertThat(request.getUri(), is(mCds.getEventSubUrl()));
