@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.Http.Status;
 import net.mm2d.util.Log;
 import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
@@ -131,6 +132,26 @@ public class Action {
         }
     }
 
+    /**
+     * エラーレスポンスの faultcode を格納するkey。
+     *
+     * <p>正常な応答であれば、SOAPのnamespaceがついた"Client"が格納されている。
+     */
+    public static final String FAULT_CODE_KEY = "faultcode";
+    /**
+     * エラーレスポンスの faultstring を格納するkey。
+     *
+     * <p>正常な応答であれば、"UPnPError"が格納されている。
+     */
+    public static final String FAULT_STRING_KEY = "faultstring";
+    /**
+     * エラーレスポンスの detail/UPnPError/errorCode を格納するkey。
+     */
+    public static final String ERROR_CODE_KEY = "UPnPError/errorCode";
+    /**
+     * エラーレスポンスの detail/UPnPError/errorDescription を格納するkey.
+     */
+    public static final String ERROR_DESCRIPTION_KEY = "UPnPError/errorDescription";
     private static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
     private static final String XMLNS_PREFIX = "xmlns:";
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
@@ -226,6 +247,10 @@ public class Action {
     /**
      * Actionを実行する。
      *
+     * <p>実行後エラー応答を受け取った場合は、IOExceptionを発生させる。
+     * エラー応答の内容を取得する必要がある場合は{@link #invoke(Map, boolean)}を使用し、第二引数にtrueを指定する。
+     * このメソッドは{@link #invoke(Map, boolean)}の第二引数にfalseを指定した場合と等価である。
+     *
      * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
      * 値はすべてStringで表現する。
      * Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われない。
@@ -234,7 +259,6 @@ public class Action {
      *
      * <p>引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
      * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
-     * 実行後エラー応答があった場合のパースには未対応であり、IOExceptionが発生するのみである。
      *
      * <p>実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
      * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
@@ -242,19 +266,68 @@ public class Action {
      * @param argumentValues 引数への入力値
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see #invoke(Map, boolean)
      */
     @Nonnull
     public Map<String, String> invoke(@Nonnull final Map<String, String> argumentValues)
             throws IOException {
+        return invoke(argumentValues, false);
+    }
+
+    /**
+     * Actionを実行する。
+     *
+     * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
+     * 値はすべてStringで表現する。
+     * Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われない。
+     *
+     * <p>引数として渡したMapの中にArgumentに記載のない値を設定していても無視される。
+     *
+     * <p>引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
+     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     *
+     * <p>実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
+     * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
+     *
+     * <p>第二引数がfalseの場合、エラーレスポンスが返却された場合は、IOExceptionを発生させる。
+     * trueを指定すると、エラーレスポンスもパースして戻り値として返却する。
+     * この場合、戻り値のMapのkeyとして
+     * エラーレスポンスが仕様に従うなら'faultcode','faultstring','UPnPError/errorCode',が含まれ
+     * 'UPnPError/errorDescription'も含まれている場合がある。
+     * このメソッドでは'UPnPError/errorCode'が含まれていない場合は、
+     * エラーレスポンスの異常として、IOExceptionを発生させる。
+     *
+     * @param argumentValues      引数への入力値
+     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see #FAULT_CODE_KEY
+     * @see #FAULT_STRING_KEY
+     * @see #ERROR_CODE_KEY
+     * @see #ERROR_DESCRIPTION_KEY
+     */
+    @Nonnull
+    public Map<String, String> invoke(
+            @Nonnull final Map<String, String> argumentValues,
+            final boolean returnErrorResponse)
+            throws IOException {
         final List<StringPair> arguments = makeArguments(argumentValues);
         final String soap = makeSoap(null, arguments);
-        return invokeInner(soap);
+        final Map<String, String> result = invokeInner(soap);
+        if (!returnErrorResponse && result.containsKey(ERROR_CODE_KEY)) {
+            throw new IOException("");
+        }
+        return result;
     }
 
     /**
      * Actionを実行する。【試験的実装】
      *
      * <p>※試験的実装であり、将来的に変更、削除される可能性が高い
+     *
+     * <p>実行後エラー応答を受け取った場合は、IOExceptionを発生させる。
+     * エラー応答の内容を取得する必要がある場合は{@link #invoke(Map, Map, Map, boolean)}を使用し、第四引数にtrueを指定する。
+     * このメソッドは{@link #invoke(Map, Map, Map, boolean)}の第四引数にfalseを指定した場合と等価である。
      *
      * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
      * 値はすべてStringで表現する。
@@ -264,7 +337,6 @@ public class Action {
      *
      * <p>引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
      * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
-     * 実行後エラー応答があった場合のパースには未対応であり、IOExceptionが発生するのみである。
      *
      * <p>第二引数として第三引数で使用するNamespaceを指定する。不要であればnullを指定する。
      * StringPairのリストであり、keyとしてprefixを、valueとしてURIを指定する。
@@ -284,6 +356,7 @@ public class Action {
      * @param customArguments カスタム引数
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see #invoke(Map, Map, Map, boolean)
      */
     @Nonnull
     public Map<String, String> invoke(
@@ -291,10 +364,70 @@ public class Action {
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments)
             throws IOException {
+        return invoke(argumentValues, customNamespace, customArguments, false);
+    }
+
+    /**
+     * Actionを実行する。【試験的実装】
+     *
+     * <p>※試験的実装であり、将来的に変更、削除される可能性が高い
+     *
+     * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
+     * 値はすべてStringで表現する。
+     * Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われない。
+     *
+     * <p>第一引数として渡したMapの中にArgumentに記載のない値を設定していても無視される。
+     *
+     * <p>引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
+     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     *
+     * <p>第二引数として第三引数で使用するNamespaceを指定する。不要であればnullを指定する。
+     * StringPairのリストであり、keyとしてprefixを、valueとしてURIを指定する。
+     * key/valueともにnullを指定することはできない。
+     * この引数によって与えたNamespaceはAction Elementに追加される。
+     *
+     * <p>第三引数として渡したStringPairのリストは純粋にSOAP XMLのAction Elementの子要素として追加される。
+     * keyとして引数名、valueとして値を指定する。keyはnullであってはならない。valueがnullの場合は空の引数指定となる。
+     * この際Argumentの値との関係性はチェックされずすべてがそのまま追加される。
+     * ただし、Namespaceとして登録されないprefixを持っているなどXMLとして不正な引数を与えると失敗する。
+     *
+     * <p>実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
+     * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
+     *
+     * <p>第四引数がfalseの場合、エラーレスポンスが返却された場合は、IOExceptionを発生させる。
+     * trueを指定すると、エラーレスポンスもパースして戻り値として返却する。
+     * この場合、戻り値のMapのkeyとして
+     * エラーレスポンスが仕様に従うなら'faultcode','faultstring','UPnPError/errorCode',が含まれ
+     * 'UPnPError/errorDescription'も含まれている場合がある。
+     * このメソッドでは'UPnPError/errorCode'が含まれていない場合は、
+     * エラーレスポンスの異常として、IOExceptionを発生させる。
+     *
+     * @param argumentValues      引数への入力値
+     * @param customNamespace     カスタム引数のNamespace情報、不要な場合null
+     * @param customArguments     カスタム引数
+     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see #FAULT_CODE_KEY
+     * @see #FAULT_STRING_KEY
+     * @see #ERROR_CODE_KEY
+     * @see #ERROR_DESCRIPTION_KEY
+     */
+    @Nonnull
+    public Map<String, String> invoke(
+            @Nonnull final Map<String, String> argumentValues,
+            @Nullable final Map<String, String> customNamespace,
+            @Nonnull final Map<String, String> customArguments,
+            final boolean returnErrorResponse)
+            throws IOException {
         final List<StringPair> arguments = makeArguments(argumentValues);
         appendArgument(arguments, customArguments);
         final String soap = makeSoap(customNamespace, arguments);
-        return invokeInner(soap);
+        final Map<String, String> result = invokeInner(soap);
+        if (!returnErrorResponse && result.containsKey(ERROR_CODE_KEY)) {
+            throw new IOException("");
+        }
+        return result;
     }
 
     /**
@@ -365,6 +498,13 @@ public class Action {
         final HttpRequest request = makeHttpRequest(url, soap);
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
+        if (response.getStatus() == Status.HTTP_INTERNAL_ERROR && response.getBody() != null) {
+            try {
+                return parseErrorResponse(response.getBody());
+            } catch (final SAXException | ParserConfigurationException e) {
+                throw new IOException(response.getBody(), e);
+            }
+        }
         if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
             Log.w(response.toString());
             throw new IOException(response.getStartLine());
@@ -500,7 +640,7 @@ public class Action {
      * Actionに対する応答をパースする
      *
      * @param xml 応答となるXML
-     * @return Actionに対する応答であるXML文字列
+     * @return Actionに対する応答、argument名をkeyとする。
      * @throws ParserConfigurationException XMLパーサのインスタンス化に問題がある場合
      * @throws SAXException                 XMLパース処理に問題がある場合
      * @throws IOException                  入力値に問題がある場合
@@ -526,7 +666,7 @@ public class Action {
     }
 
     /**
-     * Actionに対する応答をパースし、ResponseタグのElementを探し出す。
+     * Actionに対する応答をパースし、ResponseタグのElementを探して返す。
      *
      * @param xml Actionに対する応答であるXML文字列
      * @return ResponseタグのElement
@@ -549,5 +689,84 @@ public class Action {
             throw new IOException("no response tag");
         }
         return response;
+    }
+
+    /**
+     * Actionに対するエラー応答をパースする
+     *
+     * @param xml 応答となるXML
+     * @return エラー応答の情報、'faultcode','faultstring','UPnPError/errorCode','UPnPError/errorDescription'
+     * @throws ParserConfigurationException XMLパーサのインスタンス化に問題がある場合
+     * @throws SAXException                 XMLパース処理に問題がある場合
+     * @throws IOException                  入力値に問題がある場合
+     */
+    @Nonnull
+    private Map<String, String> parseErrorResponse(@Nonnull final String xml)
+            throws ParserConfigurationException, IOException, SAXException {
+        final Map<String, String> result = new HashMap<>();
+        Node node = findFaultElement(xml).getFirstChild();
+        for (; node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            final String tag = node.getLocalName();
+            if (tag.equals("detail")) {
+                result.putAll(parseErrorDetail(node));
+                continue;
+            }
+            result.put(tag, node.getTextContent());
+        }
+        if (!result.containsKey(ERROR_CODE_KEY)) {
+            throw new IOException("no UPnPError/errorCode tag");
+        }
+        return result;
+    }
+
+    /**
+     * エラー応答のdetailタグ以下をパースする。
+     *
+     * @param detailNode detailノード
+     * @return パース結果
+     * @throws IOException 入力値に問題がある場合
+     */
+    @Nonnull
+    private Map<String, String> parseErrorDetail(@Nonnull final Node detailNode) throws IOException {
+        final Map<String, String> result = new HashMap<>();
+        final Element error = XmlUtils.findChildElementByLocalName(detailNode, "UPnPError");
+        if (error == null) {
+            throw new IOException("no UPnPError tag");
+        }
+        for (Node node = error.getFirstChild(); node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            result.put("UPnPError/" + node.getLocalName(), node.getTextContent());
+        }
+        return result;
+    }
+
+    /**
+     * Actionに対するエラー応答をパースし、FaultタグのElementを探して返す。
+     *
+     * @param xml Actionに対する応答であるXML文字列
+     * @return FaultタグのElement
+     * @throws ParserConfigurationException XMLパーサのインスタンス化に問題がある場合
+     * @throws SAXException                 XMLパース処理に問題がある場合
+     * @throws IOException                  入力値に問題がある場合
+     */
+    @Nonnull
+    private Element findFaultElement(@Nonnull final String xml)
+            throws ParserConfigurationException, SAXException, IOException {
+        final Document doc = XmlUtils.newDocument(true, xml);
+        final Element envelope = doc.getDocumentElement();
+        final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
+        if (body == null) {
+            throw new IOException("no body tag");
+        }
+        final Element fault = XmlUtils.findChildElementByLocalName(body, "Fault");
+        if (fault == null) {
+            throw new IOException("no fault tag");
+        }
+        return fault;
     }
 }
