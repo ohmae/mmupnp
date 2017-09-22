@@ -35,6 +35,8 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * UPnP ControlPointのクラス。
  *
+ * <p>このライブラリを利用する上でアプリからインスタンス化する必要がある唯一のクラス。
+ *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class ControlPoint {

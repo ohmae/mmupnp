@@ -24,8 +24,6 @@ import javax.annotation.Nullable;
 /**
  * UPnP Deviceを表現するクラス
  *
- * <p>SubDeviceには非対応
- *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class Device {
