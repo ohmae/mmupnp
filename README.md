@@ -52,7 +52,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.mm2d.mmupnp:mmupnp:1.2.2'
+    compile 'net.mm2d.mmupnp:mmupnp:1.2.3'
 }
 ```
 
