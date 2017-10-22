@@ -163,6 +163,9 @@ public class HttpClient {
     }
 
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
+        assert mSocket != null;
+        assert mOutputStream != null;
+        assert mInputStream != null;
         request.writeData(mOutputStream);
         final HttpResponse response = new HttpResponse(mSocket);
         response.readData(mInputStream);

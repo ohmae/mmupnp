@@ -96,6 +96,16 @@ public class ActionWindow extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 try {
+                    final Map<String, String> result = mAction.invoke(makeArgument(), true);
+                    if (result.containsKey(Action.ERROR_CODE_KEY)) {
+                        if (result.containsKey(Action.ERROR_DESCRIPTION_KEY)) {
+                            mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY)
+                                    + " " + result.get(Action.ERROR_DESCRIPTION_KEY));
+                        } else {
+                            mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY));
+                        }
+                        return;
+                    }
                     updateResult(mAction.invoke(makeArgument()));
                 } catch (final IOException e1) {
                     e1.printStackTrace();

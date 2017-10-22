@@ -104,7 +104,7 @@ abstract class SsdpServer {
      * @throws IOException ソケット作成に失敗
      */
     void open() throws IOException {
-        if (mSocket == null) {
+        if (mSocket != null) {
             close();
         }
         mSocket = createMulticastSocket(mBindPort);
@@ -134,6 +134,7 @@ abstract class SsdpServer {
         if (mReceiveTask != null) {
             stop();
         }
+        assert mSocket != null;
         mReceiveTask = new ReceiveTask(this, mSocket, mBindPort);
         mReceiveTask.start();
     }
@@ -182,6 +183,7 @@ abstract class SsdpServer {
      * @param message 送信するメッセージ
      */
     private void send(@Nonnull final byte[] message) throws IOException {
+        assert mSocket != null;
         mSocket.send(new DatagramPacket(message, message.length, SSDP_SO_ADDR));
     }
 

@@ -44,7 +44,7 @@ Sample App
 ## How to use
 
 I placed maven repository on gh-pages.
-```
+```groovy
 repositories {
     maven {
         url 'https://ohmae.github.com/mmupnp/maven'
@@ -52,12 +52,12 @@ repositories {
 }
 
 dependencies {
-    compile 'net.mm2d.mmupnp:mmupnp:1.2.1'
+    compile 'net.mm2d.mmupnp:mmupnp:1.2.3'
 }
 ```
 
 ### Initialize and Start
-```
+```java
 ControlPoint cp = new ControlPoint();
 cp.initialize();
 // adding listener if necessary.
@@ -75,7 +75,7 @@ ControlPoint cp = new ControlPoint(ni);
 
 ### M-SEARCH
 Call ControlPoint#search() or ControlPoint#search(String).
-```
+```java
 cp.search();                   // Default ST is ssdp:all
 ```
 ```
@@ -85,7 +85,7 @@ These methods send one M-SEARCH packet to all interfaces.
 
 ### Invoke Action
 For example, to invoke "Browse" (ContentDirectory) action...
-```
+```java
 ...
 Device mediaServer = cp.getDevice(UDN);           // get device by UDN
 Action browse = mediaServer.findAction("Browse"); // find "Browse" action
@@ -103,7 +103,7 @@ String resultXml = result.get("Result");          // get result
 
 ### Event Subscription
 For example, to subscribe ContentDirectory's events...
-```
+```java
 ...
 // add listener to receive event
 cp.addNotifyEventListener(new NotifyEventListener(){
@@ -120,7 +120,7 @@ cds.unsubscribe(); // End subscribe
 ```
 
 ### Stop and Terminate
-```
+```java
 ...
 cp.stop();
 cp.removeDiscoveryListener(...);
@@ -129,6 +129,40 @@ cp.terminate();
 ```
 It is not possible to re-initialize.
 When you want to reset, try again from the constructor call.
+
+### Debug log output
+
+This library contains [useful class for log output](./lib/src/main/java/net/mm2d/util/Log.java),
+and it is used for error logs inside the library.
+This log output class can also be used from the application.
+
+By default, a log when an error occurs is output to `System.out`.
+If you do not want to output log, describe the following at initialize.
+
+```java
+Log.setLogLevel(Log.ASSERT);
+Log.setPrint(Log.EMPTY_PRINT);
+```
+
+If you use this library on Android, you will want to use `android.util.Log` instead of `System.out`.
+Also, you will want to disable the output at release build.
+The sample code for that case is following.
+
+```java
+if (BuildConfig.DEBUG) {
+    Log.setAppendCaller(true);
+    Log.setLogLevel(Log.VERBOSE);
+    Log.setPrint((level, tag, message) -> {
+        final String[] lines = message.split("\n");
+        for (final String line : lines) {
+            android.util.Log.println(level, tag, line);
+        }
+    });
+    return;
+}
+Log.setLogLevel(Log.ASSERT);
+Log.setPrint(Log.EMPTY_PRINT);
+```
 
 ### Documents
 

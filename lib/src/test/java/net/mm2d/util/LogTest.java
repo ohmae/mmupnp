@@ -357,7 +357,7 @@ public class LogTest {
     }
 
     @Test
-    public void  setAppendCaller() throws Exception {
+    public void setAppendCaller() throws Exception {
         Log.setPrint(Log.DEFAULT_PRINT);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final PrintStream defaultOut = System.out;

@@ -283,7 +283,7 @@ public class ActionInvokeTest {
     }
 
 
-    @Test
+    @Test(expected = IOException.class)
     public void invoke_200以外のレスポンスでIOExceptionが発生() throws Exception {
         Log.setLogLevel(Log.ASSERT);
         for (final Http.Status status : Http.Status.values()) {
@@ -292,15 +292,7 @@ public class ActionInvokeTest {
             }
             mHttpResponse.setStatus(status);
             mMockFactory.setResponse(mHttpResponse);
-            boolean fail = true;
-            try {
-                mAction.invoke(new HashMap<String, String>());
-            } catch (final IOException e) {
-                fail = false;
-            }
-            if (fail) {
-                fail();
-            }
+            mAction.invoke(new HashMap<String, String>());
         }
     }
 
@@ -320,8 +312,45 @@ public class ActionInvokeTest {
                 + "<" + OUT_ARG_NAME2 + ">" + OUT_ARG_VALUE2 + "</" + OUT_ARG_NAME2 + ">"
                 + "</u:" + ACTION_NAME + "Response>" + "</s:Body>" + "</s:Envelope>");
         mMockFactory.setResponse(mHttpResponse);
-        final Map<String, String> result = mAction.invoke(new HashMap<String, String>());
+        final Map<String, String> result = mAction.invoke(Collections.<String, String>emptyMap());
         assertThat(result.get(OUT_ARG_NAME1), is(OUT_ARG_VALUE1));
         assertThat(result.containsKey(OUT_ARG_NAME2), is(true));
+    }
+
+    @Test
+    public void invoke_エラーレスポンスもパースできる() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+                "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
+                "<s:Body><s:Fault><faultcode>s:Client</faultcode><faultstring>UPnPError</faultstring>" +
+                "<detail><UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\"><errorCode>711</errorCode>" +
+                "<errorDescription>Restricted object</errorDescription></UPnPError></detail>" +
+                "</s:Fault></s:Body></s:Envelope>");
+        mMockFactory.setResponse(mHttpResponse);
+        final Map<String, String> result = mAction.invoke(Collections.<String, String>emptyMap(), true);
+        assertThat(result.get(Action.FAULT_CODE_KEY), is("s:Client"));
+        assertThat(result.get(Action.FAULT_STRING_KEY), is("UPnPError"));
+        assertThat(result.get(Action.ERROR_CODE_KEY), is("711"));
+        assertThat(result.get(Action.ERROR_DESCRIPTION_KEY), is("Restricted object"));
+    }
+
+    @Test
+    public void invoke_エラーレスポンスもパースできる2() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+                "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
+                "<s:Body><s:Fault><faultcode>s:Client</faultcode><faultstring>UPnPError</faultstring>" +
+                "<detail><UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\"><errorCode>711</errorCode>" +
+                "<errorDescription>Restricted object</errorDescription></UPnPError></detail>" +
+                "</s:Fault></s:Body></s:Envelope>");
+        mMockFactory.setResponse(mHttpResponse);
+        final Map<String, String> result = mAction.invoke(Collections.<String, String>emptyMap(),
+                Collections.<String, String>emptyMap(),
+                Collections.<String, String>emptyMap(),
+                true);
+        assertThat(result.get(Action.FAULT_CODE_KEY), is("s:Client"));
+        assertThat(result.get(Action.FAULT_STRING_KEY), is("UPnPError"));
+        assertThat(result.get(Action.ERROR_CODE_KEY), is("711"));
+        assertThat(result.get(Action.ERROR_DESCRIPTION_KEY), is("Restricted object"));
     }
 }

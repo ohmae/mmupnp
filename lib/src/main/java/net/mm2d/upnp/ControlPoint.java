@@ -21,11 +21,9 @@ import java.io.IOException;
 import java.net.NetworkInterface;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,6 +34,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * UPnP ControlPointのクラス。
+ *
+ * <p>このライブラリを利用する上でアプリからインスタンス化する必要がある唯一のクラス。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
@@ -116,7 +116,7 @@ public class ControlPoint {
     @Nonnull
     private final EventReceiver mEventReceiver;
     @Nonnull
-    private final ExecutorService mCachedThreadPool;
+    private final ExecutorService mIoExecutor;
     @Nonnull
     private final ExecutorService mNotifyExecutor;
     @Nonnull
@@ -140,7 +140,8 @@ public class ControlPoint {
         return mHttpClientFactory.createHttpClient(true);
     }
 
-    private void onReceiveSsdp(@Nonnull final SsdpMessage message) {
+    // VisibleForTesting
+    void onReceiveSsdp(@Nonnull final SsdpMessage message) {
         synchronized (mDeviceHolder) {
             final Device device = mDeviceHolder.get(message.getUuid());
             if (device == null) {
@@ -262,7 +263,7 @@ public class ControlPoint {
      */
     public ControlPoint(@Nullable final Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
-        this(getDefaultInterfacesIfEmpty(interfaces), new ControlPointFactory());
+        this(getDefaultInterfacesIfEmpty(interfaces), new ControlPointDiFactory());
     }
 
     @Nonnull
@@ -277,13 +278,13 @@ public class ControlPoint {
     // VisibleForTesting
     ControlPoint(
             @Nonnull final Collection<NetworkInterface> interfaces,
-            @Nonnull final ControlPointFactory factory) {
+            @Nonnull final ControlPointDiFactory factory) {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
         }
-        mLoadingDeviceMap = new HashMap<>();
-        mNotifyExecutor = Executors.newSingleThreadExecutor();
-        mCachedThreadPool = Executors.newCachedThreadPool();
+        mLoadingDeviceMap = factory.createLoadingDeviceMap();
+        mNotifyExecutor = factory.createNotifyExecutor();
+        mIoExecutor = factory.createIoExecutor();
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();
 
@@ -309,8 +310,8 @@ public class ControlPoint {
                 });
             }
         });
-        mDeviceHolder = new DeviceHolder(this);
-        mSubscribeHolder = new SubscribeHolder();
+        mDeviceHolder = factory.createDeviceHolder(this);
+        mSubscribeHolder = factory.createSubscribeHolder();
         mEventReceiver = factory.createEventReceiver(new EventMessageListener() {
             @Override
             public boolean onEventReceived(
@@ -324,11 +325,11 @@ public class ControlPoint {
     }
 
     private boolean executeInParallel(@Nonnull final Runnable command) {
-        if (mCachedThreadPool.isShutdown()) {
+        if (mIoExecutor.isShutdown()) {
             return false;
         }
         try {
-            mCachedThreadPool.execute(command);
+            mIoExecutor.execute(command);
         } catch (final RejectedExecutionException ignored) {
             return false;
         }
@@ -383,11 +384,11 @@ public class ControlPoint {
             return;
         }
         mNotifyExecutor.shutdownNow();
-        mCachedThreadPool.shutdown();
+        mIoExecutor.shutdown();
         try {
-            if (!mCachedThreadPool.awaitTermination(
+            if (!mIoExecutor.awaitTermination(
                     Property.DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                mCachedThreadPool.shutdownNow();
+                mIoExecutor.shutdownNow();
             }
         } catch (final InterruptedException e) {
             Log.w(e);
