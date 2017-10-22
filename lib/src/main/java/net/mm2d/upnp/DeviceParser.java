@@ -274,7 +274,7 @@ public class DeviceParser {
     private static void parseDeviceList(
             @Nonnull final Device.Builder builder,
             @Nonnull final Node listNode) {
-        final List<Device.Builder> builderList = new ArrayList();
+        final List<Device.Builder> builderList = new ArrayList<>();
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
