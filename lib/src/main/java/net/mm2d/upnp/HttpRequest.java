@@ -109,6 +109,9 @@ public class HttpRequest extends HttpMessage {
         final String host = url.getHost();
         setAddress(InetAddress.getByName(host));
         int port = url.getPort();
+        if (port > 65535) {
+            throw new IOException("port number is too large. port=" + port);
+        }
         if (port < 0) {
             port = Http.DEFAULT_PORT;
         }
