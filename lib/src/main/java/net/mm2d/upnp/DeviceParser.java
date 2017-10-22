@@ -16,6 +16,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.xml.parsers.ParserConfigurationException;
@@ -272,6 +274,7 @@ public class DeviceParser {
     private static void parseDeviceList(
             @Nonnull final Device.Builder builder,
             @Nonnull final Node listNode) {
+        final List<Device.Builder> builderList = new ArrayList();
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -280,8 +283,9 @@ public class DeviceParser {
             if (TextUtils.equals(node.getLocalName(), "device")) {
                 final Device.Builder embeddedBuilder = builder.createEmbeddedDeviceBuilder();
                 parseDevice(embeddedBuilder, node);
-                builder.addEmbeddedDeviceBuilder(embeddedBuilder);
+                builderList.add(embeddedBuilder);
             }
         }
+        builder.setEmbeddedDeviceBuilderList(builderList);
     }
 }

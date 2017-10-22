@@ -58,7 +58,7 @@ public class Device {
         @Nonnull
         private final List<Service.Builder> mServiceBuilderList = new ArrayList<>();
         @Nonnull
-        private final List<Device.Builder> mDeviceBuilderList = new ArrayList<>();
+        private volatile List<Device.Builder> mDeviceBuilderList = Collections.emptyList();
         @Nonnull
         private final Map<String, Map<String, String>> mTagMap;
 
@@ -346,12 +346,12 @@ public class Device {
         /**
          * Embedded DeviceのBuilderを登録する。
          *
-         * @param builder Embedded DeviceのBuilder
+         * @param builderList Embedded DeviceのBuilderリスト
          * @return Builder
          */
         @Nonnull
-        public Builder addEmbeddedDeviceBuilder(@Nonnull final Builder builder) {
-            mDeviceBuilderList.add(builder);
+        public Builder setEmbeddedDeviceBuilderList(@Nonnull final List<Builder> builderList) {
+            mDeviceBuilderList = builderList;
             return this;
         }
 
