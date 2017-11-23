@@ -43,16 +43,18 @@ Sample App
 
 ## How to use
 
-I placed maven repository on gh-pages.
-```groovy
+Please use my maven repository.
+(URL has changed since Ver.1.3.0)
+
+```gradle
 repositories {
     maven {
-        url 'https://ohmae.github.com/mmupnp/maven'
+        url 'https://ohmae.github.com/maven'
     }
 }
 
 dependencies {
-    compile 'net.mm2d.mmupnp:mmupnp:1.2.3'
+    compile 'net.mm2d:mmupnp:1.3.0'
 }
 ```
 
