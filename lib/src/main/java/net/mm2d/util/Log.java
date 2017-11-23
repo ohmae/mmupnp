@@ -12,6 +12,7 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -113,7 +114,12 @@ public class Log {
      * System.outへ出力するデフォルトの出力処理。
      */
     private static class DefaultPrint implements Print {
-        private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        private static final ThreadLocal<DateFormat> FOMAT = new ThreadLocal<DateFormat>() {
+            @Override
+            protected DateFormat initialValue() {
+                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
+            }
+        };
 
         @Override
         public void println(
@@ -129,9 +135,7 @@ public class Log {
 
         @Nonnull
         private String getDateString() {
-            synchronized (FORMAT) {
-                return FORMAT.format(new Date(System.currentTimeMillis()));
-            }
+            return FOMAT.get().format(new Date(System.currentTimeMillis()));
         }
 
         @Nonnull
