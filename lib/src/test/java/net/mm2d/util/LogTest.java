@@ -375,4 +375,23 @@ public class LogTest {
         baos.reset();
         System.setOut(defaultOut);
     }
+
+    @Test
+    public void setAppendThread() throws Exception {
+        Log.setPrint(Log.DEFAULT_PRINT);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream defaultOut = System.out;
+        System.setOut(new PrintStream(baos));
+        Log.setAppendThread(true);
+        Log.v("tag", "");
+        assertThat(new String(baos.toByteArray()), containsString(Thread.currentThread().getName()));
+        baos.reset();
+
+        Log.setAppendThread(false);
+
+        Log.v("tag", "");
+        assertThat(new String(baos.toByteArray()), not(containsString(Thread.currentThread().getName())));
+        baos.reset();
+        System.setOut(defaultOut);
+    }
 }

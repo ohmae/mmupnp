@@ -181,6 +181,7 @@ public class Log {
     private static Print sPrint = DEFAULT_PRINT;
     private static int sLogLevel = VERBOSE;
     private static boolean sAppendCaller = false;
+    private static boolean sAppendThread = false;
 
     /**
      * 出力処理を変更する。
@@ -223,7 +224,7 @@ public class Log {
     }
 
     /**
-     * 呼び出し元の情報をログに追加する。
+     * 呼び出し元のコード位置をログに追加する。
      *
      * <p>trueを指定すると、IntelliJのログコンソールから
      * ログ出力元のコードへのリンクとなる出力を追加することができる。
@@ -235,6 +236,21 @@ public class Log {
      */
     public static void setAppendCaller(final boolean append) {
         sAppendCaller = append;
+    }
+
+    /**
+     * 呼び出し元のスレッド情報をログに追加する。
+     *
+     * <p>trueを指定すると、IntelliJのログコンソールから
+     * ログ出力元のコードへのリンクとなる出力を追加することができる。
+     * デバッグ時はtrueを指定することを推奨。
+     *
+     * <p>デフォルト値はfalse
+     *
+     * @param append 追加する場合true
+     */
+    public static void setAppendThread(final boolean append) {
+        sAppendThread = append;
     }
 
     /**
@@ -501,18 +517,39 @@ public class Log {
             return;
         }
         if (!sAppendCaller) {
-            sPrint.println(level, makeTag(tag, null), makeMessage(message, tr));
+            println(level, makeTag(tag, null), makeMessage(message, tr));
             return;
         }
         final StackTraceElement[] trace = new Throwable().getStackTrace();
         // println -> v/d/i/w/e -> ログコール場所
         if (trace.length < 3) {
-            sPrint.println(level, makeTag(tag, null), makeMessage(message, tr));
+            println(level, makeTag(tag, null), makeMessage(message, tr));
             return;
         }
         final StackTraceElement element = trace[2];
-        sPrint.println(level, makeTag(tag, element), element.toString() + " : " + makeMessage(message, tr));
+        println(level, makeTag(tag, element), element.toString() + " : " + makeMessage(message, tr));
+    }
 
+    private static void println(
+            final int level,
+            @Nonnull final String tag,
+            @Nonnull final String message) {
+        if (sAppendThread) {
+            sPrint.println(level, tag, makeThreadInfo() + message);
+            return;
+        }
+        sPrint.println(level, tag, message);
+    }
+
+    @Nonnull
+    private static String makeThreadInfo() {
+        final Thread thread = Thread.currentThread();
+        final int priority = thread.getPriority();
+        final ThreadGroup group = thread.getThreadGroup();
+        if (group == null) {
+            return "[" + thread.getName()+ "," + priority + "] ";
+        }
+        return "[" + thread.getName()+ "," + priority + "," + group.getName() + "] ";
     }
 
     @Nonnull
