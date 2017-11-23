@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.log.Log;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
-import net.mm2d.util.Log;
 
 import java.io.IOException;
 import java.net.NetworkInterface;

@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
 import net.mm2d.util.XmlUtils;
 
 import org.junit.Before;
@@ -285,7 +284,6 @@ public class ActionInvokeTest {
 
     @Test(expected = IOException.class)
     public void invoke_200以外のレスポンスでIOExceptionが発生() throws Exception {
-        Log.setLogLevel(Log.ASSERT);
         for (final Http.Status status : Http.Status.values()) {
             if (status == Http.Status.HTTP_OK) {
                 continue;

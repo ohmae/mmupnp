@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.log.Log;
 import net.mm2d.upnp.Http.Status;
-import net.mm2d.util.Log;
 import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
 

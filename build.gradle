@@ -8,5 +8,8 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
+        maven {
+            url 'https://ohmae.github.com/maven'
+        }
     }
 }
