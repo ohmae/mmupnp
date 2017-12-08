@@ -587,14 +587,13 @@ public class Service {
 
     @Nonnull
     private HttpRequest makeSubscribeRequest() throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.SUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.NT, Http.UPNP_EVENT);
-        request.setHeader(Http.CALLBACK, getCallback());
-        request.setHeader(Http.TIMEOUT, "Second-300");
-        request.setHeader(Http.CONTENT_LENGTH, "0");
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.SUBSCRIBE)
+                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setHeader(Http.NT, Http.UPNP_EVENT)
+                .setHeader(Http.CALLBACK, getCallback())
+                .setHeader(Http.TIMEOUT, "Second-300")
+                .setHeader(Http.CONTENT_LENGTH, "0");
     }
 
     /**
@@ -640,13 +639,12 @@ public class Service {
 
     @Nonnull
     private HttpRequest makeRenewSubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.SUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, subscriptionId);
-        request.setHeader(Http.TIMEOUT, "Second-300");
-        request.setHeader(Http.CONTENT_LENGTH, "0");
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.SUBSCRIBE)
+                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setHeader(Http.SID, subscriptionId)
+                .setHeader(Http.TIMEOUT, "Second-300")
+                .setHeader(Http.CONTENT_LENGTH, "0");
     }
 
     /**
@@ -675,12 +673,11 @@ public class Service {
     }
 
     private HttpRequest makeUnsubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.UNSUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, subscriptionId);
-        request.setHeader(Http.CONTENT_LENGTH, "0");
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.UNSUBSCRIBE)
+                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setHeader(Http.SID, subscriptionId)
+                .setHeader(Http.CONTENT_LENGTH, "0");
     }
 
     /**

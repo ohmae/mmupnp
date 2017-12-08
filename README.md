@@ -134,36 +134,11 @@ When you want to reset, try again from the constructor call.
 
 ### Debug log output
 
-This library contains [useful class for log output](./lib/src/main/java/net/mm2d/util/Log.java),
-and it is used for error logs inside the library.
-This log output class can also be used from the application.
-
-By default, a log when an error occurs is output to `System.out`.
-If you do not want to output log, describe the following at initialize.
+This library use [useful library for log output](https://github.com/ohmae/Log),
+If you want to see debug log. write as follows.
 
 ```java
-Log.setLogLevel(Log.ASSERT);
-Log.setPrint(Log.EMPTY_PRINT);
-```
-
-If you use this library on Android, you will want to use `android.util.Log` instead of `System.out`.
-Also, you will want to disable the output at release build.
-The sample code for that case is following.
-
-```java
-if (BuildConfig.DEBUG) {
-    Log.setAppendCaller(true);
-    Log.setLogLevel(Log.VERBOSE);
-    Log.setPrint((level, tag, message) -> {
-        final String[] lines = message.split("\n");
-        for (final String line : lines) {
-            android.util.Log.println(level, tag, line);
-        }
-    });
-    return;
-}
-Log.setLogLevel(Log.ASSERT);
-Log.setPrint(Log.EMPTY_PRINT);
+Log.initialize(true, true);
 ```
 
 ### Documents

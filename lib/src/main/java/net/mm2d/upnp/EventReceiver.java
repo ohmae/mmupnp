@@ -259,24 +259,21 @@ class EventReceiver {
     }
 
     private static class ClientTask implements Runnable {
-        private static final HttpResponse RESPONSE_OK = new HttpResponse();
-        private static final HttpResponse RESPONSE_BAD = new HttpResponse();
-        private static final HttpResponse RESPONSE_FAIL = new HttpResponse();
-
-        static {
-            RESPONSE_OK.setStatus(Http.Status.HTTP_OK);
-            RESPONSE_OK.setHeader(Http.SERVER, Property.SERVER_VALUE);
-            RESPONSE_OK.setHeader(Http.CONNECTION, Http.CLOSE);
-            RESPONSE_OK.setHeader(Http.CONTENT_LENGTH, "0");
-            RESPONSE_BAD.setStatus(Http.Status.HTTP_BAD_REQUEST);
-            RESPONSE_BAD.setHeader(Http.SERVER, Property.SERVER_VALUE);
-            RESPONSE_BAD.setHeader(Http.CONNECTION, Http.CLOSE);
-            RESPONSE_BAD.setHeader(Http.CONTENT_LENGTH, "0");
-            RESPONSE_FAIL.setStatus(Http.Status.HTTP_PRECON_FAILED);
-            RESPONSE_FAIL.setHeader(Http.SERVER, Property.SERVER_VALUE);
-            RESPONSE_FAIL.setHeader(Http.CONNECTION, Http.CLOSE);
-            RESPONSE_FAIL.setHeader(Http.CONTENT_LENGTH, "0");
-        }
+        private static final HttpResponse RESPONSE_OK = new HttpResponse()
+                .setStatus(Http.Status.HTTP_OK)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_LENGTH, "0");
+        private static final HttpResponse RESPONSE_BAD = new HttpResponse()
+                .setStatus(Http.Status.HTTP_BAD_REQUEST)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_LENGTH, "0");
+        private static final HttpResponse RESPONSE_FAIL = new HttpResponse()
+                .setStatus(Http.Status.HTTP_PRECON_FAILED)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_LENGTH, "0");
 
         @Nonnull
         private final ServerTask mServer;

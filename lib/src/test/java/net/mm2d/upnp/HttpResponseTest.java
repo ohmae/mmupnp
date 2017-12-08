@@ -63,12 +63,12 @@ public class HttpResponseTest {
     @Test
     public void writeData_書き出しができること() throws IOException {
         final String data = TestUtils.getResourceAsString("cds.xml");
-        final HttpResponse response = new HttpResponse();
-        response.setStatus(Http.Status.HTTP_OK);
-        response.setHeader(Http.SERVER, Property.SERVER_VALUE);
-        response.setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()));
-        response.setHeader(Http.CONNECTION, Http.CLOSE);
-        response.setBody(data, true);
+        final HttpResponse response = new HttpResponse()
+                .setStatus(Http.Status.HTTP_OK)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setBody(data, true);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         response.writeData(baos);
@@ -84,13 +84,13 @@ public class HttpResponseTest {
     @Test
     public void writeData_Chunk書き出しができること() throws IOException {
         final String data = TestUtils.getResourceAsString("cds.xml");
-        final HttpResponse response = new HttpResponse();
-        response.setStatus(Http.Status.HTTP_OK);
-        response.setHeader(Http.SERVER, Property.SERVER_VALUE);
-        response.setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()));
-        response.setHeader(Http.CONNECTION, Http.CLOSE);
-        response.setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED);
-        response.setBody(data, false);
+        final HttpResponse response = new HttpResponse()
+                .setStatus(Http.Status.HTTP_OK)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED)
+                .setBody(data, false);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         response.writeData(baos);

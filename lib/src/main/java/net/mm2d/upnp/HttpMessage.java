@@ -189,9 +189,11 @@ public abstract class HttpMessage {
      * HTTPバージョンを設定する。
      *
      * @param version HTTPバージョン
+     * @return HttpMessage
      */
-    public void setVersion(@Nonnull final String version) {
+    public HttpMessage setVersion(@Nonnull final String version) {
         mVersion = version;
+        return this;
     }
 
     /**
@@ -199,11 +201,13 @@ public abstract class HttpMessage {
      *
      * @param name  ヘッダ名
      * @param value 値
+     * @return HttpMessage
      */
-    public void setHeader(
+    public HttpMessage setHeader(
             @Nonnull final String name,
             @Nonnull final String value) {
         mHeaders.put(name, value);
+        return this;
     }
 
     /**
@@ -280,9 +284,10 @@ public abstract class HttpMessage {
      * メッセージボディを設定する。
      *
      * @param body メッセージボディ
+     * @return HttpMessage
      */
-    public void setBody(@Nullable final String body) {
-        setBody(body, false);
+    public HttpMessage setBody(@Nullable final String body) {
+        return setBody(body, false);
     }
 
     /**
@@ -290,11 +295,12 @@ public abstract class HttpMessage {
      *
      * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     * @return HttpMessage
      */
-    public void setBody(
+    public HttpMessage setBody(
             @Nullable final String body,
             final boolean withContentLength) {
-        setBodyInner(body, null, withContentLength);
+        return setBodyInner(body, null, withContentLength);
     }
 
     /**
@@ -303,9 +309,10 @@ public abstract class HttpMessage {
      * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
      *
      * @param body メッセージボディ
+     * @return HttpMessage
      */
-    public void setBodyBinary(@Nullable final byte[] body) {
-        setBodyBinary(body, false);
+    public HttpMessage setBodyBinary(@Nullable final byte[] body) {
+        return setBodyBinary(body, false);
     }
 
     /**
@@ -313,14 +320,15 @@ public abstract class HttpMessage {
      *
      * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
+     * @return HttpMessage
      */
-    public void setBodyBinary(
+    public HttpMessage setBodyBinary(
             @Nullable final byte[] body,
             final boolean withContentLength) {
-        setBodyInner(null, body, withContentLength);
+        return setBodyInner(null, body, withContentLength);
     }
 
-    private void setBodyInner(
+    private HttpMessage setBodyInner(
             @Nullable final String string,
             @Nullable final byte[] binary,
             final boolean withContentLength) {
@@ -338,6 +346,7 @@ public abstract class HttpMessage {
             final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
             setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
         }
+        return this;
     }
 
     /**

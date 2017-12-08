@@ -15,6 +15,7 @@ import java.net.Socket;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * HTTPリクエストメッセージを表現するクラス。
@@ -87,10 +88,12 @@ public class HttpRequest extends HttpMessage {
      * 送信先URLを設定する。
      *
      * @param url 接続先URL
+     * @return HttpRequest
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(@Nonnull final URL url) throws IOException {
+    public HttpRequest setUrl(@Nonnull final URL url) throws IOException {
         setUrl(url, false);
+        return this;
     }
 
     /**
@@ -98,9 +101,10 @@ public class HttpRequest extends HttpMessage {
      *
      * @param url            接続先URL
      * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
+     * @return HttpRequest
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    public void setUrl(
+    public HttpRequest setUrl(
             @Nonnull final URL url,
             final boolean withHostHeader) throws IOException {
         if (!TextUtils.equals(url.getProtocol(), "http")) {
@@ -120,6 +124,7 @@ public class HttpRequest extends HttpMessage {
         if (withHostHeader) {
             setHeader(Http.HOST, getAddressString());
         }
+        return this;
     }
 
     /**
@@ -136,9 +141,11 @@ public class HttpRequest extends HttpMessage {
      * リクエストメソッドを設定する。
      *
      * @param method リクエストメソッド
+     * @return HttpRequest
      */
-    public void setMethod(@Nonnull final String method) {
+    public HttpRequest setMethod(@Nonnull final String method) {
         mMethod = method;
+        return this;
     }
 
     /**
@@ -155,8 +162,46 @@ public class HttpRequest extends HttpMessage {
      * URI（リクエストパス）を設定する。
      *
      * @param uri URI
+     * @return HttpRequest
      */
-    public void setUri(@Nonnull final String uri) {
+    public HttpRequest setUri(@Nonnull final String uri) {
         mUri = uri;
+        return this;
+    }
+
+    @Override
+    public HttpRequest setVersion(@Nonnull final String version) {
+        return (HttpRequest) super.setVersion(version);
+    }
+
+    @Override
+    public HttpRequest setHeader(
+            @Nonnull final String name,
+            @Nonnull final String value) {
+        return (HttpRequest) super.setHeader(name, value);
+    }
+
+    @Override
+    public HttpRequest setBody(@Nullable final String body) {
+        return (HttpRequest) super.setBody(body);
+    }
+
+    @Override
+    public HttpRequest setBody(
+            @Nullable final String body,
+            final boolean withContentLength) {
+        return (HttpRequest) super.setBody(body, withContentLength);
+    }
+
+    @Override
+    public HttpRequest setBodyBinary(@Nullable final byte[] body) {
+        return (HttpRequest) super.setBodyBinary(body);
+    }
+
+    @Override
+    public HttpRequest setBodyBinary(
+            @Nullable final byte[] body,
+            final boolean withContentLength) {
+        return (HttpRequest) super.setBodyBinary(body, withContentLength);
     }
 }

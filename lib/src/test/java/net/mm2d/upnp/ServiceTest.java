@@ -146,15 +146,14 @@ public class ServiceTest {
     }
 
     private HttpResponse createSubscribeResponse() {
-        final HttpResponse response = new HttpResponse();
-        response.setStatus(Http.Status.HTTP_OK);
-        response.setHeader(Http.SERVER, Property.SERVER_VALUE);
-        response.setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()));
-        response.setHeader(Http.CONNECTION, Http.CLOSE);
-        response.setHeader(Http.SID, SID);
-        response.setHeader(Http.TIMEOUT, "Second-300");
-        response.setHeader(Http.CONTENT_LENGTH, "0");
-        return response;
+        return new HttpResponse()
+                .setStatus(Http.Status.HTTP_OK)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.SID, SID)
+                .setHeader(Http.TIMEOUT, "Second-300")
+                .setHeader(Http.CONTENT_LENGTH, "0");
     }
 
     @Test

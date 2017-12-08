@@ -118,10 +118,8 @@ public class Device {
          * SSDPパケットを登録する。
          *
          * @param ssdpMessage SSDPパケット
-         * @return Builder
          */
-        @Nonnull
-        public Builder updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
+        public void updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
             final String location = ssdpMessage.getLocation();
             if (location == null) {
                 throw new IllegalArgumentException();
@@ -131,7 +129,6 @@ public class Device {
             for (final Builder builder : mDeviceBuilderList) {
                 builder.updateSsdpMessage(ssdpMessage);
             }
-            return this;
         }
 
         /**

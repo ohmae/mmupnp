@@ -97,14 +97,14 @@ public class HttpRequestTest {
     @Test
     public void writeData_書き出しができること() throws IOException {
         final String soap = TestUtils.getResourceAsString("browse-request.xml");
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.POST);
-        request.setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
-        request.setHeader(Http.SOAPACTION, ACTION);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.CLOSE);
-        request.setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT);
-        request.setBody(soap, true);
+        final HttpRequest request = new HttpRequest()
+                .setMethod(Http.POST)
+                .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true)
+                .setHeader(Http.SOAPACTION, ACTION)
+                .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT)
+                .setBody(soap, true);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         request.writeData(baos);
@@ -120,15 +120,15 @@ public class HttpRequestTest {
     @Test
     public void writeData_Chunk書き出しができること() throws IOException {
         final String soap = TestUtils.getResourceAsString("browse-request.xml");
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.POST);
-        request.setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
-        request.setHeader(Http.SOAPACTION, ACTION);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.CLOSE);
-        request.setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT);
-        request.setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED);
-        request.setBody(soap, false);
+        final HttpRequest request = new HttpRequest()
+                .setMethod(Http.POST)
+                .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true)
+                .setHeader(Http.SOAPACTION, ACTION)
+                .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT)
+                .setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED)
+                .setBody(soap, false);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         request.writeData(baos);

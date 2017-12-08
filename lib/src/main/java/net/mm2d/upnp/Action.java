@@ -529,15 +529,14 @@ public class Action {
             @Nonnull final URL url,
             @Nonnull final String soap)
             throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.POST);
-        request.setUrl(url, true);
-        request.setHeader(Http.SOAPACTION, getSoapActionName());
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.CLOSE);
-        request.setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT);
-        request.setBody(soap, true);
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.POST)
+                .setUrl(url, true)
+                .setHeader(Http.SOAPACTION, getSoapActionName())
+                .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT)
+                .setBody(soap, true);
     }
 
     /**

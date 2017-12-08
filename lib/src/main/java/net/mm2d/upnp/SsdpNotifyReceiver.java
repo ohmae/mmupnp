@@ -103,9 +103,7 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
         if (bits != 0) {
             final byte mask = (byte) (0xff << (8 - bits));
-            if ((a[bytes] & mask) != (b[bytes] & mask)) {
-                return false;
-            }
+            return (a[bytes] & mask) == (b[bytes] & mask);
         }
         return true;
     }

@@ -39,12 +39,12 @@ public class EventReceiverTest {
 
     @Before
     public void setUp() throws Exception {
-        final HttpRequest notify = new HttpRequest();
-        notify.setMethod(Http.NOTIFY);
-        notify.setUri("/");
-        notify.setHeader(Http.CONNECTION, Http.CLOSE);
-        notify.setHeader(Http.SEQ, "0");
-        notify.setBody(TestUtils.getResourceAsString("propchange.xml"), true);
+        final HttpRequest notify = new HttpRequest()
+                .setMethod(Http.NOTIFY)
+                .setUri("/")
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.SEQ, "0")
+                .setBody(TestUtils.getResourceAsString("propchange.xml"), true);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         notify.writeData(baos);
         mBadRequest = baos.toByteArray();
