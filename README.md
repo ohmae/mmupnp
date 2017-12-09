@@ -54,11 +54,12 @@ repositories {
 }
 
 dependencies {
-    compile 'net.mm2d:mmupnp:1.3.0'
+    compile 'net.mm2d:mmupnp:1.3.1'
 }
 ```
 
 ### Initialize and Start
+
 ```java
 ControlPoint cp = new ControlPoint();
 cp.initialize();
@@ -70,6 +71,7 @@ cp.start();
 ```
 
 If you want to specify the network interface, describe the following.
+
 ```
 NetworkInterface ni = NetworkInterface.getByName("eth0");
 ControlPoint cp = new ControlPoint(ni);
@@ -77,16 +79,20 @@ ControlPoint cp = new ControlPoint(ni);
 
 ### M-SEARCH
 Call ControlPoint#search() or ControlPoint#search(String).
+
 ```java
 cp.search();                   // Default ST is ssdp:all
 ```
+
 ```
 cp.search("upnp:rootdevice"); // To use specific ST. In this case "upnp:rootdevice"
 ```
+
 These methods send one M-SEARCH packet to all interfaces.
 
 ### Invoke Action
 For example, to invoke "Browse" (ContentDirectory) action...
+
 ```java
 ...
 Device mediaServer = cp.getDevice(UDN);           // get device by UDN
@@ -105,6 +111,7 @@ String resultXml = result.get("Result");          // get result
 
 ### Event Subscription
 For example, to subscribe ContentDirectory's events...
+
 ```java
 ...
 // add listener to receive event
@@ -122,6 +129,7 @@ cds.unsubscribe(); // End subscribe
 ```
 
 ### Stop and Terminate
+
 ```java
 ...
 cp.stop();
@@ -129,6 +137,7 @@ cp.removeDiscoveryListener(...);
 cp.removeNotifyEventListener(...);
 cp.terminate();
 ```
+
 It is not possible to re-initialize.
 When you want to reset, try again from the constructor call.
 
