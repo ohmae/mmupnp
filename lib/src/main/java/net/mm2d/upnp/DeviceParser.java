@@ -47,7 +47,11 @@ public class DeviceParser {
             @Nonnull final HttpClient client,
             @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
-        parseDescription(builder, client.downloadString(new URL(builder.getLocation())));
+        final String description = client.downloadString(new URL(builder.getLocation()));
+        if (TextUtils.isEmpty(description)) {
+            throw new IOException("download error");
+        }
+        parseDescription(builder, description);
         loadServices(client, builder);
     }
 

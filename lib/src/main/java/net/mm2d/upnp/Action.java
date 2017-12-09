@@ -10,6 +10,7 @@ package net.mm2d.upnp;
 import net.mm2d.log.Log;
 import net.mm2d.upnp.Http.Status;
 import net.mm2d.util.StringPair;
+import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Attr;
@@ -498,21 +499,22 @@ public class Action {
         final HttpRequest request = makeHttpRequest(url, soap);
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
-        if (response.getStatus() == Status.HTTP_INTERNAL_ERROR && response.getBody() != null) {
+        final String body = response.getBody();
+        if (response.getStatus() == Status.HTTP_INTERNAL_ERROR && !TextUtils.isEmpty(body)) {
             try {
-                return parseErrorResponse(response.getBody());
+                return parseErrorResponse(body);
             } catch (final SAXException | ParserConfigurationException e) {
-                throw new IOException(response.getBody(), e);
+                throw new IOException(body, e);
             }
         }
-        if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
+        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(body)) {
             Log.w(response.toString());
             throw new IOException(response.getStartLine());
         }
         try {
-            return parseResponse(response.getBody());
+            return parseResponse(body);
         } catch (final SAXException | ParserConfigurationException e) {
-            throw new IOException(response.getBody(), e);
+            throw new IOException(body, e);
         }
     }
 

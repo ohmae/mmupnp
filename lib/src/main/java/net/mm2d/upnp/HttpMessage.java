@@ -333,8 +333,10 @@ public abstract class HttpMessage {
             @Nullable final byte[] binary,
             final boolean withContentLength) {
         mBody = string;
-        if (TextUtils.isEmpty(string)) {
+        if (string == null) {
             mBodyBinary = binary;
+        } else if (string.length() == 0) {
+            mBodyBinary = new byte[0];
         } else {
             try {
                 mBodyBinary = string.getBytes(CHARSET);
@@ -357,13 +359,22 @@ public abstract class HttpMessage {
     @Nullable
     public String getBody() {
         if (mBody == null && mBodyBinary != null) {
-            try {
-                mBody = new String(mBodyBinary, CHARSET);
-            } catch (final UnsupportedEncodingException e) {
-                Log.w(e);
-            }
+            mBody = decode(mBodyBinary);
         }
         return mBody;
+    }
+
+    private String decode(@Nonnull final byte[] binary) {
+        if (binary.length == 0) {
+            return "";
+        }
+        try {
+            return new String(binary, CHARSET);
+        } catch (final Exception e) {
+            // for bug in Android Sdk, ArrayIndexOutOfBoundsException may occur.
+            Log.w(e);
+        }
+        return null;
     }
 
     /**
