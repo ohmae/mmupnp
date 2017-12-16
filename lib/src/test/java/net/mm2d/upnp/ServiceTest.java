@@ -139,6 +139,23 @@ public class ServiceTest {
     }
 
     @Test
+    public void getStateVariableParam() throws Exception {
+        final StateVariable type = mMmupnp.findStateVariable("A_ARG_TYPE_Type");
+        assertThat(type.getName(), is("A_ARG_TYPE_Type"));
+        assertThat(type.isSendEvents(), is(false));
+        assertThat(type.getDataType(), is("string"));
+
+        final StateVariable value = mMmupnp.findStateVariable("A_ARG_TYPE_Value");
+        assertThat(value.getName(), is("A_ARG_TYPE_Value"));
+        assertThat(value.isSendEvents(), is(true));
+        assertThat(value.getDataType(), is("i4"));
+        assertThat(value.getDefaultValue(), is("10"));
+        assertThat(value.getStep(), is("1"));
+        assertThat(value.getMinimum(), is("0"));
+        assertThat(value.getMaximum(), is("100"));
+    }
+
+    @Test
     public void findStateVariable() throws Exception {
         final String name = "A_ARG_TYPE_BrowseFlag";
         final StateVariable variable = mCds.findStateVariable(name);

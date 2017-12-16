@@ -1,0 +1,10 @@
+NOTIFY * HTTP/1.1
+HOST: 239.255.255.250:1900
+CACHE-CONTROL: max-age=300
+LOCATION: http://192.0.2.3:12345/device.xml
+NTS: ssdp:alive
+SERVER: Linux/2.6 UPnP/1.0 mmupnp/1.0
+Date: Sun, 01 Jan 2017 00:00:00 GMT
+NT: uuid:01234567-89ab-cdef-0123-456789abcdef
+USN: uuid:01234567-89ab-cdef-0123-456789abcdef
+

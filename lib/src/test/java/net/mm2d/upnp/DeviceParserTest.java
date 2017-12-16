@@ -101,6 +101,20 @@ public class DeviceParserTest {
     }
 
     @Test
+    public void loadDescription_with_url_base() throws Exception {
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0-for-url-base.bin");
+        final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
+        mSsdpMessage = new SsdpRequestMessage(interfaceAddress, data, data.length);
+        doReturn(TestUtils.getResourceAsString("device-with-url-base.xml"))
+                .when(mHttpClient).downloadString(new URL("http://192.0.2.3:12345/device.xml"));
+
+        final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+        DeviceParser.loadDescription(mHttpClient, builder);
+        final Device device = builder.build();
+        assertThat(device.getBaseUrl(), is("http://192.0.2.2:12345/"));
+    }
+
+    @Test
     public void loadDescription_with_embedded_device() throws Exception {
         doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
                 .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
