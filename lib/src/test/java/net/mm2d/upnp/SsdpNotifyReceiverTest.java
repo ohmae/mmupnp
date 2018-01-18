@@ -7,19 +7,26 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TestUtils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatchers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -65,6 +72,124 @@ public class SsdpNotifyReceiverTest {
         assertThat(result[0].getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
 
+    @Test
+    public void onReceive_同一セグメントからのメッセージは通知する() throws Exception {
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        doReturn(address).when(receiver).getInterfaceAddress();
+        final NotifyListener listener = mock(NotifyListener.class);
+        receiver.setNotifyListener(listener);
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
+
+        verify(listener).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+    }
+
+    @Test
+    public void onReceive_異なるセグメントからのメッセージは無視する() throws Exception {
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        doReturn(address).when(receiver).getInterfaceAddress();
+        final NotifyListener listener = mock(NotifyListener.class);
+        receiver.setNotifyListener(listener);
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+
+        receiver.onReceive(InetAddress.getByName("192.1.2.2"), data, data.length);
+
+        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+    }
+
+    @Test
+    public void onReceive_M_SEARCHパケットは無視する() throws Exception {
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        doReturn(address).when(receiver).getInterfaceAddress();
+        final NotifyListener listener = mock(NotifyListener.class);
+        receiver.setNotifyListener(listener);
+
+        final SsdpRequestMessage message = new SsdpRequestMessage();
+        message.setMethod(SsdpMessage.M_SEARCH);
+        message.setUri("*");
+        message.setHeader(Http.HOST, SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT));
+        message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER);
+        message.setHeader(Http.MX, "1");
+        message.setHeader(Http.ST, SsdpSearchServer.ST_ALL);
+        final byte[] data = message.getMessage().getMessageString().getBytes();
+
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
+
+        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+    }
+
+    @Test
+    public void onReceive_ByeByeパケットは通知する() throws Exception {
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        doReturn(address).when(receiver).getInterfaceAddress();
+        final NotifyListener listener = mock(NotifyListener.class);
+        receiver.setNotifyListener(listener);
+
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
+
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
+
+        verify(listener).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+    }
+
+    @Test
+    public void onReceive_LocationとSourceが不一致のメッセージは無視する() throws Exception {
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        doReturn(address).when(receiver).getInterfaceAddress();
+        final NotifyListener listener = mock(NotifyListener.class);
+        receiver.setNotifyListener(listener);
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+
+        receiver.onReceive(InetAddress.getByName("192.0.2.3"), data, data.length);
+
+        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+    }
+
+    @Test
+    public void onReceive_IOExceptionが発生してもクラッシュしない() throws Exception {
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        doReturn(address).when(receiver).getInterfaceAddress();
+        doThrow(new IOException()).when(receiver).createSsdpRequestMessage(ArgumentMatchers.any(byte[].class), anyInt());
+        final NotifyListener listener = mock(NotifyListener.class);
+        receiver.setNotifyListener(listener);
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
+
+        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+    }
+
+    @Test
+    public void isSameSegment() throws Exception {
+        assertThat(
+                SsdpNotifyReceiver.isSameSegment(
+                        createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24),
+                        InetAddress.getByName("192.168.0.255")),
+                is(true));
+        assertThat(
+                SsdpNotifyReceiver.isSameSegment(
+                        createInterfaceAddress("192.168.0.1", "255.255.255.128", (short) 25),
+                        InetAddress.getByName("192.168.0.255")),
+                is(false));
+        assertThat(
+                SsdpNotifyReceiver.isSameSegment(
+                        createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24),
+                        InetAddress.getByName("192.168.1.255")),
+                is(false));
+        assertThat(
+                SsdpNotifyReceiver.isSameSegment(
+                        createInterfaceAddress("192.168.0.1", "255.255.254.0", (short) 23),
+                        InetAddress.getByName("192.168.1.255")),
+                is(true));
+    }
+
     private static InterfaceAddress findInet4Address(final NetworkInterface networkInterface) {
         final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
         for (final InterfaceAddress address : addressList) {
@@ -73,5 +198,26 @@ public class SsdpNotifyReceiverTest {
             }
         }
         throw new IllegalArgumentException("ni does not have IPv4 address.");
+    }
+
+    private static InterfaceAddress createInterfaceAddress(
+            final String address,
+            final String broadcast,
+            final short maskLength)
+            throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException, UnknownHostException {
+        final Class<InterfaceAddress> cls = InterfaceAddress.class;
+        final Constructor<InterfaceAddress> constructor = cls.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        final InterfaceAddress interfaceAddress = constructor.newInstance();
+        final Field fAddress = cls.getDeclaredField("address");
+        fAddress.setAccessible(true);
+        fAddress.set(interfaceAddress, InetAddress.getByName(address));
+        final Field fBroadcast = cls.getDeclaredField("broadcast");
+        fBroadcast.setAccessible(true);
+        fBroadcast.set(interfaceAddress, InetAddress.getByName(broadcast));
+        final Field fMaskLength = cls.getDeclaredField("maskLength");
+        fMaskLength.setAccessible(true);
+        fMaskLength.setShort(interfaceAddress, maskLength);
+        return interfaceAddress;
     }
 }

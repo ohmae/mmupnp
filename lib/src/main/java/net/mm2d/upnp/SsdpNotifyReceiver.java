@@ -71,7 +71,7 @@ class SsdpNotifyReceiver extends SsdpServer {
             return;
         }
         try {
-            final SsdpRequestMessage message = new SsdpRequestMessage(getInterfaceAddress(), data, length);
+            final SsdpRequestMessage message = createSsdpRequestMessage(data, length);
             // M-SEARCHパケットは無視する
             if (TextUtils.equals(message.getMethod(), SsdpMessage.M_SEARCH)) {
                 return;
@@ -88,7 +88,16 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
     }
 
-    private static boolean isSameSegment(
+    // VisibleForTesting
+    SsdpRequestMessage createSsdpRequestMessage(
+            @Nonnull final byte[] data,
+            final int length)
+            throws IOException {
+        return new SsdpRequestMessage(getInterfaceAddress(), data, length);
+    }
+
+    // VisibleForTesting
+    static boolean isSameSegment(
             @Nonnull final InterfaceAddress interfaceAddress,
             @Nonnull final InetAddress sourceAddress) {
         final byte[] a = interfaceAddress.getAddress().getAddress();
