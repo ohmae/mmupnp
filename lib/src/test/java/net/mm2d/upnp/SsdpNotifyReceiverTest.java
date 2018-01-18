@@ -87,6 +87,16 @@ public class SsdpNotifyReceiverTest {
     }
 
     @Test
+    public void onReceive_Listenerがnullでもクラッシュしない() throws Exception {
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        doReturn(address).when(receiver).getInterfaceAddress();
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
+    }
+
+    @Test
     public void onReceive_異なるセグメントからのメッセージは無視する() throws Exception {
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
         final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
