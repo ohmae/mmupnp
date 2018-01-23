@@ -87,7 +87,8 @@ public class HttpHeader {
          * @param name ヘッダ名
          * @throws IllegalArgumentException keyとしての値が一致しないものに更新しようとした場合
          */
-        private void setName(@Nonnull final String name) {
+        // VisibleForTesting
+        void setName(@Nonnull final String name) {
             if (!mKey.equals(toKey(name))) {
                 throw new IllegalArgumentException();
             }

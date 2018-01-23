@@ -47,17 +47,67 @@ public class HttpHeaderTest {
         assertThat(entry1, is(entry2));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testEntry_異なるnameで更新() {
+        final String name = "name";
+        final String value = "value";
+        final HttpHeader.Entry entry = new HttpHeader.Entry(name, value);
+
+        entry.setName(value);
+    }
+
+    @Test
+    public void testEntry_hashCode() {
+        final String name = "name";
+        final String value = "value";
+        final HttpHeader.Entry entry1 = new HttpHeader.Entry(name, value);
+        final HttpHeader.Entry entry2 = new HttpHeader.Entry(entry1);
+
+        assertThat(entry1.hashCode(), is(entry2.hashCode()));
+    }
+
+    @Test
+    public void testEntry_toString() {
+        final String name = "name";
+        final String value = "value";
+        final HttpHeader.Entry entry = new HttpHeader.Entry(name, value);
+
+        assertThat(entry.toString().contains(name), is(true));
+        assertThat(entry.toString().contains(value), is(true));
+    }
+
+    @Test
+    public void testEntry_equals() {
+        final String name = "name";
+        final String value = "value";
+        final HttpHeader.Entry entry1 = new HttpHeader.Entry(name, value);
+        final HttpHeader.Entry entry2 = new HttpHeader.Entry(entry1);
+        final HttpHeader.Entry entry3 = new HttpHeader.Entry(name + "1", value);
+        final HttpHeader.Entry entry4 = new HttpHeader.Entry(name, value + "1");
+
+        assertThat(entry1.equals(entry1), is(true));
+        assertThat(entry1.equals(entry2), is(true));
+        assertThat(entry1.equals(entry3), is(false));
+        assertThat(entry1.equals(entry4), is(false));
+        assertThat(entry1.equals(null), is(false));
+        assertThat(entry1.equals(name), is(false));
+    }
+
     @Test
     public void size_個数が反映される() {
         final HttpHeader header = new HttpHeader();
 
         assertThat(header.size(), is(0));
+        assertThat(header.isEmpty(), is(true));
         header.put("name", "value");
         assertThat(header.size(), is(1));
+        assertThat(header.isEmpty(), is(false));
         header.put("name1", "value");
         assertThat(header.size(), is(2));
+        assertThat(header.isEmpty(), is(false));
         header.put("NAME", "value");
         assertThat(header.size(), is(2));
+        assertThat(header.isEmpty(), is(false));
     }
 
     @Test
@@ -93,13 +143,38 @@ public class HttpHeaderTest {
         header.put(name1, value1);
         header.put(name2, value2);
 
+        assertThat(header.get(name2), is(value2));
+        assertThat(header.remove(name2.toUpperCase()), is(value2));
+        assertThat(header.get(name2), is(nullValue()));
+
         assertThat(header.get(name1), is(value1));
-        header.remove(name1);
+        assertThat(header.remove(name1), is(value1));
         assertThat(header.get(name1), is(nullValue()));
 
+        header.put(name1.toUpperCase(), value1);
+        header.put(name2.toUpperCase(), value2);
+
         assertThat(header.get(name2), is(value2));
-        header.remove(name2.toUpperCase());
+        assertThat(header.remove(name2.toUpperCase()), is(value2));
         assertThat(header.get(name2), is(nullValue()));
+
+        assertThat(header.get(name1), is(value1));
+        assertThat(header.remove(name1), is(value1));
+        assertThat(header.get(name1), is(nullValue()));
+    }
+
+    @Test
+    public void remove_存在しない値をremoveしてもクラッシュしない() {
+        final String name1 = "name1";
+        final String name2 = "name2";
+        final String value1 = "value1";
+        final String value2 = "value2";
+        final HttpHeader header = new HttpHeader();
+        header.put(name1, value1);
+        header.put(name2, value2);
+
+        assertThat(header.remove(name1), is(value1));
+        assertThat(header.remove(name1), is(nullValue()));
     }
 
     @Test
@@ -117,6 +192,23 @@ public class HttpHeaderTest {
 
         assertThat(header.containsValue(name2, value1), is(false));
         assertThat(header.containsValue(name2.toUpperCase(), value1), is(false));
+    }
+
+    @Test
+    public void toString_値が含まれる() {
+        final String name1 = "name1";
+        final String name2 = "name2";
+        final String value1 = "value1";
+        final String value2 = "value2";
+        final HttpHeader header = new HttpHeader();
+        header.put(name1, value1);
+        header.put(name2, value2);
+
+        final String string = header.toString();
+        assertThat(string.contains(name1), is(true));
+        assertThat(string.contains(name2), is(true));
+        assertThat(string.contains(value1), is(true));
+        assertThat(string.contains(value2), is(true));
     }
 
     @Test
