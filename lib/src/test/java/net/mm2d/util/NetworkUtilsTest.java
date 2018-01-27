@@ -73,33 +73,36 @@ public class NetworkUtilsTest {
 
     @RunWith(JUnit4.class)
     public static class NetworkInterfaceの取得 {
+        private Field mNetworkInterfaceEnumeration;
         private NetworkInterfaceEnumeration mOriginalNetworkInterfaceEnumeration;
 
         @Before
         public void setUp() throws Exception {
-            mOriginalNetworkInterfaceEnumeration = NetworkUtils.sNetworkInterfaceEnumeration;
+            mNetworkInterfaceEnumeration = NetworkUtils.class.getDeclaredField("sNetworkInterfaceEnumeration");
+            mNetworkInterfaceEnumeration.setAccessible(true);
+            mOriginalNetworkInterfaceEnumeration = (NetworkInterfaceEnumeration) mNetworkInterfaceEnumeration.get(null);
         }
 
         @After
         public void tearDown() throws Exception {
-            NetworkUtils.sNetworkInterfaceEnumeration = mOriginalNetworkInterfaceEnumeration;
+            mNetworkInterfaceEnumeration.set(null, mOriginalNetworkInterfaceEnumeration);
         }
 
 
         @Test
         public void getNetworkInterfaceList_Exceptionが発生すればemptyListが返る() throws Exception {
-            NetworkUtils.sNetworkInterfaceEnumeration = new NetworkInterfaceEnumeration() {
+            mNetworkInterfaceEnumeration.set(null, new NetworkInterfaceEnumeration() {
                 @Override
                 Enumeration<NetworkInterface> get() throws SocketException {
                     throw new SocketException();
                 }
-            };
+            });
             assertThat(NetworkUtils.getNetworkInterfaceList(), empty());
         }
 
         @Test
         public void getNetworkInterfaceList_空のEnumerationが戻ればemptyListが返る() throws Exception {
-            NetworkUtils.sNetworkInterfaceEnumeration = new NetworkInterfaceEnumeration() {
+            mNetworkInterfaceEnumeration.set(null, new NetworkInterfaceEnumeration() {
                 @Override
                 Enumeration<NetworkInterface> get() throws SocketException {
                     return new Enumeration<NetworkInterface>() {
@@ -114,7 +117,7 @@ public class NetworkUtilsTest {
                         }
                     };
                 }
-            };
+            });
             assertThat(NetworkUtils.getNetworkInterfaceList(), empty());
         }
     }
@@ -123,6 +126,7 @@ public class NetworkUtilsTest {
     public static class アドレス判定のテスト {
         private InterfaceAddress mIpv4Address;
         private InterfaceAddress mIpv6Address;
+
         @Before
         public void setUp() throws Exception {
             mIpv4Address = createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24);
@@ -131,24 +135,24 @@ public class NetworkUtilsTest {
 
         @Test
         public void isAvailableInet4Interface_multicast可かつupかつloopbackでなくIPv4アドレスを持っている場合true() {
-            final NetworkInterfaceWrapper wrapper = new NetworkInterfaceWrapper(null){
+            final NetworkInterfaceWrapper wrapper = new NetworkInterfaceWrapper() {
                 @Override
-                List<InterfaceAddress> getInterfaceAddresses() {
+                public List<InterfaceAddress> getInterfaceAddresses() {
                     return Arrays.asList(mIpv4Address, mIpv6Address);
                 }
 
                 @Override
-                boolean isLoopback() throws SocketException {
+                public boolean isLoopback() throws SocketException {
                     return false;
                 }
 
                 @Override
-                boolean isUp() throws SocketException {
+                public boolean isUp() throws SocketException {
                     return true;
                 }
 
                 @Override
-                boolean supportsMulticast() throws SocketException {
+                public boolean supportsMulticast() throws SocketException {
                     return true;
                 }
             };
@@ -158,68 +162,68 @@ public class NetworkUtilsTest {
 
         @Test
         public void isAvailableInet4Interface_Interfaceの状態が合致しなければfalse() {
-            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper(null){
+            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper() {
                 @Override
-                List<InterfaceAddress> getInterfaceAddresses() {
+                public List<InterfaceAddress> getInterfaceAddresses() {
                     return Arrays.asList(mIpv4Address);
                 }
 
                 @Override
-                boolean isLoopback() throws SocketException {
+                public boolean isLoopback() throws SocketException {
                     return false;
                 }
 
                 @Override
-                boolean isUp() throws SocketException {
+                public boolean isUp() throws SocketException {
                     return true;
                 }
 
                 @Override
-                boolean supportsMulticast() throws SocketException {
+                public boolean supportsMulticast() throws SocketException {
                     return false;
                 }
             }), is(false));
 
-            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper(null){
+            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper() {
                 @Override
-                List<InterfaceAddress> getInterfaceAddresses() {
+                public List<InterfaceAddress> getInterfaceAddresses() {
                     return Arrays.asList(mIpv4Address);
                 }
 
                 @Override
-                boolean isLoopback() throws SocketException {
+                public boolean isLoopback() throws SocketException {
                     return false;
                 }
 
                 @Override
-                boolean isUp() throws SocketException {
+                public boolean isUp() throws SocketException {
                     return false;
                 }
 
                 @Override
-                boolean supportsMulticast() throws SocketException {
+                public boolean supportsMulticast() throws SocketException {
                     return true;
                 }
             }), is(false));
 
-            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper(null){
+            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper() {
                 @Override
-                List<InterfaceAddress> getInterfaceAddresses() {
+                public List<InterfaceAddress> getInterfaceAddresses() {
                     return Arrays.asList(mIpv4Address);
                 }
 
                 @Override
-                boolean isLoopback() throws SocketException {
+                public boolean isLoopback() throws SocketException {
                     return true;
                 }
 
                 @Override
-                boolean isUp() throws SocketException {
+                public boolean isUp() throws SocketException {
                     return true;
                 }
 
                 @Override
-                boolean supportsMulticast() throws SocketException {
+                public boolean supportsMulticast() throws SocketException {
                     return true;
                 }
             }), is(false));
@@ -227,68 +231,68 @@ public class NetworkUtilsTest {
 
         @Test
         public void isAvailableInet4Interface_Exceptionが発生した場合false() {
-            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper(null){
+            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper() {
                 @Override
-                List<InterfaceAddress> getInterfaceAddresses() {
+                public List<InterfaceAddress> getInterfaceAddresses() {
                     return Arrays.asList(mIpv4Address);
                 }
 
                 @Override
-                boolean isLoopback() throws SocketException {
+                public boolean isLoopback() throws SocketException {
                     throw new SocketException();
                 }
 
                 @Override
-                boolean isUp() throws SocketException {
+                public boolean isUp() throws SocketException {
                     return true;
                 }
 
                 @Override
-                boolean supportsMulticast() throws SocketException {
+                public boolean supportsMulticast() throws SocketException {
                     return true;
                 }
             }), is(false));
 
-            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper(null){
+            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper() {
                 @Override
-                List<InterfaceAddress> getInterfaceAddresses() {
+                public List<InterfaceAddress> getInterfaceAddresses() {
                     return Arrays.asList(mIpv4Address);
                 }
 
                 @Override
-                boolean isLoopback() throws SocketException {
+                public boolean isLoopback() throws SocketException {
                     return false;
                 }
 
                 @Override
-                boolean isUp() throws SocketException {
+                public boolean isUp() throws SocketException {
                     throw new SocketException();
                 }
 
                 @Override
-                boolean supportsMulticast() throws SocketException {
+                public boolean supportsMulticast() throws SocketException {
                     return true;
                 }
             }), is(false));
 
-            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper(null){
+            assertThat(NetworkUtils.isAvailableInet4Interface(new NetworkInterfaceWrapper() {
                 @Override
-                List<InterfaceAddress> getInterfaceAddresses() {
+                public List<InterfaceAddress> getInterfaceAddresses() {
                     return Arrays.asList(mIpv4Address);
                 }
 
                 @Override
-                boolean isLoopback() throws SocketException {
+                public boolean isLoopback() throws SocketException {
                     return false;
                 }
 
                 @Override
-                boolean isUp() throws SocketException {
+                public boolean isUp() throws SocketException {
                     return true;
                 }
 
                 @Override
-                boolean supportsMulticast() throws SocketException {
+                public boolean supportsMulticast() throws SocketException {
                     throw new SocketException();
                 }
             }), is(false));
@@ -296,30 +300,31 @@ public class NetworkUtilsTest {
 
         @Test
         public void isAvailableInet4Interface_IPv4アドレスを持っていない場合false() {
-            final NetworkInterfaceWrapper wrapper = new NetworkInterfaceWrapper(null){
+            final NetworkInterfaceWrapper wrapper = new NetworkInterfaceWrapper() {
                 @Override
-                List<InterfaceAddress> getInterfaceAddresses() {
+                public List<InterfaceAddress> getInterfaceAddresses() {
                     return Arrays.asList(mIpv6Address);
                 }
 
                 @Override
-                boolean isLoopback() throws SocketException {
+                public boolean isLoopback() throws SocketException {
                     return false;
                 }
 
                 @Override
-                boolean isUp() throws SocketException {
+                public boolean isUp() throws SocketException {
                     return true;
                 }
 
                 @Override
-                boolean supportsMulticast() throws SocketException {
+                public boolean supportsMulticast() throws SocketException {
                     return true;
                 }
             };
 
             assertThat(NetworkUtils.isAvailableInet4Interface(wrapper), is(false));
         }
+
         private static InterfaceAddress createInterfaceAddress(
                 final String address,
                 final String broadcast,

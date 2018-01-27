@@ -35,7 +35,7 @@ public class NetworkUtils {
         final List<NetworkInterface> resultList = new ArrayList<>();
         final List<NetworkInterface> allList = getNetworkInterfaceList();
         for (final NetworkInterface ni : allList) {
-            if (isAvailableInet4Interface(new NetworkInterfaceWrapper(ni))) {
+            if (isAvailableInet4Interface(new NetworkInterfaceWrapperImpl(ni))) {
                 resultList.add(ni);
             }
         }
@@ -85,41 +85,6 @@ public class NetworkUtils {
         return null;
     }
 
-    // VisibleForTesting
-    static NetworkInterfaceEnumeration sNetworkInterfaceEnumeration = new NetworkInterfaceEnumeration();
-
-    // VisibleForTesting
-    static class NetworkInterfaceEnumeration {
-        Enumeration<NetworkInterface> get() throws SocketException {
-            return NetworkInterface.getNetworkInterfaces();
-        }
-    }
-
-    // VisibleForTesting
-    static class NetworkInterfaceWrapper {
-        private NetworkInterface mNetworkInterface;
-
-        NetworkInterfaceWrapper(@Nonnull final NetworkInterface networkInterface) {
-            mNetworkInterface = networkInterface;
-        }
-
-        List<InterfaceAddress> getInterfaceAddresses() {
-            return mNetworkInterface.getInterfaceAddresses();
-        }
-
-        boolean isLoopback() throws SocketException {
-            return mNetworkInterface.isLoopback();
-        }
-
-        boolean isUp() throws SocketException {
-            return mNetworkInterface.isUp();
-        }
-
-        boolean supportsMulticast() throws SocketException {
-            return mNetworkInterface.supportsMulticast();
-        }
-    }
-
     /**
      * 外部と通信可能なIPv4アドレスを持つか否かを返す。
      *
@@ -159,5 +124,54 @@ public class NetworkUtils {
             }
         }
         return false;
+    }
+
+    // VisibleForTesting
+    private static NetworkInterfaceEnumeration sNetworkInterfaceEnumeration = new NetworkInterfaceEnumeration();
+
+    // VisibleForTesting
+    static class NetworkInterfaceEnumeration {
+        Enumeration<NetworkInterface> get() throws SocketException {
+            return NetworkInterface.getNetworkInterfaces();
+        }
+    }
+
+    // VisibleForTesting
+    interface NetworkInterfaceWrapper {
+        List<InterfaceAddress> getInterfaceAddresses();
+
+        boolean isLoopback() throws SocketException;
+
+        boolean isUp() throws SocketException;
+
+        boolean supportsMulticast() throws SocketException;
+    }
+
+    private static class NetworkInterfaceWrapperImpl implements NetworkInterfaceWrapper {
+        private NetworkInterface mNetworkInterface;
+
+        NetworkInterfaceWrapperImpl(@Nonnull final NetworkInterface networkInterface) {
+            mNetworkInterface = networkInterface;
+        }
+
+        @Override
+        public List<InterfaceAddress> getInterfaceAddresses() {
+            return mNetworkInterface.getInterfaceAddresses();
+        }
+
+        @Override
+        public boolean isLoopback() throws SocketException {
+            return mNetworkInterface.isLoopback();
+        }
+
+        @Override
+        public boolean isUp() throws SocketException {
+            return mNetworkInterface.isUp();
+        }
+
+        @Override
+        public boolean supportsMulticast() throws SocketException {
+            return mNetworkInterface.supportsMulticast();
+        }
     }
 }
