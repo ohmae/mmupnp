@@ -24,6 +24,11 @@ import static org.mockito.Mockito.*;
 @RunWith(JUnit4.class)
 public class IoUtilsTest {
     @Test
+    public void constuctor() {
+        new IoUtils();
+    }
+
+    @Test
     public void closeQuietly_Closeable_closeがコールされる() throws IOException {
         final Closeable closeable = mock(Closeable.class);
         IoUtils.closeQuietly(closeable);

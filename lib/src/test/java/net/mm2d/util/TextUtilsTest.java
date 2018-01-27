@@ -17,6 +17,11 @@ import static org.junit.Assert.*;
 @RunWith(JUnit4.class)
 public class TextUtilsTest {
     @Test
+    public void constuctor() {
+        new TextUtils();
+    }
+
+    @Test
     public void isEmpty_nullもしくは空文字でtrueそれ意外false() {
         assertThat(TextUtils.isEmpty(null), is(true));
         assertThat(TextUtils.isEmpty(""), is(true));

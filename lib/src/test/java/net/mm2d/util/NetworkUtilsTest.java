@@ -40,6 +40,11 @@ public class NetworkUtilsTest {
     @RunWith(JUnit4.class)
     public static class NetworkInterfaceをデバイスから取得 {
         @Test
+        public void constuctor() {
+            new NetworkUtils();
+        }
+
+        @Test
         public void getAvailableInet4Interfaces() throws Exception {
             final List<NetworkInterface> list = NetworkUtils.getAvailableInet4Interfaces();
             for (final NetworkInterface ni : list) {

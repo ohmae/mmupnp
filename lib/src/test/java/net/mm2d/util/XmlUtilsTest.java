@@ -22,6 +22,11 @@ import static org.junit.Assert.*;
 @RunWith(JUnit4.class)
 public class XmlUtilsTest {
     @Test
+    public void constuctor() {
+        new XmlUtils();
+    }
+
+    @Test
     public void getDocumentBuilder_NS_not_aware() throws Exception {
         final String xml = TestUtils.getResourceAsString("propchange.xml");
         final Document document = XmlUtils.newDocument(false, xml);

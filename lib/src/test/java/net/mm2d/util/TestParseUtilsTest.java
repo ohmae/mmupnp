@@ -12,11 +12,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import sun.java2d.pipe.TextPipe;
+
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class TestParseUtilsTest {
+    @Test
+    public void constuctor() {
+        new TextParseUtils();
+    }
+
     @Test
     public void parseIntSafely_10進数異常値指定() {
         assertThat(TextParseUtils.parseIntSafely(null, -1), is(-1));
