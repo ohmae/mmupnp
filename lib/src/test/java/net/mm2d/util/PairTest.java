@@ -92,6 +92,9 @@ public class PairTest {
         final Pair<String, String> pair2 = new Pair<>("1", null);
         final Pair<String, String> pair3 = new Pair<>(null, null);
         final Pair<String, String> pair4 = new Pair<>(null, null);
+        final Pair<String, String> pair5 = new Pair<>(null, "1");
+        final Pair<String, String> pair6 = new Pair<>("1", null);
+        final Pair<String, String> pair7 = new Pair<>(null, "2");
 
         pair1.hashCode();
         pair2.hashCode();
@@ -102,8 +105,12 @@ public class PairTest {
         assertThat(pair1.equals(null), is(false));
         assertThat(pair1.equals(""), is(false));
         assertThat(pair1.equals(pair2), is(false));
+        assertThat(pair2.equals(pair1), is(false));
         assertThat(pair1.equals(pair3), is(false));
         assertThat(pair2.equals(pair3), is(false));
         assertThat(pair3.equals(pair4), is(true));
+        assertThat(pair1.equals(pair5), is(true));
+        assertThat(pair2.equals(pair6), is(true));
+        assertThat(pair1.equals(pair7), is(false));
     }
 }
