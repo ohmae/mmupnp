@@ -7,8 +7,6 @@
 
 package net.mm2d.util;
 
-import com.sun.istack.internal.NotNull;
-
 import java.net.Inet4Address;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -101,7 +99,7 @@ public class NetworkUtils {
     static class NetworkInterfaceWrapper {
         private NetworkInterface mNetworkInterface;
 
-        NetworkInterfaceWrapper(@NotNull final NetworkInterface networkInterface) {
+        NetworkInterfaceWrapper(@Nonnull final NetworkInterface networkInterface) {
             mNetworkInterface = networkInterface;
         }
 
