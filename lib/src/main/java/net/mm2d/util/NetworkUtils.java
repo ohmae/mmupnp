@@ -7,6 +7,8 @@
 
 package net.mm2d.util;
 
+import com.sun.istack.internal.NotNull;
+
 import java.net.Inet4Address;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -35,7 +37,7 @@ public class NetworkUtils {
         final List<NetworkInterface> resultList = new ArrayList<>();
         final List<NetworkInterface> allList = getNetworkInterfaceList();
         for (final NetworkInterface ni : allList) {
-            if (isAvailableInet4Interface(ni)) {
+            if (isAvailableInet4Interface(new NetworkInterfaceWrapper(ni))) {
                 resultList.add(ni);
             }
         }
@@ -56,14 +58,14 @@ public class NetworkUtils {
     @Nonnull
     public static List<NetworkInterface> getNetworkInterfaceList() {
         final Enumeration<NetworkInterface> netIfs = getNetworkInterfaces();
-        if (netIfs == null) {
+        if (netIfs == null || !netIfs.hasMoreElements()) {
             return Collections.emptyList();
         }
         final List<NetworkInterface> list = new ArrayList<>();
         while (netIfs.hasMoreElements()) {
             list.add(netIfs.nextElement());
         }
-        return Collections.unmodifiableList(list);
+        return list;
     }
 
     /**
@@ -79,10 +81,45 @@ public class NetworkUtils {
     @Nullable
     private static Enumeration<NetworkInterface> getNetworkInterfaces() {
         try {
-            return NetworkInterface.getNetworkInterfaces();
+            return sNetworkInterfaceEnumeration.get();
         } catch (final SocketException ignored) {
         }
         return null;
+    }
+
+    // VisibleForTesting
+    static NetworkInterfaceEnumeration sNetworkInterfaceEnumeration = new NetworkInterfaceEnumeration();
+
+    // VisibleForTesting
+    static class NetworkInterfaceEnumeration {
+        Enumeration<NetworkInterface> get() throws SocketException {
+            return NetworkInterface.getNetworkInterfaces();
+        }
+    }
+
+    // VisibleForTesting
+    static class NetworkInterfaceWrapper {
+        private NetworkInterface mNetworkInterface;
+
+        NetworkInterfaceWrapper(@NotNull final NetworkInterface networkInterface) {
+            mNetworkInterface = networkInterface;
+        }
+
+        List<InterfaceAddress> getInterfaceAddresses() {
+            return mNetworkInterface.getInterfaceAddresses();
+        }
+
+        boolean isLoopback() throws SocketException {
+            return mNetworkInterface.isLoopback();
+        }
+
+        boolean isUp() throws SocketException {
+            return mNetworkInterface.isUp();
+        }
+
+        boolean supportsMulticast() throws SocketException {
+            return mNetworkInterface.supportsMulticast();
+        }
     }
 
     /**
@@ -91,7 +128,8 @@ public class NetworkUtils {
      * @param netIf 検査するNetworkInterface
      * @return true:外部と通信可能なIPv4アドレスを持つ。false:それ以外
      */
-    private static boolean isAvailableInet4Interface(@Nonnull final NetworkInterface netIf) {
+    // VisibleForTesting
+    static boolean isAvailableInet4Interface(@Nonnull final NetworkInterfaceWrapper netIf) {
         return isConnectedToNetwork(netIf) && hasInet4Address(netIf);
     }
 
@@ -101,9 +139,9 @@ public class NetworkUtils {
      * @param netIf 検査するNetworkInterface
      * @return true:ネットワークに接続している。false:それ以外
      */
-    private static boolean isConnectedToNetwork(@Nonnull final NetworkInterface netIf) {
+    private static boolean isConnectedToNetwork(@Nonnull final NetworkInterfaceWrapper netIf) {
         try {
-            return !netIf.isLoopback() && netIf.isUp();
+            return !netIf.isLoopback() && netIf.isUp() && netIf.supportsMulticast();
         } catch (final SocketException ignored) {
         }
         return false;
@@ -115,7 +153,7 @@ public class NetworkUtils {
      * @param netIf 検査するNetworkInterface
      * @return true:IPv4アドレスを持つ。false:それ以外
      */
-    private static boolean hasInet4Address(@Nonnull final NetworkInterface netIf) {
+    private static boolean hasInet4Address(@Nonnull final NetworkInterfaceWrapper netIf) {
         final List<InterfaceAddress> addresses = netIf.getInterfaceAddresses();
         for (final InterfaceAddress address : addresses) {
             if (address.getAddress() instanceof Inet4Address) {
