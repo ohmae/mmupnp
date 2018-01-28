@@ -115,18 +115,6 @@ public class ServiceTest {
                     .setDescription("description")
                     .build();
         }
-
-        @Test(expected = IllegalStateException.class)
-        public void build_Description不足() throws Exception {
-            new Service.Builder()
-                    .setDevice(mock(Device.class))
-                    .setServiceType("serviceType")
-                    .setServiceId("serviceId")
-                    .setScpdUrl("scpdUrl")
-                    .setControlUrl("controlUrl")
-                    .setEventSubUrl("eventSubUrl")
-                    .build();
-        }
     }
 
     @RunWith(JUnit4.class)

@@ -188,9 +188,6 @@ public class Service {
             if (mEventSubUrl == null) {
                 throw new IllegalStateException("eventSubURL must be set.");
             }
-            if (mDescription == null) {
-                throw new IllegalStateException("description must be set.");
-            }
             return new Service(this);
         }
     }
@@ -236,7 +233,7 @@ public class Service {
         mScpdUrl = builder.mScpdUrl;
         mControlUrl = builder.mControlUrl;
         mEventSubUrl = builder.mEventSubUrl;
-        mDescription = builder.mDescription;
+        mDescription = builder.mDescription != null ? builder.mDescription : "";
         mStateVariableMap = buildStateVariableMap(this, builder.mVariableBuilderList);
         mActionMap = buildActionMap(this, mStateVariableMap, builder.mActionBuilderList);
     }

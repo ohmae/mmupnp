@@ -385,13 +385,14 @@ public class Device {
          */
         @Nonnull
         public Builder putTag(
-                @Nonnull final String namespace,
+                @Nullable final String namespace,
                 @Nonnull final String tag,
                 @Nonnull final String value) {
-            Map<String, String> map = mTagMap.get(namespace);
+            final String namespaceUri = namespace == null ? "" : namespace;
+            Map<String, String> map = mTagMap.get(namespaceUri);
             if (map == null) {
                 map = new HashMap<>();
-                mTagMap.put(namespace, map);
+                mTagMap.put(namespaceUri, map);
             }
             map.put(tag, value);
             return this;

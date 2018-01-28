@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -79,23 +80,25 @@ class ServiceParser {
         }
     }
 
+    @Nullable
+    static String getTagName(@Nonnull final Node node) {
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
+            return null;
+        }
+        return node.getLocalName();
+    }
+
     @Nonnull
     private static Action.Builder parseAction(@Nonnull final Element element) {
         final Action.Builder builder = new Action.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
+            final String tag = getTagName(node);
             if (TextUtils.equals(tag, "name")) {
                 builder.setName(node.getTextContent());
             } else if (TextUtils.equals(tag, "argumentList")) {
                 for (Node c = node.getFirstChild(); c != null; c = c.getNextSibling()) {
-                    if (c.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    if (TextUtils.equals(c.getLocalName(), "argument")) {
+                    if (TextUtils.equals(getTagName(c), "argument")) {
                         builder.addArgumentBuilder(parseArgument((Element) c));
                     }
                 }
@@ -103,16 +106,12 @@ class ServiceParser {
         }
         return builder;
     }
-
     @Nonnull
     private static Argument.Builder parseArgument(@Nonnull final Element element) {
         final Argument.Builder builder = new Argument.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
+            final String tag = getTagName(node);
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
@@ -126,18 +125,12 @@ class ServiceParser {
             @Nonnull final Argument.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
-        switch (tag) {
-            case "name":
-                builder.setName(value);
-                break;
-            case "direction":
-                builder.setDirection(value);
-                break;
-            case "relatedStateVariable":
-                builder.setRelatedStateVariableName(value);
-                break;
-            default:
-                break;
+        if ("name".equals(tag)) {
+            builder.setName(value);
+        } else if ("direction".equals(tag)){
+            builder.setDirection(value);
+        } else if ("relatedStateVariable".equals(tag)){
+            builder.setRelatedStateVariableName(value);
         }
     }
 
@@ -148,31 +141,20 @@ class ServiceParser {
                 .setMulticast(element.getAttribute("multicast"));
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
+            final String tag = getTagName(node);
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
-            switch (tag) {
-                case "name":
-                    builder.setName(node.getTextContent());
-                    break;
-                case "dataType":
-                    builder.setDataType(node.getTextContent());
-                    break;
-                case "defaultValue":
-                    builder.setDefaultValue(node.getTextContent());
-                    break;
-                case "allowedValueList":
-                    parseAllowedValueList(builder, (Element) node);
-                    break;
-                case "allowedValueRange":
-                    parseAllowedValueRange(builder, (Element) node);
-                    break;
-                default:
-                    break;
+            if ("name".equals(tag)) {
+                builder.setName(node.getTextContent());
+            } else if ("dataType".equals(tag)){
+                builder.setDataType(node.getTextContent());
+            } else if ("defaultValue".equals(tag)){
+                builder.setDefaultValue(node.getTextContent());
+            } else if ("allowedValueList".equals(tag)){
+                parseAllowedValueList(builder, (Element) node);
+            } else if ("allowedValueRange".equals(tag)){
+                parseAllowedValueRange(builder, (Element) node);
             }
         }
         return builder;
@@ -183,10 +165,8 @@ class ServiceParser {
             @Nonnull final Element element) {
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("allowedValue".equals(node.getLocalName())) {
+            final String tag = getTagName(node);
+            if ("allowedValue".equals(tag)) {
                 builder.addAllowedValue(node.getTextContent());
             }
         }
@@ -197,10 +177,7 @@ class ServiceParser {
             @Nonnull final Element element) {
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
+            final String tag = getTagName(node);
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
@@ -213,18 +190,17 @@ class ServiceParser {
             @Nonnull final StateVariable.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
-        switch (tag) {
-            case "step":
-                builder.setStep(value);
-                break;
-            case "minimum":
-                builder.setMinimum(value);
-                break;
-            case "maximum":
-                builder.setMaximum(value);
-                break;
-            default:
-                break;
+        if ("step".equals(tag)) {
+            builder.setStep(value);
+        } else if ("minimum".equals(tag)){
+            builder.setMinimum(value);
+        } else if ("maximum".equals(tag)){
+            builder.setMaximum(value);
         }
+    }
+
+    // インスタンス化禁止
+    private ServiceParser() {
+        throw new AssertionError();
     }
 }
