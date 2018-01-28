@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import com.sun.istack.internal.NotNull;
-
 import net.mm2d.log.Log;
 import net.mm2d.util.IoUtils;
 import net.mm2d.util.TextUtils;
@@ -164,7 +162,7 @@ public class HttpClient {
         }
     }
 
-    @NotNull
+    @Nonnull
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
         request.writeData(mOutputStream);
         final HttpResponse response = new HttpResponse(mSocket);
