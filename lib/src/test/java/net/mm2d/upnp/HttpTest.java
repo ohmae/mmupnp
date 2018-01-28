@@ -85,7 +85,20 @@ public class HttpTest {
     }
 
     @Test
+    public void parseDate_nullを渡してもException発生しない() throws Exception {
+        assertThat(Http.parseDate(null), is(nullValue()));
+    }
+
+    @Test
     public void getCurrentDate() {
         assertThat(Http.parseDate(Http.getCurrentDate()), is(not(nullValue())));
+    }
+
+    @Test
+    public void isHttpUrl() {
+        assertThat(Http.isHttpUrl(null), is(false));
+        assertThat(Http.isHttpUrl(""), is(false));
+        assertThat(Http.isHttpUrl("https://example.com/"), is(false));
+        assertThat(Http.isHttpUrl("http://example.com/"), is(true));
     }
 }
