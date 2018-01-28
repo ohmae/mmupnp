@@ -55,14 +55,14 @@ class ControlPointDiFactory {
     SsdpSearchServerList createSsdpSearchServerList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
-        return new SsdpSearchServerList(interfaces, listener);
+        return new SsdpSearchServerList().init(interfaces, listener);
     }
 
     @Nonnull
     SsdpNotifyReceiverList createSsdpNotifyReceiverList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
-        return new SsdpNotifyReceiverList(interfaces, listener);
+        return new SsdpNotifyReceiverList().init(interfaces, listener);
     }
 
     @Nonnull
