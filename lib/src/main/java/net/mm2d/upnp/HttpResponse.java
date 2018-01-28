@@ -56,7 +56,7 @@ public class HttpResponse extends HttpMessage {
      * @see #setStartLine(String)
      */
     public void setStatusLine(@Nonnull final String line) throws IllegalArgumentException {
-        final String[] params = line.split(" ");
+        final String[] params = line.split(" ", 3);
         if (params.length < 3) {
             throw new IllegalArgumentException();
         }
@@ -170,25 +170,29 @@ public class HttpResponse extends HttpMessage {
 
     @Override
     public HttpResponse setBody(@Nullable final String body) {
-        return (HttpResponse) super.setBody(body);
+        super.setBody(body);
+        return this;
     }
 
     @Override
     public HttpResponse setBody(
             @Nullable final String body,
             final boolean withContentLength) {
-        return (HttpResponse) super.setBody(body, withContentLength);
+        super.setBody(body, withContentLength);
+        return this;
     }
 
     @Override
     public HttpResponse setBodyBinary(@Nullable final byte[] body) {
-        return (HttpResponse) super.setBodyBinary(body);
+        super.setBodyBinary(body);
+        return this;
     }
 
     @Override
     public HttpResponse setBodyBinary(
             @Nullable final byte[] body,
             final boolean withContentLength) {
-        return (HttpResponse) super.setBodyBinary(body, withContentLength);
+        super.setBodyBinary(body, withContentLength);
+        return this;
     }
 }

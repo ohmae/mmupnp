@@ -106,6 +106,7 @@ class ServiceParser {
         }
         return builder;
     }
+
     @Nonnull
     private static Argument.Builder parseArgument(@Nonnull final Element element) {
         final Argument.Builder builder = new Argument.Builder();
@@ -127,9 +128,9 @@ class ServiceParser {
             @Nonnull final String value) {
         if ("name".equals(tag)) {
             builder.setName(value);
-        } else if ("direction".equals(tag)){
+        } else if ("direction".equals(tag)) {
             builder.setDirection(value);
-        } else if ("relatedStateVariable".equals(tag)){
+        } else if ("relatedStateVariable".equals(tag)) {
             builder.setRelatedStateVariableName(value);
         }
     }
@@ -147,13 +148,13 @@ class ServiceParser {
             }
             if ("name".equals(tag)) {
                 builder.setName(node.getTextContent());
-            } else if ("dataType".equals(tag)){
+            } else if ("dataType".equals(tag)) {
                 builder.setDataType(node.getTextContent());
-            } else if ("defaultValue".equals(tag)){
+            } else if ("defaultValue".equals(tag)) {
                 builder.setDefaultValue(node.getTextContent());
-            } else if ("allowedValueList".equals(tag)){
+            } else if ("allowedValueList".equals(tag)) {
                 parseAllowedValueList(builder, (Element) node);
-            } else if ("allowedValueRange".equals(tag)){
+            } else if ("allowedValueRange".equals(tag)) {
                 parseAllowedValueRange(builder, (Element) node);
             }
         }
@@ -192,9 +193,9 @@ class ServiceParser {
             @Nonnull final String value) {
         if ("step".equals(tag)) {
             builder.setStep(value);
-        } else if ("minimum".equals(tag)){
+        } else if ("minimum".equals(tag)) {
             builder.setMinimum(value);
-        } else if ("maximum".equals(tag)){
+        } else if ("maximum".equals(tag)) {
             builder.setMaximum(value);
         }
     }

@@ -12,11 +12,13 @@ import net.mm2d.util.TestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatchers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -171,6 +173,12 @@ public class HttpRequestTest {
         assertThat(request.getVersion(), is(Http.HTTP_1_1));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void setRequestLine_不足があればException() {
+        final HttpRequest request = new HttpRequest();
+        request.setRequestLine("GET /cds/control");
+    }
+
     @Test
     public void HttpRequest_ディープコピーができる() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-length.bin");
@@ -201,5 +209,135 @@ public class HttpRequestTest {
 
         assertThat(request.getAddress(), is(address));
         assertThat(request.getPort(), is(port));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getAddressString_未設定ならException() throws Exception {
+        final HttpRequest request = new HttpRequest();
+        request.getAddressString();
+    }
+
+    @Test
+    public void getAddressString_デフォルトポート() throws Exception {
+        final String address = "192.168.0.1";
+        final int port = 8080;
+        final HttpRequest request = new HttpRequest();
+        request.setAddress(InetAddress.getByName(address));
+        assertThat(request.getAddressString(), is(address));
+        request.setPort(Http.DEFAULT_PORT);
+        assertThat(request.getAddressString(), is(address));
+        request.setPort(port);
+        assertThat(request.getAddressString(), is(address + ":" + port));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getSocketAddress_未設定ならException() throws Exception {
+        final HttpRequest request = new HttpRequest();
+        request.getSocketAddress();
+    }
+
+    @Test
+    public void setHeaderLine_設定できる() throws Exception {
+        final HttpRequest request = new HttpRequest();
+        request.setHeaderLine("SOAPACTION: " + ACTION);
+        assertThat(request.getHeader(Http.SOAPACTION), is(ACTION));
+    }
+
+    @Test
+    public void setHeaderLine_フォーマットエラーでもExceptionは発生しない() throws Exception {
+        final HttpRequest request = new HttpRequest();
+        request.setHeaderLine("SOAPACTION " + ACTION);
+        assertThat(request.getHeader(Http.SOAPACTION), is(nullValue()));
+    }
+
+    @Test
+    public void isKeepAlive() throws Exception {
+        final HttpRequest request = new HttpRequest();
+        request.setVersion(Http.HTTP_1_0);
+        assertThat(request.isKeepAlive(), is(false));
+        request.setVersion(Http.HTTP_1_1);
+        assertThat(request.isKeepAlive(), is(true));
+
+        request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
+        request.setVersion(Http.HTTP_1_0);
+        assertThat(request.isKeepAlive(), is(true));
+        request.setVersion(Http.HTTP_1_1);
+        assertThat(request.isKeepAlive(), is(true));
+
+        request.setHeader(Http.CONNECTION, Http.CLOSE);
+        request.setVersion(Http.HTTP_1_0);
+        assertThat(request.isKeepAlive(), is(false));
+        request.setVersion(Http.HTTP_1_1);
+        assertThat(request.isKeepAlive(), is(false));
+    }
+
+    @Test
+    public void getContentLength_正常系() throws Exception {
+        final HttpRequest request = new HttpRequest();
+        request.setHeader(Http.CONTENT_LENGTH, "10");
+        assertThat(request.getContentLength(), is(10));
+    }
+
+    @Test
+    public void getContentLength_異常系() throws Exception {
+        final HttpRequest request = new HttpRequest();
+        request.setHeader(Http.CONTENT_LENGTH, "length");
+        assertThat(request.getContentLength(), is(0));
+    }
+
+    @Test
+    public void setBody_getBodyで取得できる() {
+        final String body = "body";
+        final HttpRequest request = new HttpRequest();
+        request.setBody(body);
+
+        assertThat(request.getBody(), is(body));
+    }
+
+    @Test
+    public void setBody_長さ0() {
+        final String body = "";
+        final HttpRequest request = new HttpRequest();
+        request.setBody(body, true);
+
+        assertThat(request.getBody(), is(body));
+        assertThat(request.getBodyBinary().length, is(0));
+        assertThat(request.getHeader(Http.CONTENT_LENGTH), is("0"));
+    }
+
+    @Test
+    public void setBody_エンコード不可でもExceptionは発生しない() throws Exception {
+        final String body = "body";
+        final HttpRequest request = spy(new HttpRequest());
+        doThrow(new UnsupportedEncodingException()).when(request).getBytes(anyString());
+        request.setBody(body, true);
+
+        assertThat(request.getBody(), is(body));
+    }
+
+    @Test
+    public void setBodyBinary_長さ0() {
+        final HttpRequest request = new HttpRequest();
+        request.setBodyBinary(new byte[0]);
+
+        assertThat(request.getBody().length(), is(0));
+        assertThat(request.getBodyBinary().length, is(0));
+    }
+
+    @Test
+    public void getBody_デコード不可ならnullが返る() throws Exception {
+        final HttpRequest request = spy(new HttpRequest());
+        request.setBodyBinary("body".getBytes("utf-8"));
+        doThrow(new UnsupportedEncodingException()).when(request).newString(ArgumentMatchers.any(byte[].class));
+
+        assertThat(request.getBody(), is(nullValue()));
+    }
+
+    @Test
+    public void getHeaderBytes_エンコード不可でもnullが返らない() throws Exception {
+        final HttpRequest request = spy(new HttpRequest());
+        doThrow(new UnsupportedEncodingException()).when(request).getBytes(anyString());
+
+        assertThat(request.getHeaderBytes().length, is(0));
     }
 }

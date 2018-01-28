@@ -115,6 +115,37 @@ public class HttpResponseTest {
     }
 
     @Test
+    public void setStatusLine_version_status_phraseに反映される2() {
+        final HttpResponse response = new HttpResponse();
+        response.setStatusLine("HTTP/1.1 404 Not Found");
+
+        assertThat(response.getVersion(), is(Http.HTTP_1_1));
+        assertThat(response.getStatusCode(), is(404));
+        assertThat(response.getReasonPhrase(), is("Not Found"));
+        assertThat(response.getStatus(), is(Http.Status.HTTP_NOT_FOUND));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setStatusLine_不足がある場合Exception() {
+        final HttpResponse response = new HttpResponse();
+        response.setStatusLine("HTTP/1.1 404");
+    }
+
+    @Test
+    public void setStatusCode_正常系() {
+        final HttpResponse response = new HttpResponse();
+        response.setStatusCode(200);
+
+        assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setStatusCode_不正なステータスコードはException() {
+        final HttpResponse response = new HttpResponse();
+        response.setStatusCode(0);
+    }
+
+    @Test
     public void HttpResponse_Socketの情報が反映される() throws IOException {
         final InetAddress address = InetAddress.getByName("192.0.2.2");
         final int port = 12345;

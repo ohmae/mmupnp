@@ -7,7 +7,6 @@
 
 package net.mm2d.util;
 
-import net.mm2d.upnp.Http;
 import net.mm2d.util.NetworkUtils.NetworkInterfaceEnumeration;
 import net.mm2d.util.NetworkUtils.NetworkInterfaceWrapper;
 

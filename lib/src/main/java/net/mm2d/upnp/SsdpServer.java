@@ -112,8 +112,8 @@ abstract class SsdpServer {
         mSocket.setTimeToLive(4);
     }
 
+    // VisibleForTesting
     @Nonnull
-        // VisibleForTesting
     MulticastSocket createMulticastSocket(final int port) throws IOException {
         return new MulticastSocket(port);
     }
@@ -183,7 +183,6 @@ abstract class SsdpServer {
      * @param message 送信するメッセージ
      */
     private void send(@Nonnull final byte[] message) throws IOException {
-        assert mSocket != null;
         mSocket.send(new DatagramPacket(message, message.length, SSDP_SO_ADDR));
     }
 

@@ -120,29 +120,29 @@ public class DeviceParser {
             @Nonnull final String value) {
         if ("UDN".equals(tag)) {
             builder.setUdn(value);
-        } else if("UPC".equals(tag)) {
+        } else if ("UPC".equals(tag)) {
             builder.setUpc(value);
-        } else if("deviceType".equals(tag)) {
+        } else if ("deviceType".equals(tag)) {
             builder.setDeviceType(value);
-        } else if("friendlyName".equals(tag)) {
+        } else if ("friendlyName".equals(tag)) {
             builder.setFriendlyName(value);
-        } else if("manufacturer".equals(tag)) {
+        } else if ("manufacturer".equals(tag)) {
             builder.setManufacture(value);
-        } else if("manufacturerURL".equals(tag)) {
+        } else if ("manufacturerURL".equals(tag)) {
             builder.setManufactureUrl(value);
-        } else if("modelName".equals(tag)) {
+        } else if ("modelName".equals(tag)) {
             builder.setModelName(value);
-        } else if("modelURL".equals(tag)) {
+        } else if ("modelURL".equals(tag)) {
             builder.setModelUrl(value);
-        } else if("modelDescription".equals(tag)) {
+        } else if ("modelDescription".equals(tag)) {
             builder.setModelDescription(value);
-        } else if("modelNumber".equals(tag)) {
+        } else if ("modelNumber".equals(tag)) {
             builder.setModelNumber(value);
-        } else if("serialNumber".equals(tag)) {
+        } else if ("serialNumber".equals(tag)) {
             builder.setSerialNumber(value);
-        } else if("presentationURL".equals(tag)) {
+        } else if ("presentationURL".equals(tag)) {
             builder.setPresentationUrl(value);
-        } else if("URLBase".equals(tag)) {
+        } else if ("URLBase".equals(tag)) {
             builder.setUrlBase(value);
         }
     }

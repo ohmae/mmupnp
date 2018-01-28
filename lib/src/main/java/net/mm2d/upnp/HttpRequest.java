@@ -175,37 +175,43 @@ public class HttpRequest extends HttpMessage {
 
     @Override
     public HttpRequest setVersion(@Nonnull final String version) {
-        return (HttpRequest) super.setVersion(version);
+        super.setVersion(version);
+        return this;
     }
 
     @Override
     public HttpRequest setHeader(
             @Nonnull final String name,
             @Nonnull final String value) {
-        return (HttpRequest) super.setHeader(name, value);
+        super.setHeader(name, value);
+        return this;
     }
 
     @Override
     public HttpRequest setBody(@Nullable final String body) {
-        return (HttpRequest) super.setBody(body);
+        super.setBody(body);
+        return this;
     }
 
     @Override
     public HttpRequest setBody(
             @Nullable final String body,
             final boolean withContentLength) {
-        return (HttpRequest) super.setBody(body, withContentLength);
+        super.setBody(body, withContentLength);
+        return this;
     }
 
     @Override
     public HttpRequest setBodyBinary(@Nullable final byte[] body) {
-        return (HttpRequest) super.setBodyBinary(body);
+        super.setBodyBinary(body);
+        return this;
     }
 
     @Override
     public HttpRequest setBodyBinary(
             @Nullable final byte[] body,
             final boolean withContentLength) {
-        return (HttpRequest) super.setBodyBinary(body, withContentLength);
+        super.setBodyBinary(body, withContentLength);
+        return this;
     }
 }

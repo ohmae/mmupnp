@@ -339,7 +339,7 @@ public abstract class HttpMessage {
             mBodyBinary = new byte[0];
         } else {
             try {
-                mBodyBinary = string.getBytes(CHARSET);
+                mBodyBinary = getBytes(string);
             } catch (final UnsupportedEncodingException e) {
                 Log.w(e);
             }
@@ -349,6 +349,12 @@ public abstract class HttpMessage {
             setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
         }
         return this;
+    }
+
+    // VisibleForTesting
+    @Nonnull
+    byte[] getBytes(@Nonnull final String string) throws UnsupportedEncodingException {
+        return string.getBytes(CHARSET);
     }
 
     /**
@@ -369,12 +375,18 @@ public abstract class HttpMessage {
             return "";
         }
         try {
-            return new String(binary, CHARSET);
+            return newString(binary);
         } catch (final Exception e) {
             // for bug in Android Sdk, ArrayIndexOutOfBoundsException may occur.
             Log.w(e);
         }
         return null;
+    }
+
+    // VisibleForTesting
+    @Nonnull
+    String newString(@Nonnull final byte[] binary) throws UnsupportedEncodingException {
+        return new String(binary, CHARSET);
     }
 
     /**
@@ -420,10 +432,11 @@ public abstract class HttpMessage {
      *
      * @return ヘッダバイナリ
      */
+    // VisibleForTesting
     @Nonnull
-    private byte[] getHeaderBytes() {
+    byte[] getHeaderBytes() {
         try {
-            return getHeaderString().getBytes(CHARSET);
+            return getBytes(getHeaderString());
         } catch (final UnsupportedEncodingException e) {
             Log.w(e);
         }
@@ -491,7 +504,7 @@ public abstract class HttpMessage {
     private void writeChunkSize(
             @Nonnull final OutputStream os,
             final int size) throws IOException {
-        os.write(Integer.toHexString(size).getBytes(CHARSET));
+        os.write(getBytes(Integer.toHexString(size)));
         os.write(CRLF);
     }
 
