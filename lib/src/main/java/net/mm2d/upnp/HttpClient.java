@@ -144,7 +144,7 @@ public class HttpClient {
     }
 
     private HttpResponse doRequest(@Nonnull final HttpRequest request) throws IOException {
-        if (mSocket == null) {
+        if (isClosed()) {
             openSocket(request);
             return writeAndRead(request);
         } else {
@@ -217,6 +217,11 @@ public class HttpClient {
                 && mSocket.isConnected()
                 && mSocket.getInetAddress().equals(request.getAddress())
                 && mSocket.getPort() == request.getPort();
+    }
+
+    // VisibleForTesting
+    boolean isClosed() {
+        return mSocket == null;
     }
 
     private void openSocket(@Nonnull final HttpRequest request) throws IOException {
