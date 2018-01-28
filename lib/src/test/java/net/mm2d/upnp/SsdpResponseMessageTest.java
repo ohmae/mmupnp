@@ -36,7 +36,7 @@ public class SsdpResponseMessageTest {
     @RunWith(JUnit4.class)
     public static class 作成 {
         @Test
-        public void buildUp_受信データから作成() throws IOException {
+        public void buildUp_受信データから作成() throws Exception {
             final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -46,6 +46,27 @@ public class SsdpResponseMessageTest {
             final byte[] expected = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");
 
             assertThat(new String(actual), is(new String(expected)));
+        }
+
+        @Test
+        public void setStatusCode() throws Exception {
+            final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
+            message.setStatusCode(404);
+            assertThat(message.getStatusCode(), is(404));
+        }
+
+        @Test
+        public void setReasonPhrase() throws Exception {
+            final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
+            message.setReasonPhrase("Not Found");
+            assertThat(message.getReasonPhrase(), is("Not Found"));
+        }
+
+        @Test
+        public void setStatus() throws Exception {
+            final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
+            message.setStatus(Http.Status.HTTP_NOT_FOUND);
+            assertThat(message.getStatus(), is(Http.Status.HTTP_NOT_FOUND));
         }
     }
 
