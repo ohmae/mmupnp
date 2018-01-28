@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import com.sun.istack.internal.NotNull;
+
 import net.mm2d.log.Log;
 import net.mm2d.util.IoUtils;
 import net.mm2d.util.TextUtils;
@@ -144,7 +146,7 @@ public class HttpClient {
     }
 
     private HttpResponse doRequest(@Nonnull final HttpRequest request) throws IOException {
-        if (isClosed()) {
+        if (mSocket == null) {
             openSocket(request);
             return writeAndRead(request);
         } else {
@@ -162,10 +164,8 @@ public class HttpClient {
         }
     }
 
+    @NotNull
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
-        assert mSocket != null;
-        assert mOutputStream != null;
-        assert mInputStream != null;
         request.writeData(mOutputStream);
         final HttpResponse response = new HttpResponse(mSocket);
         response.readData(mInputStream);
@@ -187,7 +187,8 @@ public class HttpClient {
         return response;
     }
 
-    private static boolean needToRedirect(@Nonnull final HttpResponse response) {
+    // VisibleForTesting
+    boolean needToRedirect(@Nonnull final HttpResponse response) {
         final Http.Status status = response.getStatus();
         switch (status) {
             case HTTP_MOVED_PERM:
@@ -212,15 +213,12 @@ public class HttpClient {
         return new HttpClient(false).post(newRequest, redirectDepth + 1);
     }
 
-    private boolean canReuse(@Nonnull final HttpRequest request) {
+    // VisibleForTesting
+    boolean canReuse(@Nonnull final HttpRequest request) {
         return mSocket != null
                 && mSocket.isConnected()
                 && mSocket.getInetAddress().equals(request.getAddress())
                 && mSocket.getPort() == request.getPort();
-    }
-
-    private boolean isClosed() {
-        return mSocket == null;
     }
 
     private void openSocket(@Nonnull final HttpRequest request) throws IOException {
@@ -256,11 +254,7 @@ public class HttpClient {
      */
     @Nonnull
     public String downloadString(@Nonnull final URL url) throws IOException {
-        final String body = download(url).getBody();
-        if (body == null) {
-            throw new IOException("body is null");
-        }
-        return body;
+        return download(url).getBody();
     }
 
     /**
@@ -272,11 +266,7 @@ public class HttpClient {
      */
     @Nonnull
     public byte[] downloadBinary(@Nonnull final URL url) throws IOException {
-        final byte[] body = download(url).getBodyBinary();
-        if (body == null) {
-            throw new IOException("body is null");
-        }
-        return body;
+        return download(url).getBodyBinary();
     }
 
     /**

@@ -161,8 +161,12 @@ public class HttpRequest extends HttpMessage {
     /**
      * URI（リクエストパス）を設定する。
      *
+     * <p>接続先の設定ではなくパスのみの設定</p>
+     *
      * @param uri URI
      * @return HttpRequest
+     * @see #setUrl(URL)
+     * @see #setUrl(URL, boolean)
      */
     public HttpRequest setUri(@Nonnull final String uri) {
         mUri = uri;

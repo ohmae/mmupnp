@@ -93,7 +93,9 @@ public class ControlPointTest {
                     new ControlPointDiFactory() {
                         @Nonnull
                         @Override
-                        SsdpSearchServerList createSsdpSearchServerList(@Nonnull Collection<NetworkInterface> interfaces, @Nonnull ResponseListener listener) {
+                        SsdpSearchServerList createSsdpSearchServerList(
+                                @Nonnull Collection<NetworkInterface> interfaces,
+                                @Nonnull ResponseListener listener) {
                             return list;
                         }
                     });
@@ -120,14 +122,16 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
-                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final ResponseListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final ResponseListener listener) {
                             return mSsdpSearchServerList;
                         }
 
                         @Nonnull
                         @Override
                         SsdpNotifyReceiverList createSsdpNotifyReceiverList(
-                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final NotifyListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final NotifyListener listener) {
                             return mSsdpNotifyReceiverList;
                         }
 
@@ -423,7 +427,8 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
-                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final ResponseListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final ResponseListener listener) {
                             mResponseListener = listener;
                             return mSsdpSearchServerList;
                         }
@@ -431,7 +436,8 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         SsdpNotifyReceiverList createSsdpNotifyReceiverList(
-                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final NotifyListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final NotifyListener listener) {
                             mNotifyListener = listener;
                             return mSsdpNotifyReceiverList;
                         }
@@ -500,14 +506,16 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
-                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final ResponseListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final ResponseListener listener) {
                             return mock(SsdpSearchServerList.class);
                         }
 
                         @Nonnull
                         @Override
                         SsdpNotifyReceiverList createSsdpNotifyReceiverList(
-                                @Nonnull final Collection<NetworkInterface> interfaces, @Nonnull final NotifyListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final NotifyListener listener) {
                             return mock(SsdpNotifyReceiverList.class);
                         }
 

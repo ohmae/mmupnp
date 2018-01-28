@@ -41,8 +41,8 @@ public class HttpRequestTest {
 
     @Test
     public void setUrl_getAddress_getPort_getUriに反映される() throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
+        final HttpRequest request = new HttpRequest()
+                .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
         final int port = 12345;
         final InetAddress address = InetAddress.getByName("192.0.2.2");
         final SocketAddress socketAddress = new InetSocketAddress(address, port);
@@ -53,6 +53,18 @@ public class HttpRequestTest {
         assertThat(request.getPort(), is(port));
         assertThat(request.getSocketAddress(), is(socketAddress));
         assertThat(request.getUri(), is("/cds/control"));
+    }
+
+    @Test(expected = IOException.class)
+    public void setUrl_http以外はException() throws IOException {
+        final HttpRequest request = new HttpRequest()
+                .setUrl(new URL("https://192.0.2.2:12345/cds/control"), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void setUrl_portがUnsignedShortMax以上ならException() throws IOException {
+        final HttpRequest request = new HttpRequest()
+                .setUrl(new URL("http://192.0.2.2:65536/cds/control"), true);
     }
 
     @Test

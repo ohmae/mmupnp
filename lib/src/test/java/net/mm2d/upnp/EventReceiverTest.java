@@ -99,7 +99,10 @@ public class EventReceiverTest {
         final Result result = new Result();
         final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull final String sid, final long seq, @Nonnull final List<StringPair> properties) {
+            public boolean onEventReceived(
+                    @Nonnull final String sid,
+                    final long seq,
+                    @Nonnull final List<StringPair> properties) {
                 result.sid = sid;
                 result.seq = seq;
                 result.properties = properties;
@@ -151,7 +154,10 @@ public class EventReceiverTest {
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
         final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull final String sid, final long seq, @Nonnull final List<StringPair> properties) {
+            public boolean onEventReceived(
+                    @Nonnull final String sid,
+                    final long seq,
+                    @Nonnull final List<StringPair> properties) {
                 return false;
             }
         }) {
@@ -273,7 +279,10 @@ public class EventReceiverTest {
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
         final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
             @Override
-            public boolean onEventReceived(@Nonnull final String sid, final long seq, @Nonnull final List<StringPair> properties) {
+            public boolean onEventReceived(
+                    @Nonnull final String sid,
+                    final long seq,
+                    @Nonnull final List<StringPair> properties) {
                 try {
                     Thread.sleep(1000);
                 } catch (final InterruptedException e) {

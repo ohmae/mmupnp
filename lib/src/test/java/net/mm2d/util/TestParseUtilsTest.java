@@ -12,8 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import sun.java2d.pipe.TextPipe;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 

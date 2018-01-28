@@ -49,7 +49,10 @@ public class MockMulticastSocket extends MulticastSocket {
         return mDatagramPacket;
     }
 
-    public void setReceiveData(final InetAddress address, final byte[] data, final long wait) {
+    public void setReceiveData(
+            final InetAddress address,
+            final byte[] data,
+            final long wait) {
         mInetAddress = address;
         mReceiveData = data;
         mWait = wait;
