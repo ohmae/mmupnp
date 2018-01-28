@@ -543,9 +543,6 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean subscribe(final boolean keepRenew) throws IOException {
-        if (TextUtils.isEmpty(mEventSubUrl)) {
-            return false;
-        }
         if (!TextUtils.isEmpty(mSubscriptionId)) {
             if (renewSubscribeInner()) {
                 mControlPoint.registerSubscribeService(this, keepRenew);
@@ -603,9 +600,6 @@ public class Service {
      * @throws IOException 通信エラー
      */
     boolean renewSubscribe() throws IOException {
-        if (TextUtils.isEmpty(mEventSubUrl)) {
-            return false;
-        }
         if (TextUtils.isEmpty(mSubscriptionId)) {
             return subscribeInner(false);
         }
@@ -654,7 +648,7 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean unsubscribe() throws IOException {
-        if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
+        if (TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
         final HttpClient client = createHttpClient();

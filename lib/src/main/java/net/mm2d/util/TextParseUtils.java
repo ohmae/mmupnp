@@ -92,4 +92,9 @@ public class TextParseUtils {
             return defaultValue;
         }
     }
+
+    // インスタンス化禁止
+    private TextParseUtils() {
+        throw new AssertionError();
+    }
 }

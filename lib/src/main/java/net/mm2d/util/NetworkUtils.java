@@ -174,4 +174,9 @@ public class NetworkUtils {
             return mNetworkInterface.supportsMulticast();
         }
     }
+
+    // インスタンス化禁止
+    private NetworkUtils() {
+        throw new AssertionError();
+    }
 }

@@ -13,6 +13,9 @@ import org.junit.runners.JUnit4;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -21,9 +24,11 @@ import static org.junit.Assert.*;
  */
 @RunWith(JUnit4.class)
 public class XmlUtilsTest {
-    @Test
-    public void constuctor() {
-        new XmlUtils();
+    @Test(expected = InvocationTargetException.class)
+    public void constructor() throws Exception {
+        final Constructor<XmlUtils> constructor = XmlUtils.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        constructor.newInstance();
     }
 
     @Test

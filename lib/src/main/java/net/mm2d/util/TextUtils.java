@@ -61,4 +61,9 @@ public class TextUtils {
     public static String toUpperCase(@Nullable final String string) {
         return string == null ? null : string.toUpperCase(Locale.ENGLISH);
     }
+
+    // インスタンス化禁止
+    private TextUtils() {
+        throw new AssertionError();
+    }
 }

@@ -101,4 +101,9 @@ public class XmlUtils {
         }
         return null;
     }
+
+    // インスタンス化禁止
+    private XmlUtils() {
+        throw new AssertionError();
+    }
 }

@@ -7,6 +7,7 @@
 
 package net.mm2d.util;
 
+import net.mm2d.upnp.Http;
 import net.mm2d.util.NetworkUtils.NetworkInterfaceEnumeration;
 import net.mm2d.util.NetworkUtils.NetworkInterfaceWrapper;
 
@@ -39,9 +40,11 @@ import static org.junit.Assert.*;
 public class NetworkUtilsTest {
     @RunWith(JUnit4.class)
     public static class NetworkInterfaceをデバイスから取得 {
-        @Test
-        public void constuctor() {
-            new NetworkUtils();
+        @Test(expected = InvocationTargetException.class)
+        public void constructor() throws Exception {
+            final Constructor<NetworkUtils> constructor = NetworkUtils.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            constructor.newInstance();
         }
 
         @Test
