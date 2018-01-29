@@ -11,6 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Arrays;
+
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -281,5 +283,61 @@ public class DeviceBuilderTest {
                 .setManufacture(manufacture)
                 .setModelName(modelName)
                 .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void build_不正なSsdpMessage1() {
+        new Device.Builder(mock(ControlPoint.class), mock(SsdpMessage.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void build_不正なSsdpMessage2() {
+        final SsdpMessage message = mock(SsdpMessage.class);
+        final String location = "location";
+        final String uuid = "uuid";
+        doReturn(location).when(message).getLocation();
+        doReturn(uuid).when(message).getUuid();
+        new Device.Builder(mock(ControlPoint.class), message)
+                .updateSsdpMessage(mock(SsdpMessage.class));
+    }
+
+    @Test
+    public void updateSsdpMessage_EmbeddedDeviceへの伝搬() {
+        final SsdpMessage message = mock(SsdpMessage.class);
+        final String location = "location";
+        final String uuid = "uuid";
+        doReturn(location).when(message).getLocation();
+        doReturn(uuid).when(message).getUuid();
+        final Device.Builder embeddedDeviceBuilder = mock(Device.Builder.class);
+        new Device.Builder(mock(ControlPoint.class), message)
+                .setEmbeddedDeviceBuilderList(Arrays.asList(embeddedDeviceBuilder))
+                .updateSsdpMessage(message);
+
+        verify(embeddedDeviceBuilder, times(1)).updateSsdpMessage(message);
+    }
+
+    @Test
+    public void putTag_namespaceのnullと空白は等価() {
+        final SsdpMessage message = mock(SsdpMessage.class);
+        doReturn("location").when(message).getLocation();
+        doReturn("uuid").when(message).getUuid();
+        final String tag1 = "tag1";
+        final String value1 = "value1";
+        final String tag2 = "tag2";
+        final String value2 = "value2";
+
+        final Device device = new Device.Builder(mock(ControlPoint.class), message)
+                .setDescription("description")
+                .setUdn("uuid")
+                .setUpc("upc")
+                .setDeviceType("deviceType")
+                .setFriendlyName("friendlyName")
+                .setManufacture("manufacture")
+                .setModelName("modelName")
+                .putTag(null, tag1, value1)
+                .putTag("", tag2, value2)
+                .build();
+        assertThat(device.getValueWithNamespace("", tag1), is(value1));
+        assertThat(device.getValueWithNamespace("", tag2), is(value2));
     }
 }

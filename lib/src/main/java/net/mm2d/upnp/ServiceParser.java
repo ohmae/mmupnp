@@ -54,11 +54,11 @@ class ServiceParser {
         }
         final URL url = Device.getAbsoluteUrl(baseUrl, scpdUrl);
         final String description = client.downloadString(url);
-        builder.setDescription(description);
         if (TextUtils.isEmpty(description)) {
             // 空であっても必須パラメータはそろっているため正常として扱う。
             return;
         }
+        builder.setDescription(description);
         final Document doc = XmlUtils.newDocument(true, description);
         parseActionList(builder, doc.getElementsByTagName("action"));
         parseStateVariableList(builder, doc.getElementsByTagName("stateVariable"));

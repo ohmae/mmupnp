@@ -11,7 +11,6 @@ import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**

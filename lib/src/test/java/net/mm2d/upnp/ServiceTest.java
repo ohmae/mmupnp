@@ -183,7 +183,7 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            doReturn(TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short)24))
+            doReturn(TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24))
                     .when(message).getInterfaceAddress();
             doReturn(80).when(cp).getEventPort();
 
@@ -374,6 +374,22 @@ public class ServiceTest {
                     .setDescription("description")
                     .build();
             assertThat(service1.equals(service2), is(false));
+        }
+
+        @Test
+        public void createHttpClient() throws Exception {
+            final Service service = new Service.Builder()
+                    .setDevice(mock(Device.class))
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+
+            final HttpClient client = service.createHttpClient();
+            assertThat(client.isKeepAlive(), is(false));
         }
     }
 

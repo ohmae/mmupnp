@@ -735,14 +735,14 @@ public class Device {
      * ネームスペースはプレフィックスではなく、URIを指定する。
      * 値が存在しない場合nullが返る。
      *
-     * @param name      タグ名
      * @param namespace ネームスペース（URI）
+     * @param name      タグ名
      * @return タグの値
      */
     @Nullable
-    public String getValue(
-            @Nonnull final String name,
-            @Nonnull final String namespace) {
+    public String getValueWithNamespace(
+            @Nonnull final String namespace,
+            @Nonnull final String name) {
         final Map<String, String> map = mTagMap.get(namespace);
         if (map == null) {
             return null;

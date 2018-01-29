@@ -61,7 +61,7 @@ public class ControlPointTest {
             cp.terminate();
         }
 
-        @Test(timeout = 5000L)
+        @Test(timeout = 10000L)
         public void start_stop() throws Exception {
             final ControlPoint cp = new ControlPoint();
             cp.initialize();
@@ -105,6 +105,13 @@ public class ControlPointTest {
             verify(list).search(null);
             cp.stop();
             cp.terminate();
+        }
+
+        @Test
+        public void createHttpClient() throws Exception {
+            final ControlPoint cp = new ControlPoint();
+            final HttpClient client = cp.createHttpClient();
+            assertThat(client.isKeepAlive(), is(true));
         }
     }
 

@@ -159,6 +159,37 @@ public class DeviceParserTest {
             assertThat(device2.getParent(), is(device1));
             assertThat(device2.isEmbeddedDevice(), is(true));
         }
+
+        @Test
+        public void loadDescription_with_embedded_device_異常系() throws Exception {
+            doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
+
+            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            DeviceParser.loadDescription(mHttpClient, builder);
+            final Device device = builder.build();
+
+            assertThat(device.findDeviceByType("urn:schemas-upnp-org:device:WANDevice:11"), is(nullValue()));
+            assertThat(device.findDeviceByTypeRecursively("urn:schemas-upnp-org:device:WANConnectionDevice:11"), is(nullValue()));
+        }
+
+        @Test
+        public void loadDescription_with_embedded_device_embedded_deviceへの伝搬() throws Exception {
+            doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
+
+            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            DeviceParser.loadDescription(mHttpClient, builder);
+            final Device device = builder.build();
+
+            final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
+            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
+            final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
+            device.updateSsdpMessage(message);
+
+            final Device device1 = device.findDeviceByType("urn:schemas-upnp-org:device:WANDevice:1");
+            assertThat(device1.getSsdpMessage(), is(message));
+        }
     }
 
     @RunWith(JUnit4.class)
