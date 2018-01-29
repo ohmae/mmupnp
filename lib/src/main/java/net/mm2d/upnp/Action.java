@@ -158,8 +158,6 @@ public class Action {
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
     @Nonnull
-    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
-    @Nonnull
     private final Service mService;
     @Nonnull
     private final String mName;
@@ -236,13 +234,9 @@ public class Action {
     }
 
     // VisibleForTesting
-    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
-        mHttpClientFactory = factory;
-    }
-
     @Nonnull
-    private HttpClient createHttpClient() {
-        return mHttpClientFactory.createHttpClient(false);
+    HttpClient createHttpClient() {
+        return new HttpClient(false);
     }
 
     /**

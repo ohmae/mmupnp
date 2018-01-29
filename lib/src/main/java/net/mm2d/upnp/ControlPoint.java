@@ -127,17 +127,11 @@ public class ControlPoint {
     private final DeviceHolder mDeviceHolder;
     @Nonnull
     private final SubscribeHolder mSubscribeHolder;
-    @Nonnull
-    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     // VisibleForTesting
-    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
-        mHttpClientFactory = factory;
-    }
-
     @Nonnull
-    private HttpClient createHttpClient() {
-        return mHttpClientFactory.createHttpClient(true);
+    HttpClient createHttpClient() {
+        return new HttpClient(true);
     }
 
     // VisibleForTesting

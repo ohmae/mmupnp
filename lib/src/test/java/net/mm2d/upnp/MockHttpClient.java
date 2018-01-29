@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
-class MockHttpClientFactory extends HttpClientFactory {
+class MockHttpClient extends HttpClient {
     private HttpRequest mHttpRequest;
     private HttpResponse mHttpResponse;
 
@@ -23,16 +23,10 @@ class MockHttpClientFactory extends HttpClientFactory {
         return mHttpRequest;
     }
 
-    @Override
     @Nonnull
-    public HttpClient createHttpClient(final boolean keepAlive) {
-        return new HttpClient() {
-            @Nonnull
-            @Override
-            public HttpResponse post(@Nonnull final HttpRequest request) throws IOException {
-                mHttpRequest = request;
-                return mHttpResponse;
-            }
-        };
+    @Override
+    public HttpResponse post(@Nonnull final HttpRequest request) throws IOException {
+        mHttpRequest = request;
+        return mHttpResponse;
     }
 }

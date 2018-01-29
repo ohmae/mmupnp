@@ -290,23 +290,17 @@ public class ControlPointTest {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final SsdpMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
-            mCp.setHttpClientFactory(new HttpClientFactory() {
+            doReturn(new HttpClient(true) {
                 @Nonnull
                 @Override
-                public HttpClient createHttpClient(boolean keepAlive) {
-                    return new HttpClient(keepAlive) {
-                        @Nonnull
-                        @Override
-                        public HttpResponse download(@Nonnull URL url) throws IOException {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                            }
-                            throw new IOException();
-                        }
-                    };
+                public HttpResponse download(@Nonnull URL url) throws IOException {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                    }
+                    throw new IOException();
                 }
-            });
+            }).when(mCp).createHttpClient();
             mCp.onReceiveSsdp(message);
             assertThat(mLoadingDeviceMap, hasKey(udn));
             Thread.sleep(1000); // Exception発生を待つ
@@ -336,13 +330,7 @@ public class ControlPointTest {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final SsdpMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
-            mCp.setHttpClientFactory(new HttpClientFactory() {
-                @Nonnull
-                @Override
-                public HttpClient createHttpClient(boolean keepAlive) {
-                    return httpClient;
-                }
-            });
+            doReturn(httpClient).when(mCp).createHttpClient();
             final IconFilter iconFilter = spy(new IconFilter() {
                 @Nonnull
                 @Override

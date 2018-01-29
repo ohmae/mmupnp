@@ -417,7 +417,7 @@ public class ServiceTest {
             DeviceParser.loadDescription(httpClient, builder);
             mDevice = builder.build();
             mCms = mDevice.findServiceById("urn:upnp-org:serviceId:ConnectionManager");
-            mCds = mDevice.findServiceById("urn:upnp-org:serviceId:ContentDirectory");
+            mCds = spy(mDevice.findServiceById("urn:upnp-org:serviceId:ContentDirectory"));
             mMmupnp = mDevice.findServiceById("urn:upnp-org:serviceId:X_mmupnp");
         }
 
@@ -531,16 +531,16 @@ public class ServiceTest {
 
         @Test
         public void subscribe() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
 
-            final HttpRequest request = factory.getHttpRequest();
+            final HttpRequest request = client.getHttpRequest();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
             verify(mControlPoint).registerSubscribeService(mCds, false);
 
-            final String callback = factory.getHttpRequest().getHeader(Http.CALLBACK);
+            final String callback = client.getHttpRequest().getHeader(Http.CALLBACK);
             assertThat(callback.charAt(0), is('<'));
             assertThat(callback.charAt(callback.length() - 1), is('>'));
             final URL url = new URL(callback.substring(1, callback.length() - 2));
@@ -551,58 +551,58 @@ public class ServiceTest {
 
         @Test
         public void subscribe_keep() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe(true);
 
-            final HttpRequest request = factory.getHttpRequest();
+            final HttpRequest request = client.getHttpRequest();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
             verify(mControlPoint).registerSubscribeService(mCds, true);
         }
 
         @Test
         public void renewSubscribe1() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
             mCds.renewSubscribe();
 
-            final HttpRequest request = factory.getHttpRequest();
+            final HttpRequest request = client.getHttpRequest();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
         }
 
         @Test
         public void renewSubscribe2() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
             mCds.subscribe();
 
-            final HttpRequest request = factory.getHttpRequest();
+            final HttpRequest request = client.getHttpRequest();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
         }
 
         @Test
         public void unsubscribe() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
             mCds.unsubscribe();
 
-            final HttpRequest request = factory.getHttpRequest();
+            final HttpRequest request = client.getHttpRequest();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
             verify(mControlPoint).unregisterSubscribeService(mCds);
         }
 
         @Test
         public void expired() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
 
             mCds.expired();
@@ -614,9 +614,9 @@ public class ServiceTest {
 
         @Test
         public void getSubscriptionId() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
 
             assertThat(mCds.getSubscriptionId(), is(SID));
@@ -624,9 +624,9 @@ public class ServiceTest {
 
         @Test
         public void getSubscriptionStart() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             final long before = System.currentTimeMillis();
             mCds.subscribe();
             final long after = System.currentTimeMillis();
@@ -637,9 +637,9 @@ public class ServiceTest {
 
         @Test
         public void getSubscriptionTimeout() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
 
             assertThat(mCds.getSubscriptionTimeout(), is(TimeUnit.SECONDS.toMillis(300L)));
@@ -647,9 +647,9 @@ public class ServiceTest {
 
         @Test
         public void getSubscriptionExpiryTime() throws Exception {
-            final MockHttpClientFactory factory = new MockHttpClientFactory();
-            factory.setResponse(createSubscribeResponse());
-            mCds.setHttpClientFactory(factory);
+            final MockHttpClient client = new MockHttpClient();
+            client.setResponse(createSubscribeResponse());
+            doReturn(client).when(mCds).createHttpClient();
             final long before = System.currentTimeMillis();
             mCds.subscribe();
             final long after = System.currentTimeMillis();

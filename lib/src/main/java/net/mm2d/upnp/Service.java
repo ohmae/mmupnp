@@ -223,8 +223,6 @@ public class Service {
     private long mSubscriptionExpiryTime;
     @Nullable
     private String mSubscriptionId;
-    @Nonnull
-    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     private Service(@Nonnull final Builder builder) {
         mDevice = builder.mDevice;
@@ -516,13 +514,9 @@ public class Service {
     }
 
     // VisibleForTesting
-    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
-        mHttpClientFactory = factory;
-    }
-
     @Nonnull
-    private HttpClient createHttpClient() {
-        return mHttpClientFactory.createHttpClient(false);
+    HttpClient createHttpClient() {
+        return new HttpClient(false);
     }
 
     /**
