@@ -131,8 +131,8 @@ public class NetworkUtilsTest {
 
         @Before
         public void setUp() throws Exception {
-            mIpv4Address = createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24);
-            mIpv6Address = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", (short) 16);
+            mIpv4Address = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24);
+            mIpv6Address = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", (short) 16);
         }
 
         @Test
@@ -325,27 +325,6 @@ public class NetworkUtilsTest {
             };
 
             assertThat(NetworkUtils.isAvailableInet4Interface(wrapper), is(false));
-        }
-
-        private static InterfaceAddress createInterfaceAddress(
-                final String address,
-                final String broadcast,
-                final short maskLength)
-                throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException, UnknownHostException {
-            final Class<InterfaceAddress> cls = InterfaceAddress.class;
-            final Constructor<InterfaceAddress> constructor = cls.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            final InterfaceAddress interfaceAddress = constructor.newInstance();
-            final Field fAddress = cls.getDeclaredField("address");
-            fAddress.setAccessible(true);
-            fAddress.set(interfaceAddress, InetAddress.getByName(address));
-            final Field fBroadcast = cls.getDeclaredField("broadcast");
-            fBroadcast.setAccessible(true);
-            fBroadcast.set(interfaceAddress, InetAddress.getByName(broadcast));
-            final Field fMaskLength = cls.getDeclaredField("maskLength");
-            fMaskLength.setAccessible(true);
-            fMaskLength.setShort(interfaceAddress, maskLength);
-            return interfaceAddress;
         }
     }
 }

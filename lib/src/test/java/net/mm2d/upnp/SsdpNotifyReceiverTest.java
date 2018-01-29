@@ -75,7 +75,7 @@ public class SsdpNotifyReceiverTest {
     @Test
     public void onReceive_同一セグメントからのメッセージは通知する() throws Exception {
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
-        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
         receiver.setNotifyListener(listener);
@@ -89,7 +89,7 @@ public class SsdpNotifyReceiverTest {
     @Test
     public void onReceive_Listenerがnullでもクラッシュしない() throws Exception {
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
-        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
 
@@ -99,7 +99,7 @@ public class SsdpNotifyReceiverTest {
     @Test
     public void onReceive_異なるセグメントからのメッセージは無視する() throws Exception {
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
-        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
         receiver.setNotifyListener(listener);
@@ -113,7 +113,7 @@ public class SsdpNotifyReceiverTest {
     @Test
     public void onReceive_M_SEARCHパケットは無視する() throws Exception {
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
-        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
         receiver.setNotifyListener(listener);
@@ -135,7 +135,7 @@ public class SsdpNotifyReceiverTest {
     @Test
     public void onReceive_ByeByeパケットは通知する() throws Exception {
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
-        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
         receiver.setNotifyListener(listener);
@@ -150,7 +150,7 @@ public class SsdpNotifyReceiverTest {
     @Test
     public void onReceive_LocationとSourceが不一致のメッセージは無視する() throws Exception {
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
-        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
         receiver.setNotifyListener(listener);
@@ -164,7 +164,7 @@ public class SsdpNotifyReceiverTest {
     @Test
     public void onReceive_IOExceptionが発生してもクラッシュしない() throws Exception {
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(NetworkUtils.getAvailableInet4Interfaces().get(0)));
-        final InterfaceAddress address = createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
+        final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", (short) 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         doThrow(new IOException()).when(receiver).createSsdpRequestMessage(ArgumentMatchers.any(byte[].class), anyInt());
         final NotifyListener listener = mock(NotifyListener.class);
@@ -180,22 +180,22 @@ public class SsdpNotifyReceiverTest {
     public void isSameSegment() throws Exception {
         assertThat(
                 SsdpNotifyReceiver.isSameSegment(
-                        createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24),
+                        TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24),
                         InetAddress.getByName("192.168.0.255")),
                 is(true));
         assertThat(
                 SsdpNotifyReceiver.isSameSegment(
-                        createInterfaceAddress("192.168.0.1", "255.255.255.128", (short) 25),
+                        TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.128", (short) 25),
                         InetAddress.getByName("192.168.0.255")),
                 is(false));
         assertThat(
                 SsdpNotifyReceiver.isSameSegment(
-                        createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24),
+                        TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24),
                         InetAddress.getByName("192.168.1.255")),
                 is(false));
         assertThat(
                 SsdpNotifyReceiver.isSameSegment(
-                        createInterfaceAddress("192.168.0.1", "255.255.254.0", (short) 23),
+                        TestUtils.createInterfaceAddress("192.168.0.1", "255.255.254.0", (short) 23),
                         InetAddress.getByName("192.168.1.255")),
                 is(true));
     }
@@ -208,26 +208,5 @@ public class SsdpNotifyReceiverTest {
             }
         }
         throw new IllegalArgumentException("ni does not have IPv4 address.");
-    }
-
-    private static InterfaceAddress createInterfaceAddress(
-            final String address,
-            final String broadcast,
-            final short maskLength)
-            throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException, UnknownHostException {
-        final Class<InterfaceAddress> cls = InterfaceAddress.class;
-        final Constructor<InterfaceAddress> constructor = cls.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        final InterfaceAddress interfaceAddress = constructor.newInstance();
-        final Field fAddress = cls.getDeclaredField("address");
-        fAddress.setAccessible(true);
-        fAddress.set(interfaceAddress, InetAddress.getByName(address));
-        final Field fBroadcast = cls.getDeclaredField("broadcast");
-        fBroadcast.setAccessible(true);
-        fBroadcast.set(interfaceAddress, InetAddress.getByName(broadcast));
-        final Field fMaskLength = cls.getDeclaredField("maskLength");
-        fMaskLength.setAccessible(true);
-        fMaskLength.setShort(interfaceAddress, maskLength);
-        return interfaceAddress;
     }
 }

@@ -48,7 +48,7 @@ public class ControlPointTest {
             new ControlPoint();
         }
 
-        @Test(timeout = 1000L)
+        @Test(timeout = 2000L)
         public void initialize_terminate() throws Exception {
             final ControlPoint cp = new ControlPoint();
             cp.initialize();
@@ -61,7 +61,7 @@ public class ControlPointTest {
             cp.terminate();
         }
 
-        @Test(timeout = 2000L)
+        @Test(timeout = 5000L)
         public void start_stop() throws Exception {
             final ControlPoint cp = new ControlPoint();
             cp.initialize();

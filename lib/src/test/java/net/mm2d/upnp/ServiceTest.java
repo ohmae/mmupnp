@@ -115,6 +115,266 @@ public class ServiceTest {
                     .setDescription("description")
                     .build();
         }
+
+        @Test(expected = IllegalStateException.class)
+        public void build_argumentのRelatedStateVariableNameが指定されていない() throws Exception {
+            final Action.Builder actionBuilder = new Action.Builder()
+                    .setName("action")
+                    .addArgumentBuilder(new Argument.Builder()
+                            .setName("argumentName")
+                            .setDirection("in"));
+            final Service service = new Service.Builder()
+                    .setDevice(mock(Device.class))
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .addActionBuilder(actionBuilder)
+                    .build();
+
+            assertThat(service, is(notNullValue()));
+        }
+
+        @Test(expected = IllegalStateException.class)
+        public void build_argumentのRelatedStateVariableNameがに対応するStateVariableがない() throws Exception {
+            final Action.Builder actionBuilder = new Action.Builder()
+                    .setName("action")
+                    .addArgumentBuilder(new Argument.Builder()
+                            .setName("argumentName")
+                            .setDirection("in")
+                            .setRelatedStateVariableName("StateVariableName"));
+            final Service service = new Service.Builder()
+                    .setDevice(mock(Device.class))
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .addActionBuilder(actionBuilder)
+                    .build();
+
+            assertThat(service, is(notNullValue()));
+        }
+
+        @Test
+        public void getCallback() throws Exception {
+            final ControlPoint cp = mock(ControlPoint.class);
+            final SsdpMessage message = mock(SsdpMessage.class);
+            doReturn("location").when(message).getLocation();
+            doReturn("uuid").when(message).getUuid();
+            final Device device = new Device.Builder(cp, message)
+                    .setDescription("description")
+                    .setUdn("uuid")
+                    .setUpc("upc")
+                    .setDeviceType("deviceType")
+                    .setFriendlyName("friendlyName")
+                    .setManufacture("manufacture")
+                    .setModelName("modelName")
+                    .build();
+            final Service service = new Service.Builder()
+                    .setDevice(device)
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            doReturn(TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short)24))
+                    .when(message).getInterfaceAddress();
+            doReturn(80).when(cp).getEventPort();
+
+            assertThat(service.getCallback(), is("<http://192.168.0.1/>"));
+
+            doReturn(8080).when(cp).getEventPort();
+
+            assertThat(service.getCallback(), is("<http://192.168.0.1:8080/>"));
+        }
+
+        @Test
+        public void hashCode_Exceptionが発生しない() throws Exception {
+            final Service service = new Service.Builder()
+                    .setDevice(mock(Device.class))
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            service.hashCode();
+        }
+
+        @Test
+        public void equals_比較可能() throws Exception {
+            final Service service = new Service.Builder()
+                    .setDevice(mock(Device.class))
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            assertThat(service.equals(null), is(false));
+            assertThat(service.equals(""), is(false));
+            assertThat(service.equals(service), is(true));
+        }
+
+        @Test
+        public void equals_同一の情報() throws Exception {
+            final SsdpMessage message = mock(SsdpMessage.class);
+            doReturn("location").when(message).getLocation();
+            doReturn("uuid").when(message).getUuid();
+            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+                    .setDescription("description")
+                    .setUdn("uuid")
+                    .setUpc("upc")
+                    .setDeviceType("deviceType")
+                    .setFriendlyName("friendlyName")
+                    .setManufacture("manufacture")
+                    .setModelName("modelName")
+                    .build();
+            final Service service1 = new Service.Builder()
+                    .setDevice(device)
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            final Service service2 = new Service.Builder()
+                    .setDevice(device)
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            assertThat(service1.equals(service2), is(true));
+        }
+
+        @Test
+        public void equals_不一致を無視() throws Exception {
+            final SsdpMessage message = mock(SsdpMessage.class);
+            doReturn("location").when(message).getLocation();
+            doReturn("uuid").when(message).getUuid();
+            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+                    .setDescription("description")
+                    .setUdn("uuid")
+                    .setUpc("upc")
+                    .setDeviceType("deviceType")
+                    .setFriendlyName("friendlyName")
+                    .setManufacture("manufacture")
+                    .setModelName("modelName")
+                    .build();
+            final Service service1 = new Service.Builder()
+                    .setDevice(device)
+                    .setServiceType("serviceType1")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl1")
+                    .setControlUrl("controlUrl1")
+                    .setEventSubUrl("eventSubUrl1")
+                    .setDescription("description1")
+                    .build();
+            final Service service2 = new Service.Builder()
+                    .setDevice(device)
+                    .setServiceType("serviceType2")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl2")
+                    .setControlUrl("controlUrl2")
+                    .setEventSubUrl("eventSubUrl2")
+                    .setDescription("description2")
+                    .build();
+            assertThat(service1.equals(service2), is(true));
+        }
+
+        @Test
+        public void equals_ServiceId不一致() throws Exception {
+            final SsdpMessage message = mock(SsdpMessage.class);
+            doReturn("location").when(message).getLocation();
+            doReturn("uuid").when(message).getUuid();
+            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+                    .setDescription("description")
+                    .setUdn("uuid")
+                    .setUpc("upc")
+                    .setDeviceType("deviceType")
+                    .setFriendlyName("friendlyName")
+                    .setManufacture("manufacture")
+                    .setModelName("modelName")
+                    .build();
+            final Service service1 = new Service.Builder()
+                    .setDevice(device)
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId1")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            final Service service2 = new Service.Builder()
+                    .setDevice(device)
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId2")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            assertThat(service1.equals(service2), is(false));
+        }
+
+        @Test
+        public void equals_device不一致() throws Exception {
+            final SsdpMessage message1 = mock(SsdpMessage.class);
+            doReturn("location").when(message1).getLocation();
+            doReturn("uuid1").when(message1).getUuid();
+            final Device device1 = new Device.Builder(mock(ControlPoint.class), message1)
+                    .setDescription("description")
+                    .setUdn("uuid1")
+                    .setUpc("upc")
+                    .setDeviceType("deviceType")
+                    .setFriendlyName("friendlyName")
+                    .setManufacture("manufacture")
+                    .setModelName("modelName")
+                    .build();
+            final SsdpMessage message2 = mock(SsdpMessage.class);
+            doReturn("location").when(message2).getLocation();
+            doReturn("uuid2").when(message2).getUuid();
+            final Device device2 = new Device.Builder(mock(ControlPoint.class), message2)
+                    .setDescription("description")
+                    .setUdn("uuid2")
+                    .setUpc("upc")
+                    .setDeviceType("deviceType")
+                    .setFriendlyName("friendlyName")
+                    .setManufacture("manufacture")
+                    .setModelName("modelName")
+                    .build();
+            final Service service1 = new Service.Builder()
+                    .setDevice(device1)
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            final Service service2 = new Service.Builder()
+                    .setDevice(device2)
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+            assertThat(service1.equals(service2), is(false));
+        }
     }
 
     @RunWith(JUnit4.class)
@@ -219,6 +479,7 @@ public class ServiceTest {
             assertThat(mCms.getActionList(), hasSize(3));
             assertThat(mCds.getActionList(), hasSize(4));
             assertThat(mMmupnp.getActionList(), hasSize(1));
+            assertThat(mCms.getActionList(), is(mCms.getActionList()));
         }
 
         @Test
@@ -230,6 +491,7 @@ public class ServiceTest {
         @Test
         public void getStateVariableList() throws Exception {
             assertThat(mCds.getStateVariableList(), hasSize(11));
+            assertThat(mCds.getStateVariableList(), is(mCds.getStateVariableList()));
         }
 
         @Test
@@ -397,15 +659,42 @@ public class ServiceTest {
             assertThat(mCds.getSubscriptionExpiryTime(),
                     lessThanOrEqualTo(after + TimeUnit.SECONDS.toMillis(300L)));
         }
+    }
 
+    @RunWith(JUnit4.class)
+    public static class subscribe機能のテスト {
         @Test
-        public void hashCode_Exceptionが発生しない() throws Exception {
-            mCds.hashCode();
+        public void parseTimeout_情報がない場合デフォルト() {
+            final HttpResponse response = new HttpResponse();
+            response.setStatusLine("HTTP/1.1 200 OK");
+            assertThat(Service.parseTimeout(response), is(Service.DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
-        public void equals_null比較可能() throws Exception {
-            assertThat(mCds.equals(null), is(false));
+        public void parseTimeout_infiniteの場合デフォルト() {
+            final HttpResponse response = new HttpResponse();
+            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setHeader(Http.TIMEOUT, "infinite");
+            assertThat(Service.parseTimeout(response), is(Service.DEFAULT_SUBSCRIPTION_TIMEOUT));
+        }
+
+        @Test
+        public void parseTimeout_secondの指定通り() {
+            final HttpResponse response = new HttpResponse();
+            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setHeader(Http.TIMEOUT, "second-100");
+            assertThat(Service.parseTimeout(response), is(TimeUnit.SECONDS.toMillis(100)));
+        }
+
+        @Test
+        public void parseTimeout_フォーマットエラーはデフォルト() {
+            final HttpResponse response = new HttpResponse();
+            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setHeader(Http.TIMEOUT, "seconds-100");
+            assertThat(Service.parseTimeout(response), is(Service.DEFAULT_SUBSCRIPTION_TIMEOUT));
+
+            response.setHeader(Http.TIMEOUT, "second-ff");
+            assertThat(Service.parseTimeout(response), is(Service.DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
     }
 }

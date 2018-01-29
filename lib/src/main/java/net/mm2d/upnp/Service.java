@@ -192,7 +192,8 @@ public class Service {
         }
     }
 
-    private static final long DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300);
+    // VisibleForTesting
+    static final long DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300);
     @Nonnull
     private final ControlPoint mControlPoint;
     @Nonnull
@@ -474,8 +475,9 @@ public class Service {
         return mStateVariableMap.get(name);
     }
 
+    // VisibleForTesting
     @Nonnull
-    private String getCallback() {
+    String getCallback() {
         final StringBuilder sb = new StringBuilder();
         sb.append("<http://");
         final SsdpMessage ssdp = mDevice.getSsdpMessage();
@@ -491,7 +493,8 @@ public class Service {
         return sb.toString();
     }
 
-    private static long parseTimeout(@Nonnull final HttpResponse response) {
+    // VisibleForTesting
+    static long parseTimeout(@Nonnull final HttpResponse response) {
         final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
         if (TextUtils.isEmpty(timeout) || timeout.contains("infinite")) {
             // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。
@@ -725,6 +728,9 @@ public class Service {
 
     @Override
     public boolean equals(final Object obj) {
+        if (obj == this) {
+            return true;
+        }
         if (obj == null || !(obj instanceof Service)) {
             return false;
         }

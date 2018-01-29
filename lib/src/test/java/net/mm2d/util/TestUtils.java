@@ -10,6 +10,11 @@ package net.mm2d.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 
 import javax.annotation.Nonnull;
@@ -38,5 +43,27 @@ public class TestUtils {
     @Nonnull
     private static ClassLoader getClassLoader() {
         return TestUtils.class.getClassLoader();
+    }
+
+    @Nonnull
+    public static InterfaceAddress createInterfaceAddress(
+            final String address,
+            final String broadcast,
+            final short maskLength)
+            throws ReflectiveOperationException, UnknownHostException {
+        final Class<InterfaceAddress> cls = InterfaceAddress.class;
+        final Constructor<InterfaceAddress> constructor = cls.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        final InterfaceAddress interfaceAddress = constructor.newInstance();
+        final Field fAddress = cls.getDeclaredField("address");
+        fAddress.setAccessible(true);
+        fAddress.set(interfaceAddress, InetAddress.getByName(address));
+        final Field fBroadcast = cls.getDeclaredField("broadcast");
+        fBroadcast.setAccessible(true);
+        fBroadcast.set(interfaceAddress, InetAddress.getByName(broadcast));
+        final Field fMaskLength = cls.getDeclaredField("maskLength");
+        fMaskLength.setAccessible(true);
+        fMaskLength.setShort(interfaceAddress, maskLength);
+        return interfaceAddress;
     }
 }
