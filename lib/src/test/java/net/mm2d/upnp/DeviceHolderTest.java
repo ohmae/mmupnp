@@ -25,6 +25,7 @@ public class DeviceHolderTest {
         holder.start();
         Thread.sleep(1);
         holder.shutdownRequest();
+        holder.shutdownRequest();
     }
 
     @Test
@@ -88,20 +89,25 @@ public class DeviceHolderTest {
     public void expireDevice_時間経過後に削除される() throws Exception {
         final ControlPoint cp = mock(ControlPoint.class);
         final DeviceHolder holder = new DeviceHolder(cp);
-        final Device device = mock(Device.class);
-        doReturn(UDN).when(device).getUdn();
-        doReturn(System.currentTimeMillis() + 100L).when(device).getExpireTime();
+        final Device device1 = mock(Device.class);
+        doReturn(UDN).when(device1).getUdn();
+        final Device device2 = mock(Device.class);
+        doReturn(UDN + "2").when(device2).getUdn();
+
+        doReturn(System.currentTimeMillis() + 100L).when(device1).getExpireTime();
+        doReturn(System.currentTimeMillis() + 200L).when(device2).getExpireTime();
 
         holder.start();
         Thread.sleep(1);
-        holder.add(device);
+        holder.add(device1);
+        holder.add(device2);
 
-        assertThat(holder.size(), is(1));
+        assertThat(holder.size(), is(2));
 
         Thread.sleep(11000L); // 内部で10秒のマージンを持っているため十分な時間を開ける
 
         assertThat(holder.size(), is(0));
-        verify(cp).lostDevice(device);
+        verify(cp).lostDevice(device1);
         holder.shutdownRequest();
     }
 }
