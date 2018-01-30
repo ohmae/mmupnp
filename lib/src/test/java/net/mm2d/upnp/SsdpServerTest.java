@@ -277,7 +277,7 @@ public class SsdpServerTest {
         final ReceiveTask receiveTask = spy(new ReceiveTask(server, socket, 0));
 
         receiveTask.start();
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         receiveTask.shutdownRequest(false);
         verify(receiveTask, times(1)).joinGroup();
         verify(receiveTask, times(1)).receiveLoop();
@@ -312,7 +312,7 @@ public class SsdpServerTest {
         final ReceiveTask receiveTask = spy(new ReceiveTask(server, socket, 10));
 
         receiveTask.start();
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         receiveTask.shutdownRequest(false);
         verify(receiveTask, times(1)).joinGroup();
         verify(receiveTask, times(1)).receiveLoop();
