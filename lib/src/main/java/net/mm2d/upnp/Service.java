@@ -546,7 +546,8 @@ public class Service {
         return subscribeInner(keepRenew);
     }
 
-    private boolean subscribeInner(final boolean keepRenew) throws IOException {
+    // VisibleForTesting
+    boolean subscribeInner(final boolean keepRenew) throws IOException {
         final HttpClient client = createHttpClient();
         final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
@@ -561,10 +562,11 @@ public class Service {
         return false;
     }
 
-    private boolean parseSubscribeResponse(@Nonnull final HttpResponse response) {
+    // VisibleForTesting
+    boolean parseSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
-        if (TextUtils.isEmpty(sid) || timeout == 0) {
+        if (TextUtils.isEmpty(sid) || timeout <= 0) {
             Log.w("subscribe response:" + response.toString());
             return false;
         }
@@ -599,7 +601,8 @@ public class Service {
         return renewSubscribeInner();
     }
 
-    private boolean renewSubscribeInner() throws IOException {
+    // VisibleForTesting
+    boolean renewSubscribeInner() throws IOException {
         final HttpClient client = createHttpClient();
         //noinspection ConstantConditions
         final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
@@ -611,10 +614,11 @@ public class Service {
         return parseRenewSubscribeResponse(response);
     }
 
-    private boolean parseRenewSubscribeResponse(@Nonnull final HttpResponse response) {
+    // VisibleForTesting
+    boolean parseRenewSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
-        if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
+        if (!TextUtils.equals(sid, mSubscriptionId) || timeout <= 0) {
             Log.w("renewSubscribe response:" + response.toString());
             return false;
         }

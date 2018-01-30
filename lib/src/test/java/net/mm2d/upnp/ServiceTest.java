@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatchers;
 
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -678,8 +679,9 @@ public class ServiceTest {
     }
 
     @RunWith(JUnit4.class)
-    public static class subscribe機能のテスト {
+    public static class subscribe_パーサー機能のテスト {
         private static final long DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300);
+
         @Test
         public void parseTimeout_情報がない場合デフォルト() {
             final HttpResponse response = new HttpResponse();
@@ -712,6 +714,191 @@ public class ServiceTest {
 
             response.setHeader(Http.TIMEOUT, "second-ff");
             assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+        }
+    }
+
+    @RunWith(JUnit4.class)
+    public static class subscribe_機能のテスト {
+        private ControlPoint mControlPoint;
+        private Device mDevice;
+        private Service mService;
+        private HttpClient mHttpClient;
+        @Before
+        public void setUp() throws Exception {
+            mControlPoint = mock(ControlPoint.class);
+            mDevice = mock(Device.class);
+            doReturn(mControlPoint).when(mDevice).getControlPoint();
+            doReturn(new URL("http://192.0.2.2/")).when(mDevice).getAbsoluteUrl(anyString());
+            mService = spy(new Service.Builder()
+                    .setDevice(mDevice)
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build());
+            doReturn("").when(mService).getCallback();
+            mHttpClient = mock(HttpClient.class);
+            doReturn(mHttpClient).when(mService).createHttpClient();
+        }
+
+        @Test
+        public void subscribe_成功() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.subscribe(), is(true));
+        }
+
+        @Test
+        public void subscribe_SIDなし() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.subscribe(), is(false));
+        }
+
+        @Test
+        public void subscribe_Timeout値異常() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-0");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.subscribe(), is(false));
+        }
+
+        @Test
+        public void subscribe_Http応答異常() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.subscribe(), is(false));
+        }
+
+        @Test
+        public void subscribe_2回目はrenewがコールされfalseが返されると失敗() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.subscribe(), is(true));
+
+            doReturn(false).when(mService).renewSubscribeInner();
+
+            assertThat(mService.subscribe(), is(false));
+            verify(mService, times(1)).renewSubscribeInner();
+        }
+
+        @Test
+        public void renewSubscribe_subscribe前はsubscribeが実行される() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.renewSubscribe(), is(true));
+            verify(mService, times(1)).subscribeInner(anyBoolean());
+        }
+
+        @Test
+        public void renewSubscribe_2回目はrenewが実行される() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.renewSubscribe(), is(true));
+            verify(mService, times(1)).subscribeInner(anyBoolean());
+
+            assertThat(mService.renewSubscribe(), is(true));
+            verify(mService, times(1)).renewSubscribeInner();
+        }
+
+        @Test
+        public void renewSubscribe_renewの応答ステータス異常で失敗() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.renewSubscribe(), is(true));
+
+            response.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+            assertThat(mService.renewSubscribe(), is(false));
+        }
+
+        @Test
+        public void renewSubscribe_sid不一致() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.renewSubscribe(), is(true));
+
+            response.setHeader(Http.SID, "sid2");
+            assertThat(mService.renewSubscribe(), is(false));
+        }
+        @Test
+        public void renewSubscribe_Timeout値異常() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+
+            assertThat(mService.renewSubscribe(), is(true));
+
+            response.setHeader(Http.TIMEOUT, "second-0");
+            assertThat(mService.renewSubscribe(), is(false));
+        }
+
+        @Test
+        public void unsubscribe_subscribeする前に実行すると失敗() throws Exception {
+            assertThat(mService.unsubscribe(), is(false));
+        }
+
+        @Test
+        public void unsubscribe_正常() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+            assertThat(mService.subscribe(), is(true));
+
+            assertThat(mService.unsubscribe(), is(true));
+        }
+
+        @Test
+        public void unsubscribe_OK以外は失敗() throws Exception {
+            final HttpResponse response = new HttpResponse();
+            response.setStatus(Http.Status.HTTP_OK);
+            response.setHeader(Http.SID, "sid");
+            response.setHeader(Http.TIMEOUT, "second-300");
+            doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
+            assertThat(mService.subscribe(), is(true));
+
+            response.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+
+            assertThat(mService.unsubscribe(), is(false));
         }
     }
 }
