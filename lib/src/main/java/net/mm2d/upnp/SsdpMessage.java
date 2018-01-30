@@ -131,7 +131,8 @@ public abstract class SsdpMessage {
         mNts = mMessage.getHeader(Http.NTS);
     }
 
-    private static int parseCacheControl(@Nonnull final HttpMessage message) {
+    // VisibleForTesting
+    static int parseCacheControl(@Nonnull final HttpMessage message) {
         final String age = TextUtils.toLowerCase(message.getHeader(Http.CACHE_CONTROL));
         if (TextUtils.isEmpty(age) || !age.startsWith("max-age")) {
             return DEFAULT_MAX_AGE;
@@ -148,7 +149,8 @@ public abstract class SsdpMessage {
     }
 
     @Nonnull
-    private static String[] parseUsn(@Nonnull final HttpMessage message) {
+    // VisibleForTesting
+    static String[] parseUsn(@Nonnull final HttpMessage message) {
         final String usn = message.getHeader(Http.USN);
         if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
             return new String[]{"", ""};
@@ -160,6 +162,18 @@ public abstract class SsdpMessage {
         return new String[]{usn.substring(0, pos), usn.substring(pos + 2)};
     }
 
+    private boolean hasValidLocation(@Nonnull final InetAddress sourceAddress) {
+        if (!Http.isHttpUrl(mLocation)) {
+            return false;
+        }
+        try {
+            final InetAddress locationAddress = InetAddress.getByName(new URL(mLocation).getHost());
+            return sourceAddress.equals(locationAddress);
+        } catch (MalformedURLException | UnknownHostException ignored) {
+        }
+        return false;
+    }
+
     /**
      * Locationに正常なURLが記述されており、記述のアドレスとパケットの送信元アドレスに不一致がないか検査する。
      *
@@ -167,15 +181,7 @@ public abstract class SsdpMessage {
      * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
      */
     public boolean hasInvalidLocation(@Nonnull final InetAddress sourceAddress) {
-        if (!Http.isHttpUrl(mLocation)) {
-            return true;
-        }
-        try {
-            final InetAddress locationAddress = InetAddress.getByName(new URL(mLocation).getHost());
-            return !sourceAddress.equals(locationAddress);
-        } catch (MalformedURLException | UnknownHostException ignored) {
-        }
-        return true;
+        return !hasValidLocation(sourceAddress);
     }
 
     /**

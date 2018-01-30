@@ -67,6 +67,12 @@ public class SsdpRequestMessageTest {
 
             assertThat(new String(actual), is(new String(expected)));
         }
+
+        @Test
+        public void toString_messageのtoStringと等価() throws Exception {
+            final SsdpRequestMessage message = makeFromResource("ssdp-notify-alive0.bin");
+            assertThat(message.toString(), is(message.getMessage().toString()));
+        }
     }
 
     @RunWith(JUnit4.class)

@@ -253,7 +253,7 @@ public class SsdpServerTest {
         thread.join();
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 5000)
     public void ReceiveTask_スレッド内の処理_port0() throws Exception {
         final SsdpServer server = mock(SsdpServer.class);
         final MulticastSocket socket = spy(new MulticastSocket() {
@@ -278,7 +278,7 @@ public class SsdpServerTest {
         final ReceiveTask receiveTask = spy(new ReceiveTask(server, socket, 0));
 
         receiveTask.start();
-        Thread.sleep(200);
+        Thread.sleep(1000);
         receiveTask.shutdownRequest(false);
         verify(receiveTask, times(1)).joinGroup();
         verify(receiveTask, times(1)).receiveLoop();
@@ -288,7 +288,7 @@ public class SsdpServerTest {
         verify(socket, never()).leaveGroup(ArgumentMatchers.any(InetAddress.class));
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 5000)
     public void ReceiveTask_スレッド内の処理_port_non0() throws Exception {
         final SsdpServer server = mock(SsdpServer.class);
         final MulticastSocket socket = spy(new MulticastSocket() {
@@ -313,7 +313,7 @@ public class SsdpServerTest {
         final ReceiveTask receiveTask = spy(new ReceiveTask(server, socket, 10));
 
         receiveTask.start();
-        Thread.sleep(200);
+        Thread.sleep(1000);
         receiveTask.shutdownRequest(false);
         verify(receiveTask, times(1)).joinGroup();
         verify(receiveTask, times(1)).receiveLoop();

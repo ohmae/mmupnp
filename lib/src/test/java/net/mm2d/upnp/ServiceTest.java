@@ -679,11 +679,12 @@ public class ServiceTest {
 
     @RunWith(JUnit4.class)
     public static class subscribe機能のテスト {
+        private static final long DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300);
         @Test
         public void parseTimeout_情報がない場合デフォルト() {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
-            assertThat(Service.parseTimeout(response), is(Service.DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
@@ -691,7 +692,7 @@ public class ServiceTest {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "infinite");
-            assertThat(Service.parseTimeout(response), is(Service.DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
@@ -707,10 +708,10 @@ public class ServiceTest {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "seconds-100");
-            assertThat(Service.parseTimeout(response), is(Service.DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
 
             response.setHeader(Http.TIMEOUT, "second-ff");
-            assertThat(Service.parseTimeout(response), is(Service.DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
     }
 }

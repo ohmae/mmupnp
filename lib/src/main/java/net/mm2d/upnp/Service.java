@@ -192,8 +192,7 @@ public class Service {
         }
     }
 
-    // VisibleForTesting
-    static final long DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300);
+    private static final long DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300);
     @Nonnull
     private final ControlPoint mControlPoint;
     @Nonnull
