@@ -617,8 +617,8 @@ public class ServiceTest {
 
         @Test
         public void expired() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = mock(HttpClient.class);
+            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
             doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
 
@@ -631,8 +631,8 @@ public class ServiceTest {
 
         @Test
         public void getSubscriptionId() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = mock(HttpClient.class);
+            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
             doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
 
@@ -641,8 +641,8 @@ public class ServiceTest {
 
         @Test
         public void getSubscriptionStart() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = mock(HttpClient.class);
+            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
             doReturn(client).when(mCds).createHttpClient();
             final long before = System.currentTimeMillis();
             mCds.subscribe();
@@ -654,8 +654,8 @@ public class ServiceTest {
 
         @Test
         public void getSubscriptionTimeout() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = mock(HttpClient.class);
+            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
             doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
 
@@ -664,8 +664,8 @@ public class ServiceTest {
 
         @Test
         public void getSubscriptionExpiryTime() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = mock(HttpClient.class);
+            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
             doReturn(client).when(mCds).createHttpClient();
             final long before = System.currentTimeMillis();
             mCds.subscribe();
@@ -723,6 +723,7 @@ public class ServiceTest {
         private Device mDevice;
         private Service mService;
         private HttpClient mHttpClient;
+
         @Before
         public void setUp() throws Exception {
             mControlPoint = mock(ControlPoint.class);
@@ -856,6 +857,7 @@ public class ServiceTest {
             response.setHeader(Http.SID, "sid2");
             assertThat(mService.renewSubscribe(), is(false));
         }
+
         @Test
         public void renewSubscribe_Timeout値異常() throws Exception {
             final HttpResponse response = new HttpResponse();

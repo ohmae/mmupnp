@@ -23,7 +23,6 @@ import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -342,6 +341,7 @@ public class SsdpServerTest {
         final ReceiveTask[] tasks = new ReceiveTask[1];
         final MulticastSocket socket = spy(new MulticastSocket() {
             private int mCount;
+
             @Override
             public synchronized void receive(final DatagramPacket p) throws IOException {
                 mCount++;

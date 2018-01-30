@@ -542,8 +542,9 @@ public class Action {
      * @return SOAP ActionのXML文字列
      * @throws IOException 通信で問題が発生した場合
      */
+    // VisibleForTesting
     @Nonnull
-    private String makeSoap(
+    String makeSoap(
             @Nullable final Map<String, String> namespaces,
             @Nonnull final List<StringPair> arguments)
             throws IOException {
@@ -620,8 +621,9 @@ public class Action {
      * @return 変換された文字列
      * @throws TransformerException 変換処理に問題が発生した場合
      */
+    // VisibleForTesting
     @Nonnull
-    private static String formatXmlString(@Nonnull final Document document)
+    String formatXmlString(@Nonnull final Document document)
             throws TransformerException {
         final TransformerFactory tf = TransformerFactory.newInstance();
         final Transformer transformer = tf.newTransformer();
