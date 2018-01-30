@@ -72,14 +72,14 @@ abstract class SsdpServer {
     SsdpServer(
             @Nonnull final NetworkInterface networkInterface,
             final int bindPort) {
-        mInterfaceAddress = findInet4Address(networkInterface);
+        mInterfaceAddress = findInet4Address(networkInterface.getInterfaceAddresses());
         mBindPort = bindPort;
         mInterface = networkInterface;
     }
 
+    // VisibleForTesting
     @Nonnull
-    private static InterfaceAddress findInet4Address(@Nonnull final NetworkInterface networkInterface) {
-        final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
+    static InterfaceAddress findInet4Address(@Nonnull final List<InterfaceAddress> addressList) {
         for (final InterfaceAddress address : addressList) {
             if (address.getAddress() instanceof Inet4Address) {
                 return address;
@@ -122,7 +122,7 @@ abstract class SsdpServer {
      * ソケットのクローズを行う
      */
     void close() {
-        stop(false);
+        stop();
         IoUtils.closeQuietly(mSocket);
         mSocket = null;
     }
@@ -134,7 +134,6 @@ abstract class SsdpServer {
         if (mReceiveTask != null) {
             stop();
         }
-        assert mSocket != null;
         mReceiveTask = new ReceiveTask(this, mSocket, mBindPort);
         mReceiveTask.start();
     }
@@ -168,6 +167,9 @@ abstract class SsdpServer {
      * @param message 送信するメッセージ
      */
     void send(@Nonnull final SsdpMessage message) {
+        if (mSocket == null) {
+            return;
+        }
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.getMessage().writeData(baos);
@@ -198,7 +200,8 @@ abstract class SsdpServer {
             @Nonnull byte[] data,
             int length);
 
-    private static class ReceiveTask implements Runnable {
+    // VisibleForTesting
+    static class ReceiveTask implements Runnable {
         @Nonnull
         private final SsdpServer mSsdpServer;
         @Nonnull
@@ -270,7 +273,8 @@ abstract class SsdpServer {
          *
          * @throws IOException 入出力処理で例外発生
          */
-        private void receiveLoop() throws IOException {
+        // VisibleForTesting
+        void receiveLoop() throws IOException {
             final byte[] buf = new byte[1500];
             while (!mShutdownRequest) {
                 try {
@@ -292,7 +296,8 @@ abstract class SsdpServer {
          *
          * @throws IOException Joinコールにより発生
          */
-        private void joinGroup() throws IOException {
+        // VisibleForTesting
+        void joinGroup() throws IOException {
             if (mBindPort != 0) {
                 mSocket.joinGroup(SSDP_INET_ADDR);
             }
@@ -305,7 +310,8 @@ abstract class SsdpServer {
          *
          * @throws IOException Leaveコールにより発生
          */
-        private void leaveGroup() throws IOException {
+        // VisibleForTesting
+        void leaveGroup() throws IOException {
             if (mBindPort != 0) {
                 mSocket.leaveGroup(SSDP_INET_ADDR);
             }
