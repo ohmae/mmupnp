@@ -104,6 +104,12 @@ public class HttpResponseTest {
     @Test(expected = IOException.class)
     public void readData_chunk_sizeよりデータが少ない場合IOException() throws Exception {
         final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n10\r\n  \r\n".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_最後が0で終わっていない場合IOException2() throws Exception {
+        final HttpResponse response = new HttpResponse();
         response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n2\r\n  \r\n".getBytes()));
     }
 
