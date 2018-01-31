@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.EventReceiver.ClientTask;
+import net.mm2d.upnp.EventReceiver.EventMessageListener;
+import net.mm2d.upnp.EventReceiver.ServerTask;
 import net.mm2d.util.StringPair;
 import net.mm2d.util.TestUtils;
 
@@ -14,12 +17,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
@@ -68,22 +74,30 @@ public class EventReceiverTest {
         receiver.close();
     }
 
+    @Test(timeout = 1000L)
+    public void close_open前なら即終了() throws Exception {
+        final EventReceiver receiver = new EventReceiver(null);
+        receiver.close();
+    }
+
     @Test
     public void getLocalPort() throws Exception {
         final int port = 12345;
-        final EventReceiver receiver = new EventReceiver(null) {
-            @Override
-            ServerSocket createServerSocket() throws IOException {
-                final ServerSocket serverSocket = mock(ServerSocket.class);
-                doReturn(port).when(serverSocket).getLocalPort();
-                doThrow(new IOException()).when(serverSocket).accept();
-                return serverSocket;
-            }
-        };
+        final ServerSocket serverSocket = mock(ServerSocket.class);
+        doReturn(port).when(serverSocket).getLocalPort();
+        doThrow(new IOException()).when(serverSocket).accept();
+        final EventReceiver receiver = spy(new EventReceiver(null));
+        doReturn(serverSocket).when(receiver).createServerSocket();
 
         receiver.open();
         assertThat(receiver.getLocalPort(), is(port));
         receiver.close();
+    }
+
+    @Test
+    public void getLocalPort_開始前は0() {
+        final EventReceiver receiver = new EventReceiver(null);
+        assertThat(receiver.getLocalPort(), is(0));
     }
 
     private class Result {
@@ -318,6 +332,123 @@ public class EventReceiverTest {
         Thread.sleep(100);
         receiver.close();
         Thread.sleep(10);
+    }
 
+    @Test
+    public void parsePropertyPairs_中身が空なら空のリスト() throws Exception {
+        final HttpRequest request = new HttpRequest();
+
+        assertThat(EventReceiver.parsePropertyPairs(request), empty());
+    }
+
+    @Test
+    public void parsePropertyPairs_rootがpropertysetでない場合リスト() throws Exception {
+        final HttpRequest request = new HttpRequest()
+                .setBody("<e:property xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                        "<e:property>\n" +
+                        "<SystemUpdateID>0</SystemUpdateID>\n" +
+                        "</e:property>\n" +
+                        "<e:property>\n" +
+                        "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                        "</e:property>\n" +
+                        "</e:property>", true);
+
+        assertThat(EventReceiver.parsePropertyPairs(request), empty());
+    }
+
+    @Test
+    public void parsePropertyPairs_property以外の要素は無視() throws Exception {
+        final HttpRequest request = new HttpRequest()
+                .setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                        "<e:property>\n" +
+                        "<SystemUpdateID>0</SystemUpdateID>\n" +
+                        "</e:property>\n" +
+                        "<e:proper>\n" +
+                        "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                        "</e:proper>\n" +
+                        "</e:propertyset>", true);
+
+        assertThat(EventReceiver.parsePropertyPairs(request), hasSize(1));
+    }
+
+    @Test
+    public void parsePropertyPairs_xml異常() throws Exception {
+        final HttpRequest request = new HttpRequest()
+                .setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                        "<e:property>\n" +
+                        "<>0</>\n" +
+                        "</e:property>\n" +
+                        "<e:property>\n" +
+                        "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                        "</e:property>\n" +
+                        "</e:propertyset>", true);
+
+        assertThat(EventReceiver.parsePropertyPairs(request), empty());
+    }
+
+    @Test
+    public void ServerTask_shutdownRequest_開始前にコール() throws Exception {
+        new ServerTask(mock(ServerSocket.class)).shutdownRequest();
+    }
+
+    @Test
+    public void ServerTask_notifyEvent_空ならfalse() throws Exception {
+        final String sid = "sid";
+        final ServerTask task = new ServerTask(mock(ServerSocket.class));
+        final EventMessageListener listener = mock(EventMessageListener.class);
+        task.setEventMessageListener(listener);
+
+        final HttpRequest request = new HttpRequest();
+        doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+
+        assertThat(task.notifyEvent(sid, request), is(false));
+        verify(listener, never()).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+    }
+
+    @Test
+    public void ServerTask_notifyEvent_listenerの戻り値と等しい() throws Exception {
+        final String sid = "sid";
+        final ServerTask task = new ServerTask(mock(ServerSocket.class));
+        final EventMessageListener listener = mock(EventMessageListener.class);
+        task.setEventMessageListener(listener);
+
+        final HttpRequest request = new HttpRequest()
+                .setHeader(Http.SEQ, "0")
+                .setBody(TestUtils.getResourceAsString("propchange.xml"), true);
+
+        doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+
+        assertThat(task.notifyEvent(sid, request), is(true));
+        verify(listener, times(1)).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+
+        doReturn(false).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+
+        assertThat(task.notifyEvent(sid, request), is(false));
+        verify(listener, times(2)).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+    }
+
+    @Test
+    public void ServerTask_notifyEvent_listenerがなければfalse() throws Exception {
+        final String sid = "sid";
+        final ServerTask task = new ServerTask(mock(ServerSocket.class));
+        final HttpRequest request = new HttpRequest()
+                .setHeader(Http.SEQ, "0")
+                .setBody(TestUtils.getResourceAsString("propchange.xml"), true);
+
+        assertThat(task.notifyEvent(sid, request), is(false));
+    }
+
+    @Test
+    public void ClientTask_run() throws Exception {
+        final Socket socket = mock(Socket.class);
+        doReturn(mock(InputStream.class)).when(socket).getInputStream();
+        doReturn(mock(OutputStream.class)).when(socket).getOutputStream();
+        final ServerTask serverTask = mock(ServerTask.class);
+        final ClientTask clientTask = spy(new ClientTask(serverTask, socket));
+        doThrow(new IOException()).when(clientTask).receiveAndReply(ArgumentMatchers.any(InputStream.class), ArgumentMatchers.any(OutputStream.class));
+
+        clientTask.run();
+
+        verify(serverTask, times(1)).notifyClientFinished(clientTask);
     }
 }

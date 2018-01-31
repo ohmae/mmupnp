@@ -83,7 +83,7 @@ public class DeviceParser {
     }
 
     @Nullable
-    static String getTagName(@Nonnull final Node node) {
+    private static String getTagName(@Nonnull final Node node) {
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return null;
         }
