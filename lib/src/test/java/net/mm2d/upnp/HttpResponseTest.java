@@ -61,6 +61,53 @@ public class HttpResponseTest {
     }
 
     @Test
+    public void readData_Chunk読み出しができること2() throws IOException {
+        final HttpResponse response = new HttpResponse();
+        response.readData(TestUtils.getResourceAsStream("cds-chunked-large.bin"));
+
+        assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
+        assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
+        assertThat(Http.parseDate(response.getHeader(Http.DATE)), is(DATE));
+        assertThat(response.getBody(), is(TestUtils.getResourceAsString("cds.xml")));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_読み出せない場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("\n".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_status_line異常の場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_size異常の場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\n  ".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_chunk_sizeなしの場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\r\n".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_chunk_sizeが16進数でない場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\ngg\r\n".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_chunk_sizeよりデータが少ない場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n2\r\n  \r\n".getBytes()));
+    }
+
+    @Test
     public void writeData_書き出しができること() throws IOException {
         final String data = TestUtils.getResourceAsString("cds.xml");
         final HttpResponse response = new HttpResponse()

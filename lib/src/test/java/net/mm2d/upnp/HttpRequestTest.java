@@ -246,7 +246,7 @@ public class HttpRequestTest {
     @Test
     public void setHeaderLine_フォーマットエラーでもExceptionは発生しない() throws Exception {
         final HttpRequest request = new HttpRequest();
-        request.setHeaderLine("SOAPACTION " + ACTION);
+        request.setHeaderLine("SOAPACTION");
         assertThat(request.getHeader(Http.SOAPACTION), is(nullValue()));
     }
 

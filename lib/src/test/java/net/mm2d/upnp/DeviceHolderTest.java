@@ -85,6 +85,15 @@ public class DeviceHolderTest {
         assertThat(holder.size(), is(1));
     }
 
+    @Test(timeout = 1000)
+    public void shutdownRequest() throws Exception {
+        final ControlPoint cp = mock(ControlPoint.class);
+        final DeviceHolder holder = new DeviceHolder(cp);
+
+        holder.shutdownRequest();
+        holder.run();
+    }
+
     @Test(timeout = 20000L)
     public void expireDevice_時間経過後に削除される() throws Exception {
         final ControlPoint cp = mock(ControlPoint.class);
