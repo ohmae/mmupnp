@@ -11,6 +11,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -179,6 +182,34 @@ public class SubscribeServiceTest {
     }
 
     @Test
+    public void calculateRenewTime() throws Exception {
+        final Service service = mock(Service.class);
+        final SubscribeService subscribeService = new SubscribeService(service, false);
+        doReturn(TimeUnit.SECONDS.toMillis(0)).when(service).getSubscriptionStart();
+        doReturn(TimeUnit.SECONDS.toMillis(300)).when(service).getSubscriptionTimeout();
+
+        assertThat(subscribeService.calculateRenewTime(), is(TimeUnit.SECONDS.toMillis(140)));
+
+        doReturn(TimeUnit.SECONDS.toMillis(16)).when(service).getSubscriptionTimeout();
+
+        assertThat(subscribeService.calculateRenewTime(), is(TimeUnit.SECONDS.toMillis(4)));
+    }
+
+    @Test
+    public void renewSubscribe() throws Exception {
+        final Service service = mock(Service.class);
+        final SubscribeService subscribeService = new SubscribeService(service, true);
+        doReturn(TimeUnit.SECONDS.toMillis(0)).when(service).getSubscriptionStart();
+        doReturn(TimeUnit.SECONDS.toMillis(300)).when(service).getSubscriptionTimeout();
+        doThrow(new IOException()).when(service).renewSubscribe();
+
+        subscribeService.renewSubscribe(TimeUnit.SECONDS.toMillis(300));
+        subscribeService.renewSubscribe(TimeUnit.SECONDS.toMillis(300));
+
+        assertThat(subscribeService.isFailed(), is(true));
+    }
+
+    @Test
     public void hashCode_Serviceと同一() throws Exception {
         final Service service = mock(Service.class);
         final SubscribeService subscribeService = new SubscribeService(service, false);
@@ -187,11 +218,29 @@ public class SubscribeServiceTest {
     }
 
     @Test
+    public void equals_同一インスタンスであれば真() throws Exception {
+        final Service service = mock(Service.class);
+        final SubscribeService subscribeService = new SubscribeService(service, false);
+
+        assertThat(subscribeService.equals(subscribeService), is(true));
+    }
+
+    @Test
     public void equals_Serviceが同一であれば真() throws Exception {
         final Service service = mock(Service.class);
         final SubscribeService subscribeService1 = new SubscribeService(service, false);
         final SubscribeService subscribeService2 = new SubscribeService(service, false);
 
+        assertThat(subscribeService1.equals(subscribeService1), is(true));
         assertThat(subscribeService1.equals(subscribeService2), is(true));
+    }
+
+    @Test
+    public void equals_異なるクラス() throws Exception {
+        final Service service = mock(Service.class);
+        final SubscribeService subscribeService = new SubscribeService(service, false);
+
+        assertThat(subscribeService.equals(service), is(false));
+        assertThat(subscribeService.equals(null), is(false));
     }
 }
