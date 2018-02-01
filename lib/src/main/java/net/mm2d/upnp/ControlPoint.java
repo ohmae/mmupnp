@@ -318,7 +318,8 @@ public class ControlPoint {
         });
     }
 
-    private boolean executeInParallel(@Nonnull final Runnable command) {
+    // VisibleForTesting
+    boolean executeInParallel(@Nonnull final Runnable command) {
         if (mIoExecutor.isShutdown()) {
             return false;
         }
@@ -330,7 +331,8 @@ public class ControlPoint {
         return true;
     }
 
-    private boolean executeInSequential(@Nonnull final Runnable command) {
+    // VisibleForTesting
+    boolean executeInSequential(@Nonnull final Runnable command) {
         if (mNotifyExecutor.isShutdown()) {
             return false;
         }
