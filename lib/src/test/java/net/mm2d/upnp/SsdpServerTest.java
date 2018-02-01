@@ -277,8 +277,8 @@ public class SsdpServerTest {
         final ReceiveTask receiveTask = spy(new ReceiveTask(server, socket, 0));
 
         receiveTask.start();
-        Thread.sleep(2000);
-        receiveTask.shutdownRequest(false);
+        Thread.sleep(500);
+        receiveTask.shutdownRequest(true);
         verify(receiveTask, times(1)).joinGroup();
         verify(receiveTask, times(1)).receiveLoop();
         verify(receiveTask, times(1)).leaveGroup();
@@ -312,8 +312,8 @@ public class SsdpServerTest {
         final ReceiveTask receiveTask = spy(new ReceiveTask(server, socket, 10));
 
         receiveTask.start();
-        Thread.sleep(2000);
-        receiveTask.shutdownRequest(false);
+        Thread.sleep(500);
+        receiveTask.shutdownRequest(true);
         verify(receiveTask, times(1)).joinGroup();
         verify(receiveTask, times(1)).receiveLoop();
         verify(receiveTask, times(1)).leaveGroup();
