@@ -113,7 +113,6 @@ public class ControlPointTest {
             doThrow(new InterruptedException()).when(executor).awaitTermination(anyLong(), ArgumentMatchers.any(TimeUnit.class));
             cp.initialize();
             cp.terminate();
-            verify(executor, times(1)).shutdownNow();
         }
 
         @Test(timeout = 1000L)
