@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -81,6 +82,40 @@ public class ControlPointTest {
             thread.join();
         }
 
+        @Test(timeout = 2000L)
+        public void initialize_terminate_timeover() throws Exception {
+            final ExecutorService executor = mock(ExecutorService.class);
+            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory() {
+                        @Nonnull
+                        @Override
+                        ExecutorService createIoExecutor() {
+                            return executor;
+                        }
+                    });
+            doReturn(false).when(executor).awaitTermination(anyLong(), ArgumentMatchers.any(TimeUnit.class));
+            cp.initialize();
+            cp.terminate();
+            verify(executor, times(1)).shutdownNow();
+        }
+
+        @Test(timeout = 2000L)
+        public void initialize_terminate_exception() throws Exception {
+            final ExecutorService executor = mock(ExecutorService.class);
+            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory() {
+                        @Nonnull
+                        @Override
+                        ExecutorService createIoExecutor() {
+                            return executor;
+                        }
+                    });
+            doThrow(new InterruptedException()).when(executor).awaitTermination(anyLong(), ArgumentMatchers.any(TimeUnit.class));
+            cp.initialize();
+            cp.terminate();
+            verify(executor, times(1)).shutdownNow();
+        }
+
         @Test(timeout = 1000L)
         public void terminate() throws Exception {
             final ControlPoint cp = new ControlPoint((Collection<NetworkInterface>) null);
@@ -96,12 +131,40 @@ public class ControlPointTest {
             cp.terminate();
         }
 
+        @Test(timeout = 10000L)
+        public void start_stop2() throws Exception {
+            final ControlPoint cp = new ControlPoint();
+            cp.initialize();
+            cp.start();
+            cp.stop();
+            cp.stop();
+            cp.terminate();
+        }
+
         @Test(timeout = 1000L)
         public void start_stop_illegal() throws Exception {
             final ControlPoint cp = new ControlPoint();
             cp.start();
             cp.start();
             cp.terminate();
+            cp.terminate();
+        }
+
+        @Test(timeout = 10000L)
+        public void start_stop_exception() throws Exception {
+            final EventReceiver eventReceiver = mock(EventReceiver.class);
+            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory() {
+                        @Nonnull
+                        @Override
+                        EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
+                            return eventReceiver;
+                        }
+                    });
+            doThrow(new IOException()).when(eventReceiver).open();
+            cp.initialize();
+            cp.start();
+            cp.stop();
             cp.terminate();
         }
 
