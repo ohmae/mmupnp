@@ -15,11 +15,10 @@ import java.net.InterfaceAddress;
 import javax.annotation.Nonnull;
 
 /**
- * SSDPパケットの受信を行うクラスの親クラス。
+ * SSDPパケットの受信を行うインターフェース
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-// TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
 interface SsdpServer {
     /**
      * SSDPに使用するアドレス。

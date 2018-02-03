@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
+// TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
 class SsdpServerDelegate implements SsdpServer {
     interface Receiver {
         /**
@@ -99,21 +100,12 @@ class SsdpServerDelegate implements SsdpServer {
         throw new IllegalArgumentException("ni does not have IPv4 address.");
     }
 
-    /**
-     * BindされたInterfaceのアドレスを返す。
-     *
-     * @return BindされたInterfaceのアドレス
-     */
+    @Override
     @Nonnull
     public InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
     }
 
-    /**
-     * ソケットのオープンを行う。
-     *
-     * @throws IOException ソケット作成に失敗
-     */
     @Override
     public void open() throws IOException {
         if (mSocket != null) {
@@ -130,9 +122,6 @@ class SsdpServerDelegate implements SsdpServer {
         return new MulticastSocket(port);
     }
 
-    /**
-     * ソケットのクローズを行う
-     */
     @Override
     public void close() {
         stop();
@@ -140,9 +129,6 @@ class SsdpServerDelegate implements SsdpServer {
         mSocket = null;
     }
 
-    /**
-     * 受信スレッドの開始を行う。
-     */
     @Override
     public void start() {
         if (mReceiveTask != null) {
@@ -152,9 +138,6 @@ class SsdpServerDelegate implements SsdpServer {
         mReceiveTask.start();
     }
 
-    /**
-     * 受信スレッドの停止を行う。
-     */
     @Override
     public void stop() {
         stop(false);
@@ -177,11 +160,6 @@ class SsdpServerDelegate implements SsdpServer {
         mReceiveTask = null;
     }
 
-    /**
-     * このソケットを使用してメッセージ送信を行う。
-     *
-     * @param message 送信するメッセージ
-     */
     @Override
     public void send(@Nonnull final SsdpMessage message) {
         if (mSocket == null) {
