@@ -69,7 +69,7 @@ public class HttpRequest extends HttpMessage {
      * @see #setStartLine(String)
      */
     public void setRequestLine(@Nonnull final String line) throws IllegalArgumentException {
-        final String[] params = line.split(" ");
+        final String[] params = line.split(" ", 3);
         if (params.length < 3) {
             throw new IllegalArgumentException();
         }
