@@ -21,16 +21,22 @@ import javax.annotation.Nonnull;
  */
 interface SsdpServer {
     /**
-     * SSDPに使用するアドレス。
+     * SSDPに使用するアドレス文字列。
      */
     @Nonnull
     String SSDP_ADDR = "239.255.255.250";
     /**
-     * SSDPに使用するポート番号
+     * SSDPに使用するポート番号。
      */
     int SSDP_PORT = 1900;
+    /**
+     * SSDPに使用するSocketAddress。
+     */
     @Nonnull
     InetSocketAddress SSDP_SO_ADDR = new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
+    /**
+     * SSDPに使用するアドレス。
+     */
     @Nonnull
     InetAddress SSDP_INET_ADDR = SSDP_SO_ADDR.getAddress();
 
@@ -71,5 +77,5 @@ interface SsdpServer {
      *
      * @param message 送信するメッセージ
      */
-    void send(@Nonnull final SsdpMessage message);
+    void send(@Nonnull SsdpMessage message);
 }
