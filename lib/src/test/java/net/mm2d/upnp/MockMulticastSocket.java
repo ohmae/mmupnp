@@ -73,6 +73,7 @@ public class MockMulticastSocket extends MulticastSocket {
             throw new IOException();
         }
         System.arraycopy(mReceiveData, 0, p.getData(), 0, mReceiveData.length);
+        p.setLength(mReceiveData.length);
         p.setAddress(mInetAddress);
         mReceiveData = null;
     }

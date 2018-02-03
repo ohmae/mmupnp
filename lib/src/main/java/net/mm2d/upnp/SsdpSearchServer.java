@@ -7,10 +7,12 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.SsdpServerDelegate.Receiver;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 
 import javax.annotation.Nonnull;
@@ -21,7 +23,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class SsdpSearchServer extends SsdpServer {
+class SsdpSearchServer implements SsdpServer, Receiver {
     /**
      * ST(SearchType) 全機器。
      */
@@ -43,6 +45,8 @@ class SsdpSearchServer extends SsdpServer {
         void onReceiveResponse(@Nonnull SsdpResponseMessage message);
     }
 
+    @Nonnull
+    private final SsdpServer mDelegate;
     @Nullable
     private ResponseListener mListener;
 
@@ -52,7 +56,11 @@ class SsdpSearchServer extends SsdpServer {
      * @param ni 使用するインターフェース
      */
     SsdpSearchServer(@Nonnull final NetworkInterface ni) {
-        super(ni);
+        mDelegate = new SsdpServerDelegate(this, ni);
+    }
+
+    SsdpSearchServer(@Nonnull final SsdpServerDelegate delegate) {
+        mDelegate = delegate;
     }
 
     /**
@@ -93,8 +101,40 @@ class SsdpSearchServer extends SsdpServer {
         return message;
     }
 
+    @Nonnull
     @Override
-    protected void onReceive(
+    public InterfaceAddress getInterfaceAddress() {
+        return mDelegate.getInterfaceAddress();
+    }
+
+    @Override
+    public void open() throws IOException {
+        mDelegate.open();
+    }
+
+    @Override
+    public void close() {
+        mDelegate.close();
+    }
+
+    @Override
+    public void start() {
+        mDelegate.start();
+    }
+
+    @Override
+    public void stop() {
+        mDelegate.stop();
+    }
+
+    @Override
+    public void send(@Nonnull final SsdpMessage message) {
+        mDelegate.send(message);
+    }
+
+    // VisibleForTesting
+    @Override
+    public void onReceive(
             @Nonnull final InetAddress sourceAddress,
             @Nonnull final byte[] data,
             final int length) {

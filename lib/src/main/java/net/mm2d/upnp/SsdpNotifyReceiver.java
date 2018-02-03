@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.log.Log;
+import net.mm2d.upnp.SsdpServerDelegate.Receiver;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class SsdpNotifyReceiver extends SsdpServer {
+class SsdpNotifyReceiver implements SsdpServer, Receiver {
     /**
      * NOTIFY受信を受け取るリスナー。
      */
@@ -36,6 +37,8 @@ class SsdpNotifyReceiver extends SsdpServer {
         void onReceiveNotify(@Nonnull SsdpRequestMessage message);
     }
 
+    @Nonnull
+    private final SsdpServer mDelegate;
     @Nullable
     private NotifyListener mListener;
 
@@ -45,7 +48,11 @@ class SsdpNotifyReceiver extends SsdpServer {
      * @param ni 使用するインターフェース
      */
     SsdpNotifyReceiver(@Nonnull final NetworkInterface ni) {
-        super(ni, SSDP_PORT);
+        mDelegate = new SsdpServerDelegate(this, ni, SSDP_PORT);
+    }
+
+    SsdpNotifyReceiver(@Nonnull final SsdpServerDelegate delegate) {
+        mDelegate = delegate;
     }
 
     /**
@@ -57,8 +64,40 @@ class SsdpNotifyReceiver extends SsdpServer {
         mListener = listener;
     }
 
+    @Nonnull
     @Override
-    protected void onReceive(
+    public InterfaceAddress getInterfaceAddress() {
+        return mDelegate.getInterfaceAddress();
+    }
+
+    @Override
+    public void open() throws IOException {
+        mDelegate.open();
+    }
+
+    @Override
+    public void close() {
+        mDelegate.close();
+    }
+
+    @Override
+    public void start() {
+        mDelegate.start();
+    }
+
+    @Override
+    public void stop() {
+        mDelegate.stop();
+    }
+
+    @Override
+    public void send(@Nonnull final SsdpMessage message) {
+        mDelegate.send(message);
+    }
+
+    // VisibleForTesting
+    @Override
+    public void onReceive(
             @Nonnull final InetAddress sourceAddress,
             @Nonnull final byte[] data,
             final int length) {

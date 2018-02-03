@@ -11,14 +11,12 @@ import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.util.NetworkUtils;
 
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -57,6 +55,7 @@ public class SsdpNotifyReceiverListTest {
         verify(receiver2, times(1)).open();
         verify(receiver2, times(1)).start();
     }
+
     @Test
     public void stop() {
         final SsdpNotifyReceiver receiver = mock(SsdpNotifyReceiver.class);

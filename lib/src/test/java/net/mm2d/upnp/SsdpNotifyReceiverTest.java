@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
+import net.mm2d.upnp.SsdpServerDelegate.Receiver;
 import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TestUtils;
 
@@ -16,14 +17,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
-import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -35,23 +32,11 @@ import static org.mockito.Mockito.*;
 public class SsdpNotifyReceiverTest {
     @Test
     public void setNotifyListener_受信メッセージが通知されること() throws Exception {
-        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-        final SsdpRequestMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final InterfaceAddress address = findInet4Address(networkInterface);
-        message.setHeader(Http.LOCATION, "http://" + address.getAddress().getHostAddress() + "/");
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        message.getMessage().writeData(baos);
-
-        final MockMulticastSocket socket = new MockMulticastSocket();
-        socket.setReceiveData(address.getAddress(), baos.toByteArray(), 0);
-        final SsdpNotifyReceiver receiver = new SsdpNotifyReceiver(networkInterface) {
-            @Nonnull
-            @Override
-            MulticastSocket createMulticastSocket(final int port) throws IOException {
-                return socket;
-            }
-        };
+        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), networkInterface));
+        final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", (short) 16);
+        doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(delegate));
         final SsdpRequestMessage result[] = new SsdpRequestMessage[1];
         receiver.setNotifyListener(new SsdpNotifyReceiver.NotifyListener() {
             @Override
@@ -59,11 +44,10 @@ public class SsdpNotifyReceiverTest {
                 result[0] = message;
             }
         });
-        receiver.open();
-        receiver.start();
-        Thread.sleep(100);
-        receiver.stop(true);
-        receiver.close();
+
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+        final InetAddress address = InetAddress.getByName("192.0.2.2");
+        receiver.onReceive(address, data, data.length);
 
         assertThat(result[0].getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
@@ -194,15 +178,5 @@ public class SsdpNotifyReceiverTest {
                         TestUtils.createInterfaceAddress("192.168.0.1", "255.255.254.0", (short) 23),
                         InetAddress.getByName("192.168.1.255")),
                 is(true));
-    }
-
-    private static InterfaceAddress findInet4Address(final NetworkInterface networkInterface) {
-        final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
-        for (final InterfaceAddress address : addressList) {
-            if (address.getAddress() instanceof Inet4Address) {
-                return address;
-            }
-        }
-        throw new IllegalArgumentException("ni does not have IPv4 address.");
     }
 }
