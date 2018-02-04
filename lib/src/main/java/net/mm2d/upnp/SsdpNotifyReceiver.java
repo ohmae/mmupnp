@@ -34,7 +34,7 @@ class SsdpNotifyReceiver implements SsdpServer {
          *
          * @param message 受信したNOTIFYメッセージ
          */
-        void onReceiveNotify(@Nonnull SsdpRequestMessage message);
+        void onReceiveNotify(@Nonnull SsdpRequest message);
     }
 
     @Nonnull
@@ -117,7 +117,7 @@ class SsdpNotifyReceiver implements SsdpServer {
             return;
         }
         try {
-            final SsdpRequestMessage message = createSsdpRequestMessage(data, length);
+            final SsdpRequest message = createSsdpRequestMessage(data, length);
             // M-SEARCHパケットは無視する
             if (TextUtils.equals(message.getMethod(), SsdpMessage.M_SEARCH)) {
                 return;
@@ -135,11 +135,11 @@ class SsdpNotifyReceiver implements SsdpServer {
     }
 
     // VisibleForTesting
-    SsdpRequestMessage createSsdpRequestMessage(
+    SsdpRequest createSsdpRequestMessage(
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        return new SsdpRequestMessage(getInterfaceAddress(), data, length);
+        return new SsdpRequest(getInterfaceAddress(), data, length);
     }
 
     // VisibleForTesting

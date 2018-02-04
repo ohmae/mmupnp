@@ -98,8 +98,8 @@ class SsdpSearchServer implements SsdpServer {
         send(makeSearchMessage(TextUtils.isEmpty(st) ? ST_ALL : st));
     }
 
-    private SsdpRequestMessage makeSearchMessage(@Nonnull final String st) {
-        final SsdpRequestMessage message = new SsdpRequestMessage();
+    private SsdpRequest makeSearchMessage(@Nonnull final String st) {
+        final SsdpRequest message = new SsdpRequest();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, SSDP_ADDR + ":" + String.valueOf(SSDP_PORT));

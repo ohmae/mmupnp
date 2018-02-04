@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpRequestMessage implements SsdpMessage {
+public class SsdpRequest implements SsdpMessage {
     @Nonnull
     private final HttpRequest mHttpRequest;
     @Nonnull
@@ -29,7 +29,7 @@ public class SsdpRequestMessage implements SsdpMessage {
     /**
      * インスタンス作成。
      */
-    public SsdpRequestMessage() {
+    public SsdpRequest() {
         mHttpRequest = new HttpRequest();
         mDelegate = new SsdpMessageDelegate(mHttpRequest);
     }
@@ -42,7 +42,7 @@ public class SsdpRequestMessage implements SsdpMessage {
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpRequestMessage(
+    public SsdpRequest(
             @Nonnull final InterfaceAddress address,
             @Nonnull final byte[] data,
             final int length)

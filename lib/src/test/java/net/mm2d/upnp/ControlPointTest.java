@@ -371,7 +371,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスにないbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final SsdpMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
+            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
             mCp.onReceiveSsdp(message);
             verify(mLoadingDeviceMap).remove(anyString());
         }
@@ -379,7 +379,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスのbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final SsdpMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
+            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
             final Device device = mock(Device.class);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(udn).when(device).getUdn();
@@ -392,7 +392,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_alive受信後失敗() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
+            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(new HttpClient(true) {
                 @Nonnull
@@ -432,7 +432,7 @@ public class ControlPointTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
+            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(httpClient).when(mCp).createHttpClient();
             final IconFilter iconFilter = spy(new IconFilter() {
@@ -457,7 +457,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスのalive受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
+            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
             final Device device = mock(Device.class);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(udn).when(device).getUdn();
@@ -469,11 +469,11 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_ロード中デバイスのalive受信() throws Exception {
             final byte[] data1 = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final SsdpMessage message1 = new SsdpRequestMessage(mock(InterfaceAddress.class), data1, data1.length);
+            final SsdpMessage message1 = new SsdpRequest(mock(InterfaceAddress.class), data1, data1.length);
             final Device.Builder deviceBuilder = spy(new Device.Builder(mCp, message1));
             mLoadingDeviceMap.put(deviceBuilder.getUuid(), deviceBuilder);
             final byte[] data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message2 = new SsdpRequestMessage(mock(InterfaceAddress.class), data2, data2.length);
+            final SsdpMessage message2 = new SsdpRequest(mock(InterfaceAddress.class), data2, data2.length);
             mCp.onReceiveSsdp(message2);
             verify(deviceBuilder).updateSsdpMessage(message2);
         }
@@ -574,7 +574,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_NotifyListenerから伝搬() throws Exception {
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final SsdpRequestMessage message = new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
             mNotifyListener.onReceiveNotify(message);
             Thread.sleep(100);
             verify(mDeviceHolder).get(udn);

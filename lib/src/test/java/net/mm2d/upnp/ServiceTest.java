@@ -427,7 +427,7 @@ public class ServiceTest {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
             doReturn(InetAddress.getByName(INTERFACE_ADDRESS)).when(interfaceAddress).getAddress();
-            final SsdpMessage ssdpMessage = new SsdpRequestMessage(interfaceAddress, data, data.length);
+            final SsdpMessage ssdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
             mControlPoint = mock(ControlPoint.class);
             doReturn(EVENT_PORT).when(mControlPoint).getEventPort();
             final Device.Builder builder = new Device.Builder(mControlPoint, ssdpMessage);

@@ -52,7 +52,7 @@ public class DeviceParserTest {
                     .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            mSsdpMessage = new SsdpRequestMessage(interfaceAddress, data, data.length);
+            mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
             mControlPoint = mock(ControlPoint.class);
         }
 
@@ -122,7 +122,7 @@ public class DeviceParserTest {
         public void loadDescription_with_url_base() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0-for-url-base.bin");
             final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            mSsdpMessage = new SsdpRequestMessage(interfaceAddress, data, data.length);
+            mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
             doReturn(TestUtils.getResourceAsString("device-with-url-base.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.3:12345/device.xml"));
 
@@ -184,7 +184,7 @@ public class DeviceParserTest {
 
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
             final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpMessage message = new SsdpRequestMessage(interfaceAddress, data, data.length);
+            final SsdpMessage message = new SsdpRequest(interfaceAddress, data, data.length);
             device.updateSsdpMessage(message);
 
             final Device device1 = device.findDeviceByType("urn:schemas-upnp-org:device:WANDevice:1");

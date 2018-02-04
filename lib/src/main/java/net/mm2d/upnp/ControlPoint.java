@@ -295,7 +295,7 @@ public class ControlPoint {
         });
         mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, new NotifyListener() {
             @Override
-            public void onReceiveNotify(@Nonnull final SsdpRequestMessage message) {
+            public void onReceiveNotify(@Nonnull final SsdpRequest message) {
                 executeInParallel(new Runnable() {
                     @Override
                     public void run() {

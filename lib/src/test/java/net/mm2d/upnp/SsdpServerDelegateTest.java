@@ -118,7 +118,7 @@ public class SsdpServerDelegateTest {
         final MulticastSocket socket = mock(MulticastSocket.class);
         doReturn(socket).when(server).createMulticastSocket(anyInt());
 
-        final SsdpRequestMessage message = new SsdpRequestMessage();
+        final SsdpRequest message = new SsdpRequest();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT));
@@ -138,7 +138,7 @@ public class SsdpServerDelegateTest {
         final MockMulticastSocket socket = spy(new MockMulticastSocket());
         doReturn(socket).when(server).createMulticastSocket(anyInt());
 
-        final SsdpRequestMessage message = new SsdpRequestMessage();
+        final SsdpRequest message = new SsdpRequest();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT));
@@ -165,7 +165,7 @@ public class SsdpServerDelegateTest {
         doReturn(socket).when(server).createMulticastSocket(anyInt());
         doThrow(new IOException()).when(socket).send(ArgumentMatchers.any(DatagramPacket.class));
 
-        final SsdpRequestMessage message = new SsdpRequestMessage();
+        final SsdpRequest message = new SsdpRequest();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT));

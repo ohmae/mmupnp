@@ -37,10 +37,10 @@ public class SsdpNotifyReceiverTest {
         final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", (short) 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(delegate));
-        final SsdpRequestMessage result[] = new SsdpRequestMessage[1];
+        final SsdpRequest result[] = new SsdpRequest[1];
         receiver.setNotifyListener(new SsdpNotifyReceiver.NotifyListener() {
             @Override
-            public void onReceiveNotify(@Nonnull final SsdpRequestMessage message) {
+            public void onReceiveNotify(@Nonnull final SsdpRequest message) {
                 result[0] = message;
             }
         });
@@ -63,7 +63,7 @@ public class SsdpNotifyReceiverTest {
 
         receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
 
-        verify(listener).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+        verify(listener).onReceiveNotify(ArgumentMatchers.any(SsdpRequest.class));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class SsdpNotifyReceiverTest {
 
         receiver.onReceive(InetAddress.getByName("192.1.2.2"), data, data.length);
 
-        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequest.class));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class SsdpNotifyReceiverTest {
         final NotifyListener listener = mock(NotifyListener.class);
         receiver.setNotifyListener(listener);
 
-        final SsdpRequestMessage message = new SsdpRequestMessage();
+        final SsdpRequest message = new SsdpRequest();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT));
@@ -109,7 +109,7 @@ public class SsdpNotifyReceiverTest {
 
         receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
 
-        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequest.class));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class SsdpNotifyReceiverTest {
 
         receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
 
-        verify(listener).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+        verify(listener).onReceiveNotify(ArgumentMatchers.any(SsdpRequest.class));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class SsdpNotifyReceiverTest {
 
         receiver.onReceive(InetAddress.getByName("192.0.2.3"), data, data.length);
 
-        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequest.class));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class SsdpNotifyReceiverTest {
 
         receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.length);
 
-        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequestMessage.class));
+        verify(listener, never()).onReceiveNotify(ArgumentMatchers.any(SsdpRequest.class));
     }
 
     @Test
