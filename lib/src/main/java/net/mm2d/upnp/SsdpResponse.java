@@ -44,6 +44,14 @@ public class SsdpResponse implements SsdpMessage {
         mDelegate = new SsdpMessageDelegate(mHttpResponse, address);
     }
 
+    // VisibleForTesting
+    SsdpResponse(
+            @Nonnull final HttpResponse response,
+            @Nonnull final SsdpMessageDelegate delegate) {
+        mHttpResponse = response;
+        mDelegate = delegate;
+    }
+
     @Nonnull
     protected HttpMessage getMessage() {
         return mHttpResponse;
@@ -107,11 +115,6 @@ public class SsdpResponse implements SsdpMessage {
     @Nonnull
     public Http.Status getStatus() {
         return mHttpResponse.getStatus();
-    }
-
-    // VisibleForTesting
-    void updateLocation() {
-        mDelegate.updateLocation();
     }
 
     @Nullable
