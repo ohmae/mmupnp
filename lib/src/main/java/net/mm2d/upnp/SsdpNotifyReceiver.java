@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class SsdpNotifyReceiver implements SsdpServer, Receiver {
+class SsdpNotifyReceiver implements SsdpServer {
     /**
      * NOTIFY受信を受け取るリスナー。
      */
@@ -48,7 +48,15 @@ class SsdpNotifyReceiver implements SsdpServer, Receiver {
      * @param ni 使用するインターフェース
      */
     SsdpNotifyReceiver(@Nonnull final NetworkInterface ni) {
-        mDelegate = new SsdpServerDelegate(this, ni, SSDP_PORT);
+        mDelegate = new SsdpServerDelegate(new Receiver() {
+            @Override
+            public void onReceive(
+                    @Nonnull final InetAddress sourceAddress,
+                    @Nonnull final byte[] data,
+                    final int length) {
+                SsdpNotifyReceiver.this.onReceive(sourceAddress, data, length);
+            }
+        }, ni, SSDP_PORT);
     }
 
     SsdpNotifyReceiver(@Nonnull final SsdpServerDelegate delegate) {
@@ -96,8 +104,7 @@ class SsdpNotifyReceiver implements SsdpServer, Receiver {
     }
 
     // VisibleForTesting
-    @Override
-    public void onReceive(
+    void onReceive(
             @Nonnull final InetAddress sourceAddress,
             @Nonnull final byte[] data,
             final int length) {

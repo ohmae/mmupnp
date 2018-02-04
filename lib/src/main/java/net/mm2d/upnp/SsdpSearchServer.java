@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class SsdpSearchServer implements SsdpServer, Receiver {
+class SsdpSearchServer implements SsdpServer {
     /**
      * ST(SearchType) 全機器。
      */
@@ -56,7 +56,15 @@ class SsdpSearchServer implements SsdpServer, Receiver {
      * @param ni 使用するインターフェース
      */
     SsdpSearchServer(@Nonnull final NetworkInterface ni) {
-        mDelegate = new SsdpServerDelegate(this, ni);
+        mDelegate = new SsdpServerDelegate(new Receiver() {
+            @Override
+            public void onReceive(
+                    @Nonnull final InetAddress sourceAddress,
+                    @Nonnull final byte[] data,
+                    final int length) {
+                SsdpSearchServer.this.onReceive(sourceAddress, data, length);
+            }
+        }, ni);
     }
 
     SsdpSearchServer(@Nonnull final SsdpServerDelegate delegate) {
@@ -133,8 +141,7 @@ class SsdpSearchServer implements SsdpServer, Receiver {
     }
 
     // VisibleForTesting
-    @Override
-    public void onReceive(
+    void onReceive(
             @Nonnull final InetAddress sourceAddress,
             @Nonnull final byte[] data,
             final int length) {
