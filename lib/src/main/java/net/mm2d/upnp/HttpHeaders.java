@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class HttpHeader {
+class HttpHeaders {
     /**
      * 名前をもとにKeyとして使用できる文字列を作成して返す。
      *
@@ -140,7 +140,7 @@ public class HttpHeader {
     /**
      * インスタンス初期化。
      */
-    public HttpHeader() {
+    public HttpHeaders() {
         mMap = new LinkedHashMap<>();
     }
 
@@ -149,7 +149,7 @@ public class HttpHeader {
      *
      * @param original コピー元
      */
-    public HttpHeader(@Nonnull final HttpHeader original) {
+    public HttpHeaders(@Nonnull final HttpHeaders original) {
         // EntryはmutableなのでDeep copyが必要
         mMap = new LinkedHashMap<>();
         for (final Entry entry : original.mMap.values()) {

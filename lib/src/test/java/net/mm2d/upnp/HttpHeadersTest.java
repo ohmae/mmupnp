@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.upnp.HttpHeader.Entry;
+import net.mm2d.upnp.HttpHeaders.Entry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,12 +20,12 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
-public class HttpHeaderTest {
+public class HttpHeadersTest {
     @Test
     public void testEntry_getName() {
         final String name = "name";
         final String value = "value";
-        final HttpHeader.Entry entry = new HttpHeader.Entry(name, value);
+        final Entry entry = new Entry(name, value);
 
         assertThat(entry.getName(), is(name));
     }
@@ -34,7 +34,7 @@ public class HttpHeaderTest {
     public void testEntry_getValue() {
         final String name = "name";
         final String value = "value";
-        final HttpHeader.Entry entry = new HttpHeader.Entry(name, value);
+        final Entry entry = new Entry(name, value);
 
         assertThat(entry.getValue(), is(value));
     }
@@ -43,8 +43,8 @@ public class HttpHeaderTest {
     public void testEntry_copy() {
         final String name = "name";
         final String value = "value";
-        final HttpHeader.Entry entry1 = new HttpHeader.Entry(name, value);
-        final HttpHeader.Entry entry2 = new HttpHeader.Entry(entry1);
+        final Entry entry1 = new Entry(name, value);
+        final Entry entry2 = new Entry(entry1);
 
         assertThat(entry1, is(entry2));
     }
@@ -53,7 +53,7 @@ public class HttpHeaderTest {
     public void testEntry_異なるnameで更新() {
         final String name = "name";
         final String value = "value";
-        final HttpHeader.Entry entry = new HttpHeader.Entry(name, value);
+        final Entry entry = new Entry(name, value);
 
         entry.setName(value);
     }
@@ -62,8 +62,8 @@ public class HttpHeaderTest {
     public void testEntry_hashCode() {
         final String name = "name";
         final String value = "value";
-        final HttpHeader.Entry entry1 = new HttpHeader.Entry(name, value);
-        final HttpHeader.Entry entry2 = new HttpHeader.Entry(entry1);
+        final Entry entry1 = new Entry(name, value);
+        final Entry entry2 = new Entry(entry1);
 
         assertThat(entry1.hashCode(), is(entry2.hashCode()));
     }
@@ -72,7 +72,7 @@ public class HttpHeaderTest {
     public void testEntry_toString() {
         final String name = "name";
         final String value = "value";
-        final HttpHeader.Entry entry = new HttpHeader.Entry(name, value);
+        final Entry entry = new Entry(name, value);
 
         assertThat(entry.toString().contains(name), is(true));
         assertThat(entry.toString().contains(value), is(true));
@@ -82,10 +82,10 @@ public class HttpHeaderTest {
     public void testEntry_equals() {
         final String name = "name";
         final String value = "value";
-        final HttpHeader.Entry entry1 = new HttpHeader.Entry(name, value);
-        final HttpHeader.Entry entry2 = new HttpHeader.Entry(entry1);
-        final HttpHeader.Entry entry3 = new HttpHeader.Entry(name + "1", value);
-        final HttpHeader.Entry entry4 = new HttpHeader.Entry(name, value + "1");
+        final Entry entry1 = new Entry(name, value);
+        final Entry entry2 = new Entry(entry1);
+        final Entry entry3 = new Entry(name + "1", value);
+        final Entry entry4 = new Entry(name, value + "1");
 
         assertThat(entry1.equals(entry1), is(true));
         assertThat(entry1.equals(entry2), is(true));
@@ -97,7 +97,7 @@ public class HttpHeaderTest {
 
     @Test
     public void size_個数が反映される() {
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
 
         assertThat(header.size(), is(0));
         assertThat(header.isEmpty(), is(true));
@@ -116,7 +116,7 @@ public class HttpHeaderTest {
     public void get_大文字小文字に関係なく値が取得できる() {
         final String name1 = "name1";
         final String value1 = "value1";
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
         header.put(name1, value1);
 
         assertThat(header.get(name1), is(value1));
@@ -128,7 +128,7 @@ public class HttpHeaderTest {
         final String name1 = "name1";
         final String value1 = "value1";
         final String value2 = "value2";
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
         header.put(name1, value1);
         header.put(name1.toUpperCase(), value2);
 
@@ -141,7 +141,7 @@ public class HttpHeaderTest {
         final String name2 = "name2";
         final String value1 = "value1";
         final String value2 = "value2";
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
         header.put(name1, value1);
         header.put(name2, value2);
 
@@ -171,7 +171,7 @@ public class HttpHeaderTest {
         final String name2 = "name2";
         final String value1 = "value1";
         final String value2 = "value2";
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
         header.put(name1, value1);
         header.put(name2, value2);
 
@@ -185,7 +185,7 @@ public class HttpHeaderTest {
         final String name2 = "name2";
         final String value1 = "value1";
         final String value2 = "value2";
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
         header.put(name1, value1);
         header.put(name2, value2);
 
@@ -202,7 +202,7 @@ public class HttpHeaderTest {
         final String name2 = "name2";
         final String value1 = "value1";
         final String value2 = "value2";
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
         header.put(name1, value1);
         header.put(name2, value2);
 
@@ -219,7 +219,7 @@ public class HttpHeaderTest {
         final String name2 = "name2";
         final String value1 = "value1";
         final String value2 = "value2";
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
         header.put(name1, value1);
         header.put(name2, value2);
 
@@ -238,13 +238,13 @@ public class HttpHeaderTest {
         final String name2 = "name2";
         final String value1 = "value1";
         final String value2 = "value2";
-        final HttpHeader header = new HttpHeader();
+        final HttpHeaders header = new HttpHeaders();
         header.put(name1, value1);
         header.put(name2, value2);
 
         final Collection<Entry> entrySet = header.values();
-        assertThat(entrySet, hasItem(new HttpHeader.Entry(name1, value1)));
-        assertThat(entrySet, hasItem(new HttpHeader.Entry(name2, value2)));
+        assertThat(entrySet, hasItem(new Entry(name1, value1)));
+        assertThat(entrySet, hasItem(new Entry(name2, value2)));
     }
 
     @Test
@@ -253,12 +253,12 @@ public class HttpHeaderTest {
         final String name2 = "name2";
         final String value1 = "value1";
         final String value2 = "value2";
-        final HttpHeader header1 = new HttpHeader();
+        final HttpHeaders header1 = new HttpHeaders();
         header1.put(name1, value1);
         header1.put(name2, value2);
-        final HttpHeader header2 = new HttpHeader(header1);
-        final ArrayList<HttpHeader.Entry> list1 = new ArrayList<>(header1.values());
-        final ArrayList<HttpHeader.Entry> list2 = new ArrayList<>(header2.values());
+        final HttpHeaders header2 = new HttpHeaders(header1);
+        final ArrayList<Entry> list1 = new ArrayList<>(header1.values());
+        final ArrayList<Entry> list2 = new ArrayList<>(header2.values());
 
         assertThat(list1.equals(list2), is(true));
 

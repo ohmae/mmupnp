@@ -50,7 +50,7 @@ public abstract class HttpMessage {
     private InetAddress mAddress;
     private int mPort;
     @Nonnull
-    private final HttpHeader mHeaders;
+    private final HttpHeaders mHeaders;
     @Nonnull
     private String mVersion = Http.DEFAULT_HTTP_VERSION;
     @Nullable
@@ -62,7 +62,7 @@ public abstract class HttpMessage {
      * インスタンス作成
      */
     public HttpMessage() {
-        mHeaders = new HttpHeader();
+        mHeaders = new HttpHeaders();
     }
 
     /**
@@ -84,7 +84,7 @@ public abstract class HttpMessage {
     public HttpMessage(@Nonnull final HttpMessage original) {
         mAddress = original.mAddress;
         mPort = original.mPort;
-        mHeaders = new HttpHeader(original.mHeaders);
+        mHeaders = new HttpHeaders(original.mHeaders);
         mVersion = original.mVersion;
         if (original.mBodyBinary != null) {
             mBodyBinary = Arrays.copyOf(original.mBodyBinary, original.mBodyBinary.length);
@@ -417,7 +417,7 @@ public abstract class HttpMessage {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
         sb.append(EOL);
-        for (final HttpHeader.Entry entry : mHeaders.values()) {
+        for (final HttpHeaders.Entry entry : mHeaders.values()) {
             sb.append(entry.getName());
             sb.append(": ");
             sb.append(entry.getValue());
@@ -453,7 +453,7 @@ public abstract class HttpMessage {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
         sb.append(EOL);
-        for (final HttpHeader.Entry entry : mHeaders.values()) {
+        for (final HttpHeaders.Entry entry : mHeaders.values()) {
             sb.append(entry.getName());
             sb.append(": ");
             sb.append(entry.getValue());
