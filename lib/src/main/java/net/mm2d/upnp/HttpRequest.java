@@ -155,6 +155,7 @@ public class HttpRequest implements HttpMessage {
      * <p>{@link #setStartLine(String)}のエイリアス。
      *
      * @param line リクエストライン
+     * @return HttpRequest
      * @see #setStartLine(String)
      */
     public HttpRequest setRequestLine(@Nonnull final String line) {

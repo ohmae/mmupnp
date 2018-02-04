@@ -76,6 +76,7 @@ public class HttpResponse implements HttpMessage {
      * <p>{@link #setStartLine(String)}のエイリアス。
      *
      * @param line ステータスライン
+     * @return HttpResponse
      * @see #setStartLine(String)
      */
     public HttpResponse setStatusLine(@Nonnull final String line) {

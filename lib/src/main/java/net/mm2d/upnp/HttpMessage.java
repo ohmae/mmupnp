@@ -79,6 +79,7 @@ public interface HttpMessage {
      * ヘッダの各行からヘッダの設定を行う
      *
      * @param line ヘッダの1行
+     * @return HttpMessage
      */
     @Nonnull
     HttpMessage setHeaderLine(@Nonnull final String line);
