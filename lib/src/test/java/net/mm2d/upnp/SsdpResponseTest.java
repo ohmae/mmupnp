@@ -26,18 +26,18 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(Enclosed.class)
-public class SsdpResponseMessageTest {
+public class SsdpResponseTest {
 
-    private static SsdpResponseMessage makeFromResource(final String name) throws IOException {
+    private static SsdpResponse makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpResponseMessage(mock(InterfaceAddress.class), data, data.length);
+        return new SsdpResponse(mock(InterfaceAddress.class), data, data.length);
     }
 
     @RunWith(JUnit4.class)
     public static class 作成 {
         @Test
         public void buildUp_受信データから作成() throws Exception {
-            final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
+            final SsdpResponse message = makeFromResource("ssdp-search-response0.bin");
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.getMessage().writeData(baos);
@@ -50,21 +50,21 @@ public class SsdpResponseMessageTest {
 
         @Test
         public void setStatusCode() throws Exception {
-            final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
+            final SsdpResponse message = makeFromResource("ssdp-search-response0.bin");
             message.setStatusCode(404);
             assertThat(message.getStatusCode(), is(404));
         }
 
         @Test
         public void setReasonPhrase() throws Exception {
-            final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
+            final SsdpResponse message = makeFromResource("ssdp-search-response0.bin");
             message.setReasonPhrase("Not Found");
             assertThat(message.getReasonPhrase(), is("Not Found"));
         }
 
         @Test
         public void setStatus() throws Exception {
-            final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
+            final SsdpResponse message = makeFromResource("ssdp-search-response0.bin");
             message.setStatus(Http.Status.HTTP_NOT_FOUND);
             assertThat(message.getStatus(), is(Http.Status.HTTP_NOT_FOUND));
         }
@@ -73,40 +73,40 @@ public class SsdpResponseMessageTest {
     @RunWith(Theories.class)
     public static class Responseメッセージ {
         @DataPoints
-        public static SsdpResponseMessage[] getMessages() throws IOException {
-            return new SsdpResponseMessage[]{
+        public static SsdpResponse[] getMessages() throws IOException {
+            return new SsdpResponse[]{
                     makeFromResource("ssdp-search-response0.bin"),
                     makeFromResource("ssdp-search-response1.bin"),
             };
         }
 
         @Theory
-        public void getStatus(final SsdpResponseMessage message) {
+        public void getStatus(final SsdpResponse message) {
             assertThat(message.getStatus(), is(Http.Status.HTTP_OK));
         }
 
         @Theory
-        public void getStatusCode(final SsdpResponseMessage message) {
+        public void getStatusCode(final SsdpResponse message) {
             assertThat(message.getStatusCode(), is(200));
         }
 
         @Theory
-        public void getReasonPhrase(final SsdpResponseMessage message) {
+        public void getReasonPhrase(final SsdpResponse message) {
             assertThat(message.getReasonPhrase(), is("OK"));
         }
 
         @Theory
-        public void getUuid_記述の値であること(final SsdpResponseMessage message) {
+        public void getUuid_記述の値であること(final SsdpResponse message) {
             assertThat(message.getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         }
 
         @Theory
-        public void getMaxAge_CACHE_CONTROLの値が取れること(final SsdpResponseMessage message) {
+        public void getMaxAge_CACHE_CONTROLの値が取れること(final SsdpResponse message) {
             assertThat(message.getMaxAge(), is(300));
         }
 
         @Theory
-        public void getLocation_Locationの値が取れること(final SsdpResponseMessage message) {
+        public void getLocation_Locationの値が取れること(final SsdpResponse message) {
             assertThat(message.getLocation(), is("http://192.0.2.2:12345/device.xml"));
         }
     }

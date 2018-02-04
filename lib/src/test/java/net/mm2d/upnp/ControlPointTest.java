@@ -563,7 +563,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_ResponseListenerから伝搬() throws Exception {
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");
-            final SsdpResponseMessage message = new SsdpResponseMessage(mock(InterfaceAddress.class), data, data.length);
+            final SsdpResponse message = new SsdpResponse(mock(InterfaceAddress.class), data, data.length);
             mResponseListener.onReceiveResponse(message);
             Thread.sleep(100);
             verify(mDeviceHolder).get(udn);

@@ -284,7 +284,7 @@ public class ControlPoint {
 
         mSearchList = factory.createSsdpSearchServerList(interfaces, new ResponseListener() {
             @Override
-            public void onReceiveResponse(@Nonnull final SsdpResponseMessage message) {
+            public void onReceiveResponse(@Nonnull final SsdpResponse message) {
                 executeInParallel(new Runnable() {
                     @Override
                     public void run() {

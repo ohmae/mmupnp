@@ -383,16 +383,16 @@ public class SsdpServerDelegateTest {
         receiveTask.run();
     }
 
-    private static SsdpResponseMessage makeFromResource(final String name) throws IOException {
+    private static SsdpResponse makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpResponseMessage(mock(InterfaceAddress.class), data, data.length);
+        return new SsdpResponse(mock(InterfaceAddress.class), data, data.length);
     }
 
     @Test
     public void isInvalidLocation_アドレス一致() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = new SsdpServerDelegate(mock(Receiver.class), networkInterface);
-        final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
+        final SsdpResponse message = makeFromResource("ssdp-search-response0.bin");
         assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(false));
     }
 
@@ -400,7 +400,7 @@ public class SsdpServerDelegateTest {
     public void isInvalidLocation_http以外() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = new SsdpServerDelegate(mock(Receiver.class), networkInterface);
-        final SsdpResponseMessage message = makeFromResource("ssdp-search-response-invalid-location0.bin");
+        final SsdpResponse message = makeFromResource("ssdp-search-response-invalid-location0.bin");
         assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(true));
     }
 
@@ -408,7 +408,7 @@ public class SsdpServerDelegateTest {
     public void isInvalidLocation_表記に問題() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = new SsdpServerDelegate(mock(Receiver.class), networkInterface);
-        final SsdpResponseMessage message = makeFromResource("ssdp-search-response-invalid-location1.bin");
+        final SsdpResponse message = makeFromResource("ssdp-search-response-invalid-location1.bin");
         assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(true));
     }
 }

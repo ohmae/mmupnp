@@ -84,10 +84,10 @@ public class SsdpSearchServerTest {
         final SsdpSearchServer server = spy(new SsdpSearchServer(delegate));
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");
         final InetAddress address = InetAddress.getByName("192.0.2.2");
-        final SsdpResponseMessage result[] = new SsdpResponseMessage[1];
+        final SsdpResponse result[] = new SsdpResponse[1];
         server.setResponseListener(new SsdpSearchServer.ResponseListener() {
             @Override
-            public void onReceiveResponse(@Nonnull final SsdpResponseMessage message) {
+            public void onReceiveResponse(@Nonnull final SsdpResponse message) {
                 result[0] = message;
             }
         });
@@ -108,7 +108,7 @@ public class SsdpSearchServerTest {
 
         server.onReceive(address, data, data.length);
 
-        verify(listener, times(1)).onReceiveResponse(ArgumentMatchers.any(SsdpResponseMessage.class));
+        verify(listener, times(1)).onReceiveResponse(ArgumentMatchers.any(SsdpResponse.class));
     }
 
     @Test
@@ -122,7 +122,7 @@ public class SsdpSearchServerTest {
 
         server.onReceive(address, data, data.length);
 
-        verify(listener, never()).onReceiveResponse(ArgumentMatchers.any(SsdpResponseMessage.class));
+        verify(listener, never()).onReceiveResponse(ArgumentMatchers.any(SsdpResponse.class));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class SsdpSearchServerTest {
 
         server.onReceive(address, data, data.length);
 
-        verify(listener, never()).onReceiveResponse(ArgumentMatchers.any(SsdpResponseMessage.class));
+        verify(listener, never()).onReceiveResponse(ArgumentMatchers.any(SsdpResponse.class));
     }
 
     @Test

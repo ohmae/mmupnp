@@ -42,7 +42,7 @@ class SsdpSearchServer implements SsdpServer {
          *
          * @param message 受信したレスポンスメッセージ
          */
-        void onReceiveResponse(@Nonnull SsdpResponseMessage message);
+        void onReceiveResponse(@Nonnull SsdpResponse message);
     }
 
     @Nonnull
@@ -146,7 +146,7 @@ class SsdpSearchServer implements SsdpServer {
             @Nonnull final byte[] data,
             final int length) {
         try {
-            final SsdpResponseMessage message = new SsdpResponseMessage(getInterfaceAddress(), data, length);
+            final SsdpResponse message = new SsdpResponse(getInterfaceAddress(), data, length);
             if (mDelegate.isInvalidLocation(message, sourceAddress)) {
                 return;
             }
