@@ -148,7 +148,7 @@ public class NetworkUtils {
     }
 
     private static class NetworkInterfaceWrapperImpl implements NetworkInterfaceWrapper {
-        private NetworkInterface mNetworkInterface;
+        private final NetworkInterface mNetworkInterface;
 
         NetworkInterfaceWrapperImpl(@Nonnull final NetworkInterface networkInterface) {
             mNetworkInterface = networkInterface;

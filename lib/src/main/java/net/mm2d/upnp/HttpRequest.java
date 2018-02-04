@@ -52,8 +52,6 @@ public class HttpRequest implements HttpMessage {
         }
     }
 
-    ;
-
     /**
      * インスタンス作成。
      */
@@ -62,7 +60,7 @@ public class HttpRequest implements HttpMessage {
     }
 
     // VisibleForTesting
-    HttpRequest(@Nonnull HttpMessageDelegate delegate) {
+    HttpRequest(@Nonnull final HttpMessageDelegate delegate) {
         mDelegate = delegate;
     }
 

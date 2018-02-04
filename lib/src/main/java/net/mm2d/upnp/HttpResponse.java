@@ -45,8 +45,6 @@ public class HttpResponse implements HttpMessage {
         }
     }
 
-    ;
-
     /**
      * インスタンス作成。
      */
@@ -55,7 +53,7 @@ public class HttpResponse implements HttpMessage {
     }
 
     // VisibleForTesting
-    HttpResponse(@Nonnull HttpMessageDelegate delegate) {
+    HttpResponse(@Nonnull final HttpMessageDelegate delegate) {
         mDelegate = delegate;
     }
 

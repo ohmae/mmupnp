@@ -238,7 +238,7 @@ class HttpMessageDelegate implements HttpMessage {
     }
 
     @Nonnull
-    String getHeaderString() {
+    private String getHeaderString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
         sb.append(EOL);

@@ -54,8 +54,8 @@ public class SsdpRequest implements SsdpMessage {
 
     // VisibleForTesting
     SsdpRequest(
-            @Nonnull HttpRequest request,
-            @Nonnull SsdpMessageDelegate delegate) {
+            @Nonnull final HttpRequest request,
+            @Nonnull final SsdpMessageDelegate delegate) {
         mHttpRequest = request;
         mDelegate = delegate;
     }
