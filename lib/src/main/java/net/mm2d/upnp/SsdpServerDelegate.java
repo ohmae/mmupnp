@@ -16,9 +16,12 @@ import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
+import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -172,6 +175,35 @@ class SsdpServerDelegate implements SsdpServer {
         } catch (final IOException e) {
             Log.w(e);
         }
+    }
+
+    /**
+     * SsdpMessageのLocationに正常なURLが記述されており、
+     * 記述のアドレスとパケットの送信元アドレスに不一致がないか検査する。
+     *
+     * @param message       確認するSsdpMessage
+     * @param sourceAddress 送信元アドレス
+     * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
+     */
+    public boolean isInvalidLocation(
+            @Nonnull final SsdpMessage message,
+            @Nonnull final InetAddress sourceAddress) {
+        return !isValidLocation(message, sourceAddress);
+    }
+
+    private boolean isValidLocation(
+            @Nonnull final SsdpMessage message,
+            @Nonnull final InetAddress sourceAddress) {
+        final String location = message.getLocation();
+        if (!Http.isHttpUrl(location)) {
+            return false;
+        }
+        try {
+            final InetAddress locationAddress = InetAddress.getByName(new URL(location).getHost());
+            return sourceAddress.equals(locationAddress);
+        } catch (MalformedURLException | UnknownHostException ignored) {
+        }
+        return false;
     }
 
     /**

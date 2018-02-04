@@ -19,7 +19,6 @@ import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InterfaceAddress;
 
 import static org.hamcrest.Matchers.*;
@@ -68,24 +67,6 @@ public class SsdpResponseMessageTest {
             final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
             message.setStatus(Http.Status.HTTP_NOT_FOUND);
             assertThat(message.getStatus(), is(Http.Status.HTTP_NOT_FOUND));
-        }
-
-        @Test
-        public void hasInvalidLocation_アドレス一致() throws Exception {
-            final SsdpResponseMessage message = makeFromResource("ssdp-search-response0.bin");
-            assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2")), is(false));
-        }
-
-        @Test
-        public void hasInvalidLocation_http以外() throws Exception {
-            final SsdpResponseMessage message = makeFromResource("ssdp-search-response-invalid-location0.bin");
-            assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2")), is(true));
-        }
-
-        @Test
-        public void hasInvalidLocation_表記に問題() throws Exception {
-            final SsdpResponseMessage message = makeFromResource("ssdp-search-response-invalid-location1.bin");
-            assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2")), is(true));
         }
     }
 

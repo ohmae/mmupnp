@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  */
 public class HttpRequest implements HttpMessage {
     @Nonnull
-    private final HttpMessage mDelegate;
+    private final HttpMessageDelegate mDelegate;
     @Nullable
     private InetAddress mAddress;
 
@@ -62,7 +62,7 @@ public class HttpRequest implements HttpMessage {
     }
 
     // VisibleForTesting
-    HttpRequest(@Nonnull HttpMessage delegate) {
+    HttpRequest(@Nonnull HttpMessageDelegate delegate) {
         mDelegate = delegate;
     }
 

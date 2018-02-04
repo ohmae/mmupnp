@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import static org.mockito.Mockito.*;
 
 public class HttpResponseDelegateTest {
-    private HttpMessage mDelegate;
+    private HttpMessageDelegate mDelegate;
     private HttpResponse mMessage;
 
     @Before

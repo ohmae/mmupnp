@@ -38,7 +38,7 @@ class SsdpNotifyReceiver implements SsdpServer {
     }
 
     @Nonnull
-    private final SsdpServer mDelegate;
+    private final SsdpServerDelegate mDelegate;
     @Nullable
     private NotifyListener mListener;
 
@@ -124,7 +124,7 @@ class SsdpNotifyReceiver implements SsdpServer {
             }
             // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
             if (!TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)
-                    && message.hasInvalidLocation(sourceAddress)) {
+                    && mDelegate.isInvalidLocation(message, sourceAddress)) {
                 return;
             }
             if (mListener != null) {

@@ -18,11 +18,9 @@ import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
 import java.net.DatagramPacket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -152,13 +150,4 @@ public class SsdpSearchServerTest {
         server.onReceive(address, data, data.length);
     }
 
-    private static InterfaceAddress findInet4Address(final NetworkInterface networkInterface) {
-        final List<InterfaceAddress> addressList = networkInterface.getInterfaceAddresses();
-        for (final InterfaceAddress address : addressList) {
-            if (address.getAddress() instanceof Inet4Address) {
-                return address;
-            }
-        }
-        throw new IllegalArgumentException("ni does not have IPv4 address.");
-    }
 }

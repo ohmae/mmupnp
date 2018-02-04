@@ -46,7 +46,7 @@ class SsdpSearchServer implements SsdpServer {
     }
 
     @Nonnull
-    private final SsdpServer mDelegate;
+    private final SsdpServerDelegate mDelegate;
     @Nullable
     private ResponseListener mListener;
 
@@ -147,7 +147,7 @@ class SsdpSearchServer implements SsdpServer {
             final int length) {
         try {
             final SsdpResponseMessage message = new SsdpResponseMessage(getInterfaceAddress(), data, length);
-            if (message.hasInvalidLocation(sourceAddress)) {
+            if (mDelegate.isInvalidLocation(message, sourceAddress)) {
                 return;
             }
             if (mListener != null) {

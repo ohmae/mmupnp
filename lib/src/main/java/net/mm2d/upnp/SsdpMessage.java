@@ -11,11 +11,7 @@ import net.mm2d.util.TextUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InterfaceAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -160,28 +156,6 @@ public abstract class SsdpMessage {
             return new String[]{usn, ""};
         }
         return new String[]{usn.substring(0, pos), usn.substring(pos + 2)};
-    }
-
-    private boolean hasValidLocation(@Nonnull final InetAddress sourceAddress) {
-        if (!Http.isHttpUrl(mLocation)) {
-            return false;
-        }
-        try {
-            final InetAddress locationAddress = InetAddress.getByName(new URL(mLocation).getHost());
-            return sourceAddress.equals(locationAddress);
-        } catch (MalformedURLException | UnknownHostException ignored) {
-        }
-        return false;
-    }
-
-    /**
-     * Locationに正常なURLが記述されており、記述のアドレスとパケットの送信元アドレスに不一致がないか検査する。
-     *
-     * @param sourceAddress 送信元アドレス
-     * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
-     */
-    public boolean hasInvalidLocation(@Nonnull final InetAddress sourceAddress) {
-        return !hasValidLocation(sourceAddress);
     }
 
     /**

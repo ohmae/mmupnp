@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  */
 public class HttpResponse implements HttpMessage {
     @Nonnull
-    private final HttpMessage mDelegate;
+    private final HttpMessageDelegate mDelegate;
     @Nonnull
     private Http.Status mStatus = Status.HTTP_INVALID;
 
@@ -55,12 +55,12 @@ public class HttpResponse implements HttpMessage {
     }
 
     // VisibleForTesting
-    HttpResponse(@Nonnull HttpMessage delegate) {
+    HttpResponse(@Nonnull HttpMessageDelegate delegate) {
         mDelegate = delegate;
     }
 
     public HttpResponse(@Nonnull final HttpResponse original) {
-        mDelegate = new HttpMessageDelegate(new Processor(), (HttpMessageDelegate) original.mDelegate);
+        mDelegate = new HttpMessageDelegate(new Processor(), original.mDelegate);
         mStatus = original.mStatus;
         mStatusCode = original.mStatusCode;
         mReasonPhrase = original.mReasonPhrase;
