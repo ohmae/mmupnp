@@ -7,17 +7,25 @@
 
 package net.mm2d.upnp;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * SSDPレスポンスメッセージを表現するクラス。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpResponseMessage extends SsdpMessage {
+public class SsdpResponseMessage implements SsdpMessage {
+    @Nonnull
+    private final HttpResponse mHttpResponse;
+    @Nonnull
+    private final SsdpMessageDelegate mDelegate;
+
     /**
      * 受信した情報からインスタンス作成。
      *
@@ -31,19 +39,14 @@ public class SsdpResponseMessage extends SsdpMessage {
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        super(address, data, length);
+        mHttpResponse = new HttpResponse();
+        mHttpResponse.readData(new ByteArrayInputStream(data, 0, length));
+        mDelegate = new SsdpMessageDelegate(mHttpResponse, address);
     }
 
-    @Override
     @Nonnull
-    protected HttpMessage newMessage() {
-        return new HttpResponse();
-    }
-
-    @Override
-    @Nonnull
-    protected HttpResponse getMessage() {
-        return (HttpResponse) super.getMessage();
+    protected HttpMessage getMessage() {
+        return mHttpResponse;
     }
 
     /**
@@ -53,7 +56,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @see #getStatus()
      */
     public int getStatusCode() {
-        return getMessage().getStatusCode();
+        return mHttpResponse.getStatusCode();
     }
 
     /**
@@ -63,7 +66,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
     public void setStatusCode(final int code) {
-        getMessage().setStatusCode(code);
+        mHttpResponse.setStatusCode(code);
     }
 
     /**
@@ -74,7 +77,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      */
     @Nonnull
     public String getReasonPhrase() {
-        return getMessage().getReasonPhrase();
+        return mHttpResponse.getReasonPhrase();
     }
 
     /**
@@ -84,7 +87,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
     public void setReasonPhrase(@Nonnull final String reasonPhrase) {
-        getMessage().setReasonPhrase(reasonPhrase);
+        mHttpResponse.setReasonPhrase(reasonPhrase);
     }
 
     /**
@@ -93,7 +96,7 @@ public class SsdpResponseMessage extends SsdpMessage {
      * @param status ステータス
      */
     public void setStatus(@Nonnull final Http.Status status) {
-        getMessage().setStatus(status);
+        mHttpResponse.setStatus(status);
     }
 
     /**
@@ -103,6 +106,74 @@ public class SsdpResponseMessage extends SsdpMessage {
      */
     @Nonnull
     public Http.Status getStatus() {
-        return getMessage().getStatus();
+        return mHttpResponse.getStatus();
+    }
+
+    // VisibleForTesting
+    void updateLocation() {
+        mDelegate.updateLocation();
+    }
+
+    @Nullable
+    @Override
+    public InterfaceAddress getInterfaceAddress() {
+        return mDelegate.getInterfaceAddress();
+    }
+
+    @Nullable
+    @Override
+    public String getHeader(@Nonnull final String name) {
+        return mDelegate.getHeader(name);
+    }
+
+    @Override
+    public void setHeader(
+            @Nonnull final String name,
+            @Nonnull final String value) {
+        mDelegate.setHeader(name, value);
+    }
+
+    @Nonnull
+    @Override
+    public String getUuid() {
+        return mDelegate.getUuid();
+    }
+
+    @Nonnull
+    @Override
+    public String getType() {
+        return mDelegate.getType();
+    }
+
+    @Nullable
+    @Override
+    public String getNts() {
+        return mDelegate.getNts();
+    }
+
+    @Override
+    public int getMaxAge() {
+        return mDelegate.getMaxAge();
+    }
+
+    @Override
+    public long getExpireTime() {
+        return mDelegate.getExpireTime();
+    }
+
+    @Nullable
+    @Override
+    public String getLocation() {
+        return mDelegate.getLocation();
+    }
+
+    @Override
+    public void writeData(@Nonnull final OutputStream os) throws IOException {
+        mDelegate.writeData(os);
+    }
+
+    @Override
+    public String toString() {
+        return mDelegate.toString();
     }
 }

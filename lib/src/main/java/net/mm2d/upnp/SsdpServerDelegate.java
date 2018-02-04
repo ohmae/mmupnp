@@ -170,7 +170,7 @@ class SsdpServerDelegate implements SsdpServer {
         }
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            message.getMessage().writeData(baos);
+            message.writeData(baos);
             send(baos.toByteArray());
         } catch (final IOException e) {
             Log.w(e);

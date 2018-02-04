@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 /**
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpMessageTest {
+public class SsdpMessageDelegateTest {
     private static final int DEFAULT_MAX_AGE = 1800;
 
     @Test
@@ -23,14 +23,14 @@ public class SsdpMessageTest {
         final HttpMessage message = new HttpResponse();
         message.setHeader(Http.CACHE_CONTROL, "max-age=100");
 
-        assertThat(SsdpMessage.parseCacheControl(message), is(100));
+        assertThat(SsdpMessageDelegate.parseCacheControl(message), is(100));
     }
 
     @Test
     public void parseCacheControl_空() {
         final HttpMessage message = new HttpResponse();
 
-        assertThat(SsdpMessage.parseCacheControl(message), is(DEFAULT_MAX_AGE));
+        assertThat(SsdpMessageDelegate.parseCacheControl(message), is(DEFAULT_MAX_AGE));
     }
 
     @Test
@@ -38,7 +38,7 @@ public class SsdpMessageTest {
         final HttpMessage message = new HttpResponse();
         message.setHeader(Http.CACHE_CONTROL, "age=100");
 
-        assertThat(SsdpMessage.parseCacheControl(message), is(DEFAULT_MAX_AGE));
+        assertThat(SsdpMessageDelegate.parseCacheControl(message), is(DEFAULT_MAX_AGE));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class SsdpMessageTest {
         final HttpMessage message = new HttpResponse();
         message.setHeader(Http.CACHE_CONTROL, "max-age:100");
 
-        assertThat(SsdpMessage.parseCacheControl(message), is(DEFAULT_MAX_AGE));
+        assertThat(SsdpMessageDelegate.parseCacheControl(message), is(DEFAULT_MAX_AGE));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class SsdpMessageTest {
         final HttpMessage message = new HttpResponse();
         message.setHeader(Http.CACHE_CONTROL, "max-age=");
 
-        assertThat(SsdpMessage.parseCacheControl(message), is(DEFAULT_MAX_AGE));
+        assertThat(SsdpMessageDelegate.parseCacheControl(message), is(DEFAULT_MAX_AGE));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class SsdpMessageTest {
         final HttpMessage message = new HttpResponse();
         message.setHeader(Http.CACHE_CONTROL, "max-age=ff");
 
-        assertThat(SsdpMessage.parseCacheControl(message), is(DEFAULT_MAX_AGE));
+        assertThat(SsdpMessageDelegate.parseCacheControl(message), is(DEFAULT_MAX_AGE));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class SsdpMessageTest {
         final HttpMessage message = new HttpResponse();
         message.setHeader(Http.USN, "uuid:01234567-89ab-cdef-0123-456789abcdef::upnp:rootdevice");
 
-        final String[] result = SsdpMessage.parseUsn(message);
+        final String[] result = SsdpMessageDelegate.parseUsn(message);
 
         assertThat(result[0], is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         assertThat(result[1], is("upnp:rootdevice"));
@@ -81,7 +81,7 @@ public class SsdpMessageTest {
         final HttpMessage message = new HttpResponse();
         message.setHeader(Http.USN, "uuid:01234567-89ab-cdef-0123-456789abcdef");
 
-        final String[] result = SsdpMessage.parseUsn(message);
+        final String[] result = SsdpMessageDelegate.parseUsn(message);
 
         assertThat(result[0], is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         assertThat(result[1], is(""));
@@ -91,7 +91,7 @@ public class SsdpMessageTest {
     public void parseUsn_空() {
         final HttpMessage message = new HttpResponse();
 
-        final String[] result = SsdpMessage.parseUsn(message);
+        final String[] result = SsdpMessageDelegate.parseUsn(message);
 
         assertThat(result[0], is(""));
         assertThat(result[1], is(""));
@@ -102,7 +102,7 @@ public class SsdpMessageTest {
         final HttpMessage message = new HttpResponse();
         message.setHeader(Http.USN, "01234567-89ab-cdef-0123-456789abcdef");
 
-        final String[] result = SsdpMessage.parseUsn(message);
+        final String[] result = SsdpMessageDelegate.parseUsn(message);
 
         assertThat(result[0], is(""));
         assertThat(result[1], is(""));

@@ -7,22 +7,31 @@
 
 package net.mm2d.upnp;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * SSDPリクエストメッセージを表現するクラス。
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class SsdpRequestMessage extends SsdpMessage {
+public class SsdpRequestMessage implements SsdpMessage {
+    @Nonnull
+    private final HttpRequest mHttpRequest;
+    @Nonnull
+    private final SsdpMessageDelegate mDelegate;
+
     /**
      * インスタンス作成。
      */
     public SsdpRequestMessage() {
-        super();
+        mHttpRequest = new HttpRequest();
+        mDelegate = new SsdpMessageDelegate(mHttpRequest);
     }
 
     /**
@@ -38,19 +47,14 @@ public class SsdpRequestMessage extends SsdpMessage {
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        super(address, data, length);
+        mHttpRequest = new HttpRequest();
+        mHttpRequest.readData(new ByteArrayInputStream(data, 0, length));
+        mDelegate = new SsdpMessageDelegate(mHttpRequest, address);
     }
 
-    @Override
-    @Nonnull
-    protected HttpMessage newMessage() {
-        return new HttpRequest();
-    }
-
-    @Override
     @Nonnull
     protected HttpRequest getMessage() {
-        return (HttpRequest) super.getMessage();
+        return mHttpRequest;
     }
 
     /**
@@ -60,7 +64,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      */
     @Nonnull
     public String getMethod() {
-        return getMessage().getMethod();
+        return mHttpRequest.getMethod();
     }
 
     /**
@@ -69,7 +73,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      * @param method リクエストメソッド
      */
     public void setMethod(@Nonnull final String method) {
-        getMessage().setMethod(method);
+        mHttpRequest.setMethod(method);
     }
 
     /**
@@ -79,7 +83,7 @@ public class SsdpRequestMessage extends SsdpMessage {
      */
     @Nonnull
     public String getUri() {
-        return getMessage().getUri();
+        return mHttpRequest.getUri();
     }
 
     /**
@@ -88,6 +92,74 @@ public class SsdpRequestMessage extends SsdpMessage {
      * @param uri URI文字列
      */
     public void setUri(@Nonnull final String uri) {
-        getMessage().setUri(uri);
+        mHttpRequest.setUri(uri);
+    }
+
+    // VisibleForTesting
+    void updateLocation() {
+        mDelegate.updateLocation();
+    }
+
+    @Nullable
+    @Override
+    public InterfaceAddress getInterfaceAddress() {
+        return mDelegate.getInterfaceAddress();
+    }
+
+    @Nullable
+    @Override
+    public String getHeader(@Nonnull final String name) {
+        return mDelegate.getHeader(name);
+    }
+
+    @Override
+    public void setHeader(
+            @Nonnull final String name,
+            @Nonnull final String value) {
+        mDelegate.setHeader(name, value);
+    }
+
+    @Nonnull
+    @Override
+    public String getUuid() {
+        return mDelegate.getUuid();
+    }
+
+    @Nonnull
+    @Override
+    public String getType() {
+        return mDelegate.getType();
+    }
+
+    @Nullable
+    @Override
+    public String getNts() {
+        return mDelegate.getNts();
+    }
+
+    @Override
+    public int getMaxAge() {
+        return mDelegate.getMaxAge();
+    }
+
+    @Override
+    public long getExpireTime() {
+        return mDelegate.getExpireTime();
+    }
+
+    @Nullable
+    @Override
+    public String getLocation() {
+        return mDelegate.getLocation();
+    }
+
+    @Override
+    public void writeData(@Nonnull final OutputStream os) throws IOException {
+        mDelegate.writeData(os);
+    }
+
+    @Override
+    public String toString() {
+        return mDelegate.toString();
     }
 }
