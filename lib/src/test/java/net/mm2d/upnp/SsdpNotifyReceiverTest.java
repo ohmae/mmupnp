@@ -157,6 +157,17 @@ public class SsdpNotifyReceiverTest {
     }
 
     @Test
+    public void send_delegateがコールされる() {
+        final SsdpServerDelegate delegate = mock(SsdpServerDelegate.class);
+        final SsdpNotifyReceiver receiver = new SsdpNotifyReceiver(delegate);
+        final SsdpMessage message = mock(SsdpMessage.class);
+
+        receiver.send(message);
+
+        verify(delegate, times(1)).send(message);
+    }
+
+    @Test
     public void isSameSegment() throws Exception {
         assertThat(
                 SsdpNotifyReceiver.isSameSegment(
