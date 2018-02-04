@@ -54,7 +54,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.mm2d:mmupnp:1.3.1'
+    compile 'net.mm2d:mmupnp:1.5.0'
 }
 ```
 
