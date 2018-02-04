@@ -51,6 +51,16 @@ public class ControlPointTest {
             new ControlPoint();
         }
 
+        @Test
+        public void constructor_インターフェース指定() throws Exception {
+            new ControlPoint(NetworkUtils.getAvailableInet4Interfaces());
+        }
+
+        @Test(expected = IllegalStateException.class)
+        public void constructor_インターフェース空で指定() throws Exception {
+            new ControlPoint(Collections.<NetworkInterface>emptyList(), mock(ControlPointDiFactory.class));
+        }
+
         @Test(timeout = 2000L)
         public void initialize_terminate() throws Exception {
             final ControlPoint cp = new ControlPoint();
