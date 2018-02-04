@@ -417,7 +417,7 @@ public abstract class HttpMessage {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
         sb.append(EOL);
-        for (final HttpHeader.Entry entry : mHeaders.entrySet()) {
+        for (final HttpHeader.Entry entry : mHeaders.values()) {
             sb.append(entry.getName());
             sb.append(": ");
             sb.append(entry.getValue());
@@ -453,7 +453,7 @@ public abstract class HttpMessage {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
         sb.append(EOL);
-        for (final HttpHeader.Entry entry : mHeaders.entrySet()) {
+        for (final HttpHeader.Entry entry : mHeaders.values()) {
             sb.append(entry.getName());
             sb.append(": ");
             sb.append(entry.getValue());

@@ -7,12 +7,14 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.HttpHeader.Entry;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Collection;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -231,7 +233,7 @@ public class HttpHeaderTest {
     }
 
     @Test
-    public void entrySet_Setインターフェース() {
+    public void values_Setインターフェース() {
         final String name1 = "name1";
         final String name2 = "name2";
         final String value1 = "value1";
@@ -240,7 +242,7 @@ public class HttpHeaderTest {
         header.put(name1, value1);
         header.put(name2, value2);
 
-        final Set<HttpHeader.Entry> entrySet = header.entrySet();
+        final Collection<Entry> entrySet = header.values();
         assertThat(entrySet, hasItem(new HttpHeader.Entry(name1, value1)));
         assertThat(entrySet, hasItem(new HttpHeader.Entry(name2, value2)));
     }
@@ -255,8 +257,8 @@ public class HttpHeaderTest {
         header1.put(name1, value1);
         header1.put(name2, value2);
         final HttpHeader header2 = new HttpHeader(header1);
-        final ArrayList<HttpHeader.Entry> list1 = new ArrayList<>(header1.entrySet());
-        final ArrayList<HttpHeader.Entry> list2 = new ArrayList<>(header2.entrySet());
+        final ArrayList<HttpHeader.Entry> list1 = new ArrayList<>(header1.values());
+        final ArrayList<HttpHeader.Entry> list2 = new ArrayList<>(header2.values());
 
         assertThat(list1.equals(list2), is(true));
 
