@@ -373,5 +373,10 @@ public class HttpRequest implements HttpMessage {
     public void readData(@Nonnull final InputStream is) throws IOException {
         mDelegate.readData(is);
     }
+
+    @Override
+    public String toString() {
+        return mDelegate.toString();
+    }
 }
 

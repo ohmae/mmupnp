@@ -172,4 +172,11 @@ public class HttpResponseDelegateTest {
 
         verify(mDelegate, times(1)).readData(is);
     }
+
+    @Test
+    public void toString_() throws Exception {
+        mMessage.toString();
+
+        verify(mDelegate, times(1)).toString();
+    }
 }
