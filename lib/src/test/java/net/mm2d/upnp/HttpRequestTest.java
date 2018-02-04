@@ -12,22 +12,18 @@ import net.mm2d.util.TestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.ArgumentMatchers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class HttpRequestTest {
@@ -198,19 +194,6 @@ public class HttpRequestTest {
         assertThat(readRequest.getMethod(), is(Http.GET));
     }
 
-    @Test
-    public void HttpRequest_Socketの情報が反映される() throws IOException {
-        final InetAddress address = InetAddress.getByName("192.0.2.2");
-        final int port = 12345;
-        final Socket socket = mock(Socket.class);
-        doReturn(address).when(socket).getInetAddress();
-        doReturn(port).when(socket).getPort();
-        final HttpRequest request = new HttpRequest(socket);
-
-        assertThat(request.getAddress(), is(address));
-        assertThat(request.getPort(), is(port));
-    }
-
     @Test(expected = IllegalStateException.class)
     public void getAddressString_未設定ならException() throws Exception {
         final HttpRequest request = new HttpRequest();
@@ -306,38 +289,11 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void setBody_エンコード不可でもExceptionは発生しない() throws Exception {
-        final String body = "body";
-        final HttpRequest request = spy(new HttpRequest());
-        doThrow(new UnsupportedEncodingException()).when(request).getBytes(anyString());
-        request.setBody(body, true);
-
-        assertThat(request.getBody(), is(body));
-    }
-
-    @Test
     public void setBodyBinary_長さ0() {
         final HttpRequest request = new HttpRequest();
         request.setBodyBinary(new byte[0]);
 
         assertThat(request.getBody().length(), is(0));
         assertThat(request.getBodyBinary().length, is(0));
-    }
-
-    @Test
-    public void getBody_デコード不可ならnullが返る() throws Exception {
-        final HttpRequest request = spy(new HttpRequest());
-        request.setBodyBinary("body".getBytes("utf-8"));
-        doThrow(new UnsupportedEncodingException()).when(request).newString(ArgumentMatchers.any(byte[].class));
-
-        assertThat(request.getBody(), is(nullValue()));
-    }
-
-    @Test
-    public void getHeaderBytes_エンコード不可でもnullが返らない() throws Exception {
-        final HttpRequest request = spy(new HttpRequest());
-        doThrow(new UnsupportedEncodingException()).when(request).getBytes(anyString());
-
-        assertThat(request.getHeaderBytes().length, is(0));
     }
 }

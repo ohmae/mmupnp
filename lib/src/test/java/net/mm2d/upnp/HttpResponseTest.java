@@ -16,15 +16,12 @@ import org.junit.runners.JUnit4;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class HttpResponseTest {
@@ -47,6 +44,24 @@ public class HttpResponseTest {
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
         assertThat(Http.parseDate(response.getHeader(Http.DATE)), is(DATE));
         assertThat(response.getBody(), is(TestUtils.getResourceAsString("cds.xml")));
+    }
+
+    @Test
+    public void HttpRequest_ディープコピーができる() throws IOException {
+        final HttpResponse response1 = new HttpResponse();
+        response1.readData(TestUtils.getResourceAsStream("cds-length.bin"));
+
+        final HttpResponse response2 = new HttpResponse(response1);
+
+        assertThat(response1.getStartLine(), is(response2.getStartLine()));
+        assertThat(response1.getStatus(), is(response2.getStatus()));
+        assertThat(response1.getHeader(Http.DATE), is(response2.getHeader(Http.DATE)));
+        assertThat(response1.getBody(), is(response2.getBody()));
+        assertThat(response1.getBodyBinary(), is(response2.getBodyBinary()));
+
+        response1.getBodyBinary()[0] = 0;
+
+        assertThat(response1.getBodyBinary(), is(not(response2.getBodyBinary())));
     }
 
     @Test
@@ -196,18 +211,5 @@ public class HttpResponseTest {
     public void setStatusCode_不正なステータスコードはException() {
         final HttpResponse response = new HttpResponse();
         response.setStatusCode(0);
-    }
-
-    @Test
-    public void HttpResponse_Socketの情報が反映される() throws IOException {
-        final InetAddress address = InetAddress.getByName("192.0.2.2");
-        final int port = 12345;
-        final Socket socket = mock(Socket.class);
-        doReturn(address).when(socket).getInetAddress();
-        doReturn(port).when(socket).getPort();
-        final HttpResponse response = new HttpResponse(socket);
-
-        assertThat(response.getAddress(), is(address));
-        assertThat(response.getPort(), is(port));
     }
 }

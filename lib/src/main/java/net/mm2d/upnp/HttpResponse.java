@@ -8,8 +8,11 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.Http.Status;
+import net.mm2d.upnp.HttpMessageDelegate.StartLineProcessor;
 
-import java.net.Socket;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,32 +22,53 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class HttpResponse extends HttpMessage {
+public class HttpResponse implements HttpMessage {
+    @Nonnull
+    private final HttpMessage mDelegate;
     @Nonnull
     private Http.Status mStatus = Status.HTTP_INVALID;
+
     private int mStatusCode;
     @Nonnull
     private String mReasonPhrase = "";
+
+    private class Processor implements StartLineProcessor {
+        @Override
+        public void setStartLine(@Nonnull final String line) {
+            HttpResponse.this.setStartLine(line);
+        }
+
+        @Nonnull
+        @Override
+        public String getStartLine() {
+            return HttpResponse.this.getStartLine();
+        }
+    }
+
+    ;
 
     /**
      * インスタンス作成。
      */
     public HttpResponse() {
-        super();
+        mDelegate = new HttpMessageDelegate(new Processor());
     }
 
-    /**
-     * インスタンス作成
-     *
-     * @param socket 受信したsocket
-     */
-    public HttpResponse(@Nonnull final Socket socket) {
-        super(socket);
+    // VisibleForTesting
+    HttpResponse(@Nonnull HttpMessage delegate) {
+        mDelegate = delegate;
+    }
+
+    public HttpResponse(@Nonnull final HttpResponse original) {
+        mDelegate = new HttpMessageDelegate(new Processor(), (HttpMessageDelegate) original.mDelegate);
+        mStatus = original.mStatus;
+        mStatusCode = original.mStatusCode;
+        mReasonPhrase = original.mReasonPhrase;
     }
 
     @Override
-    public void setStartLine(@Nonnull final String line) throws IllegalArgumentException {
-        setStatusLine(line);
+    public HttpResponse setStartLine(@Nonnull final String line) {
+        return setStatusLine(line);
     }
 
     /**
@@ -55,7 +79,7 @@ public class HttpResponse extends HttpMessage {
      * @param line ステータスライン
      * @see #setStartLine(String)
      */
-    public void setStatusLine(@Nonnull final String line) throws IllegalArgumentException {
+    public HttpResponse setStatusLine(@Nonnull final String line) {
         final String[] params = line.split(" ", 3);
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -63,10 +87,11 @@ public class HttpResponse extends HttpMessage {
         setVersion(params[0]);
         setStatusCode(Integer.parseInt(params[1]));
         setReasonPhrase(params[2]);
+        return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public String getStartLine() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getVersion());
@@ -156,43 +181,113 @@ public class HttpResponse extends HttpMessage {
         return mStatus;
     }
 
+    @Nonnull
     @Override
-    public HttpResponse setVersion(@Nonnull final String version) {
-        return (HttpResponse) super.setVersion(version);
+    public String getVersion() {
+        return mDelegate.getVersion();
     }
 
+    @Nonnull
+    @Override
+    public HttpResponse setVersion(@Nonnull final String version) {
+        mDelegate.setVersion(version);
+        return this;
+    }
+
+    @Nonnull
     @Override
     public HttpResponse setHeader(
             @Nonnull final String name,
             @Nonnull final String value) {
-        return (HttpResponse) super.setHeader(name, value);
-    }
-
-    @Override
-    public HttpResponse setBody(@Nullable final String body) {
-        super.setBody(body);
+        mDelegate.setHeader(name, value);
         return this;
     }
 
+    @Nonnull
+    @Override
+    public HttpResponse setHeaderLine(@Nonnull final String line) {
+        mDelegate.setHeaderLine(line);
+        return this;
+    }
+
+    @Nullable
+    @Override
+    public String getHeader(@Nonnull final String name) {
+        return mDelegate.getHeader(name);
+    }
+
+    @Override
+    public boolean isChunked() {
+        return mDelegate.isChunked();
+    }
+
+    @Override
+    public boolean isKeepAlive() {
+        return mDelegate.isKeepAlive();
+    }
+
+    @Override
+    public int getContentLength() {
+        return mDelegate.getContentLength();
+    }
+
+    @Nonnull
+    @Override
+    public HttpResponse setBody(@Nullable final String body) {
+        mDelegate.setBody(body);
+        return this;
+    }
+
+    @Nonnull
     @Override
     public HttpResponse setBody(
             @Nullable final String body,
             final boolean withContentLength) {
-        super.setBody(body, withContentLength);
+        mDelegate.setBody(body, withContentLength);
         return this;
     }
 
+    @Nonnull
     @Override
     public HttpResponse setBodyBinary(@Nullable final byte[] body) {
-        super.setBodyBinary(body);
+        mDelegate.setBodyBinary(body);
         return this;
     }
 
+    @Nonnull
     @Override
     public HttpResponse setBodyBinary(
             @Nullable final byte[] body,
             final boolean withContentLength) {
-        super.setBodyBinary(body, withContentLength);
+        mDelegate.setBodyBinary(body, withContentLength);
         return this;
+    }
+
+    @Nullable
+    @Override
+    public String getBody() {
+        return mDelegate.getBody();
+    }
+
+    @Nullable
+    @Override
+    public byte[] getBodyBinary() {
+        return mDelegate.getBodyBinary();
+    }
+
+    @Nonnull
+    @Override
+    public String getMessageString() {
+        return mDelegate.getMessageString();
+    }
+
+    @Override
+    public void writeData(@Nonnull final OutputStream os) throws IOException {
+        mDelegate.writeData(os);
+    }
+
+    @Override
+    public void readData(@Nonnull final InputStream is) throws IOException {
+        mDelegate.readData(is);
     }
 }

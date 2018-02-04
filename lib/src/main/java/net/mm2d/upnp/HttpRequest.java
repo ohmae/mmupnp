@@ -7,11 +7,15 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.HttpMessageDelegate.StartLineProcessor;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
@@ -22,26 +26,44 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class HttpRequest extends HttpMessage {
+public class HttpRequest implements HttpMessage {
+    @Nonnull
+    private final HttpMessage mDelegate;
+    @Nullable
+    private InetAddress mAddress;
+
+    private int mPort;
+
     @Nonnull
     private String mMethod = "GET";
     @Nonnull
     private String mUri = "";
 
+    private class Processor implements StartLineProcessor {
+        @Override
+        public void setStartLine(@Nonnull final String line) {
+            HttpRequest.this.setStartLine(line);
+        }
+
+        @Nonnull
+        @Override
+        public String getStartLine() {
+            return HttpRequest.this.getStartLine();
+        }
+    }
+
+    ;
+
     /**
      * インスタンス作成。
      */
     public HttpRequest() {
-        super();
+        mDelegate = new HttpMessageDelegate(new Processor());
     }
 
-    /**
-     * インスタンス作成
-     *
-     * @param socket 受信したsocket
-     */
-    public HttpRequest(@Nonnull final Socket socket) {
-        super(socket);
+    // VisibleForTesting
+    HttpRequest(@Nonnull HttpMessage delegate) {
+        mDelegate = delegate;
     }
 
     /**
@@ -50,14 +72,82 @@ public class HttpRequest extends HttpMessage {
      * @param original コピー元
      */
     public HttpRequest(@Nonnull final HttpRequest original) {
-        super(original);
+        mDelegate = new HttpMessageDelegate(new Processor(), (HttpMessageDelegate) original.mDelegate);
+        mAddress = original.mAddress;
+        mPort = original.mPort;
         mMethod = original.mMethod;
         mUri = original.mUri;
     }
 
+    /**
+     * 宛先アドレス情報を返す。
+     *
+     * @return 宛先アドレス情報。
+     */
+    @Nullable
+    public InetAddress getAddress() {
+        return mAddress;
+    }
+
+    /**
+     * 宛先アドレスを登録する。
+     *
+     * @param address 宛先アドレス。
+     */
+    protected void setAddress(@Nullable final InetAddress address) {
+        mAddress = address;
+    }
+
+    /**
+     * 宛先ポート番号を返す。
+     *
+     * @return 宛先ポート番号
+     */
+    public int getPort() {
+        return mPort;
+    }
+
+    /**
+     * 宛先ポート番号を設定する。
+     *
+     * @param port 宛先ポート番号
+     */
+    protected void setPort(final int port) {
+        mPort = port;
+    }
+
+    /**
+     * アドレスとポート番号の組み合わせ文字列を返す。
+     *
+     * @return アドレスとポート番号の組み合わせ文字列
+     */
+    @Nonnull
+    public String getAddressString() throws IllegalStateException {
+        if (mAddress == null) {
+            throw new IllegalStateException("address must be set");
+        }
+        if (mPort == Http.DEFAULT_PORT || mPort <= 0) {
+            return mAddress.getHostAddress();
+        }
+        return mAddress.getHostAddress() + ":" + String.valueOf(mPort);
+    }
+
+    /**
+     * 宛先SocketAddressを返す
+     *
+     * @return 宛先SocketAddress
+     */
+    @Nonnull
+    public SocketAddress getSocketAddress() throws IllegalStateException {
+        if (mAddress == null) {
+            throw new IllegalStateException("address must be set");
+        }
+        return new InetSocketAddress(mAddress, mPort);
+    }
+
     @Override
-    public void setStartLine(@Nonnull final String line) throws IllegalArgumentException {
-        setRequestLine(line);
+    public HttpRequest setStartLine(@Nonnull final String line) {
+        return setRequestLine(line);
     }
 
     /**
@@ -68,7 +158,7 @@ public class HttpRequest extends HttpMessage {
      * @param line リクエストライン
      * @see #setStartLine(String)
      */
-    public void setRequestLine(@Nonnull final String line) throws IllegalArgumentException {
+    public HttpRequest setRequestLine(@Nonnull final String line) {
         final String[] params = line.split(" ", 3);
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -76,10 +166,11 @@ public class HttpRequest extends HttpMessage {
         setMethod(params[0]);
         setUri(params[1]);
         setVersion(params[2]);
+        return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public String getStartLine() {
         return getMethod() + " " + getUri() + " " + getVersion();
     }
@@ -173,45 +264,114 @@ public class HttpRequest extends HttpMessage {
         return this;
     }
 
+    @Nonnull
+    @Override
+    public String getVersion() {
+        return mDelegate.getVersion();
+    }
+
+    @Nonnull
     @Override
     public HttpRequest setVersion(@Nonnull final String version) {
-        super.setVersion(version);
+        mDelegate.setVersion(version);
         return this;
     }
 
+    @Nonnull
     @Override
     public HttpRequest setHeader(
             @Nonnull final String name,
             @Nonnull final String value) {
-        super.setHeader(name, value);
+        mDelegate.setHeader(name, value);
         return this;
+    }
+
+    @Nonnull
+    @Override
+    public HttpRequest setHeaderLine(@Nonnull final String line) {
+        mDelegate.setHeaderLine(line);
+        return this;
+    }
+
+    @Nullable
+    @Override
+    public String getHeader(@Nonnull final String name) {
+        return mDelegate.getHeader(name);
     }
 
     @Override
+    public boolean isChunked() {
+        return mDelegate.isChunked();
+    }
+
+    @Override
+    public boolean isKeepAlive() {
+        return mDelegate.isKeepAlive();
+    }
+
+    @Override
+    public int getContentLength() {
+        return mDelegate.getContentLength();
+    }
+
+    @Nonnull
+    @Override
     public HttpRequest setBody(@Nullable final String body) {
-        super.setBody(body);
+        mDelegate.setBody(body);
         return this;
     }
 
+    @Nonnull
     @Override
     public HttpRequest setBody(
             @Nullable final String body,
             final boolean withContentLength) {
-        super.setBody(body, withContentLength);
+        mDelegate.setBody(body, withContentLength);
         return this;
     }
 
+    @Nonnull
     @Override
     public HttpRequest setBodyBinary(@Nullable final byte[] body) {
-        super.setBodyBinary(body);
+        mDelegate.setBodyBinary(body);
         return this;
     }
 
+    @Nonnull
     @Override
     public HttpRequest setBodyBinary(
             @Nullable final byte[] body,
             final boolean withContentLength) {
-        super.setBodyBinary(body, withContentLength);
+        mDelegate.setBodyBinary(body, withContentLength);
         return this;
     }
+
+    @Nullable
+    @Override
+    public String getBody() {
+        return mDelegate.getBody();
+    }
+
+    @Nullable
+    @Override
+    public byte[] getBodyBinary() {
+        return mDelegate.getBodyBinary();
+    }
+
+    @Nonnull
+    @Override
+    public String getMessageString() {
+        return mDelegate.getMessageString();
+    }
+
+    @Override
+    public void writeData(@Nonnull final OutputStream os) throws IOException {
+        mDelegate.writeData(os);
+    }
+
+    @Override
+    public void readData(@Nonnull final InputStream is) throws IOException {
+        mDelegate.readData(is);
+    }
 }
+

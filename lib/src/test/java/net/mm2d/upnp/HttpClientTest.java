@@ -30,9 +30,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-/**
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
- */
 @RunWith(JUnit4.class)
 public class HttpClientTest {
     @Test
@@ -46,7 +43,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setStatusLine("HTTP/1.1 200 OK");
@@ -88,7 +85,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setStatusLine("HTTP/1.1 200 OK");
@@ -130,7 +127,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setStatusLine("HTTP/1.1 200 OK");
@@ -173,7 +170,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setStatusLine("HTTP/1.1 200 OK");
@@ -210,7 +207,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setHeader(Http.CONNECTION, Http.CLOSE);
@@ -246,7 +243,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setHeader(Http.CONNECTION, Http.CLOSE);
@@ -287,7 +284,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setHeader(Http.CONNECTION, Http.CLOSE);
@@ -330,7 +327,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 return false;
             }
@@ -361,7 +358,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest(socket);
+                final HttpRequest request = new HttpRequest();
                 request.readData(is);
                 return false;
             }
