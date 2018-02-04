@@ -72,7 +72,7 @@ public class HttpRequest implements HttpMessage {
      * @param original コピー元
      */
     public HttpRequest(@Nonnull final HttpRequest original) {
-        mDelegate = new HttpMessageDelegate(new Processor(), (HttpMessageDelegate) original.mDelegate);
+        mDelegate = new HttpMessageDelegate(new Processor(), original.mDelegate);
         mAddress = original.mAddress;
         mPort = original.mPort;
         mMethod = original.mMethod;
@@ -145,6 +145,7 @@ public class HttpRequest implements HttpMessage {
         return new InetSocketAddress(mAddress, mPort);
     }
 
+    @Nonnull
     @Override
     public HttpRequest setStartLine(@Nonnull final String line) {
         return setRequestLine(line);

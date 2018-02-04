@@ -66,6 +66,7 @@ public class HttpResponse implements HttpMessage {
         mReasonPhrase = original.mReasonPhrase;
     }
 
+    @Nonnull
     @Override
     public HttpResponse setStartLine(@Nonnull final String line) {
         return setStatusLine(line);
