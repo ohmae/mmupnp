@@ -171,7 +171,8 @@ class SsdpServerDelegate implements SsdpServer {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.writeData(baos);
-            send(baos.toByteArray());
+            final byte[] data = baos.toByteArray();
+            mSocket.send(new DatagramPacket(data, data.length, SSDP_SO_ADDR));
         } catch (final IOException e) {
             Log.w(e);
         }
@@ -204,15 +205,6 @@ class SsdpServerDelegate implements SsdpServer {
         } catch (MalformedURLException | UnknownHostException ignored) {
         }
         return false;
-    }
-
-    /**
-     * このソケットを使用してメッセージ送信を行う。
-     *
-     * @param message 送信するメッセージ
-     */
-    private void send(@Nonnull final byte[] message) throws IOException {
-        mSocket.send(new DatagramPacket(message, message.length, SSDP_SO_ADDR));
     }
 
     // VisibleForTesting
