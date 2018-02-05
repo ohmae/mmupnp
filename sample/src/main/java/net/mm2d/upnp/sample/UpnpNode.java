@@ -7,7 +7,8 @@
 
 package net.mm2d.upnp.sample;
 
-import net.mm2d.util.Log;
+
+import net.mm2d.log.Log;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -34,8 +35,6 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
 public class UpnpNode extends DefaultMutableTreeNode {
-    private static final String TAG = "UpnpNode";
-
     public UpnpNode() {
         super();
     }
@@ -69,7 +68,7 @@ public class UpnpNode extends DefaultMutableTreeNode {
             return sw.toString();
         } catch (IllegalArgumentException | ParserConfigurationException | SAXException
                 | IOException | TransformerFactoryConfigurationError | TransformerException e) {
-            Log.w(TAG, e);
+            Log.w(e);
         }
         return "";
     }

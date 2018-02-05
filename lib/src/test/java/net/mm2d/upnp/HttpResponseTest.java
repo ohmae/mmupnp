@@ -16,15 +16,12 @@ import org.junit.runners.JUnit4;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class HttpResponseTest {
@@ -50,6 +47,24 @@ public class HttpResponseTest {
     }
 
     @Test
+    public void HttpRequest_ディープコピーができる() throws IOException {
+        final HttpResponse response1 = new HttpResponse();
+        response1.readData(TestUtils.getResourceAsStream("cds-length.bin"));
+
+        final HttpResponse response2 = new HttpResponse(response1);
+
+        assertThat(response1.getStartLine(), is(response2.getStartLine()));
+        assertThat(response1.getStatus(), is(response2.getStatus()));
+        assertThat(response1.getHeader(Http.DATE), is(response2.getHeader(Http.DATE)));
+        assertThat(response1.getBody(), is(response2.getBody()));
+        assertThat(response1.getBodyBinary(), is(response2.getBodyBinary()));
+
+        response1.getBodyBinary()[0] = 0;
+
+        assertThat(response1.getBodyBinary(), is(not(response2.getBodyBinary())));
+    }
+
+    @Test
     public void readData_Chunk読み出しができること() throws IOException {
         final HttpResponse response = new HttpResponse();
         response.readData(TestUtils.getResourceAsStream("cds-chunked.bin"));
@@ -61,14 +76,67 @@ public class HttpResponseTest {
     }
 
     @Test
+    public void readData_Chunk読み出しができること2() throws IOException {
+        final HttpResponse response = new HttpResponse();
+        response.readData(TestUtils.getResourceAsStream("cds-chunked-large.bin"));
+
+        assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
+        assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
+        assertThat(Http.parseDate(response.getHeader(Http.DATE)), is(DATE));
+        assertThat(response.getBody(), is(TestUtils.getResourceAsString("cds.xml")));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_読み出せない場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("\n".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_status_line異常の場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_size異常の場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\n  ".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_chunk_sizeなしの場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\r\n".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_chunk_sizeが16進数でない場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\ngg\r\n".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_chunk_sizeよりデータが少ない場合IOException() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n10\r\n  \r\n".getBytes()));
+    }
+
+    @Test(expected = IOException.class)
+    public void readData_最後が0で終わっていない場合IOException2() throws Exception {
+        final HttpResponse response = new HttpResponse();
+        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n2\r\n  \r\n".getBytes()));
+    }
+
+    @Test
     public void writeData_書き出しができること() throws IOException {
         final String data = TestUtils.getResourceAsString("cds.xml");
-        final HttpResponse response = new HttpResponse();
-        response.setStatus(Http.Status.HTTP_OK);
-        response.setHeader(Http.SERVER, Property.SERVER_VALUE);
-        response.setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()));
-        response.setHeader(Http.CONNECTION, Http.CLOSE);
-        response.setBody(data, true);
+        final HttpResponse response = new HttpResponse()
+                .setStatus(Http.Status.HTTP_OK)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setBody(data, true);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         response.writeData(baos);
@@ -84,13 +152,13 @@ public class HttpResponseTest {
     @Test
     public void writeData_Chunk書き出しができること() throws IOException {
         final String data = TestUtils.getResourceAsString("cds.xml");
-        final HttpResponse response = new HttpResponse();
-        response.setStatus(Http.Status.HTTP_OK);
-        response.setHeader(Http.SERVER, Property.SERVER_VALUE);
-        response.setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()));
-        response.setHeader(Http.CONNECTION, Http.CLOSE);
-        response.setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED);
-        response.setBody(data, false);
+        final HttpResponse response = new HttpResponse()
+                .setStatus(Http.Status.HTTP_OK)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED)
+                .setBody(data, false);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         response.writeData(baos);
@@ -115,15 +183,33 @@ public class HttpResponseTest {
     }
 
     @Test
-    public void HttpResponse_Socketの情報が反映される() throws IOException {
-        final InetAddress address = InetAddress.getByName("192.0.2.2");
-        final int port = 12345;
-        final Socket socket = mock(Socket.class);
-        doReturn(address).when(socket).getInetAddress();
-        doReturn(port).when(socket).getPort();
-        final HttpResponse response = new HttpResponse(socket);
+    public void setStatusLine_version_status_phraseに反映される2() {
+        final HttpResponse response = new HttpResponse();
+        response.setStatusLine("HTTP/1.1 404 Not Found");
 
-        assertThat(response.getAddress(), is(address));
-        assertThat(response.getPort(), is(port));
+        assertThat(response.getVersion(), is(Http.HTTP_1_1));
+        assertThat(response.getStatusCode(), is(404));
+        assertThat(response.getReasonPhrase(), is("Not Found"));
+        assertThat(response.getStatus(), is(Http.Status.HTTP_NOT_FOUND));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setStatusLine_不足がある場合Exception() {
+        final HttpResponse response = new HttpResponse();
+        response.setStatusLine("HTTP/1.1 404");
+    }
+
+    @Test
+    public void setStatusCode_正常系() {
+        final HttpResponse response = new HttpResponse();
+        response.setStatusCode(200);
+
+        assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setStatusCode_不正なステータスコードはException() {
+        final HttpResponse response = new HttpResponse();
+        response.setStatusCode(0);
     }
 }

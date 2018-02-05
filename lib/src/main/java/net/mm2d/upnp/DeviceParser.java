@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -47,7 +48,11 @@ public class DeviceParser {
             @Nonnull final HttpClient client,
             @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
-        parseDescription(builder, client.downloadString(new URL(builder.getLocation())));
+        final String description = client.downloadString(new URL(builder.getLocation()));
+        if (TextUtils.isEmpty(description)) {
+            throw new IOException("download error");
+        }
+        parseDescription(builder, description);
         loadServices(client, builder);
     }
 
@@ -63,7 +68,8 @@ public class DeviceParser {
         }
     }
 
-    private static void parseDescription(
+    // VisibleForTesting
+    static void parseDescription(
             @Nonnull final Device.Builder builder,
             @Nonnull final String description)
             throws IOException, SAXException, ParserConfigurationException {
@@ -71,9 +77,17 @@ public class DeviceParser {
         final Document doc = XmlUtils.newDocument(true, description);
         final Node deviceNode = XmlUtils.findChildElementByLocalName(doc.getDocumentElement(), "device");
         if (deviceNode == null) {
-            throw new IllegalStateException();
+            throw new IOException();
         }
         parseDevice(builder, deviceNode);
+    }
+
+    @Nullable
+    private static String getTagName(@Nonnull final Node node) {
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
+            return null;
+        }
+        return node.getLocalName();
     }
 
     private static void parseDevice(
@@ -81,30 +95,21 @@ public class DeviceParser {
             @Nonnull final Node deviceNode) {
         Node node = deviceNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
+            final String tag = getTagName(node);
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
-            switch (tag) {
-                case "iconList":
-                    parseIconList(builder, node);
-                    break;
-                case "serviceList":
-                    parseServiceList(builder, node);
-                    break;
-                case "deviceList":
-                    parseDeviceList(builder, node);
-                    break;
-                default:
-                    String namespace = node.getNamespaceURI();
-                    namespace = namespace == null ? "" : namespace;
-                    final String value = node.getTextContent();
-                    builder.putTag(namespace, tag, value);
-                    setField(builder, tag, value);
-                    break;
+            if ("iconList".equals(tag)) {
+                parseIconList(builder, node);
+            } else if ("serviceList".equals(tag)) {
+                parseServiceList(builder, node);
+            } else if ("deviceList".equals(tag)) {
+                parseDeviceList(builder, node);
+            } else {
+                final String namespace = node.getNamespaceURI();
+                final String value = node.getTextContent();
+                builder.putTag(namespace, tag, value);
+                setField(builder, tag, value);
             }
         }
     }
@@ -113,48 +118,32 @@ public class DeviceParser {
             @Nonnull final Device.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
-        switch (tag) {
-            case "UDN":
-                builder.setUdn(value);
-                break;
-            case "UPC":
-                builder.setUpc(value);
-                break;
-            case "deviceType":
-                builder.setDeviceType(value);
-                break;
-            case "friendlyName":
-                builder.setFriendlyName(value);
-                break;
-            case "manufacturer":
-                builder.setManufacture(value);
-                break;
-            case "manufacturerURL":
-                builder.setManufactureUrl(value);
-                break;
-            case "modelName":
-                builder.setModelName(value);
-                break;
-            case "modelURL":
-                builder.setModelUrl(value);
-                break;
-            case "modelDescription":
-                builder.setModelDescription(value);
-                break;
-            case "modelNumber":
-                builder.setModelNumber(value);
-                break;
-            case "serialNumber":
-                builder.setSerialNumber(value);
-                break;
-            case "presentationURL":
-                builder.setPresentationUrl(value);
-                break;
-            case "URLBase":
-                builder.setUrlBase(value);
-                break;
-            default:
-                break;
+        if ("UDN".equals(tag)) {
+            builder.setUdn(value);
+        } else if ("UPC".equals(tag)) {
+            builder.setUpc(value);
+        } else if ("deviceType".equals(tag)) {
+            builder.setDeviceType(value);
+        } else if ("friendlyName".equals(tag)) {
+            builder.setFriendlyName(value);
+        } else if ("manufacturer".equals(tag)) {
+            builder.setManufacture(value);
+        } else if ("manufacturerURL".equals(tag)) {
+            builder.setManufactureUrl(value);
+        } else if ("modelName".equals(tag)) {
+            builder.setModelName(value);
+        } else if ("modelURL".equals(tag)) {
+            builder.setModelUrl(value);
+        } else if ("modelDescription".equals(tag)) {
+            builder.setModelDescription(value);
+        } else if ("modelNumber".equals(tag)) {
+            builder.setModelNumber(value);
+        } else if ("serialNumber".equals(tag)) {
+            builder.setSerialNumber(value);
+        } else if ("presentationURL".equals(tag)) {
+            builder.setPresentationUrl(value);
+        } else if ("URLBase".equals(tag)) {
+            builder.setUrlBase(value);
         }
     }
 
@@ -163,10 +152,7 @@ public class DeviceParser {
             @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (TextUtils.equals(node.getLocalName(), "icon")) {
+            if (TextUtils.equals(getTagName(node), "icon")) {
                 builder.addIconBuilder(parseIcon(node));
             }
         }
@@ -176,10 +162,7 @@ public class DeviceParser {
         final Icon.Builder builder = new Icon.Builder();
         Node node = iconNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
+            final String tag = getTagName(node);
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
@@ -193,24 +176,16 @@ public class DeviceParser {
             @Nonnull final Icon.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
-        switch (tag) {
-            case "mimetype":
-                builder.setMimeType(value);
-                break;
-            case "height":
-                builder.setHeight(value);
-                break;
-            case "width":
-                builder.setWidth(value);
-                break;
-            case "depth":
-                builder.setDepth(value);
-                break;
-            case "url":
-                builder.setUrl(value);
-                break;
-            default:
-                break;
+        if ("mimetype".equals(tag)) {
+            builder.setMimeType(value);
+        } else if ("height".equals(tag)) {
+            builder.setHeight(value);
+        } else if ("width".equals(tag)) {
+            builder.setWidth(value);
+        } else if ("depth".equals(tag)) {
+            builder.setDepth(value);
+        } else if ("url".equals(tag)) {
+            builder.setUrl(value);
         }
     }
 
@@ -219,10 +194,7 @@ public class DeviceParser {
             @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (TextUtils.equals(node.getLocalName(), "service")) {
+            if (TextUtils.equals(getTagName(node), "service")) {
                 builder.addServiceBuilder(parseService(node));
             }
         }
@@ -233,10 +205,7 @@ public class DeviceParser {
         final Service.Builder builder = new Service.Builder();
         Node node = serviceNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String tag = node.getLocalName();
+            final String tag = getTagName(node);
             if (TextUtils.isEmpty(tag)) {
                 continue;
             }
@@ -250,24 +219,16 @@ public class DeviceParser {
             @Nonnull final Service.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
-        switch (tag) {
-            case "serviceType":
-                builder.setServiceType(value);
-                break;
-            case "serviceId":
-                builder.setServiceId(value);
-                break;
-            case "SCPDURL":
-                builder.setScpdUrl(value);
-                break;
-            case "eventSubURL":
-                builder.setEventSubUrl(value);
-                break;
-            case "controlURL":
-                builder.setControlUrl(value);
-                break;
-            default:
-                break;
+        if ("serviceType".equals(tag)) {
+            builder.setServiceType(value);
+        } else if ("serviceId".equals(tag)) {
+            builder.setServiceId(value);
+        } else if ("SCPDURL".equals(tag)) {
+            builder.setScpdUrl(value);
+        } else if ("eventSubURL".equals(tag)) {
+            builder.setEventSubUrl(value);
+        } else if ("controlURL".equals(tag)) {
+            builder.setControlUrl(value);
         }
     }
 
@@ -277,15 +238,17 @@ public class DeviceParser {
         final List<Device.Builder> builderList = new ArrayList<>();
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (TextUtils.equals(node.getLocalName(), "device")) {
+            if (TextUtils.equals(getTagName(node), "device")) {
                 final Device.Builder embeddedBuilder = builder.createEmbeddedDeviceBuilder();
                 parseDevice(embeddedBuilder, node);
                 builderList.add(embeddedBuilder);
             }
         }
         builder.setEmbeddedDeviceBuilderList(builderList);
+    }
+
+    // インスタンス化禁止
+    private DeviceParser() {
+        throw new AssertionError();
     }
 }

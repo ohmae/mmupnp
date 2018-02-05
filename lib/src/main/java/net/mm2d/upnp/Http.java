@@ -205,13 +205,6 @@ public final class Http {
     }
 
     /**
-     * インスタンス化禁止
-     */
-    private Http() {
-        throw new AssertionError();
-    }
-
-    /**
      * Dateヘッダのパースを行う。
      *
      * @param string Dateヘッダ
@@ -265,7 +258,7 @@ public final class Http {
      * @return RFC1123形式の日付文字列
      */
     @Nonnull
-    public static synchronized String getCurrentData() {
+    public static synchronized String getCurrentDate() {
         return formatDate(System.currentTimeMillis());
     }
 
@@ -332,5 +325,12 @@ public final class Http {
             return baseUrl.substring(0, pos + 1) + path;
         }
         return baseUrl + "/" + path;
+    }
+
+    /**
+     * インスタンス化禁止
+     */
+    private Http() {
+        throw new AssertionError();
     }
 }

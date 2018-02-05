@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
+import net.mm2d.log.Log;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
@@ -188,9 +188,6 @@ public class Service {
             if (mEventSubUrl == null) {
                 throw new IllegalStateException("eventSubURL must be set.");
             }
-            if (mDescription == null) {
-                throw new IllegalStateException("description must be set.");
-            }
             return new Service(this);
         }
     }
@@ -225,8 +222,6 @@ public class Service {
     private long mSubscriptionExpiryTime;
     @Nullable
     private String mSubscriptionId;
-    @Nonnull
-    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     private Service(@Nonnull final Builder builder) {
         mDevice = builder.mDevice;
@@ -236,7 +231,7 @@ public class Service {
         mScpdUrl = builder.mScpdUrl;
         mControlUrl = builder.mControlUrl;
         mEventSubUrl = builder.mEventSubUrl;
-        mDescription = builder.mDescription;
+        mDescription = builder.mDescription != null ? builder.mDescription : "";
         mStateVariableMap = buildStateVariableMap(this, builder.mVariableBuilderList);
         mActionMap = buildActionMap(this, mStateVariableMap, builder.mActionBuilderList);
     }
@@ -477,8 +472,9 @@ public class Service {
         return mStateVariableMap.get(name);
     }
 
+    // VisibleForTesting
     @Nonnull
-    private String getCallback() {
+    String getCallback() {
         final StringBuilder sb = new StringBuilder();
         sb.append("<http://");
         final SsdpMessage ssdp = mDevice.getSsdpMessage();
@@ -494,7 +490,8 @@ public class Service {
         return sb.toString();
     }
 
-    private static long parseTimeout(@Nonnull final HttpResponse response) {
+    // VisibleForTesting
+    static long parseTimeout(@Nonnull final HttpResponse response) {
         final String timeout = TextUtils.toLowerCase(response.getHeader(Http.TIMEOUT));
         if (TextUtils.isEmpty(timeout) || timeout.contains("infinite")) {
             // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。
@@ -516,13 +513,9 @@ public class Service {
     }
 
     // VisibleForTesting
-    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
-        mHttpClientFactory = factory;
-    }
-
     @Nonnull
-    private HttpClient createHttpClient() {
-        return mHttpClientFactory.createHttpClient(false);
+    HttpClient createHttpClient() {
+        return new HttpClient(false);
     }
 
     /**
@@ -543,9 +536,6 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean subscribe(final boolean keepRenew) throws IOException {
-        if (TextUtils.isEmpty(mEventSubUrl)) {
-            return false;
-        }
         if (!TextUtils.isEmpty(mSubscriptionId)) {
             if (renewSubscribeInner()) {
                 mControlPoint.registerSubscribeService(this, keepRenew);
@@ -556,7 +546,8 @@ public class Service {
         return subscribeInner(keepRenew);
     }
 
-    private boolean subscribeInner(final boolean keepRenew) throws IOException {
+    // VisibleForTesting
+    boolean subscribeInner(final boolean keepRenew) throws IOException {
         final HttpClient client = createHttpClient();
         final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
@@ -571,10 +562,11 @@ public class Service {
         return false;
     }
 
-    private boolean parseSubscribeResponse(@Nonnull final HttpResponse response) {
+    // VisibleForTesting
+    boolean parseSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
-        if (TextUtils.isEmpty(sid) || timeout == 0) {
+        if (TextUtils.isEmpty(sid) || timeout <= 0) {
             Log.w("subscribe response:" + response.toString());
             return false;
         }
@@ -587,14 +579,13 @@ public class Service {
 
     @Nonnull
     private HttpRequest makeSubscribeRequest() throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.SUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.NT, Http.UPNP_EVENT);
-        request.setHeader(Http.CALLBACK, getCallback());
-        request.setHeader(Http.TIMEOUT, "Second-300");
-        request.setHeader(Http.CONTENT_LENGTH, "0");
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.SUBSCRIBE)
+                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setHeader(Http.NT, Http.UPNP_EVENT)
+                .setHeader(Http.CALLBACK, getCallback())
+                .setHeader(Http.TIMEOUT, "Second-300")
+                .setHeader(Http.CONTENT_LENGTH, "0");
     }
 
     /**
@@ -604,16 +595,14 @@ public class Service {
      * @throws IOException 通信エラー
      */
     boolean renewSubscribe() throws IOException {
-        if (TextUtils.isEmpty(mEventSubUrl)) {
-            return false;
-        }
         if (TextUtils.isEmpty(mSubscriptionId)) {
             return subscribeInner(false);
         }
         return renewSubscribeInner();
     }
 
-    private boolean renewSubscribeInner() throws IOException {
+    // VisibleForTesting
+    boolean renewSubscribeInner() throws IOException {
         final HttpClient client = createHttpClient();
         //noinspection ConstantConditions
         final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
@@ -625,10 +614,11 @@ public class Service {
         return parseRenewSubscribeResponse(response);
     }
 
-    private boolean parseRenewSubscribeResponse(@Nonnull final HttpResponse response) {
+    // VisibleForTesting
+    boolean parseRenewSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
-        if (!TextUtils.equals(sid, mSubscriptionId) || timeout == 0) {
+        if (!TextUtils.equals(sid, mSubscriptionId) || timeout <= 0) {
             Log.w("renewSubscribe response:" + response.toString());
             return false;
         }
@@ -640,13 +630,12 @@ public class Service {
 
     @Nonnull
     private HttpRequest makeRenewSubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.SUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, subscriptionId);
-        request.setHeader(Http.TIMEOUT, "Second-300");
-        request.setHeader(Http.CONTENT_LENGTH, "0");
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.SUBSCRIBE)
+                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setHeader(Http.SID, subscriptionId)
+                .setHeader(Http.TIMEOUT, "Second-300")
+                .setHeader(Http.CONTENT_LENGTH, "0");
     }
 
     /**
@@ -656,7 +645,7 @@ public class Service {
      * @throws IOException 通信エラー
      */
     public boolean unsubscribe() throws IOException {
-        if (TextUtils.isEmpty(mEventSubUrl) || TextUtils.isEmpty(mSubscriptionId)) {
+        if (TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
         final HttpClient client = createHttpClient();
@@ -675,12 +664,11 @@ public class Service {
     }
 
     private HttpRequest makeUnsubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.UNSUBSCRIBE);
-        request.setUrl(getAbsoluteUrl(mEventSubUrl), true);
-        request.setHeader(Http.SID, subscriptionId);
-        request.setHeader(Http.CONTENT_LENGTH, "0");
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.UNSUBSCRIBE)
+                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setHeader(Http.SID, subscriptionId)
+                .setHeader(Http.CONTENT_LENGTH, "0");
     }
 
     /**
@@ -737,6 +725,9 @@ public class Service {
 
     @Override
     public boolean equals(final Object obj) {
+        if (obj == this) {
+            return true;
+        }
         if (obj == null || !(obj instanceof Service)) {
             return false;
         }

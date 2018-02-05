@@ -86,6 +86,16 @@ public class SubscribeHolderTest {
     }
 
     @Test
+    public void getServiceList_subscriptionIdがnullだとaddできない() {
+        final Service service1 = mock(Service.class);
+        doReturn(Long.MAX_VALUE).when(service1).getSubscriptionExpiryTime();
+        final SubscribeHolder subscribeHolder = new SubscribeHolder();
+        subscribeHolder.add(service1, false);
+
+        assertThat(subscribeHolder.getServiceList(), not(hasItem(service1)));
+    }
+
+    @Test
     public void clear_すべて取得できなくなる() {
         final String id1 = "id1";
         final Service service1 = mock(Service.class);
@@ -145,21 +155,29 @@ public class SubscribeHolderTest {
     @Test(timeout = 10000L)
     public void renew_定期的にrenewが実行される() throws Exception {
         final long now = System.currentTimeMillis();
-        final String id = "id";
-        final Service service = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service).getSubscriptionExpiryTime();
-        doReturn(now).when(service).getSubscriptionStart();
-        doReturn(1000L).when(service).getSubscriptionTimeout();
-        doReturn(true).when(service).renewSubscribe();
-        doReturn(id).when(service).getSubscriptionId();
+        final Service service1 = mock(Service.class);
+        doReturn(Long.MAX_VALUE).when(service1).getSubscriptionExpiryTime();
+        doReturn(now).when(service1).getSubscriptionStart();
+        doReturn(1000L).when(service1).getSubscriptionTimeout();
+        doReturn(true).when(service1).renewSubscribe();
+        doReturn("id1").when(service1).getSubscriptionId();
+
+        final Service service2 = mock(Service.class);
+        doReturn(Long.MAX_VALUE).when(service2).getSubscriptionExpiryTime();
+        doReturn(now).when(service2).getSubscriptionStart();
+        doReturn(500L).when(service2).getSubscriptionTimeout();
+        doReturn(true).when(service2).renewSubscribe();
+        doReturn("id2").when(service2).getSubscriptionId();
+
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
         subscribeHolder.start();
 
-        subscribeHolder.add(service, true);
-        verify(service, never()).renewSubscribe();
+        subscribeHolder.add(service1, true);
+        subscribeHolder.add(service2, true);
+        verify(service1, never()).renewSubscribe();
 
         Thread.sleep(2000L);
-        verify(service, atLeastOnce()).renewSubscribe();
+        verify(service1, atLeastOnce()).renewSubscribe();
 
         subscribeHolder.shutdownRequest();
     }

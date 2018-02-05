@@ -7,13 +7,14 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
+import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatchers;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -27,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+import javax.xml.transform.TransformerException;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -51,7 +52,7 @@ public class ActionInvokeTest {
     private HttpResponse mHttpResponse;
     private URL mUrl;
     private Action mAction;
-    private MockHttpClientFactory mMockFactory;
+    private MockHttpClient mMockHttpClient;
 
     @Before
     public void setUp() throws Exception {
@@ -60,7 +61,7 @@ public class ActionInvokeTest {
         when(service.getServiceType()).thenReturn(SERVICE_TYPE);
         when(service.getControlUrl()).thenReturn("");
         when(service.getAbsoluteUrl(anyString())).thenReturn(mUrl);
-        mAction = new Action.Builder()
+        mAction = spy(new Action.Builder()
                 .setService(service)
                 .setName(ACTION_NAME)
                 .addArgumentBuilder(new Argument.Builder()
@@ -94,38 +95,35 @@ public class ActionInvokeTest {
                                         .setDataType("string")
                                         .setName("3")
                                         .build()))
-                .build();
-        mMockFactory = new MockHttpClientFactory();
+                .build());
+        mMockHttpClient = new MockHttpClient();
         mHttpResponse = new HttpResponse();
         mHttpResponse.setStatus(Http.Status.HTTP_OK);
         mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
-                + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" + "<s:Body>"
-                + "<u:" + ACTION_NAME + "Response xmlns:u=\"" + SERVICE_TYPE + "\">"
-                + "<" + OUT_ARG_NAME1 + ">" + OUT_ARG_VALUE1 + "</" + OUT_ARG_NAME1 + ">"
-                + "</u:" + ACTION_NAME + "Response>" + "</s:Body>" + "</s:Envelope>");
-        mAction.setHttpClientFactory(mMockFactory);
+                + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+                + "<s:Body>\n"
+                + "<u:" + ACTION_NAME + "Response xmlns:u=\"" + SERVICE_TYPE + "\">\n"
+                + "<" + OUT_ARG_NAME1 + ">" + OUT_ARG_VALUE1 + "</" + OUT_ARG_NAME1 + ">\n"
+                + "</u:" + ACTION_NAME + "Response>\n"
+                + "</s:Body>\n"
+                + "</s:Envelope>");
+        doReturn(mMockHttpClient).when(mAction).createHttpClient();
     }
 
     @Test(expected = IOException.class)
     public void invoke_postでIOExceptionが発生() throws Exception {
         final HttpClient client = mock(HttpClient.class);
         when(client.post((HttpRequest) any())).thenThrow(IOException.class);
-        mAction.setHttpClientFactory(new HttpClientFactory() {
-            @Override
-            @Nonnull
-            public HttpClient createHttpClient(final boolean keepAlive) {
-                return client;
-            }
-        });
+        doReturn(client).when(mAction).createHttpClient();
         mAction.invoke(new HashMap<String, String>());
     }
 
     @Test
     public void invoke_リクエストヘッダの確認() throws Exception {
-        mMockFactory.setResponse(mHttpResponse);
+        mMockHttpClient.setResponse(mHttpResponse);
         mAction.invoke(new HashMap<String, String>());
 
-        final HttpRequest request = mMockFactory.getHttpRequest();
+        final HttpRequest request = mMockHttpClient.getHttpRequest();
         assertThat(request.getMethod(), is("POST"));
         assertThat(request.getUri(), is(mUrl.getPath()));
         assertThat(request.getVersion(), is("HTTP/1.1"));
@@ -148,9 +146,9 @@ public class ActionInvokeTest {
 
     @Test
     public void invoke_リクエストSOAPフォーマットの確認() throws Exception {
-        mMockFactory.setResponse(mHttpResponse);
+        mMockHttpClient.setResponse(mHttpResponse);
         mAction.invoke(new HashMap<String, String>());
-        final HttpRequest request = mMockFactory.getHttpRequest();
+        final HttpRequest request = mMockHttpClient.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
         final Element envelope = doc.getDocumentElement();
@@ -172,9 +170,9 @@ public class ActionInvokeTest {
 
     @Test
     public void invoke_リクエストSOAPの引数確認_指定なしでの実行() throws Exception {
-        mMockFactory.setResponse(mHttpResponse);
+        mMockHttpClient.setResponse(mHttpResponse);
         mAction.invoke(new HashMap<String, String>());
-        final HttpRequest request = mMockFactory.getHttpRequest();
+        final HttpRequest request = mMockHttpClient.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
         final Element envelope = doc.getDocumentElement();
@@ -194,13 +192,13 @@ public class ActionInvokeTest {
     public void invoke_リクエストSOAPの引数確認_指定ありでの実行() throws Exception {
         final String value1 = "value1";
         final String value2 = "value2";
-        mMockFactory.setResponse(mHttpResponse);
+        mMockHttpClient.setResponse(mHttpResponse);
         final Map<String, String> arg = new HashMap<>();
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
         mAction.invoke(arg);
-        final HttpRequest request = mMockFactory.getHttpRequest();
+        final HttpRequest request = mMockHttpClient.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
         final Element envelope = doc.getDocumentElement();
@@ -222,13 +220,13 @@ public class ActionInvokeTest {
         final String value2 = "value2";
         final String name = "name";
         final String value = "value";
-        mMockFactory.setResponse(mHttpResponse);
+        mMockHttpClient.setResponse(mHttpResponse);
         final Map<String, String> arg = new HashMap<>();
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
         mAction.invoke(arg, null, Collections.singletonMap(name, value));
-        final HttpRequest request = mMockFactory.getHttpRequest();
+        final HttpRequest request = mMockHttpClient.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
         final Element envelope = doc.getDocumentElement();
@@ -255,7 +253,7 @@ public class ActionInvokeTest {
         final String urn = "urn:schemas-custom-com:custom";
         final String name = "name";
         final String value = "value";
-        mMockFactory.setResponse(mHttpResponse);
+        mMockHttpClient.setResponse(mHttpResponse);
         final Map<String, String> arg = new HashMap<>();
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
@@ -263,7 +261,7 @@ public class ActionInvokeTest {
         mAction.invoke(arg,
                 Collections.singletonMap(prefix, urn),
                 Collections.singletonMap(prefix + ":" + name, value));
-        final HttpRequest request = mMockFactory.getHttpRequest();
+        final HttpRequest request = mMockHttpClient.getHttpRequest();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
         final Element envelope = doc.getDocumentElement();
@@ -285,20 +283,41 @@ public class ActionInvokeTest {
 
     @Test(expected = IOException.class)
     public void invoke_200以外のレスポンスでIOExceptionが発生() throws Exception {
-        Log.setLogLevel(Log.ASSERT);
         for (final Http.Status status : Http.Status.values()) {
             if (status == Http.Status.HTTP_OK) {
                 continue;
             }
             mHttpResponse.setStatus(status);
-            mMockFactory.setResponse(mHttpResponse);
+            mMockHttpClient.setResponse(mHttpResponse);
             mAction.invoke(new HashMap<String, String>());
         }
     }
 
+    @Test(expected = IOException.class)
+    public void invoke_BodyタグがないとIOExceptionが発生() throws Exception {
+        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
+                + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+                + "</s:Envelope>");
+        mMockHttpClient.setResponse(mHttpResponse);
+
+        mAction.invoke(Collections.<String, String>emptyMap(), false);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_ActionタグがないとIOExceptionが発生() throws Exception {
+        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
+                + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+                + "<s:Body>\n"
+                + "</s:Body>\n"
+                + "</s:Envelope>");
+        mMockHttpClient.setResponse(mHttpResponse);
+
+        mAction.invoke(Collections.<String, String>emptyMap(), false);
+    }
+
     @Test
     public void invoke_実行結果をパースしMapとして戻ること() throws Exception {
-        mMockFactory.setResponse(mHttpResponse);
+        mMockHttpClient.setResponse(mHttpResponse);
         final Map<String, String> result = mAction.invoke(new HashMap<String, String>());
         assertThat(result.get(OUT_ARG_NAME1), is(OUT_ARG_VALUE1));
     }
@@ -306,27 +325,111 @@ public class ActionInvokeTest {
     @Test
     public void invoke_argumentListにない結果が含まれていても結果に含まれる() throws Exception {
         mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
-                + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" + "<s:Body>"
-                + "<u:" + ACTION_NAME + "Response xmlns:u=\"" + SERVICE_TYPE + "\">"
-                + "<" + OUT_ARG_NAME1 + ">" + OUT_ARG_VALUE1 + "</" + OUT_ARG_NAME1 + ">"
-                + "<" + OUT_ARG_NAME2 + ">" + OUT_ARG_VALUE2 + "</" + OUT_ARG_NAME2 + ">"
-                + "</u:" + ACTION_NAME + "Response>" + "</s:Body>" + "</s:Envelope>");
-        mMockFactory.setResponse(mHttpResponse);
+                + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
+                + "<s:Body>\n"
+                + "<u:" + ACTION_NAME + "Response xmlns:u=\"" + SERVICE_TYPE + "\">\n"
+                + "<" + OUT_ARG_NAME1 + ">" + OUT_ARG_VALUE1 + "</" + OUT_ARG_NAME1 + ">\n"
+                + "<" + OUT_ARG_NAME2 + ">" + OUT_ARG_VALUE2 + "</" + OUT_ARG_NAME2 + ">\n"
+                + "</u:" + ACTION_NAME + "Response>\n"
+                + "</s:Body>\n"
+                + "</s:Envelope>");
+        mMockHttpClient.setResponse(mHttpResponse);
         final Map<String, String> result = mAction.invoke(Collections.<String, String>emptyMap());
         assertThat(result.get(OUT_ARG_NAME1), is(OUT_ARG_VALUE1));
         assertThat(result.containsKey(OUT_ARG_NAME2), is(true));
     }
 
+    private static final String ERROR_RESPONSE =
+            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+                    + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+                    + "<s:Body>\n"
+                    + "<s:Fault>\n"
+                    + "<faultcode>s:Client</faultcode>\n"
+                    + "<faultstring>UPnPError</faultstring>\n"
+                    + "<detail>\n"
+                    + "<UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\">\n"
+                    + "<errorCode>711</errorCode>\n"
+                    + "<errorDescription>Restricted object</errorDescription>\n"
+                    + "</UPnPError>\n"
+                    + "</detail>\n"
+                    + "</s:Fault>\n"
+                    + "</s:Body>\n"
+                    + "</s:Envelope>";
+
+    @Test(expected = IOException.class)
+    public void invoke_エラーレスポンスのときIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody(ERROR_RESPONSE);
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), false);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_エラーレスポンスにerrorCodeがないとIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+                + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+                + "<s:Body>\n"
+                + "<s:Fault>\n"
+                + "<faultcode>s:Client</faultcode>\n"
+                + "<faultstring>UPnPError</faultstring>\n"
+                + "<detail>\n"
+                + "<UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\">\n"
+                + "<errorDescription>Restricted object</errorDescription>\n"
+                + "</UPnPError>\n"
+                + "</detail>\n"
+                + "</s:Fault>\n"
+                + "</s:Body>\n"
+                + "</s:Envelope>");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_エラーレスポンスにUPnPErrorがないとIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+                + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+                + "<s:Body>\n"
+                + "<s:Fault>\n"
+                + "<faultcode>s:Client</faultcode>\n"
+                + "<faultstring>UPnPError</faultstring>\n"
+                + "<detail>\n"
+                + "</detail>\n"
+                + "</s:Fault>\n"
+                + "</s:Body>\n"
+                + "</s:Envelope>");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_エラーレスポンスにBodyがないとIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+                + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+                + "</s:Envelope>");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_エラーレスポンスにFaultがないとIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+                + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+                + "<s:Body>\n"
+                + "</s:Body>\n"
+                + "</s:Envelope>");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
     @Test
     public void invoke_エラーレスポンスもパースできる() throws Exception {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
-        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-                "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
-                "<s:Body><s:Fault><faultcode>s:Client</faultcode><faultstring>UPnPError</faultstring>" +
-                "<detail><UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\"><errorCode>711</errorCode>" +
-                "<errorDescription>Restricted object</errorDescription></UPnPError></detail>" +
-                "</s:Fault></s:Body></s:Envelope>");
-        mMockFactory.setResponse(mHttpResponse);
+        mHttpResponse.setBody(ERROR_RESPONSE);
+        mMockHttpClient.setResponse(mHttpResponse);
         final Map<String, String> result = mAction.invoke(Collections.<String, String>emptyMap(), true);
         assertThat(result.get(Action.FAULT_CODE_KEY), is("s:Client"));
         assertThat(result.get(Action.FAULT_STRING_KEY), is("UPnPError"));
@@ -334,16 +437,22 @@ public class ActionInvokeTest {
         assertThat(result.get(Action.ERROR_DESCRIPTION_KEY), is("Restricted object"));
     }
 
+    @Test(expected = IOException.class)
+    public void invoke_エラーレスポンスのときIOExceptionが発生2() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody(ERROR_RESPONSE);
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(),
+                Collections.<String, String>emptyMap(),
+                Collections.<String, String>emptyMap(),
+                false);
+    }
+
     @Test
     public void invoke_エラーレスポンスもパースできる2() throws Exception {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
-        mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-                "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
-                "<s:Body><s:Fault><faultcode>s:Client</faultcode><faultstring>UPnPError</faultstring>" +
-                "<detail><UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\"><errorCode>711</errorCode>" +
-                "<errorDescription>Restricted object</errorDescription></UPnPError></detail>" +
-                "</s:Fault></s:Body></s:Envelope>");
-        mMockFactory.setResponse(mHttpResponse);
+        mHttpResponse.setBody(ERROR_RESPONSE);
+        mMockHttpClient.setResponse(mHttpResponse);
         final Map<String, String> result = mAction.invoke(Collections.<String, String>emptyMap(),
                 Collections.<String, String>emptyMap(),
                 Collections.<String, String>emptyMap(),
@@ -352,5 +461,51 @@ public class ActionInvokeTest {
         assertThat(result.get(Action.FAULT_STRING_KEY), is("UPnPError"));
         assertThat(result.get(Action.ERROR_CODE_KEY), is("711"));
         assertThat(result.get(Action.ERROR_DESCRIPTION_KEY), is("Restricted object"));
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_ステータスコードがOKで中身が空のときIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_OK);
+        mHttpResponse.setBody("");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_ステータスコードがエラーで中身が空のときIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody("");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_ステータスコードがその他で中身が空のときIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_NOT_FOUND);
+        mHttpResponse.setBody("");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_ステータスコードがOKで中身がxmlとして異常のときIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_OK);
+        mHttpResponse.setBody("<>");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void invoke_ステータスコードがエラーで中身がxmlとして異常のときIOExceptionが発生() throws Exception {
+        mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
+        mHttpResponse.setBody("<>");
+        mMockHttpClient.setResponse(mHttpResponse);
+        mAction.invoke(Collections.<String, String>emptyMap(), true);
+    }
+
+    @Test(expected = IOException.class)
+    public void makeSoap_xml作成でExceptionが発生したらIOException() throws Exception {
+        doThrow(new TransformerException("")).when(mAction).formatXmlString(ArgumentMatchers.any(Document.class));
+        mAction.makeSoap(null, Collections.<StringPair>emptyList());
     }
 }

@@ -9,11 +9,9 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.TextUtils;
 
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,7 +21,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class HttpHeader {
+class HttpHeaders {
     /**
      * 名前をもとにKeyとして使用できる文字列を作成して返す。
      *
@@ -37,10 +35,11 @@ public class HttpHeader {
 
     /**
      * ヘッダのエントリー情報。
+     *
+     * <p>name/valueともにsetterがあるが、
+     * nameは大文字小文字の差異のみがある場合に限る
      */
     public static class Entry {
-        @Nonnull
-        private final String mKey;
         @Nonnull
         private String mName;
         @Nonnull
@@ -55,7 +54,6 @@ public class HttpHeader {
         public Entry(
                 @Nonnull final String name,
                 @Nonnull final String value) {
-            mKey = toKey(name);
             mName = name;
             mValue = value;
         }
@@ -66,19 +64,8 @@ public class HttpHeader {
          * @param original コピー元
          */
         public Entry(@Nonnull final Entry original) {
-            mKey = original.mKey;
             mName = original.mName;
             mValue = original.mValue;
-        }
-
-        /**
-         * Keyを返す。
-         *
-         * @return Key
-         */
-        @Nonnull
-        private String getKey() {
-            return mKey;
         }
 
         /**
@@ -87,8 +74,9 @@ public class HttpHeader {
          * @param name ヘッダ名
          * @throws IllegalArgumentException keyとしての値が一致しないものに更新しようとした場合
          */
-        private void setName(@Nonnull final String name) {
-            if (!mKey.equals(toKey(name))) {
+        // VisibleForTesting
+        void setName(@Nonnull final String name) {
+            if (!toKey(mName).equals(toKey(name))) {
                 throw new IllegalArgumentException();
             }
             mName = name;
@@ -147,30 +135,13 @@ public class HttpHeader {
         }
     }
 
-    /**
-     * ヘッダエントリーへSetインターフェースでアクセスさせるためのクラス。
-     */
-    private class EntrySet extends AbstractSet<Entry> {
-        @Override
-        @Nonnull
-        public Iterator<Entry> iterator() {
-            return mList.iterator();
-        }
-
-        @Override
-        public int size() {
-            return mList.size();
-        }
-    }
-
-    private EntrySet mEntrySet;
-    private final List<Entry> mList;
+    private final Map<String, Entry> mMap;
 
     /**
      * インスタンス初期化。
      */
-    public HttpHeader() {
-        mList = new LinkedList<>();
+    public HttpHeaders() {
+        mMap = new LinkedHashMap<>();
     }
 
     /**
@@ -178,11 +149,12 @@ public class HttpHeader {
      *
      * @param original コピー元
      */
-    public HttpHeader(@Nonnull final HttpHeader original) {
+    public HttpHeaders(@Nonnull final HttpHeaders original) {
         // EntryはmutableなのでDeep copyが必要
-        mList = new LinkedList<>();
-        for (final Entry entry : original.mList) {
-            mList.add(new Entry(entry));
+        mMap = new LinkedHashMap<>();
+        for (final Entry entry : original.mMap.values()) {
+            final String key = toKey(entry.getName());
+            mMap.put(key, new Entry(entry.getName(), entry.getValue()));
         }
     }
 
@@ -192,7 +164,7 @@ public class HttpHeader {
      * @return ヘッダエントリー数
      */
     public int size() {
-        return mList.size();
+        return mMap.size();
     }
 
     /**
@@ -201,7 +173,7 @@ public class HttpHeader {
      * @return ヘッダが空のときtrue
      */
     public boolean isEmpty() {
-        return mList.isEmpty();
+        return mMap.isEmpty();
     }
 
     /**
@@ -214,13 +186,8 @@ public class HttpHeader {
      */
     @Nullable
     public String get(@Nonnull final String name) {
-        final String key = toKey(name);
-        for (final Entry entry : mList) {
-            if (entry.getKey().equals(key)) {
-                return entry.getValue();
-            }
-        }
-        return null;
+        final Entry entry = mMap.get(toKey(name));
+        return entry != null ? entry.getValue() : null;
     }
 
     /**
@@ -233,16 +200,8 @@ public class HttpHeader {
      */
     @Nullable
     public String remove(@Nonnull final String name) {
-        final String key = toKey(name);
-        final Iterator<Entry> i = mList.iterator();
-        while (i.hasNext()) {
-            final Entry entry = i.next();
-            if (entry.getKey().equals(key)) {
-                i.remove();
-                return entry.mValue;
-            }
-        }
-        return null;
+        final Entry entry = mMap.remove(toKey(name));
+        return entry != null ? entry.getValue() : null;
     }
 
     /**
@@ -262,15 +221,14 @@ public class HttpHeader {
             @Nonnull final String name,
             @Nonnull final String value) {
         final String key = toKey(name);
-        for (final Entry entry : mList) {
-            if (entry.getKey().equals(key)) {
-                final String old = entry.getValue();
-                entry.setName(name);
-                entry.setValue(value);
-                return old;
-            }
+        final Entry entry = mMap.get(key);
+        if (entry != null) {
+            final String oldValue = entry.getValue();
+            entry.setName(name);
+            entry.setValue(value);
+            return oldValue;
         }
-        mList.add(new Entry(name, value));
+        mMap.put(key, new Entry(name, value));
         return null;
     }
 
@@ -294,27 +252,24 @@ public class HttpHeader {
      * 登録情報のクリアを行う。
      */
     public void clear() {
-        mList.clear();
+        mMap.clear();
     }
 
     /**
-     * 登録されているヘッダ情報へのSetビューを返す。
+     * 登録されているヘッダ情報へのCollectionビューを返す。
      *
-     * @return 登録されているヘッダ情報へのSetビュー
+     * @return 登録されているヘッダ情報へのCollectionビュー
      */
     @Nonnull
-    public Set<Entry> entrySet() {
-        if (mEntrySet == null) {
-            mEntrySet = new EntrySet();
-        }
-        return mEntrySet;
+    public Collection<Entry> values() {
+        return mMap.values();
     }
 
     @Override
     @Nonnull
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        for (final Entry entry : mList) {
+        for (final Entry entry : mMap.values()) {
             sb.append(entry.getName());
             sb.append(": ");
             sb.append(entry.getValue());

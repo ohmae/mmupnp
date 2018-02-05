@@ -118,10 +118,8 @@ public class Device {
          * SSDPパケットを登録する。
          *
          * @param ssdpMessage SSDPパケット
-         * @return Builder
          */
-        @Nonnull
-        public Builder updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
+        public void updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
             final String location = ssdpMessage.getLocation();
             if (location == null) {
                 throw new IllegalArgumentException();
@@ -131,7 +129,6 @@ public class Device {
             for (final Builder builder : mDeviceBuilderList) {
                 builder.updateSsdpMessage(ssdpMessage);
             }
-            return this;
         }
 
         /**
@@ -388,13 +385,14 @@ public class Device {
          */
         @Nonnull
         public Builder putTag(
-                @Nonnull final String namespace,
+                @Nullable final String namespace,
                 @Nonnull final String tag,
                 @Nonnull final String value) {
-            Map<String, String> map = mTagMap.get(namespace);
+            final String namespaceUri = namespace == null ? "" : namespace;
+            Map<String, String> map = mTagMap.get(namespaceUri);
             if (map == null) {
                 map = new HashMap<>();
-                mTagMap.put(namespace, map);
+                mTagMap.put(namespaceUri, map);
             }
             map.put(tag, value);
             return this;
@@ -737,14 +735,14 @@ public class Device {
      * ネームスペースはプレフィックスではなく、URIを指定する。
      * 値が存在しない場合nullが返る。
      *
-     * @param name      タグ名
      * @param namespace ネームスペース（URI）
+     * @param name      タグ名
      * @return タグの値
      */
     @Nullable
-    public String getValue(
-            @Nonnull final String name,
-            @Nonnull final String namespace) {
+    public String getValueWithNamespace(
+            @Nonnull final String namespace,
+            @Nonnull final String name) {
         final Map<String, String> map = mTagMap.get(namespace);
         if (map == null) {
             return null;

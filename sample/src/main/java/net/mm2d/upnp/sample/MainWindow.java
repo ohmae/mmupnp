@@ -7,13 +7,13 @@
 
 package net.mm2d.upnp.sample;
 
+import net.mm2d.log.Log;
 import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.IconFilter;
 import net.mm2d.upnp.Service;
-import net.mm2d.util.Log;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -53,7 +53,7 @@ public class MainWindow extends JFrame {
     private static final String TAG = "MainWindow";
 
     public static void main(final String[] args) {
-        Log.setLogLevel(Log.VERBOSE);
+        Log.initialize(true, true);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException

@@ -27,18 +27,18 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(Enclosed.class)
-public class SsdpRequestMessageTest {
+public class SsdpRequestTest {
 
-    private static SsdpRequestMessage makeFromResource(final String name) throws IOException {
+    private static SsdpRequest makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpRequestMessage(mock(InterfaceAddress.class), data, data.length);
+        return new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
     }
 
     @RunWith(JUnit4.class)
     public static class 作成 {
         @Test
         public void buildUp_所望のバイナリに変換できる() throws IOException {
-            final SsdpRequestMessage message = new SsdpRequestMessage();
+            final SsdpRequest message = new SsdpRequest();
             message.setMethod(SsdpMessage.M_SEARCH);
             message.setUri("*");
             message.setHeader(Http.HOST, SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT));
@@ -57,7 +57,7 @@ public class SsdpRequestMessageTest {
 
         @Test
         public void buildUp_受信データから作成() throws IOException {
-            final SsdpRequestMessage message = makeFromResource("ssdp-notify-alive0.bin");
+            final SsdpRequest message = makeFromResource("ssdp-notify-alive0.bin");
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.getMessage().writeData(baos);
@@ -67,13 +67,19 @@ public class SsdpRequestMessageTest {
 
             assertThat(new String(actual), is(new String(expected)));
         }
+
+        @Test
+        public void toString_messageのtoStringと等価() throws Exception {
+            final SsdpRequest message = makeFromResource("ssdp-notify-alive0.bin");
+            assertThat(message.toString(), is(message.getMessage().toString()));
+        }
     }
 
     @RunWith(JUnit4.class)
     public static class 個別パラメータ {
         @Test
         public void getType() throws IOException {
-            final SsdpRequestMessage message = makeFromResource("ssdp-notify-alive2.bin");
+            final SsdpRequest message = makeFromResource("ssdp-notify-alive2.bin");
 
             assertThat(message.getType(), is("urn:schemas-upnp-org:service:ContentDirectory:1"));
 
@@ -82,7 +88,7 @@ public class SsdpRequestMessageTest {
         @Test
         public void getExpireTime() throws IOException {
             final long beforeTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(300);
-            final SsdpRequestMessage message = makeFromResource("ssdp-notify-alive2.bin");
+            final SsdpRequest message = makeFromResource("ssdp-notify-alive2.bin");
             final long afterTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(300);
 
             assertThat(message.getExpireTime(), greaterThanOrEqualTo(beforeTime));
@@ -93,8 +99,8 @@ public class SsdpRequestMessageTest {
     @RunWith(Theories.class)
     public static class Notifyメッセージ {
         @DataPoints
-        public static SsdpRequestMessage[] getMessages() throws IOException {
-            return new SsdpRequestMessage[]{
+        public static SsdpRequest[] getMessages() throws IOException {
+            return new SsdpRequest[]{
                     makeFromResource("ssdp-notify-alive0.bin"),
                     makeFromResource("ssdp-notify-alive1.bin"),
                     makeFromResource("ssdp-notify-alive2.bin"),
@@ -105,22 +111,22 @@ public class SsdpRequestMessageTest {
         }
 
         @Theory
-        public void getMethod_NOTIFYであること(final SsdpRequestMessage message) {
+        public void getMethod_NOTIFYであること(final SsdpRequest message) {
             assertThat(message.getMethod(), is(SsdpMessage.NOTIFY));
         }
 
         @Theory
-        public void getUri_アスタリスクであること(final SsdpRequestMessage message) {
+        public void getUri_アスタリスクであること(final SsdpRequest message) {
             assertThat(message.getUri(), is("*"));
         }
 
         @Theory
-        public void getUuid_記述の値であること(final SsdpRequestMessage message) {
+        public void getUuid_記述の値であること(final SsdpRequest message) {
             assertThat(message.getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         }
 
         @Theory
-        public void getHeader_HOST_SSDPのアドレスであること(final SsdpRequestMessage message) {
+        public void getHeader_HOST_SSDPのアドレスであること(final SsdpRequest message) {
             assertThat(message.getHeader(Http.HOST), is(SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT)));
         }
     }
@@ -129,8 +135,8 @@ public class SsdpRequestMessageTest {
     @RunWith(Theories.class)
     public static class Aliveメッセージ {
         @DataPoints
-        public static SsdpRequestMessage[] getMessages() throws IOException {
-            return new SsdpRequestMessage[]{
+        public static SsdpRequest[] getMessages() throws IOException {
+            return new SsdpRequest[]{
                     makeFromResource("ssdp-notify-alive0.bin"),
                     makeFromResource("ssdp-notify-alive1.bin"),
                     makeFromResource("ssdp-notify-alive2.bin"),
@@ -138,17 +144,17 @@ public class SsdpRequestMessageTest {
         }
 
         @Theory
-        public void getNts_NTSがAliveであること(final SsdpRequestMessage message) {
+        public void getNts_NTSがAliveであること(final SsdpRequest message) {
             assertThat(message.getNts(), is(SsdpMessage.SSDP_ALIVE));
         }
 
         @Theory
-        public void getMaxAge_CACHE_CONTROLの値が取れること(final SsdpRequestMessage message) {
+        public void getMaxAge_CACHE_CONTROLの値が取れること(final SsdpRequest message) {
             assertThat(message.getMaxAge(), is(300));
         }
 
         @Theory
-        public void getLocation_Locationの値が取れること(final SsdpRequestMessage message) {
+        public void getLocation_Locationの値が取れること(final SsdpRequest message) {
             assertThat(message.getLocation(), is("http://192.0.2.2:12345/device.xml"));
         }
     }
@@ -156,8 +162,8 @@ public class SsdpRequestMessageTest {
     @RunWith(Theories.class)
     public static class ByeByeメッセージ {
         @DataPoints
-        public static SsdpRequestMessage[] getMessages() throws IOException {
-            return new SsdpRequestMessage[]{
+        public static SsdpRequest[] getMessages() throws IOException {
+            return new SsdpRequest[]{
                     makeFromResource("ssdp-notify-byebye0.bin"),
                     makeFromResource("ssdp-notify-byebye1.bin"),
                     makeFromResource("ssdp-notify-byebye2.bin"),
@@ -165,7 +171,7 @@ public class SsdpRequestMessageTest {
         }
 
         @Theory
-        public void getNts_NTSがByebyeであること(final SsdpRequestMessage message) {
+        public void getNts_NTSがByebyeであること(final SsdpRequest message) {
             assertThat(message.getNts(), is(SsdpMessage.SSDP_BYEBYE));
         }
     }

@@ -26,7 +26,7 @@
             <name>A_ARG_TYPE_Type</name>
             <dataType>string</dataType>
         </stateVariable>
-        <stateVariable sendEvents="no">
+        <stateVariable sendEvents="yes">
             <name>A_ARG_TYPE_Value</name>
             <dataType>i4</dataType>
             <allowedValueRange>
@@ -34,6 +34,7 @@
                 <minimum>0</minimum>
                 <maximum>100</maximum>
             </allowedValueRange>
+            <defaultValue>10</defaultValue>
         </stateVariable>
     </serviceStateTable>
 </scpd>

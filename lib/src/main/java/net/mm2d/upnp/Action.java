@@ -7,9 +7,10 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.log.Log;
 import net.mm2d.upnp.Http.Status;
-import net.mm2d.util.Log;
 import net.mm2d.util.StringPair;
+import net.mm2d.util.TextUtils;
 import net.mm2d.util.XmlUtils;
 
 import org.w3c.dom.Attr;
@@ -157,8 +158,6 @@ public class Action {
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
     @Nonnull
-    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
-    @Nonnull
     private final Service mService;
     @Nonnull
     private final String mName;
@@ -235,13 +234,9 @@ public class Action {
     }
 
     // VisibleForTesting
-    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
-        mHttpClientFactory = factory;
-    }
-
     @Nonnull
-    private HttpClient createHttpClient() {
-        return mHttpClientFactory.createHttpClient(false);
+    HttpClient createHttpClient() {
+        return new HttpClient(false);
     }
 
     /**
@@ -498,21 +493,22 @@ public class Action {
         final HttpRequest request = makeHttpRequest(url, soap);
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
-        if (response.getStatus() == Status.HTTP_INTERNAL_ERROR && response.getBody() != null) {
+        final String body = response.getBody();
+        if (response.getStatus() == Status.HTTP_INTERNAL_ERROR && !TextUtils.isEmpty(body)) {
             try {
-                return parseErrorResponse(response.getBody());
+                return parseErrorResponse(body);
             } catch (final SAXException | ParserConfigurationException e) {
-                throw new IOException(response.getBody(), e);
+                throw new IOException(body, e);
             }
         }
-        if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
+        if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(body)) {
             Log.w(response.toString());
             throw new IOException(response.getStartLine());
         }
         try {
-            return parseResponse(response.getBody());
+            return parseResponse(body);
         } catch (final SAXException | ParserConfigurationException e) {
-            throw new IOException(response.getBody(), e);
+            throw new IOException(body, e);
         }
     }
 
@@ -529,15 +525,14 @@ public class Action {
             @Nonnull final URL url,
             @Nonnull final String soap)
             throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.POST);
-        request.setUrl(url, true);
-        request.setHeader(Http.SOAPACTION, getSoapActionName());
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, Http.CLOSE);
-        request.setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT);
-        request.setBody(soap, true);
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.POST)
+                .setUrl(url, true)
+                .setHeader(Http.SOAPACTION, getSoapActionName())
+                .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT)
+                .setBody(soap, true);
     }
 
     /**
@@ -547,8 +542,9 @@ public class Action {
      * @return SOAP ActionのXML文字列
      * @throws IOException 通信で問題が発生した場合
      */
+    // VisibleForTesting
     @Nonnull
-    private String makeSoap(
+    String makeSoap(
             @Nullable final Map<String, String> namespaces,
             @Nonnull final List<StringPair> arguments)
             throws IOException {
@@ -625,8 +621,9 @@ public class Action {
      * @return 変換された文字列
      * @throws TransformerException 変換処理に問題が発生した場合
      */
+    // VisibleForTesting
     @Nonnull
-    private static String formatXmlString(@Nonnull final Document document)
+    String formatXmlString(@Nonnull final Document document)
             throws TransformerException {
         final TransformerFactory tf = TransformerFactory.newInstance();
         final Transformer transformer = tf.newTransformer();

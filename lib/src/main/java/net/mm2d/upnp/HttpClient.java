@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.log.Log;
 import net.mm2d.util.IoUtils;
-import net.mm2d.util.Log;
 import net.mm2d.util.TextUtils;
 
 import java.io.BufferedInputStream;
@@ -162,12 +162,10 @@ public class HttpClient {
         }
     }
 
+    @Nonnull
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
-        assert mSocket != null;
-        assert mOutputStream != null;
-        assert mInputStream != null;
         request.writeData(mOutputStream);
-        final HttpResponse response = new HttpResponse(mSocket);
+        final HttpResponse response = new HttpResponse();
         response.readData(mInputStream);
         return response;
     }
@@ -187,7 +185,8 @@ public class HttpClient {
         return response;
     }
 
-    private static boolean needToRedirect(@Nonnull final HttpResponse response) {
+    // VisibleForTesting
+    boolean needToRedirect(@Nonnull final HttpResponse response) {
         final Http.Status status = response.getStatus();
         switch (status) {
             case HTTP_MOVED_PERM:
@@ -206,20 +205,22 @@ public class HttpClient {
             @Nonnull final String location,
             final int redirectDepth)
             throws IOException {
-        final HttpRequest newRequest = new HttpRequest(request);
-        newRequest.setUrl(new URL(location), true);
-        newRequest.setHeader(Http.CONNECTION, Http.CLOSE);
+        final HttpRequest newRequest = new HttpRequest(request)
+                .setUrl(new URL(location), true)
+                .setHeader(Http.CONNECTION, Http.CLOSE);
         return new HttpClient(false).post(newRequest, redirectDepth + 1);
     }
 
-    private boolean canReuse(@Nonnull final HttpRequest request) {
+    // VisibleForTesting
+    boolean canReuse(@Nonnull final HttpRequest request) {
         return mSocket != null
                 && mSocket.isConnected()
                 && mSocket.getInetAddress().equals(request.getAddress())
                 && mSocket.getPort() == request.getPort();
     }
 
-    private boolean isClosed() {
+    // VisibleForTesting
+    boolean isClosed() {
         return mSocket == null;
     }
 
@@ -256,11 +257,7 @@ public class HttpClient {
      */
     @Nonnull
     public String downloadString(@Nonnull final URL url) throws IOException {
-        final String body = download(url).getBody();
-        if (body == null) {
-            throw new IOException("body is null");
-        }
-        return body;
+        return download(url).getBody();
     }
 
     /**
@@ -272,11 +269,7 @@ public class HttpClient {
      */
     @Nonnull
     public byte[] downloadBinary(@Nonnull final URL url) throws IOException {
-        final byte[] body = download(url).getBodyBinary();
-        if (body == null) {
-            throw new IOException("body is null");
-        }
-        return body;
+        return download(url).getBodyBinary();
     }
 
     /**
@@ -300,11 +293,10 @@ public class HttpClient {
 
     @Nonnull
     private HttpRequest makeHttpRequest(@Nonnull final URL url) throws IOException {
-        final HttpRequest request = new HttpRequest();
-        request.setMethod(Http.GET);
-        request.setUrl(url, true);
-        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
-        request.setHeader(Http.CONNECTION, isKeepAlive() ? Http.KEEP_ALIVE : Http.CLOSE);
-        return request;
+        return new HttpRequest()
+                .setMethod(Http.GET)
+                .setUrl(url, true)
+                .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
+                .setHeader(Http.CONNECTION, isKeepAlive() ? Http.KEEP_ALIVE : Http.CLOSE);
     }
 }

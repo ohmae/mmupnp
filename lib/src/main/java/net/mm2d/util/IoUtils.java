@@ -108,4 +108,9 @@ public class IoUtils {
         } catch (final IOException ignored) {
         }
     }
+
+    // インスタンス化禁止
+    private IoUtils() {
+        throw new AssertionError();
+    }
 }

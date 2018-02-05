@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.log.Log;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
-import net.mm2d.util.Log;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
@@ -26,17 +26,22 @@ import javax.annotation.Nullable;
  */
 class SsdpSearchServerList {
     @Nonnull
-    private final List<SsdpSearchServer> mList;
+    private final List<SsdpSearchServer> mList = new ArrayList<>();
 
-    SsdpSearchServerList(
+    SsdpSearchServerList init(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
-        mList = new ArrayList<>(interfaces.size());
         for (final NetworkInterface nif : interfaces) {
-            final SsdpSearchServer search = new SsdpSearchServer(nif);
+            final SsdpSearchServer search = newSsdpSearchServer(nif);
             search.setResponseListener(listener);
             mList.add(search);
         }
+        return this;
+    }
+
+    // VisibleForTesting
+    SsdpSearchServer newSsdpSearchServer(@Nonnull final NetworkInterface nif) {
+        return new SsdpSearchServer(nif);
     }
 
     void openAndStart() {

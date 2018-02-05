@@ -13,6 +13,8 @@ import org.junit.runners.JUnit4;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,6 +25,13 @@ import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class IoUtilsTest {
+    @Test(expected = InvocationTargetException.class)
+    public void constructor() throws Exception {
+        final Constructor<IoUtils> constructor = IoUtils.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        constructor.newInstance();
+    }
+
     @Test
     public void closeQuietly_Closeable_closeがコールされる() throws IOException {
         final Closeable closeable = mock(Closeable.class);

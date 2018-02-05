@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.log.Log;
 import net.mm2d.util.IoUtils;
-import net.mm2d.util.Log;
 import net.mm2d.util.StringPair;
 import net.mm2d.util.TextParseUtils;
 import net.mm2d.util.TextUtils;
@@ -112,8 +112,9 @@ class EventReceiver {
         }
     }
 
+    // VisibleForTesting
     @Nonnull
-    private static List<StringPair> parsePropertyPairs(@Nonnull final HttpRequest request) {
+    static List<StringPair> parsePropertyPairs(@Nonnull final HttpRequest request) {
         final String xml = request.getBody();
         if (TextUtils.isEmpty(xml)) {
             return Collections.emptyList();
@@ -127,22 +128,16 @@ class EventReceiver {
             final List<StringPair> list = new ArrayList<>();
             Node propertyNode = propertySetNode.getFirstChild();
             for (; propertyNode != null; propertyNode = propertyNode.getNextSibling()) {
-                if (propertyNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-                if (!propertyNode.getLocalName().equals("property")) {
+                if (!TextUtils.equals(getTagName(propertyNode), "property")) {
                     continue;
                 }
                 Node node = propertyNode.getFirstChild();
                 for (; node != null; node = node.getNextSibling()) {
-                    if (node.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    final String name = node.getLocalName();
-                    final String value = node.getTextContent();
+                    final String name = getTagName(node);
                     if (TextUtils.isEmpty(name)) {
                         continue;
                     }
+                    final String value = node.getTextContent();
                     list.add(new StringPair(name, value));
                 }
             }
@@ -152,7 +147,16 @@ class EventReceiver {
         return Collections.emptyList();
     }
 
-    private static class ServerTask implements Runnable {
+    @Nullable
+    private static String getTagName(@Nonnull final Node node) {
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
+            return null;
+        }
+        return node.getLocalName();
+    }
+
+    // VisibleForTesting
+    static class ServerTask implements Runnable {
         private volatile boolean mShutdownRequest = false;
         @Nonnull
         private final ServerSocket mServerSocket;
@@ -227,7 +231,8 @@ class EventReceiver {
          * @param request 受信したHTTPメッセージ
          * @return HTTPメッセージが正常であればtrue
          */
-        private synchronized boolean notifyEvent(
+        // VisibleForTesting
+        synchronized boolean notifyEvent(
                 @Nonnull final String sid,
                 @Nonnull final HttpRequest request) {
             if (mListener == null) {
@@ -258,25 +263,23 @@ class EventReceiver {
         }
     }
 
-    private static class ClientTask implements Runnable {
-        private static final HttpResponse RESPONSE_OK = new HttpResponse();
-        private static final HttpResponse RESPONSE_BAD = new HttpResponse();
-        private static final HttpResponse RESPONSE_FAIL = new HttpResponse();
-
-        static {
-            RESPONSE_OK.setStatus(Http.Status.HTTP_OK);
-            RESPONSE_OK.setHeader(Http.SERVER, Property.SERVER_VALUE);
-            RESPONSE_OK.setHeader(Http.CONNECTION, Http.CLOSE);
-            RESPONSE_OK.setHeader(Http.CONTENT_LENGTH, "0");
-            RESPONSE_BAD.setStatus(Http.Status.HTTP_BAD_REQUEST);
-            RESPONSE_BAD.setHeader(Http.SERVER, Property.SERVER_VALUE);
-            RESPONSE_BAD.setHeader(Http.CONNECTION, Http.CLOSE);
-            RESPONSE_BAD.setHeader(Http.CONTENT_LENGTH, "0");
-            RESPONSE_FAIL.setStatus(Http.Status.HTTP_PRECON_FAILED);
-            RESPONSE_FAIL.setHeader(Http.SERVER, Property.SERVER_VALUE);
-            RESPONSE_FAIL.setHeader(Http.CONNECTION, Http.CLOSE);
-            RESPONSE_FAIL.setHeader(Http.CONTENT_LENGTH, "0");
-        }
+    // VisibleForTesting
+    static class ClientTask implements Runnable {
+        private static final HttpResponse RESPONSE_OK = new HttpResponse()
+                .setStatus(Http.Status.HTTP_OK)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_LENGTH, "0");
+        private static final HttpResponse RESPONSE_BAD = new HttpResponse()
+                .setStatus(Http.Status.HTTP_BAD_REQUEST)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_LENGTH, "0");
+        private static final HttpResponse RESPONSE_FAIL = new HttpResponse()
+                .setStatus(Http.Status.HTTP_PRECON_FAILED)
+                .setHeader(Http.SERVER, Property.SERVER_VALUE)
+                .setHeader(Http.CONNECTION, Http.CLOSE)
+                .setHeader(Http.CONTENT_LENGTH, "0");
 
         @Nonnull
         private final ServerTask mServer;
@@ -341,11 +344,12 @@ class EventReceiver {
             }
         }
 
-        private void receiveAndReply(
+        // VisibleForTesting
+        void receiveAndReply(
                 @Nonnull final InputStream is,
                 @Nonnull final OutputStream os)
                 throws IOException {
-            final HttpRequest request = new HttpRequest(mSocket);
+            final HttpRequest request = new HttpRequest();
             request.readData(is);
             final String nt = request.getHeader(Http.NT);
             final String nts = request.getHeader(Http.NTS);

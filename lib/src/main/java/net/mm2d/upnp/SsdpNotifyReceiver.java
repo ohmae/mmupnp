@@ -7,7 +7,8 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.Log;
+import net.mm2d.log.Log;
+import net.mm2d.upnp.SsdpServerDelegate.Receiver;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-class SsdpNotifyReceiver extends SsdpServer {
+class SsdpNotifyReceiver implements SsdpServer {
     /**
      * NOTIFY受信を受け取るリスナー。
      */
@@ -33,9 +34,11 @@ class SsdpNotifyReceiver extends SsdpServer {
          *
          * @param message 受信したNOTIFYメッセージ
          */
-        void onReceiveNotify(@Nonnull SsdpRequestMessage message);
+        void onReceiveNotify(@Nonnull SsdpRequest message);
     }
 
+    @Nonnull
+    private final SsdpServerDelegate mDelegate;
     @Nullable
     private NotifyListener mListener;
 
@@ -45,7 +48,19 @@ class SsdpNotifyReceiver extends SsdpServer {
      * @param ni 使用するインターフェース
      */
     SsdpNotifyReceiver(@Nonnull final NetworkInterface ni) {
-        super(ni, SSDP_PORT);
+        mDelegate = new SsdpServerDelegate(new Receiver() {
+            @Override
+            public void onReceive(
+                    @Nonnull final InetAddress sourceAddress,
+                    @Nonnull final byte[] data,
+                    final int length) {
+                SsdpNotifyReceiver.this.onReceive(sourceAddress, data, length);
+            }
+        }, ni, SSDP_PORT);
+    }
+
+    SsdpNotifyReceiver(@Nonnull final SsdpServerDelegate delegate) {
+        mDelegate = delegate;
     }
 
     /**
@@ -57,8 +72,39 @@ class SsdpNotifyReceiver extends SsdpServer {
         mListener = listener;
     }
 
+    @Nonnull
     @Override
-    protected void onReceive(
+    public InterfaceAddress getInterfaceAddress() {
+        return mDelegate.getInterfaceAddress();
+    }
+
+    @Override
+    public void open() throws IOException {
+        mDelegate.open();
+    }
+
+    @Override
+    public void close() {
+        mDelegate.close();
+    }
+
+    @Override
+    public void start() {
+        mDelegate.start();
+    }
+
+    @Override
+    public void stop() {
+        mDelegate.stop();
+    }
+
+    @Override
+    public void send(@Nonnull final SsdpMessage message) {
+        mDelegate.send(message);
+    }
+
+    // VisibleForTesting
+    void onReceive(
             @Nonnull final InetAddress sourceAddress,
             @Nonnull final byte[] data,
             final int length) {
@@ -71,14 +117,14 @@ class SsdpNotifyReceiver extends SsdpServer {
             return;
         }
         try {
-            final SsdpRequestMessage message = new SsdpRequestMessage(getInterfaceAddress(), data, length);
+            final SsdpRequest message = createSsdpRequestMessage(data, length);
             // M-SEARCHパケットは無視する
             if (TextUtils.equals(message.getMethod(), SsdpMessage.M_SEARCH)) {
                 return;
             }
             // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
             if (!TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)
-                    && message.hasInvalidLocation(sourceAddress)) {
+                    && mDelegate.isInvalidLocation(message, sourceAddress)) {
                 return;
             }
             if (mListener != null) {
@@ -88,7 +134,16 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
     }
 
-    private static boolean isSameSegment(
+    // VisibleForTesting
+    SsdpRequest createSsdpRequestMessage(
+            @Nonnull final byte[] data,
+            final int length)
+            throws IOException {
+        return new SsdpRequest(getInterfaceAddress(), data, length);
+    }
+
+    // VisibleForTesting
+    static boolean isSameSegment(
             @Nonnull final InterfaceAddress interfaceAddress,
             @Nonnull final InetAddress sourceAddress) {
         final byte[] a = interfaceAddress.getAddress().getAddress();
@@ -103,9 +158,7 @@ class SsdpNotifyReceiver extends SsdpServer {
         }
         if (bits != 0) {
             final byte mask = (byte) (0xff << (8 - bits));
-            if ((a[bytes] & mask) != (b[bytes] & mask)) {
-                return false;
-            }
+            return (a[bytes] & mask) == (b[bytes] & mask);
         }
         return true;
     }

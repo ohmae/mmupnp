@@ -120,4 +120,16 @@ public class ActionTest {
         assertThat(argument.isInputDirection(), is(true));
         assertThat(argument.getRelatedStateVariable(), is(stateVariable));
     }
+
+    @Test
+    public void createHttpClient() {
+        final Service service = mock(Service.class);
+        final String name = "name";
+        final Action action = new Action.Builder()
+                .setService(service)
+                .setName(name)
+                .build();
+        final HttpClient client = action.createHttpClient();
+        assertThat(client.isKeepAlive(), is(false));
+    }
 }

@@ -7,10 +7,10 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.log.Log;
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
-import net.mm2d.util.Log;
 import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.StringPair;
 import net.mm2d.util.TextUtils;
@@ -127,17 +127,11 @@ public class ControlPoint {
     private final DeviceHolder mDeviceHolder;
     @Nonnull
     private final SubscribeHolder mSubscribeHolder;
-    @Nonnull
-    private HttpClientFactory mHttpClientFactory = new HttpClientFactory();
 
     // VisibleForTesting
-    void setHttpClientFactory(@Nonnull final HttpClientFactory factory) {
-        mHttpClientFactory = factory;
-    }
-
     @Nonnull
-    private HttpClient createHttpClient() {
-        return mHttpClientFactory.createHttpClient(true);
+    HttpClient createHttpClient() {
+        return new HttpClient(true);
     }
 
     // VisibleForTesting
@@ -290,7 +284,7 @@ public class ControlPoint {
 
         mSearchList = factory.createSsdpSearchServerList(interfaces, new ResponseListener() {
             @Override
-            public void onReceiveResponse(@Nonnull final SsdpResponseMessage message) {
+            public void onReceiveResponse(@Nonnull final SsdpResponse message) {
                 executeInParallel(new Runnable() {
                     @Override
                     public void run() {
@@ -301,7 +295,7 @@ public class ControlPoint {
         });
         mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, new NotifyListener() {
             @Override
-            public void onReceiveNotify(@Nonnull final SsdpRequestMessage message) {
+            public void onReceiveNotify(@Nonnull final SsdpRequest message) {
                 executeInParallel(new Runnable() {
                     @Override
                     public void run() {
@@ -324,7 +318,8 @@ public class ControlPoint {
         });
     }
 
-    private boolean executeInParallel(@Nonnull final Runnable command) {
+    // VisibleForTesting
+    boolean executeInParallel(@Nonnull final Runnable command) {
         if (mIoExecutor.isShutdown()) {
             return false;
         }
@@ -336,7 +331,8 @@ public class ControlPoint {
         return true;
     }
 
-    private boolean executeInSequential(@Nonnull final Runnable command) {
+    // VisibleForTesting
+    boolean executeInSequential(@Nonnull final Runnable command) {
         if (mNotifyExecutor.isShutdown()) {
             return false;
         }

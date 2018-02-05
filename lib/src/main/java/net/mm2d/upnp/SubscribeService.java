@@ -86,7 +86,8 @@ class SubscribeService {
      *
      * @return Renewを行う時間
      */
-    private long calculateRenewTime() {
+    // VisibleForTesting
+    long calculateRenewTime() {
         long interval = mService.getSubscriptionTimeout() * (mFailCount + 1) / RETRY_COUNT;
         if (interval > MARGIN_TIME * 2) {
             interval -= MARGIN_TIME;
@@ -144,6 +145,9 @@ class SubscribeService {
 
     @Override
     public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
         if (object == null || !(object instanceof SubscribeService)) {
             return false;
         }
