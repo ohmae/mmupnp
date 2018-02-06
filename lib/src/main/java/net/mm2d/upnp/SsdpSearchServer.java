@@ -67,6 +67,7 @@ class SsdpSearchServer implements SsdpServer {
         }, ni);
     }
 
+    // VisibleForTesting
     SsdpSearchServer(@Nonnull final SsdpServerDelegate delegate) {
         mDelegate = delegate;
     }
