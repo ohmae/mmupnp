@@ -11,9 +11,9 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    compile project(':lib')
-    compile 'net.mm2d:log:0.0.1'
-    testCompile 'junit:junit:4.12'
+    implementation project(':lib')
+    implementation 'net.mm2d:log:0.0.1'
+    testImplementation 'junit:junit:4.12'
 }
 
 jar {
