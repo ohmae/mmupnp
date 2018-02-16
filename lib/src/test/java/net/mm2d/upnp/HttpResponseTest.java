@@ -37,8 +37,8 @@ public class HttpResponseTest {
 
     @Test
     public void readData_読み出しができること() throws IOException {
-        final HttpResponse response = new HttpResponse();
-        response.readData(TestUtils.getResourceAsStream("cds-length.bin"));
+        final HttpResponse response = new HttpResponse()
+                .readData(TestUtils.getResourceAsStream("cds-length.bin"));
 
         assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
@@ -48,8 +48,8 @@ public class HttpResponseTest {
 
     @Test
     public void HttpRequest_ディープコピーができる() throws IOException {
-        final HttpResponse response1 = new HttpResponse();
-        response1.readData(TestUtils.getResourceAsStream("cds-length.bin"));
+        final HttpResponse response1 = new HttpResponse()
+                .readData(TestUtils.getResourceAsStream("cds-length.bin"));
 
         final HttpResponse response2 = new HttpResponse(response1);
 
@@ -66,8 +66,8 @@ public class HttpResponseTest {
 
     @Test
     public void readData_Chunk読み出しができること() throws IOException {
-        final HttpResponse response = new HttpResponse();
-        response.readData(TestUtils.getResourceAsStream("cds-chunked.bin"));
+        final HttpResponse response = new HttpResponse()
+                .readData(TestUtils.getResourceAsStream("cds-chunked.bin"));
 
         assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
@@ -77,8 +77,8 @@ public class HttpResponseTest {
 
     @Test
     public void readData_Chunk読み出しができること2() throws IOException {
-        final HttpResponse response = new HttpResponse();
-        response.readData(TestUtils.getResourceAsStream("cds-chunked-large.bin"));
+        final HttpResponse response = new HttpResponse()
+                .readData(TestUtils.getResourceAsStream("cds-chunked-large.bin"));
 
         assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
@@ -88,44 +88,37 @@ public class HttpResponseTest {
 
     @Test(expected = IOException.class)
     public void readData_読み出せない場合IOException() throws Exception {
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream("\n".getBytes()));
+        new HttpResponse().readData(new ByteArrayInputStream("\n".getBytes()));
     }
 
     @Test(expected = IOException.class)
     public void readData_status_line異常の場合IOException() throws Exception {
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream("HTTP/1.1 200".getBytes()));
+        new HttpResponse().readData(new ByteArrayInputStream("HTTP/1.1 200".getBytes()));
     }
 
     @Test(expected = IOException.class)
     public void readData_size異常の場合IOException() throws Exception {
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\n  ".getBytes()));
+        new HttpResponse().readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\n  ".getBytes()));
     }
 
     @Test(expected = IOException.class)
     public void readData_chunk_sizeなしの場合IOException() throws Exception {
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\r\n".getBytes()));
+        new HttpResponse().readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\r\n".getBytes()));
     }
 
     @Test(expected = IOException.class)
     public void readData_chunk_sizeが16進数でない場合IOException() throws Exception {
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\ngg\r\n".getBytes()));
+        new HttpResponse().readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\ngg\r\n".getBytes()));
     }
 
     @Test(expected = IOException.class)
     public void readData_chunk_sizeよりデータが少ない場合IOException() throws Exception {
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n10\r\n  \r\n".getBytes()));
+        new HttpResponse().readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n10\r\n  \r\n".getBytes()));
     }
 
     @Test(expected = IOException.class)
     public void readData_最後が0で終わっていない場合IOException2() throws Exception {
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n2\r\n  \r\n".getBytes()));
+        new HttpResponse().readData(new ByteArrayInputStream("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n2\r\n  \r\n".getBytes()));
     }
 
     @Test
@@ -142,8 +135,7 @@ public class HttpResponseTest {
         response.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpResponse readResponse = new HttpResponse();
-        readResponse.readData(bais);
+        final HttpResponse readResponse = new HttpResponse().readData(bais);
 
         assertThat(readResponse.getStartLine(), is(response.getStartLine()));
         assertThat(readResponse.getBody(), is(response.getBody()));
@@ -164,8 +156,7 @@ public class HttpResponseTest {
         response.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpResponse readResponse = new HttpResponse();
-        readResponse.readData(bais);
+        final HttpResponse readResponse = new HttpResponse().readData(bais);
 
         assertThat(readResponse.getStartLine(), is(response.getStartLine()));
         assertThat(readResponse.getBody(), is(response.getBody()));

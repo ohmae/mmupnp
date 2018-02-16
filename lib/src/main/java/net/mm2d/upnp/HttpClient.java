@@ -165,9 +165,7 @@ public class HttpClient {
     @Nonnull
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
         request.writeData(mOutputStream);
-        final HttpResponse response = new HttpResponse();
-        response.readData(mInputStream);
-        return response;
+        return new HttpResponse().readData(mInputStream);
     }
 
     @Nonnull
