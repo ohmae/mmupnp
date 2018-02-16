@@ -284,16 +284,16 @@ class HttpMessageDelegate implements HttpMessage {
     }
 
     @Override
-    public void writeData(@Nonnull final OutputStream os) throws IOException {
-        os.write(getHeaderBytes());
+    public void writeData(@Nonnull final OutputStream outputStream) throws IOException {
+        outputStream.write(getHeaderBytes());
         if (mBodyBinary != null) {
             if (isChunked()) {
-                writeChunkedBody(os, mBodyBinary);
+                writeChunkedBody(outputStream, mBodyBinary);
             } else {
-                os.write(mBodyBinary);
+                outputStream.write(mBodyBinary);
             }
         }
-        os.flush();
+        outputStream.flush();
     }
 
     private void writeChunkedBody(
@@ -320,14 +320,15 @@ class HttpMessageDelegate implements HttpMessage {
     }
 
     @Override
-    public void readData(@Nonnull final InputStream is) throws IOException {
-        readStartLine(is);
-        readHeaders(is);
+    public HttpMessage readData(@Nonnull final InputStream inputStream) throws IOException {
+        readStartLine(inputStream);
+        readHeaders(inputStream);
         if (isChunked()) {
-            readChunkedBody(is);
+            readChunkedBody(inputStream);
         } else {
-            readBody(is);
+            readBody(inputStream);
         }
+        return this;
     }
 
     private void readStartLine(@Nonnull final InputStream is) throws IOException {

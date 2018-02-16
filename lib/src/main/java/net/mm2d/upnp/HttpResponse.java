@@ -70,6 +70,12 @@ public class HttpResponse implements HttpMessage {
         return setStatusLine(line);
     }
 
+    @Nonnull
+    @Override
+    public String getStartLine() {
+        return getStatusLine();
+    }
+
     /**
      * ステータスラインを設定する。
      *
@@ -79,6 +85,7 @@ public class HttpResponse implements HttpMessage {
      * @return HttpResponse
      * @see #setStartLine(String)
      */
+    @Nonnull
     public HttpResponse setStatusLine(@Nonnull final String line) {
         final String[] params = line.split(" ", 3);
         if (params.length < 3) {
@@ -90,9 +97,16 @@ public class HttpResponse implements HttpMessage {
         return this;
     }
 
+    /**
+     * ステータスラインを返す。
+     *
+     * <p>{@link #getStartLine()}のエイリアス。
+     *
+     * @return ステータスライン
+     * @see #getStartLine()
+     */
     @Nonnull
-    @Override
-    public String getStartLine() {
+    public String getStatusLine() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getVersion());
         sb.append(' ');
@@ -125,6 +139,7 @@ public class HttpResponse implements HttpMessage {
      * @return HttpResponse
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
+    @Nonnull
     public HttpResponse setStatusCode(final int code) {
         mStatus = Status.valueOf(code);
         if (mStatus == Status.HTTP_INVALID) {
@@ -153,6 +168,7 @@ public class HttpResponse implements HttpMessage {
      * @return HttpResponse
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
+    @Nonnull
     public HttpResponse setReasonPhrase(@Nonnull final String reasonPhrase) {
         mReasonPhrase = reasonPhrase;
         return this;
@@ -164,6 +180,7 @@ public class HttpResponse implements HttpMessage {
      * @param status ステータス
      * @return HttpResponse
      */
+    @Nonnull
     public HttpResponse setStatus(@Nonnull final Http.Status status) {
         mStatus = status;
         mStatusCode = status.getCode();
@@ -282,13 +299,15 @@ public class HttpResponse implements HttpMessage {
     }
 
     @Override
-    public void writeData(@Nonnull final OutputStream os) throws IOException {
-        mDelegate.writeData(os);
+    public void writeData(@Nonnull final OutputStream outputStream) throws IOException {
+        mDelegate.writeData(outputStream);
     }
 
+    @Nonnull
     @Override
-    public void readData(@Nonnull final InputStream is) throws IOException {
-        mDelegate.readData(is);
+    public HttpResponse readData(@Nonnull final InputStream inputStream) throws IOException {
+        mDelegate.readData(inputStream);
+        return this;
     }
 
     @Override
