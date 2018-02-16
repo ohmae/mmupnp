@@ -19,10 +19,12 @@ tasks.withType(JavaCompile) {
 javadoc {
     title = "mmupnp $version API"
     description "Generates Javadoc."
-    options.charSet = 'UTF-8'
-    options.encoding = "UTF-8"
-    options.links("https://docs.oracle.com/javase/jp/7/api/")
-    options.stylesheetFile = new File("stylesheet.css")
+    options {
+        charSet = 'UTF-8'
+        encoding = "UTF-8"
+        links("https://docs.oracle.com/javase/jp/7/api/")
+        stylesheetFile = new File("stylesheet.css")
+    }
 }
 
 dependencies {
