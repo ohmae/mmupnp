@@ -157,8 +157,8 @@ public class EventReceiverTest {
         assertThat(result.properties, hasItem(new StringPair("SystemUpdateID", "0")));
         assertThat(result.properties, hasItem(new StringPair("ContainerUpdateIDs", "")));
 
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream(baos.toByteArray()));
+        final HttpResponse response = new HttpResponse()
+                .readData(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
     }
 
@@ -204,8 +204,8 @@ public class EventReceiverTest {
         receiver.close();
         Thread.sleep(10);
 
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream(baos.toByteArray()));
+        final HttpResponse response = new HttpResponse()
+                .readData(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(response.getStatus(), is(Http.Status.HTTP_PRECON_FAILED));
     }
 
@@ -243,8 +243,8 @@ public class EventReceiverTest {
         receiver.close();
         Thread.sleep(10);
 
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream(baos.toByteArray()));
+        final HttpResponse response = new HttpResponse()
+                .readData(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(response.getStatus(), is(Http.Status.HTTP_PRECON_FAILED));
     }
 
@@ -282,8 +282,8 @@ public class EventReceiverTest {
         receiver.close();
         Thread.sleep(10);
 
-        final HttpResponse response = new HttpResponse();
-        response.readData(new ByteArrayInputStream(baos.toByteArray()));
+        final HttpResponse response = new HttpResponse()
+                .readData(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(response.getStatus(), is(Http.Status.HTTP_BAD_REQUEST));
     }
 

@@ -59,6 +59,7 @@ class SsdpNotifyReceiver implements SsdpServer {
         }, ni, SSDP_PORT);
     }
 
+    // VisibleForTesting
     SsdpNotifyReceiver(@Nonnull final SsdpServerDelegate delegate) {
         mDelegate = delegate;
     }

@@ -149,6 +149,12 @@ public class HttpRequest implements HttpMessage {
         return setRequestLine(line);
     }
 
+    @Nonnull
+    @Override
+    public String getStartLine() {
+        return getRequestLine();
+    }
+
     /**
      * リクエストラインを設定する。
      *
@@ -158,6 +164,7 @@ public class HttpRequest implements HttpMessage {
      * @return HttpRequest
      * @see #setStartLine(String)
      */
+    @Nonnull
     public HttpRequest setRequestLine(@Nonnull final String line) {
         final String[] params = line.split(" ", 3);
         if (params.length < 3) {
@@ -169,9 +176,16 @@ public class HttpRequest implements HttpMessage {
         return this;
     }
 
+    /**
+     * リクエストラインを返す。
+     *
+     * <p>{@link #getStartLine()}のエイリアス。
+     *
+     * @return リクエストライン
+     * @see #getStartLine()
+     */
     @Nonnull
-    @Override
-    public String getStartLine() {
+    public String getRequestLine() {
         return getMethod() + " " + getUri() + " " + getVersion();
     }
 
@@ -182,6 +196,7 @@ public class HttpRequest implements HttpMessage {
      * @return HttpRequest
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
+    @Nonnull
     public HttpRequest setUrl(@Nonnull final URL url) throws IOException {
         setUrl(url, false);
         return this;
@@ -195,6 +210,7 @@ public class HttpRequest implements HttpMessage {
      * @return HttpRequest
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
+    @Nonnull
     public HttpRequest setUrl(
             @Nonnull final URL url,
             final boolean withHostHeader) throws IOException {
@@ -234,6 +250,7 @@ public class HttpRequest implements HttpMessage {
      * @param method リクエストメソッド
      * @return HttpRequest
      */
+    @Nonnull
     public HttpRequest setMethod(@Nonnull final String method) {
         mMethod = method;
         return this;
@@ -259,6 +276,7 @@ public class HttpRequest implements HttpMessage {
      * @see #setUrl(URL)
      * @see #setUrl(URL, boolean)
      */
+    @Nonnull
     public HttpRequest setUri(@Nonnull final String uri) {
         mUri = uri;
         return this;
@@ -365,13 +383,15 @@ public class HttpRequest implements HttpMessage {
     }
 
     @Override
-    public void writeData(@Nonnull final OutputStream os) throws IOException {
-        mDelegate.writeData(os);
+    public void writeData(@Nonnull final OutputStream outputStream) throws IOException {
+        mDelegate.writeData(outputStream);
     }
 
+    @Nonnull
     @Override
-    public void readData(@Nonnull final InputStream is) throws IOException {
-        mDelegate.readData(is);
+    public HttpRequest readData(@Nonnull final InputStream inputStream) throws IOException {
+        mDelegate.readData(inputStream);
+        return this;
     }
 
     @Override

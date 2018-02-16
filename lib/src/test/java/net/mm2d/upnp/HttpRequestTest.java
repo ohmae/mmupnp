@@ -76,8 +76,7 @@ public class HttpRequestTest {
     @Test
     public void readData_読み込めること() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-length.bin");
-        final HttpRequest request = new HttpRequest();
-        request.readData(is);
+        final HttpRequest request = new HttpRequest().readData(is);
 
         assertThat(request.getMethod(), is(Http.POST));
         assertThat(request.getUri(), is("/cds/control"));
@@ -91,8 +90,7 @@ public class HttpRequestTest {
     @Test
     public void readData_Chunk読み込めること() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-chunked.bin");
-        final HttpRequest request = new HttpRequest();
-        request.readData(is);
+        final HttpRequest request = new HttpRequest().readData(is);
 
         assertThat(request.getMethod(), is(Http.POST));
         assertThat(request.getUri(), is("/cds/control"));
@@ -120,8 +118,7 @@ public class HttpRequestTest {
         request.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpRequest readRequest = new HttpRequest();
-        readRequest.readData(bais);
+        final HttpRequest readRequest = new HttpRequest().readData(bais);
 
         assertThat(readRequest.getStartLine(), is(request.getStartLine()));
         assertThat(readRequest.getBody(), is(request.getBody()));
@@ -144,8 +141,7 @@ public class HttpRequestTest {
         request.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpRequest readRequest = new HttpRequest();
-        readRequest.readData(bais);
+        final HttpRequest readRequest = new HttpRequest().readData(bais);
 
         assertThat(readRequest.getStartLine(), is(request.getStartLine()));
         assertThat(readRequest.getBody(), is(request.getBody()));
@@ -178,8 +174,7 @@ public class HttpRequestTest {
     @Test
     public void HttpRequest_ディープコピーができる() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-length.bin");
-        final HttpRequest request = new HttpRequest();
-        request.readData(is);
+        final HttpRequest request = new HttpRequest().readData(is);
 
         final HttpRequest readRequest = new HttpRequest(request);
         assertThat(readRequest.getMethod(), is(request.getMethod()));

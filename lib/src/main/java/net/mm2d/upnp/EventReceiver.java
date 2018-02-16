@@ -349,8 +349,7 @@ class EventReceiver {
                 @Nonnull final InputStream is,
                 @Nonnull final OutputStream os)
                 throws IOException {
-            final HttpRequest request = new HttpRequest();
-            request.readData(is);
+            final HttpRequest request = new HttpRequest().readData(is);
             final String nt = request.getHeader(Http.NT);
             final String nts = request.getHeader(Http.NTS);
             final String sid = request.getHeader(Http.SID);

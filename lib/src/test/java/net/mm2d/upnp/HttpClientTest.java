@@ -43,8 +43,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                final HttpRequest request = new HttpRequest().readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setStatusLine("HTTP/1.1 200 OK");
                 response.setBody(responseBody, true);
@@ -85,8 +84,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                final HttpRequest request = new HttpRequest().readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setStatusLine("HTTP/1.1 200 OK");
                 response.setBodyBinary(responseBody, true);
@@ -127,8 +125,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                final HttpRequest request = new HttpRequest().readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setStatusLine("HTTP/1.1 200 OK");
                 response.setBody(responseBody, true);
@@ -170,8 +167,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                final HttpRequest request = new HttpRequest().readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setStatusLine("HTTP/1.1 200 OK");
                 response.setBody(responseBody, true);
@@ -207,8 +203,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                final HttpRequest request = new HttpRequest().readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setHeader(Http.CONNECTION, Http.CLOSE);
                 response.setStatusLine("HTTP/1.1 301 Moved Permanently");
@@ -243,8 +238,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                final HttpRequest request = new HttpRequest().readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setHeader(Http.CONNECTION, Http.CLOSE);
                 if (request.getUri().equals("/b")) {
@@ -284,8 +278,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                final HttpRequest request = new HttpRequest().readData(is);
                 final HttpResponse response = new HttpResponse();
                 response.setHeader(Http.CONNECTION, Http.CLOSE);
                 if (request.getUri().equals("/b")) {
@@ -327,8 +320,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                new HttpRequest().readData(is);
                 return false;
             }
         });
@@ -358,8 +350,7 @@ public class HttpClientTest {
                     @Nonnull final Socket socket,
                     @Nonnull final InputStream is,
                     @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest();
-                request.readData(is);
+                new HttpRequest().readData(is);
                 return false;
             }
         });

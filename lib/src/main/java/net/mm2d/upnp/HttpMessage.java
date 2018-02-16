@@ -193,16 +193,17 @@ public interface HttpMessage {
     /**
      * 指定されたOutputStreamにメッセージの内容を書き出す。
      *
-     * @param os 出力先
+     * @param outputStream 出力先
      * @throws IOException 入出力エラー
      */
-    void writeData(@Nonnull final OutputStream os) throws IOException;
+    void writeData(@Nonnull final OutputStream outputStream) throws IOException;
 
     /**
      * 指定されたInputStreamからデータの読み出しを行う。
      *
-     * @param is 入力元
+     * @param inputStream 入力元
+     * @return HttpMessage
      * @throws IOException 入出力エラー
      */
-    void readData(@Nonnull final InputStream is) throws IOException;
+    HttpMessage readData(@Nonnull final InputStream inputStream) throws IOException;
 }
