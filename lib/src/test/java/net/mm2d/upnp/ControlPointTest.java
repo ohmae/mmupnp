@@ -285,6 +285,26 @@ public class ControlPointTest {
         }
 
         @Test
+        public void stop_lostDeviceが通知される() throws Exception {
+            final String uuid = "uuid";
+            final Device device = mock(Device.class);
+            final Service service = mock(Service.class);
+            doReturn(uuid).when(device).getUdn();
+            doReturn(System.currentTimeMillis() + 1000L).when(device).getExpireTime();
+            doReturn(Collections.singletonList(service)).when(device).getServiceList();
+            mCp.start();
+            mCp.discoverDevice(device);
+            Thread.sleep(100);
+            mCp.stop();
+            Thread.sleep(100);
+
+            assertThat(mCp.getDevice(uuid), is(nullValue()));
+            assertThat(mCp.getDeviceListSize(), is(0));
+            verify(mCp).lostDevice(device);
+            verify(mCp).unregisterSubscribeService(service);
+        }
+
+        @Test
         public void removeDiscoveryListener_削除できる() throws Exception {
             final DiscoveryListener l = mock(DiscoveryListener.class);
             mCp.addDiscoveryListener(l);
@@ -551,6 +571,24 @@ public class ControlPointTest {
             final Service service = mock(Service.class);
             doReturn("SubscriptionId").when(service).getSubscriptionId();
             doReturn(System.currentTimeMillis() + 1000).when(service).getSubscriptionExpiryTime();
+            mSubscribeHolder.add(service, false);
+            mCp.stop();
+            mCp.terminate();
+            Thread.sleep(100);
+            verify(service).unsubscribe();
+            verify(mDeviceHolder).remove(device);
+        }
+
+        @Test
+        public void stop時にunsubscribeでexceptionが発生しても無視する() throws Exception {
+            mCp.start();
+            final Device device = mock(Device.class);
+            doReturn("udn").when(device).getUdn();
+            mDeviceHolder.add(device);
+            final Service service = mock(Service.class);
+            doReturn("SubscriptionId").when(service).getSubscriptionId();
+            doReturn(System.currentTimeMillis() + 1000).when(service).getSubscriptionExpiryTime();
+            doThrow(new IOException()).when(service).unsubscribe();
             mSubscribeHolder.add(service, false);
             mCp.stop();
             mCp.terminate();
