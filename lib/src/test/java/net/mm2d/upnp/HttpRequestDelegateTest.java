@@ -26,17 +26,9 @@ public class HttpRequestDelegateTest {
 
     @Before
     public void setUp() {
-        mDelegate = spy(new HttpMessageDelegate(new StartLineProcessor() {
-            @Override
-            public void setStartLine(@Nonnull final String line) {
-            }
-
-            @Nonnull
-            @Override
-            public String getStartLine() {
-                return "";
-            }
-        }));
+        final StartLineProcessor processor = mock(StartLineProcessor.class);
+        doReturn("").when(processor).getStartLine();
+        mDelegate = spy(new HttpMessageDelegate(processor));
         mMessage = new HttpRequest(mDelegate);
     }
 
