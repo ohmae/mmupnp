@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 
 import java.net.InetAddress;
@@ -548,16 +549,17 @@ public class ServiceTest {
 
         @Test
         public void subscribe() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = spy(new HttpClient());
+            final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
+            doReturn(createSubscribeResponse()).when(client).post(captor.capture());
             doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
 
-            final HttpRequest request = client.getHttpRequest();
+            final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
             verify(mControlPoint).registerSubscribeService(mCds, false);
 
-            final String callback = client.getHttpRequest().getHeader(Http.CALLBACK);
+            final String callback = request.getHeader(Http.CALLBACK);
             assertThat(callback.charAt(0), is('<'));
             assertThat(callback.charAt(callback.length() - 1), is('>'));
             final URL url = new URL(callback.substring(1, callback.length() - 2));
@@ -568,49 +570,53 @@ public class ServiceTest {
 
         @Test
         public void subscribe_keep() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = spy(new HttpClient());
+            final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
+            doReturn(createSubscribeResponse()).when(client).post(captor.capture());
             doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe(true);
 
-            final HttpRequest request = client.getHttpRequest();
+            final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
             verify(mControlPoint).registerSubscribeService(mCds, true);
         }
 
         @Test
         public void renewSubscribe1() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = spy(new HttpClient());
+            final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
+            doReturn(createSubscribeResponse()).when(client).post(captor.capture());
             doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
             mCds.renewSubscribe();
 
-            final HttpRequest request = client.getHttpRequest();
+            final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
         }
 
         @Test
         public void renewSubscribe2() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = spy(new HttpClient());
+            final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
+            doReturn(createSubscribeResponse()).when(client).post(captor.capture());
             doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
             mCds.subscribe();
 
-            final HttpRequest request = client.getHttpRequest();
+            final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
         }
 
         @Test
         public void unsubscribe() throws Exception {
-            final MockHttpClient client = new MockHttpClient();
-            client.setResponse(createSubscribeResponse());
+            final HttpClient client = spy(new HttpClient());
+            final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
+            doReturn(createSubscribeResponse()).when(client).post(captor.capture());
             doReturn(client).when(mCds).createHttpClient();
             mCds.subscribe();
             mCds.unsubscribe();
 
-            final HttpRequest request = client.getHttpRequest();
+            final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
             verify(mControlPoint).unregisterSubscribeService(mCds);
         }
