@@ -18,8 +18,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.annotation.Nonnull;
-
 import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)

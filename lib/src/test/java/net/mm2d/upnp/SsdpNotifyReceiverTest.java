@@ -15,14 +15,13 @@ import net.mm2d.util.TestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-
-import javax.annotation.Nonnull;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -37,19 +36,17 @@ public class SsdpNotifyReceiverTest {
         final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", (short) 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(delegate));
-        final SsdpRequest result[] = new SsdpRequest[1];
-        receiver.setNotifyListener(new SsdpNotifyReceiver.NotifyListener() {
-            @Override
-            public void onReceiveNotify(@Nonnull final SsdpRequest message) {
-                result[0] = message;
-            }
-        });
+
+        final ArgumentCaptor<SsdpRequest> captor = ArgumentCaptor.forClass(SsdpRequest.class);
+        final NotifyListener listener = mock(NotifyListener.class);
+        doNothing().when(listener).onReceiveNotify(captor.capture());
+        receiver.setNotifyListener(listener);
 
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
         final InetAddress address = InetAddress.getByName("192.0.2.2");
         receiver.onReceive(address, data, data.length);
 
-        assertThat(result[0].getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
+        assertThat(captor.capture().getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
 
     @Test
