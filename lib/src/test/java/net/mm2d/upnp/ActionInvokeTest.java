@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2016 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -287,17 +287,25 @@ public class ActionInvokeTest {
         assertThat(elements.get(2).getTextContent(), is(value));
     }
 
-
-    @Test(expected = IOException.class)
+    @Test
     public void invoke_200以外のレスポンスでIOExceptionが発生() throws Exception {
+        int statusCount = 0;
+        int exceptionCount = 0;
         for (final Http.Status status : Http.Status.values()) {
-            if (status == Http.Status.HTTP_OK) {
-                continue;
-            }
             mHttpResponse.setStatus(status);
             doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-            mAction.invoke(new HashMap<String, String>());
+            if (status == Http.Status.HTTP_OK) {
+                mAction.invoke(new HashMap<String, String>());
+                continue;
+            }
+            try {
+                statusCount++;
+                mAction.invoke(new HashMap<String, String>());
+            } catch (final IOException ignored) {
+                exceptionCount++;
+            }
         }
+        assertThat(statusCount, is(exceptionCount));
     }
 
     @Test(expected = IOException.class)
