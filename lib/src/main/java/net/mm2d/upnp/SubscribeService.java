@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2016 2016 大前良介 (OHMAE Ryosuke)
+ * Copyright (c) 2016 2016 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 /**
  * ServiceのSubscribe状態を管理するクラス。
  *
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 class SubscribeService {
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);

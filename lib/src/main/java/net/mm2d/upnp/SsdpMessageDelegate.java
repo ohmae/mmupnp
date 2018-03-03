@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 /**
  * SsdpMessageの共通実装。
  *
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 class SsdpMessageDelegate implements SsdpMessage {
     private static final int DEFAULT_MAX_AGE = 1800;

@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2017 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2017 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -19,9 +19,6 @@ import java.lang.reflect.InvocationTargetException;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-/**
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
- */
 @RunWith(JUnit4.class)
 public class XmlUtilsTest {
     @Test(expected = InvocationTargetException.class)

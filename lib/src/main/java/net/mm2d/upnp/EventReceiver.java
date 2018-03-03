@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2016 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -38,7 +38,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * <p>HTTPのサーバとしてリクエストの受付のみを行う。
  * HTTPメッセージのパースはリスナーの実装側が行う。
  *
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 class EventReceiver {
     /**

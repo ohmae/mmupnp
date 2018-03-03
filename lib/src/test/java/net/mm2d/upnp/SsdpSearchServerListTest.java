@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -11,6 +11,8 @@ import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.NetworkUtils;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
@@ -18,9 +20,7 @@ import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
 
-/**
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
- */
+@RunWith(JUnit4.class)
 public class SsdpSearchServerListTest {
     @Test
     public void openAndStart() throws Exception {

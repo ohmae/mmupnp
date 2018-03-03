@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 /**
  * SsdpServerの共通処理を実装するクラス。
  *
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 // TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
 class SsdpServerDelegate implements SsdpServer {

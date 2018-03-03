@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -11,6 +11,8 @@ import net.mm2d.upnp.HttpMessageDelegate.StartLineProcessor;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -20,6 +22,7 @@ import javax.annotation.Nonnull;
 
 import static org.mockito.Mockito.*;
 
+@RunWith(JUnit4.class)
 public class HttpRequestDelegateTest {
     private HttpMessageDelegate mDelegate;
     private HttpRequest mMessage;
