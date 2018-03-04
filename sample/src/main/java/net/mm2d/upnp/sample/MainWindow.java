@@ -194,6 +194,17 @@ public class MainWindow extends JFrame {
         return button;
     }
 
+    private JButton makeClearButton() {
+        final JButton button = new JButton("CLEAR");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                mControlPoint.clearDeviceList();
+            }
+        });
+        return button;
+    }
+
     private JButton makeSearchButton() {
         final JButton button = new JButton("M-SEARCH");
         button.addActionListener(new ActionListener() {
@@ -210,6 +221,7 @@ public class MainWindow extends JFrame {
         panel.setLayout(new FlowLayout());
         panel.add(makeStartButton());
         panel.add(makeStopButton());
+        panel.add(makeClearButton());
         panel.add(makeSearchButton());
         return panel;
     }

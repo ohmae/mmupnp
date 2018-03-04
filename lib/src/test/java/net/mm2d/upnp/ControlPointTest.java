@@ -265,6 +265,30 @@ public class ControlPointTest {
         }
 
         @Test
+        public void clearDeviceList_Deviceがクリアされる() throws Exception {
+            final DiscoveryListener l = mock(DiscoveryListener.class);
+            mCp.addDiscoveryListener(l);
+            final String uuid = "uuid";
+            final Device device = mock(Device.class);
+            doReturn(uuid).when(device).getUdn();
+            mCp.discoverDevice(device);
+            Thread.sleep(100);
+
+            assertThat(mCp.getDevice(uuid), is(device));
+            assertThat(mCp.getDeviceList(), hasItem(device));
+            assertThat(mCp.getDeviceListSize(), is(1));
+            verify(l, times(1)).onDiscover(device);
+
+            mCp.clearDeviceList();
+            Thread.sleep(100);
+
+            assertThat(mCp.getDevice(uuid), is(nullValue()));
+            assertThat(mCp.getDeviceList(), not(hasItem(device)));
+            assertThat(mCp.getDeviceListSize(), is(0));
+            verify(l, times(1)).onLost(device);
+        }
+
+        @Test
         public void lostDevice_onLostが通知される() throws Exception {
             final DiscoveryListener l = mock(DiscoveryListener.class);
             mCp.addDiscoveryListener(l);

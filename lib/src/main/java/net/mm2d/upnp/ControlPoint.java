@@ -458,6 +458,20 @@ public class ControlPoint {
     }
 
     /**
+     * 保持している発見済みのデバイスリストをクリアする。
+     *
+     * <p>コール時点で保持されているデバイスはlost扱いとして通知される。
+     */
+    public void clearDeviceList() {
+        synchronized (mDeviceHolder) {
+            final List<Device> list = getDeviceList();
+            for (final Device device : list) {
+                lostDevice(device);
+            }
+        }
+    }
+
+    /**
      * Searchパケットを送出する。
      *
      * <p>{@link #search(String)}を引数nullでコールするのと等価。
