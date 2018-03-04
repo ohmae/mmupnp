@@ -10,9 +10,11 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## Feature
 - Pure Java implementation.
-- Available in both Java application and Android apps
+- Available in both Java application and Android apps.
 - Easy to use
 - High response
+
+Of course, this also can be used from kotlin.
 
 ## Requirements
 - Java SE 7 or later
@@ -72,7 +74,7 @@ cp.start();
 
 If you want to specify the network interface, describe the following.
 
-```
+```java
 NetworkInterface ni = NetworkInterface.getByName("eth0");
 ControlPoint cp = new ControlPoint(ni);
 ```
@@ -84,7 +86,7 @@ Call ControlPoint#search() or ControlPoint#search(String).
 cp.search();                   // Default ST is ssdp:all
 ```
 
-```
+```java
 cp.search("upnp:rootdevice"); // To use specific ST. In this case "upnp:rootdevice"
 ```
 
