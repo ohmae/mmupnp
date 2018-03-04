@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2016 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT

@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -11,32 +11,25 @@ import net.mm2d.upnp.HttpMessageDelegate.StartLineProcessor;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.annotation.Nonnull;
-
 import static org.mockito.Mockito.*;
 
+@RunWith(JUnit4.class)
 public class HttpResponseDelegateTest {
     private HttpMessageDelegate mDelegate;
     private HttpResponse mMessage;
 
     @Before
     public void setUp() throws Exception {
-        mDelegate = spy(new HttpMessageDelegate(new StartLineProcessor() {
-            @Override
-            public void setStartLine(@Nonnull final String line) {
-            }
-
-            @Nonnull
-            @Override
-            public String getStartLine() {
-                return "";
-            }
-        }));
+        final StartLineProcessor processor = mock(StartLineProcessor.class);
+        doReturn("").when(processor).getStartLine();
+        mDelegate = spy(new HttpMessageDelegate(processor));
         mMessage = new HttpResponse(mDelegate);
     }
 

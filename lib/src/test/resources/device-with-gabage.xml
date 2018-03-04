@@ -1,11 +1,4 @@
 <?xml version="1.0"?>
-<!--
-  ~ Copyright(C)  2018 大前良介(OHMAE Ryosuke)
-  ~
-  ~ This software is released under the MIT License.
-  ~ http://opensource.org/licenses/MIT
-  -->
-
 <root xmlns="urn:schemas-upnp-org:device-1-0">
     <specVersion>
         <major>1</major>

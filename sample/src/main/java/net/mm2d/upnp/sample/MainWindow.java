@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2016 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -47,7 +47,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 public class MainWindow extends JFrame {
     private static final String TAG = "MainWindow";
@@ -194,6 +194,17 @@ public class MainWindow extends JFrame {
         return button;
     }
 
+    private JButton makeClearButton() {
+        final JButton button = new JButton("CLEAR");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                mControlPoint.clearDeviceList();
+            }
+        });
+        return button;
+    }
+
     private JButton makeSearchButton() {
         final JButton button = new JButton("M-SEARCH");
         button.addActionListener(new ActionListener() {
@@ -210,6 +221,7 @@ public class MainWindow extends JFrame {
         panel.setLayout(new FlowLayout());
         panel.add(makeStartButton());
         panel.add(makeStopButton());
+        panel.add(makeClearButton());
         panel.add(makeSearchButton());
         return panel;
     }

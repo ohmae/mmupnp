@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -13,9 +13,6 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.*;
 
-/**
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
- */
 public class NotifyEventListenerListTest {
     @Test
     public void onNotifyEvent_通知される() {

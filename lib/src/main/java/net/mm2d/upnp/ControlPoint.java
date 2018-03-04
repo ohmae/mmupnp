@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2016 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -37,7 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * <p>このライブラリを利用する上でアプリからインスタンス化する必要がある唯一のクラス。
  *
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 public class ControlPoint {
     /**
@@ -455,6 +455,20 @@ public class ControlPoint {
             lostDevice(device);
         }
         mDeviceHolder.clear();
+    }
+
+    /**
+     * 保持している発見済みのデバイスリストをクリアする。
+     *
+     * <p>コール時点で保持されているデバイスはlost扱いとして通知される。
+     */
+    public void clearDeviceList() {
+        synchronized (mDeviceHolder) {
+            final List<Device> list = getDeviceList();
+            for (final Device device : list) {
+                lostDevice(device);
+            }
+        }
     }
 
     /**

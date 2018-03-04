@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -9,12 +9,15 @@ package net.mm2d.upnp;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 import static org.mockito.Mockito.*;
 
+@RunWith(JUnit4.class)
 public class SsdpRequestDelegateTest {
     private SsdpMessageDelegate mDelegate;
     private SsdpRequest mMessage;

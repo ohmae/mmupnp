@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2017 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2017 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -15,14 +15,13 @@ import net.mm2d.util.TestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-
-import javax.annotation.Nonnull;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -84,17 +83,15 @@ public class SsdpSearchServerTest {
         final SsdpSearchServer server = spy(new SsdpSearchServer(delegate));
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");
         final InetAddress address = InetAddress.getByName("192.0.2.2");
-        final SsdpResponse result[] = new SsdpResponse[1];
-        server.setResponseListener(new SsdpSearchServer.ResponseListener() {
-            @Override
-            public void onReceiveResponse(@Nonnull final SsdpResponse message) {
-                result[0] = message;
-            }
-        });
+        final ArgumentCaptor<SsdpResponse> captor = ArgumentCaptor.forClass(SsdpResponse.class);
+        final ResponseListener listener = mock(ResponseListener.class);
+        doNothing().when(listener).onReceiveResponse(captor.capture());
+        server.setResponseListener(listener);
         server.onReceive(address, data, data.length);
 
-        assertThat(result[0].getStatus(), is(Http.Status.HTTP_OK));
-        assertThat(result[0].getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
+        SsdpResponse response = captor.getValue();
+        assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
+        assertThat(response.getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
 
     @Test

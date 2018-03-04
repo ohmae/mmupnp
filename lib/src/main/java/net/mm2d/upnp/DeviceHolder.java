@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2016 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2016 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
  *
  * <p>Deviceの有効期限を確認し、有効期限が切れたDeviceをLostとして通知する。
  *
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 class DeviceHolder implements Runnable {
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);

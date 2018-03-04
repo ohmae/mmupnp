@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
  * <p>UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
  * 長大なデータのやり取りは想定していない。
  *
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
+ * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  * @see HttpResponse
  * @see HttpRequest
  */

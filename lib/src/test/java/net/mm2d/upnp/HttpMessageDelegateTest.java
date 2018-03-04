@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -10,6 +10,8 @@ package net.mm2d.upnp;
 import net.mm2d.upnp.HttpMessageDelegate.StartLineProcessor;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
 import java.io.UnsupportedEncodingException;
@@ -18,6 +20,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@RunWith(JUnit4.class)
 public class HttpMessageDelegateTest {
     @Test
     public void setBody_エンコード不可でもExceptionは発生しない() throws Exception {

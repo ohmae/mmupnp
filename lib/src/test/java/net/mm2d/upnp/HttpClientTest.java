@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2017 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2017 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -22,7 +22,6 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
-import java.net.UnknownHostException;
 
 import javax.annotation.Nonnull;
 
@@ -404,28 +403,13 @@ public class HttpClientTest {
     @Test
     public void canReuse_接続状態かつアドレスとポートが一致すればtrue() throws Exception {
         final HttpClient client = new HttpClient();
-        final Field socket = HttpClient.class.getDeclaredField("mSocket");
-        socket.setAccessible(true);
-        socket.set(client, new Socket() {
-            @Override
-            public boolean isConnected() {
-                return true;
-            }
-
-            @Override
-            public InetAddress getInetAddress() {
-                try {
-                    return InetAddress.getByName("192.168.0.1");
-                } catch (final UnknownHostException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-
-            @Override
-            public int getPort() {
-                return 80;
-            }
-        });
+        final Socket socket = mock(Socket.class);
+        doReturn(true).when(socket).isConnected();
+        doReturn(InetAddress.getByName("192.168.0.1")).when(socket).getInetAddress();
+        doReturn(80).when(socket).getPort();
+        final Field fieldSocket = HttpClient.class.getDeclaredField("mSocket");
+        fieldSocket.setAccessible(true);
+        fieldSocket.set(client, socket);
         final HttpRequest request = new HttpRequest()
                 .setUrl(new URL("http://192.168.0.1/index.html"));
         assertThat(client.canReuse(request), is(true));
@@ -434,28 +418,13 @@ public class HttpClientTest {
     @Test
     public void canReuse_ポートが不一致ならfalse() throws Exception {
         final HttpClient client = new HttpClient();
-        final Field socket = HttpClient.class.getDeclaredField("mSocket");
-        socket.setAccessible(true);
-        socket.set(client, new Socket() {
-            @Override
-            public boolean isConnected() {
-                return true;
-            }
-
-            @Override
-            public InetAddress getInetAddress() {
-                try {
-                    return InetAddress.getByName("192.168.0.1");
-                } catch (final UnknownHostException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-
-            @Override
-            public int getPort() {
-                return 80;
-            }
-        });
+        final Socket socket = mock(Socket.class);
+        doReturn(true).when(socket).isConnected();
+        doReturn(InetAddress.getByName("192.168.0.1")).when(socket).getInetAddress();
+        doReturn(80).when(socket).getPort();
+        final Field fieldSocket = HttpClient.class.getDeclaredField("mSocket");
+        fieldSocket.setAccessible(true);
+        fieldSocket.set(client, socket);
         final HttpRequest request = new HttpRequest()
                 .setUrl(new URL("http://192.168.0.1:8080/index.html"));
         assertThat(client.canReuse(request), is(false));
@@ -464,28 +433,13 @@ public class HttpClientTest {
     @Test
     public void canReuse_アドレスが不一致ならfalse() throws Exception {
         final HttpClient client = new HttpClient();
-        final Field socket = HttpClient.class.getDeclaredField("mSocket");
-        socket.setAccessible(true);
-        socket.set(client, new Socket() {
-            @Override
-            public boolean isConnected() {
-                return true;
-            }
-
-            @Override
-            public InetAddress getInetAddress() {
-                try {
-                    return InetAddress.getByName("192.168.0.2");
-                } catch (final UnknownHostException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-
-            @Override
-            public int getPort() {
-                return 80;
-            }
-        });
+        final Socket socket = mock(Socket.class);
+        doReturn(true).when(socket).isConnected();
+        doReturn(InetAddress.getByName("192.168.0.2")).when(socket).getInetAddress();
+        doReturn(80).when(socket).getPort();
+        final Field fieldSocket = HttpClient.class.getDeclaredField("mSocket");
+        fieldSocket.setAccessible(true);
+        fieldSocket.set(client, socket);
         final HttpRequest request = new HttpRequest()
                 .setUrl(new URL("http://192.168.0.1/index.html"));
         assertThat(client.canReuse(request), is(false));
@@ -494,28 +448,13 @@ public class HttpClientTest {
     @Test
     public void canReuse_接続状態でなければfalse() throws Exception {
         final HttpClient client = new HttpClient();
-        final Field socket = HttpClient.class.getDeclaredField("mSocket");
-        socket.setAccessible(true);
-        socket.set(client, new Socket() {
-            @Override
-            public boolean isConnected() {
-                return false;
-            }
-
-            @Override
-            public InetAddress getInetAddress() {
-                try {
-                    return InetAddress.getByName("192.168.0.1");
-                } catch (final UnknownHostException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-
-            @Override
-            public int getPort() {
-                return 80;
-            }
-        });
+        final Socket socket = mock(Socket.class);
+        doReturn(false).when(socket).isConnected();
+        doReturn(InetAddress.getByName("192.168.0.1")).when(socket).getInetAddress();
+        doReturn(80).when(socket).getPort();
+        final Field fieldSocket = HttpClient.class.getDeclaredField("mSocket");
+        fieldSocket.setAccessible(true);
+        fieldSocket.set(client, socket);
         final HttpRequest request = new HttpRequest()
                 .setUrl(new URL("http://192.168.0.1/index.html"));
         assertThat(client.canReuse(request), is(false));

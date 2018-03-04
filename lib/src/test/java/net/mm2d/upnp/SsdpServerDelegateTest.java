@@ -1,5 +1,5 @@
 /*
- * Copyright(C)  2018 大前良介(OHMAE Ryosuke)
+ * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  *
  * This software is released under the MIT License.
  * http://opensource.org/licenses/MIT
@@ -13,6 +13,8 @@ import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TestUtils;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
@@ -30,9 +32,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
-/**
- * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
- */
+@RunWith(JUnit4.class)
 public class SsdpServerDelegateTest {
     @Test(timeout = 1000L)
     public void open_close_デッドロックしない() throws Exception {
