@@ -46,7 +46,7 @@ public class SsdpNotifyReceiverTest {
         final InetAddress address = InetAddress.getByName("192.0.2.2");
         receiver.onReceive(address, data, data.length);
 
-        assertThat(captor.capture().getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
+        assertThat(captor.getValue().getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }
 
     @Test
