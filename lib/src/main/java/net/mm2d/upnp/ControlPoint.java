@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.net.NetworkInterface;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -114,6 +116,8 @@ public class ControlPoint {
     @Nonnull
     private final Map<String, Device.Builder> mLoadingDeviceMap;
     @Nonnull
+    private final Set<String> mEmbeddedDeviceUdnSet = new HashSet<>();
+    @Nonnull
     private final EventReceiver mEventReceiver;
     @Nonnull
     private final ExecutorService mIoExecutor;
@@ -137,8 +141,12 @@ public class ControlPoint {
     // VisibleForTesting
     void onReceiveSsdp(@Nonnull final SsdpMessage message) {
         synchronized (mDeviceHolder) {
-            final Device device = mDeviceHolder.get(message.getUuid());
+            final String uuid = message.getUuid();
+            final Device device = mDeviceHolder.get(uuid);
             if (device == null) {
+                if (mEmbeddedDeviceUdnSet.contains(uuid)) {
+                    return;
+                }
                 onReceiveNewSsdp(message);
                 return;
             }
@@ -547,6 +555,7 @@ public class ControlPoint {
 
     // VisibleForTesting
     void discoverDevice(@Nonnull final Device device) {
+        mEmbeddedDeviceUdnSet.addAll(device.getEmbeddedDeviceUdnSet());
         mDeviceHolder.add(device);
         executeInSequential(new Runnable() {
             @Override
@@ -567,6 +576,7 @@ public class ControlPoint {
      * @see DeviceHolder
      */
     void lostDevice(@Nonnull final Device device) {
+        mEmbeddedDeviceUdnSet.removeAll(device.getEmbeddedDeviceUdnSet());
         synchronized (mDeviceHolder) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {

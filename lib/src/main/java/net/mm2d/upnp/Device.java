@@ -13,10 +13,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -434,7 +436,8 @@ public class Device {
             if (mUdn == null) {
                 throw new IllegalStateException("UDN must be set.");
             }
-            if (!mUdn.equals(getUuid())) {
+            // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
+            if (parent == null && !mUdn.equals(getUuid())) {
                 throw new IllegalStateException("uuid and udn does not match! uuid=" + getUuid() + " udn=" + mUdn);
             }
             return new Device(parent, this);
@@ -600,9 +603,11 @@ public class Device {
      * @param message SSDPパケット
      */
     void updateSsdpMessage(@Nonnull final SsdpMessage message) {
-        final String uuid = message.getUuid();
-        if (!getUdn().equals(uuid)) {
-            throw new IllegalArgumentException("uuid and udn does not match! uuid=" + uuid + " udn=" + mUdn);
+        if (!isEmbeddedDevice()) {
+            final String uuid = message.getUuid();
+            if (!getUdn().equals(uuid)) {
+                throw new IllegalArgumentException("uuid and udn does not match! uuid=" + uuid + " udn=" + mUdn);
+            }
         }
         final String location = message.getLocation();
         if (location == null) {
@@ -1137,6 +1142,18 @@ public class Device {
             }
         }
         return null;
+    }
+
+    Set<String> getEmbeddedDeviceUdnSet() {
+        if (mDeviceList.isEmpty()) {
+            return Collections.emptySet();
+        }
+        final Set<String> set = new HashSet<>();
+        for (final Device device : mDeviceList) {
+            set.add(device.getUdn());
+            set.addAll(device.getEmbeddedDeviceUdnSet());
+        }
+        return set;
     }
 
     @Override
