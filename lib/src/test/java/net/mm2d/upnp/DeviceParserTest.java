@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InterfaceAddress;
 import java.net.URL;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -158,6 +159,11 @@ public class DeviceParserTest {
             assertThat(device2.getUpc(), is("000000000000"));
             assertThat(device2.getParent(), is(device1));
             assertThat(device2.isEmbeddedDevice(), is(true));
+
+            final Set<String> udns = device.getEmbeddedDeviceUdnSet();
+            assertThat(udns, hasItem("uuid:01234567-89ab-cdef-0123-456789abcdee"));
+            assertThat(udns, hasItem("uuid:01234567-89ab-cdef-0123-456789abcded"));
+            assertThat(udns, not(hasItem("uuid:01234567-89ab-cdef-0123-456789abcdef")));
         }
 
         @Test

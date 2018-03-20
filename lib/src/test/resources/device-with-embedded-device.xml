@@ -35,7 +35,7 @@
                 <modelNumber>0000000</modelNumber>
                 <modelURL>http://www.mm2d.net/</modelURL>
                 <serialNumber>00000000</serialNumber>
-                <UDN>uuid:01234567-89ab-cdef-0123-456789abcdef</UDN>
+                <UDN>uuid:01234567-89ab-cdef-0123-456789abcdee</UDN>
                 <UPC>000000000000</UPC>
                 <serviceList>
                     <service>
@@ -57,7 +57,7 @@
                         <modelNumber>0000000</modelNumber>
                         <modelURL>http://www.mm2d.net/</modelURL>
                         <serialNumber>00000000</serialNumber>
-                        <UDN>uuid:01234567-89ab-cdef-0123-456789abcdef</UDN>
+                        <UDN>uuid:01234567-89ab-cdef-0123-456789abcded</UDN>
                         <UPC>000000000000</UPC>
                         <serviceList>
                             <service>
