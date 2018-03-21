@@ -220,7 +220,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_DUAL_STACK() throws Exception {
-            final ControlPoint cp = new ControlPoint(Protocol.DUAL_STACK);
+            final ControlPoint cp = new ControlPoint(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -234,7 +234,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V4_ONLY() throws Exception {
-            final ControlPoint cp = new ControlPoint(Protocol.IP_V4_ONLY);
+            final ControlPoint cp = new ControlPoint(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -248,7 +248,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V6_ONLY() throws Exception {
-            final ControlPoint cp = new ControlPoint(Protocol.IP_V6_ONLY);
+            final ControlPoint cp = new ControlPoint(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(false));
