@@ -108,6 +108,11 @@ public class SsdpRequest implements SsdpMessage {
         mDelegate.updateLocation();
     }
 
+    @Override
+    public int getScopeId() {
+        return mDelegate.getScopeId();
+    }
+
     @Nullable
     @Override
     public InterfaceAddress getInterfaceAddress() {

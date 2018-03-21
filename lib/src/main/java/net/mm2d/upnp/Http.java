@@ -9,6 +9,8 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.TextUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -325,6 +327,45 @@ public final class Http {
             return baseUrl.substring(0, pos + 1) + path;
         }
         return baseUrl + "/" + path;
+    }
+
+    /**
+     * URLにScopeIDを追加する
+     *
+     * @param urlString URL文字列
+     * @param scopeId   ScopeID
+     * @return ScopeIDが付加されたURL
+     * @throws MalformedURLException 不正なURL
+     */
+    @Nonnull
+    public static URL makeUrlWithScopeId(
+            @Nonnull final String urlString,
+            final int scopeId) throws MalformedURLException {
+        final URL url = new URL(urlString);
+        if (scopeId == 0) {
+            return url;
+        }
+        final String host = makeHostWithScopeId(url.getHost(), scopeId);
+        final int port = url.getPort();
+        if (url.getDefaultPort() == port || port <= 0) {
+            return new URL(url.getProtocol() + "://" + host + url.getFile());
+        }
+        return new URL(url.getProtocol() + "://" + host + ":" + url.getPort() + url.getFile());
+    }
+
+    @Nonnull
+    private static String makeHostWithScopeId(
+            @Nonnull final String host,
+            final int scopeId) {
+        final int length = host.length();
+        if (host.charAt(length - 1) != ']') {
+            return host;
+        }
+        final int index = host.indexOf("%");
+        if (index < 0) {
+            return host.substring(0, length - 1) + "%" + scopeId + "]";
+        }
+        return host.substring(0, index) + "%" + scopeId + "]";
     }
 
     /**

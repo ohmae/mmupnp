@@ -11,16 +11,18 @@ import net.mm2d.log.Log;
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
-import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.StringPair;
 import net.mm2d.util.TextUtils;
 
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +106,8 @@ public class ControlPoint {
     }
 
     @Nonnull
+    private final Protocol mProtocol;
+    @Nonnull
     private IconFilter mIconFilter = IconFilter.NONE;
     @Nonnull
     private final DiscoveryListenerList mDiscoveryListenerList;
@@ -131,50 +135,6 @@ public class ControlPoint {
     private final DeviceHolder mDeviceHolder;
     @Nonnull
     private final SubscribeHolder mSubscribeHolder;
-
-    // VisibleForTesting
-    @Nonnull
-    HttpClient createHttpClient() {
-        return new HttpClient(true);
-    }
-
-    // VisibleForTesting
-    void onReceiveSsdp(@Nonnull final SsdpMessage message) {
-        synchronized (mDeviceHolder) {
-            final String uuid = message.getUuid();
-            final Device device = mDeviceHolder.get(uuid);
-            if (device == null) {
-                if (mEmbeddedDeviceUdnSet.contains(uuid)) {
-                    return;
-                }
-                onReceiveNewSsdp(message);
-                return;
-            }
-            if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
-                lostDevice(device);
-            } else {
-                device.updateSsdpMessage(message);
-            }
-        }
-    }
-
-    private void onReceiveNewSsdp(@Nonnull final SsdpMessage message) {
-        final String uuid = message.getUuid();
-        if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
-            mLoadingDeviceMap.remove(uuid);
-            return;
-        }
-        final Device.Builder deviceBuilder = mLoadingDeviceMap.get(uuid);
-        if (deviceBuilder != null) {
-            deviceBuilder.updateSsdpMessage(message);
-            return;
-        }
-        final Device.Builder builder = new Device.Builder(this, message);
-        mLoadingDeviceMap.put(uuid, builder);
-        if (!executeInParallel(new DeviceLoader(builder))) {
-            mLoadingDeviceMap.remove(uuid);
-        }
-    }
 
     private class DeviceLoader implements Runnable {
         @Nonnull
@@ -247,14 +207,13 @@ public class ControlPoint {
      * インスタンス初期化
      *
      * <p>引数のインターフェースを利用するように初期化される。
-     * 引数なしの場合、使用するインターフェースは自動的に選定される。
+     * 使用するインターフェースは自動的に選定される。
      *
-     * @param interfaces 使用するインターフェース、指定しない場合は自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
-    public ControlPoint(@Nonnull final NetworkInterface... interfaces)
+    public ControlPoint()
             throws IllegalStateException {
-        this(Arrays.asList(interfaces));
+        this(Collections.<NetworkInterface>emptyList());
     }
 
     /**
@@ -265,25 +224,55 @@ public class ControlPoint {
      */
     public ControlPoint(@Nullable final Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
-        this(getDefaultInterfacesIfEmpty(interfaces), new ControlPointDiFactory());
+        this(Protocol.DEFAULT, interfaces);
+    }
+
+    /**
+     * インスタンス初期化
+     *
+     * <p>プロトコルスタックのみ指定して初期化を行う。
+     * 使用するインターフェースは自動的に選定される。
+     *
+     * @param protocol 使用するプロトコルスタック
+     * @throws IllegalStateException 使用可能なインターフェースがない。
+     */
+    public ControlPoint(@Nonnull final Protocol protocol) throws IllegalStateException {
+        this(protocol, Collections.<NetworkInterface>emptyList());
+    }
+
+    /**
+     * 利用するインターフェースを指定してインスタンス作成。
+     *
+     * @param protocol   使用するプロトコルスタック
+     * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
+     * @throws IllegalStateException 使用可能なインターフェースがない。
+     */
+    public ControlPoint(
+            @Nonnull final Protocol protocol,
+            @Nullable final Collection<NetworkInterface> interfaces)
+            throws IllegalStateException {
+        this(protocol, getDefaultInterfacesIfEmpty(protocol, interfaces), new ControlPointDiFactory(protocol));
     }
 
     @Nonnull
     private static Collection<NetworkInterface> getDefaultInterfacesIfEmpty(
+            @Nonnull final Protocol protocol,
             @Nullable final Collection<NetworkInterface> interfaces) {
         if (interfaces == null || interfaces.isEmpty()) {
-            return NetworkUtils.getAvailableInet4Interfaces();
+            return protocol.getAvailableInterfaces();
         }
         return interfaces;
     }
 
     // VisibleForTesting
     ControlPoint(
+            @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ControlPointDiFactory factory) {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
         }
+        mProtocol = protocol;
         mLoadingDeviceMap = factory.createLoadingDeviceMap();
         mNotifyExecutor = factory.createNotifyExecutor();
         mIoExecutor = factory.createIoExecutor();
@@ -324,6 +313,81 @@ public class ControlPoint {
                 return service != null && executeInSequential(new EventNotifyTask(service, seq, properties));
             }
         });
+    }
+
+    // VisibleForTesting
+    @Nonnull
+    HttpClient createHttpClient() {
+        return new HttpClient(true);
+    }
+
+    // VisibleForTesting
+    boolean needToUpdateSsdpMessage(
+            @Nonnull final SsdpMessage oldMessage,
+            @Nonnull final SsdpMessage newMessage) {
+        //noinspection ConstantConditions : 受信したメッセージの場合はnullではない
+        final InetAddress newAddress = newMessage.getInterfaceAddress().getAddress();
+        if (mProtocol == Protocol.IP_V4_ONLY) {
+            return newAddress instanceof Inet4Address;
+        }
+        if (mProtocol == Protocol.IP_V6_ONLY) {
+            return newAddress instanceof Inet6Address;
+        }
+        //noinspection ConstantConditions : 受信したメッセージの場合はnullではない
+        final InetAddress oldAddress = oldMessage.getInterfaceAddress().getAddress();
+        if (oldAddress instanceof Inet4Address) {
+            if (oldAddress.isLinkLocalAddress()) {
+                return true;
+            }
+            return !(newAddress instanceof Inet6Address);
+        } else {
+            if (newAddress instanceof Inet6Address) {
+                return true;
+            }
+            return !newAddress.isLinkLocalAddress();
+        }
+    }
+
+    // VisibleForTesting
+    void onReceiveSsdp(@Nonnull final SsdpMessage message) {
+        synchronized (mDeviceHolder) {
+            final String uuid = message.getUuid();
+            final Device device = mDeviceHolder.get(uuid);
+            if (device == null) {
+                if (mEmbeddedDeviceUdnSet.contains(uuid)) {
+                    return;
+                }
+                onReceiveNewSsdp(message);
+                return;
+            }
+            if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
+                lostDevice(device);
+            } else {
+                if (needToUpdateSsdpMessage(device.getSsdpMessage(), message)) {
+                    device.updateSsdpMessage(message);
+                }
+            }
+        }
+    }
+
+    private void onReceiveNewSsdp(@Nonnull final SsdpMessage message) {
+        final String uuid = message.getUuid();
+        if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
+            mLoadingDeviceMap.remove(uuid);
+            return;
+        }
+        final Device.Builder deviceBuilder = mLoadingDeviceMap.get(uuid);
+        if (deviceBuilder != null) {
+            if (needToUpdateSsdpMessage(deviceBuilder.getSsdpMessage(), message)) {
+                deviceBuilder.updateSsdpMessage(message);
+            }
+            return;
+        }
+        final Device.Builder builder = new Device.Builder(this, message);
+        mLoadingDeviceMap.put(uuid, builder);
+        if (!executeInParallel(new DeviceLoader(builder))) {
+            mLoadingDeviceMap.remove(uuid);
+        }
     }
 
     // VisibleForTesting

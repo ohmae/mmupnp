@@ -117,6 +117,16 @@ public class Device {
         }
 
         /**
+         * 最新のSSDPパケットを返す。
+         *
+         * @return 最新のSSDPパケット
+         */
+        @Nonnull
+        SsdpMessage getSsdpMessage() {
+            return mSsdpMessage;
+        }
+
+        /**
          * SSDPパケットを登録する。
          *
          * @param ssdpMessage SSDPパケット
@@ -659,7 +669,7 @@ public class Device {
      */
     @Nonnull
     URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
-        return getAbsoluteUrl(getBaseUrl(), url);
+        return getAbsoluteUrl(getBaseUrl(), url, mSsdpMessage.getScopeId());
     }
 
     /**
@@ -687,24 +697,35 @@ public class Device {
      * それ以外の場合はLocationからの相対パスであり、
      * baseUrlから抽出したディレクトリ名と結合する。
      *
+     * <p>またscopeIdの付与も行う。
+     *
      * @param baseUrl URLパスのベースとなる値
      * @param url     URLパス情報
+     * @param scopeId スコープID
      * @return 正規化したURL
      * @throws MalformedURLException 不正なURL
      */
     @Nonnull
     static URL getAbsoluteUrl(
             @Nonnull final String baseUrl,
-            @Nonnull final String url)
+            @Nonnull final String url,
+            final int scopeId)
             throws MalformedURLException {
+        return Http.makeUrlWithScopeId(getAbsoluteUrl(baseUrl, url), scopeId);
+    }
+
+    @Nonnull
+    private static String getAbsoluteUrl(
+            @Nonnull final String baseUrl,
+            @Nonnull final String url) {
         if (Http.isHttpUrl(url)) {
-            return new URL(url);
+            return url;
         }
         final String base = Http.removeQuery(baseUrl);
         if (url.startsWith("/")) {
-            return new URL(Http.makeUrlWithAbsolutePath(base, url));
+            return Http.makeUrlWithAbsolutePath(base, url);
         }
-        return new URL(Http.makeUrlWithRelativePath(base, url));
+        return Http.makeUrlWithRelativePath(base, url);
     }
 
     /**

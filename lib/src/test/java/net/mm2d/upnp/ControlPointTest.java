@@ -58,7 +58,14 @@ public class ControlPointTest {
 
         @Test(expected = IllegalStateException.class)
         public void constructor_インターフェース空で指定() throws Exception {
-            new ControlPoint(Collections.<NetworkInterface>emptyList(), mock(ControlPointDiFactory.class));
+            new ControlPoint(Protocol.DEFAULT, Collections.<NetworkInterface>emptyList(), mock(ControlPointDiFactory.class));
+        }
+
+        @Test
+        public void constructor_インターフェース選別() throws Exception {
+            new ControlPoint(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
+            new ControlPoint(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
+            new ControlPoint(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
         }
 
         @Test(timeout = 2000L)
@@ -95,8 +102,8 @@ public class ControlPointTest {
         @Test(timeout = 2000L)
         public void initialize_terminate_timeover() throws Exception {
             final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         ExecutorService createIoExecutor() {
@@ -112,8 +119,8 @@ public class ControlPointTest {
         @Test(timeout = 2000L)
         public void initialize_terminate_exception() throws Exception {
             final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         ExecutorService createIoExecutor() {
@@ -162,8 +169,8 @@ public class ControlPointTest {
         @Test(timeout = 10000L)
         public void start_stop_exception() throws Exception {
             final EventReceiver eventReceiver = mock(EventReceiver.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
@@ -186,9 +193,8 @@ public class ControlPointTest {
         @Test
         public void search() throws Exception {
             final SsdpSearchServerList list = mock(SsdpSearchServerList.class);
-            final ControlPoint cp = new ControlPoint(
-                    NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
@@ -211,6 +217,55 @@ public class ControlPointTest {
             final HttpClient client = cp.createHttpClient();
             assertThat(client.isKeepAlive(), is(true));
         }
+
+        @Test
+        public void needToUpdateSsdpMessage_DUAL_STACK() throws Exception {
+            final ControlPoint cp = new ControlPoint(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("169.254.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("192.168.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("fe80::1:1:1:1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("169.254.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("192.168.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("fe80::1:1:1:1")), is(false));
+        }
+
+        @Test
+        public void needToUpdateSsdpMessage_IP_V4_ONLY() throws Exception {
+            final ControlPoint cp = new ControlPoint(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("169.254.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("192.168.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("fe80::1:1:1:1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("169.254.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("192.168.1.1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("fe80::1:1:1:1")), is(false));
+        }
+
+        @Test
+        public void needToUpdateSsdpMessage_IP_V6_ONLY() throws Exception {
+            final ControlPoint cp = new ControlPoint(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("169.254.1.1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("192.168.1.1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("169.254.1.1"), makeAddressMock("fe80::1:1:1:1")), is(true));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("169.254.1.1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("192.168.1.1")), is(false));
+            assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("192.168.1.1"), makeAddressMock("fe80::1:1:1:1")), is(true));
+        }
+
+        private static SsdpMessage makeAddressMock(@Nonnull final String address) throws Exception {
+            final SsdpMessage message = mock(SsdpMessage.class);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress(address, "255.255.255.255", (short) 24);
+            doReturn(ifa).when(message).getInterfaceAddress();
+            return message;
+        }
     }
 
     @RunWith(JUnit4.class)
@@ -222,8 +277,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
@@ -393,8 +448,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         Map<String, Device.Builder> createLoadingDeviceMap() {
@@ -415,7 +470,8 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスにないbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             mCp.onReceiveSsdp(message);
             verify(mLoadingDeviceMap).remove(anyString());
         }
@@ -423,7 +479,8 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスのbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             final Device device = mock(Device.class);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(udn).when(device).getUdn();
@@ -436,7 +493,8 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_alive受信後失敗() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(new HttpClient(true) {
                 @Nonnull
@@ -476,7 +534,8 @@ public class ControlPointTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(httpClient).when(mCp).createHttpClient();
             final IconFilter iconFilter = spy(new IconFilter() {
@@ -501,8 +560,10 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスのalive受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             final Device device = mock(Device.class);
+            doReturn(message).when(device).getSsdpMessage();
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(udn).when(device).getUdn();
 
@@ -513,11 +574,12 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_ロード中デバイスのalive受信() throws Exception {
             final byte[] data1 = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final SsdpMessage message1 = new SsdpRequest(mock(InterfaceAddress.class), data1, data1.length);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final SsdpMessage message1 = new SsdpRequest(ifa, data1, data1.length);
             final Device.Builder deviceBuilder = spy(new Device.Builder(mCp, message1));
             mLoadingDeviceMap.put(deviceBuilder.getUuid(), deviceBuilder);
             final byte[] data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message2 = new SsdpRequest(mock(InterfaceAddress.class), data2, data2.length);
+            final SsdpMessage message2 = new SsdpRequest(ifa, data2, data2.length);
             mCp.onReceiveSsdp(message2);
             verify(deviceBuilder).updateSsdpMessage(message2);
         }
@@ -537,8 +599,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         Map<String, Device.Builder> createLoadingDeviceMap() {
@@ -655,8 +717,8 @@ public class ControlPointTest {
             mEventReceiver = mock(EventReceiver.class);
             doReturn(PORT).when(mEventReceiver).getLocalPort();
 
-            mCp = spy(new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
@@ -768,8 +830,8 @@ public class ControlPointTest {
         @Test
         public void executeInParallel_executeが実行される() throws Exception {
             final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         ExecutorService createIoExecutor() {
@@ -786,8 +848,8 @@ public class ControlPointTest {
         @Test
         public void executeInParallel_shutdown済みなら何もしないでfalse() throws Exception {
             final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         ExecutorService createIoExecutor() {
@@ -805,8 +867,8 @@ public class ControlPointTest {
         @Test
         public void executeInParallel_exceptionが発生すればfalse() throws Exception {
             final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         ExecutorService createIoExecutor() {
@@ -822,8 +884,8 @@ public class ControlPointTest {
         @Test
         public void executeInSequential_executeが実行される() throws Exception {
             final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         ExecutorService createNotifyExecutor() {
@@ -840,8 +902,8 @@ public class ControlPointTest {
         @Test
         public void executeInSequential_shutdown済みなら何もしないでfalse() throws Exception {
             final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         ExecutorService createNotifyExecutor() {
@@ -859,8 +921,8 @@ public class ControlPointTest {
         @Test
         public void executeInSequential_exceptionが発生すればfalse() throws Exception {
             final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory() {
+            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+                    new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         ExecutorService createNotifyExecutor() {

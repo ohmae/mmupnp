@@ -43,7 +43,7 @@ public class DeviceNode extends UpnpNode {
 
     @Override
     public String toString() {
-        return getUserObject().getFriendlyName();
+        return getUserObject().getFriendlyName() + " [" + getUserObject().getIpAddress() + "]";
     }
 
     @Override

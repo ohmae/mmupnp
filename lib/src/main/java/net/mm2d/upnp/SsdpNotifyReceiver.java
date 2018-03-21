@@ -47,7 +47,9 @@ class SsdpNotifyReceiver implements SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    SsdpNotifyReceiver(@Nonnull final NetworkInterface ni) {
+    SsdpNotifyReceiver(
+            @Nonnull final Address address,
+            @Nonnull final NetworkInterface ni) {
         mDelegate = new SsdpServerDelegate(new Receiver() {
             @Override
             public void onReceive(
@@ -56,7 +58,7 @@ class SsdpNotifyReceiver implements SsdpServer {
                     final int length) {
                 SsdpNotifyReceiver.this.onReceive(sourceAddress, data, length);
             }
-        }, ni, SSDP_PORT);
+        }, address, ni, SSDP_PORT);
     }
 
     // VisibleForTesting
@@ -112,7 +114,8 @@ class SsdpNotifyReceiver implements SsdpServer {
         // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
         // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
         // 受け取っても無駄なので破棄する。
-        if (!isSameSegment(getInterfaceAddress(), sourceAddress)) {
+        if (mDelegate.getAddress() == Address.IP_V4
+                && !isSameSegment(getInterfaceAddress(), sourceAddress)) {
             Log.w("Invalid segment packet received:" + sourceAddress.toString()
                     + " " + getInterfaceAddress().toString());
             return;

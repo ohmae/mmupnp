@@ -117,6 +117,11 @@ public class SsdpResponse implements SsdpMessage {
         return mHttpResponse.getStatus();
     }
 
+    @Override
+    public int getScopeId() {
+        return mDelegate.getScopeId();
+    }
+
     @Nullable
     @Override
     public InterfaceAddress getInterfaceAddress() {

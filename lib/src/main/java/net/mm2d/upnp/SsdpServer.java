@@ -7,10 +7,13 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.NetworkUtils;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
+import java.net.UnknownHostException;
 
 import javax.annotation.Nonnull;
 
@@ -21,24 +24,58 @@ import javax.annotation.Nonnull;
  */
 interface SsdpServer {
     /**
-     * SSDPに使用するアドレス文字列。
-     */
-    @Nonnull
-    String SSDP_ADDR = "239.255.255.250";
-    /**
      * SSDPに使用するポート番号。
      */
     int SSDP_PORT = 1900;
+
     /**
-     * SSDPに使用するSocketAddress。
+     * マルチキャストアドレス。
      */
-    @Nonnull
-    InetSocketAddress SSDP_SO_ADDR = new InetSocketAddress(SSDP_ADDR, SSDP_PORT);
-    /**
-     * SSDPに使用するアドレス。
-     */
-    @Nonnull
-    InetAddress SSDP_INET_ADDR = SSDP_SO_ADDR.getAddress();
+    enum Address {
+        /**
+         * IPv4用マルチキャストアドレス
+         */
+        IP_V4("239.255.255.250"),
+        /**
+         * IPv6用リンクローカルマルチキャストアドレス
+         */
+        IP_V6_LINK_LOCAL("FF02::C"),
+        /**
+         * IPv6用サイトローカルマルチキャストアドレス
+         *
+         * <p>未使用
+         */
+        IP_V6_SITE_LOCAL("FF05::C"),;
+
+        @Nonnull
+        private final InetAddress mInetAddress;
+        @Nonnull
+        private final InetSocketAddress mInetSocketAddress;
+
+        Address(@Nonnull final String address) {
+            try {
+                mInetAddress = InetAddress.getByName(address);
+            } catch (final UnknownHostException e) {
+                throw new AssertionError(e);
+            }
+            mInetSocketAddress = new InetSocketAddress(mInetAddress, SSDP_PORT);
+        }
+
+        @Nonnull
+        InetAddress getInetAddress() {
+            return mInetAddress;
+        }
+
+        @Nonnull
+        InetSocketAddress getSocketAddress() {
+            return mInetSocketAddress;
+        }
+
+        @Nonnull
+        String getAddressString() {
+            return NetworkUtils.getAddressString(mInetSocketAddress);
+        }
+    }
 
     /**
      * BindされたInterfaceのアドレスを返す。

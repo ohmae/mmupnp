@@ -48,7 +48,8 @@ public class DeviceParser {
             @Nonnull final HttpClient client,
             @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
-        final String description = client.downloadString(new URL(builder.getLocation()));
+        final URL url = Http.makeUrlWithScopeId(builder.getLocation(), builder.getSsdpMessage().getScopeId());
+        final String description = client.downloadString(url);
         if (TextUtils.isEmpty(description)) {
             throw new IOException("download error");
         }
@@ -61,7 +62,7 @@ public class DeviceParser {
             @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         for (final Service.Builder serviceBuilder : builder.getServiceBuilderList()) {
-            ServiceParser.loadDescription(client, builder.getBaseUrl(), serviceBuilder);
+            ServiceParser.loadDescription(client, builder, serviceBuilder);
         }
         for (final Device.Builder deviceBuilder : builder.getEmbeddedDeviceBuilderList()) {
             loadServices(client, deviceBuilder);
@@ -202,7 +203,7 @@ public class DeviceParser {
 
     @Nonnull
     private static Service.Builder parseService(@Nonnull final Node serviceNode) {
-        final Service.Builder builder = new Service.Builder();
+        final Service.Builder serviceBuilder = new Service.Builder();
         Node node = serviceNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             final String tag = getTagName(node);
@@ -210,9 +211,9 @@ public class DeviceParser {
                 continue;
             }
             final String value = node.getTextContent();
-            setField(builder, tag, value);
+            setField(serviceBuilder, tag, value);
         }
-        return builder;
+        return serviceBuilder;
     }
 
     private static void setField(
