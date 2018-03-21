@@ -211,6 +211,7 @@ public class DeviceParserTest {
         public void loadDescription_ダウンロード失敗でIOException() throws Exception {
             final Device.Builder builder = mock(Device.Builder.class);
             doReturn("http://192.168.0.1/").when(builder).getLocation();
+            doReturn(mock(SsdpMessage.class)).when(builder).getSsdpMessage();
             DeviceParser.loadDescription(mock(HttpClient.class), builder);
         }
 

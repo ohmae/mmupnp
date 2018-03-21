@@ -98,4 +98,26 @@ public class HttpTest {
         assertThat(Http.isHttpUrl("https://example.com/"), is(false));
         assertThat(Http.isHttpUrl("http://example.com/"), is(true));
     }
+
+    @Test
+    public void makeUrlWithScopeId() throws Exception {
+        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]:8888/device.xml", 0).toString(),
+                is("http://[fe80::1234]:8888/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://192.0.2.3:8888/device.xml", 0).toString(),
+                is("http://192.0.2.3:8888/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]/device.xml", 0).toString(),
+                is("http://[fe80::1234]/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://192.0.2.3/device.xml", 0).toString(),
+                is("http://192.0.2.3/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]:8888/device.xml", 1).toString(),
+                is("http://[fe80::1234%1]:8888/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]/device.xml", 1).toString(),
+                is("http://[fe80::1234%1]/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]:80/device.xml", 1).toString(),
+                is("http://[fe80::1234%1]/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]:8888/device.xml&bitrate=1200", 1).toString(),
+                is("http://[fe80::1234%1]:8888/device.xml&bitrate=1200"));
+        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234%2]:8888/device.xml", 1).toString(),
+                is("http://[fe80::1234%1]:8888/device.xml"));
+    }
 }

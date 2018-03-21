@@ -28,6 +28,6 @@ public class ServiceParserTest {
 
     @Test(expected = IOException.class)
     public void loadDescription_パラメータがとれないとException() throws Exception {
-        ServiceParser.loadDescription(mock(HttpClient.class), "", mock(Service.Builder.class));
+        ServiceParser.loadDescription(mock(HttpClient.class), mock(Device.Builder.class), mock(Service.Builder.class));
     }
 }

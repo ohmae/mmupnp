@@ -45,6 +45,8 @@ public interface SsdpMessage {
      */
     String SSDP_DISCOVER = "\"ssdp:discover\"";
 
+    int getScopeId();
+
     /**
      * このパケットを受信したInterfaceAddressを返す。
      *
