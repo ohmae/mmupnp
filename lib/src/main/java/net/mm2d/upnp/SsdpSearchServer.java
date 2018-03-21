@@ -55,7 +55,9 @@ class SsdpSearchServer implements SsdpServer {
      *
      * @param ni 使用するインターフェース
      */
-    SsdpSearchServer(@Nonnull final NetworkInterface ni) {
+    SsdpSearchServer(
+            @Nonnull final Address address,
+            @Nonnull final NetworkInterface ni) {
         mDelegate = new SsdpServerDelegate(new Receiver() {
             @Override
             public void onReceive(
@@ -64,7 +66,7 @@ class SsdpSearchServer implements SsdpServer {
                     final int length) {
                 SsdpSearchServer.this.onReceive(sourceAddress, data, length);
             }
-        }, ni);
+        }, address, ni);
     }
 
     // VisibleForTesting
@@ -103,7 +105,7 @@ class SsdpSearchServer implements SsdpServer {
         final SsdpRequest message = new SsdpRequest();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
-        message.setHeader(Http.HOST, SSDP_ADDR + ":" + String.valueOf(SSDP_PORT));
+        message.setHeader(Http.HOST, mDelegate.getSsdpAddressString());
         message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER);
         message.setHeader(Http.MX, "1");
         message.setHeader(Http.ST, st);

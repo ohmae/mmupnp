@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
+import net.mm2d.upnp.SsdpServer.Address;
 import net.mm2d.util.NetworkUtils;
 
 import org.junit.Test;
@@ -26,10 +27,11 @@ public class SsdpSearchServerListTest {
     public void openAndStart() throws Exception {
         final SsdpSearchServerList list = spy(new SsdpSearchServerList());
         final SsdpSearchServer server = mock(SsdpSearchServer.class);
-        doReturn(server).when(list).newSsdpSearchServer(any(NetworkInterface.class));
+        final ResponseListener listener = mock(ResponseListener.class);
+        doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Arrays.asList(nif), mock(ResponseListener.class));
+        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
 
         list.openAndStart();
         verify(server, times(1)).open();
@@ -40,10 +42,11 @@ public class SsdpSearchServerListTest {
     public void openAndStart_Exceptionが発生しても無視する() throws Exception {
         final SsdpSearchServerList list = spy(new SsdpSearchServerList());
         final SsdpSearchServer server = mock(SsdpSearchServer.class);
-        doReturn(server).when(list).newSsdpSearchServer(any(NetworkInterface.class));
+        final ResponseListener listener = mock(ResponseListener.class);
+        doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Arrays.asList(nif), mock(ResponseListener.class));
+        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
 
         doThrow(new IOException()).when(server).open();
         list.openAndStart();
@@ -53,10 +56,11 @@ public class SsdpSearchServerListTest {
     public void stop() {
         final SsdpSearchServerList list = spy(new SsdpSearchServerList());
         final SsdpSearchServer server = mock(SsdpSearchServer.class);
-        doReturn(server).when(list).newSsdpSearchServer(any(NetworkInterface.class));
+        final ResponseListener listener = mock(ResponseListener.class);
+        doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Arrays.asList(nif), mock(ResponseListener.class));
+        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
 
         list.stop();
 
@@ -67,10 +71,11 @@ public class SsdpSearchServerListTest {
     public void close() {
         final SsdpSearchServerList list = spy(new SsdpSearchServerList());
         final SsdpSearchServer server = mock(SsdpSearchServer.class);
-        doReturn(server).when(list).newSsdpSearchServer(any(NetworkInterface.class));
+        final ResponseListener listener = mock(ResponseListener.class);
+        doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Arrays.asList(nif), mock(ResponseListener.class));
+        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
 
         list.close();
 
@@ -81,10 +86,11 @@ public class SsdpSearchServerListTest {
     public void search() {
         final SsdpSearchServerList list = spy(new SsdpSearchServerList());
         final SsdpSearchServer server = mock(SsdpSearchServer.class);
-        doReturn(server).when(list).newSsdpSearchServer(any(NetworkInterface.class));
+        final ResponseListener listener = mock(ResponseListener.class);
+        doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Arrays.asList(nif), mock(ResponseListener.class));
+        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
 
         list.search("");
 

@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
+import net.mm2d.upnp.SsdpServer.Address;
 import net.mm2d.upnp.SsdpServerDelegate.Receiver;
 import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TestUtils;
@@ -32,7 +33,7 @@ public class SsdpSearchServerTest {
     @Test
     public void search_ST_ALLでのサーチ() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), networkInterface));
+        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
         final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", (short) 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
         final MockMulticastSocket socket = new MockMulticastSocket();
@@ -55,7 +56,7 @@ public class SsdpSearchServerTest {
     @Test
     public void search_ST_ROOTDEVICEでのサーチ() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), networkInterface));
+        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
         final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", (short) 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
         final MockMulticastSocket socket = new MockMulticastSocket();
@@ -97,7 +98,7 @@ public class SsdpSearchServerTest {
     @Test
     public void onReceive_listenerがコールされる() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpSearchServer server = new SsdpSearchServer(networkInterface);
+        final SsdpSearchServer server = new SsdpSearchServer(Address.IP_V4, networkInterface);
         final ResponseListener listener = mock(ResponseListener.class);
         server.setResponseListener(listener);
         final InetAddress address = InetAddress.getByName("192.0.2.2");
@@ -111,7 +112,7 @@ public class SsdpSearchServerTest {
     @Test
     public void onReceive_アドレス不一致ならlistenerコールされない() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpSearchServer server = new SsdpSearchServer(networkInterface);
+        final SsdpSearchServer server = new SsdpSearchServer(Address.IP_V4, networkInterface);
         final ResponseListener listener = mock(ResponseListener.class);
         server.setResponseListener(listener);
         final InetAddress address = InetAddress.getByName("192.0.2.3");
@@ -125,7 +126,7 @@ public class SsdpSearchServerTest {
     @Test
     public void onReceive_データに問題がある場合listenerコールされない() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpSearchServer server = new SsdpSearchServer(networkInterface);
+        final SsdpSearchServer server = new SsdpSearchServer(Address.IP_V4, networkInterface);
         final ResponseListener listener = mock(ResponseListener.class);
         server.setResponseListener(listener);
         final InetAddress address = InetAddress.getByName("192.0.2.2");
@@ -139,7 +140,7 @@ public class SsdpSearchServerTest {
     @Test
     public void onReceive_listenerが登録されていなくてもクラッシュしない() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpSearchServer server = new SsdpSearchServer(networkInterface);
+        final SsdpSearchServer server = new SsdpSearchServer(Address.IP_V4, networkInterface);
 
         final InetAddress address = InetAddress.getByName("192.0.2.2");
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");

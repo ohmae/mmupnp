@@ -27,6 +27,13 @@ import javax.annotation.Nonnull;
  */
 class ControlPointDiFactory {
     @Nonnull
+    private final Protocol mProtocol;
+
+    ControlPointDiFactory(@Nonnull final Protocol protocol) {
+        mProtocol = protocol;
+    }
+
+    @Nonnull
     Map<String, Device.Builder> createLoadingDeviceMap() {
         return new HashMap<>();
     }
@@ -55,14 +62,14 @@ class ControlPointDiFactory {
     SsdpSearchServerList createSsdpSearchServerList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
-        return new SsdpSearchServerList().init(interfaces, listener);
+        return new SsdpSearchServerList().init(mProtocol, interfaces, listener);
     }
 
     @Nonnull
     SsdpNotifyReceiverList createSsdpNotifyReceiverList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
-        return new SsdpNotifyReceiverList().init(interfaces, listener);
+        return new SsdpNotifyReceiverList().init(mProtocol, interfaces, listener);
     }
 
     @Nonnull

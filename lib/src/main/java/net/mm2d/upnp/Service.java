@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.log.Log;
+import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
@@ -479,13 +480,9 @@ public class Service {
         sb.append("<http://");
         final SsdpMessage ssdp = mDevice.getSsdpMessage();
         final InterfaceAddress ifa = ssdp.getInterfaceAddress();
-        //noinspection ConstantConditions : 受信したデータの場合はnullではない
-        sb.append(ifa.getAddress().getHostAddress());
         final int port = mControlPoint.getEventPort();
-        if (port != Http.DEFAULT_PORT) {
-            sb.append(':');
-            sb.append(String.valueOf(port));
-        }
+        //noinspection ConstantConditions : 受信したメッセージの場合はnullではない
+        sb.append(NetworkUtils.getAddressString(ifa.getAddress(), port));
         sb.append("/>");
         return sb.toString();
     }

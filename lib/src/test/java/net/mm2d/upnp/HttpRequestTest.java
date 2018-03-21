@@ -53,6 +53,22 @@ public class HttpRequestTest {
         assertThat(request.getUri(), is("/cds/control"));
     }
 
+    @Test
+    public void setUrl_getAddress_getPort_getUriに反映される1() throws IOException {
+        final HttpRequest request = new HttpRequest()
+                .setUrl(new URL("http://[2001:db8::1]:12345/cds/control"), true);
+        final int port = 12345;
+        final InetAddress address = InetAddress.getByName("2001:db8::1");
+        final SocketAddress socketAddress = new InetSocketAddress(address, port);
+
+        assertThat(request.getAddressString(), is("[2001:db8::1]:12345"));
+        assertThat(request.getHeader(Http.HOST), is("[2001:db8::1]:12345"));
+        assertThat(request.getAddress(), is(address));
+        assertThat(request.getPort(), is(port));
+        assertThat(request.getSocketAddress(), is(socketAddress));
+        assertThat(request.getUri(), is("/cds/control"));
+    }
+
     @Test(expected = IOException.class)
     public void setUrl_http以外はException() throws IOException {
         final HttpRequest request = new HttpRequest()
@@ -196,7 +212,7 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void getAddressString_デフォルトポート() throws Exception {
+    public void getAddressString_IPv4() throws Exception {
         final String address = "192.168.0.1";
         final int port = 8080;
         final HttpRequest request = new HttpRequest();
@@ -206,6 +222,19 @@ public class HttpRequestTest {
         assertThat(request.getAddressString(), is(address));
         request.setPort(port);
         assertThat(request.getAddressString(), is(address + ":" + port));
+    }
+
+    @Test
+    public void getAddressString_IPv6() throws Exception {
+        final String address = "::1";
+        final int port = 8080;
+        final HttpRequest request = new HttpRequest();
+        request.setAddress(InetAddress.getByName(address));
+        assertThat(request.getAddressString(), is("[" + address + "]"));
+        request.setPort(Http.DEFAULT_PORT);
+        assertThat(request.getAddressString(), is("[" + address + "]"));
+        request.setPort(port);
+        assertThat(request.getAddressString(), is("[" + address + "]:" + port));
     }
 
     @Test(expected = IllegalStateException.class)

@@ -117,6 +117,16 @@ public class Device {
         }
 
         /**
+         * 最新のSSDPパケットを返す。
+         *
+         * @return 最新のSSDPパケット
+         */
+        @Nonnull
+        SsdpMessage getSsdpMessage() {
+            return mSsdpMessage;
+        }
+
+        /**
          * SSDPパケットを登録する。
          *
          * @param ssdpMessage SSDPパケット
