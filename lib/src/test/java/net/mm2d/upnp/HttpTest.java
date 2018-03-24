@@ -100,7 +100,7 @@ public class HttpTest {
     }
 
     @Test
-    public void makeUrlWithScopeId() throws Exception {
+    public void makeUrlWithScopeId_0指定は何もしない() throws Exception {
         assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]:8888/device.xml", 0).toString(),
                 is("http://[fe80::1234]:8888/device.xml"));
         assertThat(Http.makeUrlWithScopeId("http://192.0.2.3:8888/device.xml", 0).toString(),
@@ -109,6 +109,10 @@ public class HttpTest {
                 is("http://[fe80::1234]/device.xml"));
         assertThat(Http.makeUrlWithScopeId("http://192.0.2.3/device.xml", 0).toString(),
                 is("http://192.0.2.3/device.xml"));
+    }
+
+    @Test
+    public void makeUrlWithScopeId_scope_idが追加できる() throws Exception {
         assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]:8888/device.xml", 1).toString(),
                 is("http://[fe80::1234%1]:8888/device.xml"));
         assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]/device.xml", 1).toString(),
@@ -117,7 +121,23 @@ public class HttpTest {
                 is("http://[fe80::1234%1]/device.xml"));
         assertThat(Http.makeUrlWithScopeId("http://[fe80::1234]:8888/device.xml&bitrate=1200", 1).toString(),
                 is("http://[fe80::1234%1]:8888/device.xml&bitrate=1200"));
-        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234%2]:8888/device.xml", 1).toString(),
+    }
+
+    @Test
+    public void makeUrlWithScopeId_指定済みの場合は置換する() throws Exception {
+        assertThat(Http.makeUrlWithScopeId("http://[fe80::1234%22]:8888/device.xml", 1).toString(),
                 is("http://[fe80::1234%1]:8888/device.xml"));
+    }
+
+    @Test
+    public void makeUrlWithScopeId_IPv6リテラル以外は追加しない() throws Exception {
+        assertThat(Http.makeUrlWithScopeId("http://192.0.2.1:8888/device.xml", 1).toString(),
+                is("http://192.0.2.1:8888/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://192.0.2.1/device.xml", 1).toString(),
+                is("http://192.0.2.1/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://www.example.com:8888/device.xml", 1).toString(),
+                is("http://www.example.com:8888/device.xml"));
+        assertThat(Http.makeUrlWithScopeId("http://www.example.com/device.xml", 1).toString(),
+                is("http://www.example.com/device.xml"));
     }
 }

@@ -358,7 +358,7 @@ public final class Http {
             @Nonnull final String host,
             final int scopeId) {
         final int length = host.length();
-        if (host.charAt(length - 1) != ']') {
+        if (host.charAt(0) != '[' || host.charAt(length - 1) != ']') {
             return host;
         }
         final int index = host.indexOf("%");
