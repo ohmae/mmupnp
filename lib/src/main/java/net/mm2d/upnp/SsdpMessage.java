@@ -48,7 +48,7 @@ public interface SsdpMessage {
     /**
      * 受信したインターフェースのScopeIDを返す。
      *
-     * @return ScopeID、0の場合未指定
+     * @return ScopeID、設定されていない場合(IPv4含む)は0
      */
     int getScopeId();
 
