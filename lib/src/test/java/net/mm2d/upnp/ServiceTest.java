@@ -185,7 +185,7 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            doReturn(TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24))
+            doReturn(TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24))
                     .when(message).getInterfaceAddress();
             doReturn(80).when(cp).getEventPort();
 

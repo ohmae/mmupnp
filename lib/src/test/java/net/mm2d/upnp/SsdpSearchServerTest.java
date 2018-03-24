@@ -34,7 +34,7 @@ public class SsdpSearchServerTest {
     public void search_ST_ALLでのサーチ() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
-        final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", (short) 16);
+        final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
         final MockMulticastSocket socket = new MockMulticastSocket();
         doReturn(socket).when(delegate).createMulticastSocket(anyInt());
@@ -57,7 +57,7 @@ public class SsdpSearchServerTest {
     public void search_ST_ROOTDEVICEでのサーチ() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
-        final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", (short) 16);
+        final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
         final MockMulticastSocket socket = new MockMulticastSocket();
         doReturn(socket).when(delegate).createMulticastSocket(anyInt());
@@ -79,7 +79,7 @@ public class SsdpSearchServerTest {
     @Test
     public void setResponseListener_受信メッセージが通知されること() throws Exception {
         final SsdpServerDelegate delegate = mock(SsdpServerDelegate.class);
-        final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", (short) 16);
+        final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
         final SsdpSearchServer server = spy(new SsdpSearchServer(delegate));
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");

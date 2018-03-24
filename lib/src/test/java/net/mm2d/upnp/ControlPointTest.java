@@ -262,7 +262,7 @@ public class ControlPointTest {
 
         private static SsdpMessage makeAddressMock(@Nonnull final String address) throws Exception {
             final SsdpMessage message = mock(SsdpMessage.class);
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress(address, "255.255.255.255", (short) 24);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress(address, "255.255.255.255", 24);
             doReturn(ifa).when(message).getInterfaceAddress();
             return message;
         }
@@ -470,7 +470,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスにないbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
             final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             mCp.onReceiveSsdp(message);
             verify(mLoadingDeviceMap).remove(anyString());
@@ -479,7 +479,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスのbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
             final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             final Device device = mock(Device.class);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
@@ -493,7 +493,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_alive受信後失敗() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
             final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(new HttpClient(true) {
@@ -534,7 +534,7 @@ public class ControlPointTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
             final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(httpClient).when(mCp).createHttpClient();
@@ -560,7 +560,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスのalive受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
             final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
             final Device device = mock(Device.class);
             doReturn(message).when(device).getSsdpMessage();
@@ -574,7 +574,7 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_ロード中デバイスのalive受信() throws Exception {
             final byte[] data1 = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", (short) 0);
+            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
             final SsdpMessage message1 = new SsdpRequest(ifa, data1, data1.length);
             final Device.Builder deviceBuilder = spy(new Device.Builder(mCp, message1));
             mLoadingDeviceMap.put(deviceBuilder.getUuid(), deviceBuilder);
