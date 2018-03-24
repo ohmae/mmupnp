@@ -136,6 +136,7 @@ public class Service {
          * @param description Description XML全内容
          * @return Builder
          */
+        @Nonnull
         public Builder setDescription(@Nonnull final String description) {
             mDescription = description;
             return this;
@@ -147,6 +148,7 @@ public class Service {
          * @param builder Serviceで定義されているActionのBuilder
          * @return Builder
          */
+        @Nonnull
         public Builder addActionBuilder(@Nonnull final Action.Builder builder) {
             mActionBuilderList.add(builder);
             return this;
@@ -158,6 +160,7 @@ public class Service {
          * @param builder Serviceで定義されているStateVariableのBuilder
          * @return Builder
          */
+        @Nonnull
         public Builder addVariableBuilder(@Nonnull final StateVariable.Builder builder) {
             mVariableBuilderList.add(builder);
             return this;
@@ -660,6 +663,7 @@ public class Service {
         return true;
     }
 
+    @Nonnull
     private HttpRequest makeUnsubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
         return new HttpRequest()
                 .setMethod(Http.UNSUBSCRIBE)

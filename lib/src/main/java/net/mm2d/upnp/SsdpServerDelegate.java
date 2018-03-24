@@ -138,6 +138,7 @@ class SsdpServerDelegate implements SsdpServer {
      *
      * @return SSDPに使用するアドレス＋ポートの文字列。
      */
+    @Nonnull
     String getSsdpAddressString() {
         return mAddress.getAddressString();
     }

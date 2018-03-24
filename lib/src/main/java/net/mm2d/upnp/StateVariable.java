@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.Device.Builder;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +26,7 @@ public class StateVariable {
      * ServiceDescriptionのパース時に使用するビルダー
      *
      * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
-     * @see ServiceParser#loadDescription(HttpClient, String, Service.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, Device.Builder, Service.Builder)
      */
     public static class Builder {
         private Service mService;

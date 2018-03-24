@@ -139,6 +139,7 @@ class SsdpNotifyReceiver implements SsdpServer {
     }
 
     // VisibleForTesting
+    @Nonnull
     SsdpRequest createSsdpRequestMessage(
             @Nonnull final byte[] data,
             final int length)

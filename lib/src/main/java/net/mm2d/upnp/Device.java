@@ -560,6 +560,7 @@ public class Device {
         return list;
     }
 
+    @Nonnull
     private static List<Device> buildDeviceList(
             @Nonnull final Device parent,
             @Nonnull final List<Device.Builder> builderList) {
@@ -1165,6 +1166,7 @@ public class Device {
         return null;
     }
 
+    @Nonnull
     Set<String> getEmbeddedDeviceUdnSet() {
         if (mDeviceList.isEmpty()) {
             return Collections.emptySet();

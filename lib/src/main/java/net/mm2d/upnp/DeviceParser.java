@@ -159,6 +159,7 @@ public class DeviceParser {
         }
     }
 
+    @Nonnull
     private static Icon.Builder parseIcon(@Nonnull final Node iconNode) {
         final Icon.Builder builder = new Icon.Builder();
         Node node = iconNode.getFirstChild();

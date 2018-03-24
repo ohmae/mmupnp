@@ -86,6 +86,7 @@ class EventReceiver {
     }
 
     // VisibleForTesting
+    @Nonnull
     ServerSocket createServerSocket() throws IOException {
         return new ServerSocket(0);
     }

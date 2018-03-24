@@ -59,6 +59,7 @@ class SsdpNotifyReceiverList {
     }
 
     // VisibleForTesting
+    @Nonnull
     SsdpNotifyReceiver newSsdpNotifyReceiver(
             @Nonnull final Address address,
             @Nonnull final NetworkInterface nif,

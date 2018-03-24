@@ -90,8 +90,8 @@ class SsdpMessageDelegate implements SsdpMessage {
         return DEFAULT_MAX_AGE;
     }
 
-    @Nonnull
     // VisibleForTesting
+    @Nonnull
     static String[] parseUsn(@Nonnull final HttpMessage message) {
         final String usn = message.getHeader(Http.USN);
         if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {

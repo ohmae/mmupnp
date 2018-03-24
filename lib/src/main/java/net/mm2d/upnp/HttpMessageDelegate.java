@@ -174,6 +174,7 @@ class HttpMessageDelegate implements HttpMessage {
         return setBodyInner(null, body, withContentLength);
     }
 
+    @Nonnull
     private HttpMessage setBodyInner(
             @Nullable final String string,
             @Nullable final byte[] binary,
@@ -212,6 +213,7 @@ class HttpMessageDelegate implements HttpMessage {
         return mBody;
     }
 
+    @Nullable
     private String decode(@Nonnull final byte[] binary) {
         if (binary.length == 0) {
             return "";
