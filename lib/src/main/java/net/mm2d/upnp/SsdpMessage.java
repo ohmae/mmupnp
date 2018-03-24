@@ -45,6 +45,11 @@ public interface SsdpMessage {
      */
     String SSDP_DISCOVER = "\"ssdp:discover\"";
 
+    /**
+     * 受信したインターフェースのScopeIDを返す。
+     *
+     * @return ScopeID、0の場合未指定
+     */
     int getScopeId();
 
     /**
