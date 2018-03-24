@@ -66,4 +66,26 @@ public class TestUtils {
         fMaskLength.setShort(interfaceAddress, (short) maskLength);
         return interfaceAddress;
     }
+
+    @Nonnull
+    public static InterfaceAddress createInterfaceAddress(
+            final InetAddress address,
+            final String broadcast,
+            final int maskLength)
+            throws ReflectiveOperationException, UnknownHostException {
+        final Class<InterfaceAddress> cls = InterfaceAddress.class;
+        final Constructor<InterfaceAddress> constructor = cls.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        final InterfaceAddress interfaceAddress = constructor.newInstance();
+        final Field fAddress = cls.getDeclaredField("address");
+        fAddress.setAccessible(true);
+        fAddress.set(interfaceAddress, address);
+        final Field fBroadcast = cls.getDeclaredField("broadcast");
+        fBroadcast.setAccessible(true);
+        fBroadcast.set(interfaceAddress, InetAddress.getByName(broadcast));
+        final Field fMaskLength = cls.getDeclaredField("maskLength");
+        fMaskLength.setAccessible(true);
+        fMaskLength.setShort(interfaceAddress, (short) maskLength);
+        return interfaceAddress;
+    }
 }
