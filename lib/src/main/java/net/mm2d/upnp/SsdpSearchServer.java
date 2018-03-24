@@ -101,6 +101,7 @@ class SsdpSearchServer implements SsdpServer {
         send(makeSearchMessage(TextUtils.isEmpty(st) ? ST_ALL : st));
     }
 
+    @Nonnull
     private SsdpRequest makeSearchMessage(@Nonnull final String st) {
         final SsdpRequest message = new SsdpRequest();
         message.setMethod(SsdpMessage.M_SEARCH);

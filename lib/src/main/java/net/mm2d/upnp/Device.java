@@ -560,6 +560,7 @@ public class Device {
         return list;
     }
 
+    @Nonnull
     private static List<Device> buildDeviceList(
             @Nonnull final Device parent,
             @Nonnull final List<Device.Builder> builderList) {
@@ -660,6 +661,30 @@ public class Device {
     }
 
     /**
+     * 受信したインターフェースのScopeIDを返す。
+     *
+     * @return ScopeID、設定されていない場合(IPv4含む)は0
+     */
+    public int getScopeId() {
+        return mSsdpMessage.getScopeId();
+    }
+
+    /**
+     * 必要に応じてURLにこのデバイスのScopeIdを付加する。
+     *
+     * <p>SSDPメッセージがIPv6インターフェース経由で通知されており、
+     * そのインターフェースのScopeIDが設定されている場合、
+     * かつURLのhost部がIPv6リテラルである場合にのみ付加する。
+     *
+     * @param url 元となるURL
+     * @return ScopeIDが付加されたURL
+     * @throws MalformedURLException 不正なURL
+     */
+    public URL appendScopeIdIfNeed(@Nonnull final String url) throws MalformedURLException {
+        return Http.makeUrlWithScopeId(url, getScopeId());
+    }
+
+    /**
      * URL情報を正規化して返す。
      *
      * @param url URLパス情報
@@ -669,7 +694,7 @@ public class Device {
      */
     @Nonnull
     URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
-        return getAbsoluteUrl(getBaseUrl(), url, mSsdpMessage.getScopeId());
+        return appendScopeIdIfNeed(getAbsoluteUrl(getBaseUrl(), url));
     }
 
     /**
@@ -1165,6 +1190,7 @@ public class Device {
         return null;
     }
 
+    @Nonnull
     Set<String> getEmbeddedDeviceUdnSet() {
         if (mDeviceList.isEmpty()) {
             return Collections.emptySet();

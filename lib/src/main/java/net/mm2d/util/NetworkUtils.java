@@ -291,6 +291,7 @@ public class NetworkUtils {
         return hostAddress + ":" + String.valueOf(port);
     }
 
+    @Nonnull
     private static String toAddressString(@Nonnull final InetAddress address) {
         if (address instanceof Inet6Address) {
             return "[" + toNormalizedString((Inet6Address) address) + "]";

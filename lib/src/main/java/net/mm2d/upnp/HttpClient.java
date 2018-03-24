@@ -143,6 +143,7 @@ public class HttpClient {
         }
     }
 
+    @Nonnull
     private HttpResponse doRequest(@Nonnull final HttpRequest request) throws IOException {
         if (isClosed()) {
             openSocket(request);

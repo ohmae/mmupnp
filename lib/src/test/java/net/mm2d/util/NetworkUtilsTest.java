@@ -120,8 +120,8 @@ public class NetworkUtilsTest {
 
         @Before
         public void setUp() throws Exception {
-            mIpv4Address = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24);
-            mIpv6Address = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", (short) 16);
+            mIpv4Address = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24);
+            mIpv6Address = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16);
         }
 
         @Test

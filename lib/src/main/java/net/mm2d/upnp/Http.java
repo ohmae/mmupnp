@@ -270,7 +270,7 @@ public final class Http {
      * @param url URL
      * @return HTTPのURLのときtrue
      */
-    public static boolean isHttpUrl(final String url) {
+    public static boolean isHttpUrl(@Nonnull final String url) {
         return url != null && url.length() > HTTP_SCHEME.length()
                 && url.substring(0, HTTP_SCHEME.length()).equalsIgnoreCase(HTTP_SCHEME);
     }
@@ -358,7 +358,7 @@ public final class Http {
             @Nonnull final String host,
             final int scopeId) {
         final int length = host.length();
-        if (host.charAt(length - 1) != ']') {
+        if (host.charAt(0) != '[' || host.charAt(length - 1) != ']') {
             return host;
         }
         final int index = host.indexOf("%");

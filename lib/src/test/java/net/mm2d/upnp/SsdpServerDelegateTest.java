@@ -65,15 +65,15 @@ public class SsdpServerDelegateTest {
 
     @Test
     public void findInet4Address() throws Exception {
-        final InterfaceAddress ipv4 = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24);
-        final InterfaceAddress ipv6 = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", (short) 16);
+        final InterfaceAddress ipv4 = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24);
+        final InterfaceAddress ipv6 = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16);
         assertThat(SsdpServerDelegate.findInet4Address(Arrays.asList(ipv4, ipv6)), is(ipv4));
         assertThat(SsdpServerDelegate.findInet4Address(Arrays.asList(ipv6, ipv4)), is(ipv4));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void findInet4Address_見つからなければException1() throws Exception {
-        final InterfaceAddress ipv6 = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", (short) 16);
+        final InterfaceAddress ipv6 = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16);
         SsdpServerDelegate.findInet4Address(Arrays.asList(ipv6, ipv6));
     }
 
@@ -84,15 +84,15 @@ public class SsdpServerDelegateTest {
 
     @Test
     public void findInet6Address() throws Exception {
-        final InterfaceAddress ipv4 = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24);
-        final InterfaceAddress ipv6 = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", (short) 16);
+        final InterfaceAddress ipv4 = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24);
+        final InterfaceAddress ipv6 = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16);
         assertThat(SsdpServerDelegate.findInet6Address(Arrays.asList(ipv4, ipv6)), is(ipv6));
         assertThat(SsdpServerDelegate.findInet6Address(Arrays.asList(ipv6, ipv4)), is(ipv6));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void findInet6Address_見つからなければException1() throws Exception {
-        final InterfaceAddress ipv4 = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24);
+        final InterfaceAddress ipv4 = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24);
         SsdpServerDelegate.findInet6Address(Arrays.asList(ipv4));
     }
 
