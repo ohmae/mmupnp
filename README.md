@@ -30,7 +30,6 @@ Therefore, this library restricts the use of such statement.
 There is no way to make Device. If you need it, please select another library.
 - Some functions that are not widely used are not implemented.
   - Multicast eventing
-  - IPv6
 
 ## Example of use
 Android App
@@ -56,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.mm2d:mmupnp:1.6.0'
+    compile 'net.mm2d:mmupnp:1.7.0'
 }
 ```
 
@@ -77,6 +76,13 @@ If you want to specify the network interface, describe the following.
 ```java
 NetworkInterface ni = NetworkInterface.getByName("eth0");
 ControlPoint cp = new ControlPoint(ni);
+```
+
+By default ControlPoint will work with dual stack of IPv4 and IPv6.
+If you want to operate with IPv4 only, specify the protocol as follows.
+
+```java
+ControlPoint cp = new ControlPoint(Protocol.IP_V4_ONLY);
 ```
 
 ### M-SEARCH
