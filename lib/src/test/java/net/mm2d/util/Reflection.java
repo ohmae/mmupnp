@@ -41,7 +41,7 @@ public class Reflection {
     public static void setFieldValue(
             @Nonnull final Object target,
             @Nonnull final String fieldName,
-            @Nonnull final Object data) throws NoSuchFieldException, IllegalAccessException {
+            @Nullable final Object data) throws NoSuchFieldException, IllegalAccessException {
         getField(target, fieldName).set(target, data);
     }
 
