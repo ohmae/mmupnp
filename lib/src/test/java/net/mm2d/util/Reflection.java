@@ -77,7 +77,8 @@ public class Reflection {
             mMethod = getMethod(target, methodName, parameterTypes);
         }
 
-        public <T> T invoke(Object... args) throws InvocationTargetException, IllegalAccessException {
+        @Nullable
+        public <T> T invoke(final Object... args) throws InvocationTargetException, IllegalAccessException {
             return (T) mMethod.invoke(mTarget, args);
         }
     }
