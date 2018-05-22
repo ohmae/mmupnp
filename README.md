@@ -5,6 +5,8 @@
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/issues)
 [![Build Status](https://travis-ci.org/ohmae/mmupnp.svg?branch=develop)](https://travis-ci.org/ohmae/mmupnp)
 [![codecov](https://codecov.io/gh/ohmae/mmupnp/branch/develop/graph/badge.svg)](https://codecov.io/gh/ohmae/mmupnp)
+[![Maven Repository](https://img.shields.io/badge/maven-jcenter-brightgreen.svg)](https://bintray.com/ohmae/maven/net.mm2d.mmupnp)
+[![Maven metadata URI](https://img.shields.io/maven-metadata/v/https/jcenter.bintray.com/net/mm2d/mmupnp/maven-metadata.xml.svg)](https://bintray.com/ohmae/maven/net.mm2d.mmupnp)
 
 Universal Plug and Play (UPnP) ControlPoint library for Java.
 
@@ -44,16 +46,15 @@ Sample App
 
 ## How to use
 
-Please use my maven repository.
-(URL has changed since Ver.1.3.0)
-
+You can download this library from jCenter. (since Ver.1.7.0)
 ```gradle
 repositories {
-    maven {
-        url 'https://ohmae.github.com/maven'
-    }
+    jcenter()
 }
+```
 
+Add dependencies, as following.
+```gradle
 dependencies {
     compile 'net.mm2d:mmupnp:1.7.0'
 }
