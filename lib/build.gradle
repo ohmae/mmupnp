@@ -1,12 +1,11 @@
-group 'net.mm2d'
-version versionName
-
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'jacoco'
 
+group 'net.mm2d'
 archivesBaseName = 'mmupnp'
+version versionName
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
