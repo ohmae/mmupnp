@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.upnp.Device.Builder;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

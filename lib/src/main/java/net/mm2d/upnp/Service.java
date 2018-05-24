@@ -729,7 +729,7 @@ public class Service {
         if (obj == this) {
             return true;
         }
-        if (obj == null || !(obj instanceof Service)) {
+        if (!(obj instanceof Service)) {
             return false;
         }
         final Service service = (Service) obj;

@@ -52,7 +52,7 @@ public class Action {
      * ServiceDescriptionのパース時に使用するビルダー
      *
      * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
-     * @see ServiceParser#loadDescription(HttpClient, String, Service.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, Device.Builder, Service.Builder)
      */
     public static class Builder {
         private Service mService;
