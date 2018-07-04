@@ -35,10 +35,10 @@ public class ActionTest {
 
     @Test
     public void addArgumentBuilder_setした値が取得できる() {
-        final Argument.Builder argumentBuilder = mock(Argument.Builder.class);
+        final ArgumentImpl.Builder argumentBuilder = mock(ArgumentImpl.Builder.class);
         final Action.Builder builder = new Action.Builder()
                 .addArgumentBuilder(argumentBuilder);
-        final List<Argument.Builder> list = builder.getArgumentBuilderList();
+        final List<ArgumentImpl.Builder> list = builder.getArgumentBuilderList();
         assertThat(list.size(), is(1));
         assertThat(list, hasItem(argumentBuilder));
     }
@@ -85,7 +85,7 @@ public class ActionTest {
         final Action action = new Action.Builder()
                 .setService(service)
                 .setName(name)
-                .addArgumentBuilder(new Argument.Builder()
+                .addArgumentBuilder(new ArgumentImpl.Builder()
                         .setName(argumentName)
                         .setDirection("in")
                         .setRelatedStateVariable(stateVariable))
@@ -108,7 +108,7 @@ public class ActionTest {
         final Action action = new Action.Builder()
                 .setService(service)
                 .setName(name)
-                .addArgumentBuilder(new Argument.Builder()
+                .addArgumentBuilder(new ArgumentImpl.Builder()
                         .setName(argumentName)
                         .setDirection("in")
                         .setRelatedStateVariable(stateVariable))

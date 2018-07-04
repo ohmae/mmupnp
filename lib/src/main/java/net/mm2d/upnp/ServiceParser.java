@@ -110,8 +110,8 @@ class ServiceParser {
     }
 
     @Nonnull
-    private static Argument.Builder parseArgument(@Nonnull final Element element) {
-        final Argument.Builder builder = new Argument.Builder();
+    private static ArgumentImpl.Builder parseArgument(@Nonnull final Element element) {
+        final ArgumentImpl.Builder builder = new ArgumentImpl.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             final String tag = getTagName(node);
@@ -125,7 +125,7 @@ class ServiceParser {
     }
 
     private static void setField(
-            @Nonnull final Argument.Builder builder,
+            @Nonnull final ArgumentImpl.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
         if ("name".equals(tag)) {

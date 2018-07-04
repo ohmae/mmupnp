@@ -265,7 +265,7 @@ public class Service {
         }
         final Map<String, Action> mActionMap = new LinkedHashMap<>(builderList.size());
         for (final Action.Builder actionBuilder : builderList) {
-            for (final Argument.Builder argumentBuilder : actionBuilder.getArgumentBuilderList()) {
+            for (final ArgumentImpl.Builder argumentBuilder : actionBuilder.getArgumentBuilderList()) {
                 final String name = argumentBuilder.getRelatedStateVariableName();
                 if (name == null) {
                     throw new IllegalStateException("relatedStateVariable name is null");

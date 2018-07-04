@@ -58,7 +58,7 @@ public class Action {
         private Service mService;
         private String mName;
         @Nonnull
-        private final List<Argument.Builder> mArgumentList;
+        private final List<ArgumentImpl.Builder> mArgumentList;
 
         /**
          * インスタンス作成。
@@ -100,7 +100,7 @@ public class Action {
          * @return Builder
          */
         @Nonnull
-        public Builder addArgumentBuilder(@Nonnull final Argument.Builder argument) {
+        public Builder addArgumentBuilder(@Nonnull final ArgumentImpl.Builder argument) {
             mArgumentList.add(argument);
             return this;
         }
@@ -111,7 +111,7 @@ public class Action {
          * @return Argumentのビルダーリスト
          */
         @Nonnull
-        public List<Argument.Builder> getArgumentBuilderList() {
+        public List<ArgumentImpl.Builder> getArgumentBuilderList() {
             return mArgumentList;
         }
 
@@ -170,7 +170,7 @@ public class Action {
         mService = builder.mService;
         mName = builder.mName;
         mArgumentMap = new LinkedHashMap<>(builder.mArgumentList.size());
-        for (final Argument.Builder argumentBuilder : builder.mArgumentList) {
+        for (final ArgumentImpl.Builder argumentBuilder : builder.mArgumentList) {
             final Argument argument = argumentBuilder.setAction(this).build();
             mArgumentMap.put(argument.getName(), argument);
         }

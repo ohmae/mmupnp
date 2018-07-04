@@ -122,7 +122,7 @@ public class ServiceTest {
         public void build_argumentのRelatedStateVariableNameが指定されていない() throws Exception {
             final Action.Builder actionBuilder = new Action.Builder()
                     .setName("action")
-                    .addArgumentBuilder(new Argument.Builder()
+                    .addArgumentBuilder(new ArgumentImpl.Builder()
                             .setName("argumentName")
                             .setDirection("in"));
             final Service service = new Service.Builder()
@@ -143,7 +143,7 @@ public class ServiceTest {
         public void build_argumentのRelatedStateVariableNameがに対応するStateVariableがない() throws Exception {
             final Action.Builder actionBuilder = new Action.Builder()
                     .setName("action")
-                    .addArgumentBuilder(new Argument.Builder()
+                    .addArgumentBuilder(new ArgumentImpl.Builder()
                             .setName("argumentName")
                             .setDirection("in")
                             .setRelatedStateVariableName("StateVariableName"));

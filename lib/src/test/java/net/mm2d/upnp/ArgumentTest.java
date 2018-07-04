@@ -19,20 +19,20 @@ import static org.mockito.Mockito.*;
 public class ArgumentTest {
     @Test(expected = IllegalStateException.class)
     public void build_Actionを設定していないとException() {
-        new Argument.Builder()
+        new ArgumentImpl.Builder()
                 .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void build_Nameを設定していないとException() {
-        new Argument.Builder()
+        new ArgumentImpl.Builder()
                 .setAction(mock(Action.class))
                 .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void build_RelatedStateVariableを設定していないとException() {
-        new Argument.Builder()
+        new ArgumentImpl.Builder()
                 .setAction(mock(Action.class))
                 .setName("")
                 .build();
@@ -41,7 +41,7 @@ public class ArgumentTest {
     @Test
     public void getRelatedStateVariableName_setした値が返る() {
         final String name = "name";
-        final Argument.Builder builder = new Argument.Builder()
+        final ArgumentImpl.Builder builder = new ArgumentImpl.Builder()
                 .setRelatedStateVariableName(name);
         assertThat(builder.getRelatedStateVariableName(), is(name));
     }
@@ -51,7 +51,7 @@ public class ArgumentTest {
         final Action action = mock(Action.class);
         final String name = "name";
         final StateVariable stateVariable = mock(StateVariable.class);
-        final Argument argument = new Argument.Builder()
+        final Argument argument = new ArgumentImpl.Builder()
                 .setAction(action)
                 .setName(name)
                 .setDirection("in")
@@ -68,7 +68,7 @@ public class ArgumentTest {
         final Action action = mock(Action.class);
         final String name = "name";
         final StateVariable stateVariable = mock(StateVariable.class);
-        final Argument argument = new Argument.Builder()
+        final Argument argument = new ArgumentImpl.Builder()
                 .setAction(action)
                 .setName(name)
                 .setDirection("out")
