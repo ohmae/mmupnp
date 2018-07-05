@@ -310,7 +310,7 @@ public class Action {
         final String soap = makeSoap(null, arguments);
         final Map<String, String> result = invokeInner(soap);
         if (!returnErrorResponse && result.containsKey(ERROR_CODE_KEY)) {
-            throw new IOException("");
+            throw new IOException("error response:" + result);
         }
         return result;
     }
@@ -420,7 +420,7 @@ public class Action {
         final String soap = makeSoap(customNamespace, arguments);
         final Map<String, String> result = invokeInner(soap);
         if (!returnErrorResponse && result.containsKey(ERROR_CODE_KEY)) {
-            throw new IOException("");
+            throw new IOException("error response:" + result);
         }
         return result;
     }
