@@ -45,7 +45,7 @@ public class Service {
         @Nonnull
         private final List<Action.Builder> mActionBuilderList = new ArrayList<>();
         @Nonnull
-        private final List<StateVariable.Builder> mVariableBuilderList = new ArrayList<>();
+        private final List<StateVariableImpl.Builder> mVariableBuilderList = new ArrayList<>();
 
         /**
          * インスタンス作成
@@ -161,7 +161,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder addVariableBuilder(@Nonnull final StateVariable.Builder builder) {
+        public Builder addVariableBuilder(@Nonnull final StateVariableImpl.Builder builder) {
             mVariableBuilderList.add(builder);
             return this;
         }
@@ -243,12 +243,12 @@ public class Service {
     @Nonnull
     private static Map<String, StateVariable> buildStateVariableMap(
             @Nonnull final Service service,
-            @Nonnull final List<StateVariable.Builder> builderList) {
+            @Nonnull final List<StateVariableImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
             return Collections.emptyMap();
         }
         final Map<String, StateVariable> map = new LinkedHashMap<>(builderList.size());
-        for (final StateVariable.Builder variableBuilder : builderList) {
+        for (final StateVariableImpl.Builder variableBuilder : builderList) {
             final StateVariable variable = variableBuilder.setService(service).build();
             map.put(variable.getName(), variable);
         }

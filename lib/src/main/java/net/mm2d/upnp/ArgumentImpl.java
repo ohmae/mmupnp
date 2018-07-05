@@ -144,43 +144,23 @@ class ArgumentImpl implements Argument {
         mRelatedStateVariable = builder.mRelatedStateVariable;
     }
 
-    /**
-     * このArgumentを保持するActionを返す。
-     *
-     * @return このArgumentを保持するAction
-     */
     @Override
     @Nonnull
     public Action getAction() {
         return mAction;
     }
 
-    /**
-     * Argument名を返す。
-     *
-     * @return Argument名
-     */
     @Override
     @Nonnull
     public String getName() {
         return mName;
     }
 
-    /**
-     * Input方向か否かを返す。
-     *
-     * @return Inputの場合true
-     */
     @Override
     public boolean isInputDirection() {
         return mInputDirection;
     }
 
-    /**
-     * RelatedStateVariableで指定されたStateVariableのインスタンスを返す。
-     *
-     * @return StateVariableのインスタンス
-     */
     @Override
     @Nonnull
     public StateVariable getRelatedStateVariable() {

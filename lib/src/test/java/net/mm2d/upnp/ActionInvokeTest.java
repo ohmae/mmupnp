@@ -70,7 +70,7 @@ public class ActionInvokeTest {
                         .setDirection("in")
                         .setRelatedStateVariableName("1")
                         .setRelatedStateVariable(
-                                new StateVariable.Builder()
+                                new StateVariableImpl.Builder()
                                         .setService(service)
                                         .setDataType("string")
                                         .setName("1")
@@ -80,7 +80,7 @@ public class ActionInvokeTest {
                         .setDirection("in")
                         .setRelatedStateVariableName("2")
                         .setRelatedStateVariable(
-                                new StateVariable.Builder()
+                                new StateVariableImpl.Builder()
                                         .setService(service)
                                         .setDataType("string")
                                         .setName("2")
@@ -91,7 +91,7 @@ public class ActionInvokeTest {
                         .setDirection("out")
                         .setRelatedStateVariableName("3")
                         .setRelatedStateVariable(
-                                new StateVariable.Builder()
+                                new StateVariableImpl.Builder()
                                         .setService(service)
                                         .setDataType("string")
                                         .setName("3")

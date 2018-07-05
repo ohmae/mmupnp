@@ -138,8 +138,8 @@ class ServiceParser {
     }
 
     @Nonnull
-    private static StateVariable.Builder parseStateVariable(@Nonnull final Element element) {
-        final StateVariable.Builder builder = new StateVariable.Builder()
+    private static StateVariableImpl.Builder parseStateVariable(@Nonnull final Element element) {
+        final StateVariableImpl.Builder builder = new StateVariableImpl.Builder()
                 .setSendEvents(element.getAttribute("sendEvents"))
                 .setMulticast(element.getAttribute("multicast"));
         Node node = element.getFirstChild();
@@ -164,7 +164,7 @@ class ServiceParser {
     }
 
     private static void parseAllowedValueList(
-            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final Element element) {
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -176,7 +176,7 @@ class ServiceParser {
     }
 
     private static void parseAllowedValueRange(
-            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final Element element) {
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -190,7 +190,7 @@ class ServiceParser {
     }
 
     private static void setField(
-            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
         if ("step".equals(tag)) {

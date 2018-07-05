@@ -21,7 +21,7 @@ public class StateVariableTest {
     public void build_Serviceを指定していなければException() {
         final String name = "name";
         final String dataType = "ui4";
-        new StateVariable.Builder()
+        new StateVariableImpl.Builder()
                 .setName(name)
                 .setDataType(dataType)
                 .build();
@@ -31,7 +31,7 @@ public class StateVariableTest {
     public void build_Nameを指定していなければException() {
         final Service service = mock(Service.class);
         final String dataType = "ui4";
-        new StateVariable.Builder()
+        new StateVariableImpl.Builder()
                 .setService(service)
                 .setDataType(dataType)
                 .build();
@@ -41,7 +41,7 @@ public class StateVariableTest {
     public void build_DataTypeを指定していなければException() {
         final Service service = mock(Service.class);
         final String name = "name";
-        new StateVariable.Builder()
+        new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .build();
@@ -52,7 +52,7 @@ public class StateVariableTest {
         final Service service = mock(Service.class);
         final String name = "name";
         final String dataType = "ui4";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -66,7 +66,7 @@ public class StateVariableTest {
         final Service service = mock(Service.class);
         final String name = "name";
         final String dataType = "ui4";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -80,7 +80,7 @@ public class StateVariableTest {
         final Service service = mock(Service.class);
         final String name = "name";
         final String dataType = "ui4";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -94,7 +94,7 @@ public class StateVariableTest {
         final Service service = mock(Service.class);
         final String name = "name";
         final String dataType = "ui4";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -109,7 +109,7 @@ public class StateVariableTest {
         final Service service = mock(Service.class);
         final String name = "name";
         final String dataType = "ui4";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -125,7 +125,7 @@ public class StateVariableTest {
         final String name = "name";
         final String dataType = "ui4";
         final String value = "1";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -141,7 +141,7 @@ public class StateVariableTest {
         final String name = "name";
         final String dataType = "ui4";
         final String value = "1";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -157,7 +157,7 @@ public class StateVariableTest {
         final String name = "name";
         final String dataType = "ui4";
         final String value = "1";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -173,7 +173,7 @@ public class StateVariableTest {
         final String name = "name";
         final String dataType = "ui4";
         final String value = "1";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
@@ -189,7 +189,7 @@ public class StateVariableTest {
         final String name = "name";
         final String dataType = "ui4";
         final String value = "1";
-        final StateVariable stateVariable = new StateVariable.Builder()
+        final StateVariable stateVariable = new StateVariableImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .setDataType(dataType)
