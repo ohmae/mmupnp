@@ -241,6 +241,10 @@ class HttpMessageDelegate implements HttpMessage {
 
     @Nonnull
     private String getHeaderString() {
+        return getHeaderStringBuilder().toString();
+    }
+
+    private StringBuilder getHeaderStringBuilder() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getStartLine());
         sb.append(EOL);
@@ -251,7 +255,7 @@ class HttpMessageDelegate implements HttpMessage {
             sb.append(EOL);
         }
         sb.append(EOL);
-        return sb.toString();
+        return sb;
     }
 
     // VisibleForTesting
@@ -268,16 +272,7 @@ class HttpMessageDelegate implements HttpMessage {
     @Nonnull
     @Override
     public String getMessageString() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(getStartLine());
-        sb.append(EOL);
-        for (final HttpHeaders.Entry entry : mHeaders.values()) {
-            sb.append(entry.getName());
-            sb.append(": ");
-            sb.append(entry.getValue());
-            sb.append(EOL);
-        }
-        sb.append(EOL);
+        final StringBuilder sb = getHeaderStringBuilder();
         final String body = getBody();
         if (!TextUtils.isEmpty(body)) {
             sb.append(body);
@@ -299,26 +294,26 @@ class HttpMessageDelegate implements HttpMessage {
     }
 
     private void writeChunkedBody(
-            @Nonnull final OutputStream os,
+            @Nonnull final OutputStream outputStream,
             @Nonnull final byte[] binary)
             throws IOException {
         int offset = 0;
         while (offset < binary.length) {
             final int size = Math.min(DEFAULT_CHUNK_SIZE, binary.length - offset);
-            writeChunkSize(os, size);
-            os.write(binary, offset, size);
-            os.write(CRLF);
+            writeChunkSize(outputStream, size);
+            outputStream.write(binary, offset, size);
+            outputStream.write(CRLF);
             offset += size;
         }
-        writeChunkSize(os, 0);
-        os.write(CRLF);
+        writeChunkSize(outputStream, 0);
+        outputStream.write(CRLF);
     }
 
     private void writeChunkSize(
-            @Nonnull final OutputStream os,
+            @Nonnull final OutputStream outputStream,
             final int size) throws IOException {
-        os.write(getBytes(Integer.toHexString(size)));
-        os.write(CRLF);
+        outputStream.write(getBytes(Integer.toHexString(size)));
+        outputStream.write(CRLF);
     }
 
     @Override
@@ -333,8 +328,8 @@ class HttpMessageDelegate implements HttpMessage {
         return this;
     }
 
-    private void readStartLine(@Nonnull final InputStream is) throws IOException {
-        final String startLine = readLine(is);
+    private void readStartLine(@Nonnull final InputStream inputStream) throws IOException {
+        final String startLine = readLine(inputStream);
         if (TextUtils.isEmpty(startLine)) {
             throw new IOException("Illegal start line:" + startLine);
         }
@@ -345,9 +340,9 @@ class HttpMessageDelegate implements HttpMessage {
         }
     }
 
-    private void readHeaders(@Nonnull final InputStream is) throws IOException {
+    private void readHeaders(@Nonnull final InputStream inputStream) throws IOException {
         while (true) {
-            final String line = readLine(is);
+            final String line = readLine(inputStream);
             if (line.isEmpty()) {
                 break;
             }
@@ -355,47 +350,45 @@ class HttpMessageDelegate implements HttpMessage {
         }
     }
 
-    private void readBody(@Nonnull final InputStream is) throws IOException {
+    private void readBody(@Nonnull final InputStream inputStream) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int length = getContentLength();
+        readInputStream(inputStream, baos, getContentLength());
+        setBodyBinary(baos.toByteArray());
+    }
+
+    private void readChunkedBody(@Nonnull final InputStream inputStream) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while (true) {
+            final int length = readChunkSize(inputStream);
+            if (length == 0) {
+                readLine(inputStream);
+                break;
+            }
+            readInputStream(inputStream, baos, length);
+            readLine(inputStream);
+        }
+        setBodyBinary(baos.toByteArray());
+    }
+
+    private void readInputStream(
+            @Nonnull final InputStream inputStream,
+            @Nonnull final OutputStream outputStream,
+            final int length) throws IOException {
         final byte[] buffer = new byte[BUFFER_SIZE];
-        while (length > 0) {
-            final int stroke = length > buffer.length ? buffer.length : length;
-            final int size = is.read(buffer, 0, stroke);
+        int remain = length;
+        while (remain > 0) {
+            final int stroke = remain > buffer.length ? buffer.length : remain;
+            final int size = inputStream.read(buffer, 0, stroke);
             if (size < 0) {
                 throw new IOException("can't read from InputStream");
             }
-            baos.write(buffer, 0, size);
-            length -= size;
+            outputStream.write(buffer, 0, size);
+            remain -= size;
         }
-        setBodyBinary(baos.toByteArray());
     }
 
-    private void readChunkedBody(@Nonnull final InputStream is) throws IOException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        while (true) {
-            int length = readChunkSize(is);
-            if (length == 0) {
-                readLine(is);
-                break;
-            }
-            final byte[] buffer = new byte[BUFFER_SIZE];
-            while (length > 0) {
-                final int stroke = length > buffer.length ? buffer.length : length;
-                final int size = is.read(buffer, 0, stroke);
-                if (size < 0) {
-                    throw new IOException("can't read from InputStream");
-                }
-                baos.write(buffer, 0, size);
-                length -= size;
-            }
-            readLine(is);
-        }
-        setBodyBinary(baos.toByteArray());
-    }
-
-    private int readChunkSize(@Nonnull final InputStream is) throws IOException {
-        final String line = readLine(is);
+    private int readChunkSize(@Nonnull final InputStream inputStream) throws IOException {
+        final String line = readLine(inputStream);
         if (TextUtils.isEmpty(line)) {
             throw new IOException("Can not read chunk size!");
         }
@@ -408,10 +401,10 @@ class HttpMessageDelegate implements HttpMessage {
     }
 
     @Nonnull
-    private static String readLine(@Nonnull final InputStream is) throws IOException {
+    private static String readLine(@Nonnull final InputStream inputStream) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {
-            final int b = is.read();
+            final int b = inputStream.read();
             if (b < 0) {
                 if (baos.size() == 0) {
                     throw new IOException("can't read from InputStream");
