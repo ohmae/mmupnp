@@ -56,7 +56,7 @@ public class Device {
         private String mPresentationUrl;
         private String mUrlBase;
         @Nonnull
-        private final List<Icon.Builder> mIconBuilderList = new ArrayList<>();
+        private final List<IconImpl.Builder> mIconBuilderList = new ArrayList<>();
         @Nonnull
         private final List<ServiceImpl.Builder> mServiceBuilderList = new ArrayList<>();
         @Nonnull
@@ -335,7 +335,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder addIconBuilder(@Nonnull final Icon.Builder builder) {
+        public Builder addIconBuilder(@Nonnull final IconImpl.Builder builder) {
             mIconBuilderList.add(builder);
             return this;
         }
@@ -535,12 +535,12 @@ public class Device {
     @Nonnull
     private static List<Icon> buildIconList(
             @Nonnull final Device device,
-            @Nonnull final List<Icon.Builder> builderList) {
+            @Nonnull final List<IconImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
             return Collections.emptyList();
         }
         final List<Icon> list = new ArrayList<>(builderList.size());
-        for (final Icon.Builder builder : builderList) {
+        for (final IconImpl.Builder builder : builderList) {
             list.add(builder.setDevice(device).build());
         }
         return list;

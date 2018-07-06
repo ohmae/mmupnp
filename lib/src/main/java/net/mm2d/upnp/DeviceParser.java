@@ -160,8 +160,8 @@ public class DeviceParser {
     }
 
     @Nonnull
-    private static Icon.Builder parseIcon(@Nonnull final Node iconNode) {
-        final Icon.Builder builder = new Icon.Builder();
+    private static IconImpl.Builder parseIcon(@Nonnull final Node iconNode) {
+        final IconImpl.Builder builder = new IconImpl.Builder();
         Node node = iconNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             final String tag = getTagName(node);
@@ -175,7 +175,7 @@ public class DeviceParser {
     }
 
     private static void setField(
-            @Nonnull final Icon.Builder builder,
+            @Nonnull final IconImpl.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
         if ("mimetype".equals(tag)) {

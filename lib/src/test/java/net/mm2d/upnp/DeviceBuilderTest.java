@@ -43,7 +43,7 @@ public class DeviceBuilderTest {
         final String presentationUrl = "presentationUrl";
         final String urlBase = "urlBase";
         final Icon icon = mock(Icon.class);
-        final Icon.Builder iconBuilder = mock(Icon.Builder.class);
+        final IconImpl.Builder iconBuilder = mock(IconImpl.Builder.class);
         doReturn(iconBuilder).when(iconBuilder).setDevice((Device) any());
         doReturn(icon).when(iconBuilder).build();
         final Service service = mock(Service.class);

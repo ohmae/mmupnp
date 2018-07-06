@@ -25,7 +25,7 @@ public class IconBuilderTest {
         final int width = 300;
         final int depth = 24;
         final String url = "http://192.168.0.1/";
-        final Icon icon = new Icon.Builder()
+        final Icon icon = new IconImpl.Builder()
                 .setDevice(device)
                 .setMimeType(mimeType)
                 .setWidth(String.valueOf(width))
@@ -49,7 +49,7 @@ public class IconBuilderTest {
         final int width = 300;
         final int depth = 24;
         final String url = "http://192.168.0.1/";
-        new Icon.Builder()
+        new IconImpl.Builder()
                 .setMimeType(mimeType)
                 .setWidth(String.valueOf(width))
                 .setHeight(String.valueOf(height))
@@ -65,7 +65,7 @@ public class IconBuilderTest {
         final int width = 300;
         final int depth = 24;
         final String url = "http://192.168.0.1/";
-        new Icon.Builder()
+        new IconImpl.Builder()
                 .setDevice(device)
                 .setWidth(String.valueOf(width))
                 .setHeight(String.valueOf(height))
@@ -81,7 +81,7 @@ public class IconBuilderTest {
         final int height = 200;
         final int depth = 24;
         final String url = "http://192.168.0.1/";
-        new Icon.Builder()
+        new IconImpl.Builder()
                 .setDevice(device)
                 .setMimeType(mimeType)
                 .setWidth("width")
@@ -98,7 +98,7 @@ public class IconBuilderTest {
         final int width = 300;
         final int depth = 24;
         final String url = "http://192.168.0.1/";
-        new Icon.Builder()
+        new IconImpl.Builder()
                 .setDevice(device)
                 .setMimeType(mimeType)
                 .setWidth(String.valueOf(width))
@@ -116,7 +116,7 @@ public class IconBuilderTest {
         final int width = 300;
         final int depth = 24;
         final String url = "http://192.168.0.1/";
-        new Icon.Builder()
+        new IconImpl.Builder()
                 .setDevice(device)
                 .setMimeType(mimeType)
                 .setWidth(String.valueOf(width))
@@ -133,7 +133,7 @@ public class IconBuilderTest {
         final int height = 200;
         final int width = 300;
         final int depth = 24;
-        new Icon.Builder()
+        new IconImpl.Builder()
                 .setDevice(device)
                 .setMimeType(mimeType)
                 .setWidth(String.valueOf(width))
