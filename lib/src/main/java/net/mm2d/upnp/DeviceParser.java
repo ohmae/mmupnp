@@ -61,7 +61,7 @@ public class DeviceParser {
             @Nonnull final HttpClient client,
             @Nonnull final Device.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
-        for (final Service.Builder serviceBuilder : builder.getServiceBuilderList()) {
+        for (final ServiceImpl.Builder serviceBuilder : builder.getServiceBuilderList()) {
             ServiceParser.loadDescription(client, builder, serviceBuilder);
         }
         for (final Device.Builder deviceBuilder : builder.getEmbeddedDeviceBuilderList()) {
@@ -203,8 +203,8 @@ public class DeviceParser {
     }
 
     @Nonnull
-    private static Service.Builder parseService(@Nonnull final Node serviceNode) {
-        final Service.Builder serviceBuilder = new Service.Builder();
+    private static ServiceImpl.Builder parseService(@Nonnull final Node serviceNode) {
+        final ServiceImpl.Builder serviceBuilder = new ServiceImpl.Builder();
         Node node = serviceNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             final String tag = getTagName(node);
@@ -218,7 +218,7 @@ public class DeviceParser {
     }
 
     private static void setField(
-            @Nonnull final Service.Builder builder,
+            @Nonnull final ServiceImpl.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
         if ("serviceType".equals(tag)) {

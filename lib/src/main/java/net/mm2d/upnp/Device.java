@@ -58,7 +58,7 @@ public class Device {
         @Nonnull
         private final List<Icon.Builder> mIconBuilderList = new ArrayList<>();
         @Nonnull
-        private final List<Service.Builder> mServiceBuilderList = new ArrayList<>();
+        private final List<ServiceImpl.Builder> mServiceBuilderList = new ArrayList<>();
         @Nonnull
         private volatile List<Device.Builder> mDeviceBuilderList = Collections.emptyList();
         @Nonnull
@@ -347,7 +347,7 @@ public class Device {
          * @return Builder
          */
         @Nonnull
-        public Builder addServiceBuilder(@Nonnull final Service.Builder builder) {
+        public Builder addServiceBuilder(@Nonnull final ServiceImpl.Builder builder) {
             mServiceBuilderList.add(builder);
             return this;
         }
@@ -370,7 +370,7 @@ public class Device {
          * @return ServiceのBuilderのリスト
          */
         @Nonnull
-        public List<Service.Builder> getServiceBuilderList() {
+        public List<ServiceImpl.Builder> getServiceBuilderList() {
             return mServiceBuilderList;
         }
 
@@ -549,12 +549,12 @@ public class Device {
     @Nonnull
     private static List<Service> buildServiceList(
             @Nonnull final Device device,
-            @Nonnull final List<Service.Builder> builderList) {
+            @Nonnull final List<ServiceImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
             return Collections.emptyList();
         }
         final List<Service> list = new ArrayList<>(builderList.size());
-        for (final Service.Builder builder : builderList) {
+        for (final ServiceImpl.Builder builder : builderList) {
             list.add(builder.setDevice(device).build());
         }
         return list;

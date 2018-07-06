@@ -47,7 +47,7 @@ public class DeviceBuilderTest {
         doReturn(iconBuilder).when(iconBuilder).setDevice((Device) any());
         doReturn(icon).when(iconBuilder).build();
         final Service service = mock(Service.class);
-        final Service.Builder serviceBuilder = mock(Service.Builder.class);
+        final ServiceImpl.Builder serviceBuilder = mock(ServiceImpl.Builder.class);
         doReturn(serviceBuilder).when(serviceBuilder).setDevice((Device) any());
         doReturn(service).when(serviceBuilder).build();
 

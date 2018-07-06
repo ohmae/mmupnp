@@ -46,7 +46,7 @@ class ServiceParser {
     static void loadDescription(
             @Nonnull final HttpClient client,
             @Nonnull final Device.Builder deviceBuilder,
-            @Nonnull final Service.Builder builder)
+            @Nonnull final ServiceImpl.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         final String scpdUrl = builder.getScpdUrl();
         if (scpdUrl == null) {
@@ -67,7 +67,7 @@ class ServiceParser {
     }
 
     private static void parseActionList(
-            @Nonnull final Service.Builder builder,
+            @Nonnull final ServiceImpl.Builder builder,
             @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             builder.addActionBuilder(parseAction((Element) nodeList.item(i)));
@@ -75,7 +75,7 @@ class ServiceParser {
     }
 
     private static void parseStateVariableList(
-            @Nonnull final Service.Builder builder,
+            @Nonnull final ServiceImpl.Builder builder,
             @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             builder.addVariableBuilder(parseStateVariable((Element) nodeList.item(i)));

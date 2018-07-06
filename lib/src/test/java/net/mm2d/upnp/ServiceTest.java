@@ -33,7 +33,7 @@ public class ServiceTest {
     public static class Builderによる生成からのテスト {
         @Test
         public void build_成功() throws Exception {
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -48,7 +48,7 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_Device不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -60,7 +60,7 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_ServiceType不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -72,7 +72,7 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_ServiceId不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setScpdUrl("scpdUrl")
@@ -84,7 +84,7 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_ScpdUrl不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -96,7 +96,7 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_ControlUrl不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -108,7 +108,7 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_EventSubUrl不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -125,7 +125,7 @@ public class ServiceTest {
                     .addArgumentBuilder(new ArgumentImpl.Builder()
                             .setName("argumentName")
                             .setDirection("in"));
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -147,7 +147,7 @@ public class ServiceTest {
                             .setName("argumentName")
                             .setDirection("in")
                             .setRelatedStateVariableName("StateVariableName"));
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -176,7 +176,7 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(device)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -189,16 +189,16 @@ public class ServiceTest {
                     .when(message).getInterfaceAddress();
             doReturn(80).when(cp).getEventPort();
 
-            assertThat(service.getCallback(), is("<http://192.168.0.1/>"));
+            assertThat(((ServiceImpl) service).getCallback(), is("<http://192.168.0.1/>"));
 
             doReturn(8080).when(cp).getEventPort();
 
-            assertThat(service.getCallback(), is("<http://192.168.0.1:8080/>"));
+            assertThat(((ServiceImpl) service).getCallback(), is("<http://192.168.0.1:8080/>"));
         }
 
         @Test
         public void hashCode_Exceptionが発生しない() throws Exception {
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -212,7 +212,7 @@ public class ServiceTest {
 
         @Test
         public void equals_比較可能() throws Exception {
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -240,7 +240,7 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service1 = new Service.Builder()
+            final Service service1 = new ServiceImpl.Builder()
                     .setDevice(device)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -249,7 +249,7 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            final Service service2 = new Service.Builder()
+            final Service service2 = new ServiceImpl.Builder()
                     .setDevice(device)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -275,7 +275,7 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service1 = new Service.Builder()
+            final Service service1 = new ServiceImpl.Builder()
                     .setDevice(device)
                     .setServiceType("serviceType1")
                     .setServiceId("serviceId")
@@ -284,7 +284,7 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl1")
                     .setDescription("description1")
                     .build();
-            final Service service2 = new Service.Builder()
+            final Service service2 = new ServiceImpl.Builder()
                     .setDevice(device)
                     .setServiceType("serviceType2")
                     .setServiceId("serviceId")
@@ -310,7 +310,7 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service1 = new Service.Builder()
+            final Service service1 = new ServiceImpl.Builder()
                     .setDevice(device)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId1")
@@ -319,7 +319,7 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            final Service service2 = new Service.Builder()
+            final Service service2 = new ServiceImpl.Builder()
                     .setDevice(device)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId2")
@@ -357,7 +357,7 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service1 = new Service.Builder()
+            final Service service1 = new ServiceImpl.Builder()
                     .setDevice(device1)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -366,7 +366,7 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            final Service service2 = new Service.Builder()
+            final Service service2 = new ServiceImpl.Builder()
                     .setDevice(device2)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -380,7 +380,7 @@ public class ServiceTest {
 
         @Test
         public void createHttpClient() throws Exception {
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -390,7 +390,7 @@ public class ServiceTest {
                     .setDescription("description")
                     .build();
 
-            final HttpClient client = service.createHttpClient();
+            final HttpClient client = ((ServiceImpl) service).createHttpClient();
             assertThat(client.isKeepAlive(), is(false));
         }
     }
@@ -402,9 +402,9 @@ public class ServiceTest {
         private static final int EVENT_PORT = 100;
         private ControlPoint mControlPoint;
         private Device mDevice;
-        private Service mCms;
-        private Service mCds;
-        private Service mMmupnp;
+        private ServiceImpl mCms;
+        private ServiceImpl mCds;
+        private ServiceImpl mMmupnp;
 
         @Before
         public void setUp() throws Exception {
@@ -434,9 +434,9 @@ public class ServiceTest {
             final Device.Builder builder = new Device.Builder(mControlPoint, ssdpMessage);
             DeviceParser.loadDescription(httpClient, builder);
             mDevice = builder.build();
-            mCms = mDevice.findServiceById("urn:upnp-org:serviceId:ConnectionManager");
-            mCds = spy(mDevice.findServiceById("urn:upnp-org:serviceId:ContentDirectory"));
-            mMmupnp = mDevice.findServiceById("urn:upnp-org:serviceId:X_mmupnp");
+            mCms = (ServiceImpl) mDevice.findServiceById("urn:upnp-org:serviceId:ConnectionManager");
+            mCds = (ServiceImpl) spy(mDevice.findServiceById("urn:upnp-org:serviceId:ContentDirectory"));
+            mMmupnp = (ServiceImpl) mDevice.findServiceById("urn:upnp-org:serviceId:X_mmupnp");
         }
 
         @Test
@@ -692,7 +692,7 @@ public class ServiceTest {
         public void parseTimeout_情報がない場合デフォルト() {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
-            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
@@ -700,7 +700,7 @@ public class ServiceTest {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "infinite");
-            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
@@ -708,7 +708,7 @@ public class ServiceTest {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "second-100");
-            assertThat(Service.parseTimeout(response), is(TimeUnit.SECONDS.toMillis(100)));
+            assertThat(ServiceImpl.parseTimeout(response), is(TimeUnit.SECONDS.toMillis(100)));
         }
 
         @Test
@@ -716,10 +716,10 @@ public class ServiceTest {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "seconds-100");
-            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
 
             response.setHeader(Http.TIMEOUT, "second-ff");
-            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
     }
 
@@ -727,7 +727,7 @@ public class ServiceTest {
     public static class subscribe_機能のテスト {
         private ControlPoint mControlPoint;
         private Device mDevice;
-        private Service mService;
+        private ServiceImpl mService;
         private HttpClient mHttpClient;
 
         @Before
@@ -736,7 +736,7 @@ public class ServiceTest {
             mDevice = mock(Device.class);
             doReturn(mControlPoint).when(mDevice).getControlPoint();
             doReturn(new URL("http://192.0.2.2/")).when(mDevice).getAbsoluteUrl(anyString());
-            mService = spy(new Service.Builder()
+            mService = (ServiceImpl) spy(new ServiceImpl.Builder()
                     .setDevice(mDevice)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
