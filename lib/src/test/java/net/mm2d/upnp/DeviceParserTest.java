@@ -62,7 +62,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
@@ -74,7 +74,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-gabage.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
@@ -88,7 +88,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("mmupnp-with-mistake.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/mmupnp.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
@@ -100,7 +100,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-no-icon.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(0));
@@ -112,7 +112,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-no-service.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
@@ -127,7 +127,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-url-base.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.3:12345/device.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getBaseUrl(), is("http://192.0.2.2:12345/"));
@@ -138,7 +138,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
 
@@ -171,7 +171,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
 
@@ -184,7 +184,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final Device.Builder builder = new Device.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
 
@@ -209,7 +209,7 @@ public class DeviceParserTest {
 
         @Test(expected = IOException.class)
         public void loadDescription_ダウンロード失敗でIOException() throws Exception {
-            final Device.Builder builder = mock(Device.Builder.class);
+            final DeviceImpl.Builder builder = mock(DeviceImpl.Builder.class);
             doReturn("http://192.168.0.1/").when(builder).getLocation();
             doReturn(mock(SsdpMessage.class)).when(builder).getSsdpMessage();
             DeviceParser.loadDescription(mock(HttpClient.class), builder);
@@ -217,7 +217,7 @@ public class DeviceParserTest {
 
         @Test(expected = IOException.class)
         public void parseDescription_deviceノードのないXMLを渡すとException() throws Exception {
-            DeviceParser.parseDescription(mock(Device.Builder.class),
+            DeviceParser.parseDescription(mock(DeviceImpl.Builder.class),
                     "<?xml version=\"1.0\"?>\n" +
                             "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">\n" +
                             "</root>");

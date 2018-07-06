@@ -23,8 +23,8 @@ class StateVariableImpl implements StateVariable {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
-     * @see ServiceParser#loadDescription(HttpClient, Device.Builder, Service.Builder)
+     * @see DeviceParser#loadDescription(HttpClient, DeviceImpl.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, DeviceImpl.Builder, ServiceImpl.Builder)
      */
     public static class Builder {
         private Service mService;

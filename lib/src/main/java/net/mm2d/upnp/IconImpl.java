@@ -22,7 +22,7 @@ public class IconImpl implements Icon {
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
-     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
+     * @see DeviceParser#loadDescription(HttpClient, DeviceImpl.Builder)
      */
     public static class Builder {
         private Device mDevice;

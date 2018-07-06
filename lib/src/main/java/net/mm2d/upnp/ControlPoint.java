@@ -118,7 +118,7 @@ public class ControlPoint {
     @Nonnull
     private final SsdpNotifyReceiverList mNotifyList;
     @Nonnull
-    private final Map<String, Device.Builder> mLoadingDeviceMap;
+    private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap;
     @Nonnull
     private final Set<String> mEmbeddedDeviceUdnSet = new HashSet<>();
     @Nonnull
@@ -138,9 +138,9 @@ public class ControlPoint {
 
     private class DeviceLoader implements Runnable {
         @Nonnull
-        private final Device.Builder mDeviceBuilder;
+        private final DeviceImpl.Builder mDeviceBuilder;
 
-        DeviceLoader(@Nonnull final Device.Builder builder) {
+        DeviceLoader(@Nonnull final DeviceImpl.Builder builder) {
             mDeviceBuilder = builder;
         }
 
@@ -376,14 +376,14 @@ public class ControlPoint {
             mLoadingDeviceMap.remove(uuid);
             return;
         }
-        final Device.Builder deviceBuilder = mLoadingDeviceMap.get(uuid);
+        final DeviceImpl.Builder deviceBuilder = mLoadingDeviceMap.get(uuid);
         if (deviceBuilder != null) {
             if (needToUpdateSsdpMessage(deviceBuilder.getSsdpMessage(), message)) {
                 deviceBuilder.updateSsdpMessage(message);
             }
             return;
         }
-        final Device.Builder builder = new Device.Builder(this, message);
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(this, message);
         mLoadingDeviceMap.put(uuid, builder);
         if (!executeInParallel(new DeviceLoader(builder))) {
             mLoadingDeviceMap.remove(uuid);

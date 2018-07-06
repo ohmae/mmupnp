@@ -34,7 +34,7 @@ class ControlPointDiFactory {
     }
 
     @Nonnull
-    Map<String, Device.Builder> createLoadingDeviceMap() {
+    Map<String, DeviceImpl.Builder> createLoadingDeviceMap() {
         return new HashMap<>();
     }
 

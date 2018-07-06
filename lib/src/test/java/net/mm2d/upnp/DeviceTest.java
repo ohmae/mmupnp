@@ -32,7 +32,7 @@ public class DeviceTest {
         private HttpClient mHttpClient;
         private SsdpMessage mSsdpMessage;
         private ControlPoint mControlPoint;
-        private Device.Builder mBuilder;
+        private DeviceImpl.Builder mBuilder;
 
         @Before
         public void setUp() throws Exception {
@@ -57,7 +57,7 @@ public class DeviceTest {
             final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
             mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
             mControlPoint = mock(ControlPoint.class);
-            mBuilder = new Device.Builder(mControlPoint, mSsdpMessage);
+            mBuilder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, mBuilder);
         }
 
@@ -479,7 +479,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("http://192.168.0.1/").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -496,7 +496,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -514,7 +514,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("http://192.168.0.1/").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")

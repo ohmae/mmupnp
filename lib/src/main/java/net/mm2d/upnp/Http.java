@@ -368,6 +368,62 @@ public final class Http {
         return host.substring(0, index) + "%" + scopeId + "]";
     }
 
+    @Nonnull
+    static String getAbsoluteUrl(
+            @Nonnull final String baseUrl,
+            @Nonnull final String url) {
+        if (isHttpUrl(url)) {
+            return url;
+        }
+        final String base = removeQuery(baseUrl);
+        if (url.startsWith("/")) {
+            return makeUrlWithAbsolutePath(base, url);
+        }
+        return makeUrlWithRelativePath(base, url);
+    }
+
+    /**
+     * URL情報を正規化して返す。
+     *
+     * <p>URLとして渡される情報は以下のバリエーションがある
+     * <ul>
+     * <li>"http://"から始まる完全なURL
+     * <li>"/"から始まる絶対パス
+     * <li>"/"以外から始まる相対パス
+     * </ul>
+     *
+     * <p>一方、baseUrlの情報としては以下のバリエーションを考慮する
+     * <ul>
+     * <li>"http://10.0.0.1:1000/" ホスト名のみ
+     * <li>"http://10.0.0.1:1000" ホスト名のみだが末尾の"/"がない。
+     * <li>"http://10.0.0.1:1000/hoge/fuga" ファイル名で終わる
+     * <li>"http://10.0.0.1:1000/hoge/fuga/" ディレクトリ名で終わる
+     * <li>"http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar" 上記に対してクエリーが付いている
+     * </ul>
+     *
+     * <p>URLが"http://"から始まっていればそのまま利用する。
+     * "/"から始まっていればbaseUrlホストの絶対パスとして
+     * baseUrlの"://"以降の最初の"/"までと結合する。
+     * それ以外の場合はLocationからの相対パスであり、
+     * baseUrlから抽出したディレクトリ名と結合する。
+     *
+     * <p>またscopeIdの付与も行う。
+     *
+     * @param baseUrl URLパスのベースとなる値
+     * @param url     URLパス情報
+     * @param scopeId スコープID
+     * @return 正規化したURL
+     * @throws MalformedURLException 不正なURL
+     */
+    @Nonnull
+    static URL getAbsoluteUrl(
+            @Nonnull final String baseUrl,
+            @Nonnull final String url,
+            final int scopeId)
+            throws MalformedURLException {
+        return makeUrlWithScopeId(getAbsoluteUrl(baseUrl, url), scopeId);
+    }
+
     /**
      * インスタンス化禁止
      */

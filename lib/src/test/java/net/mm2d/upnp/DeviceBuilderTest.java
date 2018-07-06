@@ -51,7 +51,7 @@ public class DeviceBuilderTest {
         doReturn(serviceBuilder).when(serviceBuilder).setDevice((Device) any());
         doReturn(service).when(serviceBuilder).build();
 
-        final Device device = new Device.Builder(cp, message)
+        final Device device = new DeviceImpl.Builder(cp, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setUpc(upc)
@@ -103,7 +103,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        final Device device = new Device.Builder(cp, message)
+        final Device device = new DeviceImpl.Builder(cp, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setUpc(upc)
@@ -135,7 +135,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new Device.Builder(cp, message)
+        new DeviceImpl.Builder(cp, message)
                 .setUdn(uuid)
                 .setDeviceType(deviceType)
                 .setFriendlyName(friendlyName)
@@ -157,7 +157,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new Device.Builder(cp, message)
+        new DeviceImpl.Builder(cp, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setFriendlyName(friendlyName)
@@ -179,7 +179,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new Device.Builder(cp, message)
+        new DeviceImpl.Builder(cp, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setDeviceType(deviceType)
@@ -201,7 +201,7 @@ public class DeviceBuilderTest {
         final String friendlyName = "friendlyName";
         final String modelName = "modelName";
 
-        new Device.Builder(cp, message)
+        new DeviceImpl.Builder(cp, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setDeviceType(deviceType)
@@ -223,7 +223,7 @@ public class DeviceBuilderTest {
         final String friendlyName = "friendlyName";
         final String manufacture = "manufacture";
 
-        new Device.Builder(cp, message)
+        new DeviceImpl.Builder(cp, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setDeviceType(deviceType)
@@ -246,7 +246,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new Device.Builder(cp, message)
+        new DeviceImpl.Builder(cp, message)
                 .setDescription(description)
                 .setDeviceType(deviceType)
                 .setFriendlyName(friendlyName)
@@ -271,7 +271,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new Device.Builder(cp, message)
+        new DeviceImpl.Builder(cp, message)
                 .setDescription(description)
                 .setUdn(udn)
                 .setUpc(upc)
@@ -284,7 +284,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void build_不正なSsdpMessage1() {
-        new Device.Builder(mock(ControlPoint.class), mock(SsdpMessage.class));
+        new DeviceImpl.Builder(mock(ControlPoint.class), mock(SsdpMessage.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -294,7 +294,7 @@ public class DeviceBuilderTest {
         final String uuid = "uuid";
         doReturn(location).when(message).getLocation();
         doReturn(uuid).when(message).getUuid();
-        new Device.Builder(mock(ControlPoint.class), message)
+        new DeviceImpl.Builder(mock(ControlPoint.class), message)
                 .updateSsdpMessage(mock(SsdpMessage.class));
     }
 
@@ -305,8 +305,8 @@ public class DeviceBuilderTest {
         final String uuid = "uuid";
         doReturn(location).when(message).getLocation();
         doReturn(uuid).when(message).getUuid();
-        final Device.Builder embeddedDeviceBuilder = mock(Device.Builder.class);
-        new Device.Builder(mock(ControlPoint.class), message)
+        final DeviceImpl.Builder embeddedDeviceBuilder = mock(DeviceImpl.Builder.class);
+        new DeviceImpl.Builder(mock(ControlPoint.class), message)
                 .setEmbeddedDeviceBuilderList(Arrays.asList(embeddedDeviceBuilder))
                 .updateSsdpMessage(message);
 
@@ -323,7 +323,7 @@ public class DeviceBuilderTest {
         final String tag2 = "tag2";
         final String value2 = "value2";
 
-        final Device device = new Device.Builder(mock(ControlPoint.class), message)
+        final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")

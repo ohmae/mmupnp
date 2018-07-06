@@ -51,8 +51,8 @@ class ActionImpl implements Action {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
-     * @see ServiceParser#loadDescription(HttpClient, Device.Builder, Service.Builder)
+     * @see DeviceParser#loadDescription(HttpClient, DeviceImpl.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, DeviceImpl.Builder, ServiceImpl.Builder)
      */
     public static class Builder {
         private Service mService;
@@ -378,7 +378,7 @@ class ActionImpl implements Action {
             setNamespace(action, namespaces);
             setArgument(document, action, arguments);
             return formatXmlString(document);
-        } catch (DOMException
+        } catch (final DOMException
                 | TransformerFactoryConfigurationError
                 | TransformerException
                 | ParserConfigurationException e) {

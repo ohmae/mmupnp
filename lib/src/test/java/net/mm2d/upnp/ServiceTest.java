@@ -167,7 +167,7 @@ public class ServiceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(cp, message)
+            final Device device = new DeviceImpl.Builder(cp, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -231,7 +231,7 @@ public class ServiceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -266,7 +266,7 @@ public class ServiceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -301,7 +301,7 @@ public class ServiceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -336,7 +336,7 @@ public class ServiceTest {
             final SsdpMessage message1 = mock(SsdpMessage.class);
             doReturn("location").when(message1).getLocation();
             doReturn("uuid1").when(message1).getUuid();
-            final Device device1 = new Device.Builder(mock(ControlPoint.class), message1)
+            final Device device1 = new DeviceImpl.Builder(mock(ControlPoint.class), message1)
                     .setDescription("description")
                     .setUdn("uuid1")
                     .setUpc("upc")
@@ -348,7 +348,7 @@ public class ServiceTest {
             final SsdpMessage message2 = mock(SsdpMessage.class);
             doReturn("location").when(message2).getLocation();
             doReturn("uuid2").when(message2).getUuid();
-            final Device device2 = new Device.Builder(mock(ControlPoint.class), message2)
+            final Device device2 = new DeviceImpl.Builder(mock(ControlPoint.class), message2)
                     .setDescription("description")
                     .setUdn("uuid2")
                     .setUpc("upc")
@@ -431,7 +431,7 @@ public class ServiceTest {
             final SsdpMessage ssdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
             mControlPoint = mock(ControlPoint.class);
             doReturn(EVENT_PORT).when(mControlPoint).getEventPort();
-            final Device.Builder builder = new Device.Builder(mControlPoint, ssdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, ssdpMessage);
             DeviceParser.loadDescription(httpClient, builder);
             mDevice = builder.build();
             mCms = (ServiceImpl) mDevice.findServiceById("urn:upnp-org:serviceId:ConnectionManager");

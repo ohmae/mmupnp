@@ -443,7 +443,7 @@ public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class DeviceDiscovery {
         private ControlPoint mCp;
-        private Map<String, Device.Builder> mLoadingDeviceMap = spy(new HashMap<String, Device.Builder>());
+        private Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
         private DeviceHolder mDeviceHolder;
 
         @Before
@@ -452,7 +452,7 @@ public class ControlPointTest {
                     new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
-                        Map<String, Device.Builder> createLoadingDeviceMap() {
+                        Map<String, DeviceImpl.Builder> createLoadingDeviceMap() {
                             return mLoadingDeviceMap;
                         }
 
@@ -576,7 +576,7 @@ public class ControlPointTest {
             final byte[] data1 = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
             final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
             final SsdpMessage message1 = new SsdpRequest(ifa, data1, data1.length);
-            final Device.Builder deviceBuilder = spy(new Device.Builder(mCp, message1));
+            final DeviceImpl.Builder deviceBuilder = spy(new DeviceImpl.Builder(mCp, message1));
             mLoadingDeviceMap.put(deviceBuilder.getUuid(), deviceBuilder);
             final byte[] data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final SsdpMessage message2 = new SsdpRequest(ifa, data2, data2.length);
@@ -588,7 +588,7 @@ public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class イベント伝搬テスト {
         private ControlPoint mCp;
-        private Map<String, Device.Builder> mLoadingDeviceMap = spy(new HashMap<String, Device.Builder>());
+        private Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
         private DeviceHolder mDeviceHolder;
         private SubscribeHolder mSubscribeHolder = new SubscribeHolder();
         private SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
@@ -603,7 +603,7 @@ public class ControlPointTest {
                     new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
-                        Map<String, Device.Builder> createLoadingDeviceMap() {
+                        Map<String, DeviceImpl.Builder> createLoadingDeviceMap() {
                             return mLoadingDeviceMap;
                         }
 

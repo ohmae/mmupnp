@@ -30,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-public class DeviceParser {
+public final class DeviceParser {
     /**
      * DeviceDescriptionを読み込む。
      *
@@ -46,7 +46,7 @@ public class DeviceParser {
      */
     static void loadDescription(
             @Nonnull final HttpClient client,
-            @Nonnull final Device.Builder builder)
+            @Nonnull final DeviceImpl.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         final URL url = Http.makeUrlWithScopeId(builder.getLocation(), builder.getSsdpMessage().getScopeId());
         final String description = client.downloadString(url);
@@ -59,19 +59,19 @@ public class DeviceParser {
 
     private static void loadServices(
             @Nonnull final HttpClient client,
-            @Nonnull final Device.Builder builder)
+            @Nonnull final DeviceImpl.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         for (final ServiceImpl.Builder serviceBuilder : builder.getServiceBuilderList()) {
             ServiceParser.loadDescription(client, builder, serviceBuilder);
         }
-        for (final Device.Builder deviceBuilder : builder.getEmbeddedDeviceBuilderList()) {
+        for (final DeviceImpl.Builder deviceBuilder : builder.getEmbeddedDeviceBuilderList()) {
             loadServices(client, deviceBuilder);
         }
     }
 
     // VisibleForTesting
     static void parseDescription(
-            @Nonnull final Device.Builder builder,
+            @Nonnull final DeviceImpl.Builder builder,
             @Nonnull final String description)
             throws IOException, SAXException, ParserConfigurationException {
         builder.setDescription(description);
@@ -92,7 +92,7 @@ public class DeviceParser {
     }
 
     private static void parseDevice(
-            @Nonnull final Device.Builder builder,
+            @Nonnull final DeviceImpl.Builder builder,
             @Nonnull final Node deviceNode) {
         Node node = deviceNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -116,7 +116,7 @@ public class DeviceParser {
     }
 
     private static void setField(
-            @Nonnull final Device.Builder builder,
+            @Nonnull final DeviceImpl.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
         if ("UDN".equals(tag)) {
@@ -149,7 +149,7 @@ public class DeviceParser {
     }
 
     private static void parseIconList(
-            @Nonnull final Device.Builder builder,
+            @Nonnull final DeviceImpl.Builder builder,
             @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -192,7 +192,7 @@ public class DeviceParser {
     }
 
     private static void parseServiceList(
-            @Nonnull final Device.Builder builder,
+            @Nonnull final DeviceImpl.Builder builder,
             @Nonnull final Node listNode) {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -235,13 +235,13 @@ public class DeviceParser {
     }
 
     private static void parseDeviceList(
-            @Nonnull final Device.Builder builder,
+            @Nonnull final DeviceImpl.Builder builder,
             @Nonnull final Node listNode) {
-        final List<Device.Builder> builderList = new ArrayList<>();
+        final List<DeviceImpl.Builder> builderList = new ArrayList<>();
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (TextUtils.equals(getTagName(node), "device")) {
-                final Device.Builder embeddedBuilder = builder.createEmbeddedDeviceBuilder();
+                final DeviceImpl.Builder embeddedBuilder = builder.createEmbeddedDeviceBuilder();
                 parseDevice(embeddedBuilder, node);
                 builderList.add(embeddedBuilder);
             }

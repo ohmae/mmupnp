@@ -267,7 +267,7 @@ class SsdpServerDelegate implements SsdpServer {
         try {
             final InetAddress locationAddress = InetAddress.getByName(new URL(location).getHost());
             return sourceAddress.equals(locationAddress);
-        } catch (MalformedURLException | UnknownHostException ignored) {
+        } catch (final MalformedURLException | UnknownHostException ignored) {
         }
         return false;
     }

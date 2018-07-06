@@ -19,9 +19,9 @@ class ArgumentImpl implements Argument {
     /**
      * ServiceDescriptionのパース時に使用するビルダー
      *
-     * @see DeviceParser#loadDescription(HttpClient, Device.Builder)
-     * @see ServiceParser#loadDescription(HttpClient, Device.Builder, Service.Builder)
-     * @see Action.Builder
+     * @see DeviceParser#loadDescription(HttpClient, DeviceImpl.Builder)
+     * @see ServiceParser#loadDescription(HttpClient, DeviceImpl.Builder, ServiceImpl.Builder)
+     * @see ActionImpl.Builder
      */
     public static class Builder {
         private Action mAction;

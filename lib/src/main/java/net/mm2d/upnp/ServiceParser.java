@@ -30,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-class ServiceParser {
+final class ServiceParser {
     /**
      * SCPDURLからDescriptionを取得し、パースする。
      *
@@ -45,7 +45,7 @@ class ServiceParser {
      */
     static void loadDescription(
             @Nonnull final HttpClient client,
-            @Nonnull final Device.Builder deviceBuilder,
+            @Nonnull final DeviceImpl.Builder deviceBuilder,
             @Nonnull final ServiceImpl.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         final String scpdUrl = builder.getScpdUrl();
@@ -54,7 +54,7 @@ class ServiceParser {
         }
         final String baseUrl = deviceBuilder.getBaseUrl();
         final int scopeId = deviceBuilder.getSsdpMessage().getScopeId();
-        final URL url = Device.getAbsoluteUrl(baseUrl, scpdUrl, scopeId);
+        final URL url = Http.getAbsoluteUrl(baseUrl, scpdUrl, scopeId);
         final String description = client.downloadString(url);
         if (TextUtils.isEmpty(description)) {
             // 空であっても必須パラメータはそろっているため正常として扱う。

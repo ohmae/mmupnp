@@ -143,7 +143,7 @@ class EventReceiver {
                 }
             }
             return list;
-        } catch (IOException | SAXException | ParserConfigurationException ignored) {
+        } catch (final IOException | SAXException | ParserConfigurationException ignored) {
         }
         return Collections.emptyList();
     }

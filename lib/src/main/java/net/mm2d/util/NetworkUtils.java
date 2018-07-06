@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-public class NetworkUtils {
+public final class NetworkUtils {
     /**
      * 外部と通信可能なIPv4アドレスをもつインターフェースを返す。
      *
