@@ -52,7 +52,7 @@ public class ActionInvokeTest {
     private static final String SERVICE_TYPE = "urn:schemas-upnp-org:service:TestServiceType:1";
     private HttpResponse mHttpResponse;
     private URL mUrl;
-    private Action mAction;
+    private ActionImpl mAction;
     private HttpClient mMockHttpClient;
 
     @Before
@@ -62,7 +62,7 @@ public class ActionInvokeTest {
         when(service.getServiceType()).thenReturn(SERVICE_TYPE);
         when(service.getControlUrl()).thenReturn("");
         when(service.getAbsoluteUrl(anyString())).thenReturn(mUrl);
-        mAction = spy(new Action.Builder()
+        mAction = (ActionImpl) spy(new ActionImpl.Builder()
                 .setService(service)
                 .setName(ACTION_NAME)
                 .addArgumentBuilder(new ArgumentImpl.Builder()

@@ -21,14 +21,14 @@ import static org.mockito.Mockito.*;
 public class ActionTest {
     @Test(expected = IllegalStateException.class)
     public void build_ServiceをsetしていないとException() {
-        new Action.Builder()
+        new ActionImpl.Builder()
                 .setName("name")
                 .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void build_NameをsetしていないとException() {
-        new Action.Builder()
+        new ActionImpl.Builder()
                 .setService(mock(Service.class))
                 .build();
     }
@@ -36,7 +36,7 @@ public class ActionTest {
     @Test
     public void addArgumentBuilder_setした値が取得できる() {
         final ArgumentImpl.Builder argumentBuilder = mock(ArgumentImpl.Builder.class);
-        final Action.Builder builder = new Action.Builder()
+        final ActionImpl.Builder builder = new ActionImpl.Builder()
                 .addArgumentBuilder(argumentBuilder);
         final List<ArgumentImpl.Builder> list = builder.getArgumentBuilderList();
         assertThat(list.size(), is(1));
@@ -47,7 +47,7 @@ public class ActionTest {
     public void getService_setした値が取得できる() {
         final Service service = mock(Service.class);
         final String name = "name";
-        final Action action = new Action.Builder()
+        final Action action = new ActionImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .build();
@@ -58,7 +58,7 @@ public class ActionTest {
     public void getName_setした値が取得できる() {
         final Service service = mock(Service.class);
         final String name = "name";
-        final Action action = new Action.Builder()
+        final Action action = new ActionImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .build();
@@ -69,7 +69,7 @@ public class ActionTest {
     public void getArgumentList_Argumentがない場合はサイズ0() {
         final Service service = mock(Service.class);
         final String name = "name";
-        final Action action = new Action.Builder()
+        final Action action = new ActionImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .build();
@@ -82,7 +82,7 @@ public class ActionTest {
         final StateVariable stateVariable = mock(StateVariable.class);
         final String name = "name";
         final Service service = mock(Service.class);
-        final Action action = new Action.Builder()
+        final Action action = new ActionImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .addArgumentBuilder(new ArgumentImpl.Builder()
@@ -105,7 +105,7 @@ public class ActionTest {
         final StateVariable stateVariable = mock(StateVariable.class);
         final String name = "name";
         final Service service = mock(Service.class);
-        final Action action = new Action.Builder()
+        final Action action = new ActionImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .addArgumentBuilder(new ArgumentImpl.Builder()
@@ -125,7 +125,7 @@ public class ActionTest {
     public void createHttpClient() {
         final Service service = mock(Service.class);
         final String name = "name";
-        final Action action = new Action.Builder()
+        final ActionImpl action = (ActionImpl) new ActionImpl.Builder()
                 .setService(service)
                 .setName(name)
                 .build();

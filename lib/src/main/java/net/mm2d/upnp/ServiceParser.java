@@ -91,8 +91,8 @@ class ServiceParser {
     }
 
     @Nonnull
-    private static Action.Builder parseAction(@Nonnull final Element element) {
-        final Action.Builder builder = new Action.Builder();
+    private static ActionImpl.Builder parseAction(@Nonnull final Element element) {
+        final ActionImpl.Builder builder = new ActionImpl.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             final String tag = getTagName(node);

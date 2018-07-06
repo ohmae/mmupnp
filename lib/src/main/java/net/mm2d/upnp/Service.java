@@ -43,7 +43,7 @@ public class Service {
         private String mEventSubUrl;
         private String mDescription;
         @Nonnull
-        private final List<Action.Builder> mActionBuilderList = new ArrayList<>();
+        private final List<ActionImpl.Builder> mActionBuilderList = new ArrayList<>();
         @Nonnull
         private final List<StateVariableImpl.Builder> mVariableBuilderList = new ArrayList<>();
 
@@ -149,7 +149,7 @@ public class Service {
          * @return Builder
          */
         @Nonnull
-        public Builder addActionBuilder(@Nonnull final Action.Builder builder) {
+        public Builder addActionBuilder(@Nonnull final ActionImpl.Builder builder) {
             mActionBuilderList.add(builder);
             return this;
         }
@@ -259,12 +259,12 @@ public class Service {
     private static Map<String, Action> buildActionMap(
             @Nonnull final Service service,
             @Nonnull final Map<String, StateVariable> variableMap,
-            @Nonnull final List<Action.Builder> builderList) {
+            @Nonnull final List<ActionImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
             return Collections.emptyMap();
         }
         final Map<String, Action> mActionMap = new LinkedHashMap<>(builderList.size());
-        for (final Action.Builder actionBuilder : builderList) {
+        for (final ActionImpl.Builder actionBuilder : builderList) {
             for (final ArgumentImpl.Builder argumentBuilder : actionBuilder.getArgumentBuilderList()) {
                 final String name = argumentBuilder.getRelatedStateVariableName();
                 if (name == null) {

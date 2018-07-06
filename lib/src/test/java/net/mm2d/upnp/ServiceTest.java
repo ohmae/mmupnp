@@ -120,7 +120,7 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_argumentのRelatedStateVariableNameが指定されていない() throws Exception {
-            final Action.Builder actionBuilder = new Action.Builder()
+            final ActionImpl.Builder actionBuilder = new ActionImpl.Builder()
                     .setName("action")
                     .addArgumentBuilder(new ArgumentImpl.Builder()
                             .setName("argumentName")
@@ -141,7 +141,7 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_argumentのRelatedStateVariableNameがに対応するStateVariableがない() throws Exception {
-            final Action.Builder actionBuilder = new Action.Builder()
+            final ActionImpl.Builder actionBuilder = new ActionImpl.Builder()
                     .setName("action")
                     .addArgumentBuilder(new ArgumentImpl.Builder()
                             .setName("argumentName")
