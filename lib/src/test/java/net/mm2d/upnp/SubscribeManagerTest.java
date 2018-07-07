@@ -9,6 +9,7 @@ package net.mm2d.upnp;
 
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
+import net.mm2d.util.StringPair;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.annotation.Nonnull;
 
@@ -26,6 +28,44 @@ import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public class SubscribeManagerTest {
+    @Test
+    public void onEventReceived_has_no_service() throws Exception {
+        final SubscribeHolder holder = mock(SubscribeHolder.class);
+        final ThreadPool pool = mock(ThreadPool.class);
+        final NotifyEventListener listener = mock(NotifyEventListener.class);
+        final DiFactory factory = new DiFactory() {
+            @Nonnull
+            @Override
+            SubscribeHolder createSubscribeHolder() {
+                return holder;
+            }
+        };
+        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        assertThat(manager.onEventReceived("", 0, Collections.<StringPair>emptyList()), is(false));
+    }
+
+    @Test
+    public void onEventReceived() throws Exception {
+        final SubscribeHolder holder = mock(SubscribeHolder.class);
+        final ThreadPool pool = new ThreadPool();
+        final NotifyEventListener listener = mock(NotifyEventListener.class);
+        final DiFactory factory = new DiFactory() {
+            @Nonnull
+            @Override
+            SubscribeHolder createSubscribeHolder() {
+                return holder;
+            }
+        };
+        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final String sid = "sid";
+        final Service service = mock(Service.class);
+        doReturn(service).when(holder).getService(sid);
+
+        assertThat(manager.onEventReceived(sid, 0, Collections.singletonList(new StringPair("", ""))), is(true));
+
+        pool.terminate();
+    }
+
     @Test
     public void initialize() throws Exception {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
