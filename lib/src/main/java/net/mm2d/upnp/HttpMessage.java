@@ -61,7 +61,7 @@ public interface HttpMessage {
      * @return HttpMessage
      */
     @Nonnull
-    HttpMessage setVersion(@Nonnull final String version);
+    HttpMessage setVersion(@Nonnull String version);
 
     /**
      * ヘッダを設定する。
@@ -72,8 +72,8 @@ public interface HttpMessage {
      */
     @Nonnull
     HttpMessage setHeader(
-            @Nonnull final String name,
-            @Nonnull final String value);
+            @Nonnull String name,
+            @Nonnull String value);
 
     /**
      * ヘッダの各行からヘッダの設定を行う
@@ -82,7 +82,7 @@ public interface HttpMessage {
      * @return HttpMessage
      */
     @Nonnull
-    HttpMessage setHeaderLine(@Nonnull final String line);
+    HttpMessage setHeaderLine(@Nonnull String line);
 
     /**
      * ヘッダの値を返す。
@@ -91,7 +91,7 @@ public interface HttpMessage {
      * @return ヘッダの値
      */
     @Nullable
-    String getHeader(@Nonnull final String name);
+    String getHeader(@Nonnull String name);
 
     /**
      * ヘッダの値からチャンク伝送か否かを返す。
@@ -127,7 +127,7 @@ public interface HttpMessage {
      * @return HttpMessage
      */
     @Nonnull
-    HttpMessage setBody(@Nullable final String body);
+    HttpMessage setBody(@Nullable String body);
 
     /**
      * メッセージボディを設定する。
@@ -138,8 +138,8 @@ public interface HttpMessage {
      */
     @Nonnull
     HttpMessage setBody(
-            @Nullable final String body,
-            final boolean withContentLength);
+            @Nullable String body,
+            boolean withContentLength);
 
     /**
      * メッセージボディを設定する。
@@ -150,7 +150,7 @@ public interface HttpMessage {
      * @return HttpMessage
      */
     @Nonnull
-    HttpMessage setBodyBinary(@Nullable final byte[] body);
+    HttpMessage setBodyBinary(@Nullable byte[] body);
 
     /**
      * メッセージボディを設定する。
@@ -161,8 +161,8 @@ public interface HttpMessage {
      */
     @Nonnull
     HttpMessage setBodyBinary(
-            @Nullable final byte[] body,
-            final boolean withContentLength);
+            @Nullable byte[] body,
+            boolean withContentLength);
 
     /**
      * メッセージボディを返す。
@@ -196,7 +196,7 @@ public interface HttpMessage {
      * @param outputStream 出力先
      * @throws IOException 入出力エラー
      */
-    void writeData(@Nonnull final OutputStream outputStream) throws IOException;
+    void writeData(@Nonnull OutputStream outputStream) throws IOException;
 
     /**
      * 指定されたInputStreamからデータの読み出しを行う。
@@ -205,5 +205,5 @@ public interface HttpMessage {
      * @return HttpMessage
      * @throws IOException 入出力エラー
      */
-    HttpMessage readData(@Nonnull final InputStream inputStream) throws IOException;
+    HttpMessage readData(@Nonnull InputStream inputStream) throws IOException;
 }

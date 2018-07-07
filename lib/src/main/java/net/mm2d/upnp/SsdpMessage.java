@@ -67,7 +67,7 @@ public interface SsdpMessage {
      * @return 値
      */
     @Nullable
-    String getHeader(@Nonnull final String name);
+    String getHeader(@Nonnull String name);
 
     /**
      * ヘッダの値を設定する。
@@ -76,8 +76,8 @@ public interface SsdpMessage {
      * @param value 値
      */
     void setHeader(
-            @Nonnull final String name,
-            @Nonnull final String value);
+            @Nonnull String name,
+            @Nonnull String value);
 
     /**
      * USNに記述されたUUIDを返す。
@@ -133,5 +133,5 @@ public interface SsdpMessage {
      * @param os 出力先
      * @throws IOException 入出力エラー
      */
-    void writeData(@Nonnull final OutputStream os) throws IOException;
+    void writeData(@Nonnull OutputStream os) throws IOException;
 }

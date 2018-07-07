@@ -28,7 +28,7 @@ class DeviceHolder implements Runnable {
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
 
     interface ExpireListener {
-        void onExpire(@Nonnull final Device device);
+        void onExpire(@Nonnull Device device);
     }
 
     @Nonnull
@@ -38,7 +38,7 @@ class DeviceHolder implements Runnable {
     private Thread mThread;
 
     @Nonnull
-    private final ExpireListener mExireListener;
+    private final ExpireListener mExpireListener;
     @Nonnull
     private final Map<String, Device> mDeviceMap;
 
@@ -49,7 +49,7 @@ class DeviceHolder implements Runnable {
      */
     DeviceHolder(@Nonnull final ExpireListener listener) {
         mDeviceMap = new LinkedHashMap<>();
-        mExireListener = listener;
+        mExpireListener = listener;
     }
 
     /**
@@ -147,7 +147,7 @@ class DeviceHolder implements Runnable {
             final Device device = i.next();
             if (device.getExpireTime() < now) {
                 i.remove();
-                mExireListener.onExpire(device);
+                mExpireListener.onExpire(device);
             }
         }
     }
