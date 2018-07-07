@@ -9,6 +9,7 @@ package net.mm2d.upnp;
 
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
+import net.mm2d.upnp.DeviceHolder.ExpireListener;
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
@@ -458,9 +459,9 @@ public class ControlPointTest {
 
                         @Nonnull
                         @Override
-                        DeviceHolder createDeviceHolder(@Nonnull ControlPoint cp) {
+                        DeviceHolder createDeviceHolder(@Nonnull final ExpireListener listener) {
                             if (mDeviceHolder == null) {
-                                mDeviceHolder = spy(new DeviceHolder(cp));
+                                mDeviceHolder = spy(new DeviceHolder(listener));
                             }
                             return mDeviceHolder;
                         }
@@ -609,9 +610,9 @@ public class ControlPointTest {
 
                         @Nonnull
                         @Override
-                        DeviceHolder createDeviceHolder(@Nonnull ControlPoint cp) {
+                        DeviceHolder createDeviceHolder(@Nonnull final ExpireListener listener) {
                             if (mDeviceHolder == null) {
-                                mDeviceHolder = spy(new DeviceHolder(cp));
+                                mDeviceHolder = spy(new DeviceHolder(listener));
                             }
                             return mDeviceHolder;
                         }

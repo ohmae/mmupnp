@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.DeviceHolder.ExpireListener;
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
@@ -49,8 +50,8 @@ class ControlPointDiFactory {
     }
 
     @Nonnull
-    DeviceHolder createDeviceHolder(@Nonnull final ControlPoint cp) {
-        return new DeviceHolder(cp);
+    DeviceHolder createDeviceHolder(@Nonnull final ExpireListener listener) {
+        return new DeviceHolder(listener);
     }
 
     @Nonnull

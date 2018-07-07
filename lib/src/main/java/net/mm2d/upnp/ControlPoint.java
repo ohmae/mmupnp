@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.log.Log;
+import net.mm2d.upnp.DeviceHolder.ExpireListener;
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
@@ -301,7 +302,12 @@ public class ControlPoint {
                 });
             }
         });
-        mDeviceHolder = factory.createDeviceHolder(this);
+        mDeviceHolder = factory.createDeviceHolder(new ExpireListener() {
+            @Override
+            public void onExpire(@Nonnull Device device) {
+                lostDevice(device);
+            }
+        });
         mSubscribeHolder = factory.createSubscribeHolder();
         mEventReceiver = factory.createEventReceiver(new EventMessageListener() {
             @Override
