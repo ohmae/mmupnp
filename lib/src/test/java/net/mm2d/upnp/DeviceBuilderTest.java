@@ -24,6 +24,7 @@ public class DeviceBuilderTest {
     @Test
     public void build() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -48,10 +49,11 @@ public class DeviceBuilderTest {
         doReturn(icon).when(iconBuilder).build();
         final Service service = mock(Service.class);
         final ServiceImpl.Builder serviceBuilder = mock(ServiceImpl.Builder.class);
-        doReturn(serviceBuilder).when(serviceBuilder).setDevice((Device) any());
+        doReturn(serviceBuilder).when(serviceBuilder).setDevice(any(Device.class));
+        doReturn(serviceBuilder).when(serviceBuilder).setSubscribeManager(any(SubscribeManager.class));
         doReturn(service).when(serviceBuilder).build();
 
-        final Device device = new DeviceImpl.Builder(cp, message)
+        final Device device = new DeviceImpl.Builder(cp, manager, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setUpc(upc)
@@ -91,6 +93,7 @@ public class DeviceBuilderTest {
     @Test
     public void build_最低限のパラメータ() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -103,7 +106,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        final Device device = new DeviceImpl.Builder(cp, message)
+        final Device device = new DeviceImpl.Builder(cp, manager, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setUpc(upc)
@@ -125,6 +128,7 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void build_Description不足() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -135,7 +139,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new DeviceImpl.Builder(cp, message)
+        new DeviceImpl.Builder(cp, manager, message)
                 .setUdn(uuid)
                 .setDeviceType(deviceType)
                 .setFriendlyName(friendlyName)
@@ -147,6 +151,7 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void build_DeviceType不足() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -157,7 +162,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new DeviceImpl.Builder(cp, message)
+        new DeviceImpl.Builder(cp, manager, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setFriendlyName(friendlyName)
@@ -169,6 +174,7 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void build_FriendlyName不足() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -179,7 +185,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new DeviceImpl.Builder(cp, message)
+        new DeviceImpl.Builder(cp, manager, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setDeviceType(deviceType)
@@ -191,6 +197,7 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void build_Manufacture不足() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -201,7 +208,7 @@ public class DeviceBuilderTest {
         final String friendlyName = "friendlyName";
         final String modelName = "modelName";
 
-        new DeviceImpl.Builder(cp, message)
+        new DeviceImpl.Builder(cp, manager, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setDeviceType(deviceType)
@@ -213,6 +220,7 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void build_ModelName不足() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -223,7 +231,7 @@ public class DeviceBuilderTest {
         final String friendlyName = "friendlyName";
         final String manufacture = "manufacture";
 
-        new DeviceImpl.Builder(cp, message)
+        new DeviceImpl.Builder(cp, manager, message)
                 .setDescription(description)
                 .setUdn(uuid)
                 .setDeviceType(deviceType)
@@ -235,6 +243,7 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void build_Udn不足() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -246,7 +255,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new DeviceImpl.Builder(cp, message)
+        new DeviceImpl.Builder(cp, manager, message)
                 .setDescription(description)
                 .setDeviceType(deviceType)
                 .setFriendlyName(friendlyName)
@@ -258,6 +267,7 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void build_Udn不一致() {
         final ControlPoint cp = mock(ControlPoint.class);
+        final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
         final String uuid = "uuid";
@@ -271,7 +281,7 @@ public class DeviceBuilderTest {
         final String manufacture = "manufacture";
         final String modelName = "modelName";
 
-        new DeviceImpl.Builder(cp, message)
+        new DeviceImpl.Builder(cp, manager, message)
                 .setDescription(description)
                 .setUdn(udn)
                 .setUpc(upc)
@@ -284,7 +294,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void build_不正なSsdpMessage1() {
-        new DeviceImpl.Builder(mock(ControlPoint.class), mock(SsdpMessage.class));
+        new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), mock(SsdpMessage.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -294,7 +304,7 @@ public class DeviceBuilderTest {
         final String uuid = "uuid";
         doReturn(location).when(message).getLocation();
         doReturn(uuid).when(message).getUuid();
-        new DeviceImpl.Builder(mock(ControlPoint.class), message)
+        new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
                 .updateSsdpMessage(mock(SsdpMessage.class));
     }
 
@@ -306,7 +316,7 @@ public class DeviceBuilderTest {
         doReturn(location).when(message).getLocation();
         doReturn(uuid).when(message).getUuid();
         final DeviceImpl.Builder embeddedDeviceBuilder = mock(DeviceImpl.Builder.class);
-        new DeviceImpl.Builder(mock(ControlPoint.class), message)
+        new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
                 .setEmbeddedDeviceBuilderList(Arrays.asList(embeddedDeviceBuilder))
                 .updateSsdpMessage(message);
 
@@ -323,7 +333,7 @@ public class DeviceBuilderTest {
         final String tag2 = "tag2";
         final String value2 = "value2";
 
-        final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
+        final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")

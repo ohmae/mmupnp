@@ -10,7 +10,6 @@ package net.mm2d.upnp;
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.DeviceHolder.ExpireListener;
-import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.NetworkUtils;
@@ -131,24 +130,6 @@ public class ControlPointTest {
             cp.terminate();
         }
 
-        @Test(timeout = 10000L)
-        public void start_stop_exception() throws Exception {
-            final EventReceiver eventReceiver = mock(EventReceiver.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
-                            return eventReceiver;
-                        }
-                    });
-            doThrow(new IOException()).when(eventReceiver).open();
-            cp.initialize();
-            cp.start();
-            cp.stop();
-            cp.terminate();
-        }
-
         @Test(expected = IllegalStateException.class)
         public void search_not_started() throws Exception {
             final ControlPoint cp = new ControlPoint();
@@ -238,7 +219,10 @@ public class ControlPointTest {
         private ControlPoint mCp;
         private final SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
         private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
-        private final EventReceiver mEventReceiver = mock(EventReceiver.class);
+        private final ThreadPool mThreadPool = mock(ThreadPool.class);
+        private final NotifyEventListener mNotifyEventListener = mock(NotifyEventListener.class);
+        private final ControlPointDiFactory mControlPointDiFactory = spy(new ControlPointDiFactory());
+        private final SubscribeManager mSubscribeManager = spy(new SubscribeManager(mThreadPool, mNotifyEventListener, mControlPointDiFactory));
 
         @Before
         public void setUp() throws Exception {
@@ -262,8 +246,10 @@ public class ControlPointTest {
 
                         @Nonnull
                         @Override
-                        EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
-                            return mEventReceiver;
+                        SubscribeManager createSubscribeManager(
+                                @Nonnull final ThreadPool threadPool,
+                                @Nonnull final NotifyEventListener listener) {
+                            return mSubscribeManager;
                         }
                     }));
         }
@@ -325,7 +311,7 @@ public class ControlPointTest {
             assertThat(mCp.getDevice(uuid), is(nullValue()));
             assertThat(mCp.getDeviceListSize(), is(0));
             verify(l).onLost(device);
-            verify(mCp).unregisterSubscribeService(service);
+            verify(mSubscribeManager).unregisterSubscribeService(service);
         }
 
         @Test
@@ -345,7 +331,7 @@ public class ControlPointTest {
             assertThat(mCp.getDevice(uuid), is(nullValue()));
             assertThat(mCp.getDeviceListSize(), is(0));
             verify(mCp).lostDevice(device);
-            verify(mCp).unregisterSubscribeService(service);
+            verify(mSubscribeManager).unregisterSubscribeService(service);
         }
 
         @Test
@@ -388,8 +374,8 @@ public class ControlPointTest {
             final Service service = mock(Service.class);
             doReturn(sid).when(service).getSubscriptionId();
 
-            mCp.registerSubscribeService(service, true);
-            assertThat(mCp.getSubscribeService(sid), is(service));
+            mSubscribeManager.registerSubscribeService(service, true);
+            assertThat(mSubscribeManager.getSubscribeService(sid), is(service));
         }
 
 
@@ -399,9 +385,9 @@ public class ControlPointTest {
             final Service service = mock(Service.class);
             doReturn(sid).when(service).getSubscriptionId();
 
-            mCp.registerSubscribeService(service, true);
-            mCp.unregisterSubscribeService(service);
-            assertThat(mCp.getSubscribeService(sid), is(nullValue()));
+            mSubscribeManager.registerSubscribeService(service, true);
+            mSubscribeManager.unregisterSubscribeService(service);
+            assertThat(mSubscribeManager.getSubscribeService(sid), is(nullValue()));
         }
     }
 
@@ -541,7 +527,7 @@ public class ControlPointTest {
             final byte[] data1 = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
             final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
             final SsdpMessage message1 = new SsdpRequest(ifa, data1, data1.length);
-            final DeviceImpl.Builder deviceBuilder = spy(new DeviceImpl.Builder(mCp, message1));
+            final DeviceImpl.Builder deviceBuilder = spy(new DeviceImpl.Builder(mCp, mock(SubscribeManager.class), message1));
             mLoadingDeviceMap.put(deviceBuilder.getUuid(), deviceBuilder);
             final byte[] data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final SsdpMessage message2 = new SsdpRequest(ifa, data2, data2.length);
@@ -553,12 +539,11 @@ public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class イベント伝搬テスト {
         private ControlPoint mCp;
+        private SubscribeManager mSubscribeManager;
         private Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
         private DeviceHolder mDeviceHolder;
-        private SubscribeHolder mSubscribeHolder = new SubscribeHolder();
         private SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
         private SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
-        private EventReceiver mEventReceiver = mock(EventReceiver.class);
         private ResponseListener mResponseListener;
         private NotifyListener mNotifyListener;
 
@@ -583,12 +568,6 @@ public class ControlPointTest {
 
                         @Nonnull
                         @Override
-                        SubscribeHolder createSubscribeHolder() {
-                            return mSubscribeHolder;
-                        }
-
-                        @Nonnull
-                        @Override
                         SsdpSearchServerList createSsdpSearchServerList(
                                 @Nonnull final Collection<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
@@ -607,8 +586,11 @@ public class ControlPointTest {
 
                         @Nonnull
                         @Override
-                        EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
-                            return mEventReceiver;
+                        SubscribeManager createSubscribeManager(
+                                @Nonnull final ThreadPool threadPool,
+                                @Nonnull final NotifyEventListener listener) {
+                            mSubscribeManager = spy(new SubscribeManager(threadPool, listener, this));
+                            return mSubscribeManager;
                         }
                     }));
         }
@@ -622,7 +604,7 @@ public class ControlPointTest {
             final Service service = mock(Service.class);
             doReturn("SubscriptionId").when(service).getSubscriptionId();
             doReturn(System.currentTimeMillis() + 1000).when(service).getSubscriptionExpiryTime();
-            mSubscribeHolder.add(service, false);
+            mSubscribeManager.registerSubscribeService(service, false);
             mCp.stop();
             mCp.terminate();
             Thread.sleep(100);
@@ -640,7 +622,7 @@ public class ControlPointTest {
             doReturn("SubscriptionId").when(service).getSubscriptionId();
             doReturn(System.currentTimeMillis() + 1000).when(service).getSubscriptionExpiryTime();
             doThrow(new IOException()).when(service).unsubscribe();
-            mSubscribeHolder.add(service, false);
+            mSubscribeManager.registerSubscribeService(service, false);
             mCp.stop();
             mCp.terminate();
             Thread.sleep(100);
@@ -672,16 +654,11 @@ public class ControlPointTest {
 
     @RunWith(JUnit4.class)
     public static class EventReceiverに起因するテスト {
-        private static final int PORT = 1234;
         private ControlPoint mCp;
-        private EventReceiver mEventReceiver;
-        private EventMessageListener mEventMessageListener;
+        private SubscribeManager mSubscribeManager;
 
         @Before
         public void setUp() throws Exception {
-            mEventReceiver = mock(EventReceiver.class);
-            doReturn(PORT).when(mEventReceiver).getLocalPort();
-
             mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
                     new ControlPointDiFactory(Protocol.DEFAULT) {
                         @Nonnull
@@ -700,18 +677,16 @@ public class ControlPointTest {
                             return mock(SsdpNotifyReceiverList.class);
                         }
 
+
                         @Nonnull
                         @Override
-                        EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
-                            mEventMessageListener = listener;
-                            return mEventReceiver;
+                        SubscribeManager createSubscribeManager(
+                                @Nonnull final ThreadPool threadPool,
+                                @Nonnull final NotifyEventListener listener) {
+                            mSubscribeManager = spy(new SubscribeManager(threadPool, listener, this));
+                            return mSubscribeManager;
                         }
                     }));
-        }
-
-        @Test
-        public void getEventPort_EventReceiverのportが返る() {
-            assertThat(mCp.getEventPort(), is(PORT));
         }
 
         @Test
@@ -726,13 +701,13 @@ public class ControlPointTest {
             doReturn(variableName).when(variable).getName();
             doReturn(variable).when(service).findStateVariable(variableName);
 
-            mCp.registerSubscribeService(service, false);
+            mSubscribeManager.registerSubscribeService(service, false);
 
             final NotifyEventListener l = mock(NotifyEventListener.class);
             mCp.addNotifyEventListener(l);
 
             final String value = "value";
-            mEventMessageListener.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName, value)));
+            mSubscribeManager.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName, value)));
 
             Thread.sleep(200);
 
@@ -751,14 +726,14 @@ public class ControlPointTest {
             doReturn(variableName).when(variable).getName();
             doReturn(variable).when(service).findStateVariable(variableName);
 
-            mCp.registerSubscribeService(service, false);
+            mSubscribeManager.registerSubscribeService(service, false);
 
             final NotifyEventListener l = mock(NotifyEventListener.class);
             mCp.addNotifyEventListener(l);
             mCp.removeNotifyEventListener(l);
 
             final String value = "value";
-            mEventMessageListener.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName, value)));
+            mSubscribeManager.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName, value)));
             Thread.sleep(100);
 
             verify(l, never()).onNotifyEvent(service, 0, variableName, value);
@@ -777,13 +752,13 @@ public class ControlPointTest {
             doReturn(variableName).when(variable).getName();
             doReturn(variable).when(service).findStateVariable(variableName);
 
-            mCp.registerSubscribeService(service, false);
+            mSubscribeManager.registerSubscribeService(service, false);
 
             final NotifyEventListener l = mock(NotifyEventListener.class);
             mCp.addNotifyEventListener(l);
 
             final String value = "value";
-            mEventMessageListener.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName + 1, value)));
+            mSubscribeManager.onEventReceived(sid, 0, Collections.singletonList(new StringPair(variableName + 1, value)));
             Thread.sleep(100);
 
             verify(l, never()).onNotifyEvent(service, 0, variableName, value);

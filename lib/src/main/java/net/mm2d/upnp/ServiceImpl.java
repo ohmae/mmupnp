@@ -35,6 +35,7 @@ public class ServiceImpl implements Service {
      * DeviceDescriptionのパース時に使用するビルダー
      */
     public static class Builder {
+        private SubscribeManager mSubscribeManager;
         private Device mDevice;
         private String mServiceType;
         private String mServiceId;
@@ -62,6 +63,18 @@ public class ServiceImpl implements Service {
         @Nonnull
         public Builder setDevice(@Nonnull final Device device) {
             mDevice = device;
+            return this;
+        }
+
+        /**
+         * 購読状態マネージャを設定する。
+         *
+         * @param manager 購読状態マネージャ
+         * @return Builder
+         */
+        @Nonnull
+        public Builder setSubscribeManager(@Nonnull final SubscribeManager manager) {
+            mSubscribeManager = manager;
             return this;
         }
 
@@ -177,6 +190,9 @@ public class ServiceImpl implements Service {
             if (mDevice == null) {
                 throw new IllegalStateException("device must be set.");
             }
+            if (mSubscribeManager == null) {
+                throw new IllegalStateException("subscribeManager must be set.");
+            }
             if (mServiceType == null) {
                 throw new IllegalStateException("serviceType must be set.");
             }
@@ -198,7 +214,7 @@ public class ServiceImpl implements Service {
 
     private static final long DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300);
     @Nonnull
-    private final ControlPoint mControlPoint;
+    private final SubscribeManager mSubscribeManager;
     @Nonnull
     private final Device mDevice;
     @Nonnull
@@ -228,8 +244,8 @@ public class ServiceImpl implements Service {
     private String mSubscriptionId;
 
     private ServiceImpl(@Nonnull final Builder builder) {
+        mSubscribeManager = builder.mSubscribeManager;
         mDevice = builder.mDevice;
-        mControlPoint = mDevice.getControlPoint();
         mServiceType = builder.mServiceType;
         mServiceId = builder.mServiceId;
         mScpdUrl = builder.mScpdUrl;
@@ -377,7 +393,7 @@ public class ServiceImpl implements Service {
         sb.append("<http://");
         final SsdpMessage ssdp = mDevice.getSsdpMessage();
         final InterfaceAddress ifa = ssdp.getInterfaceAddress();
-        final int port = mControlPoint.getEventPort();
+        final int port = mSubscribeManager.getEventPort();
         //noinspection ConstantConditions : 受信したメッセージの場合はnullではない
         sb.append(NetworkUtils.getAddressString(ifa.getAddress(), port));
         sb.append("/>");
@@ -421,7 +437,7 @@ public class ServiceImpl implements Service {
     public boolean subscribe(final boolean keepRenew) throws IOException {
         if (!TextUtils.isEmpty(mSubscriptionId)) {
             if (renewSubscribeInner()) {
-                mControlPoint.registerSubscribeService(this, keepRenew);
+                mSubscribeManager.registerSubscribeService(this, keepRenew);
                 return true;
             }
             return false;
@@ -439,7 +455,7 @@ public class ServiceImpl implements Service {
             return false;
         }
         if (parseSubscribeResponse(response)) {
-            mControlPoint.registerSubscribeService(this, keepRenew);
+            mSubscribeManager.registerSubscribeService(this, keepRenew);
             return true;
         }
         return false;
@@ -528,7 +544,7 @@ public class ServiceImpl implements Service {
             Log.w("unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
-        mControlPoint.unregisterSubscribeService(this);
+        mSubscribeManager.unregisterSubscribeService(this);
         mSubscriptionId = null;
         mSubscriptionStart = 0;
         mSubscriptionTimeout = 0;

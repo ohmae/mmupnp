@@ -32,6 +32,7 @@ public class DeviceTest {
         private HttpClient mHttpClient;
         private SsdpMessage mSsdpMessage;
         private ControlPoint mControlPoint;
+        private SubscribeManager mSubscribeManager;
         private DeviceImpl.Builder mBuilder;
 
         @Before
@@ -57,7 +58,8 @@ public class DeviceTest {
             final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
             mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
             mControlPoint = mock(ControlPoint.class);
-            mBuilder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            mSubscribeManager = mock(SubscribeManager.class);
+            mBuilder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, mBuilder);
         }
 
@@ -479,7 +481,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("http://192.168.0.1/").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -496,7 +498,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -514,7 +516,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("http://192.168.0.1/").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")

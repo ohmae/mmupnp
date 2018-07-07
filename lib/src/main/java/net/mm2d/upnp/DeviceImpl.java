@@ -39,6 +39,8 @@ public class DeviceImpl implements Device {
         @Nonnull
         private final ControlPoint mControlPoint;
         @Nonnull
+        private final SubscribeManager mSubscribeManager;
+        @Nonnull
         private SsdpMessage mSsdpMessage;
         @Nonnull
         private String mLocation;
@@ -68,13 +70,16 @@ public class DeviceImpl implements Device {
         /**
          * インスタンスを作成する。
          *
-         * @param controlPoint ControlPoint
-         * @param ssdpMessage  SSDPパケット
+         * @param controlPoint     ControlPoint
+         * @param subscribeManager 購読状態マネージャ
+         * @param ssdpMessage      SSDPパケット
          */
         public Builder(
                 @Nonnull final ControlPoint controlPoint,
+                @Nonnull final SubscribeManager subscribeManager,
                 @Nonnull final SsdpMessage ssdpMessage) {
             mControlPoint = controlPoint;
+            mSubscribeManager = subscribeManager;
             final String location = ssdpMessage.getLocation();
             if (location == null) {
                 throw new IllegalArgumentException();
@@ -91,7 +96,7 @@ public class DeviceImpl implements Device {
          * @return EmbeddedDevice用のBuilder
          */
         public Builder createEmbeddedDeviceBuilder() {
-            final Builder builder = new Builder(mControlPoint, mSsdpMessage);
+            final Builder builder = new Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             builder.setDescription(mDescription);
             builder.setUrlBase(mUrlBase);
             return builder;
@@ -460,6 +465,8 @@ public class DeviceImpl implements Device {
     @Nonnull
     private final ControlPoint mControlPoint;
     @Nonnull
+    private final SubscribeManager mSubscribeManager;
+    @Nonnull
     private SsdpMessage mSsdpMessage;
     @Nonnull
     private String mLocation;
@@ -511,6 +518,7 @@ public class DeviceImpl implements Device {
             @Nonnull final Builder builder) {
         mParent = parent;
         mControlPoint = builder.mControlPoint;
+        mSubscribeManager = builder.mSubscribeManager;
         mSsdpMessage = builder.mSsdpMessage;
         mLocation = builder.mLocation;
         mUdn = builder.mUdn;
@@ -529,7 +537,7 @@ public class DeviceImpl implements Device {
         mDescription = builder.mDescription;
         mTagMap = builder.mTagMap;
         mIconList = buildIconList(this, builder.mIconBuilderList);
-        mServiceList = buildServiceList(this, builder.mServiceBuilderList);
+        mServiceList = buildServiceList(this, mSubscribeManager, builder.mServiceBuilderList);
         mDeviceList = buildDeviceList(this, builder.mDeviceBuilderList);
     }
 
@@ -550,13 +558,18 @@ public class DeviceImpl implements Device {
     @Nonnull
     private static List<Service> buildServiceList(
             @Nonnull final Device device,
+            @Nonnull final SubscribeManager manager,
             @Nonnull final List<ServiceImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
             return Collections.emptyList();
         }
         final List<Service> list = new ArrayList<>(builderList.size());
         for (final ServiceImpl.Builder builder : builderList) {
-            list.add(builder.setDevice(device).build());
+            final Service service = builder
+                    .setDevice(device)
+                    .setSubscribeManager(manager)
+                    .build();
+            list.add(service);
         }
         return list;
     }

@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.DeviceHolder.ExpireListener;
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
@@ -28,6 +29,10 @@ class ControlPointDiFactory {
     @Nonnull
     private final Protocol mProtocol;
 
+    ControlPointDiFactory() {
+        this(Protocol.DEFAULT);
+    }
+
     ControlPointDiFactory(@Nonnull final Protocol protocol) {
         mProtocol = protocol;
     }
@@ -43,11 +48,6 @@ class ControlPointDiFactory {
     }
 
     @Nonnull
-    SubscribeHolder createSubscribeHolder() {
-        return new SubscribeHolder();
-    }
-
-    @Nonnull
     SsdpSearchServerList createSsdpSearchServerList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
@@ -59,6 +59,18 @@ class ControlPointDiFactory {
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
         return new SsdpNotifyReceiverList().init(mProtocol, interfaces, listener);
+    }
+
+    @Nonnull
+    SubscribeManager createSubscribeManager(
+            @Nonnull final ThreadPool threadPool,
+            @Nonnull final NotifyEventListener listener) {
+        return new SubscribeManager(threadPool, listener, this);
+    }
+
+    @Nonnull
+    SubscribeHolder createSubscribeHolder() {
+        return new SubscribeHolder();
     }
 
     @Nonnull

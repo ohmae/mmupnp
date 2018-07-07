@@ -33,6 +33,7 @@ public class DeviceParserTest {
         private HttpClient mHttpClient;
         private SsdpMessage mSsdpMessage;
         private ControlPoint mControlPoint;
+        private SubscribeManager mSubscribeManager;
 
         @Before
         public void setUp() throws Exception {
@@ -55,6 +56,7 @@ public class DeviceParserTest {
             final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
             mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
             mControlPoint = mock(ControlPoint.class);
+            mSubscribeManager = mock(SubscribeManager.class);
         }
 
         @Test
@@ -62,7 +64,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
@@ -74,7 +76,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-gabage.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
@@ -88,7 +90,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("mmupnp-with-mistake.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/mmupnp.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
@@ -100,7 +102,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-no-icon.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(0));
@@ -112,7 +114,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-no-service.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
@@ -127,7 +129,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-url-base.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.3:12345/device.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
             assertThat(device.getBaseUrl(), is("http://192.0.2.2:12345/"));
@@ -138,7 +140,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
 
@@ -171,7 +173,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
 
@@ -184,7 +186,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsString("device-with-embedded-device.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
 
-            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSsdpMessage);
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, builder);
             final Device device = builder.build();
 

@@ -9,10 +9,8 @@ package net.mm2d.upnp;
 
 import net.mm2d.log.Log;
 import net.mm2d.upnp.DeviceHolder.ExpireListener;
-import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
-import net.mm2d.util.StringPair;
 import net.mm2d.util.TextUtils;
 
 import org.xml.sax.SAXException;
@@ -120,8 +118,6 @@ public class ControlPoint {
     @Nonnull
     private final Set<String> mEmbeddedDeviceUdnSet = new HashSet<>();
     @Nonnull
-    private final EventReceiver mEventReceiver;
-    @Nonnull
     private final ThreadPool mThreadPool;
     @Nonnull
     private final AtomicBoolean mInitialized = new AtomicBoolean();
@@ -130,7 +126,7 @@ public class ControlPoint {
     @Nonnull
     private final DeviceHolder mDeviceHolder;
     @Nonnull
-    private final SubscribeHolder mSubscribeHolder;
+    private final SubscribeManager mSubscribeManager;
 
     private class DeviceLoader implements Runnable {
         @Nonnull
@@ -161,41 +157,6 @@ public class ControlPoint {
             } finally {
                 client.close();
             }
-        }
-    }
-
-    private class EventNotifyTask implements Runnable {
-        @Nonnull
-        private final Service mService;
-        private final long mSeq;
-        @Nonnull
-        private final List<StringPair> mProperties;
-
-        EventNotifyTask(
-                @Nonnull final Service service,
-                final long seq,
-                @Nonnull final List<StringPair> properties) {
-            mService = service;
-            mSeq = seq;
-            mProperties = properties;
-        }
-
-        @Override
-        public void run() {
-            for (final StringPair pair : mProperties) {
-                notifyEvent(pair.getKey(), pair.getValue());
-            }
-        }
-
-        private void notifyEvent(
-                @Nullable final String name,
-                @Nullable final String value) {
-            final StateVariable variable = mService.findStateVariable(name);
-            if (variable == null || !variable.isSendEvents() || value == null) {
-                Log.w("illegal notify argument:" + name + " " + value);
-                return;
-            }
-            mNotifyEventListenerList.onNotifyEvent(mService, mSeq, variable.getName(), value);
         }
     }
 
@@ -298,21 +259,11 @@ public class ControlPoint {
         });
         mDeviceHolder = factory.createDeviceHolder(new ExpireListener() {
             @Override
-            public void onExpire(@Nonnull Device device) {
+            public void onExpire(@Nonnull final Device device) {
                 lostDevice(device);
             }
         });
-        mSubscribeHolder = factory.createSubscribeHolder();
-        mEventReceiver = factory.createEventReceiver(new EventMessageListener() {
-            @Override
-            public boolean onEventReceived(
-                    @Nonnull final String sid,
-                    final long seq,
-                    @Nonnull final List<StringPair> properties) {
-                final Service service = getSubscribeService(sid);
-                return service != null && mThreadPool.executeInSequential(new EventNotifyTask(service, seq, properties));
-            }
-        });
+        mSubscribeManager = factory.createSubscribeManager(mThreadPool, mNotifyEventListenerList);
     }
 
     // VisibleForTesting
@@ -383,7 +334,7 @@ public class ControlPoint {
             }
             return;
         }
-        final DeviceImpl.Builder builder = new DeviceImpl.Builder(this, message);
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(this, mSubscribeManager, message);
         mLoadingDeviceMap.put(uuid, builder);
         if (!mThreadPool.executeInParallel(new DeviceLoader(builder))) {
             mLoadingDeviceMap.remove(uuid);
@@ -405,7 +356,7 @@ public class ControlPoint {
             return;
         }
         mDeviceHolder.start();
-        mSubscribeHolder.start();
+        mSubscribeManager.initialize();
     }
 
     /**
@@ -426,7 +377,7 @@ public class ControlPoint {
             return;
         }
         mThreadPool.terminate();
-        mSubscribeHolder.shutdownRequest();
+        mSubscribeManager.terminate();
         mDeviceHolder.shutdownRequest();
     }
 
@@ -446,11 +397,7 @@ public class ControlPoint {
         if (mStarted.getAndSet(true)) {
             return;
         }
-        try {
-            mEventReceiver.open();
-        } catch (final IOException e) {
-            Log.w(e);
-        }
+        mSubscribeManager.start();
         mSearchList.openAndStart();
         mNotifyList.openAndStart();
     }
@@ -468,25 +415,11 @@ public class ControlPoint {
         if (!mStarted.getAndSet(false)) {
             return;
         }
-        final List<Service> serviceList = mSubscribeHolder.getServiceList();
-        for (final Service service : serviceList) {
-            mThreadPool.executeInParallel(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        service.unsubscribe();
-                    } catch (final IOException e) {
-                        Log.w(e);
-                    }
-                }
-            });
-        }
-        mSubscribeHolder.clear();
+        mSubscribeManager.stop();
         mSearchList.stop();
         mNotifyList.stop();
         mSearchList.close();
         mNotifyList.close();
-        mEventReceiver.close();
         final List<Device> list = getDeviceList();
         for (final Device device : list) {
             lostDevice(device);
@@ -609,7 +542,7 @@ public class ControlPoint {
         synchronized (mDeviceHolder) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
-                unregisterSubscribeService(s);
+                mSubscribeManager.unregisterSubscribeService(s);
             }
             mDeviceHolder.remove(device);
         }
@@ -655,55 +588,5 @@ public class ControlPoint {
     @Nullable
     public Device getDevice(@Nonnull final String udn) {
         return mDeviceHolder.get(udn);
-    }
-
-    /**
-     * イベント通知を受け取るポートを返す。
-     *
-     * @return イベント通知受信用ポート番号
-     * @see EventReceiver
-     */
-    int getEventPort() {
-        return mEventReceiver.getLocalPort();
-    }
-
-    /**
-     * SubscriptionIDに合致するServiceを返す。
-     *
-     * <p>合致するServiceがない場合null
-     *
-     * @param subscriptionId SubscriptionID
-     * @return 該当Service
-     * @see Service
-     */
-    @Nullable
-    Service getSubscribeService(@Nonnull final String subscriptionId) {
-        return mSubscribeHolder.getService(subscriptionId);
-    }
-
-    /**
-     * SubscriptionIDが確定したServiceを購読リストに登録する
-     *
-     * <p>Serviceのsubscribeが実行された後にServiceからコールされる。
-     *
-     * @param service 登録するService
-     * @see Service
-     * @see Service#subscribe()
-     */
-    void registerSubscribeService(
-            @Nonnull final Service service,
-            final boolean keep) {
-        mSubscribeHolder.add(service, keep);
-    }
-
-    /**
-     * 指定SubscriptionIDのサービスを購読リストから削除する。
-     *
-     * @param service 削除するService
-     * @see Service
-     * @see Service#unsubscribe()
-     */
-    void unregisterSubscribeService(@Nonnull final Service service) {
-        mSubscribeHolder.remove(service);
     }
 }
