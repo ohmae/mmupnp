@@ -50,6 +50,20 @@ public class ServiceTest {
         @Test(expected = IllegalStateException.class)
         public void build_Device不足() throws Exception {
             new ServiceImpl.Builder()
+                    .setSubscribeManager(mock(SubscribeManager.class))
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+        }
+
+        @Test(expected = IllegalStateException.class)
+        public void build_SubscribeManager不足() throws Exception {
+            new ServiceImpl.Builder()
+                    .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -63,6 +77,7 @@ public class ServiceTest {
         public void build_ServiceType不足() throws Exception {
             new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
                     .setControlUrl("controlUrl")
@@ -75,6 +90,7 @@ public class ServiceTest {
         public void build_ServiceId不足() throws Exception {
             new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setScpdUrl("scpdUrl")
                     .setControlUrl("controlUrl")
@@ -87,6 +103,7 @@ public class ServiceTest {
         public void build_ScpdUrl不足() throws Exception {
             new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setControlUrl("controlUrl")
@@ -99,6 +116,7 @@ public class ServiceTest {
         public void build_ControlUrl不足() throws Exception {
             new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -111,6 +129,7 @@ public class ServiceTest {
         public void build_EventSubUrl不足() throws Exception {
             new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -128,6 +147,7 @@ public class ServiceTest {
                             .setDirection("in"));
             final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -150,6 +170,7 @@ public class ServiceTest {
                             .setRelatedStateVariableName("StateVariableName"));
             final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
