@@ -40,16 +40,6 @@ class ControlPointDiFactory {
     }
 
     @Nonnull
-    ExecutorService createNotifyExecutor() {
-        return Executors.newSingleThreadExecutor();
-    }
-
-    @Nonnull
-    ExecutorService createIoExecutor() {
-        return Executors.newCachedThreadPool();
-    }
-
-    @Nonnull
     DeviceHolder createDeviceHolder(@Nonnull final ExpireListener listener) {
         return new DeviceHolder(listener);
     }

@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -98,39 +97,6 @@ public class ControlPointTest {
             Thread.sleep(200);
             thread.interrupt();
             thread.join();
-        }
-
-        @Test(timeout = 2000L)
-        public void initialize_terminate_timeover() throws Exception {
-            final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        ExecutorService createIoExecutor() {
-                            return executor;
-                        }
-                    });
-            doReturn(false).when(executor).awaitTermination(anyLong(), ArgumentMatchers.any(TimeUnit.class));
-            cp.initialize();
-            cp.terminate();
-            verify(executor, times(1)).shutdownNow();
-        }
-
-        @Test(timeout = 2000L)
-        public void initialize_terminate_exception() throws Exception {
-            final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        ExecutorService createIoExecutor() {
-                            return executor;
-                        }
-                    });
-            doThrow(new InterruptedException()).when(executor).awaitTermination(anyLong(), ArgumentMatchers.any(TimeUnit.class));
-            cp.initialize();
-            cp.terminate();
         }
 
         @Test(timeout = 1000L)
@@ -823,117 +789,6 @@ public class ControlPointTest {
             Thread.sleep(100);
 
             verify(l, never()).onNotifyEvent(service, 0, variableName, value);
-        }
-    }
-
-    @RunWith(JUnit4.class)
-    public static class Executorのテスト {
-        @Test
-        public void executeInParallel_executeが実行される() throws Exception {
-            final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        ExecutorService createIoExecutor() {
-                            return executor;
-                        }
-                    });
-            final Runnable command = mock(Runnable.class);
-
-            assertThat(cp.executeInParallel(command), is(true));
-
-            verify(executor, times(1)).execute(command);
-        }
-
-        @Test
-        public void executeInParallel_shutdown済みなら何もしないでfalse() throws Exception {
-            final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        ExecutorService createIoExecutor() {
-                            return executor;
-                        }
-                    });
-            doReturn(true).when(executor).isShutdown();
-            final Runnable command = mock(Runnable.class);
-
-            assertThat(cp.executeInParallel(command), is(false));
-
-            verify(executor, never()).execute(command);
-        }
-
-        @Test
-        public void executeInParallel_exceptionが発生すればfalse() throws Exception {
-            final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        ExecutorService createIoExecutor() {
-                            return executor;
-                        }
-                    });
-            final Runnable command = mock(Runnable.class);
-            doThrow(new RejectedExecutionException()).when(executor).execute(command);
-
-            assertThat(cp.executeInParallel(command), is(false));
-        }
-
-        @Test
-        public void executeInSequential_executeが実行される() throws Exception {
-            final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        ExecutorService createNotifyExecutor() {
-                            return executor;
-                        }
-                    });
-            final Runnable command = mock(Runnable.class);
-
-            assertThat(cp.executeInSequential(command), is(true));
-
-            verify(executor, times(1)).execute(command);
-        }
-
-        @Test
-        public void executeInSequential_shutdown済みなら何もしないでfalse() throws Exception {
-            final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        ExecutorService createNotifyExecutor() {
-                            return executor;
-                        }
-                    });
-            doReturn(true).when(executor).isShutdown();
-            final Runnable command = mock(Runnable.class);
-
-            assertThat(cp.executeInSequential(command), is(false));
-
-            verify(executor, never()).execute(command);
-        }
-
-        @Test
-        public void executeInSequential_exceptionが発生すればfalse() throws Exception {
-            final ExecutorService executor = mock(ExecutorService.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
-                        @Nonnull
-                        @Override
-                        ExecutorService createNotifyExecutor() {
-                            return executor;
-                        }
-                    });
-            final Runnable command = mock(Runnable.class);
-            doThrow(new RejectedExecutionException()).when(executor).execute(command);
-
-            assertThat(cp.executeInSequential(command), is(false));
         }
     }
 }

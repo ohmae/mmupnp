@@ -28,9 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
@@ -125,9 +122,7 @@ public class ControlPoint {
     @Nonnull
     private final EventReceiver mEventReceiver;
     @Nonnull
-    private final ExecutorService mIoExecutor;
-    @Nonnull
-    private final ExecutorService mNotifyExecutor;
+    private final ThreadPool mThreadPool;
     @Nonnull
     private final AtomicBoolean mInitialized = new AtomicBoolean();
     @Nonnull
@@ -274,16 +269,15 @@ public class ControlPoint {
             throw new IllegalStateException("no valid network interface.");
         }
         mProtocol = protocol;
+        mThreadPool = new ThreadPool();
         mLoadingDeviceMap = factory.createLoadingDeviceMap();
-        mNotifyExecutor = factory.createNotifyExecutor();
-        mIoExecutor = factory.createIoExecutor();
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();
 
         mSearchList = factory.createSsdpSearchServerList(interfaces, new ResponseListener() {
             @Override
             public void onReceiveResponse(@Nonnull final SsdpResponse message) {
-                executeInParallel(new Runnable() {
+                mThreadPool.executeInParallel(new Runnable() {
                     @Override
                     public void run() {
                         onReceiveSsdp(message);
@@ -294,7 +288,7 @@ public class ControlPoint {
         mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, new NotifyListener() {
             @Override
             public void onReceiveNotify(@Nonnull final SsdpRequest message) {
-                executeInParallel(new Runnable() {
+                mThreadPool.executeInParallel(new Runnable() {
                     @Override
                     public void run() {
                         onReceiveSsdp(message);
@@ -316,7 +310,7 @@ public class ControlPoint {
                     final long seq,
                     @Nonnull final List<StringPair> properties) {
                 final Service service = getSubscribeService(sid);
-                return service != null && executeInSequential(new EventNotifyTask(service, seq, properties));
+                return service != null && mThreadPool.executeInSequential(new EventNotifyTask(service, seq, properties));
             }
         });
     }
@@ -391,35 +385,9 @@ public class ControlPoint {
         }
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(this, message);
         mLoadingDeviceMap.put(uuid, builder);
-        if (!executeInParallel(new DeviceLoader(builder))) {
+        if (!mThreadPool.executeInParallel(new DeviceLoader(builder))) {
             mLoadingDeviceMap.remove(uuid);
         }
-    }
-
-    // VisibleForTesting
-    boolean executeInParallel(@Nonnull final Runnable command) {
-        if (mIoExecutor.isShutdown()) {
-            return false;
-        }
-        try {
-            mIoExecutor.execute(command);
-        } catch (final RejectedExecutionException ignored) {
-            return false;
-        }
-        return true;
-    }
-
-    // VisibleForTesting
-    boolean executeInSequential(@Nonnull final Runnable command) {
-        if (mNotifyExecutor.isShutdown()) {
-            return false;
-        }
-        try {
-            mNotifyExecutor.execute(command);
-        } catch (final RejectedExecutionException ignored) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -457,16 +425,7 @@ public class ControlPoint {
         if (!mInitialized.getAndSet(false)) {
             return;
         }
-        mNotifyExecutor.shutdownNow();
-        mIoExecutor.shutdown();
-        try {
-            if (!mIoExecutor.awaitTermination(
-                    Property.DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                mIoExecutor.shutdownNow();
-            }
-        } catch (final InterruptedException e) {
-            Log.w(e);
-        }
+        mThreadPool.terminate();
         mSubscribeHolder.shutdownRequest();
         mDeviceHolder.shutdownRequest();
     }
@@ -511,7 +470,7 @@ public class ControlPoint {
         }
         final List<Service> serviceList = mSubscribeHolder.getServiceList();
         for (final Service service : serviceList) {
-            executeInParallel(new Runnable() {
+            mThreadPool.executeInParallel(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -627,7 +586,7 @@ public class ControlPoint {
     void discoverDevice(@Nonnull final Device device) {
         mEmbeddedDeviceUdnSet.addAll(device.getEmbeddedDeviceUdnSet());
         mDeviceHolder.add(device);
-        executeInSequential(new Runnable() {
+        mThreadPool.executeInSequential(new Runnable() {
             @Override
             public void run() {
                 mDiscoveryListenerList.onDiscover(device);
@@ -654,7 +613,7 @@ public class ControlPoint {
             }
             mDeviceHolder.remove(device);
         }
-        executeInSequential(new Runnable() {
+        mThreadPool.executeInSequential(new Runnable() {
             @Override
             public void run() {
                 mDiscoveryListenerList.onLost(device);
