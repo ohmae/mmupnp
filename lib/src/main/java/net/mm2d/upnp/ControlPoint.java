@@ -208,7 +208,7 @@ public class ControlPoint {
             @Nonnull final Protocol protocol,
             @Nullable final Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
-        this(protocol, getDefaultInterfacesIfEmpty(protocol, interfaces), new ControlPointDiFactory(protocol));
+        this(protocol, getDefaultInterfacesIfEmpty(protocol, interfaces), new DiFactory(protocol));
     }
 
     @Nonnull
@@ -225,7 +225,7 @@ public class ControlPoint {
     ControlPoint(
             @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
-            @Nonnull final ControlPointDiFactory factory) {
+            @Nonnull final DiFactory factory) {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
         }

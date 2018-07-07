@@ -31,7 +31,7 @@ class SubscribeManager implements EventMessageListener {
     SubscribeManager(
             @Nonnull final ThreadPool threadPool,
             @Nonnull final NotifyEventListener listener,
-            @Nonnull final ControlPointDiFactory factory) {
+            @Nonnull final DiFactory factory) {
         mThreadPool = threadPool;
         mNotifyEventListener = listener;
         mSubscribeHolder = factory.createSubscribeHolder();

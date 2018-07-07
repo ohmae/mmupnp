@@ -31,7 +31,7 @@ public class SubscribeManagerTest {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             SubscribeHolder createSubscribeHolder() {
@@ -48,7 +48,7 @@ public class SubscribeManagerTest {
         final EventReceiver receiver = mock(EventReceiver.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
@@ -66,7 +66,7 @@ public class SubscribeManagerTest {
         final EventReceiver receiver = mock(EventReceiver.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
@@ -84,7 +84,7 @@ public class SubscribeManagerTest {
         final EventReceiver receiver = mock(EventReceiver.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             SubscribeHolder createSubscribeHolder() {
@@ -111,7 +111,7 @@ public class SubscribeManagerTest {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             SubscribeHolder createSubscribeHolder() {
@@ -128,7 +128,7 @@ public class SubscribeManagerTest {
         final EventReceiver receiver = mock(EventReceiver.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
@@ -149,7 +149,7 @@ public class SubscribeManagerTest {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             SubscribeHolder createSubscribeHolder() {
@@ -171,7 +171,7 @@ public class SubscribeManagerTest {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             SubscribeHolder createSubscribeHolder() {
@@ -191,7 +191,7 @@ public class SubscribeManagerTest {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final ControlPointDiFactory factory = new ControlPointDiFactory() {
+        final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
             SubscribeHolder createSubscribeHolder() {

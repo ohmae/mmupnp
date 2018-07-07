@@ -25,15 +25,15 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-class ControlPointDiFactory {
+class DiFactory {
     @Nonnull
     private final Protocol mProtocol;
 
-    ControlPointDiFactory() {
+    DiFactory() {
         this(Protocol.DEFAULT);
     }
 
-    ControlPointDiFactory(@Nonnull final Protocol protocol) {
+    DiFactory(@Nonnull final Protocol protocol) {
         mProtocol = protocol;
     }
 

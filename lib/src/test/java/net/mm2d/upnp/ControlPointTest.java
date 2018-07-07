@@ -55,7 +55,7 @@ public class ControlPointTest {
 
         @Test(expected = IllegalStateException.class)
         public void constructor_インターフェース空で指定() throws Exception {
-            new ControlPoint(Protocol.DEFAULT, Collections.<NetworkInterface>emptyList(), mock(ControlPointDiFactory.class));
+            new ControlPoint(Protocol.DEFAULT, Collections.<NetworkInterface>emptyList(), mock(DiFactory.class));
         }
 
         @Test
@@ -140,7 +140,7 @@ public class ControlPointTest {
         public void search() throws Exception {
             final SsdpSearchServerList list = mock(SsdpSearchServerList.class);
             final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
+                    new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
@@ -221,13 +221,13 @@ public class ControlPointTest {
         private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
         private final ThreadPool mThreadPool = mock(ThreadPool.class);
         private final NotifyEventListener mNotifyEventListener = mock(NotifyEventListener.class);
-        private final ControlPointDiFactory mControlPointDiFactory = spy(new ControlPointDiFactory());
-        private final SubscribeManager mSubscribeManager = spy(new SubscribeManager(mThreadPool, mNotifyEventListener, mControlPointDiFactory));
+        private final DiFactory mDiFactory = spy(new DiFactory());
+        private final SubscribeManager mSubscribeManager = spy(new SubscribeManager(mThreadPool, mNotifyEventListener, mDiFactory));
 
         @Before
         public void setUp() throws Exception {
             mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
+                    new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
@@ -400,7 +400,7 @@ public class ControlPointTest {
         @Before
         public void setUp() throws Exception {
             mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
+                    new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         Map<String, DeviceImpl.Builder> createLoadingDeviceMap() {
@@ -550,7 +550,7 @@ public class ControlPointTest {
         @Before
         public void setUp() throws Exception {
             mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
+                    new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         Map<String, DeviceImpl.Builder> createLoadingDeviceMap() {
@@ -660,7 +660,7 @@ public class ControlPointTest {
         @Before
         public void setUp() throws Exception {
             mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
-                    new ControlPointDiFactory(Protocol.DEFAULT) {
+                    new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
