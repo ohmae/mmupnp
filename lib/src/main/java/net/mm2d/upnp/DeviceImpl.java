@@ -33,7 +33,7 @@ public class DeviceImpl implements Device {
     /**
      * DeviceのBuilder。
      *
-     * XMLファイルの読み込み処理もBuilderに対して行う。
+     * <p>XMLファイルの読み込み処理もBuilderに対して行う。
      */
     public static class Builder {
         @Nonnull
@@ -303,7 +303,7 @@ public class DeviceImpl implements Device {
         /**
          * URLBaseの値を登録する。
          *
-         * URLBaseは1.1以降Deprecated
+         * <p>URLBaseは1.1以降Deprecated
          *
          * @param urlBase URLBaseの値
          * @return Builder
@@ -317,7 +317,7 @@ public class DeviceImpl implements Device {
         /**
          * URLのベースとして使用する値を返す。
          *
-         * URLBaseの値が存在する場合はURLBase、存在しない場合はLocationの値を利用する。
+         * <p>URLBaseの値が存在する場合はURLBase、存在しない場合はLocationの値を利用する。
          *
          * @return URLのベースとして使用する値
          */

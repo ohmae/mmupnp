@@ -149,7 +149,7 @@ public interface Device {
     /**
      * URLのベースとして使用する値を返す。
      *
-     * URLBaseの値が存在する場合はURLBase、存在しない場合はLocationの値を利用する。
+     * <p>URLBaseの値が存在する場合はURLBase、存在しない場合はLocationの値を利用する。
      *
      * @return URLのベースとして使用する値
      */
