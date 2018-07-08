@@ -56,14 +56,14 @@ repositories {
 Add dependencies, as following.
 ```gradle
 dependencies {
-    compile 'net.mm2d:mmupnp:1.7.2'
+    compile 'net.mm2d:mmupnp:1.8.0'
 }
 ```
 
 ### Initialize and Start
 
 ```java
-ControlPoint cp = new ControlPoint();
+ControlPoint cp = ControlPointFactory.create();
 cp.initialize();
 // adding listener if necessary.
 cp.addDiscoveryListener(...);
@@ -76,14 +76,14 @@ If you want to specify the network interface, describe the following.
 
 ```java
 NetworkInterface ni = NetworkInterface.getByName("eth0");
-ControlPoint cp = new ControlPoint(ni);
+ControlPoint cp = ControlPointFactory.create(ni);
 ```
 
 By default ControlPoint will work with dual stack of IPv4 and IPv6.
 If you want to operate with IPv4 only, specify the protocol as follows.
 
 ```java
-ControlPoint cp = new ControlPoint(Protocol.IP_V4_ONLY);
+ControlPoint cp = ControlPointFactory.create(Protocol.IP_V4_ONLY);
 ```
 
 ### M-SEARCH
