@@ -53,11 +53,7 @@ interface SsdpServer {
         private final InetSocketAddress mInetSocketAddress;
 
         Address(@Nonnull final String address) {
-            try {
-                mInetAddress = InetAddress.getByName(address);
-            } catch (final UnknownHostException e) {
-                throw new AssertionError(e);
-            }
+            mInetAddress = parseAddress(address);
             mInetSocketAddress = new InetSocketAddress(mInetAddress, SSDP_PORT);
         }
 
@@ -74,6 +70,14 @@ interface SsdpServer {
         @Nonnull
         String getAddressString() {
             return NetworkUtils.getAddressString(mInetSocketAddress);
+        }
+
+        static InetAddress parseAddress(@Nonnull final String address) {
+            try {
+                return InetAddress.getByName(address);
+            } catch (final UnknownHostException e) {
+                throw new AssertionError(e);
+            }
         }
     }
 
