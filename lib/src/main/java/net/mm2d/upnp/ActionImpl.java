@@ -54,7 +54,7 @@ class ActionImpl implements Action {
      * @see DeviceParser#loadDescription(HttpClient, DeviceImpl.Builder)
      * @see ServiceParser#loadDescription(HttpClient, DeviceImpl.Builder, ServiceImpl.Builder)
      */
-    public static class Builder {
+    static class Builder {
         private Service mService;
         private String mName;
         @Nonnull

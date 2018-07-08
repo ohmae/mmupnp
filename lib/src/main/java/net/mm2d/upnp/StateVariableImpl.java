@@ -26,7 +26,7 @@ class StateVariableImpl implements StateVariable {
      * @see DeviceParser#loadDescription(HttpClient, DeviceImpl.Builder)
      * @see ServiceParser#loadDescription(HttpClient, DeviceImpl.Builder, ServiceImpl.Builder)
      */
-    public static class Builder {
+    static class Builder {
         private Service mService;
         private boolean mSendEvents = true;
         private boolean mMulticast = false;

@@ -282,7 +282,7 @@ public final class Http {
      * @return queryを削除した
      */
     @Nonnull
-    static String removeQuery(@Nonnull final String url) {
+    private static String removeQuery(@Nonnull final String url) {
         final int pos = url.indexOf('?');
         if (pos > 0) {
             return url.substring(0, pos);
@@ -298,7 +298,7 @@ public final class Http {
      * @return 結合されたURL
      */
     @Nonnull
-    static String makeUrlWithAbsolutePath(
+    private static String makeUrlWithAbsolutePath(
             @Nonnull final String baseUrl,
             @Nonnull final String path) {
         final int pos = baseUrl.indexOf('/', HTTP_SCHEME.length());
@@ -316,7 +316,7 @@ public final class Http {
      * @return 結合されたURL
      */
     @Nonnull
-    static String makeUrlWithRelativePath(
+    private static String makeUrlWithRelativePath(
             @Nonnull final String baseUrl,
             @Nonnull final String path) {
         if (baseUrl.endsWith("/")) {

@@ -28,14 +28,14 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class DeviceImpl implements Device {
+class DeviceImpl implements Device {
 
     /**
      * DeviceのBuilder。
      *
      * <p>XMLファイルの読み込み処理もBuilderに対して行う。
      */
-    public static class Builder {
+    static class Builder {
         @Nonnull
         private final ControlPoint mControlPoint;
         @Nonnull
@@ -465,8 +465,6 @@ public class DeviceImpl implements Device {
     @Nonnull
     private final ControlPoint mControlPoint;
     @Nonnull
-    private final SubscribeManager mSubscribeManager;
-    @Nonnull
     private SsdpMessage mSsdpMessage;
     @Nonnull
     private String mLocation;
@@ -518,7 +516,6 @@ public class DeviceImpl implements Device {
             @Nonnull final Builder builder) {
         mParent = parent;
         mControlPoint = builder.mControlPoint;
-        mSubscribeManager = builder.mSubscribeManager;
         mSsdpMessage = builder.mSsdpMessage;
         mLocation = builder.mLocation;
         mUdn = builder.mUdn;
@@ -537,7 +534,7 @@ public class DeviceImpl implements Device {
         mDescription = builder.mDescription;
         mTagMap = builder.mTagMap;
         mIconList = buildIconList(this, builder.mIconBuilderList);
-        mServiceList = buildServiceList(this, mSubscribeManager, builder.mServiceBuilderList);
+        mServiceList = buildServiceList(this, builder.mSubscribeManager, builder.mServiceBuilderList);
         mDeviceList = buildDeviceList(this, builder.mDeviceBuilderList);
     }
 

@@ -23,7 +23,7 @@ class ArgumentImpl implements Argument {
      * @see ServiceParser#loadDescription(HttpClient, DeviceImpl.Builder, ServiceImpl.Builder)
      * @see ActionImpl.Builder
      */
-    public static class Builder {
+    static class Builder {
         private Action mAction;
         private String mName;
         private boolean mInputDirection;

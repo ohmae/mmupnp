@@ -214,6 +214,7 @@ public final class NetworkUtils {
     }
 
     // VisibleForTesting
+    @SuppressWarnings("FieldMayBeFinal")
     private static NetworkInterfaceEnumeration sNetworkInterfaceEnumeration = new NetworkInterfaceEnumeration();
 
     // VisibleForTesting

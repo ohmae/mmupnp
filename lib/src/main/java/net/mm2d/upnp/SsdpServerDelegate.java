@@ -119,7 +119,7 @@ class SsdpServerDelegate implements SsdpServer {
      * @return SSDPで使用するInetSocketAddress
      */
     @Nonnull
-    InetSocketAddress getSsdpSocketAddress() {
+    private InetSocketAddress getSsdpSocketAddress() {
         return mAddress.getSocketAddress();
     }
 

@@ -30,11 +30,11 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class ServiceImpl implements Service {
+class ServiceImpl implements Service {
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      */
-    public static class Builder {
+    static class Builder {
         private SubscribeManager mSubscribeManager;
         private Device mDevice;
         private String mServiceType;
@@ -461,8 +461,7 @@ public class ServiceImpl implements Service {
         return false;
     }
 
-    // VisibleForTesting
-    boolean parseSubscribeResponse(@Nonnull final HttpResponse response) {
+    private boolean parseSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout <= 0) {
@@ -508,8 +507,7 @@ public class ServiceImpl implements Service {
         return parseRenewSubscribeResponse(response);
     }
 
-    // VisibleForTesting
-    boolean parseRenewSubscribeResponse(@Nonnull final HttpResponse response) {
+    private boolean parseRenewSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout <= 0) {

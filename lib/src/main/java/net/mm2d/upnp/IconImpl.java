@@ -18,13 +18,13 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介(OHMAE Ryosuke)</a>
  */
-public class IconImpl implements Icon {
+class IconImpl implements Icon {
     /**
      * DeviceDescriptionのパース時に使用するビルダー
      *
      * @see DeviceParser#loadDescription(HttpClient, DeviceImpl.Builder)
      */
-    public static class Builder {
+    static class Builder {
         private Device mDevice;
         private String mMimeType;
         private int mHeight;
