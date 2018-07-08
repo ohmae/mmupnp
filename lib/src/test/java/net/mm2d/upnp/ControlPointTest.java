@@ -67,14 +67,14 @@ public class ControlPointTest {
 
         @Test(timeout = 2000L)
         public void initialize_terminate() throws Exception {
-            final ControlPoint cp = new ControlPoint();
+            final ControlPoint cp = ControlPointFactory.create();
             cp.initialize();
             cp.terminate();
         }
 
         @Test(timeout = 2000L)
         public void initialize_initialize_terminate() throws Exception {
-            final ControlPoint cp = new ControlPoint();
+            final ControlPoint cp = ControlPointFactory.create();
             cp.initialize();
             cp.initialize();
             cp.terminate();
@@ -85,7 +85,7 @@ public class ControlPointTest {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    final ControlPoint cp = new ControlPoint();
+                    final ControlPoint cp = ControlPointFactory.create();
                     cp.initialize();
                     cp.terminate();
                 }
@@ -98,13 +98,13 @@ public class ControlPointTest {
 
         @Test(timeout = 1000L)
         public void terminate() throws Exception {
-            final ControlPoint cp = new ControlPoint((Collection<NetworkInterface>) null);
+            final ControlPoint cp = ControlPointFactory.create((Collection<NetworkInterface>) null);
             cp.terminate();
         }
 
         @Test(timeout = 10000L)
         public void start_stop() throws Exception {
-            final ControlPoint cp = new ControlPoint();
+            final ControlPoint cp = ControlPointFactory.create();
             cp.initialize();
             cp.start();
             cp.stop();
@@ -113,7 +113,7 @@ public class ControlPointTest {
 
         @Test(timeout = 10000L)
         public void start_stop2() throws Exception {
-            final ControlPoint cp = new ControlPoint();
+            final ControlPoint cp = ControlPointFactory.create();
             cp.initialize();
             cp.start();
             cp.stop();
@@ -123,7 +123,7 @@ public class ControlPointTest {
 
         @Test(timeout = 1000L)
         public void start_stop_illegal() throws Exception {
-            final ControlPoint cp = new ControlPoint();
+            final ControlPoint cp = ControlPointFactory.create();
             cp.start();
             cp.start();
             cp.terminate();
@@ -132,7 +132,7 @@ public class ControlPointTest {
 
         @Test(expected = IllegalStateException.class)
         public void search_not_started() throws Exception {
-            final ControlPoint cp = new ControlPoint();
+            final ControlPoint cp = ControlPointFactory.create();
             cp.search();
         }
 
@@ -159,14 +159,14 @@ public class ControlPointTest {
 
         @Test
         public void createHttpClient() throws Exception {
-            final ControlPoint cp = new ControlPoint();
+            final ControlPoint cp = ControlPointFactory.create();
             final HttpClient client = cp.createHttpClient();
             assertThat(client.isKeepAlive(), is(true));
         }
 
         @Test
         public void needToUpdateSsdpMessage_DUAL_STACK() throws Exception {
-            final ControlPoint cp = new ControlPoint(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
+            final ControlPoint cp = ControlPointFactory.create(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -180,7 +180,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V4_ONLY() throws Exception {
-            final ControlPoint cp = new ControlPoint(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
+            final ControlPoint cp = ControlPointFactory.create(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -194,7 +194,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V6_ONLY() throws Exception {
-            final ControlPoint cp = new ControlPoint(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
+            final ControlPoint cp = ControlPointFactory.create(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(false));

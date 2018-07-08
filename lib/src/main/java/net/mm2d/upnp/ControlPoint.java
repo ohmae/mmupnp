@@ -167,7 +167,9 @@ public class ControlPoint {
      * 使用するインターフェースは自動的に選定される。
      *
      * @throws IllegalStateException 使用可能なインターフェースがない。
+     * @deprecated Use {@link ControlPointFactory#create()} instead.
      */
+    @Deprecated
     public ControlPoint()
             throws IllegalStateException {
         this(Collections.<NetworkInterface>emptyList());
@@ -178,7 +180,9 @@ public class ControlPoint {
      *
      * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
+     * @deprecated Use {@link ControlPointFactory#create(Collection)} instead.
      */
+    @Deprecated
     public ControlPoint(@Nullable final Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
         this(Protocol.DEFAULT, interfaces);
@@ -192,7 +196,9 @@ public class ControlPoint {
      *
      * @param protocol 使用するプロトコルスタック
      * @throws IllegalStateException 使用可能なインターフェースがない。
+     * @deprecated Use {@link ControlPointFactory#create(Protocol)} instead.
      */
+    @Deprecated
     public ControlPoint(@Nonnull final Protocol protocol) throws IllegalStateException {
         this(protocol, Collections.<NetworkInterface>emptyList());
     }
@@ -203,7 +209,9 @@ public class ControlPoint {
      * @param protocol   使用するプロトコルスタック
      * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
      * @throws IllegalStateException 使用可能なインターフェースがない。
+     * @deprecated Use {@link ControlPointFactory#create(Protocol, Collection)} instead.
      */
+    @Deprecated
     public ControlPoint(
             @Nonnull final Protocol protocol,
             @Nullable final Collection<NetworkInterface> interfaces)
