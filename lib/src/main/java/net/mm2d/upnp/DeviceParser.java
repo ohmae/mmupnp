@@ -30,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-public final class DeviceParser {
+final class DeviceParser {
     /**
      * DeviceDescriptionを読み込む。
      *

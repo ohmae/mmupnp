@@ -24,11 +24,12 @@ import javax.annotation.Nullable;
  */
 public final class ControlPointFactory {
     /**
-     * インスタンス初期化
+     * ControlPointのインスタンスを作成する。
      *
      * <p>引数のインターフェースを利用するように初期化される。
      * 使用するインターフェースは自動的に選定される。
      *
+     * @return ControlPointのインスタンス
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     @Nonnull
@@ -38,9 +39,10 @@ public final class ControlPointFactory {
     }
 
     /**
-     * 利用するインターフェースを指定してインスタンス作成。
+     * ControlPointのインスタンスを作成する。
      *
      * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
+     * @return ControlPointのインスタンス
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     @Nonnull
@@ -50,12 +52,13 @@ public final class ControlPointFactory {
     }
 
     /**
-     * インスタンス初期化
+     * ControlPointのインスタンスを作成する。
      *
      * <p>プロトコルスタックのみ指定して初期化を行う。
      * 使用するインターフェースは自動的に選定される。
      *
      * @param protocol 使用するプロトコルスタック
+     * @return ControlPointのインスタンス
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     @Nonnull
@@ -65,10 +68,11 @@ public final class ControlPointFactory {
     }
 
     /**
-     * 利用するインターフェースを指定してインスタンス作成。
+     * ControlPointのインスタンスを作成する。
      *
      * @param protocol   使用するプロトコルスタック
      * @param interfaces 使用するインターフェース、nullもしくは空の場合自動選択となる。
+     * @return ControlPointのインスタンス
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     @Nonnull
