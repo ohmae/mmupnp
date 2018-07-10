@@ -47,7 +47,7 @@ public class SsdpSearchServerTest {
 
         final DatagramPacket packet = socket.getSendPacket();
         final SsdpRequest message = new SsdpRequest(
-                mock(InterfaceAddress.class), packet.getData(), packet.getLength());
+                mock(InetAddress.class), packet.getData(), packet.getLength());
         assertThat(message.getMethod(), is(SsdpMessage.M_SEARCH));
         assertThat(message.getHeader(Http.ST), is(SsdpSearchServer.ST_ALL));
         assertThat(message.getHeader(Http.MAN), is(SsdpMessage.SSDP_DISCOVER));
@@ -70,7 +70,7 @@ public class SsdpSearchServerTest {
 
         final DatagramPacket packet = socket.getSendPacket();
         final SsdpRequest message = new SsdpRequest(
-                mock(InterfaceAddress.class), packet.getData(), packet.getLength());
+                mock(InetAddress.class), packet.getData(), packet.getLength());
         assertThat(message.getMethod(), is(SsdpMessage.M_SEARCH));
         assertThat(message.getHeader(Http.ST), is(SsdpSearchServer.ST_ROOTDEVICE));
         assertThat(message.getHeader(Http.MAN), is(SsdpMessage.SSDP_DISCOVER));

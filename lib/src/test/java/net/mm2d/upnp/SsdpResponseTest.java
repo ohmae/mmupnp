@@ -19,7 +19,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InterfaceAddress;
+import java.net.InetAddress;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -30,7 +30,7 @@ public class SsdpResponseTest {
 
     private static SsdpResponse makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpResponse(mock(InterfaceAddress.class), data, data.length);
+        return new SsdpResponse(mock(InetAddress.class), data, data.length);
     }
 
     @RunWith(JUnit4.class)

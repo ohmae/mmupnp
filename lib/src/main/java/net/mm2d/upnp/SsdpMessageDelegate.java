@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -41,7 +40,7 @@ class SsdpMessageDelegate implements SsdpMessage {
     @Nullable
     private String mLocation;
     @Nullable
-    private final InterfaceAddress mInterfaceAddress;
+    private final InetAddress mLocalAddress;
 
     public SsdpMessageDelegate(@Nonnull final HttpMessage message) {
         mMessage = message;
@@ -51,14 +50,14 @@ class SsdpMessageDelegate implements SsdpMessage {
         mType = "";
         mNts = "";
         mLocation = null;
-        mInterfaceAddress = null;
+        mLocalAddress = null;
     }
 
     public SsdpMessageDelegate(
             @Nonnull final HttpMessage message,
-            @Nonnull final InterfaceAddress address) {
+            @Nonnull final InetAddress address) {
         mMessage = message;
-        mInterfaceAddress = address;
+        mLocalAddress = address;
         mMaxAge = parseCacheControl(mMessage);
         final String[] result = parseUsn(mMessage);
         mUuid = result[0];
@@ -106,30 +105,19 @@ class SsdpMessageDelegate implements SsdpMessage {
 
     @Override
     public int getScopeId() {
-        if (mInterfaceAddress == null) {
+        if (mLocalAddress == null) {
             return 0;
         }
-        final InetAddress address = mInterfaceAddress.getAddress();
-        if (address instanceof Inet6Address) {
-            return ((Inet6Address) address).getScopeId();
+        if (mLocalAddress instanceof Inet6Address) {
+            return ((Inet6Address) mLocalAddress).getScopeId();
         }
         return 0;
-    }
-
-    @Deprecated
-    @Nullable
-    @Override
-    public InterfaceAddress getInterfaceAddress() {
-        return mInterfaceAddress;
     }
 
     @Nullable
     @Override
     public InetAddress getLocalAddress() {
-        if (mInterfaceAddress == null) {
-            return null;
-        }
-        return mInterfaceAddress.getAddress();
+        return mLocalAddress;
     }
 
     @Nullable

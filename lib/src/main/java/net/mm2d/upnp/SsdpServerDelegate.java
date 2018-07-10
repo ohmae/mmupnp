@@ -168,10 +168,14 @@ class SsdpServerDelegate implements SsdpServer {
         throw new IllegalArgumentException("ni does not have IPv6 address.");
     }
 
-    @Override
     @Nonnull
     public InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
+    }
+
+    @Nonnull
+    public InetAddress getLocalAddress() {
+        return mInterfaceAddress.getAddress();
     }
 
     @Override

@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.IOException;
-import java.net.InterfaceAddress;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.List;
 
@@ -55,8 +55,7 @@ public class DeviceTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
+            mSsdpMessage = new SsdpRequest(mock(InetAddress.class), data, data.length);
             mControlPoint = mock(ControlPoint.class);
             mSubscribeManager = mock(SubscribeManager.class);
             mBuilder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
@@ -108,8 +107,7 @@ public class DeviceTest {
         public void updateSsdpMessage() throws Exception {
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpMessage message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpMessage message = new SsdpRequest(mock(InetAddress.class), data, data.length);
             device.updateSsdpMessage(message);
 
             assertThat(device.getSsdpMessage(), is(message));
@@ -119,8 +117,7 @@ public class DeviceTest {
         public void updateSsdpMessage_uuid不一致() throws Exception {
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpMessage message = spy(new SsdpRequest(interfaceAddress, data, data.length));
+            final SsdpMessage message = spy(new SsdpRequest(mock(InetAddress.class), data, data.length));
             doReturn("uuid:").when(message).getUuid();
             device.updateSsdpMessage(message);
         }
@@ -129,8 +126,7 @@ public class DeviceTest {
         public void updateSsdpMessage_location不正() throws Exception {
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpMessage message = spy(new SsdpRequest(interfaceAddress, data, data.length));
+            final SsdpMessage message = spy(new SsdpRequest(mock(InetAddress.class), data, data.length));
             doReturn(null).when(message).getLocation();
             device.updateSsdpMessage(message);
         }
@@ -157,8 +153,7 @@ public class DeviceTest {
         public void getAbsoluteUrl_locationがホスト名のみ() throws Exception {
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpRequest message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
             final String url1 = "http://10.0.0.1:1000/hoge/fuga";
             final String url2 = "/hoge/fuga";
@@ -177,8 +172,7 @@ public class DeviceTest {
         public void getAbsoluteUrl_locationがホスト名のみで末尾のスラッシュなし() throws Exception {
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpRequest message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
             final String url1 = "http://10.0.0.1:1000/hoge/fuga";
             final String url2 = "/hoge/fuga";
@@ -197,8 +191,7 @@ public class DeviceTest {
         public void getAbsoluteUrl_locationがファイル名で終わる() throws Exception {
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpRequest message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
             final String url1 = "http://10.0.0.1:1000/hoge/fuga";
             final String url2 = "/hoge/fuga";
@@ -217,8 +210,7 @@ public class DeviceTest {
         public void getAbsoluteUrl_locationがディレクトリ名で終わる() throws Exception {
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpRequest message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
             final String url1 = "http://10.0.0.1:1000/hoge/fuga";
             final String url2 = "/hoge/fuga";
@@ -237,8 +229,7 @@ public class DeviceTest {
         public void getAbsoluteUrl_locationにクエリーがついている() throws Exception {
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpRequest message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
             final String url1 = "http://10.0.0.1:1000/hoge/fuga";
             final String url2 = "/hoge/fuga";
@@ -258,8 +249,7 @@ public class DeviceTest {
             final String location = "http://10.0.0.1:1000/";
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpRequest message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
             message.setHeader(Http.LOCATION, location);
             message.updateLocation();
             device.updateSsdpMessage(message);
@@ -274,8 +264,7 @@ public class DeviceTest {
             mBuilder.setUrlBase(urlBase);
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpRequest message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
             message.setHeader(Http.LOCATION, location);
             message.updateLocation();
             device.updateSsdpMessage(message);

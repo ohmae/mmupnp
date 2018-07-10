@@ -18,7 +18,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -466,9 +465,7 @@ public class ServiceTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            doReturn(InetAddress.getByName(INTERFACE_ADDRESS)).when(interfaceAddress).getAddress();
-            final SsdpMessage ssdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpMessage ssdpMessage = new SsdpRequest(InetAddress.getByName(INTERFACE_ADDRESS), data, data.length);
             mControlPoint = mock(ControlPoint.class);
             mSubscribeManager = mock(SubscribeManager.class);
             doReturn(EVENT_PORT).when(mSubscribeManager).getEventPort();

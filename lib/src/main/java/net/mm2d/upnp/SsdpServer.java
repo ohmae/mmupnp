@@ -12,7 +12,6 @@ import net.mm2d.util.NetworkUtils;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
 
 import javax.annotation.Nonnull;
@@ -80,14 +79,6 @@ interface SsdpServer {
             }
         }
     }
-
-    /**
-     * BindされたInterfaceのアドレスを返す。
-     *
-     * @return BindされたInterfaceのアドレス
-     */
-    @Nonnull
-    InterfaceAddress getInterfaceAddress();
 
     /**
      * ソケットのオープンを行う。

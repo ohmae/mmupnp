@@ -18,7 +18,7 @@ import org.junit.runners.JUnit4;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.InterfaceAddress;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.Set;
 
@@ -53,8 +53,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
+            mSsdpMessage = new SsdpRequest(mock(InetAddress.class), data, data.length);
             mControlPoint = mock(ControlPoint.class);
             mSubscribeManager = mock(SubscribeManager.class);
         }
@@ -124,8 +123,7 @@ public class DeviceParserTest {
         @Test
         public void loadDescription_with_url_base() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0-for-url-base.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
+            mSsdpMessage = new SsdpRequest(mock(InetAddress.class), data, data.length);
             doReturn(TestUtils.getResourceAsString("device-with-url-base.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.3:12345/device.xml"));
 
@@ -191,8 +189,7 @@ public class DeviceParserTest {
             final Device device = builder.build();
 
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpMessage message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpMessage message = new SsdpRequest(mock(InetAddress.class), data, data.length);
             device.updateSsdpMessage(message);
 
             final Device device1 = device.findDeviceByType("urn:schemas-upnp-org:device:WANDevice:1");

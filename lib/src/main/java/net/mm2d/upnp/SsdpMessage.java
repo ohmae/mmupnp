@@ -10,7 +10,6 @@ package net.mm2d.upnp;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -52,16 +51,6 @@ public interface SsdpMessage {
      * @return ScopeID、設定されていない場合(IPv4含む)は0
      */
     int getScopeId();
-
-    /**
-     * このパケットを受信したInterfaceAddressを返す。
-     *
-     * @return このパケットを受信したInterfaceAddress
-     * @deprecated Use {@link #getLocalAddress()} instead.
-     */
-    @Deprecated
-    @Nullable
-    InterfaceAddress getInterfaceAddress();
 
     /**
      * このパケットを受信したインターフェースのアドレスを返す。

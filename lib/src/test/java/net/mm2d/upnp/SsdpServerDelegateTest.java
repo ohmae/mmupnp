@@ -405,7 +405,7 @@ public class SsdpServerDelegateTest {
 
     private static SsdpResponse makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpResponse(mock(InterfaceAddress.class), data, data.length);
+        return new SsdpResponse(mock(InetAddress.class), data, data.length);
     }
 
     @Test

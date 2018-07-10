@@ -12,7 +12,6 @@ import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 
 import javax.annotation.Nonnull;
@@ -114,9 +113,8 @@ class SsdpSearchServer implements SsdpServer {
     }
 
     @Nonnull
-    @Override
-    public InterfaceAddress getInterfaceAddress() {
-        return mDelegate.getInterfaceAddress();
+    private InetAddress getLocalAddress() {
+        return mDelegate.getLocalAddress();
     }
 
     @Override
@@ -150,7 +148,7 @@ class SsdpSearchServer implements SsdpServer {
             @Nonnull final byte[] data,
             final int length) {
         try {
-            final SsdpResponse message = new SsdpResponse(getInterfaceAddress(), data, length);
+            final SsdpResponse message = new SsdpResponse(getLocalAddress(), data, length);
             if (mDelegate.isInvalidLocation(message, sourceAddress)) {
                 return;
             }

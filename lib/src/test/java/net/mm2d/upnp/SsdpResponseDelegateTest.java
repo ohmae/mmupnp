@@ -31,13 +31,6 @@ public class SsdpResponseDelegateTest {
     }
 
     @Test
-    public void getInterfaceAddress() {
-        mMessage.getInterfaceAddress();
-
-        verify(mDelegate, times(1)).getInterfaceAddress();
-    }
-
-    @Test
     public void getLocalAddress() {
         mMessage.getLocalAddress();
 

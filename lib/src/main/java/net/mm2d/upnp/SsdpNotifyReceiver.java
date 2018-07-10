@@ -75,10 +75,15 @@ class SsdpNotifyReceiver implements SsdpServer {
         mListener = listener;
     }
 
+    // VisibleForTesting
     @Nonnull
-    @Override
-    public InterfaceAddress getInterfaceAddress() {
+    InterfaceAddress getInterfaceAddress() {
         return mDelegate.getInterfaceAddress();
+    }
+
+    @Nonnull
+    private InetAddress getLocalAddress() {
+        return mDelegate.getLocalAddress();
     }
 
     @Override
@@ -144,7 +149,7 @@ class SsdpNotifyReceiver implements SsdpServer {
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        return new SsdpRequest(getInterfaceAddress(), data, length);
+        return new SsdpRequest(getLocalAddress(), data, length);
     }
 
     // VisibleForTesting
