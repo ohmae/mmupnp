@@ -44,26 +44,9 @@ import static org.mockito.Mockito.*;
 public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class mock未使用 {
-        @Test
-        public void constructor_引数無しでコール() throws Exception {
-            new ControlPoint();
-        }
-
-        @Test
-        public void constructor_インターフェース指定() throws Exception {
-            new ControlPoint(NetworkUtils.getAvailableInet4Interfaces());
-        }
-
         @Test(expected = IllegalStateException.class)
         public void constructor_インターフェース空で指定() throws Exception {
-            new ControlPoint(Protocol.DEFAULT, Collections.<NetworkInterface>emptyList(), mock(DiFactory.class));
-        }
-
-        @Test
-        public void constructor_インターフェース選別() throws Exception {
-            new ControlPoint(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
-            new ControlPoint(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
-            new ControlPoint(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
+            new ControlPointImpl(Protocol.DEFAULT, Collections.<NetworkInterface>emptyList(), mock(DiFactory.class));
         }
 
         @Test(timeout = 2000L)
@@ -140,7 +123,7 @@ public class ControlPointTest {
         @Test
         public void search() throws Exception {
             final SsdpSearchServerList list = mock(SsdpSearchServerList.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            final ControlPoint cp = new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -160,14 +143,14 @@ public class ControlPointTest {
 
         @Test
         public void createHttpClient() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create();
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create();
             final HttpClient client = cp.createHttpClient();
             assertThat(client.isKeepAlive(), is(true));
         }
 
         @Test
         public void needToUpdateSsdpMessage_DUAL_STACK() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -181,7 +164,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V4_ONLY() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -195,7 +178,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V6_ONLY() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(false));
@@ -217,7 +200,7 @@ public class ControlPointTest {
 
     @RunWith(JUnit4.class)
     public static class ネットワーク未使用 {
-        private ControlPoint mCp;
+        private ControlPointImpl mCp;
         private final SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
         private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
         private final ThreadPool mThreadPool = mock(ThreadPool.class);
@@ -227,7 +210,7 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -394,13 +377,13 @@ public class ControlPointTest {
 
     @RunWith(JUnit4.class)
     public static class DeviceDiscovery {
-        private ControlPoint mCp;
+        private ControlPointImpl mCp;
         private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
         private DeviceHolder mDeviceHolder;
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -539,7 +522,7 @@ public class ControlPointTest {
 
     @RunWith(JUnit4.class)
     public static class イベント伝搬テスト {
-        private ControlPoint mCp;
+        private ControlPointImpl mCp;
         private SubscribeManager mSubscribeManager;
         private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
         private DeviceHolder mDeviceHolder;
@@ -550,7 +533,7 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -655,12 +638,12 @@ public class ControlPointTest {
 
     @RunWith(JUnit4.class)
     public static class EventReceiverに起因するテスト {
-        private ControlPoint mCp;
+        private ControlPointImpl mCp;
         private SubscribeManager mSubscribeManager;
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override

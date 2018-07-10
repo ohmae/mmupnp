@@ -80,7 +80,7 @@ public final class ControlPointFactory {
             @Nonnull final Protocol protocol,
             @Nullable final Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
-        return new ControlPoint(protocol, getDefaultInterfacesIfEmpty(protocol, interfaces), new DiFactory(protocol));
+        return new ControlPointImpl(protocol, getDefaultInterfacesIfEmpty(protocol, interfaces), new DiFactory(protocol));
     }
 
     @Nonnull
