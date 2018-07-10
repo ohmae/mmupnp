@@ -10,6 +10,7 @@ package net.mm2d.upnp;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
@@ -122,10 +123,17 @@ public class SsdpResponse implements SsdpMessage {
         return mDelegate.getScopeId();
     }
 
+    @Deprecated
     @Nullable
     @Override
     public InterfaceAddress getInterfaceAddress() {
         return mDelegate.getInterfaceAddress();
+    }
+
+    @Nullable
+    @Override
+    public InetAddress getLocalAddress() {
+        return mDelegate.getLocalAddress();
     }
 
     @Nullable

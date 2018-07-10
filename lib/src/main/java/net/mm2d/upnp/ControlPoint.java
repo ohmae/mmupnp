@@ -284,16 +284,14 @@ public class ControlPoint {
     boolean needToUpdateSsdpMessage(
             @Nonnull final SsdpMessage oldMessage,
             @Nonnull final SsdpMessage newMessage) {
-        //noinspection ConstantConditions : 受信したメッセージの場合はnullではない
-        final InetAddress newAddress = newMessage.getInterfaceAddress().getAddress();
+        final InetAddress newAddress = newMessage.getLocalAddress();
         if (mProtocol == Protocol.IP_V4_ONLY) {
             return newAddress instanceof Inet4Address;
         }
         if (mProtocol == Protocol.IP_V6_ONLY) {
             return newAddress instanceof Inet6Address;
         }
-        //noinspection ConstantConditions : 受信したメッセージの場合はnullではない
-        final InetAddress oldAddress = oldMessage.getInterfaceAddress().getAddress();
+        final InetAddress oldAddress = oldMessage.getLocalAddress();
         if (oldAddress instanceof Inet4Address) {
             if (oldAddress.isLinkLocalAddress()) {
                 return true;
@@ -303,7 +301,7 @@ public class ControlPoint {
             if (newAddress instanceof Inet6Address) {
                 return true;
             }
-            return !newAddress.isLinkLocalAddress();
+            return newAddress != null && !newAddress.isLinkLocalAddress();
         }
     }
 

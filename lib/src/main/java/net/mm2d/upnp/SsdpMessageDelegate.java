@@ -116,10 +116,20 @@ class SsdpMessageDelegate implements SsdpMessage {
         return 0;
     }
 
+    @Deprecated
     @Nullable
     @Override
     public InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
+    }
+
+    @Nullable
+    @Override
+    public InetAddress getLocalAddress() {
+        if (mInterfaceAddress == null) {
+            return null;
+        }
+        return mInterfaceAddress.getAddress();
     }
 
     @Nullable

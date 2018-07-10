@@ -209,8 +209,8 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            doReturn(TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24))
-                    .when(message).getInterfaceAddress();
+            doReturn(InetAddress.getByName("192.168.0.1"))
+                    .when(message).getLocalAddress();
             doReturn(80).when(manager).getEventPort();
 
             assertThat(((ServiceImpl) service).getCallback(), is("<http://192.168.0.1/>"));

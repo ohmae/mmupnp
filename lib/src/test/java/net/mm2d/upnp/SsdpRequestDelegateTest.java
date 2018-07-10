@@ -38,6 +38,13 @@ public class SsdpRequestDelegateTest {
     }
 
     @Test
+    public void getLocalAddress() {
+        mMessage.getLocalAddress();
+
+        verify(mDelegate, times(1)).getLocalAddress();
+    }
+
+    @Test
     public void getHeader() {
         final String name = "name";
         mMessage.getHeader(name);

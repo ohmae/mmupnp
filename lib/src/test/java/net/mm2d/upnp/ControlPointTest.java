@@ -24,6 +24,7 @@ import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
@@ -208,8 +209,8 @@ public class ControlPointTest {
 
         private static SsdpMessage makeAddressMock(@Nonnull final String address) throws Exception {
             final SsdpMessage message = mock(SsdpMessage.class);
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress(address, "255.255.255.255", 24);
-            doReturn(ifa).when(message).getInterfaceAddress();
+            final InetAddress inetAddress = InetAddress.getByName(address);
+            doReturn(inetAddress).when(message).getLocalAddress();
             return message;
         }
     }

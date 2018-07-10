@@ -12,6 +12,7 @@ import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -391,11 +393,10 @@ class ServiceImpl implements Service {
     String getCallback() {
         final StringBuilder sb = new StringBuilder();
         sb.append("<http://");
-        final SsdpMessage ssdp = mDevice.getSsdpMessage();
-        final InterfaceAddress ifa = ssdp.getInterfaceAddress();
+        final InetAddress address = mDevice.getSsdpMessage().getLocalAddress();
         final int port = mSubscribeManager.getEventPort();
         //noinspection ConstantConditions : 受信したメッセージの場合はnullではない
-        sb.append(NetworkUtils.getAddressString(ifa.getAddress(), port));
+        sb.append(NetworkUtils.getAddressString(address, port));
         sb.append("/>");
         return sb.toString();
     }

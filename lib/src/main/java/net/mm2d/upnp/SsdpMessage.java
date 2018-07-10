@@ -9,6 +9,7 @@ package net.mm2d.upnp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
@@ -56,9 +57,19 @@ public interface SsdpMessage {
      * このパケットを受信したInterfaceAddressを返す。
      *
      * @return このパケットを受信したInterfaceAddress
+     * @deprecated Use {@link #getLocalAddress()} instead.
      */
+    @Deprecated
     @Nullable
     InterfaceAddress getInterfaceAddress();
+
+    /**
+     * このパケットを受信したインターフェースのアドレスを返す。
+     *
+     * @return このパケットを受信したインターフェースのアドレス
+     */
+    @Nullable
+    InetAddress getLocalAddress();
 
     /**
      * ヘッダの値を返す。
