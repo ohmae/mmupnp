@@ -42,7 +42,7 @@ class SsdpSearchServer implements SsdpServer {
          *
          * @param message 受信したレスポンスメッセージ
          */
-        void onReceiveResponse(@Nonnull SsdpResponse message);
+        void onReceiveResponse(@Nonnull SsdpMessage message);
     }
 
     @Nonnull

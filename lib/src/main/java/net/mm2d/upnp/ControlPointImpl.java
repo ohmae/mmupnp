@@ -111,7 +111,7 @@ class ControlPointImpl implements ControlPoint {
 
         mSearchList = factory.createSsdpSearchServerList(interfaces, new ResponseListener() {
             @Override
-            public void onReceiveResponse(@Nonnull final SsdpResponse message) {
+            public void onReceiveResponse(@Nonnull final SsdpMessage message) {
                 mThreadPool.executeInParallel(new Runnable() {
                     @Override
                     public void run() {
@@ -122,7 +122,7 @@ class ControlPointImpl implements ControlPoint {
         });
         mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, new NotifyListener() {
             @Override
-            public void onReceiveNotify(@Nonnull final SsdpRequest message) {
+            public void onReceiveNotify(@Nonnull final SsdpMessage message) {
                 mThreadPool.executeInParallel(new Runnable() {
                     @Override
                     public void run() {

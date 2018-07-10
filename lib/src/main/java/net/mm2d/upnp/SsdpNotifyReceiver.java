@@ -34,7 +34,7 @@ class SsdpNotifyReceiver implements SsdpServer {
          *
          * @param message 受信したNOTIFYメッセージ
          */
-        void onReceiveNotify(@Nonnull SsdpRequest message);
+        void onReceiveNotify(@Nonnull SsdpMessage message);
     }
 
     @Nonnull
