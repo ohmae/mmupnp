@@ -369,7 +369,7 @@ public final class Http {
     }
 
     @Nonnull
-    static String getAbsoluteUrl(
+    public static String getAbsoluteUrl(
             @Nonnull final String baseUrl,
             @Nonnull final String url) {
         if (isHttpUrl(url)) {
@@ -416,7 +416,7 @@ public final class Http {
      * @throws MalformedURLException 不正なURL
      */
     @Nonnull
-    static URL getAbsoluteUrl(
+    public static URL getAbsoluteUrl(
             @Nonnull final String baseUrl,
             @Nonnull final String url,
             final int scopeId)

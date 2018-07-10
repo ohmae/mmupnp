@@ -28,7 +28,9 @@ class ThreadPool {
 
     // VisibleForTesting
     @SuppressWarnings("WeakerAccess")
-    ThreadPool(@Nonnull final ExecutorService sequential, @Nonnull final ExecutorService parallel) {
+    ThreadPool(
+            @Nonnull final ExecutorService sequential,
+            @Nonnull final ExecutorService parallel) {
         mSequentialExecutor = sequential;
         mParallelExecutor = parallel;
     }
