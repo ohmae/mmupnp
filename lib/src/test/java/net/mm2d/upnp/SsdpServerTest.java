@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import java.net.InetAddress;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 public class SsdpServerTest {
@@ -20,6 +20,7 @@ public class SsdpServerTest {
         final String address = "192.0.2.1";
         assertThat(SsdpServer.Address.parseAddress(address), is(InetAddress.getByName(address)));
     }
+
     @Test
     public void parseAddress_ipv6() throws Exception {
         final String address = "2001:db8::9abc";

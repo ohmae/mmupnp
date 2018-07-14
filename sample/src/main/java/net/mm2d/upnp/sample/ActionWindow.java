@@ -187,7 +187,7 @@ public class ActionWindow extends JFrame {
     private JComponent makeComboBox(final Argument argument) {
         final StateVariable variable = argument.getRelatedStateVariable();
         final List<String> allowedValueList = variable.getAllowedValueList();
-        final JComboBox<String> comboBox = new JComboBox<>(allowedValueList.toArray(new String[allowedValueList.size()]));
+        final JComboBox<String> comboBox = new JComboBox<>(allowedValueList.toArray(new String[0]));
         if (variable.getDefaultValue() != null) {
             comboBox.setSelectedItem(variable.getDefaultValue());
         }

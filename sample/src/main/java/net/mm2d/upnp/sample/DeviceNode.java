@@ -102,7 +102,7 @@ public class DeviceNode extends UpnpNode {
                 final Device device = getUserObject();
                 try {
                     Desktop.getDesktop().browse(new URI(device.getLocation()));
-                } catch (IOException | URISyntaxException e1) {
+                } catch (final IOException | URISyntaxException e1) {
                     e1.printStackTrace();
                 }
             }

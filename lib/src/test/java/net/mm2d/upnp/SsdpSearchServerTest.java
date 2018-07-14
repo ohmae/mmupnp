@@ -90,7 +90,7 @@ public class SsdpSearchServerTest {
         server.setResponseListener(listener);
         server.onReceive(address, data, data.length);
 
-        SsdpResponse response = captor.getValue();
+        final SsdpResponse response = captor.getValue();
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
         assertThat(response.getUuid(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
     }

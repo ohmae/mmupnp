@@ -17,7 +17,6 @@ import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 
 import javax.annotation.Nonnull;
@@ -133,12 +132,12 @@ public class SubscribeManagerTest {
 
             @Nonnull
             @Override
-            EventReceiver createEventReceiver(@Nonnull EventMessageListener listener) {
+            EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
                 return receiver;
             }
         };
         final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
-        doReturn(Arrays.asList(mock(Service.class))).when(holder).getServiceList();
+        doReturn(Collections.singletonList(mock(Service.class))).when(holder).getServiceList();
         manager.stop();
 
         verify(pool).executeInParallel(ArgumentMatchers.any(Runnable.class));

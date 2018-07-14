@@ -145,8 +145,8 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         SsdpSearchServerList createSsdpSearchServerList(
-                                @Nonnull Collection<NetworkInterface> interfaces,
-                                @Nonnull ResponseListener listener) {
+                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final ResponseListener listener) {
                             return list;
                         }
                     });
@@ -395,7 +395,7 @@ public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class DeviceDiscovery {
         private ControlPoint mCp;
-        private Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
+        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
         private DeviceHolder mDeviceHolder;
 
         @Before
@@ -451,10 +451,10 @@ public class ControlPointTest {
             doReturn(new HttpClient(true) {
                 @Nonnull
                 @Override
-                public HttpResponse download(@Nonnull URL url) throws IOException {
+                public HttpResponse download(@Nonnull final URL url) throws IOException {
                     try {
                         Thread.sleep(100);
-                    } catch (InterruptedException e) {
+                    } catch (final InterruptedException e) {
                     }
                     throw new IOException();
                 }
@@ -493,7 +493,7 @@ public class ControlPointTest {
             final IconFilter iconFilter = spy(new IconFilter() {
                 @Nonnull
                 @Override
-                public List<Icon> filter(@Nonnull List<Icon> list) {
+                public List<Icon> filter(@Nonnull final List<Icon> list) {
                     return Collections.singletonList(list.get(0));
                 }
             });
@@ -541,10 +541,10 @@ public class ControlPointTest {
     public static class イベント伝搬テスト {
         private ControlPoint mCp;
         private SubscribeManager mSubscribeManager;
-        private Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
+        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
         private DeviceHolder mDeviceHolder;
-        private SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
-        private SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
+        private final SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
+        private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
         private ResponseListener mResponseListener;
         private NotifyListener mNotifyListener;
 

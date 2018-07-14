@@ -17,7 +17,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 
@@ -31,7 +31,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
+        list.init(Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.openAndStart();
         verify(server, times(1)).open();
@@ -46,7 +46,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
+        list.init(Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         doThrow(new IOException()).when(server).open();
         list.openAndStart();
@@ -60,7 +60,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
+        list.init(Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.stop();
 
@@ -75,7 +75,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
+        list.init(Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.close();
 
@@ -90,7 +90,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(Protocol.DEFAULT, Arrays.asList(nif), listener);
+        list.init(Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.search("");
 

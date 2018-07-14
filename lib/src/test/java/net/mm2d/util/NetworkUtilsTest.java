@@ -27,6 +27,7 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -138,7 +139,7 @@ public class NetworkUtilsTest {
         @Test
         public void isAvailableInet4Interface_Interfaceの状態が合致しなければfalse() throws Exception {
             final NetworkInterfaceWrapper wrapper = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv4Address)).when(wrapper).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv4Address)).when(wrapper).getInterfaceAddresses();
             doReturn(false).when(wrapper).isLoopback();
             doReturn(true).when(wrapper).isUp();
             doReturn(false).when(wrapper).supportsMulticast();
@@ -146,7 +147,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.isAvailableInet4Interface(wrapper), is(false));
 
             final NetworkInterfaceWrapper wrapper1 = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv4Address)).when(wrapper1).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv4Address)).when(wrapper1).getInterfaceAddresses();
             doReturn(false).when(wrapper1).isLoopback();
             doReturn(false).when(wrapper1).isUp();
             doReturn(true).when(wrapper1).supportsMulticast();
@@ -154,7 +155,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.isAvailableInet4Interface(wrapper1), is(false));
 
             final NetworkInterfaceWrapper wrapper2 = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv4Address)).when(wrapper2).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv4Address)).when(wrapper2).getInterfaceAddresses();
             doReturn(true).when(wrapper2).isLoopback();
             doReturn(true).when(wrapper2).isUp();
             doReturn(true).when(wrapper2).supportsMulticast();
@@ -165,7 +166,7 @@ public class NetworkUtilsTest {
         @Test
         public void isAvailableInet4Interface_Exceptionが発生した場合false() throws Exception {
             final NetworkInterfaceWrapper wrapper = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv4Address)).when(wrapper).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv4Address)).when(wrapper).getInterfaceAddresses();
             doReturn(false).when(wrapper).isLoopback();
             doThrow(new SocketException()).when(wrapper).isUp();
             doReturn(false).when(wrapper).supportsMulticast();
@@ -173,7 +174,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.isAvailableInet4Interface(wrapper), is(false));
 
             final NetworkInterfaceWrapper wrapper1 = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv4Address)).when(wrapper1).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv4Address)).when(wrapper1).getInterfaceAddresses();
             doReturn(false).when(wrapper1).isLoopback();
             doThrow(new SocketException()).when(wrapper1).isUp();
             doReturn(true).when(wrapper1).supportsMulticast();
@@ -181,7 +182,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.isAvailableInet4Interface(wrapper1), is(false));
 
             final NetworkInterfaceWrapper wrapper2 = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv4Address)).when(wrapper2).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv4Address)).when(wrapper2).getInterfaceAddresses();
             doReturn(false).when(wrapper2).isLoopback();
             doReturn(true).when(wrapper2).isUp();
             doThrow(new SocketException()).when(wrapper2).supportsMulticast();
@@ -192,7 +193,7 @@ public class NetworkUtilsTest {
         @Test
         public void isAvailableInet4Interface_IPv4アドレスを持っていない場合false() throws Exception {
             final NetworkInterfaceWrapper wrapper = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv6Address)).when(wrapper).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv6Address)).when(wrapper).getInterfaceAddresses();
             doReturn(false).when(wrapper).isLoopback();
             doReturn(true).when(wrapper).isUp();
             doReturn(true).when(wrapper).supportsMulticast();
@@ -214,7 +215,7 @@ public class NetworkUtilsTest {
         @Test
         public void isAvailableInet6Interface_Interfaceの状態が合致しなければfalse() throws Exception {
             final NetworkInterfaceWrapper wrapper = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv6Address)).when(wrapper).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv6Address)).when(wrapper).getInterfaceAddresses();
             doReturn(false).when(wrapper).isLoopback();
             doReturn(true).when(wrapper).isUp();
             doReturn(false).when(wrapper).supportsMulticast();
@@ -222,7 +223,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.isAvailableInet6Interface(wrapper), is(false));
 
             final NetworkInterfaceWrapper wrapper1 = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv6Address)).when(wrapper1).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv6Address)).when(wrapper1).getInterfaceAddresses();
             doReturn(false).when(wrapper1).isLoopback();
             doReturn(false).when(wrapper1).isUp();
             doReturn(true).when(wrapper1).supportsMulticast();
@@ -230,7 +231,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.isAvailableInet6Interface(wrapper1), is(false));
 
             final NetworkInterfaceWrapper wrapper2 = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv6Address)).when(wrapper2).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv6Address)).when(wrapper2).getInterfaceAddresses();
             doReturn(true).when(wrapper2).isLoopback();
             doReturn(true).when(wrapper2).isUp();
             doReturn(true).when(wrapper2).supportsMulticast();
@@ -241,7 +242,7 @@ public class NetworkUtilsTest {
         @Test
         public void isAvailableInet6Interface_Exceptionが発生した場合false() throws Exception {
             final NetworkInterfaceWrapper wrapper = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv6Address)).when(wrapper).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv6Address)).when(wrapper).getInterfaceAddresses();
             doReturn(false).when(wrapper).isLoopback();
             doThrow(new SocketException()).when(wrapper).isUp();
             doReturn(false).when(wrapper).supportsMulticast();
@@ -249,7 +250,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.isAvailableInet6Interface(wrapper), is(false));
 
             final NetworkInterfaceWrapper wrapper1 = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv6Address)).when(wrapper1).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv6Address)).when(wrapper1).getInterfaceAddresses();
             doReturn(false).when(wrapper1).isLoopback();
             doThrow(new SocketException()).when(wrapper1).isUp();
             doReturn(true).when(wrapper1).supportsMulticast();
@@ -257,7 +258,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.isAvailableInet6Interface(wrapper1), is(false));
 
             final NetworkInterfaceWrapper wrapper2 = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv6Address)).when(wrapper2).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv6Address)).when(wrapper2).getInterfaceAddresses();
             doReturn(false).when(wrapper2).isLoopback();
             doReturn(true).when(wrapper2).isUp();
             doThrow(new SocketException()).when(wrapper2).supportsMulticast();
@@ -268,7 +269,7 @@ public class NetworkUtilsTest {
         @Test
         public void isAvailableInet6Interface_IPv6アドレスを持っていない場合false() throws Exception {
             final NetworkInterfaceWrapper wrapper = mock(NetworkInterfaceWrapper.class);
-            doReturn(Arrays.asList(mIpv4Address)).when(wrapper).getInterfaceAddresses();
+            doReturn(Collections.singletonList(mIpv4Address)).when(wrapper).getInterfaceAddresses();
             doReturn(false).when(wrapper).isLoopback();
             doReturn(true).when(wrapper).isUp();
             doReturn(true).when(wrapper).supportsMulticast();
@@ -307,7 +308,7 @@ public class NetworkUtilsTest {
                 assertThat(addressAfter, is(addressBefore));
                 return;
             }
-            int[] sections = new int[]{0, 0x1, 0x11, 0x111, 0x1111};
+            final int[] sections = new int[]{0, 0x1, 0x11, 0x111, 0x1111};
             for (final int section : sections) {
                 bin[pos] = (byte) ((section >> 8) & 0xff);
                 bin[pos + 1] = (byte) (section & 0xff);

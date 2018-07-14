@@ -85,7 +85,7 @@ public class ServiceNode extends UpnpNode {
                 final Service service = getUserObject();
                 try {
                     Desktop.getDesktop().browse(service.getAbsoluteUrl(service.getScpdUrl()).toURI());
-                } catch (IOException | URISyntaxException e1) {
+                } catch (final IOException | URISyntaxException e1) {
                     e1.printStackTrace();
                 }
             }

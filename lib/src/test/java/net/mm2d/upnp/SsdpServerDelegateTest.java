@@ -93,7 +93,7 @@ public class SsdpServerDelegateTest {
     @Test(expected = IllegalArgumentException.class)
     public void findInet6Address_見つからなければException1() throws Exception {
         final InterfaceAddress ipv4 = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24);
-        SsdpServerDelegate.findInet6Address(Arrays.asList(ipv4));
+        SsdpServerDelegate.findInet6Address(Collections.singletonList(ipv4));
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
@@ -317,7 +317,7 @@ public class DeviceBuilderTest {
         doReturn(uuid).when(message).getUuid();
         final DeviceImpl.Builder embeddedDeviceBuilder = mock(DeviceImpl.Builder.class);
         new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
-                .setEmbeddedDeviceBuilderList(Arrays.asList(embeddedDeviceBuilder))
+                .setEmbeddedDeviceBuilderList(Collections.singletonList(embeddedDeviceBuilder))
                 .updateSsdpMessage(message);
 
         verify(embeddedDeviceBuilder, times(1)).updateSsdpMessage(message);

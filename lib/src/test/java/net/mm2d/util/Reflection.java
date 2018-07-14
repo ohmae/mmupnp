@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class Reflection {
+public final class Reflection {
     @Nonnull
     public static <T> Constructor<T> getConstructor(
             @Nonnull final Class<T> cls,

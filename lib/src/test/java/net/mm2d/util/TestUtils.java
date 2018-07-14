@@ -17,7 +17,7 @@ import java.nio.file.Files;
 
 import javax.annotation.Nonnull;
 
-public class TestUtils {
+public final class TestUtils {
     @Nonnull
     public static File getResourceAsFile(final String name) {
         return new File(getClassLoader().getResource(name).getFile());

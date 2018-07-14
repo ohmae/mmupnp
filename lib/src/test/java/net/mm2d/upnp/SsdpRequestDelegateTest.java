@@ -17,6 +17,7 @@ import java.io.OutputStream;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("ALL")
 @RunWith(JUnit4.class)
 public class SsdpRequestDelegateTest {
     private SsdpMessageDelegate mDelegate;
