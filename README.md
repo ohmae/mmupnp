@@ -162,8 +162,7 @@ Log.initialize(true, true);
 ### Documents
 
 I described Javadoc comments. Please refer to it for more information.
-- Javadoc in Japanese
-  - https://ohmae.github.io/mmupnp/javadoc/
+- [Javadoc in Japanese](https://ohmae.github.io/mmupnp/javadoc/)
 
 ## Author
 大前 良介 (OHMAE Ryosuke)
