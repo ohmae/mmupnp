@@ -56,7 +56,7 @@ repositories {
 Add dependencies, as following.
 ```gradle
 dependencies {
-    compile 'net.mm2d:mmupnp:1.8.0'
+    compile 'net.mm2d:mmupnp:1.8.1'
 }
 ```
 
