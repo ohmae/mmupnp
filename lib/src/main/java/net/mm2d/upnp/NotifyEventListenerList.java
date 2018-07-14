@@ -9,8 +9,8 @@ package net.mm2d.upnp;
 
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.annotation.Nonnull;
 
@@ -21,25 +21,23 @@ import javax.annotation.Nonnull;
  */
 class NotifyEventListenerList implements NotifyEventListener {
     @Nonnull
-    private final List<NotifyEventListener> mList = new ArrayList<>();
+    private final Set<NotifyEventListener> mSet = new CopyOnWriteArraySet<>();
 
-    synchronized void add(@Nonnull final NotifyEventListener l) {
-        if (!mList.contains(l)) {
-            mList.add(l);
-        }
+    void add(@Nonnull final NotifyEventListener l) {
+        mSet.add(l);
     }
 
-    synchronized void remove(@Nonnull final NotifyEventListener l) {
-        mList.remove(l);
+    void remove(@Nonnull final NotifyEventListener l) {
+        mSet.remove(l);
     }
 
     @Override
-    public synchronized void onNotifyEvent(
+    public void onNotifyEvent(
             @Nonnull final Service service,
             final long seq,
             @Nonnull final String variable,
             @Nonnull final String value) {
-        for (final NotifyEventListener l : mList) {
+        for (final NotifyEventListener l : mSet) {
             l.onNotifyEvent(service, seq, variable, value);
         }
     }

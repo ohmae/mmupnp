@@ -11,6 +11,8 @@ import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
+
 import static org.mockito.Mockito.*;
 
 public class NotifyEventListenerListTest {
@@ -56,5 +58,65 @@ public class NotifyEventListenerListTest {
         list.onNotifyEvent(service, seq, variable, value);
 
         verify(listener, times(1)).onNotifyEvent(service, seq, variable, value);
+    }
+
+    @Test
+    public void removeOnNotify() {
+        final Service service = mock(Service.class);
+        final long seq = 0;
+        final String variable = "variable";
+        final String value = "variable";
+        final NotifyEventListenerList list = new NotifyEventListenerList();
+        list.add(new NotifyEventListener() {
+            @Override
+            public void onNotifyEvent(
+                    @Nonnull final Service service,
+                    final long seq,
+                    @Nonnull final String variable,
+                    @Nonnull final String value) {
+                list.remove(this);
+            }
+        });
+        list.add(new NotifyEventListener() {
+            @Override
+            public void onNotifyEvent(
+                    @Nonnull final Service service,
+                    final long seq,
+                    @Nonnull final String variable,
+                    @Nonnull final String value) {
+                list.remove(this);
+            }
+        });
+        list.onNotifyEvent(service, seq, variable, value);
+    }
+
+    @Test
+    public void addOnNotify() {
+        final Service service = mock(Service.class);
+        final long seq = 0;
+        final String variable = "variable";
+        final String value = "variable";
+        final NotifyEventListenerList list = new NotifyEventListenerList();
+        list.add(new NotifyEventListener() {
+            @Override
+            public void onNotifyEvent(
+                    @Nonnull final Service service,
+                    final long seq,
+                    @Nonnull final String variable,
+                    @Nonnull final String value) {
+                list.add(mock(NotifyEventListener.class));
+            }
+        });
+        list.add(new NotifyEventListener() {
+            @Override
+            public void onNotifyEvent(
+                    @Nonnull final Service service,
+                    final long seq,
+                    @Nonnull final String variable,
+                    @Nonnull final String value) {
+                list.add(mock(NotifyEventListener.class));
+            }
+        });
+        list.onNotifyEvent(service, seq, variable, value);
     }
 }
