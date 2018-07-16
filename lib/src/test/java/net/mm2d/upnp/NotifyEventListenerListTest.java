@@ -10,11 +10,15 @@ package net.mm2d.upnp;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import javax.annotation.Nonnull;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
+@RunWith(JUnit4.class)
 public class NotifyEventListenerListTest {
     @Test
     public void onNotifyEvent_通知される() {

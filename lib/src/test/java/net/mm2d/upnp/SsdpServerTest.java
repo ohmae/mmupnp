@@ -8,12 +8,16 @@
 package net.mm2d.upnp;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.net.InetAddress;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
+@RunWith(JUnit4.class)
 public class SsdpServerTest {
     @Test
     public void parseAddress_ipv4() throws Exception {

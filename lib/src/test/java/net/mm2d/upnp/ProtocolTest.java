@@ -12,8 +12,8 @@ import java.net.NetworkInterface;
 
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 public class ProtocolTest {
-
     @Test
     public void getAvailableInterfaces() throws Exception {
         for (final NetworkInterface nif : Protocol.IP_V4_ONLY.getAvailableInterfaces()) {

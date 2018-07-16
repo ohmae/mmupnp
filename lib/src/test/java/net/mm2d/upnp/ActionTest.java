@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class ActionTest {
     @Test(expected = IllegalStateException.class)
@@ -100,7 +101,7 @@ public class ActionTest {
     }
 
     @Test
-    public void findArgument_名前指定でArugumentが取得でできる() {
+    public void findArgument_名前指定でArgumentが取得でできる() {
         final String argumentName = "argumentName";
         final StateVariable stateVariable = mock(StateVariable.class);
         final String name = "name";

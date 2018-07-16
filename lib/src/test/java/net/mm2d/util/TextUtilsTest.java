@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class TextUtilsTest {
     @Test(expected = InvocationTargetException.class)

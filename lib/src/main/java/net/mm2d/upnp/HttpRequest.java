@@ -162,8 +162,9 @@ public class HttpRequest implements HttpMessage {
      * @return HttpRequest
      * @see #setStartLine(String)
      */
+    // VisibleForTesting
     @Nonnull
-    public HttpRequest setRequestLine(@Nonnull final String line) {
+    HttpRequest setRequestLine(@Nonnull final String line) {
         final String[] params = line.split(" ", 3);
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -183,7 +184,7 @@ public class HttpRequest implements HttpMessage {
      * @see #getStartLine()
      */
     @Nonnull
-    public String getRequestLine() {
+    private String getRequestLine() {
         return getMethod() + " " + getUri() + " " + getVersion();
     }
 

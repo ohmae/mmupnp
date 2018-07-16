@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class XmlUtilsTest {
     @Test(expected = InvocationTargetException.class)
@@ -60,7 +61,7 @@ public class XmlUtilsTest {
         final String xml = TestUtils.getResourceAsString("propchange.xml");
         final Document document = XmlUtils.newDocument(true, xml);
         final Element root = document.getDocumentElement();
-        final Element element = XmlUtils.findChildElementByLocalName(root, "propertys");
+        final Element element = XmlUtils.findChildElementByLocalName(root, "properties");
         assertThat(element, is(nullValue()));
     }
 }

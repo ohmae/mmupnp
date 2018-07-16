@@ -25,6 +25,7 @@ import java.net.URL;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class HttpRequestTest {
     private static final String ACTION = "\"urn:schemas-upnp-org:service:ContentDirectory:1#Browse\"";

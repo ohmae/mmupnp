@@ -249,6 +249,7 @@ public final class Http {
      * @param date 日付
      * @return RFC1123形式の日付文字列
      */
+    @SuppressWarnings("WeakerAccess")
     @Nonnull
     public static synchronized String formatDate(@Nonnull final Date date) {
         return RFC_1123_FORMAT.format(date);

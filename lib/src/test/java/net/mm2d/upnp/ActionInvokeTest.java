@@ -34,9 +34,9 @@ import javax.xml.transform.TransformerException;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class ActionInvokeTest {
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";

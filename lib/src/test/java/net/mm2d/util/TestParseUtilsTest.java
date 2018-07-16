@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class TestParseUtilsTest {
     @Test(expected = InvocationTargetException.class)
@@ -51,9 +52,9 @@ public class TestParseUtilsTest {
 
     @Test
     public void parseIntSafely_8進数正常にパースできる() {
-        assertThat(TextParseUtils.parseIntSafely("777", 8, -1), is(0777));
-        assertThat(TextParseUtils.parseIntSafely("0777", 8, -1), is(0777));
-        assertThat(TextParseUtils.parseIntSafely("-777", 8, -1), is(-0777));
+        assertThat(TextParseUtils.parseIntSafely("777", 8, -1), is(511));
+        assertThat(TextParseUtils.parseIntSafely("0777", 8, -1), is(511));
+        assertThat(TextParseUtils.parseIntSafely("-777", 8, -1), is(-511));
     }
 
     @Test
@@ -88,9 +89,9 @@ public class TestParseUtilsTest {
 
     @Test
     public void parseLongSafely_8進数正常にパースできる() {
-        assertThat(TextParseUtils.parseLongSafely("777", 8, -1), is(0777L));
-        assertThat(TextParseUtils.parseLongSafely("0777", 8, -1), is(0777L));
-        assertThat(TextParseUtils.parseLongSafely("-777", 8, -1), is(-0777L));
+        assertThat(TextParseUtils.parseLongSafely("777", 8, -1), is(511L));
+        assertThat(TextParseUtils.parseLongSafely("0777", 8, -1), is(511L));
+        assertThat(TextParseUtils.parseLongSafely("-777", 8, -1), is(-511L));
     }
 
     @Test

@@ -124,6 +124,7 @@ final class ServiceParser {
         return builder;
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final ArgumentImpl.Builder builder,
             @Nonnull final String tag,
@@ -189,6 +190,7 @@ final class ServiceParser {
         }
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final String tag,

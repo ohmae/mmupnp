@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class ServiceParserTest {
     @Test(expected = InvocationTargetException.class)

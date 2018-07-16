@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class DeviceHolderTest {
     private static final String UDN = "uuid:01234567-89ab-cdef-0123-456789abcdef";

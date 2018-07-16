@@ -116,6 +116,7 @@ final class DeviceParser {
         }
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final DeviceImpl.Builder builder,
             @Nonnull final String tag,
@@ -175,6 +176,7 @@ final class DeviceParser {
         return builder;
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final IconImpl.Builder builder,
             @Nonnull final String tag,
@@ -218,6 +220,7 @@ final class DeviceParser {
         return serviceBuilder;
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final ServiceImpl.Builder builder,
             @Nonnull final String tag,

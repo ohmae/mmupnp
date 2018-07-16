@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpMessageDelegateTest {
     private static final int DEFAULT_MAX_AGE = 1800;

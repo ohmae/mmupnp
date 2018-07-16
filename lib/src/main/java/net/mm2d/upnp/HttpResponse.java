@@ -85,8 +85,9 @@ public class HttpResponse implements HttpMessage {
      * @return HttpResponse
      * @see #setStartLine(String)
      */
+    // VisibleForTesting
     @Nonnull
-    public HttpResponse setStatusLine(@Nonnull final String line) {
+    HttpResponse setStatusLine(@Nonnull final String line) {
         final String[] params = line.split(" ", 3);
         if (params.length < 3) {
             throw new IllegalArgumentException();
@@ -106,7 +107,7 @@ public class HttpResponse implements HttpMessage {
      * @see #getStartLine()
      */
     @Nonnull
-    public String getStatusLine() {
+    private String getStatusLine() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getVersion());
         sb.append(' ');
@@ -168,6 +169,7 @@ public class HttpResponse implements HttpMessage {
      * @return HttpResponse
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
+    @SuppressWarnings("UnusedReturnValue")
     @Nonnull
     public HttpResponse setReasonPhrase(@Nonnull final String reasonPhrase) {
         mReasonPhrase = reasonPhrase;

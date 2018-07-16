@@ -173,6 +173,7 @@ class ServiceImpl implements Service {
          * @param builder Serviceで定義されているStateVariableのBuilder
          * @return Builder
          */
+        @SuppressWarnings("UnusedReturnValue")
         @Nonnull
         public Builder addVariableBuilder(@Nonnull final StateVariableImpl.Builder builder) {
             mVariableBuilderList.add(builder);

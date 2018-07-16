@@ -17,6 +17,7 @@ import java.io.OutputStream;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpResponseDelegateTest {
     private SsdpMessageDelegate mDelegate;

@@ -416,6 +416,7 @@ class DeviceImpl implements Device {
          * @param value     タグの値
          * @return Builder
          */
+        @SuppressWarnings("Java8MapApi")
         @Nonnull
         public Builder putTag(
                 @Nullable final String namespace,

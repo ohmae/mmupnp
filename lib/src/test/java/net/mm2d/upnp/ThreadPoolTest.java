@@ -8,6 +8,8 @@
 package net.mm2d.upnp;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
 import java.util.concurrent.ExecutorService;
@@ -18,6 +20,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
+@RunWith(JUnit4.class)
 public class ThreadPoolTest {
     @Test
     public void executeInParallel_executeが実行される() throws Exception {
@@ -92,7 +96,7 @@ public class ThreadPoolTest {
     }
 
     @Test(timeout = 2000L)
-    public void terminate_timeover() throws Exception {
+    public void terminate_time_over() throws Exception {
         final ExecutorService sequential = mock(ExecutorService.class);
         final ExecutorService parallel = mock(ExecutorService.class);
         final ThreadPool threadPool = new ThreadPool(sequential, parallel);

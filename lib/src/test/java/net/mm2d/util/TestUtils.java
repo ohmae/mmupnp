@@ -17,6 +17,7 @@ import java.nio.file.Files;
 
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("NonAsciiCharacters")
 public final class TestUtils {
     @Nonnull
     public static File getResourceAsFile(final String name) {

@@ -39,6 +39,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(Enclosed.class)
 public class ControlPointTest {
     @RunWith(JUnit4.class)
@@ -235,7 +236,7 @@ public class ControlPointTest {
         }
 
         @Test
-        public void discoverDevice_onDesicoverが通知される() throws Exception {
+        public void discoverDevice_onDiscoverが通知される() throws Exception {
             final DiscoveryListener l = mock(DiscoveryListener.class);
             mCp.addDiscoveryListener(l);
             final String uuid = "uuid";

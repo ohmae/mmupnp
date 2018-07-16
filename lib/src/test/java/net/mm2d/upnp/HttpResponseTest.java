@@ -23,6 +23,7 @@ import java.util.TimeZone;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class HttpResponseTest {
     private static final Date DATE;
