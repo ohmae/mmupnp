@@ -20,9 +20,12 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,6 +66,8 @@ class ControlPointImpl implements ControlPoint {
     private final DeviceHolder mDeviceHolder;
     @Nonnull
     private final SubscribeManager mSubscribeManager;
+    @Nonnull
+    private final List<DeviceImpl.Builder> mLoadingPinnedDevices = Collections.synchronizedList(new ArrayList<DeviceImpl.Builder>());
 
     private class DeviceLoader implements Runnable {
         @Nonnull
@@ -90,6 +95,41 @@ class ControlPointImpl implements ControlPoint {
                 synchronized (mDeviceHolder) {
                     mLoadingDeviceMap.remove(uuid);
                 }
+            } finally {
+                client.close();
+            }
+        }
+    }
+
+    private class PinnedDeviceLoader implements Runnable {
+        @Nonnull
+        private final DeviceImpl.Builder mDeviceBuilder;
+
+        PinnedDeviceLoader(@Nonnull final DeviceImpl.Builder builder) {
+            mDeviceBuilder = builder;
+        }
+
+        @Override
+        public void run() {
+            final HttpClient client = createHttpClient();
+            try {
+                DeviceParser.loadDescription(client, mDeviceBuilder);
+                final Device device = mDeviceBuilder.build();
+                device.loadIconBinary(client, mIconFilter);
+                synchronized (mDeviceHolder) {
+                    final String udn = device.getUdn();
+                    if (!mLoadingPinnedDevices.remove(mDeviceBuilder)) {
+                        return;
+                    }
+                    mLoadingDeviceMap.remove(udn);
+                    final Device lostDevice = mDeviceHolder.remove(udn);
+                    if (lostDevice != null) {
+                        lostDevice(lostDevice);
+                    }
+                    discoverDevice(device);
+                }
+            } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
+                Log.w(null, "fail to load:" + mDeviceBuilder.getLocation(), e);
             } finally {
                 client.close();
             }
@@ -187,7 +227,9 @@ class ControlPointImpl implements ControlPoint {
                 return;
             }
             if (TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)) {
-                lostDevice(device);
+                if (!isPinnedDevice(device)) {
+                    lostDevice(device);
+                }
             } else {
                 if (needToUpdateSsdpMessage(device.getSsdpMessage(), message)) {
                     device.updateSsdpMessage(message);
@@ -405,6 +447,9 @@ class ControlPointImpl implements ControlPoint {
     // VisibleForTesting
     @SuppressWarnings("WeakerAccess")
     void discoverDevice(@Nonnull final Device device) {
+        if (isPinnedDevice(mDeviceHolder.get(device.getUdn()))) {
+            return;
+        }
         mEmbeddedDeviceUdnSet.addAll(device.getEmbeddedDeviceUdnSet());
         mDeviceHolder.add(device);
         mThreadPool.executeInSequential(new Runnable() {
@@ -480,5 +525,41 @@ class ControlPointImpl implements ControlPoint {
     @Nullable
     public Device getDevice(@Nonnull final String udn) {
         return mDeviceHolder.get(udn);
+    }
+
+    @Override
+    public void addPinnedDevice(@Nonnull final String location) {
+        for (final Device device : getDeviceList()) {
+            if (TextUtils.equals(device.getLocation(), location) && isPinnedDevice(device)) {
+                return;
+            }
+        }
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(
+                this, mSubscribeManager, new PinnedSsdpMessage(location));
+        mLoadingPinnedDevices.add(builder);
+        mThreadPool.executeInParallel(new PinnedDeviceLoader(builder));
+    }
+
+    @Override
+    public void removePinnedDevice(@Nonnull final String location) {
+        synchronized (mLoadingPinnedDevices) {
+            for (final ListIterator<DeviceImpl.Builder> i = mLoadingPinnedDevices.listIterator(); i.hasNext(); ) {
+                final DeviceImpl.Builder builder = i.next();
+                if (TextUtils.equals(builder.getLocation(), location)) {
+                    i.remove();
+                    return;
+                }
+            }
+        }
+        for (final Device device : getDeviceList()) {
+            if (TextUtils.equals(device.getLocation(), location)) {
+                lostDevice(device);
+                return;
+            }
+        }
+    }
+
+    private static boolean isPinnedDevice(@Nullable final Device device) {
+        return device != null && device.getSsdpMessage() instanceof PinnedSsdpMessage;
     }
 }

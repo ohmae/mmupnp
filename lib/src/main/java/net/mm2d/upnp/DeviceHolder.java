@@ -96,8 +96,17 @@ class DeviceHolder implements Runnable {
      *
      * @param device 削除されるDevice。
      */
-    synchronized void remove(@Nonnull final Device device) {
-        mDeviceMap.remove(device.getUdn());
+    synchronized Device remove(@Nonnull final Device device) {
+        return mDeviceMap.remove(device.getUdn());
+    }
+
+    /**
+     * Device削除。
+     *
+     * @param udn 削除されるDeviceのudn。
+     */
+    synchronized Device remove(@Nonnull final String udn) {
+        return mDeviceMap.remove(udn);
     }
 
     /**

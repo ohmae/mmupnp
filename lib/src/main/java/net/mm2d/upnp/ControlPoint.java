@@ -219,4 +219,23 @@ public interface ControlPoint {
      */
     @Nullable
     Device getDevice(@Nonnull String udn);
+
+    /**
+     * 固定デバイスを設定する。
+     *
+     * <p>設定したデバイスの取得ができた後は時間経過やByeByeで削除されることはない。
+     *
+     * @param location locationのURL。正確な値である必要がある。
+     */
+    void addPinnedDevice(@Nonnull String location);
+
+    /**
+     * 固定デバイスを削除する。
+     *
+     * <p>固定デバイスを削除する。
+     * <p>該当するlocationを持つデバイスがあったとしても固定デバイスでない場合は削除されない。
+     *
+     * @param location locationのURL
+     */
+    void removePinnedDevice(@Nonnull String location);
 }

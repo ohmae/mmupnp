@@ -53,6 +53,7 @@ final class DeviceParser {
         if (TextUtils.isEmpty(description)) {
             throw new IOException("download error");
         }
+        builder.onDownloadDescription(client);
         parseDescription(builder, description);
         loadServices(client, builder);
     }

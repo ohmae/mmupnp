@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ class DeviceImpl implements Device {
          * @param subscribeManager 購読状態マネージャ
          * @param ssdpMessage      SSDPパケット
          */
-        public Builder(
+        Builder(
                 @Nonnull final ControlPoint controlPoint,
                 @Nonnull final SubscribeManager subscribeManager,
                 @Nonnull final SsdpMessage ssdpMessage) {
@@ -95,11 +96,22 @@ class DeviceImpl implements Device {
          *
          * @return EmbeddedDevice用のBuilder
          */
-        public Builder createEmbeddedDeviceBuilder() {
+        Builder createEmbeddedDeviceBuilder() {
             final Builder builder = new Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             builder.setDescription(mDescription);
             builder.setUrlBase(mUrlBase);
             return builder;
+        }
+
+        void onDownloadDescription(@Nonnull final HttpClient client) {
+            if (mSsdpMessage instanceof PinnedSsdpMessage) {
+                final InetAddress address = client.getLocalAddress();
+                if (address != null) {
+                    ((PinnedSsdpMessage) mSsdpMessage).setLocalAddress(address);
+                } else {
+                    throw new IllegalStateException("HttpClient is not connected yet.");
+                }
+            }
         }
 
         /**
@@ -108,7 +120,7 @@ class DeviceImpl implements Device {
          * @return SSDPに記述されたLocationの値
          */
         @Nonnull
-        public String getLocation() {
+        String getLocation() {
             return mLocation;
         }
 
@@ -118,7 +130,7 @@ class DeviceImpl implements Device {
          * @return SSDPに記述されたUUID
          */
         @Nonnull
-        public String getUuid() {
+        String getUuid() {
             return mSsdpMessage.getUuid();
         }
 
@@ -137,7 +149,10 @@ class DeviceImpl implements Device {
          *
          * @param ssdpMessage SSDPパケット
          */
-        public void updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
+        void updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
+            if (mSsdpMessage instanceof PinnedSsdpMessage) {
+                return;
+            }
             final String location = ssdpMessage.getLocation();
             if (location == null) {
                 throw new IllegalArgumentException();
@@ -156,7 +171,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setDescription(@Nonnull final String description) {
+        Builder setDescription(@Nonnull final String description) {
             mDescription = description;
             return this;
         }
@@ -168,7 +183,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setUdn(@Nonnull final String udn) {
+        Builder setUdn(@Nonnull final String udn) {
             mUdn = udn;
             return this;
         }
@@ -180,7 +195,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setUpc(@Nonnull final String upc) {
+        Builder setUpc(@Nonnull final String upc) {
             mUpc = upc;
             return this;
         }
@@ -192,7 +207,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setDeviceType(@Nonnull final String deviceType) {
+        Builder setDeviceType(@Nonnull final String deviceType) {
             mDeviceType = deviceType;
             return this;
         }
@@ -204,7 +219,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setFriendlyName(@Nonnull final String friendlyName) {
+        Builder setFriendlyName(@Nonnull final String friendlyName) {
             mFriendlyName = friendlyName;
             return this;
         }
@@ -216,7 +231,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setManufacture(@Nonnull final String manufacture) {
+        Builder setManufacture(@Nonnull final String manufacture) {
             mManufacture = manufacture;
             return this;
         }
@@ -228,7 +243,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setManufactureUrl(@Nonnull final String manufactureUrl) {
+        Builder setManufactureUrl(@Nonnull final String manufactureUrl) {
             mManufactureUrl = manufactureUrl;
             return this;
         }
@@ -240,7 +255,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setModelName(@Nonnull final String modelName) {
+        Builder setModelName(@Nonnull final String modelName) {
             mModelName = modelName;
             return this;
         }
@@ -252,7 +267,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setModelUrl(@Nonnull final String modelUrl) {
+        Builder setModelUrl(@Nonnull final String modelUrl) {
             mModelUrl = modelUrl;
             return this;
         }
@@ -264,7 +279,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setModelDescription(@Nonnull final String modelDescription) {
+        Builder setModelDescription(@Nonnull final String modelDescription) {
             mModelDescription = modelDescription;
             return this;
         }
@@ -276,7 +291,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setModelNumber(@Nonnull final String modelNumber) {
+        Builder setModelNumber(@Nonnull final String modelNumber) {
             mModelNumber = modelNumber;
             return this;
         }
@@ -288,7 +303,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setSerialNumber(@Nonnull final String serialNumber) {
+        Builder setSerialNumber(@Nonnull final String serialNumber) {
             mSerialNumber = serialNumber;
             return this;
         }
@@ -300,7 +315,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setPresentationUrl(@Nonnull final String presentationUrl) {
+        Builder setPresentationUrl(@Nonnull final String presentationUrl) {
             mPresentationUrl = presentationUrl;
             return this;
         }
@@ -314,7 +329,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder setUrlBase(final String urlBase) {
+        Builder setUrlBase(final String urlBase) {
             mUrlBase = urlBase;
             return this;
         }
@@ -327,7 +342,7 @@ class DeviceImpl implements Device {
          * @return URLのベースとして使用する値
          */
         @Nonnull
-        public String getBaseUrl() {
+        String getBaseUrl() {
             if (mUrlBase != null) {
                 return mUrlBase;
             }
@@ -341,7 +356,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder addIconBuilder(@Nonnull final IconImpl.Builder builder) {
+        Builder addIconBuilder(@Nonnull final IconImpl.Builder builder) {
             mIconBuilderList.add(builder);
             return this;
         }
@@ -353,7 +368,7 @@ class DeviceImpl implements Device {
          * @return Builder
          */
         @Nonnull
-        public Builder addServiceBuilder(@Nonnull final ServiceImpl.Builder builder) {
+        Builder addServiceBuilder(@Nonnull final ServiceImpl.Builder builder) {
             mServiceBuilderList.add(builder);
             return this;
         }
@@ -433,7 +448,7 @@ class DeviceImpl implements Device {
          * @return Deviceのインスタンス
          */
         @Nonnull
-        Device build(@Nullable final Device parent) {
+        DeviceImpl build(@Nullable final Device parent) {
             if (mDescription == null) {
                 throw new IllegalStateException("description must be set.");
             }
@@ -452,9 +467,13 @@ class DeviceImpl implements Device {
             if (mUdn == null) {
                 throw new IllegalStateException("UDN must be set.");
             }
-            // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
-            if (parent == null && !mUdn.equals(getUuid())) {
-                throw new IllegalStateException("uuid and udn does not match! uuid=" + getUuid() + " udn=" + mUdn);
+            if (parent == null) {
+                if (mSsdpMessage instanceof PinnedSsdpMessage) {
+                    ((PinnedSsdpMessage) mSsdpMessage).setUuid(mUdn);
+                } else if (!mUdn.equals(getUuid())) {
+                    // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
+                    throw new IllegalStateException("uuid and udn does not match! uuid=" + getUuid() + " udn=" + mUdn);
+                }
             }
             return new DeviceImpl(parent, this);
         }
@@ -609,6 +628,9 @@ class DeviceImpl implements Device {
 
     @Override
     public void updateSsdpMessage(@Nonnull final SsdpMessage message) {
+        if (mSsdpMessage instanceof PinnedSsdpMessage) {
+            return;
+        }
         if (!isEmbeddedDevice()) {
             final String uuid = message.getUuid();
             if (!getUdn().equals(uuid)) {
