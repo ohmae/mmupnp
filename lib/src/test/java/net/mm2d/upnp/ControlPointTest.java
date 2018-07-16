@@ -104,7 +104,7 @@ public class ControlPointTest {
             cp.terminate();
         }
 
-        @Test(timeout = 1000L)
+        @Test(timeout = 10000L)
         public void start_stop_illegal() throws Exception {
             final ControlPoint cp = ControlPointFactory.create();
             cp.start();
