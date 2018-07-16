@@ -34,7 +34,7 @@ import javax.xml.transform.TransformerException;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
@@ -116,14 +116,14 @@ public class ActionInvokeTest {
         final HttpClient client = mock(HttpClient.class);
         when(client.post((HttpRequest) any())).thenThrow(IOException.class);
         doReturn(client).when(mAction).createHttpClient();
-        mAction.invoke(new HashMap<String, String>());
+        mAction.invoke(new HashMap<>());
     }
 
     @Test
     public void invoke_リクエストヘッダの確認() throws Exception {
         final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
         doReturn(mHttpResponse).when(mMockHttpClient).post(captor.capture());
-        mAction.invoke(new HashMap<String, String>());
+        mAction.invoke(new HashMap<>());
 
         final HttpRequest request = captor.getValue();
         assertThat(request.getMethod(), is("POST"));
@@ -150,7 +150,7 @@ public class ActionInvokeTest {
     public void invoke_リクエストSOAPフォーマットの確認() throws Exception {
         final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
         doReturn(mHttpResponse).when(mMockHttpClient).post(captor.capture());
-        mAction.invoke(new HashMap<String, String>());
+        mAction.invoke(new HashMap<>());
         final HttpRequest request = captor.getValue();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -175,7 +175,7 @@ public class ActionInvokeTest {
     public void invoke_リクエストSOAPの引数確認_指定なしでの実行() throws Exception {
         final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
         doReturn(mHttpResponse).when(mMockHttpClient).post(captor.capture());
-        mAction.invoke(new HashMap<String, String>());
+        mAction.invoke(new HashMap<>());
         final HttpRequest request = captor.getValue();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -295,12 +295,12 @@ public class ActionInvokeTest {
             mHttpResponse.setStatus(status);
             doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
             if (status == Http.Status.HTTP_OK) {
-                mAction.invoke(new HashMap<String, String>());
+                mAction.invoke(new HashMap<>());
                 continue;
             }
             try {
                 statusCount++;
-                mAction.invoke(new HashMap<String, String>());
+                mAction.invoke(new HashMap<>());
             } catch (final IOException ignored) {
                 exceptionCount++;
             }
@@ -333,7 +333,7 @@ public class ActionInvokeTest {
     @Test
     public void invoke_実行結果をパースしMapとして戻ること() throws Exception {
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        final Map<String, String> result = mAction.invoke(new HashMap<String, String>());
+        final Map<String, String> result = mAction.invoke(new HashMap<>());
         assertThat(result.get(OUT_ARG_NAME1), is(OUT_ARG_VALUE1));
     }
 

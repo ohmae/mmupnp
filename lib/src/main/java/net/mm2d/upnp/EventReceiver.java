@@ -175,7 +175,7 @@ class EventReceiver {
          */
         ServerTask(@Nonnull final ServerSocket sock) {
             mServerSocket = sock;
-            mClientList = Collections.synchronizedList(new LinkedList<ClientTask>());
+            mClientList = Collections.synchronizedList(new LinkedList<>());
         }
 
         /**

@@ -19,13 +19,8 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 Of course, this also can be used from kotlin.
 
 ## Requirements
-- Java SE 7 or later
-- Android API Level 15 (Android 4.0.3) or later
-
-As you know, Android Studio (2.2 or later) supports Java 8 development.
-But it is NOT fully support. Several statements depend on the API level.
-For example, try-with-resource statement requires API level 19.
-Therefore, this library restricts the use of such statement.
+- Java 8 or later (or Java 6 or later with retrolambda)
+- Android Gradle Plugin 3.0.0 or later
 
 ## Restrictions
 - This library support only ControlPoint functions.

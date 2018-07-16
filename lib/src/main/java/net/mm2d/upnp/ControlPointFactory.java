@@ -35,7 +35,7 @@ public final class ControlPointFactory {
     @Nonnull
     public static ControlPoint create()
             throws IllegalStateException {
-        return create(Collections.<NetworkInterface>emptyList());
+        return create(Collections.emptyList());
     }
 
     /**
@@ -64,7 +64,7 @@ public final class ControlPointFactory {
     @Nonnull
     public static ControlPoint create(@Nonnull final Protocol protocol)
             throws IllegalStateException {
-        return create(protocol, Collections.<NetworkInterface>emptyList());
+        return create(protocol, Collections.emptyList());
     }
 
     /**

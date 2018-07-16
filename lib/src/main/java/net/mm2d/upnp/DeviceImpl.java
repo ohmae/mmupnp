@@ -88,7 +88,7 @@ class DeviceImpl implements Device {
             mLocation = location;
             mSsdpMessage = ssdpMessage;
             mTagMap = new LinkedHashMap<>();
-            mTagMap.put("", new HashMap<String, String>());
+            mTagMap.put("", new HashMap<>());
         }
 
         /**

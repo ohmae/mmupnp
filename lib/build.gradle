@@ -7,8 +7,8 @@ group 'net.mm2d'
 archivesBaseName = 'mmupnp'
 version versionName
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 test.maxParallelForks = 4
 

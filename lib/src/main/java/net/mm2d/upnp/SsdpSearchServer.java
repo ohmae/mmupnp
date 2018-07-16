@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.upnp.SsdpServerDelegate.Receiver;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
@@ -57,15 +56,7 @@ class SsdpSearchServer implements SsdpServer {
     SsdpSearchServer(
             @Nonnull final Address address,
             @Nonnull final NetworkInterface ni) {
-        mDelegate = new SsdpServerDelegate(new Receiver() {
-            @Override
-            public void onReceive(
-                    @Nonnull final InetAddress sourceAddress,
-                    @Nonnull final byte[] data,
-                    final int length) {
-                SsdpSearchServer.this.onReceive(sourceAddress, data, length);
-            }
-        }, address, ni);
+        mDelegate = new SsdpServerDelegate(this::onReceive, address, ni);
     }
 
     // VisibleForTesting

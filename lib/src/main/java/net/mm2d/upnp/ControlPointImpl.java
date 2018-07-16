@@ -8,9 +8,6 @@
 package net.mm2d.upnp;
 
 import net.mm2d.log.Log;
-import net.mm2d.upnp.DeviceHolder.ExpireListener;
-import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
-import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
 import net.mm2d.util.TextUtils;
 
 import org.xml.sax.SAXException;
@@ -67,7 +64,7 @@ class ControlPointImpl implements ControlPoint {
     @Nonnull
     private final SubscribeManager mSubscribeManager;
     @Nonnull
-    private final List<DeviceImpl.Builder> mLoadingPinnedDevices = Collections.synchronizedList(new ArrayList<DeviceImpl.Builder>());
+    private final List<DeviceImpl.Builder> mLoadingPinnedDevices = Collections.synchronizedList(new ArrayList<>());
 
     private class DeviceLoader implements Runnable {
         @Nonnull
@@ -149,34 +146,11 @@ class ControlPointImpl implements ControlPoint {
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();
 
-        mSearchList = factory.createSsdpSearchServerList(interfaces, new ResponseListener() {
-            @Override
-            public void onReceiveResponse(@Nonnull final SsdpMessage message) {
-                mThreadPool.executeInParallel(new Runnable() {
-                    @Override
-                    public void run() {
-                        onReceiveSsdp(message);
-                    }
-                });
-            }
-        });
-        mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, new NotifyListener() {
-            @Override
-            public void onReceiveNotify(@Nonnull final SsdpMessage message) {
-                mThreadPool.executeInParallel(new Runnable() {
-                    @Override
-                    public void run() {
-                        onReceiveSsdp(message);
-                    }
-                });
-            }
-        });
-        mDeviceHolder = factory.createDeviceHolder(new ExpireListener() {
-            @Override
-            public void onExpire(@Nonnull final Device device) {
-                lostDevice(device);
-            }
-        });
+        mSearchList = factory.createSsdpSearchServerList(interfaces, message ->
+                mThreadPool.executeInParallel(() -> onReceiveSsdp(message)));
+        mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, message ->
+                mThreadPool.executeInParallel(() -> onReceiveSsdp(message)));
+        mDeviceHolder = factory.createDeviceHolder(this::lostDevice);
         mSubscribeManager = factory.createSubscribeManager(mThreadPool, mNotifyEventListenerList);
     }
 
@@ -452,12 +426,8 @@ class ControlPointImpl implements ControlPoint {
         }
         mEmbeddedDeviceUdnSet.addAll(device.getEmbeddedDeviceUdnSet());
         mDeviceHolder.add(device);
-        mThreadPool.executeInSequential(new Runnable() {
-            @Override
-            public void run() {
-                mDiscoveryListenerList.onDiscover(device);
-            }
-        });
+        mThreadPool.executeInSequential(() ->
+                mDiscoveryListenerList.onDiscover(device));
     }
 
     /**
@@ -480,12 +450,8 @@ class ControlPointImpl implements ControlPoint {
             }
             mDeviceHolder.remove(device);
         }
-        mThreadPool.executeInSequential(new Runnable() {
-            @Override
-            public void run() {
-                mDiscoveryListenerList.onLost(device);
-            }
-        });
+        mThreadPool.executeInSequential(() ->
+                mDiscoveryListenerList.onLost(device));
     }
 
     /**

@@ -65,13 +65,10 @@ public class ControlPointTest {
 
         @Test(timeout = 2000L)
         public void initialize_terminate_intercept() throws Exception {
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final ControlPoint cp = ControlPointFactory.create();
-                    cp.initialize();
-                    cp.terminate();
-                }
+            final Thread thread = new Thread(() -> {
+                final ControlPoint cp = ControlPointFactory.create();
+                cp.initialize();
+                cp.terminate();
             });
             thread.start();
             Thread.sleep(200);
@@ -377,7 +374,7 @@ public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class DeviceDiscovery {
         private ControlPointImpl mCp;
-        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
+        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<>());
         private DeviceHolder mDeviceHolder;
 
         @Before
@@ -523,7 +520,7 @@ public class ControlPointTest {
     public static class イベント伝搬テスト {
         private ControlPointImpl mCp;
         private SubscribeManager mSubscribeManager;
-        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
+        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<>());
         private DeviceHolder mDeviceHolder;
         private final SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
         private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);

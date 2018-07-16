@@ -111,17 +111,11 @@ public class EventReceiverTest {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
         final Result result = new Result();
-        final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
-            @Override
-            public boolean onEventReceived(
-                    @Nonnull final String sid,
-                    final long seq,
-                    @Nonnull final List<StringPair> properties) {
-                result.sid = sid;
-                result.seq = seq;
-                result.properties = properties;
-                return true;
-            }
+        final EventReceiver receiver = new EventReceiver((sid, seq, properties) -> {
+            result.sid = sid;
+            result.seq = seq;
+            result.properties = properties;
+            return true;
         }) {
             @Nonnull
             @Override
@@ -167,15 +161,7 @@ public class EventReceiverTest {
     public void onEventReceived_Failedが返る1() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
-        final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
-            @Override
-            public boolean onEventReceived(
-                    @Nonnull final String sid,
-                    final long seq,
-                    @Nonnull final List<StringPair> properties) {
-                return false;
-            }
-        }) {
+        final EventReceiver receiver = new EventReceiver((sid, seq, properties) -> false) {
             @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
@@ -295,18 +281,12 @@ public class EventReceiverTest {
     public void close_shutdownRequest() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
-        final EventReceiver receiver = new EventReceiver(new EventReceiver.EventMessageListener() {
-            @Override
-            public boolean onEventReceived(
-                    @Nonnull final String sid,
-                    final long seq,
-                    @Nonnull final List<StringPair> properties) {
-                try {
-                    Thread.sleep(1000);
-                } catch (final InterruptedException e) {
-                }
-                return false;
+        final EventReceiver receiver = new EventReceiver((sid, seq, properties) -> {
+            try {
+                Thread.sleep(1000);
+            } catch (final InterruptedException e) {
             }
+            return false;
         }) {
             @Nonnull
             @Override

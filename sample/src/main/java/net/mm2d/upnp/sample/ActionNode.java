@@ -12,8 +12,6 @@ import net.mm2d.upnp.Argument;
 import net.mm2d.upnp.StateVariable;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -70,12 +68,7 @@ public class ActionNode extends UpnpNode {
             final int y) {
         final JPopupMenu menu = new JPopupMenu();
         final JMenuItem invoke = new JMenuItem("Invoke Action");
-        invoke.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                new ActionWindow(getUserObject()).show(frame.getX() + x, frame.getY() + y);
-            }
-        });
+        invoke.addActionListener(e -> new ActionWindow(getUserObject()).show(frame.getX() + x, frame.getY() + y));
         menu.add(invoke);
         menu.show(invoker, x, y);
     }

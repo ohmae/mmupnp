@@ -21,8 +21,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -174,46 +172,28 @@ public class MainWindow extends JFrame {
 
     private JButton makeStartButton() {
         final JButton button = new JButton("START");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mControlPoint.start();
-                mControlPoint.search();
-            }
+        button.addActionListener(e -> {
+            mControlPoint.start();
+            mControlPoint.search();
         });
         return button;
     }
 
     private JButton makeStopButton() {
         final JButton button = new JButton("STOP");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mControlPoint.stop();
-            }
-        });
+        button.addActionListener(e -> mControlPoint.stop());
         return button;
     }
 
     private JButton makeClearButton() {
         final JButton button = new JButton("CLEAR");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mControlPoint.clearDeviceList();
-            }
-        });
+        button.addActionListener(e -> mControlPoint.clearDeviceList());
         return button;
     }
 
     private JButton makeSearchButton() {
         final JButton button = new JButton("M-SEARCH");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mControlPoint.search();
-            }
-        });
+        button.addActionListener(e -> mControlPoint.search());
         return button;
     }
 

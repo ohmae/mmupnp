@@ -44,12 +44,9 @@ class SubscribeManager implements EventMessageListener {
             final long seq,
             @Nonnull final List<StringPair> properties) {
         final Service service = mSubscribeHolder.getService(sid);
-        return service != null && mThreadPool.executeInSequential(new Runnable() {
-            @Override
-            public void run() {
-                for (final StringPair pair : properties) {
-                    notifyEvent(service, seq, pair.getKey(), pair.getValue());
-                }
+        return service != null && mThreadPool.executeInSequential(() -> {
+            for (final StringPair pair : properties) {
+                notifyEvent(service, seq, pair.getKey(), pair.getValue());
             }
         });
     }
@@ -82,14 +79,11 @@ class SubscribeManager implements EventMessageListener {
     void stop() {
         final List<Service> serviceList = mSubscribeHolder.getServiceList();
         for (final Service service : serviceList) {
-            mThreadPool.executeInParallel(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        service.unsubscribe();
-                    } catch (final IOException e) {
-                        Log.w(e);
-                    }
+            mThreadPool.executeInParallel(() -> {
+                try {
+                    service.unsubscribe();
+                } catch (final IOException e) {
+                    Log.w(e);
                 }
             });
         }
