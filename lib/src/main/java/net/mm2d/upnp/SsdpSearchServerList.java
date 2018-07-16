@@ -9,6 +9,8 @@ package net.mm2d.upnp;
 
 import net.mm2d.log.Log;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
+import net.mm2d.upnp.SsdpServer.Address;
+import net.mm2d.util.NetworkUtils;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
@@ -29,19 +31,42 @@ class SsdpSearchServerList {
     private final List<SsdpSearchServer> mList = new ArrayList<>();
 
     SsdpSearchServerList init(
+            @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
         for (final NetworkInterface nif : interfaces) {
-            final SsdpSearchServer search = newSsdpSearchServer(nif);
-            search.setResponseListener(listener);
-            mList.add(search);
+            switch (protocol) {
+                case IP_V4_ONLY:
+                    if (NetworkUtils.isAvailableInet4Interface(nif)) {
+                        mList.add(newSsdpSearchServer(Address.IP_V4, nif, listener));
+                    }
+                    break;
+                case IP_V6_ONLY:
+                    if (NetworkUtils.isAvailableInet6Interface(nif)) {
+                        mList.add(newSsdpSearchServer(Address.IP_V6_LINK_LOCAL, nif, listener));
+                    }
+                    break;
+                case DUAL_STACK:
+                    if (NetworkUtils.isAvailableInet4Interface(nif)) {
+                        mList.add(newSsdpSearchServer(Address.IP_V4, nif, listener));
+                    }
+                    if (NetworkUtils.isAvailableInet6Interface(nif)) {
+                        mList.add(newSsdpSearchServer(Address.IP_V6_LINK_LOCAL, nif, listener));
+                    }
+                    break;
+            }
         }
         return this;
     }
 
     // VisibleForTesting
-    SsdpSearchServer newSsdpSearchServer(@Nonnull final NetworkInterface nif) {
-        return new SsdpSearchServer(nif);
+    SsdpSearchServer newSsdpSearchServer(
+            @Nonnull final Address address,
+            @Nonnull final NetworkInterface nif,
+            @Nonnull final ResponseListener listener) {
+        final SsdpSearchServer server = new SsdpSearchServer(address, nif);
+        server.setResponseListener(listener);
+        return server;
     }
 
     void openAndStart() {

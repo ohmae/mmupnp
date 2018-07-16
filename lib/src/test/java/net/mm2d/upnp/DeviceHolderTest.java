@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.DeviceHolder.ExpireListener;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -21,7 +23,7 @@ public class DeviceHolderTest {
 
     @Test(timeout = 1000L)
     public void start_shutdown_デッドロックしない() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ControlPoint.class));
+        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
         holder.start();
         Thread.sleep(1);
         holder.shutdownRequest();
@@ -30,7 +32,7 @@ public class DeviceHolderTest {
 
     @Test
     public void add() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ControlPoint.class));
+        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -40,7 +42,7 @@ public class DeviceHolderTest {
 
     @Test
     public void remove() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ControlPoint.class));
+        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -53,7 +55,7 @@ public class DeviceHolderTest {
 
     @Test
     public void clear() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ControlPoint.class));
+        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -66,7 +68,7 @@ public class DeviceHolderTest {
 
     @Test
     public void getDeviceList() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ControlPoint.class));
+        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -77,7 +79,7 @@ public class DeviceHolderTest {
 
     @Test
     public void size() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ControlPoint.class));
+        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -87,8 +89,8 @@ public class DeviceHolderTest {
 
     @Test(timeout = 1000)
     public void shutdownRequest() throws Exception {
-        final ControlPoint cp = mock(ControlPoint.class);
-        final DeviceHolder holder = new DeviceHolder(cp);
+        final ExpireListener expireListener = mock(ExpireListener.class);
+        final DeviceHolder holder = new DeviceHolder(expireListener);
 
         holder.shutdownRequest();
         holder.run();
@@ -96,8 +98,8 @@ public class DeviceHolderTest {
 
     @Test(timeout = 20000L)
     public void expireDevice_時間経過後に削除される() throws Exception {
-        final ControlPoint cp = mock(ControlPoint.class);
-        final DeviceHolder holder = new DeviceHolder(cp);
+        final ExpireListener expireListener = mock(ExpireListener.class);
+        final DeviceHolder holder = new DeviceHolder(expireListener);
         final Device device1 = mock(Device.class);
         doReturn(UDN).when(device1).getUdn();
         final Device device2 = mock(Device.class);
@@ -116,7 +118,7 @@ public class DeviceHolderTest {
         Thread.sleep(11000L); // 内部で10秒のマージンを持っているため十分な時間を開ける
 
         assertThat(holder.size(), is(0));
-        verify(cp).lostDevice(device1);
+        verify(expireListener).onExpire(device1);
         holder.shutdownRequest();
     }
 }

@@ -9,8 +9,8 @@ package net.mm2d.upnp;
 
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.annotation.Nonnull;
 
@@ -21,28 +21,26 @@ import javax.annotation.Nonnull;
  */
 class DiscoveryListenerList implements DiscoveryListener {
     @Nonnull
-    private final List<DiscoveryListener> mList = new ArrayList<>();
+    private final Set<DiscoveryListener> mSet = new CopyOnWriteArraySet<>();
 
-    synchronized void add(@Nonnull final DiscoveryListener l) {
-        if (!mList.contains(l)) {
-            mList.add(l);
-        }
+    void add(@Nonnull final DiscoveryListener l) {
+        mSet.add(l);
     }
 
-    synchronized void remove(@Nonnull final DiscoveryListener l) {
-        mList.remove(l);
+    void remove(@Nonnull final DiscoveryListener l) {
+        mSet.remove(l);
     }
 
     @Override
-    public synchronized void onDiscover(@Nonnull final Device device) {
-        for (final DiscoveryListener l : mList) {
+    public void onDiscover(@Nonnull final Device device) {
+        for (final DiscoveryListener l : mSet) {
             l.onDiscover(device);
         }
     }
 
     @Override
-    public synchronized void onLost(@Nonnull final Device device) {
-        for (final DiscoveryListener l : mList) {
+    public void onLost(@Nonnull final Device device) {
+        for (final DiscoveryListener l : mSet) {
             l.onLost(device);
         }
     }

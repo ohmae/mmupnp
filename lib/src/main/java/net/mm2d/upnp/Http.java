@@ -9,6 +9,8 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.TextUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -268,7 +270,7 @@ public final class Http {
      * @param url URL
      * @return HTTPのURLのときtrue
      */
-    public static boolean isHttpUrl(final String url) {
+    public static boolean isHttpUrl(@Nullable final String url) {
         return url != null && url.length() > HTTP_SCHEME.length()
                 && url.substring(0, HTTP_SCHEME.length()).equalsIgnoreCase(HTTP_SCHEME);
     }
@@ -280,7 +282,7 @@ public final class Http {
      * @return queryを削除した
      */
     @Nonnull
-    static String removeQuery(@Nonnull final String url) {
+    private static String removeQuery(@Nonnull final String url) {
         final int pos = url.indexOf('?');
         if (pos > 0) {
             return url.substring(0, pos);
@@ -296,7 +298,7 @@ public final class Http {
      * @return 結合されたURL
      */
     @Nonnull
-    static String makeUrlWithAbsolutePath(
+    private static String makeUrlWithAbsolutePath(
             @Nonnull final String baseUrl,
             @Nonnull final String path) {
         final int pos = baseUrl.indexOf('/', HTTP_SCHEME.length());
@@ -314,7 +316,7 @@ public final class Http {
      * @return 結合されたURL
      */
     @Nonnull
-    static String makeUrlWithRelativePath(
+    private static String makeUrlWithRelativePath(
             @Nonnull final String baseUrl,
             @Nonnull final String path) {
         if (baseUrl.endsWith("/")) {
@@ -325,6 +327,101 @@ public final class Http {
             return baseUrl.substring(0, pos + 1) + path;
         }
         return baseUrl + "/" + path;
+    }
+
+    /**
+     * URLにScopeIDを追加する
+     *
+     * @param urlString URL文字列
+     * @param scopeId   ScopeID
+     * @return ScopeIDが付加されたURL
+     * @throws MalformedURLException 不正なURL
+     */
+    @Nonnull
+    public static URL makeUrlWithScopeId(
+            @Nonnull final String urlString,
+            final int scopeId) throws MalformedURLException {
+        final URL url = new URL(urlString);
+        if (scopeId == 0) {
+            return url;
+        }
+        final String host = makeHostWithScopeId(url.getHost(), scopeId);
+        final int port = url.getPort();
+        if (url.getDefaultPort() == port || port <= 0) {
+            return new URL(url.getProtocol() + "://" + host + url.getFile());
+        }
+        return new URL(url.getProtocol() + "://" + host + ":" + url.getPort() + url.getFile());
+    }
+
+    @Nonnull
+    private static String makeHostWithScopeId(
+            @Nonnull final String host,
+            final int scopeId) {
+        final int length = host.length();
+        if (host.charAt(length - 1) != ']') {
+            return host;
+        }
+        final int index = host.indexOf("%");
+        if (index < 0) {
+            return host.substring(0, length - 1) + "%" + scopeId + "]";
+        }
+        return host.substring(0, index) + "%" + scopeId + "]";
+    }
+
+    @Nonnull
+    public static String getAbsoluteUrl(
+            @Nonnull final String baseUrl,
+            @Nonnull final String url) {
+        if (isHttpUrl(url)) {
+            return url;
+        }
+        final String base = removeQuery(baseUrl);
+        if (url.startsWith("/")) {
+            return makeUrlWithAbsolutePath(base, url);
+        }
+        return makeUrlWithRelativePath(base, url);
+    }
+
+    /**
+     * URL情報を正規化して返す。
+     *
+     * <p>URLとして渡される情報は以下のバリエーションがある
+     * <ul>
+     * <li>"http://"から始まる完全なURL
+     * <li>"/"から始まる絶対パス
+     * <li>"/"以外から始まる相対パス
+     * </ul>
+     *
+     * <p>一方、baseUrlの情報としては以下のバリエーションを考慮する
+     * <ul>
+     * <li>"http://10.0.0.1:1000/" ホスト名のみ
+     * <li>"http://10.0.0.1:1000" ホスト名のみだが末尾の"/"がない。
+     * <li>"http://10.0.0.1:1000/hoge/fuga" ファイル名で終わる
+     * <li>"http://10.0.0.1:1000/hoge/fuga/" ディレクトリ名で終わる
+     * <li>"http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar" 上記に対してクエリーが付いている
+     * </ul>
+     *
+     * <p>URLが"http://"から始まっていればそのまま利用する。
+     * "/"から始まっていればbaseUrlホストの絶対パスとして
+     * baseUrlの"://"以降の最初の"/"までと結合する。
+     * それ以外の場合はLocationからの相対パスであり、
+     * baseUrlから抽出したディレクトリ名と結合する。
+     *
+     * <p>またscopeIdの付与も行う。
+     *
+     * @param baseUrl URLパスのベースとなる値
+     * @param url     URLパス情報
+     * @param scopeId スコープID
+     * @return 正規化したURL
+     * @throws MalformedURLException 不正なURL
+     */
+    @Nonnull
+    public static URL getAbsoluteUrl(
+            @Nonnull final String baseUrl,
+            @Nonnull final String url,
+            final int scopeId)
+            throws MalformedURLException {
+        return makeUrlWithScopeId(getAbsoluteUrl(baseUrl, url), scopeId);
     }
 
     /**

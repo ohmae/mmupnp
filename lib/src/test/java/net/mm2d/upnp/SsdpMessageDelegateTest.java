@@ -7,9 +7,16 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TestUtils;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.io.ByteArrayInputStream;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -106,5 +113,46 @@ public class SsdpMessageDelegateTest {
 
         assertThat(result[0], is(""));
         assertThat(result[1], is(""));
+    }
+
+    @Test
+    public void getScopeId_インターフェース指定がなければ0() throws Exception {
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+        final HttpRequest request = new HttpRequest().readData(new ByteArrayInputStream(data, 0, data.length));
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request);
+
+        assertThat(delegate.getScopeId(), is(0));
+    }
+
+    @Test
+    public void getScopeId_インターフェースIPv4なら0() throws Exception {
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+        final HttpRequest request = new HttpRequest().readData(new ByteArrayInputStream(data, 0, data.length));
+        final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, ifa);
+
+        assertThat(delegate.getScopeId(), is(0));
+    }
+
+    @Test
+    public void getScopeId_インターフェースに紐付かないIPv6なら0() throws Exception {
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+        final HttpRequest request = new HttpRequest().readData(new ByteArrayInputStream(data, 0, data.length));
+        final InterfaceAddress ifa = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.255.0", 0);
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, ifa);
+
+        assertThat(delegate.getScopeId(), is(0));
+    }
+
+    @Test
+    public void getScopeId_インターフェースに紐付くIPv6ならその値() throws Exception {
+        final int scopeId = 1;
+        final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+        final HttpRequest request = new HttpRequest().readData(new ByteArrayInputStream(data, 0, data.length));
+        final Inet6Address address = Inet6Address.getByAddress(null, InetAddress.getByName("fe80::a831:801b:8dc6:421f").getAddress(), scopeId);
+        final InterfaceAddress ifa = TestUtils.createInterfaceAddress(address, "255.255.255.0", 0);
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, ifa);
+
+        assertThat(delegate.getScopeId(), is(scopeId));
     }
 }

@@ -66,7 +66,7 @@ public class Pair<K, V> {
         if (obj == this) {
             return true;
         }
-        if (obj == null || !(obj instanceof Pair)) {
+        if (!(obj instanceof Pair)) {
             return false;
         }
         final Pair pair = (Pair) obj;

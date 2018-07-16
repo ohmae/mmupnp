@@ -180,7 +180,7 @@ public class HttpClientTest {
 
         try {
             final HttpClient client = new HttpClient(true);
-            HttpResponse response = client.download(new URL("http://127.0.0.1:" + port + "/"));
+            final HttpResponse response = client.download(new URL("http://127.0.0.1:" + port + "/"));
             assertThat(response.getBody(), is(responseBody));
             assertThat(client.isKeepAlive(), is(true));
             assertThat(client.isClosed(), is(true));

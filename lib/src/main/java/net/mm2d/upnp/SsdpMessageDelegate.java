@@ -11,6 +11,8 @@ import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -88,8 +90,8 @@ class SsdpMessageDelegate implements SsdpMessage {
         return DEFAULT_MAX_AGE;
     }
 
-    @Nonnull
     // VisibleForTesting
+    @Nonnull
     static String[] parseUsn(@Nonnull final HttpMessage message) {
         final String usn = message.getHeader(Http.USN);
         if (TextUtils.isEmpty(usn) || !usn.startsWith("uuid")) {
@@ -102,10 +104,32 @@ class SsdpMessageDelegate implements SsdpMessage {
         return new String[]{usn.substring(0, pos), usn.substring(pos + 2)};
     }
 
+    @Override
+    public int getScopeId() {
+        if (mInterfaceAddress == null) {
+            return 0;
+        }
+        final InetAddress address = mInterfaceAddress.getAddress();
+        if (address instanceof Inet6Address) {
+            return ((Inet6Address) address).getScopeId();
+        }
+        return 0;
+    }
+
+    @Deprecated
     @Nullable
     @Override
     public InterfaceAddress getInterfaceAddress() {
         return mInterfaceAddress;
+    }
+
+    @Nullable
+    @Override
+    public InetAddress getLocalAddress() {
+        if (mInterfaceAddress == null) {
+            return null;
+        }
+        return mInterfaceAddress.getAddress();
     }
 
     @Nullable

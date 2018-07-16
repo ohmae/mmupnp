@@ -28,10 +28,12 @@ import javax.annotation.Nullable;
 class SubscribeHolder implements Runnable {
     private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
 
-    private final Object mThreadLock = new Object();
     private volatile boolean mShutdownRequest = false;
+    @Nonnull
+    private final Object mThreadLock = new Object();
+    @Nullable
     private Thread mThread;
-
+    @Nonnull
     private final Map<String, SubscribeService> mServiceMap;
 
     SubscribeHolder() {

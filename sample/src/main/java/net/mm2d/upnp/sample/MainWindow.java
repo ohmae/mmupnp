@@ -11,6 +11,7 @@ import net.mm2d.log.Log;
 import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
+import net.mm2d.upnp.ControlPointFactory;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.IconFilter;
 import net.mm2d.upnp.Service;
@@ -56,7 +57,7 @@ public class MainWindow extends JFrame {
         Log.initialize(true, true);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+        } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
             Log.w(TAG, e);
         }
@@ -163,7 +164,7 @@ public class MainWindow extends JFrame {
     };
 
     private ControlPoint initControlPoint() {
-        final ControlPoint controlPoint = new ControlPoint();
+        final ControlPoint controlPoint = ControlPointFactory.create();
         controlPoint.setIconFilter(IconFilter.ALL);
         controlPoint.initialize();
         controlPoint.addDiscoveryListener(mDiscoveryListener);

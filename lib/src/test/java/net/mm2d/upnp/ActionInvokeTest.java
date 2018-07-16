@@ -52,7 +52,7 @@ public class ActionInvokeTest {
     private static final String SERVICE_TYPE = "urn:schemas-upnp-org:service:TestServiceType:1";
     private HttpResponse mHttpResponse;
     private URL mUrl;
-    private Action mAction;
+    private ActionImpl mAction;
     private HttpClient mMockHttpClient;
 
     @Before
@@ -62,36 +62,36 @@ public class ActionInvokeTest {
         when(service.getServiceType()).thenReturn(SERVICE_TYPE);
         when(service.getControlUrl()).thenReturn("");
         when(service.getAbsoluteUrl(anyString())).thenReturn(mUrl);
-        mAction = spy(new Action.Builder()
+        mAction = (ActionImpl) spy(new ActionImpl.Builder()
                 .setService(service)
                 .setName(ACTION_NAME)
-                .addArgumentBuilder(new Argument.Builder()
+                .addArgumentBuilder(new ArgumentImpl.Builder()
                         .setName(IN_ARG_NAME_1)
                         .setDirection("in")
                         .setRelatedStateVariableName("1")
                         .setRelatedStateVariable(
-                                new StateVariable.Builder()
+                                new StateVariableImpl.Builder()
                                         .setService(service)
                                         .setDataType("string")
                                         .setName("1")
                                         .build()))
-                .addArgumentBuilder(new Argument.Builder()
+                .addArgumentBuilder(new ArgumentImpl.Builder()
                         .setName(IN_ARG_NAME_2)
                         .setDirection("in")
                         .setRelatedStateVariableName("2")
                         .setRelatedStateVariable(
-                                new StateVariable.Builder()
+                                new StateVariableImpl.Builder()
                                         .setService(service)
                                         .setDataType("string")
                                         .setName("2")
                                         .setDefaultValue(IN_ARG_DEFAULT_VALUE)
                                         .build()))
-                .addArgumentBuilder(new Argument.Builder()
+                .addArgumentBuilder(new ArgumentImpl.Builder()
                         .setName(OUT_ARG_NAME1)
                         .setDirection("out")
                         .setRelatedStateVariableName("3")
                         .setRelatedStateVariable(
-                                new StateVariable.Builder()
+                                new StateVariableImpl.Builder()
                                         .setService(service)
                                         .setDataType("string")
                                         .setName("3")

@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-public class TextParseUtils {
+public final class TextParseUtils {
     /**
      * 与えられた文字列を10進数としてint値にパースする。
      *

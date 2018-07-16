@@ -143,6 +143,7 @@ public class HttpClient {
         }
     }
 
+    @Nonnull
     private HttpResponse doRequest(@Nonnull final HttpRequest request) throws IOException {
         if (isClosed()) {
             openSocket(request);
@@ -183,8 +184,7 @@ public class HttpClient {
         return response;
     }
 
-    // VisibleForTesting
-    boolean needToRedirect(@Nonnull final HttpResponse response) {
+    private boolean needToRedirect(@Nonnull final HttpResponse response) {
         final Http.Status status = response.getStatus();
         switch (status) {
             case HTTP_MOVED_PERM:

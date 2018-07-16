@@ -5,14 +5,18 @@
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/issues)
 [![Build Status](https://travis-ci.org/ohmae/mmupnp.svg?branch=develop)](https://travis-ci.org/ohmae/mmupnp)
 [![codecov](https://codecov.io/gh/ohmae/mmupnp/branch/develop/graph/badge.svg)](https://codecov.io/gh/ohmae/mmupnp)
+[![Maven Repository](https://img.shields.io/badge/maven-jcenter-brightgreen.svg)](https://bintray.com/ohmae/maven/net.mm2d.mmupnp)
+[![Maven metadata URI](https://img.shields.io/maven-metadata/v/https/jcenter.bintray.com/net/mm2d/mmupnp/maven-metadata.xml.svg)](https://bintray.com/ohmae/maven/net.mm2d.mmupnp)
 
 Universal Plug and Play (UPnP) ControlPoint library for Java.
 
 ## Feature
 - Pure Java implementation.
-- Available in both Java application and Android apps
+- Available in both Java application and Android apps.
 - Easy to use
 - High response
+
+Of course, this also can be used from kotlin.
 
 ## Requirements
 - Java SE 7 or later
@@ -28,7 +32,6 @@ Therefore, this library restricts the use of such statement.
 There is no way to make Device. If you need it, please select another library.
 - Some functions that are not widely used are not implemented.
   - Multicast eventing
-  - IPv6
 
 ## Example of use
 Android App
@@ -43,25 +46,24 @@ Sample App
 
 ## How to use
 
-Please use my maven repository.
-(URL has changed since Ver.1.3.0)
-
+You can download this library from jCenter. (since Ver.1.7.0)
 ```gradle
 repositories {
-    maven {
-        url 'https://ohmae.github.com/maven'
-    }
+    jcenter()
 }
+```
 
+Add dependencies, as following.
+```gradle
 dependencies {
-    compile 'net.mm2d:mmupnp:1.6.0'
+    compile 'net.mm2d:mmupnp:1.8.1'
 }
 ```
 
 ### Initialize and Start
 
 ```java
-ControlPoint cp = new ControlPoint();
+ControlPoint cp = ControlPointFactory.create();
 cp.initialize();
 // adding listener if necessary.
 cp.addDiscoveryListener(...);
@@ -72,9 +74,16 @@ cp.start();
 
 If you want to specify the network interface, describe the following.
 
-```
+```java
 NetworkInterface ni = NetworkInterface.getByName("eth0");
-ControlPoint cp = new ControlPoint(ni);
+ControlPoint cp = ControlPointFactory.create(ni);
+```
+
+By default ControlPoint will work with dual stack of IPv4 and IPv6.
+If you want to operate with IPv4 only, specify the protocol as follows.
+
+```java
+ControlPoint cp = ControlPointFactory.create(Protocol.IP_V4_ONLY);
 ```
 
 ### M-SEARCH
@@ -84,7 +93,7 @@ Call ControlPoint#search() or ControlPoint#search(String).
 cp.search();                   // Default ST is ssdp:all
 ```
 
-```
+```java
 cp.search("upnp:rootdevice"); // To use specific ST. In this case "upnp:rootdevice"
 ```
 
@@ -153,8 +162,7 @@ Log.initialize(true, true);
 ### Documents
 
 I described Javadoc comments. Please refer to it for more information.
-- Javadoc in Japanese
-  - https://ohmae.github.io/mmupnp/javadoc/
+- [Javadoc in Japanese](https://ohmae.github.io/mmupnp/javadoc/)
 
 ## Author
 大前 良介 (OHMAE Ryosuke)

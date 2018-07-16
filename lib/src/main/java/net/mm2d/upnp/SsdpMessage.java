@@ -9,6 +9,7 @@ package net.mm2d.upnp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
@@ -46,12 +47,29 @@ public interface SsdpMessage {
     String SSDP_DISCOVER = "\"ssdp:discover\"";
 
     /**
+     * 受信したインターフェースのScopeIDを返す。
+     *
+     * @return ScopeID、設定されていない場合(IPv4含む)は0
+     */
+    int getScopeId();
+
+    /**
      * このパケットを受信したInterfaceAddressを返す。
      *
      * @return このパケットを受信したInterfaceAddress
+     * @deprecated Use {@link #getLocalAddress()} instead.
      */
+    @Deprecated
     @Nullable
     InterfaceAddress getInterfaceAddress();
+
+    /**
+     * このパケットを受信したインターフェースのアドレスを返す。
+     *
+     * @return このパケットを受信したインターフェースのアドレス
+     */
+    @Nullable
+    InetAddress getLocalAddress();
 
     /**
      * ヘッダの値を返す。
@@ -60,7 +78,7 @@ public interface SsdpMessage {
      * @return 値
      */
     @Nullable
-    String getHeader(@Nonnull final String name);
+    String getHeader(@Nonnull String name);
 
     /**
      * ヘッダの値を設定する。
@@ -69,8 +87,8 @@ public interface SsdpMessage {
      * @param value 値
      */
     void setHeader(
-            @Nonnull final String name,
-            @Nonnull final String value);
+            @Nonnull String name,
+            @Nonnull String value);
 
     /**
      * USNに記述されたUUIDを返す。
@@ -126,5 +144,5 @@ public interface SsdpMessage {
      * @param os 出力先
      * @throws IOException 入出力エラー
      */
-    void writeData(@Nonnull final OutputStream os) throws IOException;
+    void writeData(@Nonnull OutputStream os) throws IOException;
 }

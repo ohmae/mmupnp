@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-public class TextUtils {
+public final class TextUtils {
     /**
      * nullを許容し、Stringが空かどうかを検査する。
      *

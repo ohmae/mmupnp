@@ -121,7 +121,7 @@ class HttpHeaders {
             if (obj == this) {
                 return true;
             }
-            if (obj == null || !(obj instanceof Entry)) {
+            if (!(obj instanceof Entry)) {
                 return false;
             }
             final Entry entry = (Entry) obj;

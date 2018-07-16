@@ -101,13 +101,13 @@ Document title and Copyright styles
 */
 .clear {
   clear: both;
-  height: 0px;
+  height: 0;
   overflow: hidden;
 }
 
 .aboutLanguage {
   float: right;
-  padding: 0px 21px;
+  padding: 0 21px;
   font-size: 9pt;
   z-index: 200;
   margin-top: -9px;
@@ -149,11 +149,10 @@ Navigation bar styles
   background-color: #212121;
   color: #FFFFFF;
   float: left;
-  padding: 0;
   width: 100%;
   clear: right;
   height: 2.8em;
-  padding-top: 10px;
+  padding: 10px 0 0;
   overflow: hidden;
   font-size: 10pt;
 }
@@ -163,11 +162,10 @@ Navigation bar styles
   background-color: #212121;
   color: #FFFFFF;
   float: left;
-  padding: 0;
   width: 100%;
   clear: right;
   height: 2.8em;
-  padding-top: 10px;
+  padding: 10px 0 0;
   overflow: hidden;
   font-size: 10pt;
 }
@@ -299,7 +297,7 @@ ul.blockList ul.blockList li.blockList h3 {
 }
 
 ul.blockList li.blockList h2 {
-  padding: 0px 0 20px 0;
+  padding: 0 0 20px 0;
 }
 /*
 Page layout container styles
@@ -342,7 +340,7 @@ Page layout container styles
 
 .contentContainer .description dl dd, .contentContainer .details dl dd,
   .serializedFormContainer dl dd {
-  margin: 5px 0 10px 0px;
+  margin: 5px 0 10px 0;
   font-size: 12pt;
   font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
 }
@@ -396,7 +394,7 @@ ul.blockList li.blockList, ul.blockListLast li.blockList {
 
 ul.blockList ul.blockList li.blockList, ul.blockList ul.blockListLast li.blockList
   {
-  padding: 0px 20px 5px 10px;
+  padding: 0 20px 5px 10px;
   border: 1px solid #EEEEEE;
   background-color: #F5F5F5;
 }
@@ -437,7 +435,7 @@ Table styles
 }
 
 .overviewSummary, .memberSummary {
-  padding: 0px;
+  padding: 0;
 }
 
 .overviewSummary caption, .memberSummary caption, .typeSummary caption,
@@ -450,10 +448,8 @@ Table styles
   font-weight: bold;
   clear: none;
   overflow: hidden;
-  padding: 0px;
-  padding-top: 10px;
-  padding-left: 1px;
-  margin: 0px;
+  padding: 10px 0 0 1px;
+  margin: 0;
   white-space: pre;
 }
 
@@ -477,10 +473,7 @@ Table styles
   .useSummary caption span, .constantsSummary caption span,
   .deprecatedSummary caption span {
   white-space: nowrap;
-  padding-top: 5px;
-  padding-left: 12px;
-  padding-right: 12px;
-  padding-bottom: 7px;
+  padding: 5px 12px 7px;
   display: inline-block;
   float: left;
   background-color: #FF5722;
@@ -516,9 +509,9 @@ Table styles
 
 .memberSummary caption span.tableTab, .memberSummary caption span.activeTableTab
   {
-  padding-top: 0px;
-  padding-left: 0px;
-  padding-right: 0px;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
   background-image: none;
   float: none;
   display: inline;
@@ -555,14 +548,14 @@ Table styles
 .overviewSummary td, .memberSummary td, .typeSummary td, .useSummary td,
   .constantsSummary td, .deprecatedSummary td {
   text-align: left;
-  padding: 0px 0px 12px 10px;
+  padding: 0 0 12px 10px;
 }
 
 th.colOne, th.colFirst, th.colLast, .useSummary th, .constantsSummary th,
   td.colOne, td.colFirst, td.colLast, .useSummary td, .constantsSummary td
   {
   vertical-align: top;
-  padding-right: 0px;
+  padding-right: 0;
   padding-top: 8px;
   padding-bottom: 3px;
 }
@@ -642,7 +635,7 @@ div.block {
 }
 
 td.colLast div {
-  padding-top: 0px;
+  padding-top: 0;
 }
 
 td.colLast a {
@@ -664,7 +657,7 @@ h1.hidden {
 
 .block {
   display: block;
-  margin: 3px 10px 2px 0px;
+  margin: 3px 10px 2px 0;
   color: #474747;
 }
 
@@ -685,5 +678,5 @@ div.block div.block span.deprecationComment, div.block div.block span.emphasized
 }
 
 div.contentContainer ul.blockList li.blockList h2 {
-  padding-bottom: 0px;
+  padding-bottom: 0;
 }

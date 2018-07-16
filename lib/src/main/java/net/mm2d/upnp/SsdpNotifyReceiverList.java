@@ -9,6 +9,8 @@ package net.mm2d.upnp;
 
 import net.mm2d.log.Log;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
+import net.mm2d.upnp.SsdpServer.Address;
+import net.mm2d.util.NetworkUtils;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
@@ -28,19 +30,43 @@ class SsdpNotifyReceiverList {
     private final List<SsdpNotifyReceiver> mList = new ArrayList<>();
 
     SsdpNotifyReceiverList init(
+            @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
         for (final NetworkInterface nif : interfaces) {
-            final SsdpNotifyReceiver notify = newSsdpNotifyReceiver(nif);
-            notify.setNotifyListener(listener);
-            mList.add(notify);
+            switch (protocol) {
+                case IP_V4_ONLY:
+                    if (NetworkUtils.isAvailableInet4Interface(nif)) {
+                        mList.add(newSsdpNotifyReceiver(Address.IP_V4, nif, listener));
+                    }
+                    break;
+                case IP_V6_ONLY:
+                    if (NetworkUtils.isAvailableInet6Interface(nif)) {
+                        mList.add(newSsdpNotifyReceiver(Address.IP_V6_LINK_LOCAL, nif, listener));
+                    }
+                    break;
+                case DUAL_STACK:
+                    if (NetworkUtils.isAvailableInet4Interface(nif)) {
+                        mList.add(newSsdpNotifyReceiver(Address.IP_V4, nif, listener));
+                    }
+                    if (NetworkUtils.isAvailableInet6Interface(nif)) {
+                        mList.add(newSsdpNotifyReceiver(Address.IP_V6_LINK_LOCAL, nif, listener));
+                    }
+                    break;
+            }
         }
         return this;
     }
 
     // VisibleForTesting
-    SsdpNotifyReceiver newSsdpNotifyReceiver(@Nonnull final NetworkInterface nif) {
-        return new SsdpNotifyReceiver(nif);
+    @Nonnull
+    SsdpNotifyReceiver newSsdpNotifyReceiver(
+            @Nonnull final Address address,
+            @Nonnull final NetworkInterface nif,
+            @Nonnull final NotifyListener listener) {
+        final SsdpNotifyReceiver receiver = new SsdpNotifyReceiver(address, nif);
+        receiver.setNotifyListener(listener);
+        return receiver;
     }
 
     void openAndStart() {

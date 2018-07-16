@@ -10,8 +10,6 @@ package net.mm2d.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
@@ -19,7 +17,7 @@ import java.nio.file.Files;
 
 import javax.annotation.Nonnull;
 
-public class TestUtils {
+public final class TestUtils {
     @Nonnull
     public static File getResourceAsFile(final String name) {
         return new File(getClassLoader().getResource(name).getFile());
@@ -49,21 +47,25 @@ public class TestUtils {
     public static InterfaceAddress createInterfaceAddress(
             final String address,
             final String broadcast,
-            final short maskLength)
+            final int maskLength)
             throws ReflectiveOperationException, UnknownHostException {
-        final Class<InterfaceAddress> cls = InterfaceAddress.class;
-        final Constructor<InterfaceAddress> constructor = cls.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        final InterfaceAddress interfaceAddress = constructor.newInstance();
-        final Field fAddress = cls.getDeclaredField("address");
-        fAddress.setAccessible(true);
-        fAddress.set(interfaceAddress, InetAddress.getByName(address));
-        final Field fBroadcast = cls.getDeclaredField("broadcast");
-        fBroadcast.setAccessible(true);
-        fBroadcast.set(interfaceAddress, InetAddress.getByName(broadcast));
-        final Field fMaskLength = cls.getDeclaredField("maskLength");
-        fMaskLength.setAccessible(true);
-        fMaskLength.setShort(interfaceAddress, maskLength);
+        final InterfaceAddress interfaceAddress = Reflection.getConstructor(InterfaceAddress.class).newInstance();
+        Reflection.setFieldValue(interfaceAddress, "address", InetAddress.getByName(address));
+        Reflection.setFieldValue(interfaceAddress, "broadcast", InetAddress.getByName(broadcast));
+        Reflection.setFieldValue(interfaceAddress, "maskLength", (short) maskLength);
+        return interfaceAddress;
+    }
+
+    @Nonnull
+    public static InterfaceAddress createInterfaceAddress(
+            final InetAddress address,
+            final String broadcast,
+            final int maskLength)
+            throws ReflectiveOperationException, UnknownHostException {
+        final InterfaceAddress interfaceAddress = Reflection.getConstructor(InterfaceAddress.class).newInstance();
+        Reflection.setFieldValue(interfaceAddress, "address", address);
+        Reflection.setFieldValue(interfaceAddress, "broadcast", InetAddress.getByName(broadcast));
+        Reflection.setFieldValue(interfaceAddress, "maskLength", (short) maskLength);
         return interfaceAddress;
     }
 }

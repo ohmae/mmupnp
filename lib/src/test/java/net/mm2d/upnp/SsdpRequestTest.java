@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.SsdpServer.Address;
 import net.mm2d.util.TestUtils;
 
 import org.junit.Test;
@@ -41,7 +42,7 @@ public class SsdpRequestTest {
             final SsdpRequest message = new SsdpRequest();
             message.setMethod(SsdpMessage.M_SEARCH);
             message.setUri("*");
-            message.setHeader(Http.HOST, SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT));
+            message.setHeader(Http.HOST, Address.IP_V4.getAddressString());
             message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER);
             message.setHeader(Http.MX, "1");
             message.setHeader(Http.ST, SsdpSearchServer.ST_ROOTDEVICE);
@@ -127,7 +128,7 @@ public class SsdpRequestTest {
 
         @Theory
         public void getHeader_HOST_SSDPのアドレスであること(final SsdpRequest message) {
-            assertThat(message.getHeader(Http.HOST), is(SsdpServer.SSDP_ADDR + ":" + String.valueOf(SsdpServer.SSDP_PORT)));
+            assertThat(message.getHeader(Http.HOST), is(Address.IP_V4.getAddressString()));
         }
     }
 

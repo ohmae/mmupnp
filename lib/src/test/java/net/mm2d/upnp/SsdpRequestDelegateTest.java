@@ -17,6 +17,7 @@ import java.io.OutputStream;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("ALL")
 @RunWith(JUnit4.class)
 public class SsdpRequestDelegateTest {
     private SsdpMessageDelegate mDelegate;
@@ -35,6 +36,13 @@ public class SsdpRequestDelegateTest {
         mMessage.getInterfaceAddress();
 
         verify(mDelegate, times(1)).getInterfaceAddress();
+    }
+
+    @Test
+    public void getLocalAddress() {
+        mMessage.getLocalAddress();
+
+        verify(mDelegate, times(1)).getLocalAddress();
     }
 
     @Test

@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.HttpMessageDelegate.StartLineProcessor;
+import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
@@ -124,10 +125,7 @@ public class HttpRequest implements HttpMessage {
         if (mAddress == null) {
             throw new IllegalStateException("address must be set");
         }
-        if (mPort == Http.DEFAULT_PORT || mPort <= 0) {
-            return mAddress.getHostAddress();
-        }
-        return mAddress.getHostAddress() + ":" + String.valueOf(mPort);
+        return NetworkUtils.getAddressString(mAddress, mPort);
     }
 
     /**

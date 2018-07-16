@@ -148,7 +148,7 @@ class SubscribeService {
         if (object == this) {
             return true;
         }
-        if (object == null || !(object instanceof SubscribeService)) {
+        if (!(object instanceof SubscribeService)) {
             return false;
         }
         final SubscribeService s = (SubscribeService) object;

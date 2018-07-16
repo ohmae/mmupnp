@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.ControlPoint.NotifyEventListener;
+import net.mm2d.upnp.DeviceHolder.ExpireListener;
 import net.mm2d.upnp.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.SsdpSearchServer.ResponseListener;
@@ -15,8 +17,6 @@ import java.net.NetworkInterface;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.annotation.Nonnull;
 
@@ -25,44 +25,52 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-class ControlPointDiFactory {
+class DiFactory {
     @Nonnull
-    Map<String, Device.Builder> createLoadingDeviceMap() {
+    private final Protocol mProtocol;
+
+    DiFactory() {
+        this(Protocol.DEFAULT);
+    }
+
+    DiFactory(@Nonnull final Protocol protocol) {
+        mProtocol = protocol;
+    }
+
+    @Nonnull
+    Map<String, DeviceImpl.Builder> createLoadingDeviceMap() {
         return new HashMap<>();
     }
 
     @Nonnull
-    ExecutorService createNotifyExecutor() {
-        return Executors.newSingleThreadExecutor();
-    }
-
-    @Nonnull
-    ExecutorService createIoExecutor() {
-        return Executors.newCachedThreadPool();
-    }
-
-    @Nonnull
-    DeviceHolder createDeviceHolder(@Nonnull final ControlPoint cp) {
-        return new DeviceHolder(cp);
-    }
-
-    @Nonnull
-    SubscribeHolder createSubscribeHolder() {
-        return new SubscribeHolder();
+    DeviceHolder createDeviceHolder(@Nonnull final ExpireListener listener) {
+        return new DeviceHolder(listener);
     }
 
     @Nonnull
     SsdpSearchServerList createSsdpSearchServerList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
-        return new SsdpSearchServerList().init(interfaces, listener);
+        return new SsdpSearchServerList().init(mProtocol, interfaces, listener);
     }
 
     @Nonnull
     SsdpNotifyReceiverList createSsdpNotifyReceiverList(
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
-        return new SsdpNotifyReceiverList().init(interfaces, listener);
+        return new SsdpNotifyReceiverList().init(mProtocol, interfaces, listener);
+    }
+
+    @Nonnull
+    SubscribeManager createSubscribeManager(
+            @Nonnull final ThreadPool threadPool,
+            @Nonnull final NotifyEventListener listener) {
+        return new SubscribeManager(threadPool, listener, this);
+    }
+
+    @Nonnull
+    SubscribeHolder createSubscribeHolder() {
+        return new SubscribeHolder();
     }
 
     @Nonnull

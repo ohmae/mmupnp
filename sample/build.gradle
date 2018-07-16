@@ -1,7 +1,7 @@
+apply plugin: 'java'
+
 group 'net.mm2d'
 version versionName
-
-apply plugin: 'java'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -12,7 +12,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation project(':lib')
-    implementation 'net.mm2d:log:0.0.1'
+    implementation 'net.mm2d:log:0.0.3'
     testImplementation 'junit:junit:4.12'
 }
 

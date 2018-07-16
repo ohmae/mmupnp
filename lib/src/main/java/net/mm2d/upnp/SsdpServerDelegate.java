@@ -14,7 +14,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.MulticastSocket;
@@ -49,6 +51,8 @@ class SsdpServerDelegate implements SsdpServer {
     }
 
     @Nonnull
+    private final Address mAddress;
+    @Nonnull
     private final Receiver mReceiver;
     @Nonnull
     private final NetworkInterface mInterface;
@@ -68,11 +72,13 @@ class SsdpServerDelegate implements SsdpServer {
      *
      * @param receiver         パケット受信時にコールされるreceiver
      * @param networkInterface 使用するインターフェース
+     * @param address          モード
      */
     SsdpServerDelegate(
             @Nonnull final Receiver receiver,
+            @Nonnull final Address address,
             @Nonnull final NetworkInterface networkInterface) {
-        this(receiver, networkInterface, 0);
+        this(receiver, address, networkInterface, 0);
     }
 
     /**
@@ -81,15 +87,60 @@ class SsdpServerDelegate implements SsdpServer {
      * @param receiver         パケット受信時にコールされるreceiver
      * @param networkInterface 使用するインターフェース
      * @param bindPort         使用するポート
+     * @param address          モード
      */
     SsdpServerDelegate(
             @Nonnull final Receiver receiver,
+            @Nonnull final Address address,
             @Nonnull final NetworkInterface networkInterface,
             final int bindPort) {
         mInterface = networkInterface;
-        mInterfaceAddress = findInet4Address(networkInterface.getInterfaceAddresses());
+        mInterfaceAddress = address == Address.IP_V4 ?
+                findInet4Address(networkInterface.getInterfaceAddresses()) :
+                findInet6Address(networkInterface.getInterfaceAddresses());
         mBindPort = bindPort;
         mReceiver = receiver;
+        mAddress = address;
+    }
+
+    /**
+     * マルチキャストアドレスを返す。
+     *
+     * @return マルチキャストアドレス
+     */
+    @Nonnull
+    Address getAddress() {
+        return mAddress;
+    }
+
+    /**
+     * SSDPに使用するSocketAddress。
+     *
+     * @return SSDPで使用するInetSocketAddress
+     */
+    @Nonnull
+    private InetSocketAddress getSsdpSocketAddress() {
+        return mAddress.getSocketAddress();
+    }
+
+    /**
+     * SSDPに使用するアドレス。
+     *
+     * @return SSDPで使用するInetAddress
+     */
+    @Nonnull
+    InetAddress getSsdpInetAddress() {
+        return mAddress.getInetAddress();
+    }
+
+    /**
+     * SSDPに使用するアドレス＋ポートの文字列。
+     *
+     * @return SSDPに使用するアドレス＋ポートの文字列。
+     */
+    @Nonnull
+    String getSsdpAddressString() {
+        return mAddress.getAddressString();
     }
 
     // VisibleForTesting
@@ -101,6 +152,20 @@ class SsdpServerDelegate implements SsdpServer {
             }
         }
         throw new IllegalArgumentException("ni does not have IPv4 address.");
+    }
+
+    // VisibleForTesting
+    @Nonnull
+    static InterfaceAddress findInet6Address(@Nonnull final List<InterfaceAddress> addressList) {
+        for (final InterfaceAddress address : addressList) {
+            final InetAddress inetAddress = address.getAddress();
+            if (inetAddress instanceof Inet6Address) {
+                if (inetAddress.isLinkLocalAddress()) {
+                    return address;
+                }
+            }
+        }
+        throw new IllegalArgumentException("ni does not have IPv6 address.");
     }
 
     @Override
@@ -137,7 +202,7 @@ class SsdpServerDelegate implements SsdpServer {
         if (mReceiveTask != null) {
             stop();
         }
-        mReceiveTask = new ReceiveTask(mReceiver, mSocket, mBindPort);
+        mReceiveTask = new ReceiveTask(mReceiver, mSocket, getSsdpInetAddress(), mBindPort);
         mReceiveTask.start();
     }
 
@@ -172,7 +237,7 @@ class SsdpServerDelegate implements SsdpServer {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.writeData(baos);
             final byte[] data = baos.toByteArray();
-            mSocket.send(new DatagramPacket(data, data.length, SSDP_SO_ADDR));
+            mSocket.send(new DatagramPacket(data, data.length, getSsdpSocketAddress()));
         } catch (final IOException e) {
             Log.w(e);
         }
@@ -202,7 +267,7 @@ class SsdpServerDelegate implements SsdpServer {
         try {
             final InetAddress locationAddress = InetAddress.getByName(new URL(location).getHost());
             return sourceAddress.equals(locationAddress);
-        } catch (MalformedURLException | UnknownHostException ignored) {
+        } catch (final MalformedURLException | UnknownHostException ignored) {
         }
         return false;
     }
@@ -213,6 +278,8 @@ class SsdpServerDelegate implements SsdpServer {
         private final Receiver mReceiver;
         @Nonnull
         private final MulticastSocket mSocket;
+        @Nonnull
+        private final InetAddress mInetAddress;
         private final int mBindPort;
 
         private volatile boolean mShutdownRequest;
@@ -225,9 +292,11 @@ class SsdpServerDelegate implements SsdpServer {
         ReceiveTask(
                 @Nonnull final Receiver receiver,
                 @Nonnull final MulticastSocket socket,
+                @Nonnull final InetAddress address,
                 final int port) {
             mReceiver = receiver;
             mSocket = socket;
+            mInetAddress = address;
             mBindPort = port;
         }
 
@@ -306,7 +375,7 @@ class SsdpServerDelegate implements SsdpServer {
         // VisibleForTesting
         void joinGroup() throws IOException {
             if (mBindPort != 0) {
-                mSocket.joinGroup(SSDP_INET_ADDR);
+                mSocket.joinGroup(mInetAddress);
             }
         }
 
@@ -320,7 +389,7 @@ class SsdpServerDelegate implements SsdpServer {
         // VisibleForTesting
         void leaveGroup() throws IOException {
             if (mBindPort != 0) {
-                mSocket.leaveGroup(SSDP_INET_ADDR);
+                mSocket.leaveGroup(mInetAddress);
             }
         }
     }

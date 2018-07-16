@@ -123,6 +123,7 @@ public class EventReceiverTest {
                 return true;
             }
         }) {
+            @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
                 final Socket socket = mock(Socket.class);
@@ -175,6 +176,7 @@ public class EventReceiverTest {
                 return false;
             }
         }) {
+            @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
                 final Socket socket = mock(Socket.class);
@@ -214,6 +216,7 @@ public class EventReceiverTest {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mFailRequest);
         final EventReceiver receiver = new EventReceiver(null) {
+            @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
                 final Socket socket = mock(Socket.class);
@@ -253,6 +256,7 @@ public class EventReceiverTest {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mBadRequest);
         final EventReceiver receiver = new EventReceiver(null) {
+            @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
                 final Socket socket = mock(Socket.class);
@@ -304,6 +308,7 @@ public class EventReceiverTest {
                 return false;
             }
         }) {
+            @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
                 final Socket socket = mock(Socket.class);

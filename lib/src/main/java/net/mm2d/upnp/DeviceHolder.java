@@ -27,6 +27,10 @@ import javax.annotation.Nullable;
 class DeviceHolder implements Runnable {
     private static final long MARGIN_TIME = TimeUnit.SECONDS.toMillis(10);
 
+    interface ExpireListener {
+        void onExpire(@Nonnull Device device);
+    }
+
     @Nonnull
     private final Object mThreadLock = new Object();
     private volatile boolean mShutdownRequest = false;
@@ -34,18 +38,18 @@ class DeviceHolder implements Runnable {
     private Thread mThread;
 
     @Nonnull
-    private final ControlPoint mControlPoint;
+    private final ExpireListener mExpireListener;
     @Nonnull
     private final Map<String, Device> mDeviceMap;
 
     /**
      * インスタンス作成。
      *
-     * @param cp ControlPoint
+     * @param listener 期限切れの通知を受け取るリスナー
      */
-    DeviceHolder(@Nonnull final ControlPoint cp) {
+    DeviceHolder(@Nonnull final ExpireListener listener) {
         mDeviceMap = new LinkedHashMap<>();
-        mControlPoint = cp;
+        mExpireListener = listener;
     }
 
     /**
@@ -143,7 +147,7 @@ class DeviceHolder implements Runnable {
             final Device device = i.next();
             if (device.getExpireTime() < now) {
                 i.remove();
-                mControlPoint.lostDevice(device);
+                mExpireListener.onExpire(device);
             }
         }
     }

@@ -30,29 +30,31 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-class ServiceParser {
+final class ServiceParser {
     /**
      * SCPDURLからDescriptionを取得し、パースする。
      *
      * <p>可能であればKeepAliveを行う。
      *
-     * @param client  通信に使用するHttpClient
-     * @param baseUrl URLのベースとして使用する値
-     * @param builder ServiceのBuilder
+     * @param client        通信に使用するHttpClient
+     * @param deviceBuilder DeviceのBuilder
+     * @param builder       ServiceのBuilder
      * @throws IOException                  通信エラー
      * @throws SAXException                 XMLパースエラー
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
     static void loadDescription(
             @Nonnull final HttpClient client,
-            @Nonnull final String baseUrl,
-            @Nonnull final Service.Builder builder)
+            @Nonnull final DeviceImpl.Builder deviceBuilder,
+            @Nonnull final ServiceImpl.Builder builder)
             throws IOException, SAXException, ParserConfigurationException {
         final String scpdUrl = builder.getScpdUrl();
         if (scpdUrl == null) {
             throw new IOException();
         }
-        final URL url = Device.getAbsoluteUrl(baseUrl, scpdUrl);
+        final String baseUrl = deviceBuilder.getBaseUrl();
+        final int scopeId = deviceBuilder.getSsdpMessage().getScopeId();
+        final URL url = Http.getAbsoluteUrl(baseUrl, scpdUrl, scopeId);
         final String description = client.downloadString(url);
         if (TextUtils.isEmpty(description)) {
             // 空であっても必須パラメータはそろっているため正常として扱う。
@@ -65,7 +67,7 @@ class ServiceParser {
     }
 
     private static void parseActionList(
-            @Nonnull final Service.Builder builder,
+            @Nonnull final ServiceImpl.Builder builder,
             @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             builder.addActionBuilder(parseAction((Element) nodeList.item(i)));
@@ -73,7 +75,7 @@ class ServiceParser {
     }
 
     private static void parseStateVariableList(
-            @Nonnull final Service.Builder builder,
+            @Nonnull final ServiceImpl.Builder builder,
             @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             builder.addVariableBuilder(parseStateVariable((Element) nodeList.item(i)));
@@ -89,8 +91,8 @@ class ServiceParser {
     }
 
     @Nonnull
-    private static Action.Builder parseAction(@Nonnull final Element element) {
-        final Action.Builder builder = new Action.Builder();
+    private static ActionImpl.Builder parseAction(@Nonnull final Element element) {
+        final ActionImpl.Builder builder = new ActionImpl.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             final String tag = getTagName(node);
@@ -108,8 +110,8 @@ class ServiceParser {
     }
 
     @Nonnull
-    private static Argument.Builder parseArgument(@Nonnull final Element element) {
-        final Argument.Builder builder = new Argument.Builder();
+    private static ArgumentImpl.Builder parseArgument(@Nonnull final Element element) {
+        final ArgumentImpl.Builder builder = new ArgumentImpl.Builder();
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             final String tag = getTagName(node);
@@ -123,7 +125,7 @@ class ServiceParser {
     }
 
     private static void setField(
-            @Nonnull final Argument.Builder builder,
+            @Nonnull final ArgumentImpl.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
         if ("name".equals(tag)) {
@@ -136,8 +138,8 @@ class ServiceParser {
     }
 
     @Nonnull
-    private static StateVariable.Builder parseStateVariable(@Nonnull final Element element) {
-        final StateVariable.Builder builder = new StateVariable.Builder()
+    private static StateVariableImpl.Builder parseStateVariable(@Nonnull final Element element) {
+        final StateVariableImpl.Builder builder = new StateVariableImpl.Builder()
                 .setSendEvents(element.getAttribute("sendEvents"))
                 .setMulticast(element.getAttribute("multicast"));
         Node node = element.getFirstChild();
@@ -162,7 +164,7 @@ class ServiceParser {
     }
 
     private static void parseAllowedValueList(
-            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final Element element) {
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -174,7 +176,7 @@ class ServiceParser {
     }
 
     private static void parseAllowedValueRange(
-            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final Element element) {
         Node node = element.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -188,7 +190,7 @@ class ServiceParser {
     }
 
     private static void setField(
-            @Nonnull final StateVariable.Builder builder,
+            @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final String tag,
             @Nonnull final String value) {
         if ("step".equals(tag)) {

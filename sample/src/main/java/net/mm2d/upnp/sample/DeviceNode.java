@@ -43,7 +43,7 @@ public class DeviceNode extends UpnpNode {
 
     @Override
     public String toString() {
-        return getUserObject().getFriendlyName();
+        return getUserObject().getFriendlyName() + " [" + getUserObject().getIpAddress() + "]";
     }
 
     @Override
@@ -102,7 +102,7 @@ public class DeviceNode extends UpnpNode {
                 final Device device = getUserObject();
                 try {
                     Desktop.getDesktop().browse(new URI(device.getLocation()));
-                } catch (IOException | URISyntaxException e1) {
+                } catch (final IOException | URISyntaxException e1) {
                     e1.printStackTrace();
                 }
             }

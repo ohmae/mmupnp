@@ -66,7 +66,7 @@ public class UpnpNode extends DefaultMutableTreeNode {
             final StringWriter sw = new StringWriter();
             t.transform(new DOMSource(doc), new StreamResult(sw));
             return sw.toString();
-        } catch (IllegalArgumentException | ParserConfigurationException | SAXException
+        } catch (final IllegalArgumentException | ParserConfigurationException | SAXException
                 | IOException | TransformerFactoryConfigurationError | TransformerException e) {
             Log.w(e);
         }

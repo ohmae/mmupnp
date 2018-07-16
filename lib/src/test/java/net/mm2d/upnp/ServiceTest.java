@@ -33,8 +33,9 @@ public class ServiceTest {
     public static class Builderによる生成からのテスト {
         @Test
         public void build_成功() throws Exception {
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -48,7 +49,21 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_Device不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
+                    .setSubscribeManager(mock(SubscribeManager.class))
+                    .setServiceType("serviceType")
+                    .setServiceId("serviceId")
+                    .setScpdUrl("scpdUrl")
+                    .setControlUrl("controlUrl")
+                    .setEventSubUrl("eventSubUrl")
+                    .setDescription("description")
+                    .build();
+        }
+
+        @Test(expected = IllegalStateException.class)
+        public void build_SubscribeManager不足() throws Exception {
+            new ServiceImpl.Builder()
+                    .setDevice(mock(Device.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -60,8 +75,9 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_ServiceType不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
                     .setControlUrl("controlUrl")
@@ -72,8 +88,9 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_ServiceId不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setScpdUrl("scpdUrl")
                     .setControlUrl("controlUrl")
@@ -84,8 +101,9 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_ScpdUrl不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setControlUrl("controlUrl")
@@ -96,8 +114,9 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_ControlUrl不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -108,8 +127,9 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_EventSubUrl不足() throws Exception {
-            new Service.Builder()
+            new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -120,13 +140,14 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_argumentのRelatedStateVariableNameが指定されていない() throws Exception {
-            final Action.Builder actionBuilder = new Action.Builder()
+            final ActionImpl.Builder actionBuilder = new ActionImpl.Builder()
                     .setName("action")
-                    .addArgumentBuilder(new Argument.Builder()
+                    .addArgumentBuilder(new ArgumentImpl.Builder()
                             .setName("argumentName")
                             .setDirection("in"));
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -141,14 +162,15 @@ public class ServiceTest {
 
         @Test(expected = IllegalStateException.class)
         public void build_argumentのRelatedStateVariableNameがに対応するStateVariableがない() throws Exception {
-            final Action.Builder actionBuilder = new Action.Builder()
+            final ActionImpl.Builder actionBuilder = new ActionImpl.Builder()
                     .setName("action")
-                    .addArgumentBuilder(new Argument.Builder()
+                    .addArgumentBuilder(new ArgumentImpl.Builder()
                             .setName("argumentName")
                             .setDirection("in")
                             .setRelatedStateVariableName("StateVariableName"));
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -164,10 +186,11 @@ public class ServiceTest {
         @Test
         public void getCallback() throws Exception {
             final ControlPoint cp = mock(ControlPoint.class);
+            final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(cp, message)
+            final Device device = new DeviceImpl.Builder(cp, manager, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -176,8 +199,9 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(device)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -185,21 +209,22 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            doReturn(TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", (short) 24))
-                    .when(message).getInterfaceAddress();
-            doReturn(80).when(cp).getEventPort();
+            doReturn(InetAddress.getByName("192.168.0.1"))
+                    .when(message).getLocalAddress();
+            doReturn(80).when(manager).getEventPort();
 
-            assertThat(service.getCallback(), is("<http://192.168.0.1/>"));
+            assertThat(((ServiceImpl) service).getCallback(), is("<http://192.168.0.1/>"));
 
-            doReturn(8080).when(cp).getEventPort();
+            doReturn(8080).when(manager).getEventPort();
 
-            assertThat(service.getCallback(), is("<http://192.168.0.1:8080/>"));
+            assertThat(((ServiceImpl) service).getCallback(), is("<http://192.168.0.1:8080/>"));
         }
 
         @Test
         public void hashCode_Exceptionが発生しない() throws Exception {
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -212,8 +237,9 @@ public class ServiceTest {
 
         @Test
         public void equals_比較可能() throws Exception {
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -228,10 +254,11 @@ public class ServiceTest {
 
         @Test
         public void equals_同一の情報() throws Exception {
+            final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -240,8 +267,9 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service1 = new Service.Builder()
+            final Service service1 = new ServiceImpl.Builder()
                     .setDevice(device)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -249,8 +277,9 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            final Service service2 = new Service.Builder()
+            final Service service2 = new ServiceImpl.Builder()
                     .setDevice(device)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -263,10 +292,11 @@ public class ServiceTest {
 
         @Test
         public void equals_不一致を無視() throws Exception {
+            final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -275,8 +305,9 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service1 = new Service.Builder()
+            final Service service1 = new ServiceImpl.Builder()
                     .setDevice(device)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType1")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl1")
@@ -284,8 +315,9 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl1")
                     .setDescription("description1")
                     .build();
-            final Service service2 = new Service.Builder()
+            final Service service2 = new ServiceImpl.Builder()
                     .setDevice(device)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType2")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl2")
@@ -298,10 +330,11 @@ public class ServiceTest {
 
         @Test
         public void equals_ServiceId不一致() throws Exception {
+            final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new Device.Builder(mock(ControlPoint.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -310,8 +343,9 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service1 = new Service.Builder()
+            final Service service1 = new ServiceImpl.Builder()
                     .setDevice(device)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId1")
                     .setScpdUrl("scpdUrl")
@@ -319,8 +353,9 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            final Service service2 = new Service.Builder()
+            final Service service2 = new ServiceImpl.Builder()
                     .setDevice(device)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId2")
                     .setScpdUrl("scpdUrl")
@@ -333,10 +368,11 @@ public class ServiceTest {
 
         @Test
         public void equals_device不一致() throws Exception {
+            final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message1 = mock(SsdpMessage.class);
             doReturn("location").when(message1).getLocation();
             doReturn("uuid1").when(message1).getUuid();
-            final Device device1 = new Device.Builder(mock(ControlPoint.class), message1)
+            final Device device1 = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message1)
                     .setDescription("description")
                     .setUdn("uuid1")
                     .setUpc("upc")
@@ -348,7 +384,7 @@ public class ServiceTest {
             final SsdpMessage message2 = mock(SsdpMessage.class);
             doReturn("location").when(message2).getLocation();
             doReturn("uuid2").when(message2).getUuid();
-            final Device device2 = new Device.Builder(mock(ControlPoint.class), message2)
+            final Device device2 = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message2)
                     .setDescription("description")
                     .setUdn("uuid2")
                     .setUpc("upc")
@@ -357,8 +393,9 @@ public class ServiceTest {
                     .setManufacture("manufacture")
                     .setModelName("modelName")
                     .build();
-            final Service service1 = new Service.Builder()
+            final Service service1 = new ServiceImpl.Builder()
                     .setDevice(device1)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -366,8 +403,9 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build();
-            final Service service2 = new Service.Builder()
+            final Service service2 = new ServiceImpl.Builder()
                     .setDevice(device2)
+                    .setSubscribeManager(manager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -380,8 +418,9 @@ public class ServiceTest {
 
         @Test
         public void createHttpClient() throws Exception {
-            final Service service = new Service.Builder()
+            final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(Device.class))
+                    .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -390,7 +429,7 @@ public class ServiceTest {
                     .setDescription("description")
                     .build();
 
-            final HttpClient client = service.createHttpClient();
+            final HttpClient client = ((ServiceImpl) service).createHttpClient();
             assertThat(client.isKeepAlive(), is(false));
         }
     }
@@ -401,10 +440,11 @@ public class ServiceTest {
         private static final String INTERFACE_ADDRESS = "192.0.2.3";
         private static final int EVENT_PORT = 100;
         private ControlPoint mControlPoint;
+        private SubscribeManager mSubscribeManager;
         private Device mDevice;
-        private Service mCms;
-        private Service mCds;
-        private Service mMmupnp;
+        private ServiceImpl mCms;
+        private ServiceImpl mCds;
+        private ServiceImpl mMmupnp;
 
         @Before
         public void setUp() throws Exception {
@@ -430,13 +470,14 @@ public class ServiceTest {
             doReturn(InetAddress.getByName(INTERFACE_ADDRESS)).when(interfaceAddress).getAddress();
             final SsdpMessage ssdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
             mControlPoint = mock(ControlPoint.class);
-            doReturn(EVENT_PORT).when(mControlPoint).getEventPort();
-            final Device.Builder builder = new Device.Builder(mControlPoint, ssdpMessage);
+            mSubscribeManager = mock(SubscribeManager.class);
+            doReturn(EVENT_PORT).when(mSubscribeManager).getEventPort();
+            final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, ssdpMessage);
             DeviceParser.loadDescription(httpClient, builder);
             mDevice = builder.build();
-            mCms = mDevice.findServiceById("urn:upnp-org:serviceId:ConnectionManager");
-            mCds = spy(mDevice.findServiceById("urn:upnp-org:serviceId:ContentDirectory"));
-            mMmupnp = mDevice.findServiceById("urn:upnp-org:serviceId:X_mmupnp");
+            mCms = (ServiceImpl) mDevice.findServiceById("urn:upnp-org:serviceId:ConnectionManager");
+            mCds = (ServiceImpl) spy(mDevice.findServiceById("urn:upnp-org:serviceId:ContentDirectory"));
+            mMmupnp = (ServiceImpl) mDevice.findServiceById("urn:upnp-org:serviceId:X_mmupnp");
         }
 
         @Test
@@ -557,7 +598,7 @@ public class ServiceTest {
 
             final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
-            verify(mControlPoint).registerSubscribeService(mCds, false);
+            verify(mSubscribeManager).registerSubscribeService(mCds, false);
 
             final String callback = request.getHeader(Http.CALLBACK);
             assertThat(callback.charAt(0), is('<'));
@@ -578,7 +619,7 @@ public class ServiceTest {
 
             final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
-            verify(mControlPoint).registerSubscribeService(mCds, true);
+            verify(mSubscribeManager).registerSubscribeService(mCds, true);
         }
 
         @Test
@@ -618,7 +659,7 @@ public class ServiceTest {
 
             final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
-            verify(mControlPoint).unregisterSubscribeService(mCds);
+            verify(mSubscribeManager).unregisterSubscribeService(mCds);
         }
 
         @Test
@@ -692,7 +733,7 @@ public class ServiceTest {
         public void parseTimeout_情報がない場合デフォルト() {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
-            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
@@ -700,7 +741,7 @@ public class ServiceTest {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "infinite");
-            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
@@ -708,7 +749,7 @@ public class ServiceTest {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "second-100");
-            assertThat(Service.parseTimeout(response), is(TimeUnit.SECONDS.toMillis(100)));
+            assertThat(ServiceImpl.parseTimeout(response), is(TimeUnit.SECONDS.toMillis(100)));
         }
 
         @Test
@@ -716,10 +757,10 @@ public class ServiceTest {
             final HttpResponse response = new HttpResponse();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "seconds-100");
-            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
 
             response.setHeader(Http.TIMEOUT, "second-ff");
-            assertThat(Service.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
+            assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
     }
 
@@ -727,17 +768,20 @@ public class ServiceTest {
     public static class subscribe_機能のテスト {
         private ControlPoint mControlPoint;
         private Device mDevice;
-        private Service mService;
+        private SubscribeManager mSubscribeManager;
+        private ServiceImpl mService;
         private HttpClient mHttpClient;
 
         @Before
         public void setUp() throws Exception {
             mControlPoint = mock(ControlPoint.class);
             mDevice = mock(Device.class);
+            mSubscribeManager = mock(SubscribeManager.class);
             doReturn(mControlPoint).when(mDevice).getControlPoint();
             doReturn(new URL("http://192.0.2.2/")).when(mDevice).getAbsoluteUrl(anyString());
-            mService = spy(new Service.Builder()
+            mService = (ServiceImpl) spy(new ServiceImpl.Builder()
                     .setDevice(mDevice)
+                    .setSubscribeManager(mSubscribeManager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
