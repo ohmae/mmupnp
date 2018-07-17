@@ -676,6 +676,7 @@ class DeviceImpl implements Device {
         return mSsdpMessage.getScopeId();
     }
 
+    @Nonnull
     @Override
     public URL appendScopeIdIfNeed(@Nonnull final String url) throws MalformedURLException {
         return Http.makeUrlWithScopeId(url, getScopeId());

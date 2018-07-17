@@ -90,6 +90,7 @@ public interface Device {
      * @return ScopeIDが付加されたURL
      * @throws MalformedURLException 不正なURL
      */
+    @Nonnull
     URL appendScopeIdIfNeed(@Nonnull String url) throws MalformedURLException;
 
 
