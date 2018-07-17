@@ -103,6 +103,11 @@ class DeviceImpl implements Device {
             return builder;
         }
 
+        /**
+         * Descriptionのダウンロード完了時にダウンロードに使用したHttpClientを渡す。
+         *
+         * @param client Descriptionのダウンロードに使用したHttpClient
+         */
         void onDownloadDescription(@Nonnull final HttpClient client) {
             if (mSsdpMessage instanceof PinnedSsdpMessage) {
                 final InetAddress address = client.getLocalAddress();
@@ -629,7 +634,7 @@ class DeviceImpl implements Device {
 
     @Override
     public void updateSsdpMessage(@Nonnull final SsdpMessage message) {
-        if (mSsdpMessage instanceof PinnedSsdpMessage) {
+        if (isPinned()) {
             return;
         }
         if (!isEmbeddedDevice()) {
@@ -905,6 +910,11 @@ class DeviceImpl implements Device {
             set.addAll(device.getAllUdnSet());
         }
         return set;
+    }
+
+    @Override
+    public boolean isPinned() {
+        return mSsdpMessage instanceof PinnedSsdpMessage;
     }
 
     @Override

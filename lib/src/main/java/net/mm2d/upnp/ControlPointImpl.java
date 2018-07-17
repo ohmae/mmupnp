@@ -526,6 +526,6 @@ class ControlPointImpl implements ControlPoint {
     }
 
     private static boolean isPinnedDevice(@Nullable final Device device) {
-        return device != null && device.getSsdpMessage() instanceof PinnedSsdpMessage;
+        return device != null && device.isPinned();
     }
 }

@@ -446,4 +446,11 @@ public interface Device {
      */
     @Nonnull
     Set<String> getAllUdnSet();
+
+    /**
+     * 固定デバイスか否かを返す。
+     *
+     * @return 固定デバイスの時true
+     */
+    boolean isPinned();
 }
