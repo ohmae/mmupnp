@@ -203,6 +203,9 @@ class SsdpServerDelegate implements SsdpServer {
 
     @Override
     public void start() {
+        if (mSocket == null) {
+            throw new IllegalStateException("socket is null");
+        }
         if (mReceiveTask != null) {
             stop();
         }

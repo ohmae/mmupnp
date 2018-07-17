@@ -166,6 +166,7 @@ public class HttpClient {
         }
     }
 
+    @SuppressWarnings("ConstantConditions") // open状態でのみコールする
     @Nonnull
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
         request.writeData(mOutputStream);
@@ -269,6 +270,7 @@ public class HttpClient {
      * @return 取得できた文字列
      * @throws IOException 取得に問題があった場合
      */
+    @SuppressWarnings("ConstantConditions") // download()の中でgetBody()がnullで無いことはチェック済み
     @Nonnull
     public String downloadString(@Nonnull final URL url) throws IOException {
         return download(url).getBody();
@@ -281,6 +283,7 @@ public class HttpClient {
      * @return 取得できたバイナリ
      * @throws IOException 取得に問題があった場合
      */
+    @SuppressWarnings("ConstantConditions") // download()の中でgetBody()がnullで無いことはチェック済み
     @Nonnull
     public byte[] downloadBinary(@Nonnull final URL url) throws IOException {
         return download(url).getBodyBinary();
