@@ -52,7 +52,7 @@ class ControlPointImpl implements ControlPoint {
     @Nonnull
     private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap;
     @Nonnull
-    private final Set<String> mEmbeddedDeviceUdnSet = new HashSet<>();
+    private final Set<String> mAllUdnSet = new HashSet<>();
     @Nonnull
     private final ThreadPool mThreadPool;
     @Nonnull
@@ -194,7 +194,7 @@ class ControlPointImpl implements ControlPoint {
             final String uuid = message.getUuid();
             final Device device = mDeviceHolder.get(uuid);
             if (device == null) {
-                if (mEmbeddedDeviceUdnSet.contains(uuid)) {
+                if (mAllUdnSet.contains(uuid)) {
                     return;
                 }
                 onReceiveNewSsdp(message);
@@ -424,7 +424,7 @@ class ControlPointImpl implements ControlPoint {
         if (isPinnedDevice(mDeviceHolder.get(device.getUdn()))) {
             return;
         }
-        mEmbeddedDeviceUdnSet.addAll(device.getEmbeddedDeviceUdnSet());
+        mAllUdnSet.addAll(device.getAllUdnSet());
         mDeviceHolder.add(device);
         mThreadPool.executeInSequential(() ->
                 mDiscoveryListenerList.onDiscover(device));
@@ -442,7 +442,7 @@ class ControlPointImpl implements ControlPoint {
      */
     @SuppressWarnings("WeakerAccess")
     void lostDevice(@Nonnull final Device device) {
-        mEmbeddedDeviceUdnSet.removeAll(device.getEmbeddedDeviceUdnSet());
+        mAllUdnSet.removeAll(device.getAllUdnSet());
         synchronized (mDeviceHolder) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {

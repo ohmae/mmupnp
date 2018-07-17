@@ -895,14 +895,14 @@ class DeviceImpl implements Device {
 
     @Override
     @Nonnull
-    public Set<String> getEmbeddedDeviceUdnSet() {
+    public Set<String> getAllUdnSet() {
         if (mDeviceList.isEmpty()) {
             return Collections.emptySet();
         }
         final Set<String> set = new HashSet<>();
         for (final Device device : mDeviceList) {
             set.add(device.getUdn());
-            set.addAll(device.getEmbeddedDeviceUdnSet());
+            set.addAll(device.getAllUdnSet());
         }
         return set;
     }

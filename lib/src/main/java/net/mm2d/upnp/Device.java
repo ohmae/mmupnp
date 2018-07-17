@@ -439,6 +439,11 @@ public interface Device {
     @Nullable
     Device findDeviceByTypeRecursively(@Nonnull String deviceType);
 
+    /**
+     * EmbeddedDeviceを含めたすべてのUDNのSetを返す。
+     *
+     * @return すべてのUDNのSet
+     */
     @Nonnull
-    Set<String> getEmbeddedDeviceUdnSet();
+    Set<String> getAllUdnSet();
 }

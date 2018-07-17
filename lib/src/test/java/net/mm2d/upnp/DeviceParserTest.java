@@ -161,7 +161,7 @@ public class DeviceParserTest {
             assertThat(device2.getParent(), is(device1));
             assertThat(device2.isEmbeddedDevice(), is(true));
 
-            final Set<String> udns = device.getEmbeddedDeviceUdnSet();
+            final Set<String> udns = device.getAllUdnSet();
             assertThat(udns, hasItem("uuid:01234567-89ab-cdef-0123-456789abcdee"));
             assertThat(udns, hasItem("uuid:01234567-89ab-cdef-0123-456789abcded"));
             assertThat(udns, not(hasItem("uuid:01234567-89ab-cdef-0123-456789abcdef")));
