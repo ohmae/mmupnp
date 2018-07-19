@@ -46,9 +46,9 @@ class ControlPointImpl implements ControlPoint {
     @Nonnull
     private final NotifyEventListenerList mNotifyEventListenerList;
     @Nonnull
-    private final SsdpSearchServerList mSearchList;
+    private final SsdpSearchServerList mSearchServerList;
     @Nonnull
-    private final SsdpNotifyReceiverList mNotifyList;
+    private final SsdpNotifyReceiverList mNotifyReceiverList;
     @Nonnull
     private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap;
     @Nonnull
@@ -146,9 +146,9 @@ class ControlPointImpl implements ControlPoint {
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();
 
-        mSearchList = factory.createSsdpSearchServerList(interfaces, message ->
+        mSearchServerList = factory.createSsdpSearchServerList(interfaces, message ->
                 mThreadPool.executeInParallel(() -> onReceiveSsdp(message)));
-        mNotifyList = factory.createSsdpNotifyReceiverList(interfaces, message ->
+        mNotifyReceiverList = factory.createSsdpNotifyReceiverList(interfaces, message ->
                 mThreadPool.executeInParallel(() -> onReceiveSsdp(message)));
         mDeviceHolder = factory.createDeviceHolder(this::lostDevice);
         mSubscribeManager = factory.createSubscribeManager(mThreadPool, mNotifyEventListenerList);
@@ -232,16 +232,6 @@ class ControlPointImpl implements ControlPoint {
         }
     }
 
-    /**
-     * 初期化を行う。
-     *
-     * <p>利用前にかならず実行する。
-     * 一度初期化を行うと再初期化は不可能。
-     * インターフェースの変更など、再初期化が必要な場合はインスタンスの生成からやり直すこと。
-     * また、終了する際は必ず{@link #terminate()}をコールすること。
-     *
-     * @see #initialize()
-     */
     @Override
     public void initialize() {
         if (mInitialized.getAndSet(true)) {
@@ -251,16 +241,6 @@ class ControlPointImpl implements ControlPoint {
         mSubscribeManager.initialize();
     }
 
-    /**
-     * 終了処理を行う。
-     *
-     * <p>動作中の場合、停止処理を行う。
-     * 一度終了処理を行ったあとは再初期化は不可能。
-     * インスタンス参照を破棄すること。
-     *
-     * @see #stop()
-     * @see #initialize()
-     */
     @Override
     public void terminate() {
         if (mStarted.get()) {
@@ -274,15 +254,6 @@ class ControlPointImpl implements ControlPoint {
         mDeviceHolder.shutdownRequest();
     }
 
-    /**
-     * 処理を開始する。
-     *
-     * <p>本メソッドのコール前はネットワークに関連する処理を実行することはできない。
-     * 既に開始状態の場合は何も行われない。
-     * 一度開始したあとであっても、停止処理後であれば再度開始可能。
-     *
-     * @see #initialize()
-     */
     @Override
     public void start() {
         if (!mInitialized.get()) {
@@ -292,29 +263,20 @@ class ControlPointImpl implements ControlPoint {
             return;
         }
         mSubscribeManager.start();
-        mSearchList.openAndStart();
-        mNotifyList.openAndStart();
+        mSearchServerList.openAndStart();
+        mNotifyReceiverList.openAndStart();
     }
 
-    /**
-     * 処理を停止する。
-     *
-     * <p>開始していない状態、既に停止済みの状態の場合なにも行われない。
-     * 停止に伴い発見済みDeviceはLost扱いとなる。
-     * 停止後は発見済みDeviceのインスタンスを保持していても正常に動作しない。
-     *
-     * @see #start()
-     */
     @Override
     public void stop() {
         if (!mStarted.getAndSet(false)) {
             return;
         }
         mSubscribeManager.stop();
-        mSearchList.stop();
-        mNotifyList.stop();
-        mSearchList.close();
-        mNotifyList.close();
+        mSearchServerList.stop();
+        mNotifyReceiverList.stop();
+        mSearchServerList.close();
+        mNotifyReceiverList.close();
         final List<Device> list = getDeviceList();
         for (final Device device : list) {
             lostDevice(device);
@@ -322,11 +284,6 @@ class ControlPointImpl implements ControlPoint {
         mDeviceHolder.clear();
     }
 
-    /**
-     * 保持している発見済みのデバイスリストをクリアする。
-     *
-     * <p>コール時点で保持されているデバイスはlost扱いとして通知される。
-     */
     @Override
     public void clearDeviceList() {
         synchronized (mDeviceHolder) {
@@ -337,82 +294,44 @@ class ControlPointImpl implements ControlPoint {
         }
     }
 
-    /**
-     * Searchパケットを送出する。
-     *
-     * <p>{@link #search(String)}を引数nullでコールするのと等価。
-     */
     @Override
     public void search() {
         search(null);
     }
 
-    /**
-     * Searchパケットを送出する。
-     *
-     * <p>stがnullの場合、"ssdp:all"として動作する。
-     *
-     * @param st SearchパケットのSTフィールド
-     */
     @Override
     public void search(@Nullable final String st) {
         if (!mStarted.get()) {
             throw new IllegalStateException("ControlPoint is not started.");
         }
-        mSearchList.search(st);
+        mSearchServerList.search(st);
     }
 
-    /**
-     * ダウンロードするIconを選択するフィルタを設定する。
-     *
-     * @param filter 設定するフィルタ、nullは指定できない。
-     * @see IconFilter#NONE
-     * @see IconFilter#ALL
-     */
+    @Override
+    public void setNotifySegmentCheckEnabled(final boolean enabled) {
+        mNotifyReceiverList.setSegmentCheckEnabled(enabled);
+    }
+
     @Override
     public void setIconFilter(@Nonnull final IconFilter filter) {
         mIconFilter = filter;
     }
 
-    /**
-     * 機器発見のリスナーを登録する。
-     *
-     * @param listener リスナー
-     * @see DiscoveryListener
-     */
     @Override
     public void addDiscoveryListener(@Nonnull final DiscoveryListener listener) {
         mDiscoveryListenerList.add(listener);
     }
 
-    /**
-     * 機器発見リスナーを削除する。
-     *
-     * @param listener リスナー
-     * @see DiscoveryListener
-     */
     @Override
     public void removeDiscoveryListener(@Nonnull final DiscoveryListener listener) {
         mDiscoveryListenerList.remove(listener);
     }
 
-    /**
-     * NotifyEvent受信リスナーを登録する。
-     *
-     * @param listener リスナー
-     * @see NotifyEventListener
-     */
     @Override
     public void addNotifyEventListener(@Nonnull final NotifyEventListener listener) {
         mNotifyEventListenerList.add(listener);
     }
 
-    /**
-     * NotifyEvent受信リスナーを削除する。
-     *
-     * @param listener リスナー
-     * @see NotifyEventListener
-     */
     @Override
     public void removeNotifyEventListener(@Nonnull final NotifyEventListener listener) {
         mNotifyEventListenerList.remove(listener);
@@ -430,16 +349,6 @@ class ControlPointImpl implements ControlPoint {
                 mDiscoveryListenerList.onDiscover(device));
     }
 
-    /**
-     * デバイスの喪失を行う。
-     *
-     * <p>DeviceInspectorからコールするためにパッケージデフォルトとする
-     * 他からはコールしないこと。
-     *
-     * @param device 喪失してデバイス
-     * @see Device
-     * @see DeviceHolder
-     */
     @SuppressWarnings("WeakerAccess")
     void lostDevice(@Nonnull final Device device) {
         mAllUdnSet.removeAll(device.getAllUdnSet());
@@ -454,39 +363,17 @@ class ControlPointImpl implements ControlPoint {
                 mDiscoveryListenerList.onLost(device));
     }
 
-    /**
-     * 発見したデバイスの数を返す。
-     *
-     * @return デバイスの数
-     */
     @Override
     public int getDeviceListSize() {
         return mDeviceHolder.size();
     }
 
-    /**
-     * 発見したデバイスのリストを返す。
-     *
-     * <p>内部で保持するリストのコピーが返される。
-     *
-     * @return デバイスのリスト
-     * @see Device
-     */
     @Override
     @Nonnull
     public List<Device> getDeviceList() {
         return mDeviceHolder.getDeviceList();
     }
 
-    /**
-     * 指定UDNのデバイスを返す。
-     *
-     * <p>見つからない場合nullが返る。
-     *
-     * @param udn UDN
-     * @return 指定UDNのデバイス
-     * @see Device
-     */
     @Override
     @Nullable
     public Device getDevice(@Nonnull final String udn) {

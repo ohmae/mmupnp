@@ -82,6 +82,7 @@ public class SsdpSearchServerTest {
         final SsdpServerDelegate delegate = mock(SsdpServerDelegate.class);
         final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
+        doReturn(interfaceAddress.getAddress()).when(delegate).getLocalAddress();
         final SsdpSearchServer server = spy(new SsdpSearchServer(delegate));
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");
         final InetAddress address = InetAddress.getByName("192.0.2.2");

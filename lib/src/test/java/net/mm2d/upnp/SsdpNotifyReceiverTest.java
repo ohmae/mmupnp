@@ -28,7 +28,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("NonAsciiCharacters")
+@SuppressWarnings({"NonAsciiCharacters", "ResultOfMethodCallIgnored"})
 @RunWith(JUnit4.class)
 public class SsdpNotifyReceiverTest {
     @Test
@@ -167,26 +167,68 @@ public class SsdpNotifyReceiverTest {
     }
 
     @Test
-    public void isSameSegment() throws Exception {
-        assertThat(
-                SsdpNotifyReceiver.isSameSegment(
-                        TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24),
-                        InetAddress.getByName("192.168.0.255")),
-                is(true));
-        assertThat(
-                SsdpNotifyReceiver.isSameSegment(
-                        TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.128", 25),
-                        InetAddress.getByName("192.168.0.255")),
-                is(false));
-        assertThat(
-                SsdpNotifyReceiver.isSameSegment(
-                        TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24),
-                        InetAddress.getByName("192.168.1.255")),
-                is(false));
-        assertThat(
-                SsdpNotifyReceiver.isSameSegment(
-                        TestUtils.createInterfaceAddress("192.168.0.1", "255.255.254.0", 23),
-                        InetAddress.getByName("192.168.1.255")),
-                is(true));
+    public void invalidAddress_IPv4() throws Exception {
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(delegate));
+        receiver.setSegmentCheckEnabled(true);
+
+        InterfaceAddress interfaceAddress;
+
+        interfaceAddress = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24);
+        doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
+
+        receiver.setSegmentCheckEnabled(true);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255")), is(false));
+        receiver.setSegmentCheckEnabled(false);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255")), is(false));
+
+        interfaceAddress = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.128", 25);
+        doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
+
+        receiver.setSegmentCheckEnabled(true);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255")), is(true));
+        receiver.setSegmentCheckEnabled(false);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255")), is(false));
+
+        interfaceAddress = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.255.0", 24);
+        doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
+
+        receiver.setSegmentCheckEnabled(true);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.1.255")), is(true));
+
+        interfaceAddress = TestUtils.createInterfaceAddress("192.168.0.1", "255.255.254.0", 23);
+        doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
+
+        receiver.setSegmentCheckEnabled(true);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.1.255")), is(false));
+
+        receiver.setSegmentCheckEnabled(true);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("fe80::a831:801b:8dc6:421f")), is(true));
+        receiver.setSegmentCheckEnabled(false);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("fe80::a831:801b:8dc6:421f")), is(true));
+    }
+
+    @Test
+    public void invalidAddress_IPv6() throws Exception {
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V6_LINK_LOCAL, networkInterface));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(delegate));
+        receiver.setSegmentCheckEnabled(true);
+
+        InterfaceAddress interfaceAddress;
+
+        interfaceAddress = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16);
+        doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
+
+        receiver.setSegmentCheckEnabled(true);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("2001:db8::1")), is(false));
+        receiver.setSegmentCheckEnabled(false);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("2001:db8::1")), is(false));
+
+        receiver.setSegmentCheckEnabled(true);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255")), is(true));
+        receiver.setSegmentCheckEnabled(false);
+        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255")), is(true));
     }
 }

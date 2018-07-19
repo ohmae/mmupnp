@@ -69,6 +69,12 @@ class SsdpNotifyReceiverList {
         return receiver;
     }
 
+    void setSegmentCheckEnabled(final boolean enabled) {
+        for (final SsdpNotifyReceiver receiver : mList) {
+            receiver.setSegmentCheckEnabled(enabled);
+        }
+    }
+
     void openAndStart() {
         for (final SsdpNotifyReceiver receiver : mList) {
             try {

@@ -11,6 +11,8 @@ import net.mm2d.log.Log;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -40,6 +42,7 @@ class SsdpNotifyReceiver implements SsdpServer {
     private final SsdpServerDelegate mDelegate;
     @Nullable
     private NotifyListener mListener;
+    private boolean mSegmentCheckEnabled;
 
     /**
      * インスタンス作成。
@@ -55,6 +58,10 @@ class SsdpNotifyReceiver implements SsdpServer {
     // VisibleForTesting
     SsdpNotifyReceiver(@Nonnull final SsdpServerDelegate delegate) {
         mDelegate = delegate;
+    }
+
+    void setSegmentCheckEnabled(final boolean enabled) {
+        mSegmentCheckEnabled = enabled;
     }
 
     /**
@@ -107,13 +114,7 @@ class SsdpNotifyReceiver implements SsdpServer {
             @Nonnull final InetAddress sourceAddress,
             @Nonnull final byte[] data,
             final int length) {
-        // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
-        // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
-        // 受け取っても無駄なので破棄する。
-        if (mDelegate.getAddress() == Address.IP_V4
-                && !isSameSegment(getInterfaceAddress(), sourceAddress)) {
-            Log.w("Invalid segment packet received:" + sourceAddress.toString()
-                    + " " + getInterfaceAddress().toString());
+        if (invalidAddress(sourceAddress)) {
             return;
         }
         try {
@@ -144,7 +145,31 @@ class SsdpNotifyReceiver implements SsdpServer {
     }
 
     // VisibleForTesting
-    static boolean isSameSegment(
+    boolean invalidAddress(@Nonnull final InetAddress sourceAddress) {
+        if (invalidVersion(sourceAddress)) {
+            Log.w("IP version mismatch:" + sourceAddress.toString() + " " + getInterfaceAddress().toString());
+            return true;
+        }
+        // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
+        // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
+        // 受け取っても無駄なので破棄する。
+        if (mSegmentCheckEnabled
+                && mDelegate.getAddress() == Address.IP_V4
+                && invalidSegment(getInterfaceAddress(), sourceAddress)) {
+            Log.w("Invalid segment:" + sourceAddress.toString() + " " + getInterfaceAddress().toString());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean invalidVersion(@Nonnull final InetAddress sourceAddress) {
+        if (mDelegate.getAddress() == Address.IP_V4) {
+            return sourceAddress instanceof Inet6Address;
+        }
+        return sourceAddress instanceof Inet4Address;
+    }
+
+    private boolean invalidSegment(
             @Nonnull final InterfaceAddress interfaceAddress,
             @Nonnull final InetAddress sourceAddress) {
         final byte[] a = interfaceAddress.getAddress().getAddress();
@@ -154,13 +179,13 @@ class SsdpNotifyReceiver implements SsdpServer {
         final int bits = pref % 8;
         for (int i = 0; i < bytes; i++) {
             if (a[i] != b[i]) {
-                return false;
+                return true;
             }
         }
         if (bits != 0) {
             final byte mask = (byte) (0xff << (8 - bits));
-            return (a[bytes] & mask) == (b[bytes] & mask);
+            return (a[bytes] & mask) != (b[bytes] & mask);
         }
-        return true;
+        return false;
     }
 }

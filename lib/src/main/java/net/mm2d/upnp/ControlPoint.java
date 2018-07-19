@@ -149,6 +149,13 @@ public interface ControlPoint {
     void search(@Nullable String st);
 
     /**
+     * SSDP Notifyパケットを受け取った時にセグメントチェックを行う設定を行う
+     *
+     * @param enabled セグメントチェックを有効にするときtrue
+     */
+    void setNotifySegmentCheckEnabled(final boolean enabled);
+
+    /**
      * ダウンロードするIconを選択するフィルタを設定する。
      *
      * @param filter 設定するフィルタ、nullは指定できない。
