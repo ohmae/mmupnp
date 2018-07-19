@@ -168,8 +168,8 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void invalidAddress_IPv4() throws Exception {
-        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate delegate = mock(SsdpServerDelegate.class);
+        doReturn(Address.IP_V4).when(delegate).getAddress();
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(delegate));
         receiver.setSegmentCheckEnabled(true);
 
@@ -211,8 +211,8 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void invalidAddress_IPv6() throws Exception {
-        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V6_LINK_LOCAL, networkInterface));
+        final SsdpServerDelegate delegate = mock(SsdpServerDelegate.class);
+        doReturn(Address.IP_V6_LINK_LOCAL).when(delegate).getAddress();
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(delegate));
         receiver.setSegmentCheckEnabled(true);
 
