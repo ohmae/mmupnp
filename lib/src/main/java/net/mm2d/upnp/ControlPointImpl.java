@@ -66,73 +66,6 @@ class ControlPointImpl implements ControlPoint {
     @Nonnull
     private final List<DeviceImpl.Builder> mLoadingPinnedDevices = Collections.synchronizedList(new ArrayList<>());
 
-    private class DeviceLoader implements Runnable {
-        @Nonnull
-        private final DeviceImpl.Builder mDeviceBuilder;
-
-        DeviceLoader(@Nonnull final DeviceImpl.Builder builder) {
-            mDeviceBuilder = builder;
-        }
-
-        @Override
-        public void run() {
-            final HttpClient client = createHttpClient();
-            final String uuid = mDeviceBuilder.getUuid();
-            try {
-                DeviceParser.loadDescription(client, mDeviceBuilder);
-                final Device device = mDeviceBuilder.build();
-                device.loadIconBinary(client, mIconFilter);
-                synchronized (mDeviceHolder) {
-                    if (mLoadingDeviceMap.remove(uuid) != null) {
-                        discoverDevice(device);
-                    }
-                }
-            } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
-                Log.w(e);
-                synchronized (mDeviceHolder) {
-                    mLoadingDeviceMap.remove(uuid);
-                }
-            } finally {
-                client.close();
-            }
-        }
-    }
-
-    private class PinnedDeviceLoader implements Runnable {
-        @Nonnull
-        private final DeviceImpl.Builder mDeviceBuilder;
-
-        PinnedDeviceLoader(@Nonnull final DeviceImpl.Builder builder) {
-            mDeviceBuilder = builder;
-        }
-
-        @Override
-        public void run() {
-            final HttpClient client = createHttpClient();
-            try {
-                DeviceParser.loadDescription(client, mDeviceBuilder);
-                final Device device = mDeviceBuilder.build();
-                device.loadIconBinary(client, mIconFilter);
-                synchronized (mDeviceHolder) {
-                    final String udn = device.getUdn();
-                    if (!mLoadingPinnedDevices.remove(mDeviceBuilder)) {
-                        return;
-                    }
-                    mLoadingDeviceMap.remove(udn);
-                    final Device lostDevice = mDeviceHolder.remove(udn);
-                    if (lostDevice != null) {
-                        lostDevice(lostDevice);
-                    }
-                    discoverDevice(device);
-                }
-            } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
-                Log.w(null, "fail to load:" + mDeviceBuilder.getLocation(), e);
-            } finally {
-                client.close();
-            }
-        }
-    }
-
     ControlPointImpl(
             @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
@@ -227,8 +160,30 @@ class ControlPointImpl implements ControlPoint {
         }
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(this, mSubscribeManager, message);
         mLoadingDeviceMap.put(uuid, builder);
-        if (!mThreadPool.executeInParallel(new DeviceLoader(builder))) {
+        if (!mThreadPool.executeInParallel(() -> loadDevice(builder))) {
             mLoadingDeviceMap.remove(uuid);
+        }
+    }
+
+    private void loadDevice(@Nonnull final DeviceImpl.Builder builder) {
+        final HttpClient client = createHttpClient();
+        final String uuid = builder.getUuid();
+        try {
+            DeviceParser.loadDescription(client, builder);
+            final Device device = builder.build();
+            device.loadIconBinary(client, mIconFilter);
+            synchronized (mDeviceHolder) {
+                if (mLoadingDeviceMap.remove(uuid) != null) {
+                    discoverDevice(device);
+                }
+            }
+        } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
+            Log.w(e);
+            synchronized (mDeviceHolder) {
+                mLoadingDeviceMap.remove(uuid);
+            }
+        } finally {
+            client.close();
         }
     }
 
@@ -390,7 +345,32 @@ class ControlPointImpl implements ControlPoint {
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(
                 this, mSubscribeManager, new PinnedSsdpMessage(location));
         mLoadingPinnedDevices.add(builder);
-        mThreadPool.executeInParallel(new PinnedDeviceLoader(builder));
+        mThreadPool.executeInParallel(() -> loadPinnedDevice(builder));
+    }
+
+    private void loadPinnedDevice(@Nonnull final DeviceImpl.Builder builder) {
+        final HttpClient client = createHttpClient();
+        try {
+            DeviceParser.loadDescription(client, builder);
+            final Device device = builder.build();
+            device.loadIconBinary(client, mIconFilter);
+            synchronized (mDeviceHolder) {
+                final String udn = device.getUdn();
+                if (!mLoadingPinnedDevices.remove(builder)) {
+                    return;
+                }
+                mLoadingDeviceMap.remove(udn);
+                final Device lostDevice = mDeviceHolder.remove(udn);
+                if (lostDevice != null) {
+                    lostDevice(lostDevice);
+                }
+                discoverDevice(device);
+            }
+        } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
+            Log.w(null, "fail to load:" + builder.getLocation(), e);
+        } finally {
+            client.close();
+        }
     }
 
     @Override
