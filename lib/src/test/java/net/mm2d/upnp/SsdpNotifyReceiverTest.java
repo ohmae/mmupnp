@@ -82,6 +82,7 @@ public class SsdpNotifyReceiverTest {
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
         receiver.setNotifyListener(listener);
+        receiver.setSegmentCheckEnabled(true);
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
 
         receiver.onReceive(InetAddress.getByName("192.1.2.2"), data, data.length);

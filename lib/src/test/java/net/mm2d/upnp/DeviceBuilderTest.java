@@ -293,6 +293,15 @@ public class DeviceBuilderTest {
                 .build();
     }
 
+    @Test
+    public void build_PinnedSsdpMessage_update() {
+        final SsdpMessage message = mock(PinnedSsdpMessage.class);
+        final SsdpMessage newMessage = mock(SsdpMessage.class);
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
+        builder.updateSsdpMessage(newMessage);
+        assertThat(builder.getSsdpMessage(), is(message));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void build_不正なSsdpMessage1() {
         new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), mock(SsdpMessage.class));

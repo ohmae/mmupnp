@@ -114,6 +114,19 @@ public class DeviceTest {
             assertThat(device.getSsdpMessage(), is(message));
         }
 
+        @Test
+        public void updateSsdpMessage_pinned() throws Exception {
+            final SsdpMessage originalMessage = mock(PinnedSsdpMessage.class);
+            mBuilder.updateSsdpMessage(originalMessage);
+            final Device device = mBuilder.build();
+            final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
+            final SsdpMessage message = spy(new SsdpRequest(mock(InetAddress.class), data, data.length));
+            doReturn("uuid:").when(message).getUuid();
+            device.updateSsdpMessage(message);
+
+            assertThat(device.getSsdpMessage(), is(originalMessage));
+        }
+
         @Test(expected = IllegalArgumentException.class)
         public void updateSsdpMessage_uuid不一致() throws Exception {
             final Device device = mBuilder.build();

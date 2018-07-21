@@ -102,6 +102,13 @@ public class SsdpServerDelegateTest {
     }
 
     @Test
+    public void getInterfaceAddress() throws Exception {
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
+        assertThat(server.getInterfaceAddress(), is(SsdpServerDelegate.findInet4Address(networkInterface.getInterfaceAddresses())));
+    }
+
+    @Test
     public void open_close() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
@@ -129,6 +136,15 @@ public class SsdpServerDelegateTest {
         verify(server, times(1)).stop();
         server.stop();
         server.close();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void start_without_open() throws Exception {
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
+        final MulticastSocket socket = mock(MulticastSocket.class);
+        doReturn(socket).when(server).createMulticastSocket(anyInt());
+        server.start();
     }
 
     @Test

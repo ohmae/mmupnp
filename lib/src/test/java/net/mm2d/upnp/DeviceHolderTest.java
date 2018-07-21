@@ -42,7 +42,7 @@ public class DeviceHolderTest {
     }
 
     @Test
-    public void remove() throws Exception {
+    public void remove_device() throws Exception {
         final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
@@ -51,6 +51,19 @@ public class DeviceHolderTest {
         assertThat(holder.get(UDN), sameInstance(device));
 
         holder.remove(device);
+        assertThat(holder.get(UDN), is(nullValue()));
+    }
+
+    @Test
+    public void remove_udn() throws Exception {
+        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
+        final Device device = mock(Device.class);
+        doReturn(UDN).when(device).getUdn();
+        holder.add(device);
+
+        assertThat(holder.get(UDN), sameInstance(device));
+
+        holder.remove(UDN);
         assertThat(holder.get(UDN), is(nullValue()));
     }
 

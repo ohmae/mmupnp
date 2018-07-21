@@ -10,7 +10,7 @@ version versionName
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-test.maxParallelForks = 4
+test.maxParallelForks = 8
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
