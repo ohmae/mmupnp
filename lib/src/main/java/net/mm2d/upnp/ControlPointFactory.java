@@ -9,7 +9,6 @@ package net.mm2d.upnp;
 
 import java.net.NetworkInterface;
 import java.util.Collection;
-import java.util.Collections;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,6 +23,72 @@ import javax.annotation.Nullable;
  */
 public final class ControlPointFactory {
     /**
+     * ControlPointの初期化パラメータ
+     */
+    public static class Params {
+        @Nonnull
+        private Protocol mProtocol = Protocol.DEFAULT;
+        @Nullable
+        private Collection<NetworkInterface> mInterfaces;
+        private boolean mNotifySegmentCheckEnabled;
+
+        @Nonnull
+        private Protocol getProtocol() {
+            return mProtocol;
+        }
+
+        /**
+         * 使用するプロトコルスタックを指定する。
+         *
+         * <p>未指定の場合デフォルトのプロトコルスタックが使用される。
+         *
+         * @param protocol 使用するプロトコルスタック
+         * @return このインスタンス
+         * @see Protocol
+         */
+        @Nonnull
+        public Params setProtocol(@Nonnull final Protocol protocol) {
+            mProtocol = protocol;
+            return this;
+        }
+
+        @Nullable
+        private Collection<NetworkInterface> getInterfaces() {
+            return mInterfaces;
+        }
+
+        /**
+         * 使用するインターフェースを指定する。
+         *
+         * <p>未指定の場合、プロトコルスタックから自動選択される。
+         *
+         * @param interfaces 使用するインターフェース
+         * @return このインスタンス
+         */
+        @Nonnull
+        public Params setInterfaces(@Nullable final Collection<NetworkInterface> interfaces) {
+            mInterfaces = interfaces;
+            return this;
+        }
+
+        private boolean isNotifySegmentCheckEnabled() {
+            return mNotifySegmentCheckEnabled;
+        }
+
+        /**
+         * SSDP Notifyパケットを受け取った時にセグメントチェックを行う設定を行う
+         *
+         * @param enabled セグメントチェックを有効にするときtrue
+         * @return このインスタンス
+         */
+        @Nonnull
+        public Params setNotifySegmentCheckEnabled(final boolean enabled) {
+            mNotifySegmentCheckEnabled = enabled;
+            return this;
+        }
+    }
+
+    /**
      * ControlPointのインスタンスを作成する。
      *
      * <p>引数のインターフェースを利用するように初期化される。
@@ -35,7 +100,7 @@ public final class ControlPointFactory {
     @Nonnull
     public static ControlPoint create()
             throws IllegalStateException {
-        return create(Collections.emptyList());
+        return create(new Params());
     }
 
     /**
@@ -48,7 +113,7 @@ public final class ControlPointFactory {
     @Nonnull
     public static ControlPoint create(@Nullable final Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
-        return create(Protocol.DEFAULT, interfaces);
+        return create(new Params().setInterfaces(interfaces));
     }
 
     /**
@@ -64,7 +129,7 @@ public final class ControlPointFactory {
     @Nonnull
     public static ControlPoint create(@Nonnull final Protocol protocol)
             throws IllegalStateException {
-        return create(protocol, Collections.emptyList());
+        return create(new Params().setProtocol(protocol));
     }
 
     /**
@@ -80,7 +145,24 @@ public final class ControlPointFactory {
             @Nonnull final Protocol protocol,
             @Nullable final Collection<NetworkInterface> interfaces)
             throws IllegalStateException {
-        return new ControlPointImpl(protocol, getDefaultInterfacesIfEmpty(protocol, interfaces), new DiFactory(protocol));
+        return create(new Params().setProtocol(protocol).setInterfaces(interfaces));
+    }
+
+    /**
+     * ControlPointのインスタンスを作成する。
+     *
+     * @param params 初期化パラメータ
+     * @return ControlPointのインスタンス
+     * @throws IllegalStateException 使用可能なインターフェースがない。
+     */
+    @Nonnull
+    public static ControlPoint create(@Nonnull final Params params) {
+        final Protocol protocol = params.getProtocol();
+        return new ControlPointImpl(
+                protocol,
+                getDefaultInterfacesIfEmpty(protocol, params.getInterfaces()),
+                params.isNotifySegmentCheckEnabled(),
+                new DiFactory(protocol));
     }
 
     @Nonnull

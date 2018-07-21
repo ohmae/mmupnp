@@ -69,6 +69,7 @@ class ControlPointImpl implements ControlPoint {
     ControlPointImpl(
             @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
+            final boolean notifySegmentCheckEnabled,
             @Nonnull final DiFactory factory) {
         if (interfaces.isEmpty()) {
             throw new IllegalStateException("no valid network interface.");
@@ -83,6 +84,7 @@ class ControlPointImpl implements ControlPoint {
                 mThreadPool.executeInParallel(() -> onReceiveSsdp(message)));
         mNotifyReceiverList = factory.createSsdpNotifyReceiverList(interfaces, message ->
                 mThreadPool.executeInParallel(() -> onReceiveSsdp(message)));
+        mNotifyReceiverList.setSegmentCheckEnabled(notifySegmentCheckEnabled);
         mDeviceHolder = factory.createDeviceHolder(this::lostDevice);
         mSubscribeManager = factory.createSubscribeManager(mThreadPool, mNotifyEventListenerList);
     }
@@ -260,11 +262,6 @@ class ControlPointImpl implements ControlPoint {
             throw new IllegalStateException("ControlPoint is not started.");
         }
         mSearchServerList.search(st);
-    }
-
-    @Override
-    public void setNotifySegmentCheckEnabled(final boolean enabled) {
-        mNotifyReceiverList.setSegmentCheckEnabled(enabled);
     }
 
     @Override

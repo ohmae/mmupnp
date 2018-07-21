@@ -46,7 +46,7 @@ public class ControlPointTest {
     public static class mock未使用 {
         @Test(expected = IllegalStateException.class)
         public void constructor_インターフェース空で指定() throws Exception {
-            new ControlPointImpl(Protocol.DEFAULT, Collections.<NetworkInterface>emptyList(), mock(DiFactory.class));
+            new ControlPointImpl(Protocol.DEFAULT, Collections.emptyList(), false, mock(DiFactory.class));
         }
 
         @Test(timeout = 2000L)
@@ -120,7 +120,9 @@ public class ControlPointTest {
         @Test
         public void search() throws Exception {
             final SsdpSearchServerList list = mock(SsdpSearchServerList.class);
-            final ControlPoint cp = new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            final ControlPoint cp = new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(),
+                    false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -207,7 +209,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -380,7 +383,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -530,7 +534,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -640,7 +645,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPointImpl(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
