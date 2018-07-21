@@ -41,7 +41,7 @@ public class SubscribeManagerTest {
             }
         };
         final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
-        assertThat(manager.onEventReceived("", 0, Collections.<StringPair>emptyList()), is(false));
+        assertThat(manager.onEventReceived("", 0, Collections.emptyList()), is(false));
     }
 
     @Test

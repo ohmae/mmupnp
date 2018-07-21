@@ -79,7 +79,7 @@ public class SsdpServerDelegateTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void findInet4Address_見つからなければException2() throws Exception {
-        SsdpServerDelegate.findInet4Address(Collections.<InterfaceAddress>emptyList());
+        SsdpServerDelegate.findInet4Address(Collections.emptyList());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class SsdpServerDelegateTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void findInet6Address_見つからなければException2() throws Exception {
-        SsdpServerDelegate.findInet6Address(Collections.<InterfaceAddress>emptyList());
+        SsdpServerDelegate.findInet6Address(Collections.emptyList());
     }
 
     @Test

@@ -485,7 +485,7 @@ public class ControlPointTest {
             mCp.onReceiveSsdp(message);
             Thread.sleep(1000); // 読み込みを待つ
             final Device device = mCp.getDevice(udn);
-            verify(iconFilter).filter(ArgumentMatchers.<Icon>anyList());
+            verify(iconFilter).filter(ArgumentMatchers.anyList());
             assertThat(device.getIconList(), hasSize(4));
             assertThat(device.getIconList().get(0).getBinary(), is(not(nullValue())));
             assertThat(device.getIconList().get(1).getBinary(), is(nullValue()));

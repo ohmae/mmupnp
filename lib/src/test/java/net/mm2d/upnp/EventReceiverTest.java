@@ -385,10 +385,10 @@ public class EventReceiverTest {
         task.setEventMessageListener(listener);
 
         final HttpRequest request = new HttpRequest();
-        doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+        doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
         assertThat(task.notifyEvent(sid, request), is(false));
-        verify(listener, never()).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+        verify(listener, never()).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
     }
 
     @Test
@@ -402,15 +402,15 @@ public class EventReceiverTest {
                 .setHeader(Http.SEQ, "0")
                 .setBody(TestUtils.getResourceAsString("propchange.xml"), true);
 
-        doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+        doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
         assertThat(task.notifyEvent(sid, request), is(true));
-        verify(listener, times(1)).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+        verify(listener, times(1)).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
-        doReturn(false).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+        doReturn(false).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
         assertThat(task.notifyEvent(sid, request), is(false));
-        verify(listener, times(2)).onEventReceived(anyString(), anyLong(), ArgumentMatchers.<StringPair>anyList());
+        verify(listener, times(2)).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
     }
 
     @Test
