@@ -16,8 +16,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Set;
@@ -200,13 +198,6 @@ public class DeviceParserTest {
 
     @RunWith(JUnit4.class)
     public static class 機能ごとのテスト {
-        @Test(expected = InvocationTargetException.class)
-        public void constructor() throws Exception {
-            final Constructor<DeviceParser> constructor = DeviceParser.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            constructor.newInstance();
-        }
-
         @Test(expected = IOException.class)
         public void loadDescription_ダウンロード失敗でIOException() throws Exception {
             final DeviceImpl.Builder builder = mock(DeviceImpl.Builder.class);

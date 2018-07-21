@@ -174,4 +174,8 @@ public final class ControlPointFactory {
         }
         return interfaces;
     }
+
+    // インスタンス化禁止
+    private ControlPointFactory() {
+    }
 }

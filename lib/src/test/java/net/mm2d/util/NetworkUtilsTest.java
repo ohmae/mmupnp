@@ -17,9 +17,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -42,13 +40,6 @@ import static org.mockito.Mockito.*;
 public class NetworkUtilsTest {
     @RunWith(JUnit4.class)
     public static class NetworkInterfaceをデバイスから取得 {
-        @Test(expected = InvocationTargetException.class)
-        public void constructor() throws Exception {
-            final Constructor<NetworkUtils> constructor = NetworkUtils.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            constructor.newInstance();
-        }
-
         @Test
         public void getAvailableInet4Interfaces() throws Exception {
             final List<NetworkInterface> list = NetworkUtils.getAvailableInet4Interfaces();

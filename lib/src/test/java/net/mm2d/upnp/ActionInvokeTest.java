@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.StringPair;
 import net.mm2d.util.XmlUtils;
 
 import org.junit.Before;

@@ -13,22 +13,12 @@ import org.junit.runners.JUnit4;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 @SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class XmlUtilsTest {
-    @Test(expected = InvocationTargetException.class)
-    public void constructor() throws Exception {
-        final Constructor<XmlUtils> constructor = XmlUtils.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        constructor.newInstance();
-    }
-
     @Test
     public void getDocumentBuilder_NS_not_aware() throws Exception {
         final String xml = TestUtils.getResourceAsString("propchange.xml");

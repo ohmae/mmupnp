@@ -11,22 +11,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 @SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class TestParseUtilsTest {
-    @Test(expected = InvocationTargetException.class)
-    public void constructor() throws Exception {
-        final Constructor<TextParseUtils> constructor = TextParseUtils.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        constructor.newInstance();
-    }
-
     @Test
     public void parseIntSafely_10進数異常値指定() {
         assertThat(TextParseUtils.parseIntSafely(null, -1), is(-1));
