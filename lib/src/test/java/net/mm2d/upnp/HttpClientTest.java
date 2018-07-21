@@ -88,6 +88,7 @@ public class HttpClientTest {
             final HttpClient client = new HttpClient(true);
             assertThat(client.downloadBinary(new URL("http://127.0.0.1:" + port + "/")), is(responseBody));
             assertThat(client.isClosed(), is(false));
+            assertThat(client.getLocalAddress(), is(InetAddress.getByName("127.0.0.1")));
 
             client.setKeepAlive(false);
             assertThat(client.downloadBinary(new URL("http://127.0.0.1:" + port + "/")), is(responseBody));

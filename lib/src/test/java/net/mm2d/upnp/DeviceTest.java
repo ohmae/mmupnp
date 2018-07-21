@@ -117,6 +117,7 @@ public class DeviceTest {
         @Test
         public void updateSsdpMessage_pinned() throws Exception {
             final SsdpMessage originalMessage = mock(PinnedSsdpMessage.class);
+            doReturn("location").when(originalMessage).getLocation();
             mBuilder.updateSsdpMessage(originalMessage);
             final Device device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");

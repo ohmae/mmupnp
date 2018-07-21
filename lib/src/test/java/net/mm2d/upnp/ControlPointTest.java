@@ -522,6 +522,62 @@ public class ControlPointTest {
     }
 
     @RunWith(JUnit4.class)
+    public static class PinnedDevice {
+        private ControlPointImpl mCp;
+        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<>());
+        private DeviceHolder mDeviceHolder;
+        private HttpClient mHttpClient;
+
+        @Before
+        public void setUp() throws Exception {
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
+                    new DiFactory(Protocol.DEFAULT)));
+
+            mHttpClient = mock(HttpClient.class);
+            doReturn(TestUtils.getResourceAsString("device.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
+            doReturn(TestUtils.getResourceAsString("cds.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/cds.xml"));
+            doReturn(TestUtils.getResourceAsString("cms.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/cms.xml"));
+            doReturn(TestUtils.getResourceAsString("mmupnp.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/mmupnp.xml"));
+            doReturn(mHttpClient).when(mCp).createHttpClient();
+        }
+
+        @Test
+        public void addPinnedDevice() throws Exception {
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            doReturn(InetAddress.getByName("192.0.2.1")).when(mHttpClient).getLocalAddress();
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDeviceListSize(), is(1));
+            final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
+            assertThat(device.isPinned(), is(true));
+        }
+
+        @Test
+        public void removePinnedDevice() throws Exception {
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            doReturn(InetAddress.getByName("192.0.2.1")).when(mHttpClient).getLocalAddress();
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDeviceListSize(), is(1));
+
+            mCp.removePinnedDevice("http://192.0.2.2:12345/device.xml");
+            assertThat(mCp.getDeviceListSize(), is(0));
+        }
+        @Test
+        public void removePinnedDevice_before_load() throws Exception {
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            doReturn(InetAddress.getByName("192.0.2.1")).when(mHttpClient).getLocalAddress();
+            assertThat(mCp.getDeviceListSize(), is(0));
+            mCp.removePinnedDevice("http://192.0.2.2:12345/device.xml");
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDeviceListSize(), is(0));
+        }
+    }
+
+    @RunWith(JUnit4.class)
     public static class イベント伝搬テスト {
         private ControlPointImpl mCp;
         private SubscribeManager mSubscribeManager;
