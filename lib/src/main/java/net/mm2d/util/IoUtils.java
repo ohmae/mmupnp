@@ -111,6 +111,5 @@ public final class IoUtils {
 
     // インスタンス化禁止
     private IoUtils() {
-        throw new AssertionError();
     }
 }

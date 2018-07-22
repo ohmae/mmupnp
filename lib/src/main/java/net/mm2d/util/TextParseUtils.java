@@ -95,6 +95,5 @@ public final class TextParseUtils {
 
     // インスタンス化禁止
     private TextParseUtils() {
-        throw new AssertionError();
     }
 }

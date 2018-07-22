@@ -54,6 +54,5 @@ public final class Property {
 
     // インスタンス化禁止
     private Property() {
-        throw new AssertionError();
     }
 }

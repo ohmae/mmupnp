@@ -206,6 +206,5 @@ final class ServiceParser {
 
     // インスタンス化禁止
     private ServiceParser() {
-        throw new AssertionError();
     }
 }

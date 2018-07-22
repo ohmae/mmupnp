@@ -255,6 +255,5 @@ final class DeviceParser {
 
     // インスタンス化禁止
     private DeviceParser() {
-        throw new AssertionError();
     }
 }

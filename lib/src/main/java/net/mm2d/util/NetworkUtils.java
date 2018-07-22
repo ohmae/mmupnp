@@ -361,6 +361,5 @@ public final class NetworkUtils {
 
     // インスタンス化禁止
     private NetworkUtils() {
-        throw new AssertionError();
     }
 }

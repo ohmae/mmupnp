@@ -64,6 +64,5 @@ public final class TextUtils {
 
     // インスタンス化禁止
     private TextUtils() {
-        throw new AssertionError();
     }
 }

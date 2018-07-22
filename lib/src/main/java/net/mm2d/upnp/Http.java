@@ -429,6 +429,5 @@ public final class Http {
      * インスタンス化禁止
      */
     private Http() {
-        throw new AssertionError();
     }
 }

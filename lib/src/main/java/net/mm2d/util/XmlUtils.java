@@ -104,6 +104,5 @@ public final class XmlUtils {
 
     // インスタンス化禁止
     private XmlUtils() {
-        throw new AssertionError();
     }
 }
