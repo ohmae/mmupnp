@@ -19,8 +19,11 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 class PinnedSsdpMessage implements SsdpMessage {
+    @Nonnull
     private final String mLocation;
-    private String mUuid;
+    @Nonnull
+    private String mUuid = "";
+    @Nullable
     private InetAddress mLocalAddress;
 
     PinnedSsdpMessage(@Nonnull final String location) {

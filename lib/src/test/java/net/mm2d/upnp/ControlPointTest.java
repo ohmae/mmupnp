@@ -566,6 +566,7 @@ public class ControlPointTest {
             mCp.removePinnedDevice("http://192.0.2.2:12345/device.xml");
             assertThat(mCp.getDeviceListSize(), is(0));
         }
+
         @Test
         public void removePinnedDevice_before_load() throws Exception {
             mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
