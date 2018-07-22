@@ -399,7 +399,7 @@ public final class Http {
      * <li>"http://10.0.0.1:1000" ホスト名のみだが末尾の"/"がない。
      * <li>"http://10.0.0.1:1000/hoge/fuga" ファイル名で終わる
      * <li>"http://10.0.0.1:1000/hoge/fuga/" ディレクトリ名で終わる
-     * <li>"http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar" 上記に対してクエリーが付いている
+     * <li>"http://10.0.0.1:1000/hoge/fuga?a=foo&amp;b=bar" 上記に対してクエリーが付いている
      * </ul>
      *
      * <p>URLが"http://"から始まっていればそのまま利用する。
