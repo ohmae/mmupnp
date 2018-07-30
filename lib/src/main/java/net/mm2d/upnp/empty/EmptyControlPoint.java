@@ -5,7 +5,11 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp;
+package net.mm2d.upnp.empty;
+
+import net.mm2d.upnp.ControlPoint;
+import net.mm2d.upnp.Device;
+import net.mm2d.upnp.IconFilter;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +17,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-class EmptyControlPoint implements ControlPoint {
+public class EmptyControlPoint implements ControlPoint {
     @Override
     public void initialize() {
     }
