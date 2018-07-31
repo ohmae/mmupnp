@@ -19,14 +19,6 @@ import javax.annotation.Nullable;
  */
 public interface StateVariable {
     /**
-     * このStateVariableを保持するServiceを返す
-     *
-     * @return このStateVariableを保持するService
-     */
-    @Nonnull
-    Service getService();
-
-    /**
      * SendEventsの状態を返す。
      *
      * @return SendEventsがyesの場合true

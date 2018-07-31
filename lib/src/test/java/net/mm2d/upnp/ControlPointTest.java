@@ -525,8 +525,6 @@ public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class PinnedDevice {
         private ControlPointImpl mCp;
-        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<>());
-        private DeviceHolder mDeviceHolder;
         private HttpClient mHttpClient;
 
         @Before

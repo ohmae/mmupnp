@@ -93,7 +93,6 @@ public interface Device {
     @Nonnull
     URL appendScopeIdIfNeed(@Nonnull String url) throws MalformedURLException;
 
-
     /**
      * URL情報を正規化して返す。
      *

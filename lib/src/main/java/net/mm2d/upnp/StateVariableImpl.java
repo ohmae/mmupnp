@@ -27,12 +27,11 @@ class StateVariableImpl implements StateVariable {
      * @see ServiceParser#loadDescription(HttpClient, DeviceImpl.Builder, ServiceImpl.Builder)
      */
     static class Builder {
-        private Service mService;
         private boolean mSendEvents = true;
         private boolean mMulticast = false;
         private String mName;
         private String mDataType;
-        private final List<String> mAllowedValueList;
+        private final List<String> mAllowedValueList = new ArrayList<>();
         private String mDefaultValue = null;
         private String mMinimum;
         private String mMaximum;
@@ -42,19 +41,6 @@ class StateVariableImpl implements StateVariable {
          * インスタンス作成
          */
         public Builder() {
-            mAllowedValueList = new ArrayList<>();
-        }
-
-        /**
-         * このStateVariableを保持するServiceを登録する。
-         *
-         * @param service このStateVariableを保持するService
-         * @return Builder
-         */
-        @Nonnull
-        public Builder setService(@Nonnull final Service service) {
-            mService = service;
-            return this;
         }
 
         /**
@@ -177,9 +163,6 @@ class StateVariableImpl implements StateVariable {
          */
         @Nonnull
         public StateVariable build() {
-            if (mService == null) {
-                throw new IllegalStateException("service must be set.");
-            }
             if (mName == null) {
                 throw new IllegalStateException("name must be set.");
             }
@@ -190,8 +173,6 @@ class StateVariableImpl implements StateVariable {
         }
     }
 
-    @Nonnull
-    private final Service mService;
     private final boolean mSendEvents;
     private final boolean mMulticast;
     @Nonnull
@@ -210,7 +191,6 @@ class StateVariableImpl implements StateVariable {
     private final String mStep;
 
     private StateVariableImpl(@Nonnull final Builder builder) {
-        mService = builder.mService;
         mSendEvents = builder.mSendEvents;
         mMulticast = builder.mMulticast;
         mName = builder.mName;
@@ -220,12 +200,6 @@ class StateVariableImpl implements StateVariable {
         mMinimum = builder.mMinimum;
         mMaximum = builder.mMaximum;
         mStep = builder.mStep;
-    }
-
-    @Override
-    @Nonnull
-    public Service getService() {
-        return mService;
     }
 
     @Override

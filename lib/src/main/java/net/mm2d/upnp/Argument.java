@@ -16,14 +16,6 @@ import javax.annotation.Nonnull;
  */
 public interface Argument {
     /**
-     * このArgumentを保持するActionを返す。
-     *
-     * @return このArgumentを保持するAction
-     */
-    @Nonnull
-    Action getAction();
-
-    /**
      * Argument名を返す。
      *
      * @return Argument名

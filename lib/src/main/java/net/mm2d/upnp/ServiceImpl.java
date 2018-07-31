@@ -253,20 +253,19 @@ class ServiceImpl implements Service {
         mControlUrl = builder.mControlUrl;
         mEventSubUrl = builder.mEventSubUrl;
         mDescription = builder.mDescription != null ? builder.mDescription : "";
-        mStateVariableMap = buildStateVariableMap(this, builder.mVariableBuilderList);
+        mStateVariableMap = buildStateVariableMap(builder.mVariableBuilderList);
         mActionMap = buildActionMap(this, mStateVariableMap, builder.mActionBuilderList);
     }
 
     @Nonnull
     private static Map<String, StateVariable> buildStateVariableMap(
-            @Nonnull final Service service,
             @Nonnull final List<StateVariableImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
             return Collections.emptyMap();
         }
         final Map<String, StateVariable> map = new LinkedHashMap<>(builderList.size());
         for (final StateVariableImpl.Builder variableBuilder : builderList) {
-            final StateVariable variable = variableBuilder.setService(service).build();
+            final StateVariable variable = variableBuilder.build();
             map.put(variable.getName(), variable);
         }
         return map;

@@ -70,7 +70,6 @@ public class ActionInvokeTest {
                         .setRelatedStateVariableName("1")
                         .setRelatedStateVariable(
                                 new StateVariableImpl.Builder()
-                                        .setService(service)
                                         .setDataType("string")
                                         .setName("1")
                                         .build()))
@@ -80,7 +79,6 @@ public class ActionInvokeTest {
                         .setRelatedStateVariableName("2")
                         .setRelatedStateVariable(
                                 new StateVariableImpl.Builder()
-                                        .setService(service)
                                         .setDataType("string")
                                         .setName("2")
                                         .setDefaultValue(IN_ARG_DEFAULT_VALUE)
@@ -91,7 +89,6 @@ public class ActionInvokeTest {
                         .setRelatedStateVariableName("3")
                         .setRelatedStateVariable(
                                 new StateVariableImpl.Builder()
-                                        .setService(service)
                                         .setDataType("string")
                                         .setName("3")
                                         .build()))

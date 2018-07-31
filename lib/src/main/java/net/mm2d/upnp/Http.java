@@ -142,7 +142,8 @@ public final class Http {
         HTTP_BAD_GATEWAY(502, "Bad Gateway"),
         HTTP_UNAVAILABLE(503, "Service Unavailable"),
         HTTP_GATEWAY_TIMEOUT(504, "Gateway Time-out"),
-        HTTP_VERSION(505, "HTTP Version not supported"),;
+        HTTP_VERSION(505, "HTTP Version not supported"),
+        ;
         private final int mCode;
         @Nonnull
         private final String mPhrase;

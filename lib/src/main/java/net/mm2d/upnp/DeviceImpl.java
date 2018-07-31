@@ -558,21 +558,20 @@ class DeviceImpl implements Device {
         mUrlBase = builder.mUrlBase;
         mDescription = builder.mDescription;
         mTagMap = builder.mTagMap;
-        mIconList = buildIconList(this, builder.mIconBuilderList);
+        mIconList = buildIconList(builder.mIconBuilderList);
         mServiceList = buildServiceList(this, builder.mSubscribeManager, builder.mServiceBuilderList);
         mDeviceList = buildDeviceList(this, builder.mDeviceBuilderList);
     }
 
     @Nonnull
     private static List<Icon> buildIconList(
-            @Nonnull final Device device,
             @Nonnull final List<IconImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
             return Collections.emptyList();
         }
         final List<Icon> list = new ArrayList<>(builderList.size());
         for (final IconImpl.Builder builder : builderList) {
-            list.add(builder.setDevice(device).build());
+            list.add(builder.build());
         }
         return list;
     }
@@ -619,9 +618,11 @@ class DeviceImpl implements Device {
         }
         final List<Icon> loadList = filter.filter(mIconList);
         for (final Icon icon : loadList) {
-            try {
-                icon.loadBinary(client);
-            } catch (final IOException ignored) {
+            if (icon instanceof IconImpl) {
+                try {
+                    ((IconImpl) icon).loadBinary(this, client);
+                } catch (final IOException ignored) {
+                }
             }
         }
     }

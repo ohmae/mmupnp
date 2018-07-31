@@ -44,7 +44,8 @@ interface SsdpServer {
          *
          * <p>未使用
          */
-        IP_V6_SITE_LOCAL("FF05::C"),;
+        IP_V6_SITE_LOCAL("FF05::C"),
+        ;
 
         @Nonnull
         private final InetAddress mInetAddress;

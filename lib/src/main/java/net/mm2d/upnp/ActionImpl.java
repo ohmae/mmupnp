@@ -151,7 +151,7 @@ class ActionImpl implements Action {
         mName = builder.mName;
         mArgumentMap = new LinkedHashMap<>(builder.mArgumentList.size());
         for (final ArgumentImpl.Builder argumentBuilder : builder.mArgumentList) {
-            final Argument argument = argumentBuilder.setAction(this).build();
+            final Argument argument = argumentBuilder.build();
             mArgumentMap.put(argument.getName(), argument);
         }
     }

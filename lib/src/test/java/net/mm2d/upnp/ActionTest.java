@@ -94,7 +94,6 @@ public class ActionTest {
 
         assertThat(action.getArgumentList().size(), is(1));
         final Argument argument = action.getArgumentList().get(0);
-        assertThat(argument.getAction(), is(action));
         assertThat(argument.getName(), is(argumentName));
         assertThat(argument.isInputDirection(), is(true));
         assertThat(argument.getRelatedStateVariable(), is(stateVariable));
@@ -116,7 +115,6 @@ public class ActionTest {
                 .build();
         final Argument argument = action.findArgument(argumentName);
 
-        assertThat(argument.getAction(), is(action));
         assertThat(argument.getName(), is(argumentName));
         assertThat(argument.isInputDirection(), is(true));
         assertThat(argument.getRelatedStateVariable(), is(stateVariable));

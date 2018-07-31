@@ -182,7 +182,7 @@ public class HttpClientTest {
 
         try {
             final HttpClient client = new HttpClient(false);
-            final HttpResponse response = client.post(new HttpRequest()
+            client.post(new HttpRequest()
                     .setMethod(Http.GET)
                     .setUrl(new URL("http://127.0.0.1:" + port + "/a"), true)
                     .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
