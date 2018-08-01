@@ -620,7 +620,7 @@ class DeviceImpl implements Device {
         for (final Icon icon : loadList) {
             if (icon instanceof IconImpl) {
                 try {
-                    ((IconImpl) icon).loadBinary(this, client);
+                    ((IconImpl) icon).loadBinary(client, getBaseUrl(), getScopeId());
                 } catch (final IOException ignored) {
                 }
             }
@@ -675,19 +675,6 @@ class DeviceImpl implements Device {
     @Override
     public int getScopeId() {
         return mSsdpMessage.getScopeId();
-    }
-
-    /**
-     * URL情報を正規化して返す。
-     *
-     * @param url URLパス情報
-     * @return 正規化したURL
-     * @throws MalformedURLException 不正なURL
-     * @see Http#makeAbsoluteUrl(String, String, int)
-     */
-    @Nonnull
-    URL makeAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
-        return Http.makeAbsoluteUrl(getBaseUrl(), url, getScopeId());
     }
 
     @Override

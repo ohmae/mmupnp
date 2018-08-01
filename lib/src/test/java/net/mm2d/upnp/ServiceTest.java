@@ -780,7 +780,6 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build());
-            doReturn(new URL("http://192.0.2.2/")).when(mDevice).makeAbsoluteUrl(anyString());
             doReturn(new URL("http://192.0.2.2/")).when(mService).makeAbsoluteUrl(anyString());
             doReturn("").when(mService).getCallback();
             mHttpClient = mock(HttpClient.class);
