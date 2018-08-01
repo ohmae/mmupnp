@@ -25,6 +25,7 @@ import java.net.URL;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class HttpRequestTest {
     private static final String ACTION = "\"urn:schemas-upnp-org:service:ContentDirectory:1#Browse\"";
@@ -71,14 +72,12 @@ public class HttpRequestTest {
 
     @Test(expected = IOException.class)
     public void setUrl_http以外はException() throws IOException {
-        final HttpRequest request = new HttpRequest()
-                .setUrl(new URL("https://192.0.2.2:12345/cds/control"), true);
+        new HttpRequest().setUrl(new URL("https://192.0.2.2:12345/cds/control"), true);
     }
 
     @Test(expected = IOException.class)
     public void setUrl_portがUnsignedShortMax以上ならException() throws IOException {
-        final HttpRequest request = new HttpRequest()
-                .setUrl(new URL("http://192.0.2.2:65536/cds/control"), true);
+        new HttpRequest().setUrl(new URL("http://192.0.2.2:65536/cds/control"), true);
     }
 
     @Test

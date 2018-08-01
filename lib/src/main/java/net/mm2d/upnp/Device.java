@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -78,31 +76,6 @@ public interface Device {
      * @return ScopeID、設定されていない場合(IPv4含む)は0
      */
     int getScopeId();
-
-    /**
-     * 必要に応じてURLにこのデバイスのScopeIdを付加する。
-     *
-     * <p>SSDPメッセージがIPv6インターフェース経由で通知されており、
-     * そのインターフェースのScopeIDが設定されている場合、
-     * かつURLのhost部がIPv6リテラルである場合にのみ付加する。
-     *
-     * @param url 元となるURL
-     * @return ScopeIDが付加されたURL
-     * @throws MalformedURLException 不正なURL
-     */
-    URL appendScopeIdIfNeed(@Nonnull String url) throws MalformedURLException;
-
-
-    /**
-     * URL情報を正規化して返す。
-     *
-     * @param url URLパス情報
-     * @return 正規化したURL
-     * @throws MalformedURLException 不正なURL
-     * @see Http#getAbsoluteUrl(String, String)
-     */
-    @Nonnull
-    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException;
 
     /**
      * Descriptionに記述されていたタグの値を取得する。
@@ -439,6 +412,18 @@ public interface Device {
     @Nullable
     Device findDeviceByTypeRecursively(@Nonnull String deviceType);
 
+    /**
+     * EmbeddedDeviceを含めたすべてのUDNのSetを返す。
+     *
+     * @return すべてのUDNのSet
+     */
     @Nonnull
-    Set<String> getEmbeddedDeviceUdnSet();
+    Set<String> getAllUdnSet();
+
+    /**
+     * 固定デバイスか否かを返す。
+     *
+     * @return 固定デバイスの時true
+     */
+    boolean isPinned();
 }

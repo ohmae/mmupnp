@@ -214,7 +214,7 @@ public final class NetworkUtils {
     }
 
     // VisibleForTesting
-    @SuppressWarnings("FieldMayBeFinal")
+    @SuppressWarnings({"FieldMayBeFinal", "CanBeFinal"})
     private static NetworkInterfaceEnumeration sNetworkInterfaceEnumeration = new NetworkInterfaceEnumeration();
 
     // VisibleForTesting
@@ -361,6 +361,5 @@ public final class NetworkUtils {
 
     // インスタンス化禁止
     private NetworkUtils() {
-        throw new AssertionError();
     }
 }

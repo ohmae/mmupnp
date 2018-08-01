@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
+@SuppressWarnings("WeakerAccess")
 public final class Property {
     /**
      * ライブラリバージョン
@@ -53,6 +54,5 @@ public final class Property {
 
     // インスタンス化禁止
     private Property() {
-        throw new AssertionError();
     }
 }

@@ -7,12 +7,10 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.upnp.SsdpServerDelegate.Receiver;
 import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 
 import javax.annotation.Nonnull;
@@ -42,7 +40,7 @@ class SsdpSearchServer implements SsdpServer {
          *
          * @param message 受信したレスポンスメッセージ
          */
-        void onReceiveResponse(@Nonnull SsdpResponse message);
+        void onReceiveResponse(@Nonnull SsdpMessage message);
     }
 
     @Nonnull
@@ -58,15 +56,7 @@ class SsdpSearchServer implements SsdpServer {
     SsdpSearchServer(
             @Nonnull final Address address,
             @Nonnull final NetworkInterface ni) {
-        mDelegate = new SsdpServerDelegate(new Receiver() {
-            @Override
-            public void onReceive(
-                    @Nonnull final InetAddress sourceAddress,
-                    @Nonnull final byte[] data,
-                    final int length) {
-                SsdpSearchServer.this.onReceive(sourceAddress, data, length);
-            }
-        }, address, ni);
+        mDelegate = new SsdpServerDelegate(this::onReceive, address, ni);
     }
 
     // VisibleForTesting
@@ -114,9 +104,8 @@ class SsdpSearchServer implements SsdpServer {
     }
 
     @Nonnull
-    @Override
-    public InterfaceAddress getInterfaceAddress() {
-        return mDelegate.getInterfaceAddress();
+    private InetAddress getLocalAddress() {
+        return mDelegate.getLocalAddress();
     }
 
     @Override
@@ -150,7 +139,7 @@ class SsdpSearchServer implements SsdpServer {
             @Nonnull final byte[] data,
             final int length) {
         try {
-            final SsdpResponse message = new SsdpResponse(getInterfaceAddress(), data, length);
+            final SsdpResponse message = new SsdpResponse(getLocalAddress(), data, length);
             if (mDelegate.isInvalidLocation(message, sourceAddress)) {
                 return;
             }

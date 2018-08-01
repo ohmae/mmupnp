@@ -14,6 +14,7 @@ import org.junit.runners.JUnit4;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class PairTest {
     @Test
@@ -87,7 +88,7 @@ public class PairTest {
     }
 
     @Test
-    public void nullalbe() throws Exception {
+    public void nullalbel() throws Exception {
         final Pair<String, String> pair1 = new Pair<>(null, "1");
         final Pair<String, String> pair2 = new Pair<>("1", null);
         final Pair<String, String> pair3 = new Pair<>(null, null);

@@ -16,9 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.InterfaceAddress;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.Set;
 
@@ -26,6 +24,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(Enclosed.class)
 public class DeviceParserTest {
     @RunWith(JUnit4.class)
@@ -53,8 +52,7 @@ public class DeviceParserTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
+            mSsdpMessage = new SsdpRequest(mock(InetAddress.class), data, data.length);
             mControlPoint = mock(ControlPoint.class);
             mSubscribeManager = mock(SubscribeManager.class);
         }
@@ -124,8 +122,7 @@ public class DeviceParserTest {
         @Test
         public void loadDescription_with_url_base() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0-for-url-base.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            mSsdpMessage = new SsdpRequest(interfaceAddress, data, data.length);
+            mSsdpMessage = new SsdpRequest(mock(InetAddress.class), data, data.length);
             doReturn(TestUtils.getResourceAsString("device-with-url-base.xml"))
                     .when(mHttpClient).downloadString(new URL("http://192.0.2.3:12345/device.xml"));
 
@@ -162,7 +159,7 @@ public class DeviceParserTest {
             assertThat(device2.getParent(), is(device1));
             assertThat(device2.isEmbeddedDevice(), is(true));
 
-            final Set<String> udns = device.getEmbeddedDeviceUdnSet();
+            final Set<String> udns = device.getAllUdnSet();
             assertThat(udns, hasItem("uuid:01234567-89ab-cdef-0123-456789abcdee"));
             assertThat(udns, hasItem("uuid:01234567-89ab-cdef-0123-456789abcded"));
             assertThat(udns, not(hasItem("uuid:01234567-89ab-cdef-0123-456789abcdef")));
@@ -191,8 +188,7 @@ public class DeviceParserTest {
             final Device device = builder.build();
 
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final InterfaceAddress interfaceAddress = mock(InterfaceAddress.class);
-            final SsdpMessage message = new SsdpRequest(interfaceAddress, data, data.length);
+            final SsdpMessage message = new SsdpRequest(mock(InetAddress.class), data, data.length);
             device.updateSsdpMessage(message);
 
             final Device device1 = device.findDeviceByType("urn:schemas-upnp-org:device:WANDevice:1");
@@ -202,13 +198,6 @@ public class DeviceParserTest {
 
     @RunWith(JUnit4.class)
     public static class 機能ごとのテスト {
-        @Test(expected = InvocationTargetException.class)
-        public void constructor() throws Exception {
-            final Constructor<DeviceParser> constructor = DeviceParser.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            constructor.newInstance();
-        }
-
         @Test(expected = IOException.class)
         public void loadDescription_ダウンロード失敗でIOException() throws Exception {
             final DeviceImpl.Builder builder = mock(DeviceImpl.Builder.class);

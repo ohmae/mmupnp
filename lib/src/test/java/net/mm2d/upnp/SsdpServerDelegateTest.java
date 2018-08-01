@@ -30,9 +30,9 @@ import java.util.Collections;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpServerDelegateTest {
     @Test(timeout = 1000L)
@@ -79,7 +79,7 @@ public class SsdpServerDelegateTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void findInet4Address_見つからなければException2() throws Exception {
-        SsdpServerDelegate.findInet4Address(Collections.<InterfaceAddress>emptyList());
+        SsdpServerDelegate.findInet4Address(Collections.emptyList());
     }
 
     @Test
@@ -98,7 +98,14 @@ public class SsdpServerDelegateTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void findInet6Address_見つからなければException2() throws Exception {
-        SsdpServerDelegate.findInet6Address(Collections.<InterfaceAddress>emptyList());
+        SsdpServerDelegate.findInet6Address(Collections.emptyList());
+    }
+
+    @Test
+    public void getInterfaceAddress() throws Exception {
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
+        assertThat(server.getInterfaceAddress(), is(SsdpServerDelegate.findInet4Address(networkInterface.getInterfaceAddresses())));
     }
 
     @Test
@@ -129,6 +136,15 @@ public class SsdpServerDelegateTest {
         verify(server, times(1)).stop();
         server.stop();
         server.close();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void start_without_open() throws Exception {
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
+        final MulticastSocket socket = mock(MulticastSocket.class);
+        doReturn(socket).when(server).createMulticastSocket(anyInt());
+        server.start();
     }
 
     @Test
@@ -277,12 +293,8 @@ public class SsdpServerDelegateTest {
             }
         };
         receiveTask.start();
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                receiveTask.shutdownRequest(true);
-            }
-        });
+        final Thread thread = new Thread(() ->
+                receiveTask.shutdownRequest(true));
         thread.start();
         thread.interrupt();
         thread.join();
@@ -405,7 +417,7 @@ public class SsdpServerDelegateTest {
 
     private static SsdpResponse makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpResponse(mock(InterfaceAddress.class), data, data.length);
+        return new SsdpResponse(mock(InetAddress.class), data, data.length);
     }
 
     @Test

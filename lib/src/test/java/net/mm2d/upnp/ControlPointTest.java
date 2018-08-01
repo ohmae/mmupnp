@@ -25,7 +25,6 @@ import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.util.Collection;
@@ -38,32 +37,17 @@ import javax.annotation.Nonnull;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(Enclosed.class)
 public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class mock未使用 {
-        @Test
-        public void constructor_引数無しでコール() throws Exception {
-            new ControlPoint();
-        }
-
-        @Test
-        public void constructor_インターフェース指定() throws Exception {
-            new ControlPoint(NetworkUtils.getAvailableInet4Interfaces());
-        }
-
         @Test(expected = IllegalStateException.class)
         public void constructor_インターフェース空で指定() throws Exception {
-            new ControlPoint(Protocol.DEFAULT, Collections.<NetworkInterface>emptyList(), mock(DiFactory.class));
-        }
-
-        @Test
-        public void constructor_インターフェース選別() throws Exception {
-            new ControlPoint(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
-            new ControlPoint(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
-            new ControlPoint(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
+            new ControlPointImpl(Protocol.DEFAULT, Collections.emptyList(), false, mock(DiFactory.class));
         }
 
         @Test(timeout = 2000L)
@@ -83,13 +67,10 @@ public class ControlPointTest {
 
         @Test(timeout = 2000L)
         public void initialize_terminate_intercept() throws Exception {
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final ControlPoint cp = ControlPointFactory.create();
-                    cp.initialize();
-                    cp.terminate();
-                }
+            final Thread thread = new Thread(() -> {
+                final ControlPoint cp = ControlPointFactory.create();
+                cp.initialize();
+                cp.terminate();
             });
             thread.start();
             Thread.sleep(200);
@@ -122,7 +103,7 @@ public class ControlPointTest {
             cp.terminate();
         }
 
-        @Test(timeout = 1000L)
+        @Test(timeout = 10000L)
         public void start_stop_illegal() throws Exception {
             final ControlPoint cp = ControlPointFactory.create();
             cp.start();
@@ -140,7 +121,9 @@ public class ControlPointTest {
         @Test
         public void search() throws Exception {
             final SsdpSearchServerList list = mock(SsdpSearchServerList.class);
-            final ControlPoint cp = new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            final ControlPoint cp = new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(),
+                    false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -160,14 +143,14 @@ public class ControlPointTest {
 
         @Test
         public void createHttpClient() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create();
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create();
             final HttpClient client = cp.createHttpClient();
             assertThat(client.isKeepAlive(), is(true));
         }
 
         @Test
         public void needToUpdateSsdpMessage_DUAL_STACK() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -181,7 +164,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V4_ONLY() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -195,7 +178,7 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V6_ONLY() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(false));
@@ -217,7 +200,7 @@ public class ControlPointTest {
 
     @RunWith(JUnit4.class)
     public static class ネットワーク未使用 {
-        private ControlPoint mCp;
+        private ControlPointImpl mCp;
         private final SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
         private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
         private final ThreadPool mThreadPool = mock(ThreadPool.class);
@@ -227,7 +210,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -256,7 +240,7 @@ public class ControlPointTest {
         }
 
         @Test
-        public void discoverDevice_onDesicoverが通知される() throws Exception {
+        public void discoverDevice_onDiscoverが通知される() throws Exception {
             final DiscoveryListener l = mock(DiscoveryListener.class);
             mCp.addDiscoveryListener(l);
             final String uuid = "uuid";
@@ -394,13 +378,14 @@ public class ControlPointTest {
 
     @RunWith(JUnit4.class)
     public static class DeviceDiscovery {
-        private ControlPoint mCp;
-        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
+        private ControlPointImpl mCp;
+        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<>());
         private DeviceHolder mDeviceHolder;
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -422,8 +407,8 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスにないbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
-            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
+            final InetAddress addr = InetAddress.getByName("192.0.2.3");
+            final SsdpMessage message = new SsdpRequest(addr, data, data.length);
             mCp.onReceiveSsdp(message);
             verify(mLoadingDeviceMap).remove(anyString());
         }
@@ -431,8 +416,8 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスのbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
-            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
+            final InetAddress addr = InetAddress.getByName("192.0.2.3");
+            final SsdpMessage message = new SsdpRequest(addr, data, data.length);
             final Device device = mock(Device.class);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(udn).when(device).getUdn();
@@ -445,8 +430,8 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_alive受信後失敗() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
-            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
+            final InetAddress addr = InetAddress.getByName("192.0.2.3");
+            final SsdpMessage message = new SsdpRequest(addr, data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(new HttpClient(true) {
                 @Nonnull
@@ -486,8 +471,8 @@ public class ControlPointTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
-            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
+            final InetAddress address = InetAddress.getByName("192.0.2.3");
+            final SsdpMessage message = new SsdpRequest(address, data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(httpClient).when(mCp).createHttpClient();
             final IconFilter iconFilter = spy(new IconFilter() {
@@ -501,7 +486,7 @@ public class ControlPointTest {
             mCp.onReceiveSsdp(message);
             Thread.sleep(1000); // 読み込みを待つ
             final Device device = mCp.getDevice(udn);
-            verify(iconFilter).filter(ArgumentMatchers.<Icon>anyList());
+            verify(iconFilter).filter(ArgumentMatchers.anyList());
             assertThat(device.getIconList(), hasSize(4));
             assertThat(device.getIconList().get(0).getBinary(), is(not(nullValue())));
             assertThat(device.getIconList().get(1).getBinary(), is(nullValue()));
@@ -512,8 +497,8 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_読み込み済みデバイスのalive受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
-            final SsdpMessage message = new SsdpRequest(ifa, data, data.length);
+            final InetAddress addr = InetAddress.getByName("192.0.2.3");
+            final SsdpMessage message = new SsdpRequest(addr, data, data.length);
             final Device device = mock(Device.class);
             doReturn(message).when(device).getSsdpMessage();
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
@@ -526,22 +511,125 @@ public class ControlPointTest {
         @Test
         public void onReceiveSsdp_ロード中デバイスのalive受信() throws Exception {
             final byte[] data1 = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
-            final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
-            final SsdpMessage message1 = new SsdpRequest(ifa, data1, data1.length);
+            final InetAddress addr = InetAddress.getByName("192.0.2.3");
+            final SsdpMessage message1 = new SsdpRequest(addr, data1, data1.length);
             final DeviceImpl.Builder deviceBuilder = spy(new DeviceImpl.Builder(mCp, mock(SubscribeManager.class), message1));
             mLoadingDeviceMap.put(deviceBuilder.getUuid(), deviceBuilder);
             final byte[] data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message2 = new SsdpRequest(ifa, data2, data2.length);
+            final SsdpMessage message2 = new SsdpRequest(addr, data2, data2.length);
             mCp.onReceiveSsdp(message2);
             verify(deviceBuilder).updateSsdpMessage(message2);
         }
     }
 
     @RunWith(JUnit4.class)
+    public static class PinnedDevice {
+        private ControlPointImpl mCp;
+        private HttpClient mHttpClient;
+
+        @Before
+        public void setUp() throws Exception {
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
+                    new DiFactory(Protocol.DEFAULT)));
+
+            mHttpClient = mock(HttpClient.class);
+            doReturn(TestUtils.getResourceAsString("device.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/device.xml"));
+            doReturn(TestUtils.getResourceAsString("cds.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/cds.xml"));
+            doReturn(TestUtils.getResourceAsString("cms.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/cms.xml"));
+            doReturn(TestUtils.getResourceAsString("mmupnp.xml"))
+                    .when(mHttpClient).downloadString(new URL("http://192.0.2.2:12345/mmupnp.xml"));
+            doReturn(mHttpClient).when(mCp).createHttpClient();
+            doReturn(InetAddress.getByName("192.0.2.3")).when(mHttpClient).getLocalAddress();
+        }
+
+        @Test
+        public void addPinnedDevice() throws Exception {
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDeviceListSize(), is(1));
+            final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
+            assertThat(device.isPinned(), is(true));
+        }
+
+        @Test
+        public void addPinnedDevice2回目() throws Exception {
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDeviceListSize(), is(1));
+            final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
+            assertThat(device.isPinned(), is(true));
+
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+        }
+
+        @Test
+        public void addPinnedDevice_すでに発見済み() throws Exception {
+            final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+            final InetAddress address = InetAddress.getByName("192.0.2.3");
+            final SsdpMessage message = new SsdpRequest(address, data, data.length);
+            mCp.onReceiveSsdp(message);
+            Thread.sleep(1000); // 読み込みを待つ
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDeviceListSize(), is(1));
+            final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
+            assertThat(device.isPinned(), is(true));
+        }
+
+        @Test
+        public void addPinnedDeviceの後に発見() throws Exception {
+            final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+            final InetAddress address = InetAddress.getByName("192.0.2.3");
+            final SsdpMessage message = new SsdpRequest(address, data, data.length);
+            mCp.onReceiveSsdp(message);
+            Thread.sleep(1000); // 読み込みを待つ
+            final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
+            assertThat(device.isPinned(), is(false));
+
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef").isPinned(), is(true));
+
+            mCp.discoverDevice(device);
+            assertThat(mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef").isPinned(), is(true));
+        }
+
+        @Test
+        public void addPinnedDevice_Exceptionが発生してもクラッシュしない() throws Exception {
+            doThrow(new IOException()).when(mHttpClient).downloadString(any());
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            Thread.sleep(1000); // 読み込みを待つ
+        }
+
+        @Test
+        public void removePinnedDevice() throws Exception {
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDeviceListSize(), is(1));
+
+            mCp.removePinnedDevice("http://192.0.2.2:12345/device.xml");
+            assertThat(mCp.getDeviceListSize(), is(0));
+        }
+
+        @Test
+        public void removePinnedDevice_before_load() throws Exception {
+            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            assertThat(mCp.getDeviceListSize(), is(0));
+            mCp.removePinnedDevice("http://192.0.2.2:12345/device.xml");
+            Thread.sleep(1000); // 読み込みを待つ
+            assertThat(mCp.getDeviceListSize(), is(0));
+        }
+    }
+
+    @RunWith(JUnit4.class)
     public static class イベント伝搬テスト {
-        private ControlPoint mCp;
+        private ControlPointImpl mCp;
         private SubscribeManager mSubscribeManager;
-        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<String, DeviceImpl.Builder>());
+        private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap = spy(new HashMap<>());
         private DeviceHolder mDeviceHolder;
         private final SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
         private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
@@ -550,7 +638,8 @@ public class ControlPointTest {
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override
@@ -635,7 +724,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_ResponseListenerから伝搬() throws Exception {
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");
-            final SsdpResponse message = new SsdpResponse(mock(InterfaceAddress.class), data, data.length);
+            final SsdpResponse message = new SsdpResponse(mock(InetAddress.class), data, data.length);
             mResponseListener.onReceiveResponse(message);
             Thread.sleep(100);
             verify(mDeviceHolder).get(udn);
@@ -646,7 +735,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_NotifyListenerから伝搬() throws Exception {
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final SsdpRequest message = new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
+            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
             mNotifyListener.onReceiveNotify(message);
             Thread.sleep(100);
             verify(mDeviceHolder).get(udn);
@@ -655,12 +744,13 @@ public class ControlPointTest {
 
     @RunWith(JUnit4.class)
     public static class EventReceiverに起因するテスト {
-        private ControlPoint mCp;
+        private ControlPointImpl mCp;
         private SubscribeManager mSubscribeManager;
 
         @Before
         public void setUp() throws Exception {
-            mCp = spy(new ControlPoint(Protocol.DEFAULT, NetworkUtils.getAvailableInet4Interfaces(),
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
                         @Nonnull
                         @Override

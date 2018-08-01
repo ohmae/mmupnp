@@ -142,7 +142,8 @@ public final class Http {
         HTTP_BAD_GATEWAY(502, "Bad Gateway"),
         HTTP_UNAVAILABLE(503, "Service Unavailable"),
         HTTP_GATEWAY_TIMEOUT(504, "Gateway Time-out"),
-        HTTP_VERSION(505, "HTTP Version not supported"),;
+        HTTP_VERSION(505, "HTTP Version not supported"),
+        ;
         private final int mCode;
         @Nonnull
         private final String mPhrase;
@@ -249,6 +250,7 @@ public final class Http {
      * @param date 日付
      * @return RFC1123形式の日付文字列
      */
+    @SuppressWarnings("WeakerAccess")
     @Nonnull
     public static synchronized String formatDate(@Nonnull final Date date) {
         return RFC_1123_FORMAT.format(date);
@@ -369,7 +371,7 @@ public final class Http {
     }
 
     @Nonnull
-    public static String getAbsoluteUrl(
+    public static String makeAbsoluteUrl(
             @Nonnull final String baseUrl,
             @Nonnull final String url) {
         if (isHttpUrl(url)) {
@@ -398,7 +400,7 @@ public final class Http {
      * <li>"http://10.0.0.1:1000" ホスト名のみだが末尾の"/"がない。
      * <li>"http://10.0.0.1:1000/hoge/fuga" ファイル名で終わる
      * <li>"http://10.0.0.1:1000/hoge/fuga/" ディレクトリ名で終わる
-     * <li>"http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar" 上記に対してクエリーが付いている
+     * <li>"http://10.0.0.1:1000/hoge/fuga?a=foo&amp;b=bar" 上記に対してクエリーが付いている
      * </ul>
      *
      * <p>URLが"http://"から始まっていればそのまま利用する。
@@ -416,18 +418,17 @@ public final class Http {
      * @throws MalformedURLException 不正なURL
      */
     @Nonnull
-    public static URL getAbsoluteUrl(
+    public static URL makeAbsoluteUrl(
             @Nonnull final String baseUrl,
             @Nonnull final String url,
             final int scopeId)
             throws MalformedURLException {
-        return makeUrlWithScopeId(getAbsoluteUrl(baseUrl, url), scopeId);
+        return makeUrlWithScopeId(makeAbsoluteUrl(baseUrl, url), scopeId);
     }
 
     /**
      * インスタンス化禁止
      */
     private Http() {
-        throw new AssertionError();
     }
 }

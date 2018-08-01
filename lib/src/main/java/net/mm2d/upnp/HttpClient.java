@@ -16,6 +16,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 
@@ -47,6 +48,8 @@ public class HttpClient {
     private InputStream mInputStream;
     @Nullable
     private OutputStream mOutputStream;
+    @Nullable
+    private InetAddress mLocalAddress;
 
     /**
      * インスタンス作成
@@ -163,6 +166,7 @@ public class HttpClient {
         }
     }
 
+    @SuppressWarnings("ConstantConditions") // open状態でのみコールする
     @Nonnull
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
         request.writeData(mOutputStream);
@@ -228,6 +232,7 @@ public class HttpClient {
         mSocket.setSoTimeout(Property.DEFAULT_TIMEOUT);
         mInputStream = new BufferedInputStream(mSocket.getInputStream());
         mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
+        mLocalAddress = mSocket.getLocalAddress();
     }
 
     private void closeSocket() {
@@ -247,12 +252,25 @@ public class HttpClient {
     }
 
     /**
+     * ソケットが使用したローカルアドレスを返す。
+     *
+     * <p>connectの後保存し、次の接続まで保持される。
+     *
+     * @return ソケットが使用したローカルアドレス
+     */
+    @Nullable
+    public InetAddress getLocalAddress() {
+        return mLocalAddress;
+    }
+
+    /**
      * 単純なHTTP GETにより文字列を取得する。
      *
      * @param url 取得先URL
      * @return 取得できた文字列
      * @throws IOException 取得に問題があった場合
      */
+    @SuppressWarnings("ConstantConditions") // download()の中でgetBody()がnullで無いことはチェック済み
     @Nonnull
     public String downloadString(@Nonnull final URL url) throws IOException {
         return download(url).getBody();
@@ -265,6 +283,7 @@ public class HttpClient {
      * @return 取得できたバイナリ
      * @throws IOException 取得に問題があった場合
      */
+    @SuppressWarnings("ConstantConditions") // download()の中でgetBody()がnullで無いことはチェック済み
     @Nonnull
     public byte[] downloadBinary(@Nonnull final URL url) throws IOException {
         return download(url).getBodyBinary();

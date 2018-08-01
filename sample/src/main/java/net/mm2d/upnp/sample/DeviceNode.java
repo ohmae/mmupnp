@@ -12,8 +12,6 @@ import net.mm2d.upnp.Service;
 
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,7 +47,9 @@ public class DeviceNode extends UpnpNode {
     @Override
     public String getDetailText() {
         final Device device = getUserObject();
-        return "UDN:  " +
+        return "Location: " +
+                device.getLocation() +
+                "\nUDN: " +
                 device.getUdn() +
                 '\n' +
                 "DeviceType: " +
@@ -96,15 +96,12 @@ public class DeviceNode extends UpnpNode {
             final int y) {
         final JPopupMenu menu = new JPopupMenu();
         final JMenuItem open = new JMenuItem("Open Device Description");
-        open.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Device device = getUserObject();
-                try {
-                    Desktop.getDesktop().browse(new URI(device.getLocation()));
-                } catch (final IOException | URISyntaxException e1) {
-                    e1.printStackTrace();
-                }
+        open.addActionListener(e -> {
+            final Device device = getUserObject();
+            try {
+                Desktop.getDesktop().browse(new URI(device.getLocation()));
+            } catch (final IOException | URISyntaxException e1) {
+                e1.printStackTrace();
             }
         });
         menu.add(open);

@@ -15,8 +15,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -92,25 +90,22 @@ public class ActionWindow extends JFrame {
         final JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
         final JButton invoke = new JButton("Invoke");
-        invoke.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                try {
-                    final Map<String, String> result = mAction.invoke(makeArgument(), true);
-                    if (result.containsKey(Action.ERROR_CODE_KEY)) {
-                        if (result.containsKey(Action.ERROR_DESCRIPTION_KEY)) {
-                            mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY)
-                                    + " " + result.get(Action.ERROR_DESCRIPTION_KEY));
-                        } else {
-                            mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY));
-                        }
-                        return;
+        invoke.addActionListener(e -> {
+            try {
+                final Map<String, String> result = mAction.invoke(makeArgument(), true);
+                if (result.containsKey(Action.ERROR_CODE_KEY)) {
+                    if (result.containsKey(Action.ERROR_DESCRIPTION_KEY)) {
+                        mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY)
+                                + " " + result.get(Action.ERROR_DESCRIPTION_KEY));
+                    } else {
+                        mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY));
                     }
-                    updateResult(mAction.invoke(makeArgument()));
-                } catch (final IOException e1) {
-                    e1.printStackTrace();
-                    mErrorMessage.setText(e1.getMessage());
+                    return;
                 }
+                updateResult(mAction.invoke(makeArgument()));
+            } catch (final IOException e1) {
+                e1.printStackTrace();
+                mErrorMessage.setText(e1.getMessage());
             }
         });
         panel.add(invoke);

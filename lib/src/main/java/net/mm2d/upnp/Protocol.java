@@ -57,7 +57,8 @@ public enum Protocol {
         public List<NetworkInterface> getAvailableInterfaces() {
             return NetworkUtils.getAvailableInterfaces();
         }
-    },;
+    },
+    ;
 
     /**
      * デフォルトのプロトコルスタック。

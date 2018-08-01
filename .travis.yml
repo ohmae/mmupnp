@@ -2,6 +2,7 @@ language: java
 sudo: false
 
 before_install:
+  - echo 0 | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6
   - chmod +x gradlew
 
 script:

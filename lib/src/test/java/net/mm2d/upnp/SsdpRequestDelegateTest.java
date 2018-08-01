@@ -17,7 +17,7 @@ import java.io.OutputStream;
 
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpRequestDelegateTest {
     private SsdpMessageDelegate mDelegate;
@@ -29,13 +29,6 @@ public class SsdpRequestDelegateTest {
         doReturn("").when(mDelegate).getType();
         doReturn("").when(mDelegate).getUuid();
         mMessage = new SsdpRequest(mock(HttpRequest.class), mDelegate);
-    }
-
-    @Test
-    public void getInterfaceAddress() {
-        mMessage.getInterfaceAddress();
-
-        verify(mDelegate, times(1)).getInterfaceAddress();
     }
 
     @Test

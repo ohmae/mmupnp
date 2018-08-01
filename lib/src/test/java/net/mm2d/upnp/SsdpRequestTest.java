@@ -20,19 +20,20 @@ import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InterfaceAddress;
+import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(Enclosed.class)
 public class SsdpRequestTest {
 
     private static SsdpRequest makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpRequest(mock(InterfaceAddress.class), data, data.length);
+        return new SsdpRequest(mock(InetAddress.class), data, data.length);
     }
 
     @RunWith(JUnit4.class)

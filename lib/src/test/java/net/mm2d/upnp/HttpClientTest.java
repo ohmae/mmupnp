@@ -8,7 +8,6 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.Http.Status;
-import net.mm2d.upnp.HttpServerMock.ServerCore;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,19 +15,16 @@ import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 
-import javax.annotation.Nonnull;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class HttpClientTest {
     @Test
@@ -36,25 +32,19 @@ public class HttpClientTest {
         final String responseBody = "responseBody";
 
         final HttpServerMock server = new HttpServerMock();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest().readData(is);
-                final HttpResponse response = new HttpResponse();
-                response.setStatusLine("HTTP/1.1 200 OK");
-                response.setBody(responseBody, true);
-                if (request.isKeepAlive()) {
-                    response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-                    response.writeData(os);
-                    return true;
-                }
-                response.setHeader(Http.CONNECTION, Http.CLOSE);
+        server.setServerCore((socket, is, os) -> {
+            final HttpRequest request = new HttpRequest().readData(is);
+            final HttpResponse response = new HttpResponse();
+            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setBody(responseBody, true);
+            if (request.isKeepAlive()) {
+                response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
                 response.writeData(os);
-                return false;
+                return true;
             }
+            response.setHeader(Http.CONNECTION, Http.CLOSE);
+            response.writeData(os);
+            return false;
         });
         server.open();
         final int port = server.getLocalPort();
@@ -77,25 +67,19 @@ public class HttpClientTest {
         final byte[] responseBody = "responseBody".getBytes("utf-8");
 
         final HttpServerMock server = new HttpServerMock();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest().readData(is);
-                final HttpResponse response = new HttpResponse();
-                response.setStatusLine("HTTP/1.1 200 OK");
-                response.setBodyBinary(responseBody, true);
-                if (request.isKeepAlive()) {
-                    response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-                    response.writeData(os);
-                    return true;
-                }
-                response.setHeader(Http.CONNECTION, Http.CLOSE);
+        server.setServerCore((socket, is, os) -> {
+            final HttpRequest request = new HttpRequest().readData(is);
+            final HttpResponse response = new HttpResponse();
+            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setBodyBinary(responseBody, true);
+            if (request.isKeepAlive()) {
+                response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
                 response.writeData(os);
-                return false;
+                return true;
             }
+            response.setHeader(Http.CONNECTION, Http.CLOSE);
+            response.writeData(os);
+            return false;
         });
         server.open();
         final int port = server.getLocalPort();
@@ -104,6 +88,7 @@ public class HttpClientTest {
             final HttpClient client = new HttpClient(true);
             assertThat(client.downloadBinary(new URL("http://127.0.0.1:" + port + "/")), is(responseBody));
             assertThat(client.isClosed(), is(false));
+            assertThat(client.getLocalAddress(), is(InetAddress.getByName("127.0.0.1")));
 
             client.setKeepAlive(false);
             assertThat(client.downloadBinary(new URL("http://127.0.0.1:" + port + "/")), is(responseBody));
@@ -118,25 +103,19 @@ public class HttpClientTest {
         final String responseBody = "responseBody";
 
         final HttpServerMock server = new HttpServerMock();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest().readData(is);
-                final HttpResponse response = new HttpResponse();
-                response.setStatusLine("HTTP/1.1 200 OK");
-                response.setBody(responseBody, true);
-                if (request.isKeepAlive()) {
-                    response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
-                    response.writeData(os);
-                    return false; // コネクション切断
-                }
-                response.setHeader(Http.CONNECTION, Http.CLOSE);
+        server.setServerCore((socket, is, os) -> {
+            final HttpRequest request = new HttpRequest().readData(is);
+            final HttpResponse response = new HttpResponse();
+            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setBody(responseBody, true);
+            if (request.isKeepAlive()) {
+                response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
                 response.writeData(os);
-                return false;
+                return false; // コネクション切断
             }
+            response.setHeader(Http.CONNECTION, Http.CLOSE);
+            response.writeData(os);
+            return false;
         });
         server.open();
         final int port = server.getLocalPort();
@@ -160,20 +139,14 @@ public class HttpClientTest {
         final String responseBody = "responseBody";
 
         final HttpServerMock server = new HttpServerMock();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest().readData(is);
-                final HttpResponse response = new HttpResponse();
-                response.setStatusLine("HTTP/1.1 200 OK");
-                response.setBody(responseBody, true);
-                response.setHeader(Http.CONNECTION, Http.CLOSE);
-                response.writeData(os);
-                return false;
-            }
+        server.setServerCore((socket, is, os) -> {
+            final HttpRequest request = new HttpRequest().readData(is);
+            final HttpResponse response = new HttpResponse();
+            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setBody(responseBody, true);
+            response.setHeader(Http.CONNECTION, Http.CLOSE);
+            response.writeData(os);
+            return false;
         });
         server.open();
         final int port = server.getLocalPort();
@@ -196,26 +169,20 @@ public class HttpClientTest {
         final HttpServerMock server = new HttpServerMock();
         server.open();
         final int port = server.getLocalPort();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest().readData(is);
-                final HttpResponse response = new HttpResponse();
-                response.setHeader(Http.CONNECTION, Http.CLOSE);
-                response.setStatusLine("HTTP/1.1 301 Moved Permanently");
-                response.setHeader(Http.LOCATION, "http://127.0.0.1:" + port + "/b");
-                response.setBody("a", true);
-                response.writeData(os);
-                return false;
-            }
+        server.setServerCore((socket, is, os) -> {
+            final HttpRequest request = new HttpRequest().readData(is);
+            final HttpResponse response = new HttpResponse();
+            response.setHeader(Http.CONNECTION, Http.CLOSE);
+            response.setStatusLine("HTTP/1.1 301 Moved Permanently");
+            response.setHeader(Http.LOCATION, "http://127.0.0.1:" + port + "/b");
+            response.setBody("a", true);
+            response.writeData(os);
+            return false;
         });
 
         try {
             final HttpClient client = new HttpClient(false);
-            final HttpResponse response = client.post(new HttpRequest()
+            client.post(new HttpRequest()
                     .setMethod(Http.GET)
                     .setUrl(new URL("http://127.0.0.1:" + port + "/a"), true)
                     .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
@@ -231,27 +198,21 @@ public class HttpClientTest {
         final HttpServerMock server = new HttpServerMock();
         server.open();
         final int port = server.getLocalPort();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest().readData(is);
-                final HttpResponse response = new HttpResponse();
-                response.setHeader(Http.CONNECTION, Http.CLOSE);
-                if (request.getUri().equals("/b")) {
-                    response.setStatusLine("HTTP/1.1 200 OK");
-                    response.setBody("b", true);
-                    response.writeData(os);
-                    return false;
-                }
-                response.setStatusLine("HTTP/1.1 301 Moved Permanently");
-                response.setHeader(Http.LOCATION, "http://127.0.0.1:" + port + "/b");
-                response.setBody("a", true);
+        server.setServerCore((socket, is, os) -> {
+            final HttpRequest request = new HttpRequest().readData(is);
+            final HttpResponse response = new HttpResponse();
+            response.setHeader(Http.CONNECTION, Http.CLOSE);
+            if (request.getUri().equals("/b")) {
+                response.setStatusLine("HTTP/1.1 200 OK");
+                response.setBody("b", true);
                 response.writeData(os);
                 return false;
             }
+            response.setStatusLine("HTTP/1.1 301 Moved Permanently");
+            response.setHeader(Http.LOCATION, "http://127.0.0.1:" + port + "/b");
+            response.setBody("a", true);
+            response.writeData(os);
+            return false;
         });
 
         try {
@@ -271,26 +232,20 @@ public class HttpClientTest {
     @Test
     public void post_Redirectのlocationがなければひとまずそのまま取得する() throws Exception {
         final HttpServerMock server = new HttpServerMock();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                final HttpRequest request = new HttpRequest().readData(is);
-                final HttpResponse response = new HttpResponse();
-                response.setHeader(Http.CONNECTION, Http.CLOSE);
-                if (request.getUri().equals("/b")) {
-                    response.setStatusLine("HTTP/1.1 200 OK");
-                    response.setBody("b", true);
-                    response.writeData(os);
-                    return false;
-                }
-                response.setStatusLine("HTTP/1.1 301 Moved Permanently");
-                response.setBody("a", true);
+        server.setServerCore((socket, is, os) -> {
+            final HttpRequest request = new HttpRequest().readData(is);
+            final HttpResponse response = new HttpResponse();
+            response.setHeader(Http.CONNECTION, Http.CLOSE);
+            if (request.getUri().equals("/b")) {
+                response.setStatusLine("HTTP/1.1 200 OK");
+                response.setBody("b", true);
                 response.writeData(os);
                 return false;
             }
+            response.setStatusLine("HTTP/1.1 301 Moved Permanently");
+            response.setBody("a", true);
+            response.writeData(os);
+            return false;
         });
 
         server.open();
@@ -313,15 +268,9 @@ public class HttpClientTest {
     @Test(expected = IOException.class)
     public void post_応答がなければException() throws Exception {
         final HttpServerMock server = new HttpServerMock();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                new HttpRequest().readData(is);
-                return false;
-            }
+        server.setServerCore((socket, is, os) -> {
+            new HttpRequest().readData(is);
+            return false;
         });
         server.open();
         final int port = server.getLocalPort();
@@ -343,15 +292,9 @@ public class HttpClientTest {
     @Test
     public void post_応答がなければcloseしてException() throws Exception {
         final HttpServerMock server = new HttpServerMock();
-        server.setServerCore(new ServerCore() {
-            @Override
-            public boolean receiveAndReply(
-                    @Nonnull final Socket socket,
-                    @Nonnull final InputStream is,
-                    @Nonnull final OutputStream os) throws IOException {
-                new HttpRequest().readData(is);
-                return false;
-            }
+        server.setServerCore((socket, is, os) -> {
+            new HttpRequest().readData(is);
+            return false;
         });
         server.open();
         final int port = server.getLocalPort();

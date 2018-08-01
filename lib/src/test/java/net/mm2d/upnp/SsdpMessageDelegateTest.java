@@ -16,11 +16,11 @@ import org.junit.runners.JUnit4;
 import java.io.ByteArrayInputStream;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpMessageDelegateTest {
     private static final int DEFAULT_MAX_AGE = 1800;
@@ -128,8 +128,7 @@ public class SsdpMessageDelegateTest {
     public void getScopeId_インターフェースIPv4なら0() throws Exception {
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
         final HttpRequest request = new HttpRequest().readData(new ByteArrayInputStream(data, 0, data.length));
-        final InterfaceAddress ifa = TestUtils.createInterfaceAddress("192.0.2.3", "255.255.255.0", 0);
-        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, ifa);
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, InetAddress.getByName("192.0.2.3"));
 
         assertThat(delegate.getScopeId(), is(0));
     }
@@ -138,8 +137,7 @@ public class SsdpMessageDelegateTest {
     public void getScopeId_インターフェースに紐付かないIPv6なら0() throws Exception {
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
         final HttpRequest request = new HttpRequest().readData(new ByteArrayInputStream(data, 0, data.length));
-        final InterfaceAddress ifa = TestUtils.createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.255.0", 0);
-        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, ifa);
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, InetAddress.getByName("fe80::a831:801b:8dc6:421f"));
 
         assertThat(delegate.getScopeId(), is(0));
     }
@@ -150,8 +148,7 @@ public class SsdpMessageDelegateTest {
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
         final HttpRequest request = new HttpRequest().readData(new ByteArrayInputStream(data, 0, data.length));
         final Inet6Address address = Inet6Address.getByAddress(null, InetAddress.getByName("fe80::a831:801b:8dc6:421f").getAddress(), scopeId);
-        final InterfaceAddress ifa = TestUtils.createInterfaceAddress(address, "255.255.255.0", 0);
-        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, ifa);
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, address);
 
         assertThat(delegate.getScopeId(), is(scopeId));
     }

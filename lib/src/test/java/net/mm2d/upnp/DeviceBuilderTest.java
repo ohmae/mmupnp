@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.net.InetAddress;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.contains;
@@ -19,6 +20,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class DeviceBuilderTest {
     @Test
@@ -45,7 +47,6 @@ public class DeviceBuilderTest {
         final String urlBase = "urlBase";
         final Icon icon = mock(Icon.class);
         final IconImpl.Builder iconBuilder = mock(IconImpl.Builder.class);
-        doReturn(iconBuilder).when(iconBuilder).setDevice((Device) any());
         doReturn(icon).when(iconBuilder).build();
         final Service service = mock(Service.class);
         final ServiceImpl.Builder serviceBuilder = mock(ServiceImpl.Builder.class);
@@ -292,6 +293,16 @@ public class DeviceBuilderTest {
                 .build();
     }
 
+    @Test
+    public void build_PinnedSsdpMessage_update() {
+        final SsdpMessage message = mock(PinnedSsdpMessage.class);
+        doReturn("location").when(message).getLocation();
+        final SsdpMessage newMessage = mock(SsdpMessage.class);
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
+        builder.updateSsdpMessage(newMessage);
+        assertThat(builder.getSsdpMessage(), is(message));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void build_不正なSsdpMessage1() {
         new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), mock(SsdpMessage.class));
@@ -346,5 +357,28 @@ public class DeviceBuilderTest {
                 .build();
         assertThat(device.getValueWithNamespace("", tag1), is(value1));
         assertThat(device.getValueWithNamespace("", tag2), is(value2));
+    }
+
+    @Test()
+    public void onDownloadDescription() throws Exception {
+        final PinnedSsdpMessage message = mock(PinnedSsdpMessage.class);
+        doReturn("location").when(message).getLocation();
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
+        final HttpClient client = mock(HttpClient.class);
+        final InetAddress address = InetAddress.getByName("127.0.0.1");
+        doReturn(address).when(client).getLocalAddress();
+        builder.onDownloadDescription(client);
+
+        verify(client).getLocalAddress();
+        verify(message).setLocalAddress(address);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void onDownloadDescription_before_download() {
+        final PinnedSsdpMessage message = mock(PinnedSsdpMessage.class);
+        doReturn("location").when(message).getLocation();
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
+        final HttpClient client = new HttpClient();
+        builder.onDownloadDescription(client);
     }
 }

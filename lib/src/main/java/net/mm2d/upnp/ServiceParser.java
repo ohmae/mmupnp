@@ -54,7 +54,7 @@ final class ServiceParser {
         }
         final String baseUrl = deviceBuilder.getBaseUrl();
         final int scopeId = deviceBuilder.getSsdpMessage().getScopeId();
-        final URL url = Http.getAbsoluteUrl(baseUrl, scpdUrl, scopeId);
+        final URL url = Http.makeAbsoluteUrl(baseUrl, scpdUrl, scopeId);
         final String description = client.downloadString(url);
         if (TextUtils.isEmpty(description)) {
             // 空であっても必須パラメータはそろっているため正常として扱う。
@@ -124,6 +124,7 @@ final class ServiceParser {
         return builder;
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final ArgumentImpl.Builder builder,
             @Nonnull final String tag,
@@ -189,6 +190,7 @@ final class ServiceParser {
         }
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final String tag,
@@ -204,6 +206,5 @@ final class ServiceParser {
 
     // インスタンス化禁止
     private ServiceParser() {
-        throw new AssertionError();
     }
 }

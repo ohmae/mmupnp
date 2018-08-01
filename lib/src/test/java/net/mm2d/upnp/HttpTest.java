@@ -13,8 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -22,15 +21,9 @@ import java.util.Locale;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class HttpTest {
-    @Test(expected = InvocationTargetException.class)
-    public void constructor() throws Exception {
-        final Constructor<Http> constructor = Http.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        constructor.newInstance();
-    }
-
     @Test
     public void status_valueOf_変換できる() {
         assertThat(Status.valueOf(200), is(Status.HTTP_OK));
@@ -139,5 +132,65 @@ public class HttpTest {
                 is("http://www.example.com:8888/device.xml"));
         assertThat(Http.makeUrlWithScopeId("http://www.example.com/device.xml", 1).toString(),
                 is("http://www.example.com/device.xml"));
+    }
+
+    @Test
+    public void getAbsoluteUrl_locationがホスト名のみ() throws Exception {
+        final String baseUrl = "http://10.0.0.1:1000/";
+        final String url1 = "http://10.0.0.1:1000/hoge/fuga";
+        final String url2 = "/hoge/fuga";
+        final String url3 = "fuga";
+
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url1, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url2, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url3, 0), is(new URL("http://10.0.0.1:1000/fuga")));
+    }
+
+    @Test
+    public void getAbsoluteUrl_locationがホスト名のみで末尾のスラッシュなし() throws Exception {
+        final String baseUrl = "http://10.0.0.1:1000";
+        final String url1 = "http://10.0.0.1:1000/hoge/fuga";
+        final String url2 = "/hoge/fuga";
+        final String url3 = "fuga";
+
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url1, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url2, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url3, 0), is(new URL("http://10.0.0.1:1000/fuga")));
+    }
+
+    @Test
+    public void getAbsoluteUrl_locationがファイル名で終わる() throws Exception {
+        final String baseUrl = "http://10.0.0.1:1000/hoge/fuga";
+        final String url1 = "http://10.0.0.1:1000/hoge/fuga";
+        final String url2 = "/hoge/fuga";
+        final String url3 = "fuga";
+
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url1, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url2, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url3, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+    }
+
+    @Test
+    public void getAbsoluteUrl_locationがディレクトリ名で終わる() throws Exception {
+        final String baseUrl = "http://10.0.0.1:1000/hoge/fuga/";
+        final String url1 = "http://10.0.0.1:1000/hoge/fuga";
+        final String url2 = "/hoge/fuga";
+        final String url3 = "fuga";
+
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url1, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url2, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url3, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga/fuga")));
+    }
+
+    @Test
+    public void getAbsoluteUrl_locationにクエリーがついている() throws Exception {
+        final String baseUrl = "http://10.0.0.1:1000/hoge/fuga?a=foo&b=bar";
+        final String url1 = "http://10.0.0.1:1000/hoge/fuga";
+        final String url2 = "/hoge/fuga";
+        final String url3 = "fuga";
+
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url1, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url2, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+        assertThat(Http.makeAbsoluteUrl(baseUrl, url3, 0), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
     }
 }

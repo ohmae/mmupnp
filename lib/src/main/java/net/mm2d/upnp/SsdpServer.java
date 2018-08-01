@@ -12,7 +12,6 @@ import net.mm2d.util.NetworkUtils;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
 
 import javax.annotation.Nonnull;
@@ -45,7 +44,8 @@ interface SsdpServer {
          *
          * <p>未使用
          */
-        IP_V6_SITE_LOCAL("FF05::C"),;
+        IP_V6_SITE_LOCAL("FF05::C"),
+        ;
 
         @Nonnull
         private final InetAddress mInetAddress;
@@ -80,14 +80,6 @@ interface SsdpServer {
             }
         }
     }
-
-    /**
-     * BindされたInterfaceのアドレスを返す。
-     *
-     * @return BindされたInterfaceのアドレス
-     */
-    @Nonnull
-    InterfaceAddress getInterfaceAddress();
 
     /**
      * ソケットのオープンを行う。

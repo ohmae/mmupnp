@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SubscribeManagerTest {
     @Test
@@ -40,7 +41,7 @@ public class SubscribeManagerTest {
             }
         };
         final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
-        assertThat(manager.onEventReceived("", 0, Collections.<StringPair>emptyList()), is(false));
+        assertThat(manager.onEventReceived("", 0, Collections.emptyList()), is(false));
     }
 
     @Test

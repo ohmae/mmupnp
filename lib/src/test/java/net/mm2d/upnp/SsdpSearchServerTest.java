@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpSearchServerTest {
     @Test
@@ -47,7 +48,7 @@ public class SsdpSearchServerTest {
 
         final DatagramPacket packet = socket.getSendPacket();
         final SsdpRequest message = new SsdpRequest(
-                mock(InterfaceAddress.class), packet.getData(), packet.getLength());
+                mock(InetAddress.class), packet.getData(), packet.getLength());
         assertThat(message.getMethod(), is(SsdpMessage.M_SEARCH));
         assertThat(message.getHeader(Http.ST), is(SsdpSearchServer.ST_ALL));
         assertThat(message.getHeader(Http.MAN), is(SsdpMessage.SSDP_DISCOVER));
@@ -70,7 +71,7 @@ public class SsdpSearchServerTest {
 
         final DatagramPacket packet = socket.getSendPacket();
         final SsdpRequest message = new SsdpRequest(
-                mock(InterfaceAddress.class), packet.getData(), packet.getLength());
+                mock(InetAddress.class), packet.getData(), packet.getLength());
         assertThat(message.getMethod(), is(SsdpMessage.M_SEARCH));
         assertThat(message.getHeader(Http.ST), is(SsdpSearchServer.ST_ROOTDEVICE));
         assertThat(message.getHeader(Http.MAN), is(SsdpMessage.SSDP_DISCOVER));
@@ -81,6 +82,7 @@ public class SsdpSearchServerTest {
         final SsdpServerDelegate delegate = mock(SsdpServerDelegate.class);
         final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
+        doReturn(interfaceAddress.getAddress()).when(delegate).getLocalAddress();
         final SsdpSearchServer server = spy(new SsdpSearchServer(delegate));
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");
         final InetAddress address = InetAddress.getByName("192.0.2.2");

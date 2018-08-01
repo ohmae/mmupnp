@@ -24,7 +24,6 @@ class ArgumentImpl implements Argument {
      * @see ActionImpl.Builder
      */
     static class Builder {
-        private Action mAction;
         private String mName;
         private boolean mInputDirection;
         private String mRelatedStateVariableName;
@@ -34,18 +33,6 @@ class ArgumentImpl implements Argument {
          * インスタンス作成
          */
         public Builder() {
-        }
-
-        /**
-         * このArgumentを保持するActionを登録する。
-         *
-         * @param action このArgumentを保持するAction
-         * @return Builder
-         */
-        @Nonnull
-        public Builder setAction(@Nonnull final Action action) {
-            mAction = action;
-            return this;
         }
 
         /**
@@ -116,9 +103,6 @@ class ArgumentImpl implements Argument {
          */
         @Nonnull
         public Argument build() throws IllegalStateException {
-            if (mAction == null) {
-                throw new IllegalStateException("action must be set.");
-            }
             if (mName == null) {
                 throw new IllegalStateException("name must be set.");
             }
@@ -130,24 +114,15 @@ class ArgumentImpl implements Argument {
     }
 
     @Nonnull
-    private final Action mAction;
-    @Nonnull
     private final String mName;
     private final boolean mInputDirection;
     @Nonnull
     private final StateVariable mRelatedStateVariable;
 
     private ArgumentImpl(@Nonnull final Builder builder) {
-        mAction = builder.mAction;
         mName = builder.mName;
         mInputDirection = builder.mInputDirection;
         mRelatedStateVariable = builder.mRelatedStateVariable;
-    }
-
-    @Override
-    @Nonnull
-    public Action getAction() {
-        return mAction;
     }
 
     @Override

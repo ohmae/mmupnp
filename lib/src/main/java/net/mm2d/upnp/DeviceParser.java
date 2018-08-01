@@ -53,6 +53,7 @@ final class DeviceParser {
         if (TextUtils.isEmpty(description)) {
             throw new IOException("download error");
         }
+        builder.onDownloadDescription(client);
         parseDescription(builder, description);
         loadServices(client, builder);
     }
@@ -115,6 +116,7 @@ final class DeviceParser {
         }
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final DeviceImpl.Builder builder,
             @Nonnull final String tag,
@@ -174,6 +176,7 @@ final class DeviceParser {
         return builder;
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final IconImpl.Builder builder,
             @Nonnull final String tag,
@@ -217,6 +220,7 @@ final class DeviceParser {
         return serviceBuilder;
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private static void setField(
             @Nonnull final ServiceImpl.Builder builder,
             @Nonnull final String tag,
@@ -251,6 +255,5 @@ final class DeviceParser {
 
     // インスタンス化禁止
     private DeviceParser() {
-        throw new AssertionError();
     }
 }

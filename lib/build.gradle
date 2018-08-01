@@ -7,8 +7,8 @@ group 'net.mm2d'
 archivesBaseName = 'mmupnp'
 version versionName
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 test.maxParallelForks = 4
 
@@ -111,9 +111,13 @@ artifacts {
     archives sourcesJar
 }
 
+jacoco {
+    toolVersion = '0.8.1'
+}
+
 jacocoTestReport {
     reports {
         xml.enabled true
-        html.enabled false
+        html.enabled true
     }
 }

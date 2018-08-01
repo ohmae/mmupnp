@@ -25,7 +25,6 @@ class IconImpl implements Icon {
      * @see DeviceParser#loadDescription(HttpClient, DeviceImpl.Builder)
      */
     static class Builder {
-        private Device mDevice;
         private String mMimeType;
         private int mHeight;
         private int mWidth;
@@ -36,18 +35,6 @@ class IconImpl implements Icon {
          * インスタンス作成
          */
         public Builder() {
-        }
-
-        /**
-         * このIconを保持するDeviceを登録する。
-         *
-         * @param device このIconを保持するDevice
-         * @return Builder
-         */
-        @Nonnull
-        public Builder setDevice(@Nonnull final Device device) {
-            mDevice = device;
-            return this;
         }
 
         /**
@@ -130,9 +117,6 @@ class IconImpl implements Icon {
          */
         @Nonnull
         public Icon build() throws IllegalStateException {
-            if (mDevice == null) {
-                throw new IllegalStateException("device must be set.");
-            }
             if (mMimeType == null) {
                 throw new IllegalStateException("mimetype must be set.");
             }
@@ -153,8 +137,6 @@ class IconImpl implements Icon {
     }
 
     @Nonnull
-    private final Device mDevice;
-    @Nonnull
     private final String mMimeType;
     private final int mHeight;
     private final int mWidth;
@@ -170,18 +152,11 @@ class IconImpl implements Icon {
      * @param builder Builder
      */
     private IconImpl(@Nonnull final Builder builder) {
-        mDevice = builder.mDevice;
         mMimeType = builder.mMimeType;
         mHeight = builder.mHeight;
         mWidth = builder.mWidth;
         mDepth = builder.mDepth;
         mUrl = builder.mUrl;
-    }
-
-    @Override
-    @Nonnull
-    public Device getDevice() {
-        return mDevice;
     }
 
     @Override
@@ -211,9 +186,18 @@ class IconImpl implements Icon {
         return mUrl;
     }
 
-    @Override
-    public void loadBinary(@Nonnull final HttpClient client) throws IOException {
-        final URL url = mDevice.getAbsoluteUrl(mUrl);
+    /**
+     * URLからバイナリデータを読み込む。
+     *
+     * @param device DeviceImpl
+     * @param client 通信に使用する{@link HttpClient}
+     * @throws IOException 通信エラー
+     */
+    void loadBinary(
+            @Nonnull final HttpClient client,
+            @Nonnull final String baseUrl,
+            final int scopeId) throws IOException {
+        final URL url = Http.makeAbsoluteUrl(baseUrl, mUrl, scopeId);
         mBinary = client.downloadBinary(url);
     }
 

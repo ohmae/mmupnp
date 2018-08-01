@@ -11,7 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,13 +29,13 @@ public class SsdpResponse implements SsdpMessage {
     /**
      * 受信した情報からインスタンス作成。
      *
-     * @param address 受信したInterfaceAddress
+     * @param address 受信したインターフェースのアドレス
      * @param data    受信したデータ
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
     public SsdpResponse(
-            @Nonnull final InterfaceAddress address,
+            @Nonnull final InetAddress address,
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
@@ -121,13 +120,6 @@ public class SsdpResponse implements SsdpMessage {
     @Override
     public int getScopeId() {
         return mDelegate.getScopeId();
-    }
-
-    @Deprecated
-    @Nullable
-    @Override
-    public InterfaceAddress getInterfaceAddress() {
-        return mDelegate.getInterfaceAddress();
     }
 
     @Nullable

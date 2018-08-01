@@ -15,25 +15,18 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class ArgumentTest {
     @Test(expected = IllegalStateException.class)
-    public void build_Actionを設定していないとException() {
-        new ArgumentImpl.Builder()
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void build_Nameを設定していないとException() {
         new ArgumentImpl.Builder()
-                .setAction(mock(Action.class))
                 .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void build_RelatedStateVariableを設定していないとException() {
         new ArgumentImpl.Builder()
-                .setAction(mock(Action.class))
                 .setName("")
                 .build();
     }
@@ -48,16 +41,13 @@ public class ArgumentTest {
 
     @Test
     public void build_Builderで指定した値が得られる() {
-        final Action action = mock(Action.class);
         final String name = "name";
         final StateVariable stateVariable = mock(StateVariable.class);
         final Argument argument = new ArgumentImpl.Builder()
-                .setAction(action)
                 .setName(name)
                 .setDirection("in")
                 .setRelatedStateVariable(stateVariable)
                 .build();
-        assertThat(argument.getAction(), is(action));
         assertThat(argument.getRelatedStateVariable(), is(stateVariable));
         assertThat(argument.getName(), is(name));
         assertThat(argument.isInputDirection(), is(true));
@@ -65,11 +55,9 @@ public class ArgumentTest {
 
     @Test
     public void isInputDirection_Builderでoutを指定した場合false() {
-        final Action action = mock(Action.class);
         final String name = "name";
         final StateVariable stateVariable = mock(StateVariable.class);
         final Argument argument = new ArgumentImpl.Builder()
-                .setAction(action)
                 .setName(name)
                 .setDirection("out")
                 .setRelatedStateVariable(stateVariable)

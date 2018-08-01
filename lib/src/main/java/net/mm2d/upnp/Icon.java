@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp;
 
-import java.io.IOException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -18,14 +16,6 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 public interface Icon {
-    /**
-     * このIconを保持するDeviceを返す。
-     *
-     * @return このIconを保持するDevice
-     */
-    @Nonnull
-    Device getDevice();
-
     /**
      * MimeTypeの値を返す。
      *
@@ -75,14 +65,6 @@ public interface Icon {
      */
     @Nonnull
     String getUrl();
-
-    /**
-     * URLからバイナリデータを読み込む。
-     *
-     * @param client 通信に使用する{@link HttpClient}
-     * @throws IOException 通信エラー
-     */
-    void loadBinary(@Nonnull HttpClient client) throws IOException;
 
     /**
      * バイナリデータを返す。
