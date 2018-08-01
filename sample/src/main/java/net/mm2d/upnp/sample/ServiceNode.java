@@ -8,11 +8,14 @@
 package net.mm2d.upnp.sample;
 
 import net.mm2d.upnp.Action;
+import net.mm2d.upnp.Device;
+import net.mm2d.upnp.Http;
 import net.mm2d.upnp.Service;
 
 import java.awt.Component;
 import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -79,8 +82,13 @@ public class ServiceNode extends UpnpNode {
         final JMenuItem open = new JMenuItem("Open Service Description");
         open.addActionListener(e -> {
             final Service service = getUserObject();
+            final Device device = service.getDevice();
+            final String baseUrl = device.getBaseUrl();
+            final String scpdUrl = service.getScpdUrl();
+            final int scopeId = device.getScopeId();
             try {
-                Desktop.getDesktop().browse(service.getAbsoluteUrl(service.getScpdUrl()).toURI());
+                final URI uri = Http.makeAbsoluteUrl(baseUrl, scpdUrl, scopeId).toURI();
+                Desktop.getDesktop().browse(uri);
             } catch (final IOException | URISyntaxException e1) {
                 e1.printStackTrace();
             }
