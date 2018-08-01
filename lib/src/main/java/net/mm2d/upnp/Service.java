@@ -8,8 +8,6 @@
 package net.mm2d.upnp;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -28,17 +26,6 @@ public interface Service {
      */
     @Nonnull
     Device getDevice();
-
-    /**
-     * URL関連プロパティの値からURLに変換する。
-     *
-     * @param url URLプロパティ値
-     * @return URLオブジェクト
-     * @throws MalformedURLException 不正なURL
-     * @see Device#getAbsoluteUrl(String)
-     */
-    @Nonnull
-    URL getAbsoluteUrl(@Nonnull String url) throws MalformedURLException;
 
     /**
      * serviceTypeを返す。

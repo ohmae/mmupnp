@@ -196,7 +196,7 @@ class IconImpl implements Icon {
     void loadBinary(
             @Nonnull final DeviceImpl device,
             @Nonnull final HttpClient client) throws IOException {
-        final URL url = device.getAbsoluteUrl(mUrl);
+        final URL url = device.makeAbsoluteUrl(mUrl);
         mBinary = client.downloadBinary(url);
     }
 

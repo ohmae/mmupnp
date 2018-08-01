@@ -166,7 +166,7 @@ public class DeviceTest {
 
         @Test
         public void getAbsoluteUrl_locationがホスト名のみ() throws Exception {
-            final Device device = mBuilder.build();
+            final DeviceImpl device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
             final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
@@ -178,14 +178,14 @@ public class DeviceTest {
             message.updateLocation();
             device.updateSsdpMessage(message);
 
-            assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/fuga")));
+            assertThat(device.makeAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/fuga")));
         }
 
         @Test
         public void getAbsoluteUrl_locationがホスト名のみで末尾のスラッシュなし() throws Exception {
-            final Device device = mBuilder.build();
+            final DeviceImpl device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
             final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
@@ -197,14 +197,14 @@ public class DeviceTest {
             message.updateLocation();
             device.updateSsdpMessage(message);
 
-            assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/fuga")));
+            assertThat(device.makeAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/fuga")));
         }
 
         @Test
         public void getAbsoluteUrl_locationがファイル名で終わる() throws Exception {
-            final Device device = mBuilder.build();
+            final DeviceImpl device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
             final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
@@ -216,14 +216,14 @@ public class DeviceTest {
             message.updateLocation();
             device.updateSsdpMessage(message);
 
-            assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         }
 
         @Test
         public void getAbsoluteUrl_locationがディレクトリ名で終わる() throws Exception {
-            final Device device = mBuilder.build();
+            final DeviceImpl device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
             final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
@@ -235,14 +235,14 @@ public class DeviceTest {
             message.updateLocation();
             device.updateSsdpMessage(message);
 
-            assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga/fuga")));
+            assertThat(device.makeAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga/fuga")));
         }
 
         @Test
         public void getAbsoluteUrl_locationにクエリーがついている() throws Exception {
-            final Device device = mBuilder.build();
+            final DeviceImpl device = mBuilder.build();
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin");
             final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
 
@@ -254,9 +254,9 @@ public class DeviceTest {
             message.updateLocation();
             device.updateSsdpMessage(message);
 
-            assertThat(device.getAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
-            assertThat(device.getAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url1), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url2), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
+            assertThat(device.makeAbsoluteUrl(url3), is(new URL("http://10.0.0.1:1000/hoge/fuga")));
         }
 
         @Test

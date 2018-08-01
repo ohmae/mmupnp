@@ -14,8 +14,6 @@ import net.mm2d.upnp.Service;
 import net.mm2d.upnp.StateVariable;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,12 +25,6 @@ public class EmptyService implements Service {
     @Override
     public Device getDevice() {
         return ControlPoints.emptyDevice();
-    }
-
-    @Nonnull
-    @Override
-    public URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
-        throw new MalformedURLException("empty object");
     }
 
     @Nonnull

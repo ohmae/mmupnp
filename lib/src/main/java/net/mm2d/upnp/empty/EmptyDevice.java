@@ -17,8 +17,6 @@ import net.mm2d.upnp.IconFilter;
 import net.mm2d.upnp.Service;
 import net.mm2d.upnp.SsdpMessage;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -63,18 +61,6 @@ public class EmptyDevice implements Device {
     @Override
     public int getScopeId() {
         return 0;
-    }
-
-    @Nonnull
-    @Override
-    public URL appendScopeIdIfNeed(@Nonnull final String url) throws MalformedURLException {
-        throw new MalformedURLException("empty device");
-    }
-
-    @Nonnull
-    @Override
-    public URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
-        throw new MalformedURLException("empty device");
     }
 
     @Nullable

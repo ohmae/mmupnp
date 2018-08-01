@@ -443,7 +443,7 @@ class DeviceImpl implements Device {
          * @return Deviceのインスタンス
          */
         @Nonnull
-        public Device build() {
+        public DeviceImpl build() {
             return build(null);
         }
 
@@ -677,16 +677,17 @@ class DeviceImpl implements Device {
         return mSsdpMessage.getScopeId();
     }
 
+    /**
+     * URL情報を正規化して返す。
+     *
+     * @param url URLパス情報
+     * @return 正規化したURL
+     * @throws MalformedURLException 不正なURL
+     * @see Http#makeAbsoluteUrl(String, String, int)
+     */
     @Nonnull
-    @Override
-    public URL appendScopeIdIfNeed(@Nonnull final String url) throws MalformedURLException {
-        return Http.makeUrlWithScopeId(url, getScopeId());
-    }
-
-    @Override
-    @Nonnull
-    public URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
-        return appendScopeIdIfNeed(Http.getAbsoluteUrl(getBaseUrl(), url));
+    URL makeAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
+        return Http.makeAbsoluteUrl(getBaseUrl(), url, getScopeId());
     }
 
     @Override

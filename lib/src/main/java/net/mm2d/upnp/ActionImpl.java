@@ -22,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -313,7 +314,7 @@ class ActionImpl implements Action {
     @Nonnull
     private Map<String, String> invokeInner(@Nonnull final String soap)
             throws IOException {
-        final URL url = mService.getAbsoluteUrl(mService.getControlUrl());
+        final URL url = makeAbsoluteControlUrl();
         final HttpRequest request = makeHttpRequest(url, soap);
         final HttpClient client = createHttpClient();
         final HttpResponse response = client.post(request);
@@ -334,6 +335,13 @@ class ActionImpl implements Action {
         } catch (final SAXException | ParserConfigurationException e) {
             throw new IOException(body, e);
         }
+    }
+
+    // VisibleForTesting
+    @Nonnull
+    URL makeAbsoluteControlUrl() throws MalformedURLException {
+        final Device device = mService.getDevice();
+        return Http.makeAbsoluteUrl(device.getBaseUrl(), mService.getControlUrl(), device.getScopeId());
     }
 
     /**

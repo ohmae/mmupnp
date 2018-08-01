@@ -312,10 +312,10 @@ class ServiceImpl implements Service {
         return mDevice;
     }
 
-    @Override
+    // VisibleForTesting
     @Nonnull
-    public URL getAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
-        return mDevice.getAbsoluteUrl(url);
+    URL makeAbsoluteUrl(@Nonnull final String url) throws MalformedURLException {
+        return Http.makeAbsoluteUrl(mDevice.getBaseUrl(), url, mDevice.getScopeId());
     }
 
     @Override
@@ -478,7 +478,7 @@ class ServiceImpl implements Service {
     private HttpRequest makeSubscribeRequest() throws IOException {
         return new HttpRequest()
                 .setMethod(Http.SUBSCRIBE)
-                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
                 .setHeader(Http.NT, Http.UPNP_EVENT)
                 .setHeader(Http.CALLBACK, getCallback())
                 .setHeader(Http.TIMEOUT, "Second-300")
@@ -523,7 +523,7 @@ class ServiceImpl implements Service {
     private HttpRequest makeRenewSubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
         return new HttpRequest()
                 .setMethod(Http.SUBSCRIBE)
-                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
                 .setHeader(Http.SID, subscriptionId)
                 .setHeader(Http.TIMEOUT, "Second-300")
                 .setHeader(Http.CONTENT_LENGTH, "0");
@@ -553,7 +553,7 @@ class ServiceImpl implements Service {
     private HttpRequest makeUnsubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
         return new HttpRequest()
                 .setMethod(Http.UNSUBSCRIBE)
-                .setUrl(getAbsoluteUrl(mEventSubUrl), true)
+                .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
                 .setHeader(Http.SID, subscriptionId)
                 .setHeader(Http.CONTENT_LENGTH, "0");
     }

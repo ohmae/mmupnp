@@ -484,12 +484,6 @@ public class ServiceTest {
         }
 
         @Test
-        public void getAbsoluteUrl_deviceのメソッドと等価() throws Exception {
-            final String url = "test";
-            assertThat(mCms.getAbsoluteUrl(url), is(mDevice.getAbsoluteUrl(url)));
-        }
-
-        @Test
         public void getServiceType() throws Exception {
             assertThat(mCms.getServiceType(), is("urn:schemas-upnp-org:service:ConnectionManager:1"));
             assertThat(mCds.getServiceType(), is("urn:schemas-upnp-org:service:ContentDirectory:1"));
@@ -765,7 +759,7 @@ public class ServiceTest {
     @RunWith(JUnit4.class)
     public static class subscribe_機能のテスト {
         private ControlPoint mControlPoint;
-        private Device mDevice;
+        private DeviceImpl mDevice;
         private SubscribeManager mSubscribeManager;
         private ServiceImpl mService;
         private HttpClient mHttpClient;
@@ -773,10 +767,9 @@ public class ServiceTest {
         @Before
         public void setUp() throws Exception {
             mControlPoint = mock(ControlPoint.class);
-            mDevice = mock(Device.class);
+            mDevice = mock(DeviceImpl.class);
             mSubscribeManager = mock(SubscribeManager.class);
             doReturn(mControlPoint).when(mDevice).getControlPoint();
-            doReturn(new URL("http://192.0.2.2/")).when(mDevice).getAbsoluteUrl(anyString());
             mService = (ServiceImpl) spy(new ServiceImpl.Builder()
                     .setDevice(mDevice)
                     .setSubscribeManager(mSubscribeManager)
@@ -787,6 +780,8 @@ public class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build());
+            doReturn(new URL("http://192.0.2.2/")).when(mDevice).makeAbsoluteUrl(anyString());
+            doReturn(new URL("http://192.0.2.2/")).when(mService).makeAbsoluteUrl(anyString());
             doReturn("").when(mService).getCallback();
             mHttpClient = mock(HttpClient.class);
             doReturn(mHttpClient).when(mService).createHttpClient();

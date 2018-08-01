@@ -57,10 +57,9 @@ public class ActionInvokeTest {
     @Before
     public void setUp() throws Exception {
         mUrl = new URL("http://127.0.0.1:8888/test");
-        final Service service = mock(Service.class);
+        final ServiceImpl service = mock(ServiceImpl.class);
         when(service.getServiceType()).thenReturn(SERVICE_TYPE);
         when(service.getControlUrl()).thenReturn("");
-        when(service.getAbsoluteUrl(anyString())).thenReturn(mUrl);
         mAction = (ActionImpl) spy(new ActionImpl.Builder()
                 .setService(service)
                 .setName(ACTION_NAME)
@@ -93,6 +92,7 @@ public class ActionInvokeTest {
                                         .setName("3")
                                         .build()))
                 .build());
+        doReturn(mUrl).when(mAction).makeAbsoluteControlUrl();
         mMockHttpClient = spy(new HttpClient());
         mHttpResponse = new HttpResponse();
         mHttpResponse.setStatus(Http.Status.HTTP_OK);
