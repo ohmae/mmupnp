@@ -60,7 +60,7 @@ class DeviceImpl implements Device {
         private String mPresentationUrl;
         private String mUrlBase;
         @Nonnull
-        private final List<IconImpl.Builder> mIconBuilderList = new ArrayList<>();
+        private final List<Icon> mIconList = new ArrayList<>();
         @Nonnull
         private final List<ServiceImpl.Builder> mServiceBuilderList = new ArrayList<>();
         @Nonnull
@@ -357,12 +357,12 @@ class DeviceImpl implements Device {
         /**
          * IconのBuilderを登録する。
          *
-         * @param builder IconのBuilder
+         * @param icon Icon
          * @return Builder
          */
         @Nonnull
-        Builder addIconBuilder(@Nonnull final IconImpl.Builder builder) {
-            mIconBuilderList.add(builder);
+        Builder addIcon(@Nonnull final Icon icon) {
+            mIconList.add(icon);
             return this;
         }
 
@@ -558,22 +558,9 @@ class DeviceImpl implements Device {
         mUrlBase = builder.mUrlBase;
         mDescription = builder.mDescription;
         mTagMap = builder.mTagMap;
-        mIconList = buildIconList(builder.mIconBuilderList);
+        mIconList = builder.mIconList.isEmpty() ? Collections.emptyList() : new ArrayList<>(builder.mIconList);
         mServiceList = buildServiceList(this, builder.mSubscribeManager, builder.mServiceBuilderList);
         mDeviceList = buildDeviceList(this, builder.mDeviceBuilderList);
-    }
-
-    @Nonnull
-    private static List<Icon> buildIconList(
-            @Nonnull final List<IconImpl.Builder> builderList) {
-        if (builderList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        final List<Icon> list = new ArrayList<>(builderList.size());
-        for (final IconImpl.Builder builder : builderList) {
-            list.add(builder.build());
-        }
-        return list;
     }
 
     @Nonnull

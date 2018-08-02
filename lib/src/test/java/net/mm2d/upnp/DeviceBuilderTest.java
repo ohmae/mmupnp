@@ -46,8 +46,6 @@ public class DeviceBuilderTest {
         final String presentationUrl = "presentationUrl";
         final String urlBase = "urlBase";
         final Icon icon = mock(Icon.class);
-        final IconImpl.Builder iconBuilder = mock(IconImpl.Builder.class);
-        doReturn(icon).when(iconBuilder).build();
         final Service service = mock(Service.class);
         final ServiceImpl.Builder serviceBuilder = mock(ServiceImpl.Builder.class);
         doReturn(serviceBuilder).when(serviceBuilder).setDevice(any(Device.class));
@@ -69,7 +67,7 @@ public class DeviceBuilderTest {
                 .setSerialNumber(serialNumber)
                 .setPresentationUrl(presentationUrl)
                 .setUrlBase(urlBase)
-                .addIconBuilder(iconBuilder)
+                .addIcon(icon)
                 .addServiceBuilder(serviceBuilder)
                 .build();
 

@@ -156,13 +156,13 @@ final class DeviceParser {
         Node node = listNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
             if (TextUtils.equals(getTagName(node), "icon")) {
-                builder.addIconBuilder(parseIcon(node));
+                builder.addIcon(parseIcon(node));
             }
         }
     }
 
     @Nonnull
-    private static IconImpl.Builder parseIcon(@Nonnull final Node iconNode) {
+    private static Icon parseIcon(@Nonnull final Node iconNode) {
         final IconImpl.Builder builder = new IconImpl.Builder();
         Node node = iconNode.getFirstChild();
         for (; node != null; node = node.getNextSibling()) {
@@ -173,7 +173,7 @@ final class DeviceParser {
             final String value = node.getTextContent();
             setField(builder, tag, value);
         }
-        return builder;
+        return builder.build();
     }
 
     @SuppressWarnings("IfCanBeSwitch")
