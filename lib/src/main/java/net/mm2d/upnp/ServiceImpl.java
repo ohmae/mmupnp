@@ -46,7 +46,7 @@ class ServiceImpl implements Service {
         @Nonnull
         private final List<ActionImpl.Builder> mActionBuilderList = new ArrayList<>();
         @Nonnull
-        private final List<StateVariableImpl.Builder> mVariableBuilderList = new ArrayList<>();
+        private final List<StateVariable> mStateVariables = new ArrayList<>();
 
         /**
          * インスタンス作成
@@ -175,8 +175,8 @@ class ServiceImpl implements Service {
          */
         @SuppressWarnings("UnusedReturnValue")
         @Nonnull
-        public Builder addVariableBuilder(@Nonnull final StateVariableImpl.Builder builder) {
-            mVariableBuilderList.add(builder);
+        public Builder addStateVariable(@Nonnull final StateVariable builder) {
+            mStateVariables.add(builder);
             return this;
         }
 
@@ -253,19 +253,17 @@ class ServiceImpl implements Service {
         mControlUrl = builder.mControlUrl;
         mEventSubUrl = builder.mEventSubUrl;
         mDescription = builder.mDescription != null ? builder.mDescription : "";
-        mStateVariableMap = buildStateVariableMap(builder.mVariableBuilderList);
+        mStateVariableMap = buildStateVariableMap(builder.mStateVariables);
         mActionMap = buildActionMap(this, mStateVariableMap, builder.mActionBuilderList);
     }
 
     @Nonnull
-    private static Map<String, StateVariable> buildStateVariableMap(
-            @Nonnull final List<StateVariableImpl.Builder> builderList) {
-        if (builderList.isEmpty()) {
+    private static Map<String, StateVariable> buildStateVariableMap(@Nonnull final List<StateVariable> list) {
+        if (list.isEmpty()) {
             return Collections.emptyMap();
         }
-        final Map<String, StateVariable> map = new LinkedHashMap<>(builderList.size());
-        for (final StateVariableImpl.Builder variableBuilder : builderList) {
-            final StateVariable variable = variableBuilder.build();
+        final Map<String, StateVariable> map = new LinkedHashMap<>(list.size());
+        for (final StateVariable variable : list) {
             map.put(variable.getName(), variable);
         }
         return map;

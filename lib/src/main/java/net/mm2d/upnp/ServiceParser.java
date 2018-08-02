@@ -78,7 +78,7 @@ final class ServiceParser {
             @Nonnull final ServiceImpl.Builder builder,
             @Nonnull final NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
-            builder.addVariableBuilder(parseStateVariable((Element) nodeList.item(i)));
+            builder.addStateVariable(parseStateVariable((Element) nodeList.item(i)));
         }
     }
 
@@ -139,7 +139,7 @@ final class ServiceParser {
     }
 
     @Nonnull
-    private static StateVariableImpl.Builder parseStateVariable(@Nonnull final Element element) {
+    private static StateVariable parseStateVariable(@Nonnull final Element element) {
         final StateVariableImpl.Builder builder = new StateVariableImpl.Builder()
                 .setSendEvents(element.getAttribute("sendEvents"))
                 .setMulticast(element.getAttribute("multicast"));
@@ -161,7 +161,7 @@ final class ServiceParser {
                 parseAllowedValueRange(builder, (Element) node);
             }
         }
-        return builder;
+        return builder.build();
     }
 
     private static void parseAllowedValueList(
