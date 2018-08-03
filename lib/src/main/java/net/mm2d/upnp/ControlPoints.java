@@ -14,6 +14,9 @@ import net.mm2d.upnp.empty.EmptyService;
 import net.mm2d.upnp.empty.EmptySsdpMessage;
 
 public final class ControlPoints {
+    private ControlPoints() {
+    }
+
     private static final ControlPoint EMPTY_CONTROL_POINT = new EmptyControlPoint();
 
     public static ControlPoint emptyControlPoint() {
