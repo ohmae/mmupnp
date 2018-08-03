@@ -48,7 +48,7 @@ public class EmptyAction implements Action {
     @Nonnull
     @Override
     public Map<String, String> invoke(@Nonnull final Map<String, String> argumentValues) throws IOException {
-        return invoke(argumentValues, false);
+        throw new IOException("empty object");
     }
 
     @Nonnull
@@ -65,7 +65,7 @@ public class EmptyAction implements Action {
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments) throws IOException {
-        return invoke(argumentValues, customNamespace, customArguments, false);
+        throw new IOException("empty object");
     }
 
     @Nonnull
