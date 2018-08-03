@@ -67,6 +67,8 @@ public class DeviceParserTest {
             final Device device = builder.build();
             assertThat(device.getIconList(), hasSize(4));
             assertThat(device.getServiceList(), hasSize(3));
+
+            assertThat(ControlPointImpl.collectEmbeddedUdn(device), empty());
         }
 
         @Test
@@ -159,7 +161,7 @@ public class DeviceParserTest {
             assertThat(device2.getParent(), is(device1));
             assertThat(device2.isEmbeddedDevice(), is(true));
 
-            final Set<String> udns = device.getAllUdnSet();
+            final Set<String> udns = ControlPointImpl.collectEmbeddedUdn(device);
             assertThat(udns, hasItem("uuid:01234567-89ab-cdef-0123-456789abcdee"));
             assertThat(udns, hasItem("uuid:01234567-89ab-cdef-0123-456789abcded"));
             assertThat(udns, not(hasItem("uuid:01234567-89ab-cdef-0123-456789abcdef")));

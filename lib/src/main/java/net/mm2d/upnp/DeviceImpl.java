@@ -14,12 +14,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -873,20 +871,6 @@ class DeviceImpl implements Device {
             }
         }
         return null;
-    }
-
-    @Override
-    @Nonnull
-    public Set<String> getAllUdnSet() {
-        if (mDeviceList.isEmpty()) {
-            return Collections.emptySet();
-        }
-        final Set<String> set = new HashSet<>();
-        for (final Device device : mDeviceList) {
-            set.add(device.getUdn());
-            set.addAll(device.getAllUdnSet());
-        }
-        return set;
     }
 
     @Override

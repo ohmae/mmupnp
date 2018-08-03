@@ -19,7 +19,6 @@ import net.mm2d.upnp.SsdpMessage;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -224,12 +223,6 @@ public class EmptyDevice implements Device {
     @Override
     public Device findDeviceByTypeRecursively(@Nonnull final String deviceType) {
         return null;
-    }
-
-    @Nonnull
-    @Override
-    public Set<String> getAllUdnSet() {
-        return Collections.emptySet();
     }
 
     @Override

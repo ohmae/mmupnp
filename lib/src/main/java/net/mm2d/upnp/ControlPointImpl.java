@@ -52,7 +52,7 @@ class ControlPointImpl implements ControlPoint {
     @Nonnull
     private final Map<String, DeviceImpl.Builder> mLoadingDeviceMap;
     @Nonnull
-    private final Set<String> mAllUdnSet = new HashSet<>();
+    private final Set<String> mEmbeddedUdnSet = new HashSet<>();
     @Nonnull
     private final ThreadPool mThreadPool;
     @Nonnull
@@ -129,7 +129,7 @@ class ControlPointImpl implements ControlPoint {
             final String uuid = message.getUuid();
             final Device device = mDeviceHolder.get(uuid);
             if (device == null) {
-                if (mAllUdnSet.contains(uuid)) {
+                if (mEmbeddedUdnSet.contains(uuid)) {
                     return;
                 }
                 onReceiveNewSsdp(message);
@@ -295,7 +295,7 @@ class ControlPointImpl implements ControlPoint {
         if (isPinnedDevice(mDeviceHolder.get(device.getUdn()))) {
             return;
         }
-        mAllUdnSet.addAll(device.getAllUdnSet());
+        mEmbeddedUdnSet.addAll(collectEmbeddedUdn(device));
         mDeviceHolder.add(device);
         mThreadPool.executeInSequential(() ->
                 mDiscoveryListenerList.onDiscover(device));
@@ -303,7 +303,7 @@ class ControlPointImpl implements ControlPoint {
 
     @SuppressWarnings("WeakerAccess")
     void lostDevice(@Nonnull final Device device) {
-        mAllUdnSet.removeAll(device.getAllUdnSet());
+        mEmbeddedUdnSet.removeAll(collectEmbeddedUdn(device));
         synchronized (mDeviceHolder) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
@@ -313,6 +313,29 @@ class ControlPointImpl implements ControlPoint {
         }
         mThreadPool.executeInSequential(() ->
                 mDiscoveryListenerList.onLost(device));
+    }
+
+    // VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    static Set<String> collectEmbeddedUdn(@Nonnull final Device device) {
+        final List<Device> deviceList = device.getDeviceList();
+        if (deviceList.isEmpty()) {
+            return Collections.emptySet();
+        }
+        final Set<String> outSet = new HashSet<>();
+        for (final Device d : deviceList) {
+            collectEmbeddedUdn(d, outSet);
+        }
+        return outSet;
+    }
+
+    private static void collectEmbeddedUdn(
+            @Nonnull final Device device,
+            @Nonnull final Set<String> outSet) {
+        outSet.add(device.getUdn());
+        for (final Device d : device.getDeviceList()) {
+            collectEmbeddedUdn(d, outSet);
+        }
     }
 
     @Override

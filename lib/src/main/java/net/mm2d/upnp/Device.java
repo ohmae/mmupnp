@@ -8,7 +8,6 @@
 package net.mm2d.upnp;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -411,14 +410,6 @@ public interface Device {
      */
     @Nullable
     Device findDeviceByTypeRecursively(@Nonnull String deviceType);
-
-    /**
-     * EmbeddedDeviceを含めたすべてのUDNのSetを返す。
-     *
-     * @return すべてのUDNのSet
-     */
-    @Nonnull
-    Set<String> getAllUdnSet();
 
     /**
      * 固定デバイスか否かを返す。
