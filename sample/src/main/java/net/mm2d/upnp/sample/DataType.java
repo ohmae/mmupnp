@@ -142,7 +142,8 @@ public enum DataType {
     /**
      * Unknown Data Type.
      */
-    UNKNOWN("unknown", "", false, false, true),;
+    UNKNOWN("unknown", "", false, false, true),
+    ;
 
     private static final Map<String, DataType> mMap = new HashMap<>(values().length);
 
