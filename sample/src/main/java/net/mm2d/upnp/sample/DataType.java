@@ -145,16 +145,16 @@ public enum DataType {
     UNKNOWN("unknown", "", false, false, true),
     ;
 
-    private static final Map<String, DataType> mMap = new HashMap<>(values().length);
+    private static final Map<String, DataType> MAP = new HashMap<>(values().length);
 
     static {
         for (final DataType type : values()) {
-            mMap.put(type.mSymbol, type);
+            MAP.put(type.getSymbol(), type);
         }
     }
 
     public static DataType of(@Nonnull final String symbol) {
-        final DataType dataType = mMap.get(symbol);
+        final DataType dataType = MAP.get(symbol);
         return dataType != null ? dataType : UNKNOWN;
     }
 

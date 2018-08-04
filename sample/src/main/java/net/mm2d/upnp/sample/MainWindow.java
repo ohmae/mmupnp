@@ -245,7 +245,7 @@ public class MainWindow extends JFrame {
         }
     };
 
-    public MainWindow() {
+    private MainWindow() {
         super();
         mControlPoint = initControlPoint();
         setTitle("UPnP");

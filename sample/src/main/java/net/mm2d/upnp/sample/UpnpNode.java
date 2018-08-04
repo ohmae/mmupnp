@@ -35,11 +35,7 @@ import javax.xml.transform.stream.StreamResult;
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 public class UpnpNode extends DefaultMutableTreeNode {
-    public UpnpNode() {
-        super();
-    }
-
-    public UpnpNode(final Object userObject) {
+    UpnpNode(final Object userObject) {
         super(userObject);
     }
 
