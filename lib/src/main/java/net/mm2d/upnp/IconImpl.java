@@ -189,8 +189,9 @@ class IconImpl implements Icon {
     /**
      * URLからバイナリデータを読み込む。
      *
-     * @param device DeviceImpl
      * @param client 通信に使用する{@link HttpClient}
+     * @param baseUrl baseUrl
+     * @param scopeId scopeId
      * @throws IOException 通信エラー
      */
     void loadBinary(

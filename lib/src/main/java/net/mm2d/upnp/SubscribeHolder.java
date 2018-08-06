@@ -7,9 +7,12 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.util.TextUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +39,6 @@ class SubscribeHolder implements Runnable {
     private Thread mThread;
     @Nonnull
     private final Map<String, SubscribeService> mSubscriptionMap = new HashMap<>();
-    @Nonnull
-    private final Map<Service, SubscribeService> mServiceMap = new HashMap<>();
 
     /**
      * スレッドを開始する。
@@ -74,11 +75,10 @@ class SubscribeHolder implements Runnable {
             final long timeout,
             final boolean keepRenew) {
         final String id = service.getSubscriptionId();
-        if (id == null) {
+        if (TextUtils.isEmpty(id)) {
             return;
         }
         final SubscribeService subscribeService = new SubscribeService(service, timeout, keepRenew);
-        mServiceMap.put(service, subscribeService);
         mSubscriptionMap.put(id, subscribeService);
         notifyAll();
     }
@@ -86,7 +86,7 @@ class SubscribeHolder implements Runnable {
     synchronized void renew(
             @Nonnull final Service service,
             final long timeout) {
-        final SubscribeService subscribing = mServiceMap.get(service);
+        final SubscribeService subscribing = mSubscriptionMap.get(service.getSubscriptionId());
         if (subscribing != null) {
             subscribing.renew(timeout);
         }
@@ -95,7 +95,7 @@ class SubscribeHolder implements Runnable {
     synchronized void setKeepRenew(
             @Nonnull final Service service,
             final boolean keep) {
-        final SubscribeService subscribing = mServiceMap.get(service);
+        final SubscribeService subscribing = mSubscriptionMap.get(service.getSubscriptionId());
         if (subscribing != null) {
             subscribing.setKeepRenew(keep);
         }
@@ -108,13 +108,9 @@ class SubscribeHolder implements Runnable {
      * @param service 削除するサービス
      */
     synchronized void remove(@Nonnull final Service service) {
-        mServiceMap.remove(service);
-        mSubscriptionMap.remove(service.getSubscriptionId());
-        notifyAll();
-    }
-
-    synchronized boolean contains(@Nonnull final Service service) {
-        return mServiceMap.containsKey(service);
+        if (mSubscriptionMap.remove(service.getSubscriptionId()) != null) {
+            notifyAll();
+        }
     }
 
     /**
@@ -124,7 +120,14 @@ class SubscribeHolder implements Runnable {
      */
     @Nonnull
     synchronized List<Service> getServiceList() {
-        return new ArrayList<>(mServiceMap.keySet());
+        if (mSubscriptionMap.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final List<Service> list = new ArrayList<>();
+        for (final SubscribeService subscribeService : mSubscriptionMap.values()) {
+            list.add(subscribeService.getService());
+        }
+        return list;
     }
 
     /**
