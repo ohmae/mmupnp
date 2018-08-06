@@ -118,14 +118,14 @@ public class SubscribeServiceTest {
 
     @Test
     public void isExpired_期限が切れるとtrue() throws Exception {
+        final Service service = mock(Service.class);
         final long start = System.currentTimeMillis();
         final long timeout = 1000L;
         final long expiryTime = start + timeout;
-        final Service service = mock(Service.class);
         final SubscribeService subscribeService = new SubscribeService(service, timeout, false);
 
         assertThat(subscribeService.isExpired(expiryTime), is(false));
-        assertThat(subscribeService.isExpired(expiryTime + 1), is(true));
+        assertThat(subscribeService.isExpired(expiryTime + 100L), is(true));
     }
 
     @Test
