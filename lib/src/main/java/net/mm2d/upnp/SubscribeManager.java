@@ -43,7 +43,11 @@ class SubscribeManager implements EventMessageListener {
             @Nonnull final String sid,
             final long seq,
             @Nonnull final List<StringPair> properties) {
+        Log.e(sid);
         final Service service = mSubscribeHolder.getService(sid);
+        if (service == null) {
+            Log.e("service is null");
+        }
         return service != null && mThreadPool.executeInSequential(() -> {
             for (final StringPair pair : properties) {
                 notifyEvent(service, seq, pair.getKey(), pair.getValue());
@@ -128,10 +132,23 @@ class SubscribeManager implements EventMessageListener {
      * @see Service
      * @see Service#subscribe()
      */
-    void registerSubscribeService(
+    void register(
+            @Nonnull final Service service,
+            final long timeout,
+            final boolean keep) {
+        mSubscribeHolder.add(service, timeout, keep);
+    }
+
+    void renew(
+            @Nonnull final Service service,
+            final long timeout) {
+        mSubscribeHolder.renew(service, timeout);
+    }
+
+    void setKeepRenew(
             @Nonnull final Service service,
             final boolean keep) {
-        mSubscribeHolder.add(service, keep);
+        mSubscribeHolder.setKeepRenew(service, keep);
     }
 
     /**
@@ -141,7 +158,7 @@ class SubscribeManager implements EventMessageListener {
      * @see Service
      * @see Service#unsubscribe()
      */
-    void unregisterSubscribeService(@Nonnull final Service service) {
+    void unregister(@Nonnull final Service service) {
         mSubscribeHolder.remove(service);
     }
 }

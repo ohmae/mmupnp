@@ -29,11 +29,10 @@ public class SubscribeHolderTest {
     public void add_getServiceできる() {
         final String id = "id";
         final Service service = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service).getSubscriptionExpiryTime();
         doReturn(id).when(service).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
 
-        subscribeHolder.add(service, false);
+        subscribeHolder.add(service, 1000L, false);
 
         assertThat(subscribeHolder.getService(id), is(service));
     }
@@ -42,16 +41,14 @@ public class SubscribeHolderTest {
     public void remove_getServiceできない() {
         final String id1 = "id1";
         final Service service1 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service1).getSubscriptionExpiryTime();
         doReturn(id1).when(service1).getSubscriptionId();
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service2).getSubscriptionExpiryTime();
         doReturn(id2).when(service2).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
 
-        subscribeHolder.add(service1, false);
-        subscribeHolder.add(service2, false);
+        subscribeHolder.add(service1, 1000L, false);
+        subscribeHolder.add(service2, 1000L, false);
 
         assertThat(subscribeHolder.getService(id1), is(service1));
         assertThat(subscribeHolder.getService(id2), is(service2));
@@ -66,16 +63,14 @@ public class SubscribeHolderTest {
     public void getServiceList_addしたServiceが取得できる() {
         final String id1 = "id1";
         final Service service1 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service1).getSubscriptionExpiryTime();
         doReturn(id1).when(service1).getSubscriptionId();
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service2).getSubscriptionExpiryTime();
         doReturn(id2).when(service2).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
 
-        subscribeHolder.add(service1, false);
-        subscribeHolder.add(service2, false);
+        subscribeHolder.add(service1, 1000L, false);
+        subscribeHolder.add(service2, 1000L, false);
 
         assertThat(subscribeHolder.getServiceList(), hasItem(service1));
         assertThat(subscribeHolder.getServiceList(), hasItem(service2));
@@ -89,9 +84,8 @@ public class SubscribeHolderTest {
     @Test
     public void getServiceList_subscriptionIdがnullだとaddできない() {
         final Service service1 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service1).getSubscriptionExpiryTime();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
-        subscribeHolder.add(service1, false);
+        subscribeHolder.add(service1, 1000L, false);
 
         assertThat(subscribeHolder.getServiceList(), not(hasItem(service1)));
     }
@@ -100,16 +94,14 @@ public class SubscribeHolderTest {
     public void clear_すべて取得できなくなる() {
         final String id1 = "id1";
         final Service service1 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service1).getSubscriptionExpiryTime();
         doReturn(id1).when(service1).getSubscriptionId();
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service2).getSubscriptionExpiryTime();
         doReturn(id2).when(service2).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
 
-        subscribeHolder.add(service1, false);
-        subscribeHolder.add(service2, false);
+        subscribeHolder.add(service1, 1000L, false);
+        subscribeHolder.add(service2, 1000L, false);
 
         assertThat(subscribeHolder.getService(id1), is(service1));
         assertThat(subscribeHolder.getService(id2), is(service2));
@@ -125,17 +117,15 @@ public class SubscribeHolderTest {
         final long now = System.currentTimeMillis();
         final String id1 = "id1";
         final Service service1 = mock(Service.class);
-        doReturn(now + 1000).when(service1).getSubscriptionExpiryTime();
         doReturn(id1).when(service1).getSubscriptionId();
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
-        doReturn(now + 4000).when(service2).getSubscriptionExpiryTime();
         doReturn(id2).when(service2).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
         subscribeHolder.start();
 
-        subscribeHolder.add(service1, false);
-        subscribeHolder.add(service2, false);
+        subscribeHolder.add(service1, 1000L, false);
+        subscribeHolder.add(service2, 4000L, false);
 
         assertThat(subscribeHolder.getService(id1), is(service1));
         assertThat(subscribeHolder.getService(id2), is(service2));
@@ -157,24 +147,18 @@ public class SubscribeHolderTest {
     public void renew_定期的にrenewが実行される() throws Exception {
         final long now = System.currentTimeMillis();
         final Service service1 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service1).getSubscriptionExpiryTime();
-        doReturn(now).when(service1).getSubscriptionStart();
-        doReturn(1000L).when(service1).getSubscriptionTimeout();
         doReturn(true).when(service1).renewSubscribe();
         doReturn("id1").when(service1).getSubscriptionId();
 
         final Service service2 = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service2).getSubscriptionExpiryTime();
-        doReturn(now).when(service2).getSubscriptionStart();
-        doReturn(500L).when(service2).getSubscriptionTimeout();
         doReturn(true).when(service2).renewSubscribe();
         doReturn("id2").when(service2).getSubscriptionId();
 
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
         subscribeHolder.start();
 
-        subscribeHolder.add(service1, true);
-        subscribeHolder.add(service2, true);
+        subscribeHolder.add(service1, 1000L, true);
+        subscribeHolder.add(service2, 500L, true);
         verify(service1, never()).renewSubscribe();
 
         Thread.sleep(2000L);
@@ -189,15 +173,12 @@ public class SubscribeHolderTest {
         final long now = System.currentTimeMillis();
         final String id = "id";
         final Service service = mock(Service.class);
-        doReturn(Long.MAX_VALUE).when(service).getSubscriptionExpiryTime();
-        doReturn(now).when(service).getSubscriptionStart();
-        doReturn(1000L).when(service).getSubscriptionTimeout();
         doReturn(false).when(service).renewSubscribe();
         doReturn(id).when(service).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder();
         subscribeHolder.start();
 
-        subscribeHolder.add(service, true);
+        subscribeHolder.add(service, 1000L, true);
         Thread.sleep(3000L);
         assertThat(subscribeHolder.getService(id), is(nullValue()));
 

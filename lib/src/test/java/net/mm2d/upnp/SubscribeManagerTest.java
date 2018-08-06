@@ -220,10 +220,11 @@ public class SubscribeManagerTest {
         };
         final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
         final Service service = mock(Service.class);
+        final long timeout = 1000L;
 
-        manager.registerSubscribeService(service, true);
+        manager.register(service, timeout, true);
 
-        verify(holder).add(service, true);
+        verify(holder).add(service, timeout, true);
     }
 
     @Test
@@ -241,7 +242,7 @@ public class SubscribeManagerTest {
         final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
         final Service service = mock(Service.class);
 
-        manager.unregisterSubscribeService(service);
+        manager.unregister(service);
 
         verify(holder).remove(service);
     }

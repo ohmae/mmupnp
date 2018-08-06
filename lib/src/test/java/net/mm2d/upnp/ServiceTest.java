@@ -590,7 +590,7 @@ public class ServiceTest {
 
             final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
-            verify(mSubscribeManager).registerSubscribeService(mCds, false);
+            verify(mSubscribeManager).register(mCds, TimeUnit.SECONDS.toMillis(300), false);
 
             final String callback = request.getHeader(Http.CALLBACK);
             assertThat(callback.charAt(0), is('<'));
@@ -611,7 +611,7 @@ public class ServiceTest {
 
             final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
-            verify(mSubscribeManager).registerSubscribeService(mCds, true);
+            verify(mSubscribeManager).register(mCds, TimeUnit.SECONDS.toMillis(300), true);
         }
 
         @Test
@@ -651,21 +651,7 @@ public class ServiceTest {
 
             final HttpRequest request = captor.getValue();
             assertThat(request.getUri(), is(mCds.getEventSubUrl()));
-            verify(mSubscribeManager).unregisterSubscribeService(mCds);
-        }
-
-        @Test
-        public void expired() throws Exception {
-            final HttpClient client = mock(HttpClient.class);
-            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
-            doReturn(client).when(mCds).createHttpClient();
-            mCds.subscribe();
-
-            mCds.expired();
-            assertThat(mCds.getSubscriptionId(), is(nullValue()));
-            assertThat(mCds.getSubscriptionExpiryTime(), is(0L));
-            assertThat(mCds.getSubscriptionStart(), is(0L));
-            assertThat(mCds.getSubscriptionTimeout(), is(0L));
+            verify(mSubscribeManager).unregister(mCds);
         }
 
         @Test
@@ -676,44 +662,6 @@ public class ServiceTest {
             mCds.subscribe();
 
             assertThat(mCds.getSubscriptionId(), is(SID));
-        }
-
-        @Test
-        public void getSubscriptionStart() throws Exception {
-            final HttpClient client = mock(HttpClient.class);
-            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
-            doReturn(client).when(mCds).createHttpClient();
-            final long before = System.currentTimeMillis();
-            mCds.subscribe();
-            final long after = System.currentTimeMillis();
-
-            assertThat(mCds.getSubscriptionStart(), greaterThanOrEqualTo(before));
-            assertThat(mCds.getSubscriptionStart(), lessThanOrEqualTo(after));
-        }
-
-        @Test
-        public void getSubscriptionTimeout() throws Exception {
-            final HttpClient client = mock(HttpClient.class);
-            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
-            doReturn(client).when(mCds).createHttpClient();
-            mCds.subscribe();
-
-            assertThat(mCds.getSubscriptionTimeout(), is(TimeUnit.SECONDS.toMillis(300L)));
-        }
-
-        @Test
-        public void getSubscriptionExpiryTime() throws Exception {
-            final HttpClient client = mock(HttpClient.class);
-            doReturn(createSubscribeResponse()).when(client).post(ArgumentMatchers.any(HttpRequest.class));
-            doReturn(client).when(mCds).createHttpClient();
-            final long before = System.currentTimeMillis();
-            mCds.subscribe();
-            final long after = System.currentTimeMillis();
-
-            assertThat(mCds.getSubscriptionExpiryTime(),
-                    greaterThanOrEqualTo(before + TimeUnit.SECONDS.toMillis(300L)));
-            assertThat(mCds.getSubscriptionExpiryTime(),
-                    lessThanOrEqualTo(after + TimeUnit.SECONDS.toMillis(300L)));
         }
     }
 

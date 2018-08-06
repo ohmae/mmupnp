@@ -94,7 +94,7 @@ public class HttpClient {
      *
      * @param keepAlive keep-aliveを行う場合true
      */
-    public void setKeepAlive(final boolean keepAlive) {
+    public final void setKeepAlive(final boolean keepAlive) {
         mKeepAlive = keepAlive;
     }
 

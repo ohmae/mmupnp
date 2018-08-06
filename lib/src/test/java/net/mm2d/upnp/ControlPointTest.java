@@ -296,7 +296,7 @@ public class ControlPointTest {
             assertThat(mCp.getDevice(uuid), is(nullValue()));
             assertThat(mCp.getDeviceListSize(), is(0));
             verify(l).onLost(device);
-            verify(mSubscribeManager).unregisterSubscribeService(service);
+            verify(mSubscribeManager).unregister(service);
         }
 
         @Test
@@ -316,7 +316,7 @@ public class ControlPointTest {
             assertThat(mCp.getDevice(uuid), is(nullValue()));
             assertThat(mCp.getDeviceListSize(), is(0));
             verify(mCp).lostDevice(device);
-            verify(mSubscribeManager).unregisterSubscribeService(service);
+            verify(mSubscribeManager).unregister(service);
         }
 
         @Test
@@ -359,7 +359,7 @@ public class ControlPointTest {
             final Service service = mock(Service.class);
             doReturn(sid).when(service).getSubscriptionId();
 
-            mSubscribeManager.registerSubscribeService(service, true);
+            mSubscribeManager.register(service, 1000L, true);
             assertThat(mSubscribeManager.getSubscribeService(sid), is(service));
         }
 
@@ -370,8 +370,8 @@ public class ControlPointTest {
             final Service service = mock(Service.class);
             doReturn(sid).when(service).getSubscriptionId();
 
-            mSubscribeManager.registerSubscribeService(service, true);
-            mSubscribeManager.unregisterSubscribeService(service);
+            mSubscribeManager.register(service, 1000L, true);
+            mSubscribeManager.unregister(service);
             assertThat(mSubscribeManager.getSubscribeService(sid), is(nullValue()));
         }
     }
@@ -693,8 +693,7 @@ public class ControlPointTest {
             mDeviceHolder.add(device);
             final Service service = mock(Service.class);
             doReturn("SubscriptionId").when(service).getSubscriptionId();
-            doReturn(System.currentTimeMillis() + 1000).when(service).getSubscriptionExpiryTime();
-            mSubscribeManager.registerSubscribeService(service, false);
+            mSubscribeManager.register(service, 1000L, false);
             mCp.stop();
             mCp.terminate();
             Thread.sleep(100);
@@ -710,9 +709,8 @@ public class ControlPointTest {
             mDeviceHolder.add(device);
             final Service service = mock(Service.class);
             doReturn("SubscriptionId").when(service).getSubscriptionId();
-            doReturn(System.currentTimeMillis() + 1000).when(service).getSubscriptionExpiryTime();
             doThrow(new IOException()).when(service).unsubscribe();
-            mSubscribeManager.registerSubscribeService(service, false);
+            mSubscribeManager.register(service, 1000L, false);
             mCp.stop();
             mCp.terminate();
             Thread.sleep(100);
@@ -792,7 +790,7 @@ public class ControlPointTest {
             doReturn(variableName).when(variable).getName();
             doReturn(variable).when(service).findStateVariable(variableName);
 
-            mSubscribeManager.registerSubscribeService(service, false);
+            mSubscribeManager.register(service, 1000L, false);
 
             final NotifyEventListener l = mock(NotifyEventListener.class);
             mCp.addNotifyEventListener(l);
@@ -817,7 +815,7 @@ public class ControlPointTest {
             doReturn(variableName).when(variable).getName();
             doReturn(variable).when(service).findStateVariable(variableName);
 
-            mSubscribeManager.registerSubscribeService(service, false);
+            mSubscribeManager.register(service, 1000L, false);
 
             final NotifyEventListener l = mock(NotifyEventListener.class);
             mCp.addNotifyEventListener(l);
@@ -843,7 +841,7 @@ public class ControlPointTest {
             doReturn(variableName).when(variable).getName();
             doReturn(variable).when(service).findStateVariable(variableName);
 
-            mSubscribeManager.registerSubscribeService(service, false);
+            mSubscribeManager.register(service, 1000L, false);
 
             final NotifyEventListener l = mock(NotifyEventListener.class);
             mCp.addNotifyEventListener(l);

@@ -112,32 +112,8 @@ public class EmptyServiceTest {
     }
 
     @Test
-    public void expired() {
-        final Service service = new EmptyService();
-        service.expired();
-    }
-
-    @Test
     public void getSubscriptionId() {
         final Service service = new EmptyService();
         assertThat(service.getSubscriptionId(), is(nullValue()));
-    }
-
-    @Test
-    public void getSubscriptionStart() {
-        final Service service = new EmptyService();
-        assertThat(service.getSubscriptionStart(), is(0L));
-    }
-
-    @Test
-    public void getSubscriptionTimeout() {
-        final Service service = new EmptyService();
-        assertThat(service.getSubscriptionTimeout(), is(0L));
-    }
-
-    @Test
-    public void getSubscriptionExpiryTime() {
-        final Service service = new EmptyService();
-        assertThat(service.getSubscriptionExpiryTime(), is(0L));
     }
 }

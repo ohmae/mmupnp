@@ -22,8 +22,11 @@ class SubscribeService {
     private static final int RETRY_COUNT = 2;
     @Nonnull
     private final Service mService;
-    private final boolean mKeepRenew;
+    private boolean mKeepRenew;
     private int mFailCount;
+    private long mSubscriptionStart;
+    private long mSubscriptionTimeout;
+    private long mSubscriptionExpiryTime;
 
     /**
      * Serviceを指定し初期化する。
@@ -33,10 +36,24 @@ class SubscribeService {
      */
     SubscribeService(
             @Nonnull final Service service,
+            final long timeout,
             final boolean keepRenew) {
         mService = service;
+        mSubscriptionStart = System.currentTimeMillis();
+        mSubscriptionTimeout = timeout;
+        mSubscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
         mKeepRenew = keepRenew;
         mFailCount = 0;
+    }
+
+    void renew(final long timeout) {
+        mSubscriptionStart = System.currentTimeMillis();
+        mSubscriptionTimeout = timeout;
+        mSubscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
+    }
+
+    void setKeepRenew(final boolean keep) {
+        mKeepRenew = keep;
     }
 
     /**
@@ -68,7 +85,7 @@ class SubscribeService {
      */
     long getNextScanTime() {
         if (!mKeepRenew) {
-            return mService.getSubscriptionExpiryTime();
+            return mSubscriptionExpiryTime;
         }
         return calculateRenewTime();
     }
@@ -88,13 +105,13 @@ class SubscribeService {
      */
     // VisibleForTesting
     long calculateRenewTime() {
-        long interval = mService.getSubscriptionTimeout() * (mFailCount + 1) / RETRY_COUNT;
+        long interval = mSubscriptionTimeout * (mFailCount + 1) / RETRY_COUNT;
         if (interval > MARGIN_TIME * 2) {
             interval -= MARGIN_TIME;
         } else {
             interval = interval / 2;
         }
-        return mService.getSubscriptionStart() + interval;
+        return mSubscriptionStart + interval;
     }
 
     /**
@@ -104,7 +121,7 @@ class SubscribeService {
      * @return 有効期限切れの場合true
      */
     boolean isExpired(final long now) {
-        return mService.getSubscriptionExpiryTime() < now;
+        return mSubscriptionExpiryTime < now;
     }
 
     /**

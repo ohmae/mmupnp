@@ -107,28 +107,9 @@ public class EmptyService implements Service {
         throw new IOException("empty object");
     }
 
-    @Override
-    public void expired() {
-    }
-
     @Nullable
     @Override
     public String getSubscriptionId() {
         return null;
-    }
-
-    @Override
-    public long getSubscriptionStart() {
-        return 0;
-    }
-
-    @Override
-    public long getSubscriptionTimeout() {
-        return 0;
-    }
-
-    @Override
-    public long getSubscriptionExpiryTime() {
-        return 0;
     }
 }

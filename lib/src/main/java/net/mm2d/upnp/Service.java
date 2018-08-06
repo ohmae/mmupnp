@@ -196,37 +196,10 @@ public interface Service {
     boolean unsubscribe() throws IOException;
 
     /**
-     * Subscribeの期限切れ通知
-     */
-    void expired();
-
-    /**
      * SID(SubscriptionID)を返す。
      *
      * @return SubscriptionID
      */
     @Nullable
     String getSubscriptionId();
-
-    /**
-     * Subscriptionの開始時刻
-     *
-     * @return Subscriptionの開始時刻
-     */
-    long getSubscriptionStart();
-
-    /**
-     * Subscriptionの有効期間
-     *
-     * @return Subscriptionの有効期間
-     */
-    long getSubscriptionTimeout();
-
-    /**
-     * Subscriptionの有効期限
-     *
-     * @return Subscriptionの有効期限
-     */
-    long getSubscriptionExpiryTime();
-
 }

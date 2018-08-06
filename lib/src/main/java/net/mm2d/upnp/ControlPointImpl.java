@@ -307,7 +307,7 @@ class ControlPointImpl implements ControlPoint {
         synchronized (mDeviceHolder) {
             final List<Service> list = device.getServiceList();
             for (final Service s : list) {
-                mSubscribeManager.unregisterSubscribeService(s);
+                mSubscribeManager.unregister(s);
             }
             mDeviceHolder.remove(device);
         }

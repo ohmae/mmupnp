@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,11 +35,9 @@ class SubscribeHolder implements Runnable {
     @Nullable
     private Thread mThread;
     @Nonnull
-    private final Map<String, SubscribeService> mServiceMap;
-
-    SubscribeHolder() {
-        mServiceMap = new HashMap<>();
-    }
+    private final Map<String, SubscribeService> mSubscriptionMap = new HashMap<>();
+    @Nonnull
+    private final Map<Service, SubscribeService> mServiceMap = new HashMap<>();
 
     /**
      * スレッドを開始する。
@@ -72,12 +71,34 @@ class SubscribeHolder implements Runnable {
      */
     synchronized void add(
             @Nonnull final Service service,
+            final long timeout,
             final boolean keepRenew) {
-        if (service.getSubscriptionId() == null) {
+        final String id = service.getSubscriptionId();
+        if (id == null) {
             return;
         }
-        final SubscribeService subscribeService = new SubscribeService(service, keepRenew);
-        mServiceMap.put(service.getSubscriptionId(), subscribeService);
+        final SubscribeService subscribeService = new SubscribeService(service, timeout, keepRenew);
+        mServiceMap.put(service, subscribeService);
+        mSubscriptionMap.put(id, subscribeService);
+        notifyAll();
+    }
+
+    synchronized void renew(
+            @Nonnull final Service service,
+            final long timeout) {
+        final SubscribeService subscribing = mServiceMap.get(service);
+        if (subscribing != null) {
+            subscribing.renew(timeout);
+        }
+    }
+
+    synchronized void setKeepRenew(
+            @Nonnull final Service service,
+            final boolean keep) {
+        final SubscribeService subscribing = mServiceMap.get(service);
+        if (subscribing != null) {
+            subscribing.setKeepRenew(keep);
+        }
         notifyAll();
     }
 
@@ -87,8 +108,13 @@ class SubscribeHolder implements Runnable {
      * @param service 削除するサービス
      */
     synchronized void remove(@Nonnull final Service service) {
-        mServiceMap.remove(service.getSubscriptionId());
+        mServiceMap.remove(service);
+        mSubscriptionMap.remove(service.getSubscriptionId());
         notifyAll();
+    }
+
+    synchronized boolean contains(@Nonnull final Service service) {
+        return mServiceMap.containsKey(service);
     }
 
     /**
@@ -98,11 +124,7 @@ class SubscribeHolder implements Runnable {
      */
     @Nonnull
     synchronized List<Service> getServiceList() {
-        final List<Service> list = new ArrayList<>(mServiceMap.size());
-        for (final Map.Entry<String, SubscribeService> entry : mServiceMap.entrySet()) {
-            list.add(entry.getValue().getService());
-        }
-        return list;
+        return new ArrayList<>(mServiceMap.keySet());
     }
 
     /**
@@ -113,7 +135,7 @@ class SubscribeHolder implements Runnable {
      */
     @Nullable
     synchronized Service getService(@Nonnull final String subscriptionId) {
-        final SubscribeService c = mServiceMap.get(subscriptionId);
+        final SubscribeService c = mSubscriptionMap.get(subscriptionId);
         if (c == null) {
             return null;
         }
@@ -124,7 +146,7 @@ class SubscribeHolder implements Runnable {
      * 保持しているServiceをすべて削除する。
      */
     synchronized void clear() {
-        mServiceMap.clear();
+        mSubscriptionMap.clear();
     }
 
     @Override
@@ -150,11 +172,11 @@ class SubscribeHolder implements Runnable {
      */
     @Nonnull
     private synchronized Collection<SubscribeService> waitEntry() throws InterruptedException {
-        while (mServiceMap.size() == 0) {
+        while (mSubscriptionMap.size() == 0) {
             wait();
         }
         // 操作をロックしないようにコピーに対して処理を行う。
-        return new ArrayList<>(mServiceMap.values());
+        return new ArrayList<>(mSubscriptionMap.values());
     }
 
     /**
@@ -178,12 +200,15 @@ class SubscribeHolder implements Runnable {
      */
     private synchronized void removeExpiredService() {
         final long now = System.currentTimeMillis();
-        final List<SubscribeService> list = new ArrayList<>(mServiceMap.values());
+        final List<SubscribeService> list = new ArrayList<>(mSubscriptionMap.values());
         for (final SubscribeService s : list) {
             if (s.isExpired(now)) {
                 final Service service = s.getService();
                 remove(service);
-                service.expired();
+                try {
+                    service.unsubscribe();
+                } catch (final IOException ignored) {
+                }
             }
         }
     }
@@ -194,7 +219,7 @@ class SubscribeHolder implements Runnable {
      * @throws InterruptedException 割り込みが発生した
      */
     private synchronized void waitNextRenewTime() throws InterruptedException {
-        if (mServiceMap.size() == 0) {
+        if (mSubscriptionMap.size() == 0) {
             return;
         }
         final long sleep = findMostRecentTime() - System.currentTimeMillis();
@@ -208,7 +233,7 @@ class SubscribeHolder implements Runnable {
      */
     private long findMostRecentTime() {
         long recent = Long.MAX_VALUE;
-        for (final SubscribeService s : mServiceMap.values()) {
+        for (final SubscribeService s : mSubscriptionMap.values()) {
             final long wait = s.getNextScanTime();
             if (recent > wait) {
                 recent = wait;

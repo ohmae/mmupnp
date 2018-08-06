@@ -238,9 +238,6 @@ class ServiceImpl implements Service {
     private List<StateVariable> mStateVariableList;
     @Nonnull
     private final Map<String, StateVariable> mStateVariableMap;
-    private long mSubscriptionStart;
-    private long mSubscriptionTimeout;
-    private long mSubscriptionExpiryTime;
     @Nullable
     private String mSubscriptionId;
 
@@ -434,7 +431,7 @@ class ServiceImpl implements Service {
     public boolean subscribe(final boolean keepRenew) throws IOException {
         if (!TextUtils.isEmpty(mSubscriptionId)) {
             if (renewSubscribeInner()) {
-                mSubscribeManager.registerSubscribeService(this, keepRenew);
+                mSubscribeManager.setKeepRenew(this, keepRenew);
                 return true;
             }
             return false;
@@ -451,14 +448,6 @@ class ServiceImpl implements Service {
             Log.w("subscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
-        if (parseSubscribeResponse(response)) {
-            mSubscribeManager.registerSubscribeService(this, keepRenew);
-            return true;
-        }
-        return false;
-    }
-
-    private boolean parseSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout <= 0) {
@@ -466,9 +455,7 @@ class ServiceImpl implements Service {
             return false;
         }
         mSubscriptionId = sid;
-        mSubscriptionStart = System.currentTimeMillis();
-        mSubscriptionTimeout = timeout;
-        mSubscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
+        mSubscribeManager.register(this, timeout, keepRenew);
         return true;
     }
 
@@ -501,19 +488,13 @@ class ServiceImpl implements Service {
             Log.w("renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
-        return parseRenewSubscribeResponse(response);
-    }
-
-    private boolean parseRenewSubscribeResponse(@Nonnull final HttpResponse response) {
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout <= 0) {
             Log.w("renewSubscribe response:" + response.toString());
             return false;
         }
-        mSubscriptionStart = System.currentTimeMillis();
-        mSubscriptionTimeout = timeout;
-        mSubscriptionExpiryTime = mSubscriptionStart + mSubscriptionTimeout;
+        mSubscribeManager.renew(this, timeout);
         return true;
     }
 
@@ -535,15 +516,12 @@ class ServiceImpl implements Service {
         final HttpClient client = createHttpClient();
         final HttpRequest request = makeUnsubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
+        mSubscribeManager.unregister(this);
+        mSubscriptionId = null;
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Log.w("unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
-        mSubscribeManager.unregisterSubscribeService(this);
-        mSubscriptionId = null;
-        mSubscriptionStart = 0;
-        mSubscriptionTimeout = 0;
-        mSubscriptionExpiryTime = 0;
         return true;
     }
 
@@ -557,32 +535,9 @@ class ServiceImpl implements Service {
     }
 
     @Override
-    public void expired() {
-        mSubscriptionId = null;
-        mSubscriptionStart = 0;
-        mSubscriptionTimeout = 0;
-        mSubscriptionExpiryTime = 0;
-    }
-
-    @Override
     @Nullable
     public String getSubscriptionId() {
         return mSubscriptionId;
-    }
-
-    @Override
-    public long getSubscriptionStart() {
-        return mSubscriptionStart;
-    }
-
-    @Override
-    public long getSubscriptionTimeout() {
-        return mSubscriptionTimeout;
-    }
-
-    @Override
-    public long getSubscriptionExpiryTime() {
-        return mSubscriptionExpiryTime;
     }
 
     @Override
