@@ -207,7 +207,7 @@ public class SubscribeManagerTest {
     }
 
     @Test
-    public void registerSubscribeService() {
+    public void register() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
@@ -228,7 +228,25 @@ public class SubscribeManagerTest {
     }
 
     @Test
-    public void unregisterSubscribeService() {
+    public void renew() {
+        final ThreadPool pool = mock(ThreadPool.class);
+        final NotifyEventListener listener = mock(NotifyEventListener.class);
+        final DiFactory factory = new DiFactory();
+        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final Service service = mock(Service.class);
+        final String id = "id";
+        doReturn(id).when(service).getSubscriptionId();
+        final long timeout = 1000L;
+
+        manager.renew(service, timeout);
+        manager.setKeepRenew(service, false);
+        manager.register(service, timeout, true);
+        manager.renew(service, timeout);
+        manager.setKeepRenew(service, false);
+    }
+
+    @Test
+    public void unregister() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final ThreadPool pool = mock(ThreadPool.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
