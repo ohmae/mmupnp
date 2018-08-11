@@ -189,7 +189,7 @@ class IconImpl implements Icon {
     /**
      * URLからバイナリデータを読み込む。
      *
-     * @param client 通信に使用する{@link HttpClient}
+     * @param client  通信に使用する{@link HttpClient}
      * @param baseUrl baseUrl
      * @param scopeId scopeId
      * @throws IOException 通信エラー

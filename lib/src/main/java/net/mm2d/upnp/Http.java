@@ -9,8 +9,11 @@ package net.mm2d.upnp;
 
 import net.mm2d.util.TextUtils;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -359,6 +362,9 @@ public final class Http {
     private static String makeHostWithScopeId(
             @Nonnull final String host,
             final int scopeId) {
+        if (!isInet6Host(host)) {
+            return host;
+        }
         final int length = host.length();
         if (host.charAt(length - 1) != ']') {
             return host;
@@ -368,6 +374,14 @@ public final class Http {
             return host.substring(0, length - 1) + "%" + scopeId + "]";
         }
         return host.substring(0, index) + "%" + scopeId + "]";
+    }
+
+    private static boolean isInet6Host(@Nonnull final String host) {
+        try {
+            return InetAddress.getByName(host) instanceof Inet6Address;
+        } catch (final UnknownHostException ignored) {
+            return false;
+        }
     }
 
     @Nonnull

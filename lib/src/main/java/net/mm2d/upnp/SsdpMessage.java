@@ -39,6 +39,7 @@ public interface SsdpMessage {
     /**
      * NTSの値：ssdp:update
      */
+    @SuppressWarnings("unused")
     String SSDP_UPDATE = "ssdp:update";
     /**
      * MANの値：ssdp:discover

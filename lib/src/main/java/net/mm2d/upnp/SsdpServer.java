@@ -44,6 +44,7 @@ interface SsdpServer {
          *
          * <p>未使用
          */
+        @SuppressWarnings("unused")
         IP_V6_SITE_LOCAL("FF05::C"),
         ;
 
