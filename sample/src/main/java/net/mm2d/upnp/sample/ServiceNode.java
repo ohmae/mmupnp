@@ -44,22 +44,8 @@ public class ServiceNode extends UpnpNode {
     }
 
     @Override
-    public String getDetailText() {
-        final Service service = getUserObject();
-        return "ServiceType: " +
-                service.getServiceType() +
-                '\n' +
-                "ServiceId: " +
-                service.getServiceId() +
-                '\n' +
-                "ScpdUrl: " +
-                service.getScpdUrl() +
-                '\n' +
-                "ControlUrl: " +
-                service.getControlUrl() +
-                '\n' +
-                "EventSubUrl: " +
-                service.getEventSubUrl();
+    public String formatDescription() {
+        return Formatter.format(getUserObject());
     }
 
     @Override

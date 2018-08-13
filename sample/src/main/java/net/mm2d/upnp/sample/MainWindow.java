@@ -156,7 +156,7 @@ public class MainWindow extends JFrame {
         @Override
         public void valueChanged(final TreeSelectionEvent event) {
             final UpnpNode node = (UpnpNode) mTree.getLastSelectedPathComponent();
-            mDetail1.setText(node.getDetailText());
+            mDetail1.setText(node.formatDescription());
             mDetail2.setText(node.getDetailXml());
         }
     };

@@ -45,7 +45,7 @@ public class UpnpNode extends DefaultMutableTreeNode {
         super(userObject, allowsChildren);
     }
 
-    public String getDetailText() {
+    public String formatDescription() {
         return "";
     }
 

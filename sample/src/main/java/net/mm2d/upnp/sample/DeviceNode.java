@@ -45,42 +45,8 @@ public class DeviceNode extends UpnpNode {
     }
 
     @Override
-    public String getDetailText() {
-        final Device device = getUserObject();
-        return "Location: " +
-                device.getLocation() +
-                "\nUDN: " +
-                device.getUdn() +
-                '\n' +
-                "DeviceType: " +
-                device.getDeviceType() +
-                '\n' +
-                "FriendlyName: " +
-                device.getFriendlyName() +
-                '\n' +
-                "Manufacture: " +
-                device.getManufacture() +
-                '\n' +
-                "ManufactureUrl: " +
-                device.getManufactureUrl() +
-                '\n' +
-                "ModelName: " +
-                device.getModelName() +
-                '\n' +
-                "ModelUrl: " +
-                device.getModelUrl() +
-                '\n' +
-                "ModelDescription: " +
-                device.getModelDescription() +
-                '\n' +
-                "ModelNumber: " +
-                device.getModelNumber() +
-                '\n' +
-                "SerialNumber: " +
-                device.getSerialNumber() +
-                '\n' +
-                "PresentationUrl: " +
-                device.getPresentationUrl();
+    public String formatDescription() {
+        return Formatter.format(getUserObject());
     }
 
     @Override
