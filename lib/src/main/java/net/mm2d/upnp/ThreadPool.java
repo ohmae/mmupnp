@@ -12,6 +12,8 @@ import net.mm2d.log.Log;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -23,7 +25,21 @@ class ThreadPool {
     private final ExecutorService mParallelExecutor;
 
     ThreadPool() {
-        this(Executors.newSingleThreadExecutor(), Executors.newCachedThreadPool());
+        this(createSequentialExecutor(), createParallelExecutor());
+    }
+
+    private static ExecutorService createSequentialExecutor() {
+        return Executors.newSingleThreadExecutor();
+    }
+
+    private static ExecutorService createParallelExecutor() {
+        return new ThreadPoolExecutor(0, calculateMaximumPoolSize(),
+                60L, TimeUnit.SECONDS,
+                new SynchronousQueue<>());
+    }
+
+    private static int calculateMaximumPoolSize() {
+        return Math.max(2, Runtime.getRuntime().availableProcessors());
     }
 
     // VisibleForTesting
