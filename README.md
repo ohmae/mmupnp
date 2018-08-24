@@ -147,7 +147,7 @@ When you want to reset, try again from the constructor call.
 
 ### Debug log output
 
-This library use [useful library for log output](https://github.com/ohmae/Log),
+This library use [useful library for log output](https://github.com/ohmae/log),
 If you want to see debug log. write as follows.
 
 ```java
