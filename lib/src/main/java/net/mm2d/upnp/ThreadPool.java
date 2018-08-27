@@ -12,6 +12,7 @@ import net.mm2d.log.Log;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -31,19 +32,9 @@ class ThreadPool {
     }
 
     private static ExecutorService createParallelExecutor() {
-        // TODO: スレッド数を範囲内で動的に増減させつつ、アイドルスレッドがあればそのスレッドに実行させるThreadPoolを作る
-        // - ThreadPoolExecutorはworkQueueにofferを実行しfalseの時にスレッドを増加させるため
-        //    - SynchronousQueueではスレッド上限に来たときにrejectされてしまう
-        //    - LinkedBlockingQueueでは常にキューイングを行うためスレッド数が変化しない
-        // workQueueで細工をするならofferをコールされた際
-        // - 読み出し待ちのスレッドがあればキューに積み、trueを返す
-        // - 読み出し待ちのスレッドはなく、スレッド数に余裕があればfalse
-        // - 読み出し待ちのスレッドはなく、スレッド数に余裕がなければキューに積みtrueを返す
-        // スレッド数はExecutor側の情報なので可能なら避けたい
-        // - 読み出し待ちのスレッドがあればキューに積み、trueを返す
-        // - 読み出し待ちのスレッドがなければfalse
-        // というQueueを作り、RejectedExecutionHandler経由でキューに積むほうがよいか？
-        return Executors.newFixedThreadPool(calculateMaximumPoolSize());
+        final ThreadWorkQueue queue = new ThreadWorkQueue();
+        return new ThreadPoolExecutor(0, calculateMaximumPoolSize(),
+                1L, TimeUnit.MINUTES, queue, queue);
     }
 
     private static int calculateMaximumPoolSize() {
