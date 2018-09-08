@@ -48,7 +48,7 @@ import javax.annotation.Nonnull;
  */
 class ThreadWorkQueue implements BlockingQueue<Runnable>, RejectedExecutionHandler {
     private final BlockingQueue<Runnable> mDelegate;
-    private final AtomicInteger mCount = new AtomicInteger(0);
+    private final AtomicInteger mIdleThreads = new AtomicInteger(0);
 
     ThreadWorkQueue() {
         this(new LinkedBlockingQueue<>());
@@ -61,7 +61,7 @@ class ThreadWorkQueue implements BlockingQueue<Runnable>, RejectedExecutionHandl
 
     @Override
     public boolean offer(@Nonnull final Runnable runnable) {
-        if (mCount.get() == 0) {
+        if (mIdleThreads.get() == 0) {
             return false;
         }
         return mDelegate.offer(runnable);
@@ -70,11 +70,11 @@ class ThreadWorkQueue implements BlockingQueue<Runnable>, RejectedExecutionHandl
     @Nonnull
     @Override
     public Runnable take() throws InterruptedException {
-        mCount.incrementAndGet();
+        mIdleThreads.incrementAndGet();
         try {
             return mDelegate.take();
         } finally {
-            mCount.decrementAndGet();
+            mIdleThreads.decrementAndGet();
         }
     }
 
@@ -82,11 +82,11 @@ class ThreadWorkQueue implements BlockingQueue<Runnable>, RejectedExecutionHandl
     public Runnable poll(
             final long timeout,
             @Nonnull final TimeUnit unit) throws InterruptedException {
-        mCount.incrementAndGet();
+        mIdleThreads.incrementAndGet();
         try {
             return mDelegate.poll(timeout, unit);
         } finally {
-            mCount.decrementAndGet();
+            mIdleThreads.decrementAndGet();
         }
     }
 
@@ -101,6 +101,7 @@ class ThreadWorkQueue implements BlockingQueue<Runnable>, RejectedExecutionHandl
         mDelegate.offer(r);
     }
 
+    // 以下、デリゲートのためのボイラープレートコード
     @Override
     public boolean add(@Nonnull final Runnable runnable) {
         return mDelegate.add(runnable);
@@ -201,6 +202,7 @@ class ThreadWorkQueue implements BlockingQueue<Runnable>, RejectedExecutionHandl
         return mDelegate.toArray();
     }
 
+    @SuppressWarnings("SuspiciousToArrayCall")
     @Nonnull
     @Override
     public <T> T[] toArray(@Nonnull final T[] a) {
