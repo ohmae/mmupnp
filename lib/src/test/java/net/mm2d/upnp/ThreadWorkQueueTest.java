@@ -181,6 +181,21 @@ public class ThreadWorkQueueTest {
         });
     }
 
+    @Test(timeout = 5000)
+    public void fixedThreadPool() throws Exception {
+        final int processorsCount = NUMBER_OF_PROCESSORS;
+        final ThreadWorkQueue queue = new ThreadWorkQueue();
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(processorsCount, processorsCount,
+                0L, TimeUnit.MILLISECONDS, queue, queue);
+        final CountDownLatch latch = new CountDownLatch(processorsCount);
+        for (int i = 0; i < processorsCount + 1; i++) {
+            executor.execute(latch::countDown);
+        }
+        latch.await();
+        assertThat(executor.getPoolSize(), is(processorsCount));
+        executor.shutdownNow();
+    }
+
     @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})
     @Test
     public void delegate() throws Exception {
