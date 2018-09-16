@@ -179,7 +179,8 @@ class ControlPointImpl implements ControlPoint {
                     discoverDevice(device);
                 }
             }
-        } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
+        } catch (final IOException | SAXException | ParserConfigurationException | RuntimeException e) {
+            Log.d(e.getClass().getSimpleName() + " occurred on loadDevice\n" + builder.toDumpString());
             Log.w(e);
             synchronized (mDeviceHolder) {
                 mLoadingDeviceMap.remove(uuid);
