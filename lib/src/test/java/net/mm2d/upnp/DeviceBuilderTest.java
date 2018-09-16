@@ -365,7 +365,7 @@ public class DeviceBuilderTest {
         final HttpClient client = mock(HttpClient.class);
         final InetAddress address = InetAddress.getByName("127.0.0.1");
         doReturn(address).when(client).getLocalAddress();
-        builder.onDownloadDescription(client);
+        builder.setDownloadInfo(client);
 
         verify(client).getLocalAddress();
         verify(message).setLocalAddress(address);
@@ -377,6 +377,6 @@ public class DeviceBuilderTest {
         doReturn("location").when(message).getLocation();
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
         final HttpClient client = new HttpClient();
-        builder.onDownloadDescription(client);
+        builder.setDownloadInfo(client);
     }
 }

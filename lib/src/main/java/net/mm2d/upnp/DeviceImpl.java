@@ -106,7 +106,7 @@ class DeviceImpl implements Device {
          *
          * @param client Descriptionのダウンロードに使用したHttpClient
          */
-        void onDownloadDescription(@Nonnull final HttpClient client) {
+        void setDownloadInfo(@Nonnull final HttpClient client) {
             if (mSsdpMessage instanceof PinnedSsdpMessage) {
                 final InetAddress address = client.getLocalAddress();
                 if (address != null) {
@@ -472,14 +472,28 @@ class DeviceImpl implements Device {
                 throw new IllegalStateException("UDN must be set.");
             }
             if (parent == null) {
+                // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
                 if (mSsdpMessage instanceof PinnedSsdpMessage) {
                     ((PinnedSsdpMessage) mSsdpMessage).setUuid(mUdn);
                 } else if (!mUdn.equals(getUuid())) {
-                    // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
                     throw new IllegalStateException("uuid and udn does not match! uuid=" + getUuid() + " udn=" + mUdn);
                 }
             }
             return new DeviceImpl(parent, this);
+        }
+
+        public String toDumpString() {
+            final StringBuilder sb = new StringBuilder()
+                    .append("DeviceBuilder")
+                    .append("\nSSDP:").append(mSsdpMessage.toString())
+                    .append("\nDESCRIPTION:").append(mDescription);
+            if (mServiceBuilderList.size() != 0) {
+                sb.append("\n");
+                for (final ServiceImpl.Builder serviceBuilder : mServiceBuilderList) {
+                    sb.append(serviceBuilder.toDumpString());
+                }
+            }
+            return sb.toString();
         }
     }
 
