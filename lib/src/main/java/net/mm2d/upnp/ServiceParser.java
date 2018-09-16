@@ -50,7 +50,7 @@ final class ServiceParser {
             throws IOException, SAXException, ParserConfigurationException {
         final String scpdUrl = builder.getScpdUrl();
         if (scpdUrl == null) {
-            throw new IOException();
+            throw new IOException("scpdUrl is null");
         }
         final String baseUrl = deviceBuilder.getBaseUrl();
         final int scopeId = deviceBuilder.getSsdpMessage().getScopeId();
