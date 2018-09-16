@@ -51,7 +51,7 @@ class ServiceImpl implements Service {
         /**
          * インスタンス作成
          */
-        public Builder() {
+        Builder() {
         }
 
         /**
@@ -61,7 +61,7 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setDevice(@Nonnull final Device device) {
+        Builder setDevice(@Nonnull final Device device) {
             mDevice = device;
             return this;
         }
@@ -73,7 +73,7 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setSubscribeManager(@Nonnull final SubscribeManager manager) {
+        Builder setSubscribeManager(@Nonnull final SubscribeManager manager) {
             mSubscribeManager = manager;
             return this;
         }
@@ -85,7 +85,7 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setServiceType(@Nonnull final String serviceType) {
+        Builder setServiceType(@Nonnull final String serviceType) {
             mServiceType = serviceType;
             return this;
         }
@@ -97,7 +97,7 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setServiceId(@Nonnull final String serviceId) {
+        Builder setServiceId(@Nonnull final String serviceId) {
             mServiceId = serviceId;
             return this;
         }
@@ -109,13 +109,13 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setScpdUrl(@Nonnull final String scpdUrl) {
+        Builder setScpdUrl(@Nonnull final String scpdUrl) {
             mScpdUrl = scpdUrl;
             return this;
         }
 
         @Nullable
-        public String getScpdUrl() {
+        String getScpdUrl() {
             return mScpdUrl;
         }
 
@@ -126,7 +126,7 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setControlUrl(@Nonnull final String controlUrl) {
+        Builder setControlUrl(@Nonnull final String controlUrl) {
             mControlUrl = controlUrl;
             return this;
         }
@@ -138,7 +138,7 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setEventSubUrl(@Nonnull final String eventSubUrl) {
+        Builder setEventSubUrl(@Nonnull final String eventSubUrl) {
             mEventSubUrl = eventSubUrl;
             return this;
         }
@@ -150,7 +150,7 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder setDescription(@Nonnull final String description) {
+        Builder setDescription(@Nonnull final String description) {
             mDescription = description;
             return this;
         }
@@ -162,7 +162,7 @@ class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        public Builder addActionBuilder(@Nonnull final ActionImpl.Builder builder) {
+        Builder addActionBuilder(@Nonnull final ActionImpl.Builder builder) {
             mActionBuilderList.add(builder);
             return this;
         }
@@ -175,7 +175,7 @@ class ServiceImpl implements Service {
          */
         @SuppressWarnings("UnusedReturnValue")
         @Nonnull
-        public Builder addStateVariable(@Nonnull final StateVariable builder) {
+        Builder addStateVariable(@Nonnull final StateVariable builder) {
             mStateVariables.add(builder);
             return this;
         }
@@ -187,7 +187,7 @@ class ServiceImpl implements Service {
          * @throws IllegalStateException 必須パラメータが設定されていない場合
          */
         @Nonnull
-        public Service build() throws IllegalStateException {
+        Service build() throws IllegalStateException {
             if (mDevice == null) {
                 throw new IllegalStateException("device must be set.");
             }
@@ -210,6 +210,16 @@ class ServiceImpl implements Service {
                 throw new IllegalStateException("eventSubURL must be set.");
             }
             return new ServiceImpl(this);
+        }
+
+        public String toDumpString() {
+            return "ServiceBuilder:" +
+                    "\nserviceType:" + mServiceType +
+                    "\nserviceId:" + mServiceId +
+                    "\nSCPDURL:" + mScpdUrl +
+                    "\neventSubURL:" + mEventSubUrl +
+                    "\ncontrolURL:" + mControlUrl +
+                    "\nDESCRIPTION:" + mDescription;
         }
     }
 
