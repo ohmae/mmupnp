@@ -42,6 +42,7 @@ Sample App
 ## How to use
 
 You can download this library from jCenter. (since Ver.1.7.0)
+
 ```gradle
 repositories {
     jcenter()
@@ -49,9 +50,28 @@ repositories {
 ```
 
 Add dependencies, as following.
+
 ```gradle
 dependencies {
-    compile 'net.mm2d:mmupnp:1.8.1'
+    implementation 'net.mm2d:mmupnp:1.8.1'
+}
+```
+
+### Test release
+
+This library is currently under development of 2.0.0.
+Currently alpha version, and I'm making destructive change.
+
+It is distributed in this maven repository.
+
+```gradle
+repositories {
+    maven {
+        url 'https://ohmae.github.com/mmupnp/maven'
+    }
+}
+dependencies {
+    implementation 'net.mm2d:mmupnp:2.0.0-alpha6'
 }
 ```
 
@@ -147,12 +167,25 @@ When you want to reset, try again from the constructor call.
 
 ### Debug log output
 
-This library use [useful library for log output](https://github.com/ohmae/log),
-If you want to see debug log. write as follows.
+This library use [log library](https://github.com/ohmae/log),
+
+If you want to enable debug log.
 
 ```java
 Log.initialize(true, true);
 ```
+
+If you want send log to some library. eg.
+
+```kotlin
+Log.setPrint { level, tag, message ->
+    if (level >= Log.DEBUG) {
+        SomeLogger.send("$tag $message")
+    }
+}
+```
+
+Please see [log library](https://github.com/ohmae/log) for more details
 
 ### Documents
 
