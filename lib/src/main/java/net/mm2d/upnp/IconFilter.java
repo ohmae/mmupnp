@@ -26,23 +26,11 @@ public interface IconFilter {
     /**
      * ダウンロードしない場合に指定する。デフォルト値。
      */
-    IconFilter NONE = new IconFilter() {
-        @Override
-        @Nonnull
-        public List<Icon> filter(@Nonnull final List<Icon> list) {
-            return Collections.emptyList();
-        }
-    };
+    IconFilter NONE = l -> Collections.emptyList();
     /**
      * すべてをダウンロードする場合に指定する。
      */
-    IconFilter ALL = new IconFilter() {
-        @Override
-        @Nonnull
-        public List<Icon> filter(@Nonnull final List<Icon> list) {
-            return list;
-        }
-    };
+    IconFilter ALL = l -> l;
 
     /**
      * ダウンロード時にバイナリデータをダウンロードするIconを選択する。
