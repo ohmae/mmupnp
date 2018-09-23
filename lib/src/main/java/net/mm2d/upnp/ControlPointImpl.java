@@ -40,6 +40,8 @@ class ControlPointImpl implements ControlPoint {
     @Nonnull
     private final Protocol mProtocol;
     @Nonnull
+    private SsdpMessageFilter mSsdpMessageFilter = SsdpMessageFilter.DEFAULT;
+    @Nonnull
     private IconFilter mIconFilter = IconFilter.NONE;
     @Nonnull
     private final DiscoveryListenerList mDiscoveryListenerList;
@@ -81,9 +83,9 @@ class ControlPointImpl implements ControlPoint {
         mNotifyEventListenerList = new NotifyEventListenerList();
 
         mSearchServerList = factory.createSsdpSearchServerList(interfaces, message ->
-                mThreadPool.executeInParallel(() -> onReceiveSsdp(message)));
+                mThreadPool.executeInParallel(() -> onReceiveSsdpMessage(message)));
         mNotifyReceiverList = factory.createSsdpNotifyReceiverList(interfaces, message ->
-                mThreadPool.executeInParallel(() -> onReceiveSsdp(message)));
+                mThreadPool.executeInParallel(() -> onReceiveSsdpMessage(message)));
         mNotifyReceiverList.setSegmentCheckEnabled(notifySegmentCheckEnabled);
         mDeviceHolder = factory.createDeviceHolder(this::lostDevice);
         mSubscribeManager = factory.createSubscribeManager(mThreadPool, mNotifyEventListenerList);
@@ -124,7 +126,15 @@ class ControlPointImpl implements ControlPoint {
 
     // VisibleForTesting
     @SuppressWarnings("WeakerAccess")
-    void onReceiveSsdp(@Nonnull final SsdpMessage message) {
+    void onReceiveSsdpMessage(@Nonnull final SsdpMessage message) {
+        if (mSsdpMessageFilter.accept(message)) {
+            onAcceptSsdpMessage(message);
+        }
+    }
+
+    // VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    void onAcceptSsdpMessage(@Nonnull final SsdpMessage message) {
         synchronized (mDeviceHolder) {
             final String uuid = message.getUuid();
             final Device device = mDeviceHolder.get(uuid);
@@ -266,8 +276,13 @@ class ControlPointImpl implements ControlPoint {
     }
 
     @Override
-    public void setIconFilter(@Nonnull final IconFilter filter) {
-        mIconFilter = filter;
+    public void setSsdpMessageFilter(@Nullable final SsdpMessageFilter filter) {
+        mSsdpMessageFilter = filter != null ? filter : SsdpMessageFilter.DEFAULT;
+    }
+
+    @Override
+    public void setIconFilter(@Nullable final IconFilter filter) {
+        mIconFilter = filter != null ? filter : IconFilter.NONE;
     }
 
     @Override

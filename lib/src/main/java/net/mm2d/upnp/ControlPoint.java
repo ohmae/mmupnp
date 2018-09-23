@@ -149,13 +149,23 @@ public interface ControlPoint {
     void search(@Nullable String st);
 
     /**
+     * SsdpMessageを受け入れるかどうかの判定メソッドを設定する。
+     *
+     * @param filter 判定メソッド、nullは{@link SsdpMessageFilter#DEFAULT}と等価。
+     * @see SsdpMessageFilter#DEFAULT
+     */
+    void setSsdpMessageFilter(@Nullable SsdpMessageFilter filter);
+
+    /**
      * ダウンロードするIconを選択するフィルタを設定する。
      *
-     * @param filter 設定するフィルタ、nullは指定できない。
+     * <p>コールしない場合は{@link IconFilter#NONE}が指定されている。
+     *
+     * @param filter 設定するフィルタ、nullは{@link IconFilter#NONE}と等価。
      * @see IconFilter#NONE
      * @see IconFilter#ALL
      */
-    void setIconFilter(@Nonnull IconFilter filter);
+    void setIconFilter(@Nullable IconFilter filter);
 
     /**
      * 機器発見のリスナーを登録する。

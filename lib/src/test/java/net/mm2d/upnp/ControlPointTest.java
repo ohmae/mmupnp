@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
@@ -195,6 +196,12 @@ public class ControlPointTest {
             final InetAddress inetAddress = InetAddress.getByName(address);
             doReturn(inetAddress).when(message).getLocalAddress();
             return message;
+        }
+
+        @Test
+        public void setIconFilter_nullを指定しても問題ない() throws Exception {
+            final ControlPoint cp = ControlPointFactory.create();
+            cp.setIconFilter(null);
         }
     }
 
@@ -409,7 +416,7 @@ public class ControlPointTest {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
             final InetAddress addr = InetAddress.getByName("192.0.2.3");
             final SsdpMessage message = new SsdpRequest(addr, data, data.length);
-            mCp.onReceiveSsdp(message);
+            mCp.onAcceptSsdpMessage(message);
             verify(mLoadingDeviceMap).remove(anyString());
         }
 
@@ -423,7 +430,7 @@ public class ControlPointTest {
             doReturn(udn).when(device).getUdn();
             mDeviceHolder.add(device);
             assertThat(mDeviceHolder.get(udn), is(device));
-            mCp.onReceiveSsdp(message);
+            mCp.onAcceptSsdpMessage(message);
             assertThat(mDeviceHolder.get(udn), is(nullValue()));
         }
 
@@ -444,7 +451,7 @@ public class ControlPointTest {
                     throw new IOException();
                 }
             }).when(mCp).createHttpClient();
-            mCp.onReceiveSsdp(message);
+            mCp.onAcceptSsdpMessage(message);
             assertThat(mLoadingDeviceMap, hasKey(udn));
             Thread.sleep(1000); // Exception発生を待つ
             assertThat(mLoadingDeviceMap, not(hasKey(udn)));
@@ -483,7 +490,7 @@ public class ControlPointTest {
                 }
             });
             mCp.setIconFilter(iconFilter);
-            mCp.onReceiveSsdp(message);
+            mCp.onAcceptSsdpMessage(message);
             Thread.sleep(1000); // 読み込みを待つ
             final Device device = mCp.getDevice(udn);
             verify(iconFilter).filter(ArgumentMatchers.anyList());
@@ -505,7 +512,7 @@ public class ControlPointTest {
             doReturn(udn).when(device).getUdn();
 
             mDeviceHolder.add(device);
-            mCp.onReceiveSsdp(message);
+            mCp.onAcceptSsdpMessage(message);
         }
 
         @Test
@@ -517,7 +524,7 @@ public class ControlPointTest {
             mLoadingDeviceMap.put(deviceBuilder.getUuid(), deviceBuilder);
             final byte[] data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final SsdpMessage message2 = new SsdpRequest(addr, data2, data2.length);
-            mCp.onReceiveSsdp(message2);
+            mCp.onAcceptSsdpMessage(message2);
             verify(deviceBuilder).updateSsdpMessage(message2);
         }
     }
@@ -571,7 +578,7 @@ public class ControlPointTest {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress address = InetAddress.getByName("192.0.2.3");
             final SsdpMessage message = new SsdpRequest(address, data, data.length);
-            mCp.onReceiveSsdp(message);
+            mCp.onAcceptSsdpMessage(message);
             Thread.sleep(1000); // 読み込みを待つ
             mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
             Thread.sleep(1000); // 読み込みを待つ
@@ -585,7 +592,7 @@ public class ControlPointTest {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress address = InetAddress.getByName("192.0.2.3");
             final SsdpMessage message = new SsdpRequest(address, data, data.length);
-            mCp.onReceiveSsdp(message);
+            mCp.onAcceptSsdpMessage(message);
             Thread.sleep(1000); // 読み込みを待つ
             final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
             assertThat(device.isPinned(), is(false));
@@ -851,6 +858,49 @@ public class ControlPointTest {
             Thread.sleep(100);
 
             verify(l, never()).onNotifyEvent(service, 0, variableName, value);
+        }
+    }
+
+    @RunWith(JUnit4.class)
+    public static class SsdpMessageFilterのテスト {
+        private ControlPointImpl mCp;
+        private SsdpMessage mSsdpMessage;
+
+        @Before
+        public void setUp() throws Exception {
+            mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
+                    new DiFactory(Protocol.DEFAULT)));
+            final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
+            final InetAddress addr = InetAddress.getByName("192.0.2.3");
+            mSsdpMessage = new SsdpRequest(addr, data, data.length);
+        }
+
+        @Test
+        public void デフォルトでは受け付ける() throws Exception {
+            mCp.onReceiveSsdpMessage(mSsdpMessage);
+            verify(mCp).onAcceptSsdpMessage(mSsdpMessage);
+        }
+
+        @Test
+        public void filterが機能する() throws Exception {
+            final ArgumentCaptor<SsdpMessage> captor = ArgumentCaptor.forClass(SsdpMessage.class);
+            final SsdpMessageFilter filter = mock(SsdpMessageFilter.class);
+            doReturn(false).when(filter).accept(captor.capture());
+            mCp.setSsdpMessageFilter(filter);
+            mCp.onReceiveSsdpMessage(mSsdpMessage);
+            assertThat(captor.getValue(), is(mSsdpMessage));
+            verify(mCp, never()).onAcceptSsdpMessage(any());
+        }
+
+        @Test
+        public void filterにnullを指定すると受け付ける() throws Exception {
+            mCp.setSsdpMessageFilter(message -> false);
+            mCp.onReceiveSsdpMessage(mSsdpMessage);
+            verify(mCp, never()).onAcceptSsdpMessage(any());
+            mCp.setSsdpMessageFilter(null);
+            mCp.onReceiveSsdpMessage(mSsdpMessage);
+            verify(mCp).onAcceptSsdpMessage(mSsdpMessage);
         }
     }
 }

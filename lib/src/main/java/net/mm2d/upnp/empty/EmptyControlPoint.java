@@ -10,6 +10,7 @@ package net.mm2d.upnp.empty;
 import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.IconFilter;
+import net.mm2d.upnp.SsdpMessageFilter;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +48,11 @@ public class EmptyControlPoint implements ControlPoint {
     }
 
     @Override
-    public void setIconFilter(@Nonnull final IconFilter filter) {
+    public void setSsdpMessageFilter(@Nullable final SsdpMessageFilter filter) {
+    }
+
+    @Override
+    public void setIconFilter(@Nullable final IconFilter filter) {
     }
 
     @Override
