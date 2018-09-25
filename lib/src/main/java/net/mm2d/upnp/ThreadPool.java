@@ -27,10 +27,12 @@ class ThreadPool {
         this(createSequentialExecutor(), createParallelExecutor());
     }
 
+    @Nonnull
     private static ExecutorService createSequentialExecutor() {
         return Executors.newSingleThreadExecutor();
     }
 
+    @Nonnull
     private static ExecutorService createParallelExecutor() {
         final ThreadWorkQueue queue = new ThreadWorkQueue();
         return new ThreadPoolExecutor(0, calculateMaximumPoolSize(),
