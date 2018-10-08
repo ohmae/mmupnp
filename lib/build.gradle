@@ -3,9 +3,18 @@ apply plugin: 'maven'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'jacoco'
 
-group 'net.mm2d'
-archivesBaseName = 'mmupnp'
-version versionName
+def versionMajor = 2
+def versionMinor = 0
+def versionPatch = 0
+def versionSuffix = "-alpha7"
+def packageName = 'net.mm2d'
+def libraryId = 'mmupnp'
+def siteUrl = 'https://github.com/ohmae/mmupnp'
+def githubUrl = 'https://github.com/ohmae/mmupnp'
+
+version "${versionMajor}.${versionMinor}.${versionPatch}${versionSuffix}"
+group packageName
+archivesBaseName = libraryId
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -23,10 +32,6 @@ dependencies {
     testImplementation 'org.hamcrest:hamcrest-library:1.3'
     testImplementation 'org.mockito:mockito-core:2.18.3'
 }
-
-def libraryId = 'mmupnp'
-def siteUrl = 'https://github.com/ohmae/mmupnp'
-def githubUrl = 'https://github.com/ohmae/mmupnp'
 
 bintray {
     user = project.hasProperty('bintray_user') ? bintray_user : ''
