@@ -1,2 +1,9 @@
 net.mm2d.upnp
+net.mm2d.upnp.empty
+net.mm2d.upnp.internal.impl
+net.mm2d.upnp.internal.manager
+net.mm2d.upnp.internal.message
+net.mm2d.upnp.internal.parser
+net.mm2d.upnp.internal.server
+net.mm2d.upnp.internal.thread
 net.mm2d.util
