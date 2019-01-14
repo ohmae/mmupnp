@@ -101,6 +101,24 @@ If you want to operate with IPv4 only, specify the protocol as follows.
 ControlPoint cp = ControlPointFactory.create(Protocol.IP_V4_ONLY);
 ```
 
+You can specify callback and thread of IO processing.
+For example in Android, you may want to run callbacks with MainThread.
+In that case write as follows.
+
+```java
+Params params = new Params().setCallbackExecutor(new TaskExecutor() {
+    @Override
+    public boolean execute(@Nonnull final Runnable task) {
+        return handler.post(task);
+    }
+
+    @Override
+    public void terminate() {
+    }
+});
+ControlPoint cp = ControlPointFactory.create(params);
+```
+
 ### M-SEARCH
 Call ControlPoint#search() or ControlPoint#search(String).
 
