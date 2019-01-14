@@ -58,6 +58,16 @@ public class IoTaskExecutorTest {
     }
 
     @Test
+    public void execute_terminate後はfalse() throws Exception {
+        final ExecutorService executorService = mock(ExecutorService.class);
+        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final Runnable command = mock(Runnable.class);
+
+        taskExecutor.terminate();
+        assertThat(taskExecutor.execute(command), is(false));
+    }
+
+    @Test
     public void terminate_shutdownNowが実行される() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
         final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
@@ -80,6 +90,18 @@ public class IoTaskExecutorTest {
         taskExecutor.terminate();
 
         verify(executorService, times(1)).shutdown();
+    }
+
+    @Test
+    public void terminate_awaitTerminationが割り込まれてもshutdownNowがコールされる() throws Exception {
+        final ExecutorService executorService = mock(ExecutorService.class);
+        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        doThrow(new InterruptedException()).when(executorService)
+                .awaitTermination(1, TimeUnit.SECONDS);
+
+        taskExecutor.terminate();
+
+        verify(executorService, times(1)).shutdownNow();
     }
 
     @Test

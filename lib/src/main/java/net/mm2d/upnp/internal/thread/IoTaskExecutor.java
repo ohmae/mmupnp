@@ -68,6 +68,7 @@ public class IoTaskExecutor implements TaskExecutor {
                 executor.shutdownNow();
             }
         } catch (final InterruptedException e) {
+            executor.shutdownNow();
             Log.w(e);
         } finally {
             mExecutor = null;

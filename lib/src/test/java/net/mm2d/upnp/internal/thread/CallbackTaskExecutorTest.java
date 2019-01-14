@@ -57,6 +57,16 @@ public class CallbackTaskExecutorTest {
     }
 
     @Test
+    public void execute_terminate後はfalse() throws Exception {
+        final ExecutorService executorService = mock(ExecutorService.class);
+        final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
+        final Runnable command = mock(Runnable.class);
+
+        taskExecutor.terminate();
+        assertThat(taskExecutor.execute(command), is(false));
+    }
+
+    @Test
     public void terminate_shutdownNowが実行される() {
         final ExecutorService executorService = mock(ExecutorService.class);
         final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
