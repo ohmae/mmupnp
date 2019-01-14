@@ -34,6 +34,7 @@ class SubscribeService {
      * Serviceを指定し初期化する。
      *
      * @param service   Service
+     * @param timeout   タイムアウトするまでの時間
      * @param keepRenew 定期的にrenewを実行する場合true
      */
     SubscribeService(

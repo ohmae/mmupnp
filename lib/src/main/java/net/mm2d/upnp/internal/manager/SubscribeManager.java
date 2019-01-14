@@ -134,6 +134,8 @@ public class SubscribeManager implements EventMessageListener {
      * <p>Serviceのsubscribeが実行された後にServiceからコールされる。
      *
      * @param service 登録するService
+     * @param timeout タイムアウトするまでの時間
+     * @param keep keep-aliveを行う場合true
      * @see Service
      * @see Service#subscribe()
      */

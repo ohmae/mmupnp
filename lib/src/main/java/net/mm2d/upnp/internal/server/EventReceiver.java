@@ -72,6 +72,8 @@ public class EventReceiver {
 
     /**
      * インスタンス作成。
+     *
+     * @param listener イベントを通知するリスナー
      */
     public EventReceiver(@Nullable final EventMessageListener listener) {
         mListener = listener;

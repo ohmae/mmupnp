@@ -97,6 +97,7 @@ public class DeviceHolder implements Runnable {
      * Device削除。
      *
      * @param device 削除されるDevice。
+     * @return 削除されたDevice
      */
     public synchronized Device remove(@Nonnull final Device device) {
         return mDeviceMap.remove(device.getUdn());
@@ -106,6 +107,7 @@ public class DeviceHolder implements Runnable {
      * Device削除。
      *
      * @param udn 削除されるDeviceのudn。
+     * @return 削除されたDevice
      */
     public synchronized Device remove(@Nonnull final String udn) {
         return mDeviceMap.remove(udn);
