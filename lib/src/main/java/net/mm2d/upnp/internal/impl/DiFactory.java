@@ -9,6 +9,7 @@ package net.mm2d.upnp.internal.impl;
 
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.Protocol;
+import net.mm2d.upnp.TaskExecutor;
 import net.mm2d.upnp.internal.manager.DeviceHolder;
 import net.mm2d.upnp.internal.manager.DeviceHolder.ExpireListener;
 import net.mm2d.upnp.internal.manager.SubscribeHolder;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * ControlPointのテストを容易にするためのDependency injection
@@ -36,13 +38,26 @@ import javax.annotation.Nonnull;
 public class DiFactory {
     @Nonnull
     private final Protocol mProtocol;
+    @Nullable
+    private final TaskExecutor mCallbackExecutor;
+    @Nullable
+    private final TaskExecutor mIoExecutor;
 
     public DiFactory() {
-        this(Protocol.DEFAULT);
+        this(Protocol.DEFAULT, null, null);
     }
 
-    public DiFactory(@Nonnull final Protocol protocol) {
+    DiFactory(@Nonnull final Protocol protocol) {
+        this(protocol, null, null);
+    }
+
+    public DiFactory(
+            @Nonnull final Protocol protocol,
+            @Nullable final TaskExecutor callback,
+            @Nullable final TaskExecutor io) {
         mProtocol = protocol;
+        mCallbackExecutor = callback;
+        mIoExecutor = io;
     }
 
     @Nonnull
@@ -84,5 +99,10 @@ public class DiFactory {
     @Nonnull
     public EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
         return new EventReceiver(listener);
+    }
+
+    @Nonnull
+    public TaskHandler createTaskHandler() {
+        return new TaskHandler(mCallbackExecutor, mIoExecutor);
     }
 }

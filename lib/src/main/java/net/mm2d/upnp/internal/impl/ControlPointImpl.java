@@ -92,7 +92,7 @@ public class ControlPointImpl implements ControlPoint {
             throw new IllegalStateException("no valid network interface.");
         }
         mProtocol = protocol;
-        mTaskHandler = new TaskHandler();
+        mTaskHandler = factory.createTaskHandler();
         mLoadingDeviceMap = factory.createLoadingDeviceMap();
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();

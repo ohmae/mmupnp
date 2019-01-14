@@ -33,12 +33,12 @@ public final class ControlPointFactory {
         private Protocol mProtocol = Protocol.DEFAULT;
         @Nullable
         private Collection<NetworkInterface> mInterfaces;
-        private boolean mNotifySegmentCheckEnabled;
+        @Nullable
+        private TaskExecutor mCallbackExecutor;
+        @Nullable
+        private TaskExecutor mIoExecutor;
 
-        @Nonnull
-        private Protocol getProtocol() {
-            return mProtocol;
-        }
+        private boolean mNotifySegmentCheckEnabled;
 
         /**
          * 使用するプロトコルスタックを指定する。
@@ -55,9 +55,9 @@ public final class ControlPointFactory {
             return this;
         }
 
-        @Nullable
-        private Collection<NetworkInterface> getInterfaces() {
-            return mInterfaces;
+        @Nonnull
+        Protocol getProtocol() {
+            return mProtocol;
         }
 
         /**
@@ -74,8 +74,9 @@ public final class ControlPointFactory {
             return this;
         }
 
-        private boolean isNotifySegmentCheckEnabled() {
-            return mNotifySegmentCheckEnabled;
+        @Nullable
+        Collection<NetworkInterface> getInterfaces() {
+            return mInterfaces;
         }
 
         /**
@@ -88,6 +89,50 @@ public final class ControlPointFactory {
         public Params setNotifySegmentCheckEnabled(final boolean enabled) {
             mNotifySegmentCheckEnabled = enabled;
             return this;
+        }
+
+        boolean isNotifySegmentCheckEnabled() {
+            return mNotifySegmentCheckEnabled;
+        }
+
+        /**
+         * コールバックを実行する{@link TaskExecutor}を指定する。
+         *
+         * コールバックのスレッドを指定したい場合に指定する。
+         * 未指定の場合singleThreadのExecutorが使用される。
+         *
+         * @param executor コールバックを実行するTaskExecutor
+         * @return このインスタンス
+         */
+        @Nonnull
+        public Params setCallbackExecutor(@Nullable final TaskExecutor executor) {
+            mCallbackExecutor = executor;
+            return this;
+        }
+
+        @Nullable
+        TaskExecutor getCallbackExecutor() {
+            return mCallbackExecutor;
+        }
+
+        /**
+         * IO処理を実行する{@link TaskExecutor}を指定する。
+         *
+         * IO処理のスレッドを指定したい場合に指定する。
+         * 未指定の場合、CPU数に基づくExecutorが利用される。
+         *
+         * @param executor IO処理を実行するTaskExecutor
+         * @return このインスタンス
+         */
+        @Nonnull
+        public Params setIoExecutor(@Nullable final TaskExecutor executor) {
+            mIoExecutor = executor;
+            return this;
+        }
+
+        @Nullable
+        TaskExecutor getIoExecutor() {
+            return mIoExecutor;
         }
     }
 
@@ -165,7 +210,7 @@ public final class ControlPointFactory {
                 protocol,
                 getDefaultInterfacesIfEmpty(protocol, params.getInterfaces()),
                 params.isNotifySegmentCheckEnabled(),
-                new DiFactory(protocol));
+                new DiFactory(protocol, params.getCallbackExecutor(), params.getIoExecutor()));
     }
 
     @Nonnull
