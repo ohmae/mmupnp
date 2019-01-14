@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.internal.impl.ControlPointImpl;
+import net.mm2d.upnp.internal.impl.DiFactory;
+
 import java.net.NetworkInterface;
 import java.util.Collection;
 

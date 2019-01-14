@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.internal.message.HttpRequest;
+import net.mm2d.upnp.internal.message.HttpResponse;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

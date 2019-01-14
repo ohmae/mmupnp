@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2019 大前良介 (OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/MIT
+ */
+
+package net.mm2d.upnp.internal.thread;
+
+import net.mm2d.log.Log;
+import net.mm2d.upnp.Property;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
+
+public class ThreadPool {
+    @Nonnull
+    private final ExecutorService mSequentialExecutor;
+    @Nonnull
+    private final ExecutorService mParallelExecutor;
+
+    public ThreadPool() {
+        this(createSequentialExecutor(), createParallelExecutor());
+    }
+
+    @Nonnull
+    private static ExecutorService createSequentialExecutor() {
+        return Executors.newSingleThreadExecutor();
+    }
+
+    @Nonnull
+    private static ExecutorService createParallelExecutor() {
+        final ThreadWorkQueue queue = new ThreadWorkQueue();
+        return new ThreadPoolExecutor(0, calculateMaximumPoolSize(),
+                1L, TimeUnit.MINUTES, queue, queue);
+    }
+
+    private static int calculateMaximumPoolSize() {
+        return Math.max(2, Runtime.getRuntime().availableProcessors());
+    }
+
+    // VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    ThreadPool(
+            @Nonnull final ExecutorService sequential,
+            @Nonnull final ExecutorService parallel) {
+        mSequentialExecutor = sequential;
+        mParallelExecutor = parallel;
+    }
+
+    public boolean executeInSequential(@Nonnull final Runnable command) {
+        if (mSequentialExecutor.isShutdown()) {
+            return false;
+        }
+        try {
+            mSequentialExecutor.execute(command);
+        } catch (final RejectedExecutionException ignored) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean executeInParallel(@Nonnull final Runnable command) {
+        if (mParallelExecutor.isShutdown()) {
+            return false;
+        }
+        try {
+            mParallelExecutor.execute(command);
+        } catch (final RejectedExecutionException ignored) {
+            return false;
+        }
+        return true;
+    }
+
+    public void terminate() {
+        mSequentialExecutor.shutdownNow();
+        mParallelExecutor.shutdown();
+        try {
+            if (!mParallelExecutor.awaitTermination(
+                    Property.DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)) {
+                mParallelExecutor.shutdownNow();
+            }
+        } catch (final InterruptedException e) {
+            Log.w(e);
+        }
+    }
+}

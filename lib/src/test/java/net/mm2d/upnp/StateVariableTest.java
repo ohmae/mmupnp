@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp;
 
+import net.mm2d.upnp.internal.impl.StateVariableImpl;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

@@ -289,7 +289,7 @@ public final class NetworkUtils {
         if (port == Http.DEFAULT_PORT || port <= 0) {
             return hostAddress;
         }
-        return hostAddress + ":" + String.valueOf(port);
+        return hostAddress + ":" + port;
     }
 
     @Nonnull

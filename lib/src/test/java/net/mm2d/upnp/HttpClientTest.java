@@ -8,6 +8,8 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.Http.Status;
+import net.mm2d.upnp.internal.message.HttpRequest;
+import net.mm2d.upnp.internal.message.HttpResponse;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
