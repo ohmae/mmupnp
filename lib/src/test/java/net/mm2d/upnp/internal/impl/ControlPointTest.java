@@ -30,7 +30,7 @@ import net.mm2d.upnp.internal.server.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList;
 import net.mm2d.upnp.internal.server.SsdpSearchServer.ResponseListener;
 import net.mm2d.upnp.internal.server.SsdpSearchServerList;
-import net.mm2d.upnp.internal.thread.ThreadPool;
+import net.mm2d.upnp.internal.thread.TaskHandler;
 import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.StringPair;
 import net.mm2d.util.TestUtils;
@@ -229,10 +229,10 @@ public class ControlPointTest {
         private ControlPointImpl mCp;
         private final SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
         private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
-        private final ThreadPool mThreadPool = mock(ThreadPool.class);
+        private final TaskHandler mTaskHandler = mock(TaskHandler.class);
         private final NotifyEventListener mNotifyEventListener = mock(NotifyEventListener.class);
         private final DiFactory mDiFactory = spy(new DiFactory());
-        private final SubscribeManager mSubscribeManager = spy(new SubscribeManager(mThreadPool, mNotifyEventListener, mDiFactory));
+        private final SubscribeManager mSubscribeManager = spy(new SubscribeManager(mTaskHandler, mNotifyEventListener, mDiFactory));
 
         @Before
         public void setUp() throws Exception {
@@ -258,7 +258,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SubscribeManager createSubscribeManager(
-                                @Nonnull final ThreadPool threadPool,
+                                @Nonnull final TaskHandler taskHandler,
                                 @Nonnull final NotifyEventListener listener) {
                             return mSubscribeManager;
                         }
@@ -703,9 +703,9 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SubscribeManager createSubscribeManager(
-                                @Nonnull final ThreadPool threadPool,
+                                @Nonnull final TaskHandler taskHandler,
                                 @Nonnull final NotifyEventListener listener) {
-                            mSubscribeManager = spy(new SubscribeManager(threadPool, listener, this));
+                            mSubscribeManager = spy(new SubscribeManager(taskHandler, listener, this));
                             return mSubscribeManager;
                         }
                     }));
@@ -796,9 +796,9 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SubscribeManager createSubscribeManager(
-                                @Nonnull final ThreadPool threadPool,
+                                @Nonnull final TaskHandler taskHandler,
                                 @Nonnull final NotifyEventListener listener) {
-                            mSubscribeManager = spy(new SubscribeManager(threadPool, listener, this));
+                            mSubscribeManager = spy(new SubscribeManager(taskHandler, listener, this));
                             return mSubscribeManager;
                         }
                     }));

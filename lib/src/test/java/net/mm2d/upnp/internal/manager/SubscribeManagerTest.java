@@ -12,7 +12,7 @@ import net.mm2d.upnp.Service;
 import net.mm2d.upnp.internal.impl.DiFactory;
 import net.mm2d.upnp.internal.server.EventReceiver;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
-import net.mm2d.upnp.internal.thread.ThreadPool;
+import net.mm2d.upnp.internal.thread.TaskHandler;
 import net.mm2d.util.StringPair;
 
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class SubscribeManagerTest {
     @Test
     public void onEventReceived_has_no_service() throws Exception {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -44,14 +44,14 @@ public class SubscribeManagerTest {
                 return holder;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         assertThat(manager.onEventReceived("", 0, Collections.emptyList()), is(false));
     }
 
     @Test
     public void onEventReceived() throws Exception {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
-        final ThreadPool pool = new ThreadPool();
+        final TaskHandler handler = new TaskHandler();
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -60,20 +60,20 @@ public class SubscribeManagerTest {
                 return holder;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         final String sid = "sid";
         final Service service = mock(Service.class);
         doReturn(service).when(holder).getService(sid);
 
         assertThat(manager.onEventReceived(sid, 0, Collections.singletonList(new StringPair("", ""))), is(true));
 
-        pool.terminate();
+        handler.terminate();
     }
 
     @Test
     public void initialize() throws Exception {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -82,7 +82,7 @@ public class SubscribeManagerTest {
                 return holder;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         manager.initialize();
         verify(holder).start();
     }
@@ -90,7 +90,7 @@ public class SubscribeManagerTest {
     @Test
     public void start() throws Exception {
         final EventReceiver receiver = mock(EventReceiver.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -99,7 +99,7 @@ public class SubscribeManagerTest {
                 return receiver;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         doThrow(new IOException()).when(receiver).open();
         manager.start();
         verify(receiver).open();
@@ -108,7 +108,7 @@ public class SubscribeManagerTest {
     @Test
     public void start_exception() throws Exception {
         final EventReceiver receiver = mock(EventReceiver.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -117,7 +117,7 @@ public class SubscribeManagerTest {
                 return receiver;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         manager.start();
         verify(receiver).open();
     }
@@ -126,7 +126,7 @@ public class SubscribeManagerTest {
     public void stop() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final EventReceiver receiver = mock(EventReceiver.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -141,11 +141,11 @@ public class SubscribeManagerTest {
                 return receiver;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         doReturn(Collections.singletonList(mock(Service.class))).when(holder).getServiceList();
         manager.stop();
 
-        verify(pool).executeInParallel(ArgumentMatchers.any(Runnable.class));
+        verify(handler).io(ArgumentMatchers.any(Runnable.class));
         verify(holder).clear();
         verify(receiver).close();
     }
@@ -153,7 +153,7 @@ public class SubscribeManagerTest {
     @Test
     public void terminate() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -162,7 +162,7 @@ public class SubscribeManagerTest {
                 return holder;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         manager.terminate();
         verify(holder).shutdownRequest();
     }
@@ -170,7 +170,7 @@ public class SubscribeManagerTest {
     @Test
     public void getEventPort() {
         final EventReceiver receiver = mock(EventReceiver.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -179,7 +179,7 @@ public class SubscribeManagerTest {
                 return receiver;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         final int port = 80;
         doReturn(port).when(receiver).getLocalPort();
 
@@ -191,7 +191,7 @@ public class SubscribeManagerTest {
     @Test
     public void getSubscribeService() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -200,7 +200,7 @@ public class SubscribeManagerTest {
                 return holder;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         final String id = "id";
         final Service service = mock(Service.class);
         doReturn(service).when(holder).getService(id);
@@ -213,7 +213,7 @@ public class SubscribeManagerTest {
     @Test
     public void register() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -222,7 +222,7 @@ public class SubscribeManagerTest {
                 return holder;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         final Service service = mock(Service.class);
         final long timeout = 1000L;
 
@@ -233,10 +233,10 @@ public class SubscribeManagerTest {
 
     @Test
     public void renew() {
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory();
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         final Service service = mock(Service.class);
         final String id = "id";
         doReturn(id).when(service).getSubscriptionId();
@@ -252,7 +252,7 @@ public class SubscribeManagerTest {
     @Test
     public void unregister() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
-        final ThreadPool pool = mock(ThreadPool.class);
+        final TaskHandler handler = mock(TaskHandler.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
         final DiFactory factory = new DiFactory() {
             @Nonnull
@@ -261,7 +261,7 @@ public class SubscribeManagerTest {
                 return holder;
             }
         };
-        final SubscribeManager manager = new SubscribeManager(pool, listener, factory);
+        final SubscribeManager manager = new SubscribeManager(handler, listener, factory);
         final Service service = mock(Service.class);
 
         manager.unregister(service);

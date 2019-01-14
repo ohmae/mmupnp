@@ -22,7 +22,7 @@ import net.mm2d.upnp.internal.message.PinnedSsdpMessage;
 import net.mm2d.upnp.internal.parser.DeviceParser;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList;
 import net.mm2d.upnp.internal.server.SsdpSearchServerList;
-import net.mm2d.upnp.internal.thread.ThreadPool;
+import net.mm2d.upnp.internal.thread.TaskHandler;
 import net.mm2d.util.TextUtils;
 
 import org.xml.sax.SAXException;
@@ -71,7 +71,7 @@ public class ControlPointImpl implements ControlPoint {
     @Nonnull
     private final Set<String> mEmbeddedUdnSet = new HashSet<>();
     @Nonnull
-    private final ThreadPool mThreadPool;
+    private final TaskHandler mTaskHandler;
     @Nonnull
     private final AtomicBoolean mInitialized = new AtomicBoolean();
     @Nonnull
@@ -92,18 +92,18 @@ public class ControlPointImpl implements ControlPoint {
             throw new IllegalStateException("no valid network interface.");
         }
         mProtocol = protocol;
-        mThreadPool = new ThreadPool();
+        mTaskHandler = new TaskHandler();
         mLoadingDeviceMap = factory.createLoadingDeviceMap();
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();
 
         mSearchServerList = factory.createSsdpSearchServerList(interfaces, message ->
-                mThreadPool.executeInParallel(() -> onReceiveSsdpMessage(message)));
+                mTaskHandler.io(() -> onReceiveSsdpMessage(message)));
         mNotifyReceiverList = factory.createSsdpNotifyReceiverList(interfaces, message ->
-                mThreadPool.executeInParallel(() -> onReceiveSsdpMessage(message)));
+                mTaskHandler.io(() -> onReceiveSsdpMessage(message)));
         mNotifyReceiverList.setSegmentCheckEnabled(notifySegmentCheckEnabled);
         mDeviceHolder = factory.createDeviceHolder(this::lostDevice);
-        mSubscribeManager = factory.createSubscribeManager(mThreadPool, mNotifyEventListenerList);
+        mSubscribeManager = factory.createSubscribeManager(mTaskHandler, mNotifyEventListenerList);
     }
 
     // VisibleForTesting
@@ -187,7 +187,7 @@ public class ControlPointImpl implements ControlPoint {
         }
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(this, mSubscribeManager, message);
         mLoadingDeviceMap.put(uuid, builder);
-        if (!mThreadPool.executeInParallel(() -> loadDevice(builder))) {
+        if (!mTaskHandler.io(() -> loadDevice(builder))) {
             mLoadingDeviceMap.remove(uuid);
         }
     }
@@ -232,7 +232,7 @@ public class ControlPointImpl implements ControlPoint {
         if (!mInitialized.getAndSet(false)) {
             return;
         }
-        mThreadPool.terminate();
+        mTaskHandler.terminate();
         mSubscribeManager.terminate();
         mDeviceHolder.shutdownRequest();
     }
@@ -328,7 +328,7 @@ public class ControlPointImpl implements ControlPoint {
         }
         mEmbeddedUdnSet.addAll(collectEmbeddedUdn(device));
         mDeviceHolder.add(device);
-        mThreadPool.executeInSequential(() ->
+        mTaskHandler.callback(() ->
                 mDiscoveryListenerList.onDiscover(device));
     }
 
@@ -342,7 +342,7 @@ public class ControlPointImpl implements ControlPoint {
             }
             mDeviceHolder.remove(device);
         }
-        mThreadPool.executeInSequential(() ->
+        mTaskHandler.callback(() ->
                 mDiscoveryListenerList.onLost(device));
     }
 
@@ -396,7 +396,7 @@ public class ControlPointImpl implements ControlPoint {
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(
                 this, mSubscribeManager, new PinnedSsdpMessage(location));
         mLoadingPinnedDevices.add(builder);
-        mThreadPool.executeInParallel(() -> loadPinnedDevice(builder));
+        mTaskHandler.io(() -> loadPinnedDevice(builder));
     }
 
     private void loadPinnedDevice(@Nonnull final DeviceImpl.Builder builder) {

@@ -19,7 +19,7 @@ import net.mm2d.upnp.internal.server.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList;
 import net.mm2d.upnp.internal.server.SsdpSearchServer.ResponseListener;
 import net.mm2d.upnp.internal.server.SsdpSearchServerList;
-import net.mm2d.upnp.internal.thread.ThreadPool;
+import net.mm2d.upnp.internal.thread.TaskHandler;
 
 import java.net.NetworkInterface;
 import java.util.Collection;
@@ -71,9 +71,9 @@ public class DiFactory {
 
     @Nonnull
     public SubscribeManager createSubscribeManager(
-            @Nonnull final ThreadPool threadPool,
+            @Nonnull final TaskHandler taskHandler,
             @Nonnull final NotifyEventListener listener) {
-        return new SubscribeManager(threadPool, listener, this);
+        return new SubscribeManager(taskHandler, listener, this);
     }
 
     @Nonnull

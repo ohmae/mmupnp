@@ -14,7 +14,7 @@ import net.mm2d.upnp.StateVariable;
 import net.mm2d.upnp.internal.impl.DiFactory;
 import net.mm2d.upnp.internal.server.EventReceiver;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
-import net.mm2d.upnp.internal.thread.ThreadPool;
+import net.mm2d.upnp.internal.thread.TaskHandler;
 import net.mm2d.util.StringPair;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 
 public class SubscribeManager implements EventMessageListener {
     @Nonnull
-    private final ThreadPool mThreadPool;
+    private final TaskHandler mTaskHandler;
     @Nonnull
     private final NotifyEventListener mNotifyEventListener;
     @Nonnull
@@ -34,10 +34,10 @@ public class SubscribeManager implements EventMessageListener {
     private final EventReceiver mEventReceiver;
 
     public SubscribeManager(
-            @Nonnull final ThreadPool threadPool,
+            @Nonnull final TaskHandler taskHandler,
             @Nonnull final NotifyEventListener listener,
             @Nonnull final DiFactory factory) {
-        mThreadPool = threadPool;
+        mTaskHandler = taskHandler;
         mNotifyEventListener = listener;
         mSubscribeHolder = factory.createSubscribeHolder();
         mEventReceiver = factory.createEventReceiver(this);
@@ -53,7 +53,7 @@ public class SubscribeManager implements EventMessageListener {
         if (service == null) {
             Log.e("service is null");
         }
-        return service != null && mThreadPool.executeInSequential(() -> {
+        return service != null && mTaskHandler.callback(() -> {
             for (final StringPair pair : properties) {
                 notifyEvent(service, seq, pair.getKey(), pair.getValue());
             }
@@ -88,7 +88,7 @@ public class SubscribeManager implements EventMessageListener {
     public void stop() {
         final List<Service> serviceList = mSubscribeHolder.getServiceList();
         for (final Service service : serviceList) {
-            mThreadPool.executeInParallel(() -> {
+            mTaskHandler.io(() -> {
                 try {
                     service.unsubscribe();
                 } catch (final IOException e) {
