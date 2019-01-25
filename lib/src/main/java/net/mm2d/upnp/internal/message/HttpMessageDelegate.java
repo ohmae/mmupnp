@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.message;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpMessage;
 import net.mm2d.util.TextUtils;
@@ -142,7 +142,7 @@ class HttpMessageDelegate implements HttpMessage {
             try {
                 return Integer.parseInt(len);
             } catch (final NumberFormatException e) {
-                Log.w(e);
+                Logger.w(e);
             }
         }
         return 0;
@@ -190,7 +190,7 @@ class HttpMessageDelegate implements HttpMessage {
             try {
                 mBodyBinary = getBytes(string);
             } catch (final UnsupportedEncodingException e) {
-                Log.w(e);
+                Logger.w(e);
             }
         }
         if (withContentLength) {
@@ -224,7 +224,7 @@ class HttpMessageDelegate implements HttpMessage {
             return newString(binary);
         } catch (final Exception e) {
             // for bug in Android Sdk, ArrayIndexOutOfBoundsException may occur.
-            Log.w(e);
+            Logger.w(e);
         }
         return null;
     }
@@ -266,7 +266,7 @@ class HttpMessageDelegate implements HttpMessage {
         try {
             return getBytes(getHeaderString());
         } catch (final UnsupportedEncodingException e) {
-            Log.w(e);
+            Logger.w(e);
         }
         return new byte[0];
     }

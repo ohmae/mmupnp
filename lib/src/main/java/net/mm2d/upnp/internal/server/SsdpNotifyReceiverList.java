@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.server;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.Protocol;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.internal.server.SsdpServer.Address;
@@ -82,7 +82,7 @@ public class SsdpNotifyReceiverList {
                 receiver.open();
                 receiver.start();
             } catch (final IOException e) {
-                Log.w(e);
+                Logger.w(e);
             }
         }
     }

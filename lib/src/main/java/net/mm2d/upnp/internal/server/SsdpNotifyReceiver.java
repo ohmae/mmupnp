@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.server;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.util.TextUtils;
@@ -149,7 +149,7 @@ public class SsdpNotifyReceiver implements SsdpServer {
     // VisibleForTesting
     boolean invalidAddress(@Nonnull final InetAddress sourceAddress) {
         if (invalidVersion(sourceAddress)) {
-            Log.w("IP version mismatch:" + sourceAddress.toString() + " " + getInterfaceAddress().toString());
+            Logger.w(() -> "IP version mismatch:" + sourceAddress.toString() + " " + getInterfaceAddress().toString());
             return true;
         }
         // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
@@ -158,7 +158,7 @@ public class SsdpNotifyReceiver implements SsdpServer {
         if (mSegmentCheckEnabled
                 && mDelegate.getAddress() == Address.IP_V4
                 && invalidSegment(getInterfaceAddress(), sourceAddress)) {
-            Log.w("Invalid segment:" + sourceAddress.toString() + " " + getInterfaceAddress().toString());
+            Logger.w(() -> "Invalid segment:" + sourceAddress.toString() + " " + getInterfaceAddress().toString());
             return true;
         }
         return false;

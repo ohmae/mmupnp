@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.impl;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.HttpClient;
@@ -107,14 +107,12 @@ public class ControlPointImpl implements ControlPoint {
     }
 
     // VisibleForTesting
-    @SuppressWarnings("WeakerAccess")
     @Nonnull
     HttpClient createHttpClient() {
         return new HttpClient(true);
     }
 
     // VisibleForTesting
-    @SuppressWarnings("WeakerAccess")
     boolean needToUpdateSsdpMessage(
             @Nonnull final SsdpMessage oldMessage,
             @Nonnull final SsdpMessage newMessage) {
@@ -140,7 +138,6 @@ public class ControlPointImpl implements ControlPoint {
     }
 
     // VisibleForTesting
-    @SuppressWarnings("WeakerAccess")
     void onReceiveSsdpMessage(@Nonnull final SsdpMessage message) {
         if (mSsdpMessageFilter.accept(message)) {
             onAcceptSsdpMessage(message);
@@ -148,7 +145,6 @@ public class ControlPointImpl implements ControlPoint {
     }
 
     // VisibleForTesting
-    @SuppressWarnings("WeakerAccess")
     void onAcceptSsdpMessage(@Nonnull final SsdpMessage message) {
         synchronized (mDeviceHolder) {
             final String uuid = message.getUuid();
@@ -205,8 +201,8 @@ public class ControlPointImpl implements ControlPoint {
                 }
             }
         } catch (final IOException | SAXException | ParserConfigurationException | RuntimeException e) {
-            Log.d(e.getClass().getSimpleName() + " occurred on loadDevice\n" + builder.toDumpString());
-            Log.w(e);
+            Logger.d(() -> e.getClass().getSimpleName() + " occurred on loadDevice\n" + builder.toDumpString());
+            Logger.w(e);
             synchronized (mDeviceHolder) {
                 mLoadingDeviceMap.remove(uuid);
             }
@@ -418,7 +414,7 @@ public class ControlPointImpl implements ControlPoint {
                 discoverDevice(device);
             }
         } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
-            Log.w(null, "fail to load:" + builder.getLocation(), e);
+            Logger.w("fail to load:" + builder.getLocation(), e);
         } finally {
             client.close();
         }

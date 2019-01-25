@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.impl;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.Action;
 import net.mm2d.upnp.Argument;
 import net.mm2d.upnp.Device;
@@ -338,7 +338,7 @@ public class ActionImpl implements Action {
             }
         }
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(body)) {
-            Log.w(response.toString());
+            Logger.w(() -> response.toString());
             throw new IOException(response.getStartLine());
         }
         try {
@@ -498,7 +498,7 @@ public class ActionImpl implements Action {
             final String text = node.getTextContent();
             if (findArgument(tag) == null) {
                 // Optionalな情報としてArgumentに記述されていないタグが含まれる可能性があるためログ出力に留める
-                Log.d("invalid argument:" + tag + "->" + text);
+                Logger.d(() -> "invalid argument:" + tag + "->" + text);
             }
             result.put(tag, text);
         }

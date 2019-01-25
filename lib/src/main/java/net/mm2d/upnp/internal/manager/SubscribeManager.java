@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.manager;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.Service;
 import net.mm2d.upnp.StateVariable;
@@ -48,10 +48,10 @@ public class SubscribeManager implements EventMessageListener {
             @Nonnull final String sid,
             final long seq,
             @Nonnull final List<StringPair> properties) {
-        Log.e(sid);
+        Logger.e(sid);
         final Service service = mSubscribeHolder.getService(sid);
         if (service == null) {
-            Log.e("service is null");
+            Logger.e("service is null");
         }
         return service != null && mTaskHandler.callback(() -> {
             for (final StringPair pair : properties) {
@@ -67,7 +67,7 @@ public class SubscribeManager implements EventMessageListener {
             @Nullable final String value) {
         final StateVariable variable = service.findStateVariable(name);
         if (variable == null || !variable.isSendEvents() || value == null) {
-            Log.w("illegal notify argument:" + name + " " + value);
+            Logger.w("illegal notify argument:" + name + " " + value);
             return;
         }
         mNotifyEventListener.onNotifyEvent(service, seq, variable.getName(), value);
@@ -81,7 +81,7 @@ public class SubscribeManager implements EventMessageListener {
         try {
             mEventReceiver.open();
         } catch (final IOException e) {
-            Log.w(e);
+            Logger.w(e);
         }
     }
 
@@ -92,7 +92,7 @@ public class SubscribeManager implements EventMessageListener {
                 try {
                     service.unsubscribe();
                 } catch (final IOException e) {
-                    Log.w(e);
+                    Logger.w(e);
                 }
             });
         }

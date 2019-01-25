@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.server;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.Protocol;
 import net.mm2d.upnp.internal.server.SsdpSearchServer.ResponseListener;
 import net.mm2d.upnp.internal.server.SsdpServer.Address;
@@ -76,7 +76,7 @@ public class SsdpSearchServerList {
                 server.open();
                 server.start();
             } catch (final IOException e) {
-                Log.w(e);
+                Logger.w(e);
             }
         }
     }

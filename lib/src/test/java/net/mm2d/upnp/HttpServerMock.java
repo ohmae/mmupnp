@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.log.Log;
 import net.mm2d.util.IoUtils;
 
 import java.io.IOException;
@@ -178,7 +177,6 @@ public class HttpServerMock {
                 os = mSocket.getOutputStream();
                 while (mServer.receiveAndReply(mSocket, is, os)) ;
             } catch (final IOException e) {
-                Log.w(e);
             } finally {
                 IoUtils.closeQuietly(is);
                 IoUtils.closeQuietly(os);

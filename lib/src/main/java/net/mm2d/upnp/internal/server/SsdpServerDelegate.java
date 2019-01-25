@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.server;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.util.IoUtils;
@@ -248,7 +248,7 @@ class SsdpServerDelegate implements SsdpServer {
             final byte[] data = baos.toByteArray();
             mSocket.send(new DatagramPacket(data, data.length, getSsdpSocketAddress()));
         } catch (final IOException e) {
-            Log.w(e);
+            Logger.w(e);
         }
     }
 

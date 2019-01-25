@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.internal.message.HttpRequest;
 import net.mm2d.upnp.internal.message.HttpResponse;
 import net.mm2d.util.IoUtils;
@@ -159,7 +159,7 @@ public class HttpClient {
             } catch (final IOException e) {
                 // コネクションを再利用した場合はpeerから既に切断されていた可能性がある。
                 // KeepAliveできないサーバである可能性があるのでKeepAliveを無効にしてリトライ
-                Log.w("retry:" + e.getMessage());
+                Logger.w(() -> "retry:" + e.getMessage());
                 setKeepAlive(false);
                 closeSocket();
                 openSocket(request);
@@ -304,7 +304,7 @@ public class HttpClient {
         final HttpResponse response = post(request);
         // response bodyがemptyであることは正常
         if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
-            Log.i("request:" + request.toString() + "\nresponse:" + response.toString());
+            Logger.i(() -> "request:" + request.toString() + "\nresponse:" + response.toString());
             throw new IOException(response.getStartLine());
         }
         return response;

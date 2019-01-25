@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.server;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.Property;
 import net.mm2d.upnp.internal.message.HttpRequest;
@@ -342,7 +342,7 @@ public class EventReceiver {
                 os = mSocket.getOutputStream();
                 receiveAndReply(is, os);
             } catch (final IOException e) {
-                Log.w(e);
+                Logger.w(e);
             } finally {
                 IoUtils.closeQuietly(is);
                 IoUtils.closeQuietly(os);

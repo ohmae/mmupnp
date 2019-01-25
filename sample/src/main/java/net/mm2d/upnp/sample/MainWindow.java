@@ -7,7 +7,8 @@
 
 package net.mm2d.upnp.sample;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
+import net.mm2d.log.Senders;
 import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
@@ -49,15 +50,14 @@ import javax.swing.tree.TreeSelectionModel;
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 public class MainWindow extends JFrame {
-    private static final String TAG = "MainWindow";
-
     public static void main(final String[] args) {
-        Log.initialize(true, true);
+        Logger.setLogLevel(Logger.VERBOSE);
+        Logger.setSender(Senders.create());
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
-            Log.w(TAG, e);
+            e.printStackTrace();
         }
         new MainWindow();
     }

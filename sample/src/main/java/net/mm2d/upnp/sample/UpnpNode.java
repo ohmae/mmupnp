@@ -7,9 +7,6 @@
 
 package net.mm2d.upnp.sample;
 
-
-import net.mm2d.log.Log;
-
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -64,7 +61,7 @@ public class UpnpNode extends DefaultMutableTreeNode {
             return sw.toString();
         } catch (final IllegalArgumentException | ParserConfigurationException | SAXException
                 | IOException | TransformerFactoryConfigurationError | TransformerException e) {
-            Log.w(e);
+            e.printStackTrace();
         }
         return "";
     }

@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.thread;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.TaskExecutor;
 
 import java.util.concurrent.ExecutorService;
@@ -69,7 +69,7 @@ public class IoTaskExecutor implements TaskExecutor {
             }
         } catch (final InterruptedException e) {
             executor.shutdownNow();
-            Log.w(e);
+            Logger.w(e);
         } finally {
             mExecutor = null;
         }

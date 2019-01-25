@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.impl;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.Action;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.Http;
@@ -308,7 +308,7 @@ public class ServiceImpl implements Service {
                     if (variable == null) {
                         throw new IllegalStateException("There is no StateVariable " + name);
                     }
-                    Log.w("Invalid description. relatedStateVariable name has unnecessary blanks ["
+                    Logger.w("Invalid description. relatedStateVariable name has unnecessary blanks ["
                             + name + "] on " + service.getServiceId());
                     argumentBuilder.setRelatedStateVariableName(trimmedName);
                 }
@@ -430,7 +430,7 @@ public class ServiceImpl implements Service {
             final int second = Integer.parseInt(secondSection);
             return TimeUnit.SECONDS.toMillis(second);
         } catch (final NumberFormatException e) {
-            Log.w(e);
+            Logger.w(e);
         }
         return DEFAULT_SUBSCRIPTION_TIMEOUT;
     }
@@ -464,13 +464,13 @@ public class ServiceImpl implements Service {
         final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w("subscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Logger.w(() -> "subscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout <= 0) {
-            Log.w("subscribe response:" + response.toString());
+            Logger.w(() -> "subscribe response:" + response.toString());
             return false;
         }
         mSubscriptionId = sid;
@@ -504,13 +504,13 @@ public class ServiceImpl implements Service {
         final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w("renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Logger.w(() -> "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout <= 0) {
-            Log.w("renewSubscribe response:" + response.toString());
+            Logger.w(() -> "renewSubscribe response:" + response.toString());
             return false;
         }
         mSubscribeManager.renew(this, timeout);
@@ -538,7 +538,7 @@ public class ServiceImpl implements Service {
         mSubscribeManager.unregister(this);
         mSubscriptionId = null;
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Log.w("unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Logger.w(() -> "unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
             return false;
         }
         return true;
