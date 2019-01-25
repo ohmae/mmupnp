@@ -226,11 +226,7 @@ public class ActionImpl implements Action {
             throws IOException {
         final List<StringPair> arguments = makeArguments(argumentValues);
         final String soap = makeSoap(null, arguments);
-        final Map<String, String> result = invokeInner(soap);
-        if (!returnErrorResponse && result.containsKey(ERROR_CODE_KEY)) {
-            throw new IOException("error response:" + result);
-        }
-        return result;
+        return invokeInner(soap, returnErrorResponse);
     }
 
     @Override
@@ -254,11 +250,7 @@ public class ActionImpl implements Action {
         final List<StringPair> arguments = makeArguments(argumentValues);
         appendArgument(arguments, customArguments);
         final String soap = makeSoap(customNamespace, arguments);
-        final Map<String, String> result = invokeInner(soap);
-        if (!returnErrorResponse && result.containsKey(ERROR_CODE_KEY)) {
-            throw new IOException("error response:" + result);
-        }
-        return result;
+        return invokeInner(soap, returnErrorResponse);
     }
 
     /**
@@ -315,6 +307,18 @@ public class ActionImpl implements Action {
         return argument.getRelatedStateVariable().getDefaultValue();
     }
 
+    @Nonnull
+    private Map<String, String> invokeInner(
+            @Nonnull final String soap,
+            final boolean returnErrorResponse)
+            throws IOException {
+        final Map<String, String> result = invokeInner(soap);
+        if (!returnErrorResponse && result.containsKey(ERROR_CODE_KEY)) {
+            throw new IOException("error response:" + result);
+        }
+        return result;
+    }
+
     /**
      * Actionの実行を行う。
      *
@@ -338,7 +342,7 @@ public class ActionImpl implements Action {
             }
         }
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(body)) {
-            Logger.w(() -> response.toString());
+            Logger.w(response::toString);
             throw new IOException(response.getStartLine());
         }
         try {
@@ -517,18 +521,7 @@ public class ActionImpl implements Action {
     @Nonnull
     private Element findResponseElement(@Nonnull final String xml)
             throws ParserConfigurationException, SAXException, IOException {
-        final String responseTag = getResponseTagName();
-        final Document doc = XmlUtils.newDocument(true, xml);
-        final Element envelope = doc.getDocumentElement();
-        final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
-        if (body == null) {
-            throw new IOException("no body tag");
-        }
-        final Element response = XmlUtils.findChildElementByLocalName(body, responseTag);
-        if (response == null) {
-            throw new IOException("no response tag");
-        }
-        return response;
+        return findElement(xml, getResponseTagName());
     }
 
     /**
@@ -597,16 +590,24 @@ public class ActionImpl implements Action {
     @Nonnull
     private Element findFaultElement(@Nonnull final String xml)
             throws ParserConfigurationException, SAXException, IOException {
+        return findElement(xml, "Fault");
+    }
+
+    @Nonnull
+    private Element findElement(
+            @Nonnull final String xml,
+            @Nonnull final String tag)
+            throws IOException, ParserConfigurationException, SAXException {
         final Document doc = XmlUtils.newDocument(true, xml);
         final Element envelope = doc.getDocumentElement();
         final Element body = XmlUtils.findChildElementByLocalName(envelope, "Body");
         if (body == null) {
             throw new IOException("no body tag");
         }
-        final Element fault = XmlUtils.findChildElementByLocalName(body, "Fault");
-        if (fault == null) {
-            throw new IOException("no fault tag");
+        final Element element = XmlUtils.findChildElementByLocalName(body, tag);
+        if (element == null) {
+            throw new IOException("no response tag");
         }
-        return fault;
+        return element;
     }
 }

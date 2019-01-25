@@ -385,7 +385,7 @@ public final class Http {
     }
 
     @Nonnull
-    public static String makeAbsoluteUrl(
+    private static String makeAbsoluteUrl(
             @Nonnull final String baseUrl,
             @Nonnull final String url) {
         if (isHttpUrl(url)) {

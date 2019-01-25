@@ -313,6 +313,7 @@ public class HttpResponse implements HttpMessage {
         return this;
     }
 
+    @Nonnull
     @Override
     public String toString() {
         return mDelegate.toString();
