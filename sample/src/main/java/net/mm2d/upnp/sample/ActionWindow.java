@@ -102,7 +102,7 @@ public class ActionWindow extends JFrame {
                     }
                     return;
                 }
-                updateResult(mAction.invoke(makeArgument()));
+                updateResult(result);
             } catch (final IOException e1) {
                 e1.printStackTrace();
                 mErrorMessage.setText(e1.getMessage());
