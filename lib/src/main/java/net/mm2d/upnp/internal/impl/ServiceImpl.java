@@ -464,15 +464,16 @@ public class ServiceImpl implements Service {
         final HttpRequest request = makeSubscribeRequest();
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Logger.w(() -> "subscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Logger.w(() -> "error subscribe request:\n" + request + "\nresponse:\n" + response);
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (TextUtils.isEmpty(sid) || timeout <= 0) {
-            Logger.w(() -> "subscribe response:" + response.toString());
+            Logger.w(() -> "error subscribe response:\n" + response);
             return false;
         }
+        Logger.v(() -> "subscribe request:\n" + request + "\nresponse:\n" + response);
         mSubscriptionId = sid;
         mSubscribeManager.register(this, timeout, keepRenew);
         return true;
@@ -504,15 +505,16 @@ public class ServiceImpl implements Service {
         final HttpRequest request = makeRenewSubscribeRequest(mSubscriptionId);
         final HttpResponse response = client.post(request);
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Logger.w(() -> "renewSubscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Logger.w(() -> "renewSubscribe request:\n" + request + "\nresponse:\n" + response);
             return false;
         }
         final String sid = response.getHeader(Http.SID);
         final long timeout = parseTimeout(response);
         if (!TextUtils.equals(sid, mSubscriptionId) || timeout <= 0) {
-            Logger.w(() -> "renewSubscribe response:" + response.toString());
+            Logger.w(() -> "renewSubscribe response:\n" + response);
             return false;
         }
+        Logger.v(() -> "renew subscribe request:\n" + request + "\nresponse:\n" + response);
         mSubscribeManager.renew(this, timeout);
         return true;
     }
@@ -538,9 +540,10 @@ public class ServiceImpl implements Service {
         mSubscribeManager.unregister(this);
         mSubscriptionId = null;
         if (response.getStatus() != Http.Status.HTTP_OK) {
-            Logger.w(() -> "unsubscribe request:" + request.toString() + "\nresponse:" + response.toString());
+            Logger.w(() -> "unsubscribe request:\n" + request + "\nresponse:\n" + response);
             return false;
         }
+        Logger.v(() -> "unsubscribe request:\n" + request + "\nresponse:\n" + response);
         return true;
     }
 

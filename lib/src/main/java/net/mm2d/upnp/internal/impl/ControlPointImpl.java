@@ -201,8 +201,8 @@ public class ControlPointImpl implements ControlPoint {
                 }
             }
         } catch (final IOException | SAXException | ParserConfigurationException | RuntimeException e) {
-            Logger.d(() -> e.getClass().getSimpleName() + " occurred on loadDevice\n" + builder.toDumpString());
             Logger.w(e);
+            Logger.i(() -> e.getClass().getSimpleName() + " occurred on loadDevice\n" + builder.toDumpString());
             synchronized (mDeviceHolder) {
                 mLoadingDeviceMap.remove(uuid);
             }
@@ -319,6 +319,7 @@ public class ControlPointImpl implements ControlPoint {
     // VisibleForTesting
     @SuppressWarnings("WeakerAccess")
     void discoverDevice(@Nonnull final Device device) {
+        Logger.d(() -> "discoverDevice:[" + device.getFriendlyName() + "](" + device.getIpAddress() + ")");
         if (isPinnedDevice(mDeviceHolder.get(device.getUdn()))) {
             return;
         }
@@ -330,6 +331,7 @@ public class ControlPointImpl implements ControlPoint {
 
     @SuppressWarnings("WeakerAccess")
     void lostDevice(@Nonnull final Device device) {
+        Logger.d(() -> "lostDevice:[" + device.getFriendlyName() + "](" + device.getIpAddress() + ")");
         mEmbeddedUdnSet.removeAll(collectEmbeddedUdn(device));
         synchronized (mDeviceHolder) {
             final List<Service> list = device.getServiceList();
@@ -386,6 +388,7 @@ public class ControlPointImpl implements ControlPoint {
     public void addPinnedDevice(@Nonnull final String location) {
         for (final Device device : getDeviceList()) {
             if (TextUtils.equals(device.getLocation(), location) && isPinnedDevice(device)) {
+                Logger.i(() -> "already added: " + location);
                 return;
             }
         }
@@ -414,7 +417,7 @@ public class ControlPointImpl implements ControlPoint {
                 discoverDevice(device);
             }
         } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
-            Logger.w("fail to load:" + builder.getLocation(), e);
+            Logger.w("fail to load:\n" + builder.getLocation(), e);
         } finally {
             client.close();
         }

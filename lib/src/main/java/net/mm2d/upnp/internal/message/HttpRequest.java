@@ -395,6 +395,7 @@ public class HttpRequest implements HttpMessage {
         return this;
     }
 
+    @Nonnull
     @Override
     public String toString() {
         return mDelegate.toString();

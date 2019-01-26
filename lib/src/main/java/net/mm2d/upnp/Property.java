@@ -9,6 +9,8 @@ package net.mm2d.upnp;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
+
 /**
  * ライブラリのプロパティ情報を管理するクラス。
  *
@@ -19,22 +21,27 @@ public final class Property {
     /**
      * ライブラリバージョン
      */
-    public static final String LIB_VERSION = "mmupnp/1.0";
+    @Nonnull
+    public static final String LIB_VERSION = "mmupnp/2.0.0";
     /**
      * OSバージョン
      */
+    @Nonnull
     public static final String OS_VERSION;
     /**
      * UPnPバージョン
      */
+    @Nonnull
     public static final String UPNP_VERSION = "UPnP/1.0";
     /**
      * ライブラリで使用するUserAgentの値
      */
+    @Nonnull
     public static final String USER_AGENT_VALUE;
     /**
      * ライブラリで使用するServer名
      */
+    @Nonnull
     public static final String SERVER_VALUE;
     /**
      * デフォルトタイムアウト値[ms]（30秒）

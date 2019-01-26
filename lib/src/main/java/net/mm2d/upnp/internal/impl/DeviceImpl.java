@@ -82,20 +82,16 @@ public class DeviceImpl implements Device {
          *
          * @param controlPoint     ControlPoint
          * @param subscribeManager 購読状態マネージャ
-         * @param ssdpMessage      SSDPパケット
+         * @param message          SSDPパケット
          */
         public Builder(
                 @Nonnull final ControlPoint controlPoint,
                 @Nonnull final SubscribeManager subscribeManager,
-                @Nonnull final SsdpMessage ssdpMessage) {
+                @Nonnull final SsdpMessage message) {
             mControlPoint = controlPoint;
             mSubscribeManager = subscribeManager;
-            final String location = ssdpMessage.getLocation();
-            if (location == null) {
-                throw new IllegalArgumentException();
-            }
-            mLocation = location;
-            mSsdpMessage = ssdpMessage;
+            mLocation = getLocationWithException(message);
+            mSsdpMessage = message;
             mTagMap = new LinkedHashMap<>();
             mTagMap.put("", new HashMap<>());
         }
@@ -161,20 +157,16 @@ public class DeviceImpl implements Device {
         /**
          * SSDPパケットを登録する。
          *
-         * @param ssdpMessage SSDPパケット
+         * @param message SSDPパケット
          */
-        void updateSsdpMessage(@Nonnull final SsdpMessage ssdpMessage) {
+        void updateSsdpMessage(@Nonnull final SsdpMessage message) {
             if (mSsdpMessage instanceof PinnedSsdpMessage) {
                 return;
             }
-            final String location = ssdpMessage.getLocation();
-            if (location == null) {
-                throw new IllegalArgumentException();
-            }
-            mLocation = location;
-            mSsdpMessage = ssdpMessage;
+            mLocation = getLocationWithException(message);
+            mSsdpMessage = message;
             for (final Builder builder : mDeviceBuilderList) {
-                builder.updateSsdpMessage(ssdpMessage);
+                builder.updateSsdpMessage(message);
             }
         }
 
@@ -619,6 +611,16 @@ public class DeviceImpl implements Device {
         return list;
     }
 
+    @Nonnull
+    private static String getLocationWithException(@Nonnull final SsdpMessage ssdpMessage)
+            throws IllegalArgumentException {
+        final String location = ssdpMessage.getLocation();
+        if (location == null) {
+            throw new IllegalArgumentException();
+        }
+        return location;
+    }
+
     @Override
     public void loadIconBinary(
             @Nonnull final HttpClient client,
@@ -654,11 +656,7 @@ public class DeviceImpl implements Device {
                 throw new IllegalArgumentException("uuid and udn does not match! uuid=" + uuid + " udn=" + mUdn);
             }
         }
-        final String location = message.getLocation();
-        if (location == null) {
-            throw new IllegalArgumentException();
-        }
-        mLocation = location;
+        mLocation = getLocationWithException(message);
         mSsdpMessage = message;
         for (final Device device : mDeviceList) {
             device.updateSsdpMessage(message);

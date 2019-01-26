@@ -125,6 +125,8 @@ public class SsdpNotifyReceiver implements SsdpServer {
             if (TextUtils.equals(message.getMethod(), SsdpMessage.M_SEARCH)) {
                 return;
             }
+            Logger.v(() -> "receive ssdp notify from " + sourceAddress +
+                    " in " + mDelegate.getLocalAddress() + ":\n" + message);
             // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
             if (!TextUtils.equals(message.getNts(), SsdpMessage.SSDP_BYEBYE)
                     && mDelegate.isInvalidLocation(message, sourceAddress)) {
@@ -149,7 +151,7 @@ public class SsdpNotifyReceiver implements SsdpServer {
     // VisibleForTesting
     boolean invalidAddress(@Nonnull final InetAddress sourceAddress) {
         if (invalidVersion(sourceAddress)) {
-            Logger.w(() -> "IP version mismatch:" + sourceAddress.toString() + " " + getInterfaceAddress().toString());
+            Logger.w(() -> "IP version mismatch:" + sourceAddress + " " + getInterfaceAddress());
             return true;
         }
         // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
@@ -158,7 +160,7 @@ public class SsdpNotifyReceiver implements SsdpServer {
         if (mSegmentCheckEnabled
                 && mDelegate.getAddress() == Address.IP_V4
                 && invalidSegment(getInterfaceAddress(), sourceAddress)) {
-            Logger.w(() -> "Invalid segment:" + sourceAddress.toString() + " " + getInterfaceAddress().toString());
+            Logger.w(() -> "Invalid segment:" + sourceAddress + " " + getInterfaceAddress());
             return true;
         }
         return false;

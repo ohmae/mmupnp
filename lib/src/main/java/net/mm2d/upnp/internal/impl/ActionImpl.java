@@ -312,9 +312,11 @@ public class ActionImpl implements Action {
             @Nonnull final String soap,
             final boolean returnErrorResponse)
             throws IOException {
+        Logger.d(() -> "action invoke:\n" + soap);
         final Map<String, String> result = invokeInner(soap);
+        Logger.d(() -> "action result:\n" + result);
         if (!returnErrorResponse && result.containsKey(ERROR_CODE_KEY)) {
-            throw new IOException("error response:" + result);
+            throw new IOException("error response: " + result);
         }
         return result;
     }
@@ -342,7 +344,7 @@ public class ActionImpl implements Action {
             }
         }
         if (response.getStatus() != Http.Status.HTTP_OK || TextUtils.isEmpty(body)) {
-            Logger.w(response::toString);
+            Logger.w(() -> "action invoke error\n" + response);
             throw new IOException(response.getStartLine());
         }
         try {

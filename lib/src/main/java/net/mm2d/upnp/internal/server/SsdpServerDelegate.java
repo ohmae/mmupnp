@@ -242,6 +242,7 @@ class SsdpServerDelegate implements SsdpServer {
         if (mSocket == null) {
             return;
         }
+        Logger.d(() -> "send from " + getInterfaceAddress() + ":\n" + message);
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.writeData(baos);

@@ -30,6 +30,7 @@ public class SsdpNotifyReceiverList {
     @Nonnull
     private final List<SsdpNotifyReceiver> mList = new ArrayList<>();
 
+    @Nonnull
     public SsdpNotifyReceiverList init(
             @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,

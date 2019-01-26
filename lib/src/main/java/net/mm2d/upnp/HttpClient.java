@@ -159,7 +159,7 @@ public class HttpClient {
             } catch (final IOException e) {
                 // コネクションを再利用した場合はpeerから既に切断されていた可能性がある。
                 // KeepAliveできないサーバである可能性があるのでKeepAliveを無効にしてリトライ
-                Logger.w(() -> "retry:" + e.getMessage());
+                Logger.w(() -> "retry:\n" + e.getMessage());
                 setKeepAlive(false);
                 closeSocket();
                 openSocket(request);
@@ -304,7 +304,7 @@ public class HttpClient {
         final HttpResponse response = post(request);
         // response bodyがemptyであることは正常
         if (response.getStatus() != Http.Status.HTTP_OK || response.getBody() == null) {
-            Logger.i(() -> "request:" + request.toString() + "\nresponse:" + response.toString());
+            Logger.i(() -> "request:\n" + request + "\nresponse:\n" + response);
             throw new IOException(response.getStartLine());
         }
         return response;

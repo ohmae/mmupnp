@@ -31,6 +31,7 @@ public class SsdpSearchServerList {
     @Nonnull
     private final List<SsdpSearchServer> mList = new ArrayList<>();
 
+    @Nonnull
     public SsdpSearchServerList init(
             @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
@@ -61,6 +62,7 @@ public class SsdpSearchServerList {
     }
 
     // VisibleForTesting
+    @Nonnull
     SsdpSearchServer newSsdpSearchServer(
             @Nonnull final Address address,
             @Nonnull final NetworkInterface nif,

@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp.internal.server;
 
+import net.mm2d.log.Logger;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
@@ -144,6 +145,8 @@ public class SsdpSearchServer implements SsdpServer {
             final int length) {
         try {
             final SsdpResponse message = new SsdpResponse(getLocalAddress(), data, length);
+            Logger.v(() -> "receive ssdp search response from " + sourceAddress +
+                    " to " + mDelegate.getLocalAddress() + ":\n" + message);
             if (mDelegate.isInvalidLocation(message, sourceAddress)) {
                 return;
             }

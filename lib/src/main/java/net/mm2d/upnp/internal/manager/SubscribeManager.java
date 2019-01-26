@@ -48,7 +48,7 @@ public class SubscribeManager implements EventMessageListener {
             @Nonnull final String sid,
             final long seq,
             @Nonnull final List<StringPair> properties) {
-        Logger.e(sid);
+        Logger.d(() -> sid + " " + seq + " " + properties);
         final Service service = mSubscribeHolder.getService(sid);
         if (service == null) {
             Logger.e("service is null");
@@ -67,7 +67,7 @@ public class SubscribeManager implements EventMessageListener {
             @Nullable final String value) {
         final StateVariable variable = service.findStateVariable(name);
         if (variable == null || !variable.isSendEvents() || value == null) {
-            Logger.w("illegal notify argument:" + name + " " + value);
+            Logger.w("illegal notify argument: " + name + " " + value);
             return;
         }
         mNotifyEventListener.onNotifyEvent(service, seq, variable.getName(), value);
@@ -135,7 +135,7 @@ public class SubscribeManager implements EventMessageListener {
      *
      * @param service 登録するService
      * @param timeout タイムアウトするまでの時間
-     * @param keep keep-aliveを行う場合true
+     * @param keep    keep-aliveを行う場合true
      * @see Service
      * @see Service#subscribe()
      */

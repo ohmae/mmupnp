@@ -184,6 +184,7 @@ public class SsdpResponse implements SsdpMessage {
         mDelegate.writeData(os);
     }
 
+    @Nonnull
     @Override
     public String toString() {
         return mDelegate.toString();

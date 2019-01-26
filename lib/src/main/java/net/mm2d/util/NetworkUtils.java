@@ -219,6 +219,7 @@ public final class NetworkUtils {
 
     // VisibleForTesting
     static class NetworkInterfaceEnumeration {
+        @Nonnull
         Enumeration<NetworkInterface> get() throws SocketException {
             return NetworkInterface.getNetworkInterfaces();
         }
@@ -226,6 +227,7 @@ public final class NetworkUtils {
 
     // VisibleForTesting
     interface NetworkInterfaceWrapper {
+        @Nonnull
         List<InterfaceAddress> getInterfaceAddresses();
 
         boolean isLoopback() throws SocketException;
@@ -242,6 +244,7 @@ public final class NetworkUtils {
             mNetworkInterface = networkInterface;
         }
 
+        @Nonnull
         @Override
         public List<InterfaceAddress> getInterfaceAddresses() {
             return mNetworkInterface.getInterfaceAddresses();

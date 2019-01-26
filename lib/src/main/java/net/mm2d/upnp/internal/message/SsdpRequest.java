@@ -173,6 +173,7 @@ public class SsdpRequest implements SsdpMessage {
         mDelegate.writeData(os);
     }
 
+    @Nonnull
     @Override
     public String toString() {
         return mDelegate.toString();
