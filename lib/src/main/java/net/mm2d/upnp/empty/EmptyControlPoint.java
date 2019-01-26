@@ -89,7 +89,13 @@ public class EmptyControlPoint implements ControlPoint {
     }
 
     @Override
-    public void addPinnedDevice(@Nonnull final String location) {
+    public void tryAddDevice(
+            @Nonnull final String uuid,
+            @Nonnull final String location) {
+    }
+
+    @Override
+    public void tryAddPinnedDevice(@Nonnull final String location) {
     }
 
     @Override

@@ -231,13 +231,25 @@ public interface ControlPoint {
     Device getDevice(@Nonnull String udn);
 
     /**
+     * デバイスの追加を試みる。
+     *
+     * <p>キャッシュしておいた情報を元に読み込ませるなどに利用。
+     *
+     * @param uuid     UDN
+     * @param location location
+     */
+    void tryAddDevice(
+            @Nonnull String uuid,
+            @Nonnull String location);
+
+    /**
      * 固定デバイスを設定する。
      *
      * <p>設定したデバイスの取得ができた後は時間経過やByeByeで削除されることはない。
      *
      * @param location locationのURL。正確な値である必要がある。
      */
-    void addPinnedDevice(@Nonnull String location);
+    void tryAddPinnedDevice(@Nonnull String location);
 
     /**
      * 固定デバイスを削除する。

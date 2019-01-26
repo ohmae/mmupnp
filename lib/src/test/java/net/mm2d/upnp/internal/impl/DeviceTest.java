@@ -17,7 +17,7 @@ import net.mm2d.upnp.IconFilter;
 import net.mm2d.upnp.Service;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.manager.SubscribeManager;
-import net.mm2d.upnp.internal.message.PinnedSsdpMessage;
+import net.mm2d.upnp.internal.message.FakeSsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.upnp.internal.parser.DeviceParser;
 import net.mm2d.util.TestUtils;
@@ -129,7 +129,7 @@ public class DeviceTest {
 
         @Test
         public void updateSsdpMessage_pinned() throws Exception {
-            final SsdpMessage originalMessage = mock(PinnedSsdpMessage.class);
+            final SsdpMessage originalMessage = mock(FakeSsdpMessage.class);
             doReturn("location").when(originalMessage).getLocation();
             mBuilder.updateSsdpMessage(originalMessage);
             final Device device = mBuilder.build();

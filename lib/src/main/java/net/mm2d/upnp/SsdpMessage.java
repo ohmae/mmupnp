@@ -47,6 +47,13 @@ public interface SsdpMessage {
     String SSDP_DISCOVER = "\"ssdp:discover\"";
 
     /**
+     * 固定用メッセージかを返す。
+     *
+     * @return 固定用メッセージの時true
+     */
+    boolean isPinned();
+
+    /**
      * 受信したインターフェースのScopeIDを返す。
      *
      * @return ScopeID、設定されていない場合(IPv4含む)は0

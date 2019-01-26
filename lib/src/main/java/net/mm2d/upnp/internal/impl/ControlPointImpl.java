@@ -18,7 +18,7 @@ import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.SsdpMessageFilter;
 import net.mm2d.upnp.internal.manager.DeviceHolder;
 import net.mm2d.upnp.internal.manager.SubscribeManager;
-import net.mm2d.upnp.internal.message.PinnedSsdpMessage;
+import net.mm2d.upnp.internal.message.FakeSsdpMessage;
 import net.mm2d.upnp.internal.parser.DeviceParser;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList;
 import net.mm2d.upnp.internal.server.SsdpSearchServerList;
@@ -181,7 +181,12 @@ public class ControlPointImpl implements ControlPoint {
             }
             return;
         }
-        final DeviceImpl.Builder builder = new DeviceImpl.Builder(this, mSubscribeManager, message);
+        loadDevice(uuid, new DeviceImpl.Builder(this, mSubscribeManager, message));
+    }
+
+    private void loadDevice(
+            @Nonnull final String uuid,
+            @Nonnull final DeviceImpl.Builder builder) {
         mLoadingDeviceMap.put(uuid, builder);
         if (!mTaskHandler.io(() -> loadDevice(builder))) {
             mLoadingDeviceMap.remove(uuid);
@@ -385,7 +390,27 @@ public class ControlPointImpl implements ControlPoint {
     }
 
     @Override
-    public void addPinnedDevice(@Nonnull final String location) {
+    public void tryAddDevice(
+            @Nonnull final String uuid,
+            @Nonnull final String location) {
+        for (final Device device : getDeviceList()) {
+            if (TextUtils.equals(device.getLocation(), location)) {
+                Logger.i(() -> "already added: " + location);
+                return;
+            }
+        }
+        for (final DeviceImpl.Builder builder : mLoadingDeviceMap.values()) {
+            if (TextUtils.equals(builder.getLocation(), location)) {
+                Logger.i(() -> "already loading: " + location);
+                return;
+            }
+        }
+        final FakeSsdpMessage message = new FakeSsdpMessage(uuid, location, false);
+        loadDevice(uuid, new DeviceImpl.Builder(this, mSubscribeManager, message));
+    }
+
+    @Override
+    public void tryAddPinnedDevice(@Nonnull final String location) {
         for (final Device device : getDeviceList()) {
             if (TextUtils.equals(device.getLocation(), location) && isPinnedDevice(device)) {
                 Logger.i(() -> "already added: " + location);
@@ -393,7 +418,7 @@ public class ControlPointImpl implements ControlPoint {
             }
         }
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(
-                this, mSubscribeManager, new PinnedSsdpMessage(location));
+                this, mSubscribeManager, new FakeSsdpMessage(location));
         mLoadingPinnedDevices.add(builder);
         mTaskHandler.io(() -> loadPinnedDevice(builder));
     }

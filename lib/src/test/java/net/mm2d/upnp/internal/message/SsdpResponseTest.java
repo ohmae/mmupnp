@@ -70,6 +70,12 @@ public class SsdpResponseTest {
             message.setStatus(Http.Status.HTTP_NOT_FOUND);
             assertThat(message.getStatus(), is(Http.Status.HTTP_NOT_FOUND));
         }
+
+        @Test
+        public void isPinned() throws Exception {
+            final SsdpResponse message = makeFromResource("ssdp-search-response0.bin");
+            assertThat(message.isPinned(), is(false));
+        }
     }
 
     @RunWith(Theories.class)

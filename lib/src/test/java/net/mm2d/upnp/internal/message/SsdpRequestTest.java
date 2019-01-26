@@ -78,6 +78,12 @@ public class SsdpRequestTest {
             final SsdpRequest message = makeFromResource("ssdp-notify-alive0.bin");
             assertThat(message.toString(), is(message.getMessage().toString()));
         }
+
+        @Test
+        public void isPinned() throws Exception {
+            final SsdpRequest message = makeFromResource("ssdp-notify-alive0.bin");
+            assertThat(message.isPinned(), is(false));
+        }
     }
 
     @RunWith(JUnit4.class)

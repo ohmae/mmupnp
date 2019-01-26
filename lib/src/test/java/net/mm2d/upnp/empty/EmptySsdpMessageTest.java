@@ -24,6 +24,12 @@ import static org.mockito.Mockito.*;
 @RunWith(JUnit4.class)
 public class EmptySsdpMessageTest {
     @Test
+    public void isPinned() {
+        final SsdpMessage message = new EmptySsdpMessage();
+        assertThat(message.isPinned(), is(false));
+    }
+
+    @Test
     public void getScopeId() {
         final SsdpMessage message = new EmptySsdpMessage();
         assertThat(message.getScopeId(), is(0));

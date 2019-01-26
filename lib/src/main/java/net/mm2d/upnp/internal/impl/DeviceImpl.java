@@ -16,7 +16,8 @@ import net.mm2d.upnp.IconFilter;
 import net.mm2d.upnp.Service;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.manager.SubscribeManager;
-import net.mm2d.upnp.internal.message.PinnedSsdpMessage;
+import net.mm2d.upnp.internal.message.FakeSsdpMessage;
+import net.mm2d.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -114,10 +115,10 @@ public class DeviceImpl implements Device {
          * @param client Descriptionのダウンロードに使用したHttpClient
          */
         public void setDownloadInfo(@Nonnull final HttpClient client) {
-            if (mSsdpMessage instanceof PinnedSsdpMessage) {
+            if (mSsdpMessage instanceof FakeSsdpMessage) {
                 final InetAddress address = client.getLocalAddress();
                 if (address != null) {
-                    ((PinnedSsdpMessage) mSsdpMessage).setLocalAddress(address);
+                    ((FakeSsdpMessage) mSsdpMessage).setLocalAddress(address);
                 } else {
                     throw new IllegalStateException("HttpClient is not connected yet.");
                 }
@@ -160,7 +161,7 @@ public class DeviceImpl implements Device {
          * @param message SSDPパケット
          */
         void updateSsdpMessage(@Nonnull final SsdpMessage message) {
-            if (mSsdpMessage instanceof PinnedSsdpMessage) {
+            if (mSsdpMessage.isPinned()) {
                 return;
             }
             mLocation = getLocationWithException(message);
@@ -476,9 +477,10 @@ public class DeviceImpl implements Device {
             }
             if (parent == null) {
                 // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
-                if (mSsdpMessage instanceof PinnedSsdpMessage) {
-                    ((PinnedSsdpMessage) mSsdpMessage).setUuid(mUdn);
-                } else if (!mUdn.equals(getUuid())) {
+                final String uuid = getUuid();
+                if (TextUtils.isEmpty(uuid) && mSsdpMessage instanceof FakeSsdpMessage) {
+                    ((FakeSsdpMessage) mSsdpMessage).setUuid(mUdn);
+                } else if (!mUdn.equals(uuid)) {
                     throw new IllegalStateException("uuid and udn does not match! uuid=" + getUuid() + " udn=" + mUdn);
                 }
             }
@@ -647,7 +649,7 @@ public class DeviceImpl implements Device {
 
     @Override
     public void updateSsdpMessage(@Nonnull final SsdpMessage message) {
-        if (isPinned()) {
+        if (mSsdpMessage.isPinned()) {
             return;
         }
         if (!isEmbeddedDevice()) {
@@ -898,7 +900,7 @@ public class DeviceImpl implements Device {
 
     @Override
     public boolean isPinned() {
-        return mSsdpMessage instanceof PinnedSsdpMessage;
+        return mSsdpMessage.isPinned();
     }
 
     @Override

@@ -18,6 +18,11 @@ import javax.annotation.Nullable;
 
 public class EmptySsdpMessage implements SsdpMessage {
     @Override
+    public boolean isPinned() {
+        return false;
+    }
+
+    @Override
     public int getScopeId() {
         return 0;
     }

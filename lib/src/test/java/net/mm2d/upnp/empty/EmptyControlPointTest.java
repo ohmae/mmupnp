@@ -115,9 +115,15 @@ public class EmptyControlPointTest {
     }
 
     @Test
+    public void tryAddDevice() {
+        final ControlPoint controlPoint = new EmptyControlPoint();
+        controlPoint.tryAddDevice("", "");
+    }
+
+    @Test
     public void addPinnedDevice() {
         final ControlPoint controlPoint = new EmptyControlPoint();
-        controlPoint.addPinnedDevice("");
+        controlPoint.tryAddPinnedDevice("");
     }
 
     @Test

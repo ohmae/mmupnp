@@ -573,8 +573,8 @@ public class ControlPointTest {
         }
 
         @Test
-        public void addPinnedDevice() throws Exception {
-            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+        public void tryAddPinnedDevice() throws Exception {
+            mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
             Thread.sleep(1000); // 読み込みを待つ
             assertThat(mCp.getDeviceListSize(), is(1));
             final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
@@ -582,24 +582,24 @@ public class ControlPointTest {
         }
 
         @Test
-        public void addPinnedDevice2回目() throws Exception {
-            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+        public void tryAddPinnedDevice2回目() throws Exception {
+            mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
             Thread.sleep(1000); // 読み込みを待つ
             assertThat(mCp.getDeviceListSize(), is(1));
             final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
             assertThat(device.isPinned(), is(true));
 
-            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
         }
 
         @Test
-        public void addPinnedDevice_すでに発見済み() throws Exception {
+        public void tryAddPinnedDevice_すでに発見済み() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress address = InetAddress.getByName("192.0.2.3");
             final SsdpMessage message = new SsdpRequest(address, data, data.length);
             mCp.onAcceptSsdpMessage(message);
             Thread.sleep(1000); // 読み込みを待つ
-            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
             Thread.sleep(1000); // 読み込みを待つ
             assertThat(mCp.getDeviceListSize(), is(1));
             final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
@@ -607,7 +607,7 @@ public class ControlPointTest {
         }
 
         @Test
-        public void addPinnedDeviceの後に発見() throws Exception {
+        public void tryAddPinnedDeviceの後に発見() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress address = InetAddress.getByName("192.0.2.3");
             final SsdpMessage message = new SsdpRequest(address, data, data.length);
@@ -616,7 +616,7 @@ public class ControlPointTest {
             final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
             assertThat(device.isPinned(), is(false));
 
-            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
             Thread.sleep(1000); // 読み込みを待つ
             assertThat(mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef").isPinned(), is(true));
 
@@ -625,15 +625,15 @@ public class ControlPointTest {
         }
 
         @Test
-        public void addPinnedDevice_Exceptionが発生してもクラッシュしない() throws Exception {
+        public void tryAddPinnedDevice_Exceptionが発生してもクラッシュしない() throws Exception {
             doThrow(new IOException()).when(mHttpClient).downloadString(any());
-            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
             Thread.sleep(1000); // 読み込みを待つ
         }
 
         @Test
         public void removePinnedDevice() throws Exception {
-            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
             Thread.sleep(1000); // 読み込みを待つ
             assertThat(mCp.getDeviceListSize(), is(1));
 
@@ -643,7 +643,7 @@ public class ControlPointTest {
 
         @Test
         public void removePinnedDevice_before_load() throws Exception {
-            mCp.addPinnedDevice("http://192.0.2.2:12345/device.xml");
+            mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
             assertThat(mCp.getDeviceListSize(), is(0));
             mCp.removePinnedDevice("http://192.0.2.2:12345/device.xml");
             Thread.sleep(1000); // 読み込みを待つ

@@ -20,16 +20,32 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-public class PinnedSsdpMessage implements SsdpMessage {
+public class FakeSsdpMessage implements SsdpMessage {
     @Nonnull
     private final String mLocation;
     @Nonnull
-    private String mUuid = "";
+    private String mUuid;
     @Nullable
     private InetAddress mLocalAddress;
 
-    public PinnedSsdpMessage(@Nonnull final String location) {
+    private final boolean mPinned;
+
+    public FakeSsdpMessage(@Nonnull final String location) {
+        this("", location, true);
+    }
+
+    public FakeSsdpMessage(
+            @Nonnull final String uuid,
+            @Nonnull final String location,
+            final boolean pinned) {
+        mUuid = uuid;
         mLocation = location;
+        mPinned = pinned;
+    }
+
+    @Override
+    public boolean isPinned() {
+        return mPinned;
     }
 
     @Override

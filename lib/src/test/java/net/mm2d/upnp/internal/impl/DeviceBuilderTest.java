@@ -14,7 +14,7 @@ import net.mm2d.upnp.Icon;
 import net.mm2d.upnp.Service;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.manager.SubscribeManager;
-import net.mm2d.upnp.internal.message.PinnedSsdpMessage;
+import net.mm2d.upnp.internal.message.FakeSsdpMessage;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -302,7 +302,7 @@ public class DeviceBuilderTest {
 
     @Test
     public void build_PinnedSsdpMessage_update() {
-        final SsdpMessage message = mock(PinnedSsdpMessage.class);
+        final SsdpMessage message = mock(FakeSsdpMessage.class);
         doReturn("location").when(message).getLocation();
         final SsdpMessage newMessage = mock(SsdpMessage.class);
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
@@ -368,7 +368,7 @@ public class DeviceBuilderTest {
 
     @Test()
     public void onDownloadDescription() throws Exception {
-        final PinnedSsdpMessage message = mock(PinnedSsdpMessage.class);
+        final FakeSsdpMessage message = mock(FakeSsdpMessage.class);
         doReturn("location").when(message).getLocation();
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
         final HttpClient client = mock(HttpClient.class);
@@ -382,7 +382,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void onDownloadDescription_before_download() {
-        final PinnedSsdpMessage message = mock(PinnedSsdpMessage.class);
+        final FakeSsdpMessage message = mock(FakeSsdpMessage.class);
         doReturn("location").when(message).getLocation();
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
         final HttpClient client = new HttpClient();

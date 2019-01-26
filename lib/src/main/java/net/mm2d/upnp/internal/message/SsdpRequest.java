@@ -111,6 +111,11 @@ public class SsdpRequest implements SsdpMessage {
     }
 
     @Override
+    public boolean isPinned() {
+        return mDelegate.isPinned();
+    }
+
+    @Override
     public int getScopeId() {
         return mDelegate.getScopeId();
     }

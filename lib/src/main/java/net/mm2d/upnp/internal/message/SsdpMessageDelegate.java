@@ -107,6 +107,11 @@ class SsdpMessageDelegate implements SsdpMessage {
     }
 
     @Override
+    public boolean isPinned() {
+        return false;
+    }
+
+    @Override
     public int getScopeId() {
         if (mLocalAddress == null) {
             return 0;
