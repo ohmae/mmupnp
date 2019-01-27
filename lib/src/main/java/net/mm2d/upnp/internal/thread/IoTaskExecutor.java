@@ -18,27 +18,31 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class IoTaskExecutor implements TaskExecutor {
+class IoTaskExecutor implements TaskExecutor {
     @Nullable
     private ExecutorService mExecutor;
 
     IoTaskExecutor() {
-        this(createExecutor());
+        this(calculateMaximumPoolSize());
     }
 
+    IoTaskExecutor(final int maxThread) {
+        this(createExecutor(maxThread));
+    }
+
+    // VisibleForTesting
     IoTaskExecutor(@Nonnull final ExecutorService executor) {
         mExecutor = executor;
     }
 
     @Nonnull
-    private static ExecutorService createExecutor() {
+    private static ExecutorService createExecutor(final int maxThread) {
         final ThreadWorkQueue queue = new ThreadWorkQueue();
-        return new ThreadPoolExecutor(0, calculateMaximumPoolSize(),
-                1L, TimeUnit.MINUTES, queue, queue);
+        return new ThreadPoolExecutor(0, maxThread,1L, TimeUnit.MINUTES, queue, queue);
     }
 
     private static int calculateMaximumPoolSize() {
-        return Math.max(2, Runtime.getRuntime().availableProcessors());
+        return Math.max(2, Runtime.getRuntime().availableProcessors()) * 2;
     }
 
     @SuppressWarnings("Duplicates")

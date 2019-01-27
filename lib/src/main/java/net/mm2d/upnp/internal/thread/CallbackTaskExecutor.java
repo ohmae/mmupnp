@@ -16,7 +16,7 @@ import java.util.concurrent.RejectedExecutionException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CallbackTaskExecutor implements TaskExecutor {
+class CallbackTaskExecutor implements TaskExecutor {
     @Nullable
     private ExecutorService mExecutor;
 
@@ -24,6 +24,7 @@ public class CallbackTaskExecutor implements TaskExecutor {
         this(createExecutor());
     }
 
+    // VisibleForTesting
     CallbackTaskExecutor(@Nonnull final ExecutorService executor) {
         mExecutor = executor;
     }
