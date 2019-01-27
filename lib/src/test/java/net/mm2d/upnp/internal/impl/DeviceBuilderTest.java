@@ -304,6 +304,7 @@ public class DeviceBuilderTest {
     public void build_PinnedSsdpMessage_update() {
         final SsdpMessage message = mock(FakeSsdpMessage.class);
         doReturn("location").when(message).getLocation();
+        doReturn(true).when(message).isPinned();
         final SsdpMessage newMessage = mock(SsdpMessage.class);
         final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
         builder.updateSsdpMessage(newMessage);
