@@ -6,7 +6,7 @@ apply plugin: 'jacoco'
 def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
-def versionSuffix = "-alpha9"
+def versionSuffix = "-alpha10"
 def packageName = 'net.mm2d'
 def libraryId = 'mmupnp'
 def siteUrl = 'https://github.com/ohmae/mmupnp'
