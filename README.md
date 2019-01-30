@@ -190,17 +190,32 @@ This library use [log library](https://github.com/ohmae/log),
 If you want to enable debug log.
 
 ```java
-Log.initialize(true, true);
+Logger.setLogLevel(Logger.VERBOSE);
+Logger.setSender(Senders.create());
 ```
 
-If you want send log to some library. eg.
+In this case output to `System.out`
 
-```kotlin
-Log.setPrint { level, tag, message ->
-    if (level >= Log.DEBUG) {
-        SomeLogger.send("$tag $message")
+If you want send log to some library.
+
+eg. Simply change the output method.
+
+```java
+Logger.setSender(new DefaultSender((level, tag, message) -> {
+    for (final String line : message.split("\n")) {
+        android.util.Log.println(level, tag, line);
     }
-}
+}));
+```
+
+eg. If you want to handle exception.
+
+```java
+Logger.setSender((level, message, throwable) -> {
+    if (level >= Log.DEBUG) {
+        SomeLogger.send(...)
+    }
+});
 ```
 
 Please see [log library](https://github.com/ohmae/log) for more details
