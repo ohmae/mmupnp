@@ -8,6 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.ControlPointFactory.Params;
+import net.mm2d.upnp.internal.impl.ControlPointImpl;
 import net.mm2d.util.NetworkUtils;
 
 import org.junit.Test;
@@ -26,22 +27,41 @@ public class ControlPointFactoryTest {
 
     @Test
     public void create_インターフェース指定() throws Exception {
-        ControlPointFactory.create(NetworkUtils.getAvailableInet4Interfaces());
-        ControlPointFactory.create(Collections.emptyList());
+        ControlPointFactory.create(new Params()
+                .setInterfaces(NetworkUtils.getAvailableInet4Interfaces())
+        );
+        ControlPointFactory.create(new Params()
+                .setInterfaces(Collections.emptyList())
+        );
     }
 
     @Test
     public void create_インターフェース選別() throws Exception {
-        ControlPointFactory.create(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
-        ControlPointFactory.create(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
-        ControlPointFactory.create(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
+        ControlPointFactory.create(new Params()
+                .setProtocol(Protocol.IP_V4_ONLY)
+                .setInterfaces(NetworkUtils.getNetworkInterfaceList())
+        );
+        ControlPointFactory.create(new Params()
+                .setProtocol(Protocol.IP_V6_ONLY)
+                .setInterfaces(NetworkUtils.getNetworkInterfaceList())
+        );
+        ControlPointFactory.create(new Params()
+                .setProtocol(Protocol.DUAL_STACK)
+                .setInterfaces(NetworkUtils.getNetworkInterfaceList())
+        );
     }
 
     @Test
     public void create_プロトコルスタックのみ指定() throws Exception {
-        ControlPointFactory.create(Protocol.IP_V4_ONLY);
-        ControlPointFactory.create(Protocol.IP_V6_ONLY);
-        ControlPointFactory.create(Protocol.DUAL_STACK);
+        ControlPointFactory.create(new Params()
+                .setProtocol(Protocol.IP_V4_ONLY)
+        );
+        ControlPointFactory.create(new Params()
+                .setProtocol(Protocol.IP_V6_ONLY)
+        );
+        ControlPointFactory.create(new Params()
+                .setProtocol(Protocol.DUAL_STACK)
+        );
     }
 
     @Test

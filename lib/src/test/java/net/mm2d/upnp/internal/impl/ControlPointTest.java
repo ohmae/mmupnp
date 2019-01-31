@@ -11,6 +11,7 @@ import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
 import net.mm2d.upnp.ControlPointFactory;
+import net.mm2d.upnp.ControlPointFactory.Params;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.HttpClient;
 import net.mm2d.upnp.Icon;
@@ -100,7 +101,7 @@ public class ControlPointTest {
 
         @Test(timeout = 1000L)
         public void terminate() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create((Collection<NetworkInterface>) null);
+            final ControlPoint cp = ControlPointFactory.create();
             cp.terminate();
         }
 
@@ -170,7 +171,10 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_DUAL_STACK() throws Exception {
-            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.DUAL_STACK, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(new Params()
+                    .setProtocol(Protocol.DUAL_STACK)
+                    .setInterfaces(NetworkUtils.getNetworkInterfaceList())
+            );
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -184,7 +188,10 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V4_ONLY() throws Exception {
-            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.IP_V4_ONLY, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(new Params()
+                    .setProtocol(Protocol.IP_V4_ONLY)
+                    .setInterfaces(NetworkUtils.getNetworkInterfaceList())
+            );
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(true));
@@ -198,7 +205,10 @@ public class ControlPointTest {
 
         @Test
         public void needToUpdateSsdpMessage_IP_V6_ONLY() throws Exception {
-            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(Protocol.IP_V6_ONLY, NetworkUtils.getNetworkInterfaceList());
+            final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create(new Params()
+                    .setProtocol(Protocol.IP_V6_ONLY)
+                    .setInterfaces(NetworkUtils.getNetworkInterfaceList())
+            );
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("fe80::1:1:1:1")), is(true));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("169.254.1.1")), is(false));
             assertThat(cp.needToUpdateSsdpMessage(makeAddressMock("fe80::1:1:1:1"), makeAddressMock("192.168.1.1")), is(false));
