@@ -67,7 +67,7 @@ public class SubscribeManager implements EventMessageListener {
             @Nullable final String value) {
         final StateVariable variable = service.findStateVariable(name);
         if (variable == null || !variable.isSendEvents() || value == null) {
-            Logger.w("illegal notify argument: " + name + " " + value);
+            Logger.w(() -> "illegal notify argument: " + name + " " + value);
             return;
         }
         mNotifyEventListener.onNotifyEvent(service, seq, variable.getName(), value);

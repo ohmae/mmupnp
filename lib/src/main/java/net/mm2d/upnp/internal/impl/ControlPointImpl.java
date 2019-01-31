@@ -442,7 +442,7 @@ public class ControlPointImpl implements ControlPoint {
                 discoverDevice(device);
             }
         } catch (final IOException | IllegalStateException | SAXException | ParserConfigurationException e) {
-            Logger.w("fail to load:\n" + builder.getLocation(), e);
+            Logger.w(() -> "fail to load:\n" + builder.getLocation(), e);
         } finally {
             client.close();
         }

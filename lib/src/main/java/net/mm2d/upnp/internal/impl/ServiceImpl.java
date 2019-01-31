@@ -308,7 +308,7 @@ public class ServiceImpl implements Service {
                     if (variable == null) {
                         throw new IllegalStateException("There is no StateVariable " + name);
                     }
-                    Logger.w("Invalid description. relatedStateVariable name has unnecessary blanks ["
+                    Logger.w(() -> "Invalid description. relatedStateVariable name has unnecessary blanks ["
                             + name + "] on " + service.getServiceId());
                     argumentBuilder.setRelatedStateVariableName(trimmedName);
                 }
