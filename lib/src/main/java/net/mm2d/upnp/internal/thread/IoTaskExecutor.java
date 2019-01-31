@@ -8,6 +8,7 @@
 package net.mm2d.upnp.internal.thread;
 
 import net.mm2d.log.Logger;
+import net.mm2d.upnp.Property;
 import net.mm2d.upnp.TaskExecutor;
 
 import java.util.concurrent.ExecutorService;
@@ -19,6 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 class IoTaskExecutor implements TaskExecutor {
+    private static final long AWAIT_TIMEOUT = Property.DEFAULT_TIMEOUT;
     @Nullable
     private ExecutorService mExecutor;
 
@@ -68,7 +70,7 @@ class IoTaskExecutor implements TaskExecutor {
         }
         try {
             executor.shutdown();
-            if (!executor.awaitTermination(1, TimeUnit.MILLISECONDS)) {
+            if (!executor.awaitTermination(AWAIT_TIMEOUT, TimeUnit.MILLISECONDS)) {
                 executor.shutdownNow();
             }
         } catch (final InterruptedException e) {
