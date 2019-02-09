@@ -169,7 +169,7 @@ public class HttpResponseTest {
     @Test
     public void setStatusLine_version_status_phraseに反映される() {
         final HttpResponse response = HttpResponse.create();
-        response.setStatusLine("HTTP/1.1 200 OK");
+        response.setStartLine("HTTP/1.1 200 OK");
 
         assertThat(response.getVersion(), is(Http.HTTP_1_1));
         assertThat(response.getStatusCode(), is(200));
@@ -180,7 +180,7 @@ public class HttpResponseTest {
     @Test
     public void setStatusLine_version_status_phraseに反映される2() {
         final HttpResponse response = HttpResponse.create();
-        response.setStatusLine("HTTP/1.1 404 Not Found");
+        response.setStartLine("HTTP/1.1 404 Not Found");
 
         assertThat(response.getVersion(), is(Http.HTTP_1_1));
         assertThat(response.getStatusCode(), is(404));
@@ -191,7 +191,7 @@ public class HttpResponseTest {
     @Test(expected = IllegalArgumentException.class)
     public void setStatusLine_不足がある場合Exception() {
         final HttpResponse response = HttpResponse.create();
-        response.setStatusLine("HTTP/1.1 404");
+        response.setStartLine("HTTP/1.1 404");
     }
 
     @Test

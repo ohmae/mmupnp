@@ -206,41 +206,13 @@ public class HttpRequest implements HttpMessage {
     @Nonnull
     @Override
     public HttpRequest setStartLine(@Nonnull final String line) {
-        return setRequestLine(line);
+        mStartLine.setStartLine(line);
+        return this;
     }
 
     @Nonnull
     @Override
     public String getStartLine() {
-        return getRequestLine();
-    }
-
-    /**
-     * リクエストラインを設定する。
-     *
-     * <p>{@link #setStartLine(String)}のエイリアス。
-     *
-     * @param line リクエストライン
-     * @return HttpRequest
-     * @see #setStartLine(String)
-     */
-    // VisibleForTesting
-    @Nonnull
-    HttpRequest setRequestLine(@Nonnull final String line) {
-        mStartLine.setStartLine(line);
-        return this;
-    }
-
-    /**
-     * リクエストラインを返す。
-     *
-     * <p>{@link #getStartLine()}のエイリアス。
-     *
-     * @return リクエストライン
-     * @see #getStartLine()
-     */
-    @Nonnull
-    private String getRequestLine() {
         return mStartLine.getStartLine();
     }
 

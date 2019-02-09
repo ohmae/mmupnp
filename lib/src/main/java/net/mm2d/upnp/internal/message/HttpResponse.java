@@ -155,41 +155,13 @@ public class HttpResponse implements HttpMessage {
     @Nonnull
     @Override
     public HttpResponse setStartLine(@Nonnull final String line) {
-        return setStatusLine(line);
+        mStartLine.setStartLine(line);
+        return this;
     }
 
     @Nonnull
     @Override
     public String getStartLine() {
-        return getStatusLine();
-    }
-
-    /**
-     * ステータスラインを設定する。
-     *
-     * <p>{@link #setStartLine(String)}のエイリアス。
-     *
-     * @param line ステータスライン
-     * @return HttpResponse
-     * @see #setStartLine(String)
-     */
-    // VisibleForTesting
-    @Nonnull
-    public HttpResponse setStatusLine(@Nonnull final String line) {
-        mStartLine.setStartLine(line);
-        return this;
-    }
-
-    /**
-     * ステータスラインを返す。
-     *
-     * <p>{@link #getStartLine()}のエイリアス。
-     *
-     * @return ステータスライン
-     * @see #getStartLine()
-     */
-    @Nonnull
-    private String getStatusLine() {
         return mStartLine.getStartLine();
     }
 

@@ -685,14 +685,14 @@ public class ServiceTest {
         @Test
         public void parseTimeout_情報がない場合デフォルト() {
             final HttpResponse response = HttpResponse.create();
-            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setStartLine("HTTP/1.1 200 OK");
             assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
         public void parseTimeout_infiniteの場合デフォルト() {
             final HttpResponse response = HttpResponse.create();
-            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setStartLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "infinite");
             assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
@@ -700,7 +700,7 @@ public class ServiceTest {
         @Test
         public void parseTimeout_secondの指定通り() {
             final HttpResponse response = HttpResponse.create();
-            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setStartLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "second-100");
             assertThat(ServiceImpl.parseTimeout(response), is(TimeUnit.SECONDS.toMillis(100)));
         }
@@ -708,7 +708,7 @@ public class ServiceTest {
         @Test
         public void parseTimeout_フォーマットエラーはデフォルト() {
             final HttpResponse response = HttpResponse.create();
-            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setStartLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "seconds-100");
             assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
 

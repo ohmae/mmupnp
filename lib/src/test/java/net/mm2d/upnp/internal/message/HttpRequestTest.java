@@ -175,7 +175,7 @@ public class HttpRequestTest {
     @Test
     public void setRequestLine_method_uri_versionに反映される() {
         final HttpRequest request = HttpRequest.create();
-        request.setRequestLine("GET /cds/control HTTP/1.1");
+        request.setStartLine("GET /cds/control HTTP/1.1");
 
         assertThat(request.getMethod(), is(Http.GET));
         assertThat(request.getUri(), is("/cds/control"));
@@ -185,7 +185,7 @@ public class HttpRequestTest {
     @Test(expected = IllegalArgumentException.class)
     public void setRequestLine_不足があればException() {
         final HttpRequest request = HttpRequest.create();
-        request.setRequestLine("GET /cds/control");
+        request.setStartLine("GET /cds/control");
     }
 
     @Test

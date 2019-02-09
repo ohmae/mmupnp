@@ -37,7 +37,7 @@ public class HttpClientTest {
         server.setServerCore((socket, is, os) -> {
             final HttpRequest request = HttpRequest.create().readData(is);
             final HttpResponse response = HttpResponse.create();
-            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setStartLine("HTTP/1.1 200 OK");
             response.setBody(responseBody, true);
             if (request.isKeepAlive()) {
                 response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
@@ -72,7 +72,7 @@ public class HttpClientTest {
         server.setServerCore((socket, is, os) -> {
             final HttpRequest request = HttpRequest.create().readData(is);
             final HttpResponse response = HttpResponse.create();
-            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setStartLine("HTTP/1.1 200 OK");
             response.setBodyBinary(responseBody, true);
             if (request.isKeepAlive()) {
                 response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
@@ -108,7 +108,7 @@ public class HttpClientTest {
         server.setServerCore((socket, is, os) -> {
             final HttpRequest request = HttpRequest.create().readData(is);
             final HttpResponse response = HttpResponse.create();
-            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setStartLine("HTTP/1.1 200 OK");
             response.setBody(responseBody, true);
             if (request.isKeepAlive()) {
                 response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE);
@@ -144,7 +144,7 @@ public class HttpClientTest {
         server.setServerCore((socket, is, os) -> {
             final HttpRequest request = HttpRequest.create().readData(is);
             final HttpResponse response = HttpResponse.create();
-            response.setStatusLine("HTTP/1.1 200 OK");
+            response.setStartLine("HTTP/1.1 200 OK");
             response.setBody(responseBody, true);
             response.setHeader(Http.CONNECTION, Http.CLOSE);
             response.writeData(os);
@@ -175,7 +175,7 @@ public class HttpClientTest {
             final HttpRequest request = HttpRequest.create().readData(is);
             final HttpResponse response = HttpResponse.create();
             response.setHeader(Http.CONNECTION, Http.CLOSE);
-            response.setStatusLine("HTTP/1.1 301 Moved Permanently");
+            response.setStartLine("HTTP/1.1 301 Moved Permanently");
             response.setHeader(Http.LOCATION, "http://127.0.0.1:" + port + "/b");
             response.setBody("a", true);
             response.writeData(os);
@@ -205,12 +205,12 @@ public class HttpClientTest {
             final HttpResponse response = HttpResponse.create();
             response.setHeader(Http.CONNECTION, Http.CLOSE);
             if (request.getUri().equals("/b")) {
-                response.setStatusLine("HTTP/1.1 200 OK");
+                response.setStartLine("HTTP/1.1 200 OK");
                 response.setBody("b", true);
                 response.writeData(os);
                 return false;
             }
-            response.setStatusLine("HTTP/1.1 301 Moved Permanently");
+            response.setStartLine("HTTP/1.1 301 Moved Permanently");
             response.setHeader(Http.LOCATION, "http://127.0.0.1:" + port + "/b");
             response.setBody("a", true);
             response.writeData(os);
@@ -239,12 +239,12 @@ public class HttpClientTest {
             final HttpResponse response = HttpResponse.create();
             response.setHeader(Http.CONNECTION, Http.CLOSE);
             if (request.getUri().equals("/b")) {
-                response.setStatusLine("HTTP/1.1 200 OK");
+                response.setStartLine("HTTP/1.1 200 OK");
                 response.setBody("b", true);
                 response.writeData(os);
                 return false;
             }
-            response.setStatusLine("HTTP/1.1 301 Moved Permanently");
+            response.setStartLine("HTTP/1.1 301 Moved Permanently");
             response.setBody("a", true);
             response.writeData(os);
             return false;
@@ -322,7 +322,7 @@ public class HttpClientTest {
     public void download_HTTP_OKでなければException() throws Exception {
         final HttpClient client = spy(new HttpClient());
         final HttpResponse response = HttpResponse.create();
-        response.setStatusLine("HTTP/1.1 404 Not Found");
+        response.setStartLine("HTTP/1.1 404 Not Found");
         doReturn(response).when(client).post(ArgumentMatchers.any(HttpRequest.class));
         client.download(new URL("http://www.example.com/index.html"));
     }
@@ -331,7 +331,7 @@ public class HttpClientTest {
     public void download_bodyがnullならException() throws Exception {
         final HttpClient client = spy(new HttpClient());
         final HttpResponse response = HttpResponse.create();
-        response.setStatusLine("HTTP/1.1 200 OK");
+        response.setStartLine("HTTP/1.1 200 OK");
         doReturn(response).when(client).post(ArgumentMatchers.any(HttpRequest.class));
         client.download(new URL("http://www.example.com/index.html"));
     }
