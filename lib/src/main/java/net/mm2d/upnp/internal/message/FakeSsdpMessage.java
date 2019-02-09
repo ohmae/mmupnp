@@ -31,12 +31,12 @@ public class FakeSsdpMessage implements SsdpMessage {
     private final boolean mPinned;
 
     public FakeSsdpMessage(@Nonnull final String location) {
-        this("", location, true);
+        this(location, "", true);
     }
 
     public FakeSsdpMessage(
-            @Nonnull final String uuid,
             @Nonnull final String location,
+            @Nonnull final String uuid,
             final boolean pinned) {
         mUuid = uuid;
         mLocation = location;

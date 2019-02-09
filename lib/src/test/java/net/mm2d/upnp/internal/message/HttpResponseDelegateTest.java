@@ -8,7 +8,6 @@
 package net.mm2d.upnp.internal.message;
 
 import net.mm2d.upnp.Http;
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate;
 import net.mm2d.upnp.internal.message.HttpResponse.StartLine;
 
 import org.junit.Before;

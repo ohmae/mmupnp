@@ -8,7 +8,6 @@
 package net.mm2d.upnp;
 
 import net.mm2d.upnp.ControlPointFactory.Params;
-import net.mm2d.upnp.internal.impl.ControlPointImpl;
 import net.mm2d.util.NetworkUtils;
 
 import org.junit.Test;

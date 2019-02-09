@@ -405,7 +405,7 @@ public class ControlPointImpl implements ControlPoint {
                 return;
             }
         }
-        final FakeSsdpMessage message = new FakeSsdpMessage(uuid, location, false);
+        final FakeSsdpMessage message = new FakeSsdpMessage(location, uuid, false);
         loadDevice(uuid, new DeviceImpl.Builder(this, mSubscribeManager, message));
     }
 

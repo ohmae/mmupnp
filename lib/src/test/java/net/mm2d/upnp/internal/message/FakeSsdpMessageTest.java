@@ -31,9 +31,9 @@ public class FakeSsdpMessageTest {
 
     @Test
     public void isPinned() {
-        SsdpMessage message = new FakeSsdpMessage("", LOCATION, true);
+        SsdpMessage message = new FakeSsdpMessage(LOCATION, "", true);
         assertThat(message.isPinned(), is(true));
-        message = new FakeSsdpMessage("", LOCATION, false);
+        message = new FakeSsdpMessage(LOCATION, "", false);
         assertThat(message.isPinned(), is(false));
     }
 
