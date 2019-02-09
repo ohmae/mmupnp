@@ -444,7 +444,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_読み込み済みデバイスにないbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
             final InetAddress addr = InetAddress.getByName("192.0.2.3");
-            final SsdpMessage message = new SsdpRequest(addr, data, data.length);
+            final SsdpMessage message = SsdpRequest.create(addr, data, data.length);
             mCp.onAcceptSsdpMessage(message);
             verify(mLoadingDeviceMap).remove(anyString());
         }
@@ -453,7 +453,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_読み込み済みデバイスのbyebye受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
             final InetAddress addr = InetAddress.getByName("192.0.2.3");
-            final SsdpMessage message = new SsdpRequest(addr, data, data.length);
+            final SsdpMessage message = SsdpRequest.create(addr, data, data.length);
             final Device device = mock(Device.class);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(udn).when(device).getUdn();
@@ -467,7 +467,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_alive受信後失敗() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress addr = InetAddress.getByName("192.0.2.3");
-            final SsdpMessage message = new SsdpRequest(addr, data, data.length);
+            final SsdpMessage message = SsdpRequest.create(addr, data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(new HttpClient(true) {
                 @Nonnull
@@ -508,7 +508,7 @@ public class ControlPointTest {
                     .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress address = InetAddress.getByName("192.0.2.3");
-            final SsdpMessage message = new SsdpRequest(address, data, data.length);
+            final SsdpMessage message = SsdpRequest.create(address, data, data.length);
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             doReturn(httpClient).when(mCp).createHttpClient();
             final IconFilter iconFilter = spy(new IconFilter() {
@@ -534,7 +534,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_読み込み済みデバイスのalive受信() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress addr = InetAddress.getByName("192.0.2.3");
-            final SsdpMessage message = new SsdpRequest(addr, data, data.length);
+            final SsdpMessage message = SsdpRequest.create(addr, data, data.length);
             final Device device = mock(Device.class);
             doReturn(message).when(device).getSsdpMessage();
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
@@ -548,11 +548,11 @@ public class ControlPointTest {
         public void onReceiveSsdp_ロード中デバイスのalive受信() throws Exception {
             final byte[] data1 = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin");
             final InetAddress addr = InetAddress.getByName("192.0.2.3");
-            final SsdpMessage message1 = new SsdpRequest(addr, data1, data1.length);
+            final SsdpMessage message1 = SsdpRequest.create(addr, data1, data1.length);
             final DeviceImpl.Builder deviceBuilder = spy(new DeviceImpl.Builder(mCp, mock(SubscribeManager.class), message1));
             mLoadingDeviceMap.put(deviceBuilder.getUuid(), deviceBuilder);
             final byte[] data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage message2 = new SsdpRequest(addr, data2, data2.length);
+            final SsdpMessage message2 = SsdpRequest.create(addr, data2, data2.length);
             mCp.onAcceptSsdpMessage(message2);
             verify(deviceBuilder).updateSsdpMessage(message2);
         }
@@ -606,7 +606,7 @@ public class ControlPointTest {
         public void tryAddPinnedDevice_すでに発見済み() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress address = InetAddress.getByName("192.0.2.3");
-            final SsdpMessage message = new SsdpRequest(address, data, data.length);
+            final SsdpMessage message = SsdpRequest.create(address, data, data.length);
             mCp.onAcceptSsdpMessage(message);
             Thread.sleep(1000); // 読み込みを待つ
             mCp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml");
@@ -620,7 +620,7 @@ public class ControlPointTest {
         public void tryAddPinnedDeviceの後に発見() throws Exception {
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress address = InetAddress.getByName("192.0.2.3");
-            final SsdpMessage message = new SsdpRequest(address, data, data.length);
+            final SsdpMessage message = SsdpRequest.create(address, data, data.length);
             mCp.onAcceptSsdpMessage(message);
             Thread.sleep(1000); // 読み込みを待つ
             final Device device = mCp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef");
@@ -758,7 +758,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_ResponseListenerから伝搬() throws Exception {
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin");
-            final SsdpResponse message = new SsdpResponse(mock(InetAddress.class), data, data.length);
+            final SsdpResponse message = SsdpResponse.create(mock(InetAddress.class), data, data.length);
             mResponseListener.onReceiveResponse(message);
             Thread.sleep(100);
             verify(mDeviceHolder).get(udn);
@@ -769,7 +769,7 @@ public class ControlPointTest {
         public void onReceiveSsdp_NotifyListenerから伝搬() throws Exception {
             final String udn = "uuid:01234567-89ab-cdef-0123-456789abcdef";
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin");
-            final SsdpRequest message = new SsdpRequest(mock(InetAddress.class), data, data.length);
+            final SsdpRequest message = SsdpRequest.create(mock(InetAddress.class), data, data.length);
             mNotifyListener.onReceiveNotify(message);
             Thread.sleep(100);
             verify(mDeviceHolder).get(udn);
@@ -902,7 +902,7 @@ public class ControlPointTest {
                     new DiFactory(Protocol.DEFAULT)));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final InetAddress addr = InetAddress.getByName("192.0.2.3");
-            mSsdpMessage = new SsdpRequest(addr, data, data.length);
+            mSsdpMessage = SsdpRequest.create(addr, data, data.length);
         }
 
         @Test

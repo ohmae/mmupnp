@@ -159,7 +159,7 @@ public class SsdpServerDelegateTest {
         final MulticastSocket socket = mock(MulticastSocket.class);
         doReturn(socket).when(server).createMulticastSocket(anyInt());
 
-        final SsdpRequest message = new SsdpRequest();
+        final SsdpRequest message = SsdpRequest.create();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, server.getSsdpAddressString());
@@ -179,7 +179,7 @@ public class SsdpServerDelegateTest {
         final MockMulticastSocket socket = spy(new MockMulticastSocket());
         doReturn(socket).when(server).createMulticastSocket(anyInt());
 
-        final SsdpRequest message = new SsdpRequest();
+        final SsdpRequest message = SsdpRequest.create();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, server.getSsdpAddressString());
@@ -206,7 +206,7 @@ public class SsdpServerDelegateTest {
         doReturn(socket).when(server).createMulticastSocket(anyInt());
         doThrow(new IOException()).when(socket).send(ArgumentMatchers.any(DatagramPacket.class));
 
-        final SsdpRequest message = new SsdpRequest();
+        final SsdpRequest message = SsdpRequest.create();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, server.getSsdpAddressString());
@@ -422,7 +422,7 @@ public class SsdpServerDelegateTest {
 
     private static SsdpResponse makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpResponse(mock(InetAddress.class), data, data.length);
+        return SsdpResponse.create(mock(InetAddress.class), data, data.length);
     }
 
     @Test

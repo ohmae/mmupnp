@@ -145,7 +145,7 @@ public class SsdpNotifyReceiver implements SsdpServer {
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        return new SsdpRequest(getLocalAddress(), data, length);
+        return SsdpRequest.create(getLocalAddress(), data, length);
     }
 
     // VisibleForTesting

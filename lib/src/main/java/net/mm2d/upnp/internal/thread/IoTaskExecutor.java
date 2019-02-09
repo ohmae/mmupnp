@@ -40,7 +40,7 @@ class IoTaskExecutor implements TaskExecutor {
     @Nonnull
     private static ExecutorService createExecutor(final int maxThread) {
         final ThreadWorkQueue queue = new ThreadWorkQueue();
-        return new ThreadPoolExecutor(0, maxThread,1L, TimeUnit.MINUTES, queue, queue);
+        return new ThreadPoolExecutor(0, maxThread, 1L, TimeUnit.MINUTES, queue, queue);
     }
 
     private static int calculateMaximumPoolSize() {

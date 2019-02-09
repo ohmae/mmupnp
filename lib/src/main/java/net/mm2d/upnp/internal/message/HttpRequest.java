@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.message;
 
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpMessage;
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineProcessor;
+import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate;
 import net.mm2d.util.NetworkUtils;
 import net.mm2d.util.TextUtils;
 
@@ -36,35 +36,86 @@ public class HttpRequest implements HttpMessage {
     private InetAddress mAddress;
 
     private int mPort;
-
     @Nonnull
-    private String mMethod = "GET";
-    @Nonnull
-    private String mUri = "";
+    private final StartLine mStartLine;
 
-    private class Processor implements StartLineProcessor {
+    static class StartLine implements StartLineDelegate {
+        @Nonnull
+        private String mMethod;
+        @Nonnull
+        private String mUri;
+        @Nonnull
+        private String mVersion;
+
+        StartLine() {
+            mMethod = Http.GET;
+            mUri = "";
+            mVersion = Http.DEFAULT_HTTP_VERSION;
+        }
+
+        StartLine(@Nonnull final StartLine original) {
+            mMethod = original.mMethod;
+            mUri = original.mUri;
+            mVersion = original.mVersion;
+        }
+
+        @Nonnull
+        public String getMethod() {
+            return mMethod;
+        }
+
+        @Nonnull
+        public void setMethod(@Nonnull final String method) {
+            mMethod = method;
+        }
+
+        @Nonnull
+        public String getUri() {
+            return mUri;
+        }
+
+        @Nonnull
+        public void setUri(@Nonnull final String uri) {
+            mUri = uri;
+        }
+
+        @Nonnull
+        @Override
+        public String getVersion() {
+            return mVersion;
+        }
+
+        @Nonnull
+        @Override
+        public void setVersion(@Nonnull final String version) {
+            mVersion = version;
+        }
+
         @Override
         public void setStartLine(@Nonnull final String line) {
-            HttpRequest.this.setStartLine(line);
+            final String[] params = line.split(" ", 3);
+            if (params.length < 3) {
+                throw new IllegalArgumentException();
+            }
+            setMethod(params[0]);
+            setUri(params[1]);
+            setVersion(params[2]);
         }
 
         @Nonnull
         @Override
         public String getStartLine() {
-            return HttpRequest.this.getStartLine();
+            return getMethod() + " " + getUri() + " " + getVersion();
         }
     }
 
     /**
      * インスタンス作成。
      */
-    public HttpRequest() {
-        mDelegate = new HttpMessageDelegate(new Processor());
-    }
-
-    // VisibleForTesting
-    HttpRequest(@Nonnull final HttpMessageDelegate delegate) {
-        mDelegate = delegate;
+    public static HttpRequest create() {
+        final StartLine startLine = new StartLine();
+        final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine);
+        return new HttpRequest(startLine, delegate);
     }
 
     /**
@@ -72,12 +123,21 @@ public class HttpRequest implements HttpMessage {
      *
      * @param original コピー元
      */
-    public HttpRequest(@Nonnull final HttpRequest original) {
-        mDelegate = new HttpMessageDelegate(new Processor(), original.mDelegate);
-        mAddress = original.mAddress;
-        mPort = original.mPort;
-        mMethod = original.mMethod;
-        mUri = original.mUri;
+    public static HttpRequest copy(@Nonnull final HttpRequest original) {
+        final StartLine startLine = new StartLine(original.mStartLine);
+        final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine, original.mDelegate);
+        final HttpRequest request = new HttpRequest(startLine, delegate);
+        request.mAddress = original.mAddress;
+        request.mPort = original.mPort;
+        return request;
+    }
+
+    // VisibleForTesting
+    HttpRequest(
+            @Nonnull final StartLine startLine,
+            @Nonnull final HttpMessageDelegate delegate) {
+        mStartLine = startLine;
+        mDelegate = delegate;
     }
 
     /**
@@ -167,13 +227,7 @@ public class HttpRequest implements HttpMessage {
     // VisibleForTesting
     @Nonnull
     HttpRequest setRequestLine(@Nonnull final String line) {
-        final String[] params = line.split(" ", 3);
-        if (params.length < 3) {
-            throw new IllegalArgumentException();
-        }
-        setMethod(params[0]);
-        setUri(params[1]);
-        setVersion(params[2]);
+        mStartLine.setStartLine(line);
         return this;
     }
 
@@ -187,7 +241,7 @@ public class HttpRequest implements HttpMessage {
      */
     @Nonnull
     private String getRequestLine() {
-        return getMethod() + " " + getUri() + " " + getVersion();
+        return mStartLine.getStartLine();
     }
 
     /**
@@ -242,7 +296,7 @@ public class HttpRequest implements HttpMessage {
      */
     @Nonnull
     public String getMethod() {
-        return mMethod;
+        return mStartLine.getMethod();
     }
 
     /**
@@ -253,7 +307,7 @@ public class HttpRequest implements HttpMessage {
      */
     @Nonnull
     public HttpRequest setMethod(@Nonnull final String method) {
-        mMethod = method;
+        mStartLine.setMethod(method);
         return this;
     }
 
@@ -264,7 +318,7 @@ public class HttpRequest implements HttpMessage {
      */
     @Nonnull
     public String getUri() {
-        return mUri;
+        return mStartLine.getUri();
     }
 
     /**
@@ -279,7 +333,7 @@ public class HttpRequest implements HttpMessage {
      */
     @Nonnull
     public HttpRequest setUri(@Nonnull final String uri) {
-        mUri = uri;
+        mStartLine.setUri(uri);
         return this;
     }
 

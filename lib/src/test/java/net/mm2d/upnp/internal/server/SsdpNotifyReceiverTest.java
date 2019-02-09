@@ -101,7 +101,7 @@ public class SsdpNotifyReceiverTest {
         final NotifyListener listener = mock(NotifyListener.class);
         receiver.setNotifyListener(listener);
 
-        final SsdpRequest message = new SsdpRequest();
+        final SsdpRequest message = SsdpRequest.create();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, Address.IP_V4.getAddressString());

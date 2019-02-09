@@ -36,14 +36,14 @@ public class SsdpRequestTest {
 
     private static SsdpRequest makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpRequest(mock(InetAddress.class), data, data.length);
+        return SsdpRequest.create(mock(InetAddress.class), data, data.length);
     }
 
     @RunWith(JUnit4.class)
     public static class 作成 {
         @Test
         public void buildUp_所望のバイナリに変換できる() throws IOException {
-            final SsdpRequest message = new SsdpRequest();
+            final SsdpRequest message = SsdpRequest.create();
             message.setMethod(SsdpMessage.M_SEARCH);
             message.setUri("*");
             message.setHeader(Http.HOST, Address.IP_V4.getAddressString());

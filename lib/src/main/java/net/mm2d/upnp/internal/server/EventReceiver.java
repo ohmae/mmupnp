@@ -272,17 +272,17 @@ public class EventReceiver {
 
     // VisibleForTesting
     static class ClientTask implements Runnable {
-        private static final HttpResponse RESPONSE_OK = new HttpResponse()
+        private static final HttpResponse RESPONSE_OK = HttpResponse.create()
                 .setStatus(Http.Status.HTTP_OK)
                 .setHeader(Http.SERVER, Property.SERVER_VALUE)
                 .setHeader(Http.CONNECTION, Http.CLOSE)
                 .setHeader(Http.CONTENT_LENGTH, "0");
-        private static final HttpResponse RESPONSE_BAD = new HttpResponse()
+        private static final HttpResponse RESPONSE_BAD = HttpResponse.create()
                 .setStatus(Http.Status.HTTP_BAD_REQUEST)
                 .setHeader(Http.SERVER, Property.SERVER_VALUE)
                 .setHeader(Http.CONNECTION, Http.CLOSE)
                 .setHeader(Http.CONTENT_LENGTH, "0");
-        private static final HttpResponse RESPONSE_FAIL = new HttpResponse()
+        private static final HttpResponse RESPONSE_FAIL = HttpResponse.create()
                 .setStatus(Http.Status.HTTP_PRECON_FAILED)
                 .setHeader(Http.SERVER, Property.SERVER_VALUE)
                 .setHeader(Http.CONNECTION, Http.CLOSE)
@@ -356,7 +356,7 @@ public class EventReceiver {
                 @Nonnull final InputStream is,
                 @Nonnull final OutputStream os)
                 throws IOException {
-            final HttpRequest request = new HttpRequest().readData(is);
+            final HttpRequest request = HttpRequest.create().readData(is);
             Logger.v(() -> "receive event:\n" + request);
             final String nt = request.getHeader(Http.NT);
             final String nts = request.getHeader(Http.NTS);

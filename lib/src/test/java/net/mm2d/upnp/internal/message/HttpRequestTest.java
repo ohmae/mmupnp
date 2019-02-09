@@ -34,7 +34,7 @@ public class HttpRequestTest {
 
     @Test
     public void setMethod_getMethodに反映される() {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setMethod(Http.GET);
 
         assertThat(request.getMethod(), is(Http.GET));
@@ -42,7 +42,7 @@ public class HttpRequestTest {
 
     @Test
     public void setUrl_getAddress_getPort_getUriに反映される() throws IOException {
-        final HttpRequest request = new HttpRequest()
+        final HttpRequest request = HttpRequest.create()
                 .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
         final int port = 12345;
         final InetAddress address = InetAddress.getByName("192.0.2.2");
@@ -58,7 +58,7 @@ public class HttpRequestTest {
 
     @Test
     public void setUrl_getAddress_getPort_getUriに反映される1() throws IOException {
-        final HttpRequest request = new HttpRequest()
+        final HttpRequest request = HttpRequest.create()
                 .setUrl(new URL("http://[2001:db8::1]:12345/cds/control"), true);
         final int port = 12345;
         final InetAddress address = InetAddress.getByName("2001:db8::1");
@@ -74,17 +74,17 @@ public class HttpRequestTest {
 
     @Test(expected = IOException.class)
     public void setUrl_http以外はException() throws IOException {
-        new HttpRequest().setUrl(new URL("https://192.0.2.2:12345/cds/control"), true);
+        HttpRequest.create().setUrl(new URL("https://192.0.2.2:12345/cds/control"), true);
     }
 
     @Test(expected = IOException.class)
     public void setUrl_portがUnsignedShortMax以上ならException() throws IOException {
-        new HttpRequest().setUrl(new URL("http://192.0.2.2:65536/cds/control"), true);
+        HttpRequest.create().setUrl(new URL("http://192.0.2.2:65536/cds/control"), true);
     }
 
     @Test
     public void setUrl_falseではHOSTに反映されない() throws IOException {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setUrl(new URL("http://192.0.2.2:12345/cds/control"));
 
         assertThat(request.getHeader(Http.HOST), is(nullValue()));
@@ -93,7 +93,7 @@ public class HttpRequestTest {
     @Test
     public void readData_読み込めること() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-length.bin");
-        final HttpRequest request = new HttpRequest().readData(is);
+        final HttpRequest request = HttpRequest.create().readData(is);
 
         assertThat(request.getMethod(), is(Http.POST));
         assertThat(request.getUri(), is("/cds/control"));
@@ -107,7 +107,7 @@ public class HttpRequestTest {
     @Test
     public void readData_Chunk読み込めること() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-chunked.bin");
-        final HttpRequest request = new HttpRequest().readData(is);
+        final HttpRequest request = HttpRequest.create().readData(is);
 
         assertThat(request.getMethod(), is(Http.POST));
         assertThat(request.getUri(), is("/cds/control"));
@@ -122,7 +122,7 @@ public class HttpRequestTest {
     @Test
     public void writeData_書き出しができること() throws IOException {
         final String soap = TestUtils.getResourceAsString("browse-request.xml");
-        final HttpRequest request = new HttpRequest()
+        final HttpRequest request = HttpRequest.create()
                 .setMethod(Http.POST)
                 .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true)
                 .setHeader(Http.SOAPACTION, ACTION)
@@ -135,7 +135,7 @@ public class HttpRequestTest {
         request.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpRequest readRequest = new HttpRequest().readData(bais);
+        final HttpRequest readRequest = HttpRequest.create().readData(bais);
 
         assertThat(readRequest.getStartLine(), is(request.getStartLine()));
         assertThat(readRequest.getBody(), is(request.getBody()));
@@ -144,7 +144,7 @@ public class HttpRequestTest {
     @Test
     public void writeData_Chunk書き出しができること() throws IOException {
         final String soap = TestUtils.getResourceAsString("browse-request.xml");
-        final HttpRequest request = new HttpRequest()
+        final HttpRequest request = HttpRequest.create()
                 .setMethod(Http.POST)
                 .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true)
                 .setHeader(Http.SOAPACTION, ACTION)
@@ -158,7 +158,7 @@ public class HttpRequestTest {
         request.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpRequest readRequest = new HttpRequest().readData(bais);
+        final HttpRequest readRequest = HttpRequest.create().readData(bais);
 
         assertThat(readRequest.getStartLine(), is(request.getStartLine()));
         assertThat(readRequest.getBody(), is(request.getBody()));
@@ -166,7 +166,7 @@ public class HttpRequestTest {
 
     @Test
     public void setVersion_getVersionで取得できる() {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setVersion(Http.HTTP_1_0);
 
         assertThat(request.getVersion(), is(Http.HTTP_1_0));
@@ -174,7 +174,7 @@ public class HttpRequestTest {
 
     @Test
     public void setRequestLine_method_uri_versionに反映される() {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setRequestLine("GET /cds/control HTTP/1.1");
 
         assertThat(request.getMethod(), is(Http.GET));
@@ -184,16 +184,16 @@ public class HttpRequestTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void setRequestLine_不足があればException() {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setRequestLine("GET /cds/control");
     }
 
     @Test
     public void HttpRequest_ディープコピーができる() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-length.bin");
-        final HttpRequest request = new HttpRequest().readData(is);
+        final HttpRequest request = HttpRequest.create().readData(is);
 
-        final HttpRequest readRequest = new HttpRequest(request);
+        final HttpRequest readRequest = HttpRequest.copy(request);
         assertThat(readRequest.getMethod(), is(request.getMethod()));
         assertThat(readRequest.getUri(), is(request.getUri()));
         assertThat(readRequest.getHeader(Http.SOAPACTION), is(request.getHeader(Http.SOAPACTION)));
@@ -208,7 +208,7 @@ public class HttpRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void getAddressString_未設定ならException() throws Exception {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.getAddressString();
     }
 
@@ -216,7 +216,7 @@ public class HttpRequestTest {
     public void getAddressString_IPv4() throws Exception {
         final String address = "192.168.0.1";
         final int port = 8080;
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setAddress(InetAddress.getByName(address));
         assertThat(request.getAddressString(), is(address));
         request.setPort(Http.DEFAULT_PORT);
@@ -229,7 +229,7 @@ public class HttpRequestTest {
     public void getAddressString_IPv6() throws Exception {
         final String address = "::1";
         final int port = 8080;
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setAddress(InetAddress.getByName(address));
         assertThat(request.getAddressString(), is("[" + address + "]"));
         request.setPort(Http.DEFAULT_PORT);
@@ -240,27 +240,27 @@ public class HttpRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void getSocketAddress_未設定ならException() throws Exception {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.getSocketAddress();
     }
 
     @Test
     public void setHeaderLine_設定できる() throws Exception {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setHeaderLine("SOAPACTION: " + ACTION);
         assertThat(request.getHeader(Http.SOAPACTION), is(ACTION));
     }
 
     @Test
     public void setHeaderLine_フォーマットエラーでもExceptionは発生しない() throws Exception {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setHeaderLine("SOAPACTION");
         assertThat(request.getHeader(Http.SOAPACTION), is(nullValue()));
     }
 
     @Test
     public void isKeepAlive() throws Exception {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setVersion(Http.HTTP_1_0);
         assertThat(request.isKeepAlive(), is(false));
         request.setVersion(Http.HTTP_1_1);
@@ -281,14 +281,14 @@ public class HttpRequestTest {
 
     @Test
     public void getContentLength_正常系() throws Exception {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setHeader(Http.CONTENT_LENGTH, "10");
         assertThat(request.getContentLength(), is(10));
     }
 
     @Test
     public void getContentLength_異常系() throws Exception {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setHeader(Http.CONTENT_LENGTH, "length");
         assertThat(request.getContentLength(), is(0));
     }
@@ -296,7 +296,7 @@ public class HttpRequestTest {
     @Test
     public void setBody_getBodyで取得できる() {
         final String body = "body";
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setBody(body);
 
         assertThat(request.getBody(), is(body));
@@ -305,7 +305,7 @@ public class HttpRequestTest {
     @Test
     public void setBody_長さ0() {
         final String body = "";
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setBody(body, true);
 
         assertThat(request.getBody(), is(body));
@@ -315,7 +315,7 @@ public class HttpRequestTest {
 
     @Test
     public void setBodyBinary_長さ0() {
-        final HttpRequest request = new HttpRequest();
+        final HttpRequest request = HttpRequest.create();
         request.setBodyBinary(new byte[0]);
 
         assertThat(request.getBody().length(), is(0));

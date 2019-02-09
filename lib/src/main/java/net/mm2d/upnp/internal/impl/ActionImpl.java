@@ -374,7 +374,7 @@ public class ActionImpl implements Action {
             @Nonnull final URL url,
             @Nonnull final String soap)
             throws IOException {
-        return new HttpRequest()
+        return HttpRequest.create()
                 .setMethod(Http.POST)
                 .setUrl(url, true)
                 .setHeader(Http.SOAPACTION, getSoapActionName())

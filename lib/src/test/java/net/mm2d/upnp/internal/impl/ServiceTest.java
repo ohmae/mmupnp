@@ -479,7 +479,7 @@ public class ServiceTest {
             doReturn(TestUtils.getResourceAsByteArray("icon/icon48.png"))
                     .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-            final SsdpMessage ssdpMessage = new SsdpRequest(InetAddress.getByName(INTERFACE_ADDRESS), data, data.length);
+            final SsdpMessage ssdpMessage = SsdpRequest.create(InetAddress.getByName(INTERFACE_ADDRESS), data, data.length);
             mControlPoint = mock(ControlPoint.class);
             mSubscribeManager = mock(SubscribeManager.class);
             doReturn(EVENT_PORT).when(mSubscribeManager).getEventPort();
@@ -583,7 +583,7 @@ public class ServiceTest {
         }
 
         private HttpResponse createSubscribeResponse() {
-            return new HttpResponse()
+            return HttpResponse.create()
                     .setStatus(Http.Status.HTTP_OK)
                     .setHeader(Http.SERVER, Property.SERVER_VALUE)
                     .setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
@@ -684,14 +684,14 @@ public class ServiceTest {
 
         @Test
         public void parseTimeout_情報がない場合デフォルト() {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatusLine("HTTP/1.1 200 OK");
             assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
         }
 
         @Test
         public void parseTimeout_infiniteの場合デフォルト() {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "infinite");
             assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
@@ -699,7 +699,7 @@ public class ServiceTest {
 
         @Test
         public void parseTimeout_secondの指定通り() {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "second-100");
             assertThat(ServiceImpl.parseTimeout(response), is(TimeUnit.SECONDS.toMillis(100)));
@@ -707,7 +707,7 @@ public class ServiceTest {
 
         @Test
         public void parseTimeout_フォーマットエラーはデフォルト() {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatusLine("HTTP/1.1 200 OK");
             response.setHeader(Http.TIMEOUT, "seconds-100");
             assertThat(ServiceImpl.parseTimeout(response), is(DEFAULT_SUBSCRIPTION_TIMEOUT));
@@ -749,7 +749,7 @@ public class ServiceTest {
 
         @Test
         public void subscribe_成功() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -760,7 +760,7 @@ public class ServiceTest {
 
         @Test
         public void subscribe_SIDなし() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.TIMEOUT, "second-300");
             doReturn(response).when(mHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
@@ -770,7 +770,7 @@ public class ServiceTest {
 
         @Test
         public void subscribe_Timeout値異常() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-0");
@@ -781,7 +781,7 @@ public class ServiceTest {
 
         @Test
         public void subscribe_Http応答異常() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -792,7 +792,7 @@ public class ServiceTest {
 
         @Test
         public void subscribe_2回目はrenewがコールされfalseが返されると失敗() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -808,7 +808,7 @@ public class ServiceTest {
 
         @Test
         public void renewSubscribe_subscribe前はsubscribeが実行される() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -820,7 +820,7 @@ public class ServiceTest {
 
         @Test
         public void renewSubscribe_2回目はrenewが実行される() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -835,7 +835,7 @@ public class ServiceTest {
 
         @Test
         public void renewSubscribe_renewの応答ステータス異常で失敗() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -849,7 +849,7 @@ public class ServiceTest {
 
         @Test
         public void renewSubscribe_sid不一致() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -863,7 +863,7 @@ public class ServiceTest {
 
         @Test
         public void renewSubscribe_Timeout値異常() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -882,7 +882,7 @@ public class ServiceTest {
 
         @Test
         public void unsubscribe_正常() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");
@@ -894,7 +894,7 @@ public class ServiceTest {
 
         @Test
         public void unsubscribe_OK以外は失敗() throws Exception {
-            final HttpResponse response = new HttpResponse();
+            final HttpResponse response = HttpResponse.create();
             response.setStatus(Http.Status.HTTP_OK);
             response.setHeader(Http.SID, "sid");
             response.setHeader(Http.TIMEOUT, "second-300");

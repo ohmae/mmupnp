@@ -172,7 +172,7 @@ public class HttpClient {
     @Nonnull
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
         request.writeData(mOutputStream);
-        return new HttpResponse().readData(mInputStream);
+        return HttpResponse.create().readData(mInputStream);
     }
 
     @Nonnull
@@ -209,7 +209,7 @@ public class HttpClient {
             @Nonnull final String location,
             final int redirectDepth)
             throws IOException {
-        final HttpRequest newRequest = new HttpRequest(request)
+        final HttpRequest newRequest = HttpRequest.copy(request)
                 .setUrl(new URL(location), true)
                 .setHeader(Http.CONNECTION, Http.CLOSE);
         return new HttpClient(false).post(newRequest, redirectDepth + 1);
@@ -312,7 +312,7 @@ public class HttpClient {
 
     @Nonnull
     private HttpRequest makeHttpRequest(@Nonnull final URL url) throws IOException {
-        return new HttpRequest()
+        return HttpRequest.create()
                 .setMethod(Http.GET)
                 .setUrl(url, true)
                 .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)

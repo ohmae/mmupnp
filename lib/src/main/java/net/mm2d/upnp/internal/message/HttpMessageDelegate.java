@@ -36,33 +36,36 @@ class HttpMessageDelegate implements HttpMessage {
     private static final String EOL = "\r\n";
     private static final String CHARSET = "utf-8";
 
-    interface StartLineProcessor {
-        void setStartLine(@Nonnull String line);
+    interface StartLineDelegate {
+        @Nonnull
+        String getVersion();
+
+        void setVersion(@Nonnull String version);
 
         @Nonnull
         String getStartLine();
+
+        void setStartLine(@Nonnull String line);
     }
 
     @Nonnull
     private final HttpHeaders mHeaders;
-    @Nonnull
-    private String mVersion = Http.DEFAULT_HTTP_VERSION;
     @Nullable
     private byte[] mBodyBinary;
     @Nullable
     private String mBody;
     @Nonnull
-    private final StartLineProcessor mStartLineProcessor;
+    private final StartLineDelegate mStartLineDelegate;
 
-    public HttpMessageDelegate(@Nonnull final StartLineProcessor processor) {
-        mStartLineProcessor = processor;
+    public HttpMessageDelegate(@Nonnull final StartLineDelegate startLine) {
+        mStartLineDelegate = startLine;
         mHeaders = new HttpHeaders();
     }
 
     public HttpMessageDelegate(
-            @Nonnull final StartLineProcessor processor,
+            @Nonnull final StartLineDelegate startLine,
             @Nonnull final HttpMessageDelegate original) {
-        mStartLineProcessor = processor;
+        mStartLineDelegate = startLine;
         mHeaders = new HttpHeaders(original.mHeaders);
         mBodyBinary = original.mBodyBinary == null ? null :
                 Arrays.copyOf(original.mBodyBinary, original.mBodyBinary.length);
@@ -72,26 +75,26 @@ class HttpMessageDelegate implements HttpMessage {
     @Nullable
     @Override
     public String getStartLine() {
-        return mStartLineProcessor.getStartLine();
+        return mStartLineDelegate.getStartLine();
     }
 
     @Nonnull
     @Override
     public HttpMessage setStartLine(@Nonnull final String line) {
-        mStartLineProcessor.setStartLine(line);
+        mStartLineDelegate.setStartLine(line);
         return this;
     }
 
     @Nonnull
     @Override
     public String getVersion() {
-        return mVersion;
+        return mStartLineDelegate.getVersion();
     }
 
     @Nonnull
     @Override
     public HttpMessage setVersion(@Nonnull final String version) {
-        mVersion = version;
+        mStartLineDelegate.setVersion(version);
         return this;
     }
 
@@ -129,7 +132,7 @@ class HttpMessageDelegate implements HttpMessage {
 
     @Override
     public boolean isKeepAlive() {
-        if (mVersion.equals(Http.HTTP_1_0)) {
+        if (getVersion().equals(Http.HTTP_1_0)) {
             return mHeaders.containsValue(Http.CONNECTION, Http.KEEP_ALIVE);
         }
         return !mHeaders.containsValue(Http.CONNECTION, Http.CLOSE);

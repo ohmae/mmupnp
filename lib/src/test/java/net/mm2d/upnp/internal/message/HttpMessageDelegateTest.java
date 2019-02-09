@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.message;
 
 
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineProcessor;
+import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,7 @@ public class HttpMessageDelegateTest {
     @Test
     public void setBody_エンコード不可でもExceptionは発生しない() throws Exception {
         final String body = "body";
-        final HttpMessageDelegate message = Mockito.spy(new HttpMessageDelegate(mock(StartLineProcessor.class)));
+        final HttpMessageDelegate message = Mockito.spy(new HttpMessageDelegate(mock(StartLineDelegate.class)));
         doThrow(new UnsupportedEncodingException()).when(message).getBytes(anyString());
         message.setBody(body, true);
 
@@ -37,7 +37,7 @@ public class HttpMessageDelegateTest {
 
     @Test
     public void getBody_デコード不可ならnullが返る() throws Exception {
-        final HttpMessageDelegate message = Mockito.spy(new HttpMessageDelegate(mock(StartLineProcessor.class)));
+        final HttpMessageDelegate message = Mockito.spy(new HttpMessageDelegate(mock(StartLineDelegate.class)));
         message.setBodyBinary("body".getBytes("utf-8"));
         doThrow(new UnsupportedEncodingException()).when(message).newString(ArgumentMatchers.any(byte[].class));
 
@@ -47,7 +47,7 @@ public class HttpMessageDelegateTest {
 
     @Test
     public void getHeaderBytes_エンコード不可でもnullが返らない() throws Exception {
-        final HttpMessageDelegate message = Mockito.spy(new HttpMessageDelegate(mock(StartLineProcessor.class)));
+        final HttpMessageDelegate message = Mockito.spy(new HttpMessageDelegate(mock(StartLineDelegate.class)));
         doThrow(new UnsupportedEncodingException()).when(message).getBytes(anyString());
 
         assertThat(message.getHeaderBytes().length, is(0));

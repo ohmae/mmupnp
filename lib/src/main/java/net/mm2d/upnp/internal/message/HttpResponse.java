@@ -7,9 +7,10 @@
 
 package net.mm2d.upnp.internal.message;
 
+import net.mm2d.upnp.Http;
 import net.mm2d.upnp.Http.Status;
 import net.mm2d.upnp.HttpMessage;
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineProcessor;
+import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,42 +28,128 @@ public class HttpResponse implements HttpMessage {
     @Nonnull
     private final HttpMessageDelegate mDelegate;
     @Nonnull
-    private Status mStatus = Status.HTTP_INVALID;
+    private final StartLine mStartLine;
 
-    private int mStatusCode;
-    @Nonnull
-    private String mReasonPhrase = "";
+    static class StartLine implements StartLineDelegate {
+        @Nonnull
+        private Status mStatus;
 
-    private class Processor implements StartLineProcessor {
+        private int mStatusCode;
+        @Nonnull
+        private String mReasonPhrase;
+        @Nonnull
+        private String mVersion;
+
+        StartLine() {
+            mStatus = Status.HTTP_INVALID;
+            mStatusCode = 0;
+            mReasonPhrase = "";
+            mVersion = Http.DEFAULT_HTTP_VERSION;
+        }
+
+        StartLine(@Nonnull final StartLine original) {
+            mStatus = original.mStatus;
+            mStatusCode = original.mStatusCode;
+            mReasonPhrase = original.mReasonPhrase;
+            mVersion = original.mVersion;
+        }
+
+        int getStatusCode() {
+            return mStatusCode;
+        }
+
+        void setStatusCode(final int code) {
+            mStatus = Status.valueOf(code);
+            if (mStatus == Status.HTTP_INVALID) {
+                throw new IllegalArgumentException("unexpected status code:" + code);
+            }
+            mStatusCode = code;
+            mReasonPhrase = mStatus.getPhrase();
+        }
+
+        @Nonnull
+        String getReasonPhrase() {
+            return mReasonPhrase;
+        }
+
+        void setReasonPhrase(@Nonnull final String reasonPhrase) {
+            mReasonPhrase = reasonPhrase;
+        }
+
+        void setStatus(@Nonnull final Status status) {
+            mStatus = status;
+            mStatusCode = status.getCode();
+            mReasonPhrase = status.getPhrase();
+        }
+
+        @Nonnull
+        public Status getStatus() {
+            return mStatus;
+        }
+
+        @Nonnull
         @Override
-        public void setStartLine(@Nonnull final String line) {
-            HttpResponse.this.setStartLine(line);
+        public String getVersion() {
+            return mVersion;
+        }
+
+        @Nonnull
+        @Override
+        public void setVersion(@Nonnull final String version) {
+            mVersion = version;
         }
 
         @Nonnull
         @Override
         public String getStartLine() {
-            return HttpResponse.this.getStartLine();
+            final StringBuilder sb = new StringBuilder();
+            sb.append(getVersion());
+            sb.append(' ');
+            if (mStatus != Status.HTTP_INVALID) {
+                sb.append(mStatus.getCode());
+                sb.append(' ');
+                sb.append(mStatus.getPhrase());
+            } else {
+                sb.append(mStatusCode);
+                sb.append(' ');
+                sb.append(getReasonPhrase());
+            }
+            return sb.toString();
+        }
+
+        @Override
+        public void setStartLine(@Nonnull final String line) {
+            final String[] params = line.split(" ", 3);
+            if (params.length < 3) {
+                throw new IllegalArgumentException();
+            }
+            setVersion(params[0]);
+            setStatusCode(Integer.parseInt(params[1]));
+            setReasonPhrase(params[2]);
         }
     }
 
     /**
      * インスタンス作成。
      */
-    public HttpResponse() {
-        mDelegate = new HttpMessageDelegate(new Processor());
+    public static HttpResponse create() {
+        final StartLine startLine = new StartLine();
+        final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine);
+        return new HttpResponse(startLine, delegate);
+    }
+
+    public static HttpResponse copy(@Nonnull final HttpResponse original) {
+        final StartLine startLine = new StartLine(original.mStartLine);
+        final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine, original.mDelegate);
+        return new HttpResponse(startLine, delegate);
     }
 
     // VisibleForTesting
-    HttpResponse(@Nonnull final HttpMessageDelegate delegate) {
+    HttpResponse(
+            @Nonnull final StartLine startLine,
+            @Nonnull final HttpMessageDelegate delegate) {
+        mStartLine = startLine;
         mDelegate = delegate;
-    }
-
-    public HttpResponse(@Nonnull final HttpResponse original) {
-        mDelegate = new HttpMessageDelegate(new Processor(), original.mDelegate);
-        mStatus = original.mStatus;
-        mStatusCode = original.mStatusCode;
-        mReasonPhrase = original.mReasonPhrase;
     }
 
     @Nonnull
@@ -89,13 +176,7 @@ public class HttpResponse implements HttpMessage {
     // VisibleForTesting
     @Nonnull
     public HttpResponse setStatusLine(@Nonnull final String line) {
-        final String[] params = line.split(" ", 3);
-        if (params.length < 3) {
-            throw new IllegalArgumentException();
-        }
-        setVersion(params[0]);
-        setStatusCode(Integer.parseInt(params[1]));
-        setReasonPhrase(params[2]);
+        mStartLine.setStartLine(line);
         return this;
     }
 
@@ -109,19 +190,7 @@ public class HttpResponse implements HttpMessage {
      */
     @Nonnull
     private String getStatusLine() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(getVersion());
-        sb.append(' ');
-        if (mStatus != Status.HTTP_INVALID) {
-            sb.append(mStatus.getCode());
-            sb.append(' ');
-            sb.append(mStatus.getPhrase());
-        } else {
-            sb.append(mStatusCode);
-            sb.append(' ');
-            sb.append(getReasonPhrase());
-        }
-        return sb.toString();
+        return mStartLine.getStartLine();
     }
 
     /**
@@ -131,7 +200,7 @@ public class HttpResponse implements HttpMessage {
      * @see #getStatus()
      */
     public int getStatusCode() {
-        return mStatusCode;
+        return mStartLine.getStatusCode();
     }
 
     /**
@@ -143,12 +212,7 @@ public class HttpResponse implements HttpMessage {
      */
     @Nonnull
     public HttpResponse setStatusCode(final int code) {
-        mStatus = Status.valueOf(code);
-        if (mStatus == Status.HTTP_INVALID) {
-            throw new IllegalArgumentException("unexpected status code:" + code);
-        }
-        mStatusCode = code;
-        mReasonPhrase = mStatus.getPhrase();
+        mStartLine.setStatusCode(code);
         return this;
     }
 
@@ -160,7 +224,7 @@ public class HttpResponse implements HttpMessage {
      */
     @Nonnull
     public String getReasonPhrase() {
-        return mReasonPhrase;
+        return mStartLine.getReasonPhrase();
     }
 
     /**
@@ -173,7 +237,7 @@ public class HttpResponse implements HttpMessage {
     @SuppressWarnings("UnusedReturnValue")
     @Nonnull
     public HttpResponse setReasonPhrase(@Nonnull final String reasonPhrase) {
-        mReasonPhrase = reasonPhrase;
+        mStartLine.setReasonPhrase(reasonPhrase);
         return this;
     }
 
@@ -185,9 +249,7 @@ public class HttpResponse implements HttpMessage {
      */
     @Nonnull
     public HttpResponse setStatus(@Nonnull final Status status) {
-        mStatus = status;
-        mStatusCode = status.getCode();
-        mReasonPhrase = status.getPhrase();
+        mStartLine.setStatus(status);
         return this;
     }
 
@@ -198,7 +260,7 @@ public class HttpResponse implements HttpMessage {
      */
     @Nonnull
     public Status getStatus() {
-        return mStatus;
+        return mStartLine.getStatus();
     }
 
     @Nonnull

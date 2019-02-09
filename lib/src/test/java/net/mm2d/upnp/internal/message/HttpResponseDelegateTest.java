@@ -8,7 +8,8 @@
 package net.mm2d.upnp.internal.message;
 
 import net.mm2d.upnp.Http;
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineProcessor;
+import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate;
+import net.mm2d.upnp.internal.message.HttpResponse.StartLine;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +31,11 @@ public class HttpResponseDelegateTest {
 
     @Before
     public void setUp() throws Exception {
-        final StartLineProcessor processor = mock(StartLineProcessor.class);
-        doReturn("").when(processor).getStartLine();
-        mDelegate = Mockito.spy(new HttpMessageDelegate(processor));
-        mMessage = new HttpResponse(mDelegate);
+        final StartLine startLine = mock(StartLine.class);
+        doReturn("").when(startLine).getVersion();
+        doReturn("").when(startLine).getStartLine();
+        mDelegate = Mockito.spy(new HttpMessageDelegate(startLine));
+        mMessage = new HttpResponse(startLine, mDelegate);
     }
 
     @Test

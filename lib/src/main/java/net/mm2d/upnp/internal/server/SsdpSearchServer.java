@@ -98,7 +98,7 @@ public class SsdpSearchServer implements SsdpServer {
 
     @Nonnull
     private SsdpRequest makeSearchMessage(@Nonnull final String st) {
-        final SsdpRequest message = new SsdpRequest();
+        final SsdpRequest message = SsdpRequest.create();
         message.setMethod(SsdpMessage.M_SEARCH);
         message.setUri("*");
         message.setHeader(Http.HOST, mDelegate.getSsdpAddressString());
@@ -144,7 +144,7 @@ public class SsdpSearchServer implements SsdpServer {
             @Nonnull final byte[] data,
             final int length) {
         try {
-            final SsdpResponse message = new SsdpResponse(getLocalAddress(), data, length);
+            final SsdpResponse message = SsdpResponse.create(getLocalAddress(), data, length);
             Logger.v(() -> "receive ssdp search response from " + sourceAddress +
                     " to " + mDelegate.getLocalAddress() + ":\n" + message);
             if (mDelegate.isInvalidLocation(message, sourceAddress)) {

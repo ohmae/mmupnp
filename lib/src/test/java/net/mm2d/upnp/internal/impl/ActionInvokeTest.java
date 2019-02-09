@@ -99,7 +99,7 @@ public class ActionInvokeTest {
                 .build());
         doReturn(mUrl).when(mAction).makeAbsoluteControlUrl();
         mMockHttpClient = spy(new HttpClient());
-        mHttpResponse = new HttpResponse();
+        mHttpResponse = HttpResponse.create();
         mHttpResponse.setStatus(Http.Status.HTTP_OK);
         mHttpResponse.setBody("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
                 + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"

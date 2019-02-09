@@ -38,14 +38,15 @@ public class SsdpResponse implements SsdpMessage {
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpResponse(
+    public static SsdpResponse create(
             @Nonnull final InetAddress address,
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        mHttpResponse = new HttpResponse()
+        final HttpResponse httpResponse = HttpResponse.create()
                 .readData(new ByteArrayInputStream(data, 0, length));
-        mDelegate = new SsdpMessageDelegate(mHttpResponse, address);
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(httpResponse, address);
+        return new SsdpResponse(httpResponse, delegate);
     }
 
     // VisibleForTesting

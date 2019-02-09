@@ -31,9 +31,10 @@ public class SsdpRequest implements SsdpMessage {
     /**
      * インスタンス作成。
      */
-    public SsdpRequest() {
-        mHttpRequest = new HttpRequest();
-        mDelegate = new SsdpMessageDelegate(mHttpRequest);
+    public static SsdpRequest create() {
+        final HttpRequest httpRequest = HttpRequest.create();
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(httpRequest);
+        return new SsdpRequest(httpRequest, delegate);
     }
 
     /**
@@ -44,14 +45,15 @@ public class SsdpRequest implements SsdpMessage {
      * @param length  受信したデータの長さ
      * @throws IOException 入出力エラー
      */
-    public SsdpRequest(
+    public static SsdpRequest create(
             @Nonnull final InetAddress address,
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        mHttpRequest = new HttpRequest()
+        final HttpRequest httpRequest = HttpRequest.create()
                 .readData(new ByteArrayInputStream(data, 0, length));
-        mDelegate = new SsdpMessageDelegate(mHttpRequest, address);
+        final SsdpMessageDelegate delegate = new SsdpMessageDelegate(httpRequest, address);
+        return new SsdpRequest(httpRequest, delegate);
     }
 
     // VisibleForTesting

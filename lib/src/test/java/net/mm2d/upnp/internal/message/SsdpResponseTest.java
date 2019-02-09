@@ -32,7 +32,7 @@ public class SsdpResponseTest {
 
     private static SsdpResponse makeFromResource(final String name) throws IOException {
         final byte[] data = TestUtils.getResourceAsByteArray(name);
-        return new SsdpResponse(mock(InetAddress.class), data, data.length);
+        return SsdpResponse.create(mock(InetAddress.class), data, data.length);
     }
 
     @RunWith(JUnit4.class)

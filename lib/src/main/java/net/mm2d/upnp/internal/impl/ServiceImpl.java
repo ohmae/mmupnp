@@ -481,7 +481,7 @@ public class ServiceImpl implements Service {
 
     @Nonnull
     private HttpRequest makeSubscribeRequest() throws IOException {
-        return new HttpRequest()
+        return HttpRequest.create()
                 .setMethod(Http.SUBSCRIBE)
                 .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
                 .setHeader(Http.NT, Http.UPNP_EVENT)
@@ -521,7 +521,7 @@ public class ServiceImpl implements Service {
 
     @Nonnull
     private HttpRequest makeRenewSubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
-        return new HttpRequest()
+        return HttpRequest.create()
                 .setMethod(Http.SUBSCRIBE)
                 .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
                 .setHeader(Http.SID, subscriptionId)
@@ -549,7 +549,7 @@ public class ServiceImpl implements Service {
 
     @Nonnull
     private HttpRequest makeUnsubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
-        return new HttpRequest()
+        return HttpRequest.create()
                 .setMethod(Http.UNSUBSCRIBE)
                 .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
                 .setHeader(Http.SID, subscriptionId)
