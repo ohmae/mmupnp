@@ -16,6 +16,8 @@ import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -98,11 +100,7 @@ public final class NetworkUtils {
         if (netIfs == null || !netIfs.hasMoreElements()) {
             return Collections.emptyList();
         }
-        final List<NetworkInterface> list = new ArrayList<>();
-        while (netIfs.hasMoreElements()) {
-            list.add(netIfs.nextElement());
-        }
-        return list;
+        return Collections.list(netIfs);
     }
 
     /**
@@ -306,14 +304,14 @@ public final class NetworkUtils {
     // VisibleForTesting
     @Nonnull
     static String toNormalizedString(@Nonnull final Inet6Address address) {
-        final byte[] bin = address.getAddress();
+        final ShortBuffer buffer = ByteBuffer.wrap(address.getAddress()).asShortBuffer();
         final int[] section = new int[8];
         for (int i = 0; i < section.length; i++) {
-            section[i] = ((bin[i << 1] << 8) & 0xff00) | (bin[(i << 1) + 1] & 0xff);
+            section[i] = buffer.get();
         }
         final int[] omitInfo = findSectionToOmit(section);
         final int start = omitInfo[0];
-        final int end = start + omitInfo[1];
+        final int end = omitInfo[1];
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < section.length; i++) {
             if (i == start) {
@@ -359,7 +357,7 @@ public final class NetworkUtils {
             savedLength = length;
             savedStart = start;
         }
-        return new int[]{savedStart, savedLength};
+        return new int[]{savedStart, savedStart + savedLength};
     }
 
     // インスタンス化禁止
