@@ -309,38 +309,35 @@ public final class NetworkUtils {
         for (int i = 0; i < section.length; i++) {
             section[i] = buffer.get();
         }
-        final int[] omitInfo = findSectionToOmit(section);
-        final int start = omitInfo[0];
-        final int end = omitInfo[1];
+        final int[] toOmission = findSectionToOmission(section);
+        final int start = toOmission[0];
+        final int end = toOmission[1];
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < section.length; i++) {
-            if (i == start) {
+            if (i < start || i >= end) {
+                if (i != 0 && i != end) {
+                    sb.append(':');
+                }
+                sb.append(Integer.toHexString(section[i]));
+            } else if (i == start) {
                 sb.append("::");
-                continue;
             }
-            if (i > start && i < end) {
-                continue;
-            }
-            if (sb.length() != 0 && sb.charAt(sb.length() - 1) != ':') {
-                sb.append(":");
-            }
-            sb.append(Integer.toHexString(section[i]));
         }
         return sb.toString();
     }
 
     @Nonnull
-    private static int[] findSectionToOmit(@Nonnull final int[] section) {
+    private static int[] findSectionToOmission(@Nonnull final int[] section) {
         int length = 0;
         int start = -1;
         int savedLength = 0;
         int savedStart = -1;
         for (int i = 0; i < section.length; i++) {
             if (section[i] == 0) {
-                length++;
                 if (start < 0) {
                     start = i;
                 }
+                length++;
             } else {
                 if (start < 0) {
                     continue;
@@ -356,6 +353,9 @@ public final class NetworkUtils {
         if (length > savedLength) {
             savedLength = length;
             savedStart = start;
+        }
+        if (savedLength < 2) {
+            return new int[] {-1, -1};
         }
         return new int[]{savedStart, savedStart + savedLength};
     }

@@ -282,6 +282,7 @@ public class NetworkUtilsTest {
             assertThat(NetworkUtils.toNormalizedString((Inet6Address) InetAddress.getByName("0:1:0:0:0:0:0:0")), is("0:1::"));
             assertThat(NetworkUtils.toNormalizedString((Inet6Address) InetAddress.getByName("0:0:0:0:0:0:1:0")), is("::1:0"));
             assertThat(NetworkUtils.toNormalizedString((Inet6Address) InetAddress.getByName("0:1:0:0:0:0:1:0")), is("0:1::1:0"));
+            assertThat(NetworkUtils.toNormalizedString((Inet6Address) InetAddress.getByName("1:1:0:1:1:1:1:1")), is("1:1:0:1:1:1:1:1"));
             assertThat(NetworkUtils.toNormalizedString((Inet6Address) InetAddress.getByName("1:1:1:1:1:1:1:1")), is("1:1:1:1:1:1:1:1"));
         }
 
