@@ -57,7 +57,7 @@ public final class DeviceParser {
         final URL url = Http.makeUrlWithScopeId(builder.getLocation(), builder.getSsdpMessage().getScopeId());
         final String description = client.downloadString(url);
         if (TextUtils.isEmpty(description)) {
-            throw new IOException("download error");
+            throw new IOException("download error: " + url);
         }
         builder.setDownloadInfo(client);
         parseDescription(builder, description);
