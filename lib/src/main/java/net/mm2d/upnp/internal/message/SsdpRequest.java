@@ -30,6 +30,8 @@ public class SsdpRequest implements SsdpMessage {
 
     /**
      * インスタンス作成。
+     *
+     * @return インスタンス
      */
     public static SsdpRequest create() {
         final HttpRequest httpRequest = HttpRequest.create();
@@ -43,6 +45,7 @@ public class SsdpRequest implements SsdpMessage {
      * @param address 受信したインターフェースのアドレス
      * @param data    受信したデータ
      * @param length  受信したデータの長さ
+     * @return インスタンス
      * @throws IOException 入出力エラー
      */
     public static SsdpRequest create(

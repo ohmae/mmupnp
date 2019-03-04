@@ -111,6 +111,8 @@ public class HttpRequest implements HttpMessage {
 
     /**
      * インスタンス作成。
+     *
+     * @return インスタンス
      */
     public static HttpRequest create() {
         final StartLine startLine = new StartLine();
@@ -122,6 +124,7 @@ public class HttpRequest implements HttpMessage {
      * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
      *
      * @param original コピー元
+     * @return インスタンス
      */
     public static HttpRequest copy(@Nonnull final HttpRequest original) {
         final StartLine startLine = new StartLine(original.mStartLine);

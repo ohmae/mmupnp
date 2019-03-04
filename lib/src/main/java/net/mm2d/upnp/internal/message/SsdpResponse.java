@@ -36,6 +36,7 @@ public class SsdpResponse implements SsdpMessage {
      * @param address 受信したインターフェースのアドレス
      * @param data    受信したデータ
      * @param length  受信したデータの長さ
+     * @return インスタンス
      * @throws IOException 入出力エラー
      */
     public static SsdpResponse create(

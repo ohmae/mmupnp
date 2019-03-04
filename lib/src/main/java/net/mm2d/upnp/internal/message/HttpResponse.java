@@ -131,6 +131,8 @@ public class HttpResponse implements HttpMessage {
 
     /**
      * インスタンス作成。
+     *
+     * @return インスタンス
      */
     public static HttpResponse create() {
         final StartLine startLine = new StartLine();
@@ -138,6 +140,12 @@ public class HttpResponse implements HttpMessage {
         return new HttpResponse(startLine, delegate);
     }
 
+    /**
+     * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
+     *
+     * @param original コピー元
+     * @return インスタンス
+     */
     public static HttpResponse copy(@Nonnull final HttpResponse original) {
         final StartLine startLine = new StartLine(original.mStartLine);
         final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine, original.mDelegate);
