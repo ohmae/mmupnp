@@ -3,18 +3,11 @@ apply plugin: 'maven'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'jacoco'
 
-def versionMajor = 2
-def versionMinor = 0
-def versionPatch = 0
-def versionSuffix = "-alpha10"
-def packageName = 'net.mm2d'
-def libraryId = 'mmupnp'
-def siteUrl = 'https://github.com/ohmae/mmupnp'
-def githubUrl = 'https://github.com/ohmae/mmupnp'
+def libraryName = 'mmupnp'
 
-version "${versionMajor}.${versionMinor}.${versionPatch}${versionSuffix}"
-group packageName
-archivesBaseName = libraryId
+group pj.groupId
+archivesBaseName = libraryName
+version pj.versions.name
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -40,12 +33,12 @@ bintray {
 
     pkg {
         repo = 'maven'
-        name = project.group + '.' + libraryId
+        name = pj.groupId + '.' + libraryName
         licenses = ['MIT']
-        websiteUrl = siteUrl
-        issueTrackerUrl = githubUrl + '/blob/master/LICENSE'
-        vcsUrl = githubUrl + '.git'
-        issueTrackerUrl = githubUrl + '/issues'
+        websiteUrl = pj.siteUrl
+        issueTrackerUrl = pj.githubUrl + '/blob/master/LICENSE'
+        vcsUrl = pj.githubUrl + '.git'
+        issueTrackerUrl = pj.githubUrl + '/issues'
         publicDownloadNumbers = true
         version {
             name = project.version
@@ -56,24 +49,24 @@ bintray {
 install {
     repositories.mavenInstaller {
         pom.project {
-            name libraryId
-            url siteUrl
+            name = libraryName
+            url = pj.siteUrl
 
-            packaging 'jar'
-            groupId project.group
-            artifactId libraryId
-            version project.version
+            packaging = 'aar'
+            groupId = pj.groupId
+            artifactId = libraryName
+            version = pj.versions.name
 
             licenses {
                 license {
-                    name 'The MIT License'
-                    url 'https://opensource.org/licenses/MIT'
-                    distribution 'repo'
+                    name = 'The MIT License'
+                    url = 'https://opensource.org/licenses/MIT'
+                    distribution = 'repo'
                 }
             }
             scm {
-                connection githubUrl + '.git'
-                url githubUrl
+                connection pj.githubUrl + '.git'
+                url pj.githubUrl
             }
         }
     }
@@ -84,18 +77,20 @@ uploadArchives {
         mavenDeployer {
             repository(url: 'file:build/maven')
             pom.project {
+                groupId = pj.groupId
+                artifactId = libraryName
+                version = pj.versions.name
                 licenses {
                     license {
-                        name 'The MIT License'
-                        url 'https://opensource.org/licenses/MIT'
-                        distribution 'repo'
+                        name = 'The MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                        distribution = 'repo'
                     }
                 }
             }
         }
     }
 }
-
 javadoc {
     title = "mmupnp $version API"
     description "Generates Javadoc."
