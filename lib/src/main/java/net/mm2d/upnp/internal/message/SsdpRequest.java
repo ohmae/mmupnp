@@ -53,8 +53,8 @@ public class SsdpRequest implements SsdpMessage {
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        final HttpRequest httpRequest = HttpRequest.create()
-                .readData(new ByteArrayInputStream(data, 0, length));
+        final HttpRequest httpRequest = HttpRequest.create();
+        httpRequest.readData(new ByteArrayInputStream(data, 0, length));
         final SsdpMessageDelegate delegate = new SsdpMessageDelegate(httpRequest, address);
         return new SsdpRequest(httpRequest, delegate);
     }

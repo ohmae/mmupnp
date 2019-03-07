@@ -41,8 +41,8 @@ public class HttpResponseTest {
 
     @Test
     public void readData_読み出しができること() throws IOException {
-        final HttpResponse response = HttpResponse.create()
-                .readData(TestUtils.getResourceAsStream("cds-length.bin"));
+        final HttpResponse response = HttpResponse.create();
+        response.readData(TestUtils.getResourceAsStream("cds-length.bin"));
 
         assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
         assertThat(response.getStatus(), Matchers.is(Http.Status.HTTP_OK));
@@ -52,26 +52,26 @@ public class HttpResponseTest {
 
     @Test
     public void HttpRequest_ディープコピーができる() throws IOException {
-        final HttpResponse response1 = HttpResponse.create()
-                .readData(TestUtils.getResourceAsStream("cds-length.bin"));
+        final HttpResponse response = HttpResponse.create();
+        response.readData(TestUtils.getResourceAsStream("cds-length.bin"));
 
-        final HttpResponse response2 = HttpResponse.copy(response1);
+        final HttpResponse response2 = HttpResponse.copy(response);
 
-        assertThat(response1.getStartLine(), is(response2.getStartLine()));
-        assertThat(response1.getStatus(), is(response2.getStatus()));
-        assertThat(response1.getHeader(Http.DATE), is(response2.getHeader(Http.DATE)));
-        assertThat(response1.getBody(), is(response2.getBody()));
-        assertThat(response1.getBodyBinary(), is(response2.getBodyBinary()));
+        assertThat(response.getStartLine(), is(response2.getStartLine()));
+        assertThat(response.getStatus(), is(response2.getStatus()));
+        assertThat(response.getHeader(Http.DATE), is(response2.getHeader(Http.DATE)));
+        assertThat(response.getBody(), is(response2.getBody()));
+        assertThat(response.getBodyBinary(), is(response2.getBodyBinary()));
 
-        response1.getBodyBinary()[0] = 0;
+        response.getBodyBinary()[0] = 0;
 
-        assertThat(response1.getBodyBinary(), is(not(response2.getBodyBinary())));
+        assertThat(response.getBodyBinary(), is(not(response2.getBodyBinary())));
     }
 
     @Test
     public void readData_Chunk読み出しができること() throws IOException {
-        final HttpResponse response = HttpResponse.create()
-                .readData(TestUtils.getResourceAsStream("cds-chunked.bin"));
+        final HttpResponse response = HttpResponse.create();
+        response.readData(TestUtils.getResourceAsStream("cds-chunked.bin"));
 
         assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
@@ -81,8 +81,8 @@ public class HttpResponseTest {
 
     @Test
     public void readData_Chunk読み出しができること2() throws IOException {
-        final HttpResponse response = HttpResponse.create()
-                .readData(TestUtils.getResourceAsStream("cds-chunked-large.bin"));
+        final HttpResponse response = HttpResponse.create();
+        response.readData(TestUtils.getResourceAsStream("cds-chunked-large.bin"));
 
         assertThat(response.getStartLine(), is("HTTP/1.1 200 OK"));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
@@ -128,18 +128,19 @@ public class HttpResponseTest {
     @Test
     public void writeData_書き出しができること() throws IOException {
         final String data = TestUtils.getResourceAsString("cds.xml");
-        final HttpResponse response = HttpResponse.create()
-                .setStatus(Http.Status.HTTP_OK)
-                .setHeader(Http.SERVER, Property.SERVER_VALUE)
-                .setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
-                .setHeader(Http.CONNECTION, Http.CLOSE)
-                .setBody(data, true);
+        final HttpResponse response = HttpResponse.create();
+        response.setStatus(Http.Status.HTTP_OK);
+        response.setHeader(Http.SERVER, Property.SERVER_VALUE);
+        response.setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()));
+        response.setHeader(Http.CONNECTION, Http.CLOSE);
+        response.setBody(data, true);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         response.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpResponse readResponse = HttpResponse.create().readData(bais);
+        final HttpResponse readResponse = HttpResponse.create();
+        readResponse.readData(bais);
 
         assertThat(readResponse.getStartLine(), is(response.getStartLine()));
         assertThat(readResponse.getBody(), is(response.getBody()));
@@ -148,19 +149,20 @@ public class HttpResponseTest {
     @Test
     public void writeData_Chunk書き出しができること() throws IOException {
         final String data = TestUtils.getResourceAsString("cds.xml");
-        final HttpResponse response = HttpResponse.create()
-                .setStatus(Http.Status.HTTP_OK)
-                .setHeader(Http.SERVER, Property.SERVER_VALUE)
-                .setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
-                .setHeader(Http.CONNECTION, Http.CLOSE)
-                .setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED)
-                .setBody(data, false);
+        final HttpResponse response = HttpResponse.create();
+        response.setStatus(Http.Status.HTTP_OK);
+        response.setHeader(Http.SERVER, Property.SERVER_VALUE);
+        response.setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()));
+        response.setHeader(Http.CONNECTION, Http.CLOSE);
+        response.setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED);
+        response.setBody(data, false);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         response.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpResponse readResponse = HttpResponse.create().readData(bais);
+        final HttpResponse readResponse = HttpResponse.create();
+        readResponse.readData(bais);
 
         assertThat(readResponse.getStartLine(), is(response.getStartLine()));
         assertThat(readResponse.getBody(), is(response.getBody()));

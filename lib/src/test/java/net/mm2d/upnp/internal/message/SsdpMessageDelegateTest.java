@@ -120,7 +120,8 @@ public class SsdpMessageDelegateTest {
     @Test
     public void getScopeId_インターフェース指定がなければ0() throws Exception {
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-        final HttpRequest request = HttpRequest.create().readData(new ByteArrayInputStream(data, 0, data.length));
+        final HttpRequest request = HttpRequest.create();
+        request.readData(new ByteArrayInputStream(data, 0, data.length));
         final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request);
 
         assertThat(delegate.getScopeId(), is(0));
@@ -129,7 +130,8 @@ public class SsdpMessageDelegateTest {
     @Test
     public void getScopeId_インターフェースIPv4なら0() throws Exception {
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-        final HttpRequest request = HttpRequest.create().readData(new ByteArrayInputStream(data, 0, data.length));
+        final HttpRequest request = HttpRequest.create();
+        request.readData(new ByteArrayInputStream(data, 0, data.length));
         final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, InetAddress.getByName("192.0.2.3"));
 
         assertThat(delegate.getScopeId(), is(0));
@@ -138,7 +140,8 @@ public class SsdpMessageDelegateTest {
     @Test
     public void getScopeId_インターフェースに紐付かないIPv6なら0() throws Exception {
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-        final HttpRequest request = HttpRequest.create().readData(new ByteArrayInputStream(data, 0, data.length));
+        final HttpRequest request = HttpRequest.create();
+        request.readData(new ByteArrayInputStream(data, 0, data.length));
         final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, InetAddress.getByName("fe80::a831:801b:8dc6:421f"));
 
         assertThat(delegate.getScopeId(), is(0));
@@ -148,7 +151,8 @@ public class SsdpMessageDelegateTest {
     public void getScopeId_インターフェースに紐付くIPv6ならその値() throws Exception {
         final int scopeId = 1;
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
-        final HttpRequest request = HttpRequest.create().readData(new ByteArrayInputStream(data, 0, data.length));
+        final HttpRequest request = HttpRequest.create();
+        request.readData(new ByteArrayInputStream(data, 0, data.length));
         final Inet6Address address = Inet6Address.getByAddress(null, InetAddress.getByName("fe80::a831:801b:8dc6:421f").getAddress(), scopeId);
         final SsdpMessageDelegate delegate = new SsdpMessageDelegate(request, address);
 

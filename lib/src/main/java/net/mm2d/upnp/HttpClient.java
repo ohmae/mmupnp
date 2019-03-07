@@ -172,7 +172,9 @@ public class HttpClient {
     @Nonnull
     private HttpResponse writeAndRead(@Nonnull final HttpRequest request) throws IOException {
         request.writeData(mOutputStream);
-        return HttpResponse.create().readData(mInputStream);
+        final HttpResponse response = HttpResponse.create();
+        response.readData(mInputStream);
+        return response;
     }
 
     @Nonnull
@@ -209,9 +211,9 @@ public class HttpClient {
             @Nonnull final String location,
             final int redirectDepth)
             throws IOException {
-        final HttpRequest newRequest = HttpRequest.copy(request)
-                .setUrl(new URL(location), true)
-                .setHeader(Http.CONNECTION, Http.CLOSE);
+        final HttpRequest newRequest = HttpRequest.copy(request);
+        newRequest.setUrl(new URL(location), true);
+        newRequest.setHeader(Http.CONNECTION, Http.CLOSE);
         return new HttpClient(false).post(newRequest, redirectDepth + 1);
     }
 
@@ -312,10 +314,11 @@ public class HttpClient {
 
     @Nonnull
     private HttpRequest makeHttpRequest(@Nonnull final URL url) throws IOException {
-        return HttpRequest.create()
-                .setMethod(Http.GET)
-                .setUrl(url, true)
-                .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-                .setHeader(Http.CONNECTION, isKeepAlive() ? Http.KEEP_ALIVE : Http.CLOSE);
+        final HttpRequest request = HttpRequest.create();
+        request.setMethod(Http.GET);
+        request.setUrl(url, true);
+        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+        request.setHeader(Http.CONNECTION, isKeepAlive() ? Http.KEEP_ALIVE : Http.CLOSE);
+        return request;
     }
 }

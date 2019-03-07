@@ -160,11 +160,9 @@ public class HttpResponse implements HttpMessage {
         mDelegate = delegate;
     }
 
-    @Nonnull
     @Override
-    public HttpResponse setStartLine(@Nonnull final String line) {
+    public void setStartLine(@Nonnull final String line) {
         mStartLine.setStartLine(line);
-        return this;
     }
 
     @Nonnull
@@ -187,13 +185,10 @@ public class HttpResponse implements HttpMessage {
      * ステータスコードを設定する。
      *
      * @param code ステータスコード
-     * @return HttpResponse
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    @Nonnull
-    public HttpResponse setStatusCode(final int code) {
+    public void setStatusCode(final int code) {
         mStartLine.setStatusCode(code);
-        return this;
     }
 
     /**
@@ -211,26 +206,19 @@ public class HttpResponse implements HttpMessage {
      * レスポンスフレーズを設定する。
      *
      * @param reasonPhrase レスポンスフレーズ
-     * @return HttpResponse
      * @see #setStatus(net.mm2d.upnp.Http.Status)
      */
-    @SuppressWarnings("UnusedReturnValue")
-    @Nonnull
-    public HttpResponse setReasonPhrase(@Nonnull final String reasonPhrase) {
+    public void setReasonPhrase(@Nonnull final String reasonPhrase) {
         mStartLine.setReasonPhrase(reasonPhrase);
-        return this;
     }
 
     /**
      * ステータスを設定する。
      *
      * @param status ステータス
-     * @return HttpResponse
      */
-    @Nonnull
-    public HttpResponse setStatus(@Nonnull final Status status) {
+    public void setStatus(@Nonnull final Status status) {
         mStartLine.setStatus(status);
-        return this;
     }
 
     /**
@@ -249,27 +237,21 @@ public class HttpResponse implements HttpMessage {
         return mDelegate.getVersion();
     }
 
-    @Nonnull
     @Override
-    public HttpResponse setVersion(@Nonnull final String version) {
+    public void setVersion(@Nonnull final String version) {
         mDelegate.setVersion(version);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpResponse setHeader(
+    public void setHeader(
             @Nonnull final String name,
             @Nonnull final String value) {
         mDelegate.setHeader(name, value);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpResponse setHeaderLine(@Nonnull final String line) {
+    public void setHeaderLine(@Nonnull final String line) {
         mDelegate.setHeaderLine(line);
-        return this;
     }
 
     @Nullable
@@ -293,36 +275,28 @@ public class HttpResponse implements HttpMessage {
         return mDelegate.getContentLength();
     }
 
-    @Nonnull
     @Override
-    public HttpResponse setBody(@Nullable final String body) {
+    public void setBody(@Nullable final String body) {
         mDelegate.setBody(body);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpResponse setBody(
+    public void setBody(
             @Nullable final String body,
             final boolean withContentLength) {
         mDelegate.setBody(body, withContentLength);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpResponse setBodyBinary(@Nullable final byte[] body) {
+    public void setBodyBinary(@Nullable final byte[] body) {
         mDelegate.setBodyBinary(body);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpResponse setBodyBinary(
+    public void setBodyBinary(
             @Nullable final byte[] body,
             final boolean withContentLength) {
         mDelegate.setBodyBinary(body, withContentLength);
-        return this;
     }
 
     @Nullable
@@ -348,11 +322,9 @@ public class HttpResponse implements HttpMessage {
         mDelegate.writeData(outputStream);
     }
 
-    @Nonnull
     @Override
-    public HttpResponse readData(@Nonnull final InputStream inputStream) throws IOException {
+    public void readData(@Nonnull final InputStream inputStream) throws IOException {
         mDelegate.readData(inputStream);
-        return this;
     }
 
     @Nonnull

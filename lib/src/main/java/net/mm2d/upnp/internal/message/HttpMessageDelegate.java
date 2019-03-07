@@ -78,11 +78,9 @@ class HttpMessageDelegate implements HttpMessage {
         return mStartLineDelegate.getStartLine();
     }
 
-    @Nonnull
     @Override
-    public HttpMessage setStartLine(@Nonnull final String line) {
+    public void setStartLine(@Nonnull final String line) {
         mStartLineDelegate.setStartLine(line);
-        return this;
     }
 
     @Nonnull
@@ -91,32 +89,27 @@ class HttpMessageDelegate implements HttpMessage {
         return mStartLineDelegate.getVersion();
     }
 
-    @Nonnull
     @Override
-    public HttpMessage setVersion(@Nonnull final String version) {
+    public void setVersion(@Nonnull final String version) {
         mStartLineDelegate.setVersion(version);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpMessage setHeader(
+    public void setHeader(
             @Nonnull final String name,
             @Nonnull final String value) {
         mHeaders.put(name, value);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpMessage setHeaderLine(@Nonnull final String line) {
+    public void setHeaderLine(@Nonnull final String line) {
         final int pos = line.indexOf(':');
         if (pos < 0) {
-            return this;
+            return;
         }
         final String name = line.substring(0, pos).trim();
         final String value = line.substring(pos + 1).trim();
-        return setHeader(name, value);
+        setHeader(name, value);
     }
 
     @Nullable
@@ -151,36 +144,31 @@ class HttpMessageDelegate implements HttpMessage {
         return 0;
     }
 
-    @Nonnull
     @Override
-    public HttpMessage setBody(@Nullable final String body) {
-        return setBody(body, false);
+    public void setBody(@Nullable final String body) {
+        setBody(body, false);
     }
 
-    @Nonnull
     @Override
-    public HttpMessage setBody(
+    public void setBody(
             @Nullable final String body,
             final boolean withContentLength) {
-        return setBodyInner(body, null, withContentLength);
+        setBodyInner(body, null, withContentLength);
     }
 
-    @Nonnull
     @Override
-    public HttpMessage setBodyBinary(@Nullable final byte[] body) {
-        return setBodyBinary(body, false);
+    public void setBodyBinary(@Nullable final byte[] body) {
+        setBodyBinary(body, false);
     }
 
-    @Nonnull
     @Override
-    public HttpMessage setBodyBinary(
+    public void setBodyBinary(
             @Nullable final byte[] body,
             final boolean withContentLength) {
-        return setBodyInner(null, body, withContentLength);
+        setBodyInner(null, body, withContentLength);
     }
 
-    @Nonnull
-    private HttpMessage setBodyInner(
+    private void setBodyInner(
             @Nullable final String string,
             @Nullable final byte[] binary,
             final boolean withContentLength) {
@@ -200,7 +188,6 @@ class HttpMessageDelegate implements HttpMessage {
             final int length = mBodyBinary == null ? 0 : mBodyBinary.length;
             setHeader(Http.CONTENT_LENGTH, String.valueOf(length));
         }
-        return this;
     }
 
     // VisibleForTesting
@@ -322,7 +309,7 @@ class HttpMessageDelegate implements HttpMessage {
     }
 
     @Override
-    public HttpMessage readData(@Nonnull final InputStream inputStream) throws IOException {
+    public void readData(@Nonnull final InputStream inputStream) throws IOException {
         readStartLine(inputStream);
         readHeaders(inputStream);
         if (isChunked()) {
@@ -330,7 +317,6 @@ class HttpMessageDelegate implements HttpMessage {
         } else {
             readBody(inputStream);
         }
-        return this;
     }
 
     private void readStartLine(@Nonnull final InputStream inputStream) throws IOException {

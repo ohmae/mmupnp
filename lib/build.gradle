@@ -91,6 +91,7 @@ uploadArchives {
         }
     }
 }
+
 javadoc {
     title = "mmupnp $version API"
     description "Generates Javadoc."

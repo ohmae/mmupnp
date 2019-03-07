@@ -35,7 +35,8 @@ public class HttpClientTest {
 
         final HttpServerMock server = new HttpServerMock();
         server.setServerCore((socket, is, os) -> {
-            final HttpRequest request = HttpRequest.create().readData(is);
+            final HttpRequest request = HttpRequest.create();
+            request.readData(is);
             final HttpResponse response = HttpResponse.create();
             response.setStartLine("HTTP/1.1 200 OK");
             response.setBody(responseBody, true);
@@ -70,7 +71,8 @@ public class HttpClientTest {
 
         final HttpServerMock server = new HttpServerMock();
         server.setServerCore((socket, is, os) -> {
-            final HttpRequest request = HttpRequest.create().readData(is);
+            final HttpRequest request = HttpRequest.create();
+            request.readData(is);
             final HttpResponse response = HttpResponse.create();
             response.setStartLine("HTTP/1.1 200 OK");
             response.setBodyBinary(responseBody, true);
@@ -106,7 +108,8 @@ public class HttpClientTest {
 
         final HttpServerMock server = new HttpServerMock();
         server.setServerCore((socket, is, os) -> {
-            final HttpRequest request = HttpRequest.create().readData(is);
+            final HttpRequest request = HttpRequest.create();
+            request.readData(is);
             final HttpResponse response = HttpResponse.create();
             response.setStartLine("HTTP/1.1 200 OK");
             response.setBody(responseBody, true);
@@ -142,7 +145,8 @@ public class HttpClientTest {
 
         final HttpServerMock server = new HttpServerMock();
         server.setServerCore((socket, is, os) -> {
-            final HttpRequest request = HttpRequest.create().readData(is);
+            final HttpRequest request = HttpRequest.create();
+            request.readData(is);
             final HttpResponse response = HttpResponse.create();
             response.setStartLine("HTTP/1.1 200 OK");
             response.setBody(responseBody, true);
@@ -172,7 +176,8 @@ public class HttpClientTest {
         server.open();
         final int port = server.getLocalPort();
         server.setServerCore((socket, is, os) -> {
-            final HttpRequest request = HttpRequest.create().readData(is);
+            final HttpRequest request = HttpRequest.create();
+            request.readData(is);
             final HttpResponse response = HttpResponse.create();
             response.setHeader(Http.CONNECTION, Http.CLOSE);
             response.setStartLine("HTTP/1.1 301 Moved Permanently");
@@ -183,12 +188,13 @@ public class HttpClientTest {
         });
 
         try {
+            final HttpRequest request = HttpRequest.create();
+            request.setMethod(Http.GET);
+            request.setUrl(new URL("http://127.0.0.1:" + port + "/a"), true);
+            request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+            request.setHeader(Http.CONNECTION, Http.CLOSE);
             final HttpClient client = new HttpClient(false);
-            client.post(HttpRequest.create()
-                    .setMethod(Http.GET)
-                    .setUrl(new URL("http://127.0.0.1:" + port + "/a"), true)
-                    .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-                    .setHeader(Http.CONNECTION, Http.CLOSE));
+            client.post(request);
             client.close();
         } finally {
             server.close();
@@ -201,7 +207,8 @@ public class HttpClientTest {
         server.open();
         final int port = server.getLocalPort();
         server.setServerCore((socket, is, os) -> {
-            final HttpRequest request = HttpRequest.create().readData(is);
+            final HttpRequest request = HttpRequest.create();
+            request.readData(is);
             final HttpResponse response = HttpResponse.create();
             response.setHeader(Http.CONNECTION, Http.CLOSE);
             if (request.getUri().equals("/b")) {
@@ -218,12 +225,13 @@ public class HttpClientTest {
         });
 
         try {
+            final HttpRequest request = HttpRequest.create();
+            request.setMethod(Http.GET);
+            request.setUrl(new URL("http://127.0.0.1:" + port + "/a"), true);
+            request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+            request.setHeader(Http.CONNECTION, Http.CLOSE);
             final HttpClient client = new HttpClient(false);
-            final HttpResponse response = client.post(HttpRequest.create()
-                    .setMethod(Http.GET)
-                    .setUrl(new URL("http://127.0.0.1:" + port + "/a"), true)
-                    .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-                    .setHeader(Http.CONNECTION, Http.CLOSE));
+            final HttpResponse response = client.post(request);
             assertThat(response.getBody(), is("b"));
             client.close();
         } finally {
@@ -235,7 +243,8 @@ public class HttpClientTest {
     public void post_Redirectのlocationがなければひとまずそのまま取得する() throws Exception {
         final HttpServerMock server = new HttpServerMock();
         server.setServerCore((socket, is, os) -> {
-            final HttpRequest request = HttpRequest.create().readData(is);
+            final HttpRequest request = HttpRequest.create();
+            request.readData(is);
             final HttpResponse response = HttpResponse.create();
             response.setHeader(Http.CONNECTION, Http.CLOSE);
             if (request.getUri().equals("/b")) {
@@ -253,12 +262,13 @@ public class HttpClientTest {
         server.open();
         final int port = server.getLocalPort();
         try {
+            final HttpRequest request = HttpRequest.create();
+            request.setMethod(Http.GET);
+            request.setUrl(new URL("http://127.0.0.1:" + port + "/a"), true);
+            request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+            request.setHeader(Http.CONNECTION, Http.CLOSE);
             final HttpClient client = new HttpClient(false);
-            final HttpResponse response = client.post(HttpRequest.create()
-                    .setMethod(Http.GET)
-                    .setUrl(new URL("http://127.0.0.1:" + port + "/a"), true)
-                    .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-                    .setHeader(Http.CONNECTION, Http.CLOSE));
+            final HttpResponse response = client.post(request);
             assertThat(response.getStatus(), is(Status.HTTP_MOVED_PERM));
             assertThat(response.getBody(), is("a"));
             client.close();
@@ -278,12 +288,13 @@ public class HttpClientTest {
         final int port = server.getLocalPort();
 
         try {
+            final HttpRequest request = HttpRequest.create();
+            request.setMethod(Http.GET);
+            request.setUrl(new URL("http://127.0.0.1:" + port + "/a"), true);
+            request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+            request.setHeader(Http.CONNECTION, Http.CLOSE);
             final HttpClient client = new HttpClient(false);
-            client.post(HttpRequest.create()
-                    .setMethod(Http.GET)
-                    .setUrl(new URL("http://127.0.0.1:" + port + "/a"), true)
-                    .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-                    .setHeader(Http.CONNECTION, Http.CLOSE));
+            client.post(request);
             assertThat(client.isClosed(), is(true));
             client.close();
         } finally {
@@ -302,13 +313,14 @@ public class HttpClientTest {
         final int port = server.getLocalPort();
 
         try {
+            final HttpRequest request = HttpRequest.create();
+            request.setMethod(Http.GET);
+            request.setUrl(new URL("http://127.0.0.1:" + port + "/a"), true);
+            request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+            request.setHeader(Http.CONNECTION, Http.CLOSE);
             final HttpClient client = new HttpClient(false);
             try {
-                client.post(HttpRequest.create()
-                        .setMethod(Http.GET)
-                        .setUrl(new URL("http://127.0.0.1:" + port + "/a"), true)
-                        .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-                        .setHeader(Http.CONNECTION, Http.CLOSE));
+                client.post(request);
             } catch (final IOException ignored) {
             }
             assertThat(client.isClosed(), is(true));
@@ -339,8 +351,8 @@ public class HttpClientTest {
     @Test
     public void canReuse_初期状態ではfalse() throws Exception {
         final HttpClient client = new HttpClient();
-        final HttpRequest request = HttpRequest.create()
-                .setUrl(new URL("http://192.168.0.1/index.html"));
+        final HttpRequest request = HttpRequest.create();
+        request.setUrl(new URL("http://192.168.0.1/index.html"));
 
         assertThat(client.canReuse(request), is(false));
     }
@@ -355,8 +367,8 @@ public class HttpClientTest {
         final Field fieldSocket = HttpClient.class.getDeclaredField("mSocket");
         fieldSocket.setAccessible(true);
         fieldSocket.set(client, socket);
-        final HttpRequest request = HttpRequest.create()
-                .setUrl(new URL("http://192.168.0.1/index.html"));
+        final HttpRequest request = HttpRequest.create();
+        request.setUrl(new URL("http://192.168.0.1/index.html"));
         assertThat(client.canReuse(request), is(true));
     }
 
@@ -370,8 +382,8 @@ public class HttpClientTest {
         final Field fieldSocket = HttpClient.class.getDeclaredField("mSocket");
         fieldSocket.setAccessible(true);
         fieldSocket.set(client, socket);
-        final HttpRequest request = HttpRequest.create()
-                .setUrl(new URL("http://192.168.0.1:8080/index.html"));
+        final HttpRequest request = HttpRequest.create();
+        request.setUrl(new URL("http://192.168.0.1:8080/index.html"));
         assertThat(client.canReuse(request), is(false));
     }
 
@@ -385,8 +397,8 @@ public class HttpClientTest {
         final Field fieldSocket = HttpClient.class.getDeclaredField("mSocket");
         fieldSocket.setAccessible(true);
         fieldSocket.set(client, socket);
-        final HttpRequest request = HttpRequest.create()
-                .setUrl(new URL("http://192.168.0.1/index.html"));
+        final HttpRequest request = HttpRequest.create();
+        request.setUrl(new URL("http://192.168.0.1/index.html"));
         assertThat(client.canReuse(request), is(false));
     }
 
@@ -400,8 +412,8 @@ public class HttpClientTest {
         final Field fieldSocket = HttpClient.class.getDeclaredField("mSocket");
         fieldSocket.setAccessible(true);
         fieldSocket.set(client, socket);
-        final HttpRequest request = HttpRequest.create()
-                .setUrl(new URL("http://192.168.0.1/index.html"));
+        final HttpRequest request = HttpRequest.create();
+        request.setUrl(new URL("http://192.168.0.1/index.html"));
         assertThat(client.canReuse(request), is(false));
     }
 }

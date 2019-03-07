@@ -355,7 +355,7 @@ public final class NetworkUtils {
             savedStart = start;
         }
         if (savedLength < 2) {
-            return new int[] {-1, -1};
+            return new int[]{-1, -1};
         }
         return new int[]{savedStart, savedStart + savedLength};
     }

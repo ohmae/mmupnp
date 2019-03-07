@@ -64,7 +64,6 @@ public class HttpRequest implements HttpMessage {
             return mMethod;
         }
 
-        @Nonnull
         public void setMethod(@Nonnull final String method) {
             mMethod = method;
         }
@@ -74,7 +73,6 @@ public class HttpRequest implements HttpMessage {
             return mUri;
         }
 
-        @Nonnull
         public void setUri(@Nonnull final String uri) {
             mUri = uri;
         }
@@ -85,7 +83,6 @@ public class HttpRequest implements HttpMessage {
             return mVersion;
         }
 
-        @Nonnull
         @Override
         public void setVersion(@Nonnull final String version) {
             mVersion = version;
@@ -206,11 +203,9 @@ public class HttpRequest implements HttpMessage {
         return new InetSocketAddress(mAddress, mPort);
     }
 
-    @Nonnull
     @Override
-    public HttpRequest setStartLine(@Nonnull final String line) {
+    public void setStartLine(@Nonnull final String line) {
         mStartLine.setStartLine(line);
-        return this;
     }
 
     @Nonnull
@@ -223,13 +218,10 @@ public class HttpRequest implements HttpMessage {
      * 送信先URLを設定する。
      *
      * @param url 接続先URL
-     * @return HttpRequest
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    @Nonnull
-    public HttpRequest setUrl(@Nonnull final URL url) throws IOException {
+    public void setUrl(@Nonnull final URL url) throws IOException {
         setUrl(url, false);
-        return this;
     }
 
     /**
@@ -237,11 +229,9 @@ public class HttpRequest implements HttpMessage {
      *
      * @param url            接続先URL
      * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
-     * @return HttpRequest
      * @throws IOException http以外を指定した場合、URLのパースエラー
      */
-    @Nonnull
-    public HttpRequest setUrl(
+    public void setUrl(
             @Nonnull final URL url,
             final boolean withHostHeader) throws IOException {
         if (!TextUtils.equals(url.getProtocol(), "http")) {
@@ -261,7 +251,6 @@ public class HttpRequest implements HttpMessage {
         if (withHostHeader) {
             setHeader(Http.HOST, getAddressString());
         }
-        return this;
     }
 
     /**
@@ -278,12 +267,9 @@ public class HttpRequest implements HttpMessage {
      * リクエストメソッドを設定する。
      *
      * @param method リクエストメソッド
-     * @return HttpRequest
      */
-    @Nonnull
-    public HttpRequest setMethod(@Nonnull final String method) {
+    public void setMethod(@Nonnull final String method) {
         mStartLine.setMethod(method);
-        return this;
     }
 
     /**
@@ -302,14 +288,11 @@ public class HttpRequest implements HttpMessage {
      * <p>接続先の設定ではなくパスのみの設定</p>
      *
      * @param uri URI
-     * @return HttpRequest
      * @see #setUrl(URL)
      * @see #setUrl(URL, boolean)
      */
-    @Nonnull
-    public HttpRequest setUri(@Nonnull final String uri) {
+    public void setUri(@Nonnull final String uri) {
         mStartLine.setUri(uri);
-        return this;
     }
 
     @Nonnull
@@ -318,27 +301,21 @@ public class HttpRequest implements HttpMessage {
         return mDelegate.getVersion();
     }
 
-    @Nonnull
     @Override
-    public HttpRequest setVersion(@Nonnull final String version) {
+    public void setVersion(@Nonnull final String version) {
         mDelegate.setVersion(version);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpRequest setHeader(
+    public void setHeader(
             @Nonnull final String name,
             @Nonnull final String value) {
         mDelegate.setHeader(name, value);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpRequest setHeaderLine(@Nonnull final String line) {
+    public void setHeaderLine(@Nonnull final String line) {
         mDelegate.setHeaderLine(line);
-        return this;
     }
 
     @Nullable
@@ -362,36 +339,28 @@ public class HttpRequest implements HttpMessage {
         return mDelegate.getContentLength();
     }
 
-    @Nonnull
     @Override
-    public HttpRequest setBody(@Nullable final String body) {
+    public void setBody(@Nullable final String body) {
         mDelegate.setBody(body);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpRequest setBody(
+    public void setBody(
             @Nullable final String body,
             final boolean withContentLength) {
         mDelegate.setBody(body, withContentLength);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpRequest setBodyBinary(@Nullable final byte[] body) {
+    public void setBodyBinary(@Nullable final byte[] body) {
         mDelegate.setBodyBinary(body);
-        return this;
     }
 
-    @Nonnull
     @Override
-    public HttpRequest setBodyBinary(
+    public void setBodyBinary(
             @Nullable final byte[] body,
             final boolean withContentLength) {
         mDelegate.setBodyBinary(body, withContentLength);
-        return this;
     }
 
     @Nullable
@@ -417,11 +386,9 @@ public class HttpRequest implements HttpMessage {
         mDelegate.writeData(outputStream);
     }
 
-    @Nonnull
     @Override
-    public HttpRequest readData(@Nonnull final InputStream inputStream) throws IOException {
+    public void readData(@Nonnull final InputStream inputStream) throws IOException {
         mDelegate.readData(inputStream);
-        return this;
     }
 
     @Nonnull

@@ -272,21 +272,27 @@ public class EventReceiver {
 
     // VisibleForTesting
     static class ClientTask implements Runnable {
-        private static final HttpResponse RESPONSE_OK = HttpResponse.create()
-                .setStatus(Http.Status.HTTP_OK)
-                .setHeader(Http.SERVER, Property.SERVER_VALUE)
-                .setHeader(Http.CONNECTION, Http.CLOSE)
-                .setHeader(Http.CONTENT_LENGTH, "0");
-        private static final HttpResponse RESPONSE_BAD = HttpResponse.create()
-                .setStatus(Http.Status.HTTP_BAD_REQUEST)
-                .setHeader(Http.SERVER, Property.SERVER_VALUE)
-                .setHeader(Http.CONNECTION, Http.CLOSE)
-                .setHeader(Http.CONTENT_LENGTH, "0");
-        private static final HttpResponse RESPONSE_FAIL = HttpResponse.create()
-                .setStatus(Http.Status.HTTP_PRECON_FAILED)
-                .setHeader(Http.SERVER, Property.SERVER_VALUE)
-                .setHeader(Http.CONNECTION, Http.CLOSE)
-                .setHeader(Http.CONTENT_LENGTH, "0");
+        private static final HttpResponse RESPONSE_OK;
+        private static final HttpResponse RESPONSE_BAD;
+        private static final HttpResponse RESPONSE_FAIL;
+
+        static {
+            RESPONSE_OK = HttpResponse.create();
+            RESPONSE_OK.setStatus(Http.Status.HTTP_OK);
+            RESPONSE_OK.setHeader(Http.SERVER, Property.SERVER_VALUE);
+            RESPONSE_OK.setHeader(Http.CONNECTION, Http.CLOSE);
+            RESPONSE_OK.setHeader(Http.CONTENT_LENGTH, "0");
+            RESPONSE_BAD = HttpResponse.create();
+            RESPONSE_BAD.setStatus(Http.Status.HTTP_BAD_REQUEST);
+            RESPONSE_BAD.setHeader(Http.SERVER, Property.SERVER_VALUE);
+            RESPONSE_BAD.setHeader(Http.CONNECTION, Http.CLOSE);
+            RESPONSE_BAD.setHeader(Http.CONTENT_LENGTH, "0");
+            RESPONSE_FAIL = HttpResponse.create();
+            RESPONSE_FAIL.setStatus(Http.Status.HTTP_PRECON_FAILED);
+            RESPONSE_FAIL.setHeader(Http.SERVER, Property.SERVER_VALUE);
+            RESPONSE_FAIL.setHeader(Http.CONNECTION, Http.CLOSE);
+            RESPONSE_FAIL.setHeader(Http.CONTENT_LENGTH, "0");
+        }
 
         @Nonnull
         private final ServerTask mServer;
@@ -356,7 +362,8 @@ public class EventReceiver {
                 @Nonnull final InputStream is,
                 @Nonnull final OutputStream os)
                 throws IOException {
-            final HttpRequest request = HttpRequest.create().readData(is);
+            final HttpRequest request = HttpRequest.create();
+            request.readData(is);
             Logger.v(() -> "receive event:\n" + request);
             final String nt = request.getHeader(Http.NT);
             final String nts = request.getHeader(Http.NTS);

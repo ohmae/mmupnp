@@ -44,10 +44,8 @@ public interface HttpMessage {
      * Start Lineを設定する。
      *
      * @param line Start Line
-     * @return HttpMessage
      */
-    @Nonnull
-    HttpMessage setStartLine(@Nonnull String line) throws IllegalArgumentException;
+    void setStartLine(@Nonnull String line) throws IllegalArgumentException;
 
     /**
      * HTTPバージョンの値を返す。
@@ -61,20 +59,16 @@ public interface HttpMessage {
      * HTTPバージョンを設定する。
      *
      * @param version HTTPバージョン
-     * @return HttpMessage
      */
-    @Nonnull
-    HttpMessage setVersion(@Nonnull String version);
+    void setVersion(@Nonnull String version);
 
     /**
      * ヘッダを設定する。
      *
      * @param name  ヘッダ名
      * @param value 値
-     * @return HttpMessage
      */
-    @Nonnull
-    HttpMessage setHeader(
+    void setHeader(
             @Nonnull String name,
             @Nonnull String value);
 
@@ -82,10 +76,8 @@ public interface HttpMessage {
      * ヘッダの各行からヘッダの設定を行う
      *
      * @param line ヘッダの1行
-     * @return HttpMessage
      */
-    @Nonnull
-    HttpMessage setHeaderLine(@Nonnull String line);
+    void setHeaderLine(@Nonnull String line);
 
     /**
      * ヘッダの値を返す。
@@ -127,20 +119,16 @@ public interface HttpMessage {
      * メッセージボディを設定する。
      *
      * @param body メッセージボディ
-     * @return HttpMessage
      */
-    @Nonnull
-    HttpMessage setBody(@Nullable String body);
+    void setBody(@Nullable String body);
 
     /**
      * メッセージボディを設定する。
      *
      * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
-     * @return HttpMessage
      */
-    @Nonnull
-    HttpMessage setBody(
+    void setBody(
             @Nullable String body,
             boolean withContentLength);
 
@@ -150,20 +138,16 @@ public interface HttpMessage {
      * <p>取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
      *
      * @param body メッセージボディ
-     * @return HttpMessage
      */
-    @Nonnull
-    HttpMessage setBodyBinary(@Nullable byte[] body);
+    void setBodyBinary(@Nullable byte[] body);
 
     /**
      * メッセージボディを設定する。
      *
      * @param body              メッセージボディ
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
-     * @return HttpMessage
      */
-    @Nonnull
-    HttpMessage setBodyBinary(
+    void setBodyBinary(
             @Nullable byte[] body,
             boolean withContentLength);
 
@@ -205,8 +189,7 @@ public interface HttpMessage {
      * 指定されたInputStreamからデータの読み出しを行う。
      *
      * @param inputStream 入力元
-     * @return HttpMessage
      * @throws IOException 入出力エラー
      */
-    HttpMessage readData(@Nonnull InputStream inputStream) throws IOException;
+    void readData(@Nonnull InputStream inputStream) throws IOException;
 }

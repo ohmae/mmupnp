@@ -44,8 +44,8 @@ public class SsdpResponse implements SsdpMessage {
             @Nonnull final byte[] data,
             final int length)
             throws IOException {
-        final HttpResponse httpResponse = HttpResponse.create()
-                .readData(new ByteArrayInputStream(data, 0, length));
+        final HttpResponse httpResponse = HttpResponse.create();
+        httpResponse.readData(new ByteArrayInputStream(data, 0, length));
         final SsdpMessageDelegate delegate = new SsdpMessageDelegate(httpResponse, address);
         return new SsdpResponse(httpResponse, delegate);
     }

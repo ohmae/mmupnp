@@ -42,8 +42,8 @@ public class HttpRequestTest {
 
     @Test
     public void setUrl_getAddress_getPort_getUriに反映される() throws IOException {
-        final HttpRequest request = HttpRequest.create()
-                .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
+        final HttpRequest request = HttpRequest.create();
+        request.setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
         final int port = 12345;
         final InetAddress address = InetAddress.getByName("192.0.2.2");
         final SocketAddress socketAddress = new InetSocketAddress(address, port);
@@ -58,8 +58,8 @@ public class HttpRequestTest {
 
     @Test
     public void setUrl_getAddress_getPort_getUriに反映される1() throws IOException {
-        final HttpRequest request = HttpRequest.create()
-                .setUrl(new URL("http://[2001:db8::1]:12345/cds/control"), true);
+        final HttpRequest request = HttpRequest.create();
+        request.setUrl(new URL("http://[2001:db8::1]:12345/cds/control"), true);
         final int port = 12345;
         final InetAddress address = InetAddress.getByName("2001:db8::1");
         final SocketAddress socketAddress = new InetSocketAddress(address, port);
@@ -93,7 +93,8 @@ public class HttpRequestTest {
     @Test
     public void readData_読み込めること() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-length.bin");
-        final HttpRequest request = HttpRequest.create().readData(is);
+        final HttpRequest request = HttpRequest.create();
+        request.readData(is);
 
         assertThat(request.getMethod(), is(Http.POST));
         assertThat(request.getUri(), is("/cds/control"));
@@ -107,7 +108,8 @@ public class HttpRequestTest {
     @Test
     public void readData_Chunk読み込めること() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-chunked.bin");
-        final HttpRequest request = HttpRequest.create().readData(is);
+        final HttpRequest request = HttpRequest.create();
+        request.readData(is);
 
         assertThat(request.getMethod(), is(Http.POST));
         assertThat(request.getUri(), is("/cds/control"));
@@ -122,20 +124,21 @@ public class HttpRequestTest {
     @Test
     public void writeData_書き出しができること() throws IOException {
         final String soap = TestUtils.getResourceAsString("browse-request.xml");
-        final HttpRequest request = HttpRequest.create()
-                .setMethod(Http.POST)
-                .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true)
-                .setHeader(Http.SOAPACTION, ACTION)
-                .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-                .setHeader(Http.CONNECTION, Http.CLOSE)
-                .setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT)
-                .setBody(soap, true);
+        final HttpRequest request = HttpRequest.create();
+        request.setMethod(Http.POST);
+        request.setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
+        request.setHeader(Http.SOAPACTION, ACTION);
+        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+        request.setHeader(Http.CONNECTION, Http.CLOSE);
+        request.setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT);
+        request.setBody(soap, true);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         request.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpRequest readRequest = HttpRequest.create().readData(bais);
+        final HttpRequest readRequest = HttpRequest.create();
+        readRequest.readData(bais);
 
         assertThat(readRequest.getStartLine(), is(request.getStartLine()));
         assertThat(readRequest.getBody(), is(request.getBody()));
@@ -144,21 +147,22 @@ public class HttpRequestTest {
     @Test
     public void writeData_Chunk書き出しができること() throws IOException {
         final String soap = TestUtils.getResourceAsString("browse-request.xml");
-        final HttpRequest request = HttpRequest.create()
-                .setMethod(Http.POST)
-                .setUrl(new URL("http://192.0.2.2:12345/cds/control"), true)
-                .setHeader(Http.SOAPACTION, ACTION)
-                .setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-                .setHeader(Http.CONNECTION, Http.CLOSE)
-                .setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT)
-                .setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED)
-                .setBody(soap, false);
+        final HttpRequest request = HttpRequest.create();
+        request.setMethod(Http.POST);
+        request.setUrl(new URL("http://192.0.2.2:12345/cds/control"), true);
+        request.setHeader(Http.SOAPACTION, ACTION);
+        request.setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE);
+        request.setHeader(Http.CONNECTION, Http.CLOSE);
+        request.setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT);
+        request.setHeader(Http.TRANSFER_ENCODING, Http.CHUNKED);
+        request.setBody(soap, false);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         request.writeData(baos);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final HttpRequest readRequest = HttpRequest.create().readData(bais);
+        final HttpRequest readRequest = HttpRequest.create();
+        readRequest.readData(bais);
 
         assertThat(readRequest.getStartLine(), is(request.getStartLine()));
         assertThat(readRequest.getBody(), is(request.getBody()));
@@ -191,7 +195,8 @@ public class HttpRequestTest {
     @Test
     public void HttpRequest_ディープコピーができる() throws IOException {
         final InputStream is = TestUtils.getResourceAsStream("browse-request-length.bin");
-        final HttpRequest request = HttpRequest.create().readData(is);
+        final HttpRequest request = HttpRequest.create();
+        request.readData(is);
 
         final HttpRequest readRequest = HttpRequest.copy(request);
         assertThat(readRequest.getMethod(), is(request.getMethod()));

@@ -49,12 +49,12 @@ public class EventReceiverTest {
 
     @Before
     public void setUp() throws Exception {
-        final HttpRequest notify = HttpRequest.create()
-                .setMethod(Http.NOTIFY)
-                .setUri("/")
-                .setHeader(Http.CONNECTION, Http.CLOSE)
-                .setHeader(Http.SEQ, "0")
-                .setBody(TestUtils.getResourceAsString("propchange.xml"), true);
+        final HttpRequest notify = HttpRequest.create();
+        notify.setMethod(Http.NOTIFY);
+        notify.setUri("/");
+        notify.setHeader(Http.CONNECTION, Http.CLOSE);
+        notify.setHeader(Http.SEQ, "0");
+        notify.setBody(TestUtils.getResourceAsString("propchange.xml"), true);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         notify.writeData(baos);
         mBadRequest = baos.toByteArray();
@@ -156,8 +156,8 @@ public class EventReceiverTest {
         assertThat(result.properties, hasItem(new StringPair("SystemUpdateID", "0")));
         assertThat(result.properties, hasItem(new StringPair("ContainerUpdateIDs", "")));
 
-        final HttpResponse response = HttpResponse.create()
-                .readData(new ByteArrayInputStream(baos.toByteArray()));
+        final HttpResponse response = HttpResponse.create();
+        response.readData(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(response.getStatus(), is(Http.Status.HTTP_OK));
     }
 
@@ -196,8 +196,8 @@ public class EventReceiverTest {
         receiver.close();
         Thread.sleep(10);
 
-        final HttpResponse response = HttpResponse.create()
-                .readData(new ByteArrayInputStream(baos.toByteArray()));
+        final HttpResponse response = HttpResponse.create();
+        response.readData(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(response.getStatus(), is(Http.Status.HTTP_PRECON_FAILED));
     }
 
@@ -236,8 +236,8 @@ public class EventReceiverTest {
         receiver.close();
         Thread.sleep(10);
 
-        final HttpResponse response = HttpResponse.create()
-                .readData(new ByteArrayInputStream(baos.toByteArray()));
+        final HttpResponse response = HttpResponse.create();
+        response.readData(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(response.getStatus(), is(Http.Status.HTTP_PRECON_FAILED));
     }
 
@@ -276,8 +276,8 @@ public class EventReceiverTest {
         receiver.close();
         Thread.sleep(10);
 
-        final HttpResponse response = HttpResponse.create()
-                .readData(new ByteArrayInputStream(baos.toByteArray()));
+        final HttpResponse response = HttpResponse.create();
+        response.readData(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(response.getStatus(), is(Http.Status.HTTP_BAD_REQUEST));
     }
 
@@ -332,45 +332,45 @@ public class EventReceiverTest {
 
     @Test
     public void parsePropertyPairs_rootがpropertysetでない場合リスト() throws Exception {
-        final HttpRequest request = HttpRequest.create()
-                .setBody("<e:property xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
-                        "<e:property>\n" +
-                        "<SystemUpdateID>0</SystemUpdateID>\n" +
-                        "</e:property>\n" +
-                        "<e:property>\n" +
-                        "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
-                        "</e:property>\n" +
-                        "</e:property>", true);
+        final HttpRequest request = HttpRequest.create();
+        request.setBody("<e:property xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                "<e:property>\n" +
+                "<SystemUpdateID>0</SystemUpdateID>\n" +
+                "</e:property>\n" +
+                "<e:property>\n" +
+                "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                "</e:property>\n" +
+                "</e:property>", true);
 
         assertThat(EventReceiver.parsePropertyPairs(request), empty());
     }
 
     @Test
     public void parsePropertyPairs_property以外の要素は無視() throws Exception {
-        final HttpRequest request = HttpRequest.create()
-                .setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
-                        "<e:property>\n" +
-                        "<SystemUpdateID>0</SystemUpdateID>\n" +
-                        "</e:property>\n" +
-                        "<e:proper>\n" +
-                        "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
-                        "</e:proper>\n" +
-                        "</e:propertyset>", true);
+        final HttpRequest request = HttpRequest.create();
+        request.setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                "<e:property>\n" +
+                "<SystemUpdateID>0</SystemUpdateID>\n" +
+                "</e:property>\n" +
+                "<e:proper>\n" +
+                "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                "</e:proper>\n" +
+                "</e:propertyset>", true);
 
         assertThat(EventReceiver.parsePropertyPairs(request), hasSize(1));
     }
 
     @Test
     public void parsePropertyPairs_xml異常() throws Exception {
-        final HttpRequest request = HttpRequest.create()
-                .setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
-                        "<e:property>\n" +
-                        "<>0</>\n" +
-                        "</e:property>\n" +
-                        "<e:property>\n" +
-                        "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
-                        "</e:property>\n" +
-                        "</e:propertyset>", true);
+        final HttpRequest request = HttpRequest.create();
+        request.setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                "<e:property>\n" +
+                "<>0</>\n" +
+                "</e:property>\n" +
+                "<e:property>\n" +
+                "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                "</e:property>\n" +
+                "</e:propertyset>", true);
 
         assertThat(EventReceiver.parsePropertyPairs(request), empty());
     }
@@ -401,9 +401,9 @@ public class EventReceiverTest {
         final EventMessageListener listener = mock(EventMessageListener.class);
         task.setEventMessageListener(listener);
 
-        final HttpRequest request = HttpRequest.create()
-                .setHeader(Http.SEQ, "0")
-                .setBody(TestUtils.getResourceAsString("propchange.xml"), true);
+        final HttpRequest request = HttpRequest.create();
+        request.setHeader(Http.SEQ, "0");
+        request.setBody(TestUtils.getResourceAsString("propchange.xml"), true);
 
         doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
@@ -420,9 +420,9 @@ public class EventReceiverTest {
     public void ServerTask_notifyEvent_listenerがなければfalse() throws Exception {
         final String sid = "sid";
         final ServerTask task = new ServerTask(mock(ServerSocket.class));
-        final HttpRequest request = HttpRequest.create()
-                .setHeader(Http.SEQ, "0")
-                .setBody(TestUtils.getResourceAsString("propchange.xml"), true);
+        final HttpRequest request = HttpRequest.create();
+        request.setHeader(Http.SEQ, "0");
+        request.setBody(TestUtils.getResourceAsString("propchange.xml"), true);
 
         assertThat(task.notifyEvent(sid, request), is(false));
     }

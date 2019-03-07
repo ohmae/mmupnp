@@ -481,13 +481,14 @@ public class ServiceImpl implements Service {
 
     @Nonnull
     private HttpRequest makeSubscribeRequest() throws IOException {
-        return HttpRequest.create()
-                .setMethod(Http.SUBSCRIBE)
-                .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
-                .setHeader(Http.NT, Http.UPNP_EVENT)
-                .setHeader(Http.CALLBACK, getCallback())
-                .setHeader(Http.TIMEOUT, "Second-300")
-                .setHeader(Http.CONTENT_LENGTH, "0");
+        final HttpRequest request = HttpRequest.create();
+        request.setMethod(Http.SUBSCRIBE);
+        request.setUrl(makeAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.NT, Http.UPNP_EVENT);
+        request.setHeader(Http.CALLBACK, getCallback());
+        request.setHeader(Http.TIMEOUT, "Second-300");
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
     }
 
     @Override
@@ -521,12 +522,13 @@ public class ServiceImpl implements Service {
 
     @Nonnull
     private HttpRequest makeRenewSubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
-        return HttpRequest.create()
-                .setMethod(Http.SUBSCRIBE)
-                .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
-                .setHeader(Http.SID, subscriptionId)
-                .setHeader(Http.TIMEOUT, "Second-300")
-                .setHeader(Http.CONTENT_LENGTH, "0");
+        final HttpRequest request = HttpRequest.create();
+        request.setMethod(Http.SUBSCRIBE);
+        request.setUrl(makeAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.SID, subscriptionId);
+        request.setHeader(Http.TIMEOUT, "Second-300");
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
     }
 
     @Override
@@ -549,11 +551,12 @@ public class ServiceImpl implements Service {
 
     @Nonnull
     private HttpRequest makeUnsubscribeRequest(@Nonnull final String subscriptionId) throws IOException {
-        return HttpRequest.create()
-                .setMethod(Http.UNSUBSCRIBE)
-                .setUrl(makeAbsoluteUrl(mEventSubUrl), true)
-                .setHeader(Http.SID, subscriptionId)
-                .setHeader(Http.CONTENT_LENGTH, "0");
+        final HttpRequest request = HttpRequest.create();
+        request.setMethod(Http.UNSUBSCRIBE);
+        request.setUrl(makeAbsoluteUrl(mEventSubUrl), true);
+        request.setHeader(Http.SID, subscriptionId);
+        request.setHeader(Http.CONTENT_LENGTH, "0");
+        return request;
     }
 
     @Override
