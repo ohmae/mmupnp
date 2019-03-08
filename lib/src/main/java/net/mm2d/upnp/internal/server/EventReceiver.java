@@ -339,7 +339,7 @@ public class EventReceiver {
          */
         void shutdownRequest() {
             if (mFutureTask != null) {
-                mFutureTask.cancel(true);
+                mFutureTask.cancel(false);
                 mFutureTask = null;
             }
             IoUtils.closeQuietly(mSocket);
