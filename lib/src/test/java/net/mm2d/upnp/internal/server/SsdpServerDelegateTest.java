@@ -12,7 +12,6 @@ import net.mm2d.upnp.MockMulticastSocket;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.upnp.internal.message.SsdpResponse;
-import net.mm2d.upnp.internal.server.SsdpServer.Address;
 import net.mm2d.upnp.internal.server.SsdpServerDelegate.ReceiveTask;
 import net.mm2d.upnp.internal.server.SsdpServerDelegate.Receiver;
 import net.mm2d.util.NetworkUtils;

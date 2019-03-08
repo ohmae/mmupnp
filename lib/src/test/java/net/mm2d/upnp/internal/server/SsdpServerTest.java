@@ -22,18 +22,18 @@ public class SsdpServerTest {
     @Test
     public void parseAddress_ipv4() throws Exception {
         final String address = "192.0.2.1";
-        assertThat(SsdpServer.Address.parseAddress(address), is(InetAddress.getByName(address)));
+        assertThat(Address.parseAddress(address), is(InetAddress.getByName(address)));
     }
 
     @Test
     public void parseAddress_ipv6() throws Exception {
         final String address = "2001:db8::9abc";
-        assertThat(SsdpServer.Address.parseAddress(address), is(InetAddress.getByName(address)));
+        assertThat(Address.parseAddress(address), is(InetAddress.getByName(address)));
     }
 
     @Test(expected = AssertionError.class)
     public void parseAddress_error() throws Exception {
         final String address = "unknown_host";
-        assertThat(SsdpServer.Address.parseAddress(address), is(InetAddress.getByName(address)));
+        assertThat(Address.parseAddress(address), is(InetAddress.getByName(address)));
     }
 }

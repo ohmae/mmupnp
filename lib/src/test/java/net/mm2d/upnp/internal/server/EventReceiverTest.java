@@ -81,7 +81,7 @@ public class EventReceiverTest {
 
     @Test(timeout = 1000L)
     public void close_open前なら即終了() throws Exception {
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(),null);
+        final EventReceiver receiver = new EventReceiver(new TaskHandler(), null);
         receiver.close();
     }
 
@@ -91,7 +91,7 @@ public class EventReceiverTest {
         final ServerSocket serverSocket = mock(ServerSocket.class);
         doReturn(port).when(serverSocket).getLocalPort();
         doThrow(new IOException()).when(serverSocket).accept();
-        final EventReceiver receiver = spy(new EventReceiver(new TaskHandler(),null));
+        final EventReceiver receiver = spy(new EventReceiver(new TaskHandler(), null));
         doReturn(serverSocket).when(receiver).createServerSocket();
 
         receiver.open();
@@ -101,7 +101,7 @@ public class EventReceiverTest {
 
     @Test
     public void getLocalPort_開始前は0() {
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(),null);
+        final EventReceiver receiver = new EventReceiver(new TaskHandler(), null);
         assertThat(receiver.getLocalPort(), is(0));
     }
 
