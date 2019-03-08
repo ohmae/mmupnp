@@ -97,8 +97,10 @@ public class DiFactory {
     }
 
     @Nonnull
-    public EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
-        return new EventReceiver(listener);
+    public EventReceiver createEventReceiver(
+            @Nonnull final TaskHandler taskHandler,
+            @Nonnull final EventMessageListener listener) {
+        return new EventReceiver(taskHandler, listener);
     }
 
     @Nonnull

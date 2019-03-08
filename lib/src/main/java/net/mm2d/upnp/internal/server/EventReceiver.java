@@ -12,6 +12,7 @@ import net.mm2d.upnp.Http;
 import net.mm2d.upnp.Property;
 import net.mm2d.upnp.internal.message.HttpRequest;
 import net.mm2d.upnp.internal.message.HttpResponse;
+import net.mm2d.upnp.internal.thread.TaskHandler;
 import net.mm2d.util.IoUtils;
 import net.mm2d.util.StringPair;
 import net.mm2d.util.TextParseUtils;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -67,6 +69,8 @@ public class EventReceiver {
     private ServerSocket mServerSocket;
     @Nullable
     private ServerTask mServerTask;
+    @Nonnull
+    private final TaskHandler mTaskHandler;
     @Nullable
     private final EventMessageListener mListener;
 
@@ -75,7 +79,10 @@ public class EventReceiver {
      *
      * @param listener イベントを通知するリスナー
      */
-    public EventReceiver(@Nullable final EventMessageListener listener) {
+    public EventReceiver(
+            @Nonnull final TaskHandler taskHandler,
+            @Nullable final EventMessageListener listener) {
+        mTaskHandler = taskHandler;
         mListener = listener;
     }
 
@@ -86,7 +93,7 @@ public class EventReceiver {
      */
     public void open() throws IOException {
         mServerSocket = createServerSocket();
-        mServerTask = new ServerTask(mServerSocket);
+        mServerTask = new ServerTask(mTaskHandler, mServerSocket);
         mServerTask.setEventMessageListener(mListener);
         mServerTask.start();
     }
@@ -166,6 +173,8 @@ public class EventReceiver {
     static class ServerTask implements Runnable {
         private volatile boolean mShutdownRequest = false;
         @Nonnull
+        private final TaskHandler mTaskHandler;
+        @Nonnull
         private final ServerSocket mServerSocket;
         @Nonnull
         private final List<ClientTask> mClientList;
@@ -179,7 +188,10 @@ public class EventReceiver {
          *
          * @param sock サーバソケット
          */
-        ServerTask(@Nonnull final ServerSocket sock) {
+        ServerTask(
+                @Nonnull final TaskHandler taskHandler,
+                @Nonnull final ServerSocket sock) {
+            mTaskHandler = taskHandler;
             mServerSocket = sock;
             mClientList = Collections.synchronizedList(new LinkedList<>());
         }
@@ -261,7 +273,7 @@ public class EventReceiver {
                     sock.setSoTimeout(Property.DEFAULT_TIMEOUT);
                     final ClientTask client = new ClientTask(this, sock);
                     mClientList.add(client);
-                    client.start();
+                    client.start(mTaskHandler);
                 }
             } catch (final IOException ignored) {
             } finally {
@@ -299,7 +311,7 @@ public class EventReceiver {
         @Nonnull
         private final Socket mSocket;
         @Nullable
-        private Thread mThread;
+        private FutureTask<Void> mFutureTask;
 
         /**
          * インスタンス作成
@@ -317,18 +329,18 @@ public class EventReceiver {
         /**
          * スレッドを作成し開始する。
          */
-        void start() {
-            mThread = new Thread(this, "EventReceiver::ClientTask");
-            mThread.start();
+        void start(@Nonnull final TaskHandler handler) {
+            mFutureTask = new FutureTask<>(this, null);
+            handler.io(mFutureTask);
         }
 
         /**
          * スレッドを終了させ、ソケットのクローズを行う。
          */
         void shutdownRequest() {
-            if (mThread != null) {
-                mThread.interrupt();
-                mThread = null;
+            if (mFutureTask != null) {
+                mFutureTask.cancel(true);
+                mFutureTask = null;
             }
             IoUtils.closeQuietly(mSocket);
         }

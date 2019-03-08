@@ -95,7 +95,9 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
+            public EventReceiver createEventReceiver(
+                    @Nonnull final TaskHandler handler,
+                    @Nonnull final EventMessageListener listener) {
                 return receiver;
             }
         };
@@ -113,7 +115,9 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
+            public EventReceiver createEventReceiver(
+                    @Nonnull final TaskHandler handler,
+                    @Nonnull final EventMessageListener listener) {
                 return receiver;
             }
         };
@@ -137,7 +141,9 @@ public class SubscribeManagerTest {
 
             @Nonnull
             @Override
-            public EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
+            public EventReceiver createEventReceiver(
+                    @Nonnull final TaskHandler handler,
+                    @Nonnull final EventMessageListener listener) {
                 return receiver;
             }
         };
@@ -175,7 +181,9 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public EventReceiver createEventReceiver(@Nonnull final EventMessageListener listener) {
+            public EventReceiver createEventReceiver(
+                    @Nonnull final TaskHandler handler,
+                    @Nonnull final EventMessageListener listener) {
                 return receiver;
             }
         };

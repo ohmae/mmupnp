@@ -40,7 +40,7 @@ public class SubscribeManager implements EventMessageListener {
         mTaskHandler = taskHandler;
         mNotifyEventListener = listener;
         mSubscribeHolder = factory.createSubscribeHolder();
-        mEventReceiver = factory.createEventReceiver(this);
+        mEventReceiver = factory.createEventReceiver(taskHandler, this);
     }
 
     @Override
