@@ -134,6 +134,7 @@ public class HttpResponse implements HttpMessage {
      *
      * @return インスタンス
      */
+    @Nonnull
     public static HttpResponse create() {
         final StartLine startLine = new StartLine();
         final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine);
@@ -146,6 +147,7 @@ public class HttpResponse implements HttpMessage {
      * @param original コピー元
      * @return インスタンス
      */
+    @Nonnull
     public static HttpResponse copy(@Nonnull final HttpResponse original) {
         final StartLine startLine = new StartLine(original.mStartLine);
         final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine, original.mDelegate);

@@ -111,6 +111,7 @@ public class HttpRequest implements HttpMessage {
      *
      * @return インスタンス
      */
+    @Nonnull
     public static HttpRequest create() {
         final StartLine startLine = new StartLine();
         final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine);
@@ -123,6 +124,7 @@ public class HttpRequest implements HttpMessage {
      * @param original コピー元
      * @return インスタンス
      */
+    @Nonnull
     public static HttpRequest copy(@Nonnull final HttpRequest original) {
         final StartLine startLine = new StartLine(original.mStartLine);
         final HttpMessageDelegate delegate = new HttpMessageDelegate(startLine, original.mDelegate);
@@ -155,7 +157,8 @@ public class HttpRequest implements HttpMessage {
      *
      * @param address 宛先アドレス。
      */
-    protected void setAddress(@Nullable final InetAddress address) {
+    // VisibleForTesting
+    void setAddress(@Nullable final InetAddress address) {
         mAddress = address;
     }
 
@@ -173,7 +176,8 @@ public class HttpRequest implements HttpMessage {
      *
      * @param port 宛先ポート番号
      */
-    protected void setPort(final int port) {
+    // VisibleForTesting
+    void setPort(final int port) {
         mPort = port;
     }
 
@@ -182,8 +186,9 @@ public class HttpRequest implements HttpMessage {
      *
      * @return アドレスとポート番号の組み合わせ文字列
      */
+    // VisibleForTesting
     @Nonnull
-    public String getAddressString() throws IllegalStateException {
+    String getAddressString() throws IllegalStateException {
         if (mAddress == null) {
             throw new IllegalStateException("address must be set");
         }
