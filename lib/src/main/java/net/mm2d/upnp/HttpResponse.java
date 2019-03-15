@@ -5,11 +5,10 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message;
+package net.mm2d.upnp;
 
-import net.mm2d.upnp.Http;
 import net.mm2d.upnp.Http.Status;
-import net.mm2d.upnp.HttpMessage;
+import net.mm2d.upnp.internal.message.HttpMessageDelegate;
 import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate;
 
 import java.io.IOException;
@@ -93,7 +92,6 @@ public class HttpResponse implements HttpMessage {
             return mVersion;
         }
 
-        @Nonnull
         @Override
         public void setVersion(@Nonnull final String version) {
             mVersion = version;

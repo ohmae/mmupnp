@@ -9,9 +9,9 @@ package net.mm2d.upnp.internal.server;
 
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.Http;
+import net.mm2d.upnp.HttpRequest;
+import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.Property;
-import net.mm2d.upnp.internal.message.HttpRequest;
-import net.mm2d.upnp.internal.message.HttpResponse;
 import net.mm2d.upnp.internal.thread.TaskHandler;
 import net.mm2d.upnp.util.IoUtils;
 import net.mm2d.upnp.util.StringPair;

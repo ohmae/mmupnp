@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp.internal.message;
 
+import net.mm2d.upnp.HttpRequest;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

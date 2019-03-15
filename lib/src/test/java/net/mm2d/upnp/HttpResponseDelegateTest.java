@@ -5,10 +5,10 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message;
+package net.mm2d.upnp;
 
-import net.mm2d.upnp.Http;
-import net.mm2d.upnp.internal.message.HttpResponse.StartLine;
+import net.mm2d.upnp.HttpResponse.StartLine;
+import net.mm2d.upnp.internal.message.HttpMessageDelegate;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -9,6 +9,7 @@ package net.mm2d.upnp.internal.message;
 
 import net.mm2d.upnp.Http.Status;
 import net.mm2d.upnp.HttpMessage;
+import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.SsdpMessage;
 
 import java.io.ByteArrayInputStream;

@@ -5,10 +5,9 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message;
+package net.mm2d.upnp;
 
-import net.mm2d.upnp.Http;
-import net.mm2d.upnp.HttpMessage;
+import net.mm2d.upnp.internal.message.HttpMessageDelegate;
 import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate;
 import net.mm2d.upnp.util.NetworkUtils;
 import net.mm2d.upnp.util.TextUtils;

@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-class HttpMessageDelegate implements HttpMessage {
+public class HttpMessageDelegate implements HttpMessage {
     private static final int BUFFER_SIZE = 1500;
     private static final int DEFAULT_CHUNK_SIZE = 1024;
     private static final int CR = 0x0d;
@@ -36,7 +36,7 @@ class HttpMessageDelegate implements HttpMessage {
     private static final String EOL = "\r\n";
     private static final String CHARSET = "utf-8";
 
-    interface StartLineDelegate {
+    public interface StartLineDelegate {
         @Nonnull
         String getVersion();
 

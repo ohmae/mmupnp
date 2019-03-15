@@ -8,8 +8,8 @@
 package net.mm2d.upnp.internal.server;
 
 import net.mm2d.upnp.Http;
-import net.mm2d.upnp.internal.message.HttpRequest;
-import net.mm2d.upnp.internal.message.HttpResponse;
+import net.mm2d.upnp.HttpRequest;
+import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.internal.server.EventReceiver.ClientTask;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.internal.server.EventReceiver.ServerTask;

@@ -10,8 +10,8 @@ package net.mm2d.upnp.internal.impl;
 import net.mm2d.upnp.Action;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpClient;
-import net.mm2d.upnp.internal.message.HttpRequest;
-import net.mm2d.upnp.internal.message.HttpResponse;
+import net.mm2d.upnp.HttpRequest;
+import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.util.XmlUtils;
 
 import org.junit.Before;

@@ -9,6 +9,8 @@ package net.mm2d.upnp.internal.message;
 
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpMessage;
+import net.mm2d.upnp.HttpRequest;
+import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.util.TestUtils;
 
 import org.junit.Test;
