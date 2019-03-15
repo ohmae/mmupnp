@@ -12,6 +12,7 @@ import net.mm2d.upnp.TaskExecutor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,7 +32,8 @@ class CallbackTaskExecutor implements TaskExecutor {
 
     @Nonnull
     private static ExecutorService createExecutor() {
-        return Executors.newSingleThreadExecutor();
+        final ThreadFactory factory = new TaskExecutorThreadFactory("callback-", Thread.NORM_PRIORITY);
+        return Executors.newSingleThreadExecutor(factory);
     }
 
     @SuppressWarnings("Duplicates")

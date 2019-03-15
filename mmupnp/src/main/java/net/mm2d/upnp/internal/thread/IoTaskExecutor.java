@@ -13,6 +13,7 @@ import net.mm2d.upnp.TaskExecutor;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -39,8 +40,9 @@ class IoTaskExecutor implements TaskExecutor {
 
     @Nonnull
     private static ExecutorService createExecutor(final int maxThread) {
+        final ThreadFactory factory = new TaskExecutorThreadFactory("io-", Thread.MIN_PRIORITY);
         final ThreadWorkQueue queue = new ThreadWorkQueue();
-        return new ThreadPoolExecutor(0, maxThread, 1L, TimeUnit.MINUTES, queue, queue);
+        return new ThreadPoolExecutor(0, maxThread, 1L, TimeUnit.MINUTES, queue, factory, queue);
     }
 
     private static int calculateMaximumPoolSize() {
