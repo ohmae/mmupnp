@@ -11,7 +11,7 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    implementation project(':lib')
+    implementation project(':mmupnp')
     implementation 'net.mm2d:log:0.2.0'
     testImplementation 'junit:junit:4.12'
 }

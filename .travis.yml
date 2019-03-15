@@ -6,7 +6,7 @@ before_install:
   - chmod +x gradlew
 
 script:
-  - ./gradlew lib:check
+  - ./gradlew mmupnp:check
   - ./gradlew jacocoTestReport
 
 after_success:
