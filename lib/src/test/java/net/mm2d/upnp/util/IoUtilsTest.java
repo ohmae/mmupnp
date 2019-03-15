@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.util;
+package net.mm2d.upnp.util;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

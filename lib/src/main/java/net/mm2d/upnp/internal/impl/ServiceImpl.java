@@ -17,8 +17,8 @@ import net.mm2d.upnp.StateVariable;
 import net.mm2d.upnp.internal.manager.SubscribeManager;
 import net.mm2d.upnp.internal.message.HttpRequest;
 import net.mm2d.upnp.internal.message.HttpResponse;
-import net.mm2d.util.NetworkUtils;
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.NetworkUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;

@@ -11,7 +11,7 @@ import net.mm2d.upnp.Http;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.server.Address;
 import net.mm2d.upnp.internal.server.SsdpSearchServer;
-import net.mm2d.util.TestUtils;
+import net.mm2d.upnp.util.TestUtils;
 
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;

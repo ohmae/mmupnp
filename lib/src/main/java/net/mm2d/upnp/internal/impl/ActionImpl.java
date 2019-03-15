@@ -20,9 +20,9 @@ import net.mm2d.upnp.internal.message.HttpRequest;
 import net.mm2d.upnp.internal.message.HttpResponse;
 import net.mm2d.upnp.internal.parser.DeviceParser;
 import net.mm2d.upnp.internal.parser.ServiceParser;
-import net.mm2d.util.StringPair;
-import net.mm2d.util.TextUtils;
-import net.mm2d.util.XmlUtils;
+import net.mm2d.upnp.util.StringPair;
+import net.mm2d.upnp.util.TextUtils;
+import net.mm2d.upnp.util.XmlUtils;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;

@@ -12,7 +12,7 @@ import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpClient;
 import net.mm2d.upnp.internal.message.HttpRequest;
 import net.mm2d.upnp.internal.message.HttpResponse;
-import net.mm2d.util.XmlUtils;
+import net.mm2d.upnp.util.XmlUtils;
 
 import org.junit.Before;
 import org.junit.Test;

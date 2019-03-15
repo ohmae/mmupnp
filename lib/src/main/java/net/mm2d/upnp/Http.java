@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;

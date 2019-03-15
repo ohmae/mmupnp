@@ -12,7 +12,7 @@ import net.mm2d.upnp.Http;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.upnp.internal.message.SsdpResponse;
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;

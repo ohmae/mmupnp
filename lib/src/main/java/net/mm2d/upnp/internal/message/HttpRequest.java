@@ -10,8 +10,8 @@ package net.mm2d.upnp.internal.message;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpMessage;
 import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate;
-import net.mm2d.util.NetworkUtils;
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.NetworkUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

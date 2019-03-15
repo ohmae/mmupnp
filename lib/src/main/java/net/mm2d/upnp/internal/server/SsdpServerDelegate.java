@@ -10,7 +10,7 @@ package net.mm2d.upnp.internal.server;
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.SsdpMessage;
-import net.mm2d.util.IoUtils;
+import net.mm2d.upnp.util.IoUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

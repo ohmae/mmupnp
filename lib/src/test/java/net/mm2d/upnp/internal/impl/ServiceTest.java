@@ -20,7 +20,7 @@ import net.mm2d.upnp.internal.message.HttpRequest;
 import net.mm2d.upnp.internal.message.HttpResponse;
 import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.upnp.internal.parser.DeviceParser;
-import net.mm2d.util.TestUtils;
+import net.mm2d.upnp.util.TestUtils;
 
 import org.junit.Before;
 import org.junit.Test;

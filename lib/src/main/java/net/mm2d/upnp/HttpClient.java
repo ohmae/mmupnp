@@ -10,8 +10,8 @@ package net.mm2d.upnp;
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.internal.message.HttpRequest;
 import net.mm2d.upnp.internal.message.HttpResponse;
-import net.mm2d.util.IoUtils;
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.IoUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

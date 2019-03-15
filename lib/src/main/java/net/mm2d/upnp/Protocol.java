@@ -4,7 +4,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.util.NetworkUtils;
+import net.mm2d.upnp.util.NetworkUtils;
 
 import java.net.NetworkInterface;
 import java.util.List;

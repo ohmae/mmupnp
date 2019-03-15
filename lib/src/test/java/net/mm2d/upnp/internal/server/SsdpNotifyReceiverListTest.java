@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.server;
 
 import net.mm2d.upnp.Protocol;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiver.NotifyListener;
-import net.mm2d.util.NetworkUtils;
+import net.mm2d.upnp.util.NetworkUtils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

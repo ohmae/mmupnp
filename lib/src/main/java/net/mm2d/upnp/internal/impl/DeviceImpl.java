@@ -17,7 +17,7 @@ import net.mm2d.upnp.Service;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.manager.SubscribeManager;
 import net.mm2d.upnp.internal.message.FakeSsdpMessage;
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;

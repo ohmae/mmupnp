@@ -13,7 +13,7 @@ import net.mm2d.upnp.internal.impl.DiFactory;
 import net.mm2d.upnp.internal.server.EventReceiver;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.internal.thread.TaskHandler;
-import net.mm2d.util.StringPair;
+import net.mm2d.upnp.util.StringPair;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

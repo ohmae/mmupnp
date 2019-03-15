@@ -13,11 +13,11 @@ import net.mm2d.upnp.Property;
 import net.mm2d.upnp.internal.message.HttpRequest;
 import net.mm2d.upnp.internal.message.HttpResponse;
 import net.mm2d.upnp.internal.thread.TaskHandler;
-import net.mm2d.util.IoUtils;
-import net.mm2d.util.StringPair;
-import net.mm2d.util.TextParseUtils;
-import net.mm2d.util.TextUtils;
-import net.mm2d.util.XmlUtils;
+import net.mm2d.upnp.util.IoUtils;
+import net.mm2d.upnp.util.StringPair;
+import net.mm2d.upnp.util.TextParseUtils;
+import net.mm2d.upnp.util.TextUtils;
+import net.mm2d.upnp.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

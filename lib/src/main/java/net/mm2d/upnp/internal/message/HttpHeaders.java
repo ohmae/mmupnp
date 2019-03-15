@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.message;
 
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

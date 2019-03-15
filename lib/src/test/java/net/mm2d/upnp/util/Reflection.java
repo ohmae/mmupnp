@@ -2,7 +2,7 @@
  * Copyright (c) 2018 大前良介 (OHMAE Ryosuke)
  */
 
-package net.mm2d.util;
+package net.mm2d.upnp.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

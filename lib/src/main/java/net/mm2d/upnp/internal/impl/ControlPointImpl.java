@@ -23,7 +23,7 @@ import net.mm2d.upnp.internal.parser.DeviceParser;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList;
 import net.mm2d.upnp.internal.server.SsdpSearchServerList;
 import net.mm2d.upnp.internal.thread.TaskHandler;
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import org.xml.sax.SAXException;
 

@@ -10,7 +10,7 @@ package net.mm2d.upnp.internal.server;
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.Protocol;
 import net.mm2d.upnp.internal.server.SsdpSearchServer.ResponseListener;
-import net.mm2d.util.NetworkUtils;
+import net.mm2d.upnp.util.NetworkUtils;
 
 import java.io.IOException;
 import java.net.NetworkInterface;

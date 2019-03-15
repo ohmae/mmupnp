@@ -15,8 +15,8 @@ import net.mm2d.upnp.internal.impl.ArgumentImpl;
 import net.mm2d.upnp.internal.impl.DeviceImpl;
 import net.mm2d.upnp.internal.impl.ServiceImpl;
 import net.mm2d.upnp.internal.impl.StateVariableImpl;
-import net.mm2d.util.TextUtils;
-import net.mm2d.util.XmlUtils;
+import net.mm2d.upnp.util.TextUtils;
+import net.mm2d.upnp.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

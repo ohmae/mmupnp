@@ -5,10 +5,10 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.util;
+package net.mm2d.upnp.util;
 
-import net.mm2d.util.NetworkUtils.NetworkInterfaceEnumeration;
-import net.mm2d.util.NetworkUtils.NetworkInterfaceWrapper;
+import net.mm2d.upnp.util.NetworkUtils.NetworkInterfaceEnumeration;
+import net.mm2d.upnp.util.NetworkUtils.NetworkInterfaceWrapper;
 
 import org.junit.After;
 import org.junit.Before;

@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.message;
 
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.Property;
-import net.mm2d.util.TestUtils;
+import net.mm2d.upnp.util.TestUtils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -14,8 +14,8 @@ import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.upnp.internal.message.SsdpResponse;
 import net.mm2d.upnp.internal.server.SsdpServerDelegate.ReceiveTask;
 import net.mm2d.upnp.internal.server.SsdpServerDelegate.Receiver;
-import net.mm2d.util.NetworkUtils;
-import net.mm2d.util.TestUtils;
+import net.mm2d.upnp.util.NetworkUtils;
+import net.mm2d.upnp.util.TestUtils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

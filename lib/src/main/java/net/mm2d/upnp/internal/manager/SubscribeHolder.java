@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.manager;
 
 import net.mm2d.upnp.Service;
-import net.mm2d.util.TextUtils;
+import net.mm2d.upnp.util.TextUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
