@@ -23,11 +23,11 @@ import static org.mockito.Mockito.*;
 
 @SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
-public class IoTaskExecutorTest {
+public class IoExecutorTest {
     @Test
     public void execute_executeが実行される() {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         final Runnable command = mock(Runnable.class);
 
         assertThat(taskExecutor.execute(command), is(true));
@@ -38,7 +38,7 @@ public class IoTaskExecutorTest {
     @Test
     public void execute_shutdown済みなら何もしないでfalse() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         final Runnable command = mock(Runnable.class);
         doReturn(true).when(executorService).isShutdown();
 
@@ -50,7 +50,7 @@ public class IoTaskExecutorTest {
     @Test
     public void execute_exceptionが発生すればfalse() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         final Runnable command = mock(Runnable.class);
         doThrow(new RejectedExecutionException()).when(executorService).execute(command);
 
@@ -60,7 +60,7 @@ public class IoTaskExecutorTest {
     @Test
     public void execute_terminate後はfalse() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         final Runnable command = mock(Runnable.class);
 
         taskExecutor.terminate();
@@ -70,7 +70,7 @@ public class IoTaskExecutorTest {
     @Test
     public void terminate_shutdownNowが実行される() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         doReturn(true).when(executorService)
                 .awaitTermination(1, TimeUnit.SECONDS);
 
@@ -82,7 +82,7 @@ public class IoTaskExecutorTest {
     @Test
     public void terminate_2回コールできる() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         doReturn(true).when(executorService)
                 .awaitTermination(1, TimeUnit.SECONDS);
 
@@ -95,7 +95,7 @@ public class IoTaskExecutorTest {
     @Test
     public void terminate_awaitTerminationが割り込まれてもshutdownNowがコールされる() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         doThrow(new InterruptedException()).when(executorService)
                 .awaitTermination(1, TimeUnit.SECONDS);
 
@@ -107,7 +107,7 @@ public class IoTaskExecutorTest {
     @Test
     public void terminate_terminate済みなら何もしない() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         doReturn(true).when(executorService)
                 .awaitTermination(1, TimeUnit.SECONDS);
         doReturn(true).when(executorService).isShutdown();
@@ -120,7 +120,7 @@ public class IoTaskExecutorTest {
     @Test
     public void terminate_タイムアウトしたらshutdownNow() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new IoTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new IoExecutor(executorService);
         doReturn(false).when(executorService)
                 .awaitTermination(1, TimeUnit.SECONDS);
 

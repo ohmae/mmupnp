@@ -22,11 +22,11 @@ import static org.mockito.Mockito.*;
 
 @SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
-public class CallbackTaskExecutorTest {
+public class CallbackExecutorTest {
     @Test
     public void execute_executeが実行される() {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new CallbackExecutor(executorService);
         final Runnable command = mock(Runnable.class);
 
         assertThat(taskExecutor.execute(command), is(true));
@@ -37,7 +37,7 @@ public class CallbackTaskExecutorTest {
     @Test
     public void execute_shutdown済みなら何もしないでfalse() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new CallbackExecutor(executorService);
         final Runnable command = mock(Runnable.class);
         doReturn(true).when(executorService).isShutdown();
 
@@ -49,7 +49,7 @@ public class CallbackTaskExecutorTest {
     @Test
     public void execute_exceptionが発生すればfalse() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new CallbackExecutor(executorService);
         final Runnable command = mock(Runnable.class);
         doThrow(new RejectedExecutionException()).when(executorService).execute(command);
 
@@ -59,7 +59,7 @@ public class CallbackTaskExecutorTest {
     @Test
     public void execute_terminate後はfalse() throws Exception {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new CallbackExecutor(executorService);
         final Runnable command = mock(Runnable.class);
 
         taskExecutor.terminate();
@@ -69,7 +69,7 @@ public class CallbackTaskExecutorTest {
     @Test
     public void terminate_shutdownNowが実行される() {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new CallbackExecutor(executorService);
 
         taskExecutor.terminate();
 
@@ -79,7 +79,7 @@ public class CallbackTaskExecutorTest {
     @Test
     public void terminate_2回コールできる() {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new CallbackExecutor(executorService);
 
         taskExecutor.terminate();
         taskExecutor.terminate();
@@ -90,7 +90,7 @@ public class CallbackTaskExecutorTest {
     @Test
     public void terminate_terminate済みなら何もしない() {
         final ExecutorService executorService = mock(ExecutorService.class);
-        final TaskExecutor taskExecutor = new CallbackTaskExecutor(executorService);
+        final TaskExecutor taskExecutor = new CallbackExecutor(executorService);
         doReturn(true).when(executorService).isShutdown();
 
         taskExecutor.terminate();

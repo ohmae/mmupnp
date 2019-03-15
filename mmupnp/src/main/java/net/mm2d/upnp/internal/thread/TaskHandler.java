@@ -13,30 +13,36 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TaskHandler {
-    private final TaskExecutor mCallbackTaskExecutor;
-    private final TaskExecutor mIoTaskExecutor;
+    private final TaskExecutor mCallbackExecutor;
+    private final TaskExecutor mIoExecutor;
 
     public TaskHandler() {
-        this(null, null);
+        this(null);
     }
 
     public TaskHandler(
+            @Nullable final TaskExecutor callback) {
+        this(callback, null);
+    }
+
+    // VisibleForTesting
+    TaskHandler(
             @Nullable final TaskExecutor callback,
             @Nullable final TaskExecutor io) {
-        mCallbackTaskExecutor = callback != null ? callback : new CallbackTaskExecutor();
-        mIoTaskExecutor = io != null ? io : new IoTaskExecutor();
+        mCallbackExecutor = callback != null ? callback : new CallbackExecutor();
+        mIoExecutor = io != null ? io : new IoExecutor();
     }
 
     public boolean callback(@Nonnull final Runnable task) {
-        return mCallbackTaskExecutor.execute(task);
+        return mCallbackExecutor.execute(task);
     }
 
     public boolean io(@Nonnull final Runnable task) {
-        return mIoTaskExecutor.execute(task);
+        return mIoExecutor.execute(task);
     }
 
     public void terminate() {
-        mCallbackTaskExecutor.terminate();
-        mIoTaskExecutor.terminate();
+        mCallbackExecutor.terminate();
+        mIoExecutor.terminate();
     }
 }

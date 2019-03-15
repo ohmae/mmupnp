@@ -35,8 +35,6 @@ public final class ControlPointFactory {
         private Collection<NetworkInterface> mInterfaces;
         @Nullable
         private TaskExecutor mCallbackExecutor;
-        @Nullable
-        private TaskExecutor mIoExecutor;
 
         private boolean mNotifySegmentCheckEnabled;
 
@@ -114,26 +112,6 @@ public final class ControlPointFactory {
         TaskExecutor getCallbackExecutor() {
             return mCallbackExecutor;
         }
-
-        /**
-         * IO処理を実行する{@link TaskExecutor}を指定する。
-         *
-         * IO処理のスレッドを指定したい場合に指定する。
-         * 未指定の場合、CPU数に基づくExecutorが利用される。
-         *
-         * @param executor IO処理を実行するTaskExecutor
-         * @return このインスタンス
-         */
-        @Nonnull
-        public Params setIoExecutor(@Nullable final TaskExecutor executor) {
-            mIoExecutor = executor;
-            return this;
-        }
-
-        @Nullable
-        TaskExecutor getIoExecutor() {
-            return mIoExecutor;
-        }
     }
 
     /**
@@ -165,7 +143,7 @@ public final class ControlPointFactory {
                 protocol,
                 getDefaultInterfacesIfEmpty(protocol, params.getInterfaces()),
                 params.isNotifySegmentCheckEnabled(),
-                new DiFactory(protocol, params.getCallbackExecutor(), params.getIoExecutor()));
+                new DiFactory(protocol, params.getCallbackExecutor()));
     }
 
     @Nonnull

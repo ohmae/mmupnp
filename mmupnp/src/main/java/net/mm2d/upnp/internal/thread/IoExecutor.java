@@ -20,27 +20,27 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-class IoTaskExecutor implements TaskExecutor {
+class IoExecutor implements TaskExecutor {
     private static final long AWAIT_TIMEOUT = Property.DEFAULT_TIMEOUT;
     @Nullable
     private ExecutorService mExecutor;
 
-    IoTaskExecutor() {
+    IoExecutor() {
         this(calculateMaximumPoolSize());
     }
 
-    IoTaskExecutor(final int maxThread) {
+    IoExecutor(final int maxThread) {
         this(createExecutor(maxThread));
     }
 
     // VisibleForTesting
-    IoTaskExecutor(@Nonnull final ExecutorService executor) {
+    IoExecutor(@Nonnull final ExecutorService executor) {
         mExecutor = executor;
     }
 
     @Nonnull
     private static ExecutorService createExecutor(final int maxThread) {
-        final ThreadFactory factory = new TaskExecutorThreadFactory("io-", Thread.MIN_PRIORITY);
+        final ThreadFactory factory = new ExecutorThreadFactory("io-", Thread.MIN_PRIORITY);
         final ThreadWorkQueue queue = new ThreadWorkQueue();
         return new ThreadPoolExecutor(0, maxThread, 1L, TimeUnit.MINUTES, queue, factory, queue);
     }

@@ -17,22 +17,22 @@ import java.util.concurrent.ThreadFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-class CallbackTaskExecutor implements TaskExecutor {
+class CallbackExecutor implements TaskExecutor {
     @Nullable
     private ExecutorService mExecutor;
 
-    CallbackTaskExecutor() {
+    CallbackExecutor() {
         this(createExecutor());
     }
 
     // VisibleForTesting
-    CallbackTaskExecutor(@Nonnull final ExecutorService executor) {
+    CallbackExecutor(@Nonnull final ExecutorService executor) {
         mExecutor = executor;
     }
 
     @Nonnull
     private static ExecutorService createExecutor() {
-        final ThreadFactory factory = new TaskExecutorThreadFactory("callback-", Thread.NORM_PRIORITY);
+        final ThreadFactory factory = new ExecutorThreadFactory("callback-", Thread.NORM_PRIORITY);
         return Executors.newSingleThreadExecutor(factory);
     }
 

@@ -40,24 +40,20 @@ public class DiFactory {
     private final Protocol mProtocol;
     @Nullable
     private final TaskExecutor mCallbackExecutor;
-    @Nullable
-    private final TaskExecutor mIoExecutor;
 
     public DiFactory() {
-        this(Protocol.DEFAULT, null, null);
+        this(Protocol.DEFAULT, null);
     }
 
     DiFactory(@Nonnull final Protocol protocol) {
-        this(protocol, null, null);
+        this(protocol, null);
     }
 
     public DiFactory(
             @Nonnull final Protocol protocol,
-            @Nullable final TaskExecutor callback,
-            @Nullable final TaskExecutor io) {
+            @Nullable final TaskExecutor callback) {
         mProtocol = protocol;
         mCallbackExecutor = callback;
-        mIoExecutor = io;
     }
 
     @Nonnull
@@ -105,6 +101,6 @@ public class DiFactory {
 
     @Nonnull
     public TaskHandler createTaskHandler() {
-        return new TaskHandler(mCallbackExecutor, mIoExecutor);
+        return new TaskHandler(mCallbackExecutor);
     }
 }

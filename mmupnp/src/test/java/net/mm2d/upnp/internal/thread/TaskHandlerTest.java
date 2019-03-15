@@ -21,8 +21,8 @@ public class TaskHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        mCallback = mock(CallbackTaskExecutor.class);
-        mIo = mock(IoTaskExecutor.class);
+        mCallback = mock(CallbackExecutor.class);
+        mIo = mock(IoExecutor.class);
         mTaskHandler = new TaskHandler(mCallback, mIo);
     }
 
