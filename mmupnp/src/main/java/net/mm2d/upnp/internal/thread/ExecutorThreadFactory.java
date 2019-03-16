@@ -36,8 +36,7 @@ class ExecutorThreadFactory implements ThreadFactory {
     @Override
     public Thread newThread(@Nonnull final Runnable runnable) {
         final Thread thread = new Thread(mThreadGroup, runnable,
-                mNamePrefix + mThreadNumber.getAndIncrement(),
-                0);
+                mNamePrefix + mThreadNumber.getAndIncrement());
         if (thread.getPriority() != mPriority) {
             thread.setPriority(mPriority);
         }
