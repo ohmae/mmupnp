@@ -14,7 +14,7 @@ import net.mm2d.upnp.StateVariable;
 import net.mm2d.upnp.internal.impl.DiFactory;
 import net.mm2d.upnp.internal.server.EventReceiver;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
-import net.mm2d.upnp.internal.thread.TaskHandler;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.StringPair;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 
 public class SubscribeManager implements EventMessageListener {
     @Nonnull
-    private final TaskHandler mTaskHandler;
+    private final TaskExecutors mTaskExecutors;
     @Nonnull
     private final NotifyEventListener mNotifyEventListener;
     @Nonnull
@@ -34,13 +34,13 @@ public class SubscribeManager implements EventMessageListener {
     private final EventReceiver mEventReceiver;
 
     public SubscribeManager(
-            @Nonnull final TaskHandler taskHandler,
+            @Nonnull final TaskExecutors taskExecutors,
             @Nonnull final NotifyEventListener listener,
             @Nonnull final DiFactory factory) {
-        mTaskHandler = taskHandler;
+        mTaskExecutors = taskExecutors;
         mNotifyEventListener = listener;
         mSubscribeHolder = factory.createSubscribeHolder();
-        mEventReceiver = factory.createEventReceiver(taskHandler, this);
+        mEventReceiver = factory.createEventReceiver(taskExecutors, this);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SubscribeManager implements EventMessageListener {
         if (service == null) {
             Logger.e("service is null");
         }
-        return service != null && mTaskHandler.callback(() -> {
+        return service != null && mTaskExecutors.callback(() -> {
             for (final StringPair pair : properties) {
                 notifyEvent(service, seq, pair.getKey(), pair.getValue());
             }
@@ -88,7 +88,7 @@ public class SubscribeManager implements EventMessageListener {
     public void stop() {
         final List<Service> serviceList = mSubscribeHolder.getServiceList();
         for (final Service service : serviceList) {
-            mTaskHandler.io(() -> {
+            mTaskExecutors.io(() -> {
                 try {
                     service.unsubscribe();
                 } catch (final IOException e) {

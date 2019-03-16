@@ -31,7 +31,7 @@ import net.mm2d.upnp.internal.server.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList;
 import net.mm2d.upnp.internal.server.SsdpSearchServer.ResponseListener;
 import net.mm2d.upnp.internal.server.SsdpSearchServerList;
-import net.mm2d.upnp.internal.thread.TaskHandler;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 import net.mm2d.upnp.util.StringPair;
 import net.mm2d.upnp.util.TestUtils;
@@ -239,10 +239,10 @@ public class ControlPointTest {
         private ControlPointImpl mCp;
         private final SsdpSearchServerList mSsdpSearchServerList = mock(SsdpSearchServerList.class);
         private final SsdpNotifyReceiverList mSsdpNotifyReceiverList = mock(SsdpNotifyReceiverList.class);
-        private final TaskHandler mTaskHandler = mock(TaskHandler.class);
+        private final TaskExecutors mTaskExecutors = mock(TaskExecutors.class);
         private final NotifyEventListener mNotifyEventListener = mock(NotifyEventListener.class);
         private final DiFactory mDiFactory = spy(new DiFactory());
-        private final SubscribeManager mSubscribeManager = spy(new SubscribeManager(mTaskHandler, mNotifyEventListener, mDiFactory));
+        private final SubscribeManager mSubscribeManager = spy(new SubscribeManager(mTaskExecutors, mNotifyEventListener, mDiFactory));
 
         @Before
         public void setUp() throws Exception {
@@ -268,7 +268,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SubscribeManager createSubscribeManager(
-                                @Nonnull final TaskHandler taskHandler,
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final NotifyEventListener listener) {
                             return mSubscribeManager;
                         }
@@ -713,9 +713,9 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SubscribeManager createSubscribeManager(
-                                @Nonnull final TaskHandler taskHandler,
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final NotifyEventListener listener) {
-                            mSubscribeManager = spy(new SubscribeManager(taskHandler, listener, this));
+                            mSubscribeManager = spy(new SubscribeManager(taskExecutors, listener, this));
                             return mSubscribeManager;
                         }
                     }));
@@ -806,9 +806,9 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SubscribeManager createSubscribeManager(
-                                @Nonnull final TaskHandler taskHandler,
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final NotifyEventListener listener) {
-                            mSubscribeManager = spy(new SubscribeManager(taskHandler, listener, this));
+                            mSubscribeManager = spy(new SubscribeManager(taskExecutors, listener, this));
                             return mSubscribeManager;
                         }
                     }));

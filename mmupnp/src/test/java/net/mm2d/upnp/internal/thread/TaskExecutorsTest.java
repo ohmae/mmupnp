@@ -14,22 +14,22 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.*;
 
-public class TaskHandlerTest {
+public class TaskExecutorsTest {
     private TaskExecutor mCallback;
     private TaskExecutor mIo;
-    private TaskHandler mTaskHandler;
+    private TaskExecutors mTaskExecutors;
 
     @Before
     public void setUp() throws Exception {
         mCallback = mock(CallbackExecutor.class);
         mIo = mock(IoExecutor.class);
-        mTaskHandler = new TaskHandler(mCallback, mIo);
+        mTaskExecutors = new TaskExecutors(mCallback, mIo);
     }
 
     @Test
     public void callback() {
         final Runnable task = mock(Runnable.class);
-        mTaskHandler.callback(task);
+        mTaskExecutors.callback(task);
 
         verify(mCallback, times(1)).execute(task);
     }
@@ -37,14 +37,14 @@ public class TaskHandlerTest {
     @Test
     public void io() {
         final Runnable task = mock(Runnable.class);
-        mTaskHandler.io(task);
+        mTaskExecutors.io(task);
 
         verify(mIo, times(1)).execute(task);
     }
 
     @Test
     public void terminate() {
-        mTaskHandler.terminate();
+        mTaskExecutors.terminate();
 
         verify(mCallback, times(1)).terminate();
         verify(mIo, times(1)).terminate();

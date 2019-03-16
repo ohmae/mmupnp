@@ -13,7 +13,7 @@ import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.internal.server.EventReceiver.ClientTask;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.internal.server.EventReceiver.ServerTask;
-import net.mm2d.upnp.internal.thread.TaskHandler;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.StringPair;
 import net.mm2d.upnp.util.TestUtils;
 
@@ -74,14 +74,14 @@ public class EventReceiverTest {
 
     @Test(timeout = 10000L)
     public void open_close_デッドロックしない() throws Exception {
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(), null);
+        final EventReceiver receiver = new EventReceiver(new TaskExecutors(), null);
         receiver.open();
         receiver.close();
     }
 
     @Test(timeout = 1000L)
     public void close_open前なら即終了() throws Exception {
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(), null);
+        final EventReceiver receiver = new EventReceiver(new TaskExecutors(), null);
         receiver.close();
     }
 
@@ -91,7 +91,7 @@ public class EventReceiverTest {
         final ServerSocket serverSocket = mock(ServerSocket.class);
         doReturn(port).when(serverSocket).getLocalPort();
         doThrow(new IOException()).when(serverSocket).accept();
-        final EventReceiver receiver = spy(new EventReceiver(new TaskHandler(), null));
+        final EventReceiver receiver = spy(new EventReceiver(new TaskExecutors(), null));
         doReturn(serverSocket).when(receiver).createServerSocket();
 
         receiver.open();
@@ -101,7 +101,7 @@ public class EventReceiverTest {
 
     @Test
     public void getLocalPort_開始前は0() {
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(), null);
+        final EventReceiver receiver = new EventReceiver(new TaskExecutors(), null);
         assertThat(receiver.getLocalPort(), is(0));
     }
 
@@ -116,7 +116,7 @@ public class EventReceiverTest {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
         final Result result = new Result();
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(), (sid, seq, properties) -> {
+        final EventReceiver receiver = new EventReceiver(new TaskExecutors(), (sid, seq, properties) -> {
             result.sid = sid;
             result.seq = seq;
             result.properties = properties;
@@ -166,7 +166,7 @@ public class EventReceiverTest {
     public void onEventReceived_Failedが返る1() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(), (sid, seq, properties) -> false) {
+        final EventReceiver receiver = new EventReceiver(new TaskExecutors(), (sid, seq, properties) -> false) {
             @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
@@ -206,7 +206,7 @@ public class EventReceiverTest {
     public void onEventReceived_Failedが返る2() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mFailRequest);
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(), null) {
+        final EventReceiver receiver = new EventReceiver(new TaskExecutors(), null) {
             @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
@@ -246,7 +246,7 @@ public class EventReceiverTest {
     public void onEventReceived_BadRequestが返る() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mBadRequest);
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(), null) {
+        final EventReceiver receiver = new EventReceiver(new TaskExecutors(), null) {
             @Nonnull
             @Override
             ServerSocket createServerSocket() throws IOException {
@@ -286,7 +286,7 @@ public class EventReceiverTest {
     public void close_shutdownRequest() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
-        final EventReceiver receiver = new EventReceiver(new TaskHandler(), (sid, seq, properties) -> {
+        final EventReceiver receiver = new EventReceiver(new TaskExecutors(), (sid, seq, properties) -> {
             try {
                 Thread.sleep(1000);
             } catch (final InterruptedException e) {
@@ -378,13 +378,13 @@ public class EventReceiverTest {
 
     @Test
     public void ServerTask_shutdownRequest_開始前にコール() throws Exception {
-        new ServerTask(new TaskHandler(), mock(ServerSocket.class)).shutdownRequest();
+        new ServerTask(new TaskExecutors(), mock(ServerSocket.class)).shutdownRequest();
     }
 
     @Test
     public void ServerTask_notifyEvent_空ならfalse() throws Exception {
         final String sid = "sid";
-        final ServerTask task = new ServerTask(new TaskHandler(), mock(ServerSocket.class));
+        final ServerTask task = new ServerTask(new TaskExecutors(), mock(ServerSocket.class));
         final EventMessageListener listener = mock(EventMessageListener.class);
         task.setEventMessageListener(listener);
 
@@ -398,7 +398,7 @@ public class EventReceiverTest {
     @Test
     public void ServerTask_notifyEvent_listenerの戻り値と等しい() throws Exception {
         final String sid = "sid";
-        final ServerTask task = new ServerTask(new TaskHandler(), mock(ServerSocket.class));
+        final ServerTask task = new ServerTask(new TaskExecutors(), mock(ServerSocket.class));
         final EventMessageListener listener = mock(EventMessageListener.class);
         task.setEventMessageListener(listener);
 
@@ -420,7 +420,7 @@ public class EventReceiverTest {
     @Test
     public void ServerTask_notifyEvent_listenerがなければfalse() throws Exception {
         final String sid = "sid";
-        final ServerTask task = new ServerTask(new TaskHandler(), mock(ServerSocket.class));
+        final ServerTask task = new ServerTask(new TaskExecutors(), mock(ServerSocket.class));
         final HttpRequest request = HttpRequest.create();
         request.setHeader(Http.SEQ, "0");
         request.setBody(TestUtils.getResourceAsString("propchange.xml"), true);

@@ -12,21 +12,21 @@ import net.mm2d.upnp.TaskExecutor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TaskHandler {
+public class TaskExecutors {
     private final TaskExecutor mCallbackExecutor;
     private final TaskExecutor mIoExecutor;
 
-    public TaskHandler() {
+    public TaskExecutors() {
         this(null);
     }
 
-    public TaskHandler(
+    public TaskExecutors(
             @Nullable final TaskExecutor callback) {
         this(callback, null);
     }
 
     // VisibleForTesting
-    TaskHandler(
+    TaskExecutors(
             @Nullable final TaskExecutor callback,
             @Nullable final TaskExecutor io) {
         mCallbackExecutor = callback != null ? callback : new CallbackExecutor();
