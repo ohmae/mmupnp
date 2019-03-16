@@ -29,8 +29,8 @@ public class TaskExecutors {
     TaskExecutors(
             @Nullable final TaskExecutor callback,
             @Nullable final TaskExecutor io) {
-        mCallbackExecutor = callback != null ? callback : new CallbackExecutor();
-        mIoExecutor = io != null ? io : new IoExecutor();
+        mCallbackExecutor = callback != null ? callback : ExecutorFactory.createCallback();
+        mIoExecutor = io != null ? io : ExecutorFactory.createIo();
     }
 
     public boolean callback(@Nonnull final Runnable task) {

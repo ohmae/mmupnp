@@ -13,43 +13,29 @@ import net.mm2d.upnp.TaskExecutor;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-class IoExecutor implements TaskExecutor {
+public class DefaultTaskExecutor implements TaskExecutor {
     private static final long AWAIT_TIMEOUT = Property.DEFAULT_TIMEOUT;
     @Nullable
     private ExecutorService mExecutor;
 
-    IoExecutor() {
-        this(calculateMaximumPoolSize());
+    private boolean mIo;
+
+    DefaultTaskExecutor(@Nonnull final ExecutorService executor) {
+        this(executor, false);
     }
 
-    IoExecutor(final int maxThread) {
-        this(createExecutor(maxThread));
-    }
-
-    // VisibleForTesting
-    IoExecutor(@Nonnull final ExecutorService executor) {
+    DefaultTaskExecutor(
+            @Nonnull final ExecutorService executor,
+            final boolean io) {
         mExecutor = executor;
+        mIo = io;
     }
 
-    @Nonnull
-    private static ExecutorService createExecutor(final int maxThread) {
-        final ThreadFactory factory = new ExecutorThreadFactory("io-", Thread.MIN_PRIORITY);
-        final ThreadWorkQueue queue = new ThreadWorkQueue();
-        return new ThreadPoolExecutor(0, maxThread, 1L, TimeUnit.MINUTES, queue, factory, queue);
-    }
-
-    private static int calculateMaximumPoolSize() {
-        return Math.max(2, Runtime.getRuntime().availableProcessors()) * 2;
-    }
-
-    @SuppressWarnings("Duplicates")
     @Override
     public boolean execute(@Nonnull final Runnable task) {
         final ExecutorService executor = mExecutor;
@@ -68,6 +54,11 @@ class IoExecutor implements TaskExecutor {
     public void terminate() {
         final ExecutorService executor = mExecutor;
         if (executor == null || executor.isShutdown()) {
+            return;
+        }
+        if (!mIo) {
+            executor.shutdownNow();
+            mExecutor = null;
             return;
         }
         try {
