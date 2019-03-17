@@ -10,6 +10,8 @@ package net.mm2d.upnp.internal.manager;
 import net.mm2d.upnp.Service;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -21,9 +23,21 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SubscribeHolderTest {
+    private TaskExecutors mTaskExecutors;
+
+    @Before
+    public void setUp() {
+        mTaskExecutors = new TaskExecutors();
+    }
+
+    @After
+    public void terminate() {
+        mTaskExecutors.terminate();
+    }
+
     @Test(timeout = 100L)
     public void start_shutdownRequest_でロックしない() {
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
         subscribeHolder.start();
         subscribeHolder.shutdownRequest();
     }
@@ -33,7 +47,7 @@ public class SubscribeHolderTest {
         final String id = "id";
         final Service service = mock(Service.class);
         doReturn(id).when(service).getSubscriptionId();
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
 
         subscribeHolder.add(service, 1000L, false);
 
@@ -48,7 +62,7 @@ public class SubscribeHolderTest {
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
         doReturn(id2).when(service2).getSubscriptionId();
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
 
         subscribeHolder.add(service1, 1000L, false);
         subscribeHolder.add(service2, 1000L, false);
@@ -70,7 +84,7 @@ public class SubscribeHolderTest {
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
         doReturn(id2).when(service2).getSubscriptionId();
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
 
         subscribeHolder.add(service1, 1000L, false);
         subscribeHolder.add(service2, 1000L, false);
@@ -87,7 +101,7 @@ public class SubscribeHolderTest {
     @Test
     public void getServiceList_subscriptionIdがnullだとaddできない() {
         final Service service1 = mock(Service.class);
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
         subscribeHolder.add(service1, 1000L, false);
 
         assertThat(subscribeHolder.getServiceList(), not(hasItem(service1)));
@@ -101,7 +115,7 @@ public class SubscribeHolderTest {
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
         doReturn(id2).when(service2).getSubscriptionId();
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
 
         subscribeHolder.add(service1, 1000L, false);
         subscribeHolder.add(service2, 1000L, false);
@@ -124,7 +138,7 @@ public class SubscribeHolderTest {
         final String id2 = "id2";
         final Service service2 = mock(Service.class);
         doReturn(id2).when(service2).getSubscriptionId();
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
         subscribeHolder.start();
 
         subscribeHolder.add(service1, 1000L, false);
@@ -157,7 +171,7 @@ public class SubscribeHolderTest {
         doReturn(true).when(service2).renewSubscribe();
         doReturn("id2").when(service2).getSubscriptionId();
 
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
         subscribeHolder.start();
 
         subscribeHolder.add(service1, 1000L, true);
@@ -178,7 +192,7 @@ public class SubscribeHolderTest {
         final Service service = mock(Service.class);
         doReturn(false).when(service).renewSubscribe();
         doReturn(id).when(service).getSubscriptionId();
-        final SubscribeHolder subscribeHolder = new SubscribeHolder(new TaskExecutors());
+        final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
         subscribeHolder.start();
 
         subscribeHolder.add(service, 1000L, true);

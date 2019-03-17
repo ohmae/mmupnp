@@ -11,6 +11,8 @@ import net.mm2d.upnp.Device;
 import net.mm2d.upnp.internal.manager.DeviceHolder.ExpireListener;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -23,10 +25,22 @@ import static org.mockito.Mockito.*;
 @RunWith(JUnit4.class)
 public class DeviceHolderTest {
     private static final String UDN = "uuid:01234567-89ab-cdef-0123-456789abcdef";
+    private TaskExecutors mTaskExecutors;
+
+    @Before
+    public void setUp() {
+        mTaskExecutors = new TaskExecutors();
+    }
+
+    @After
+    public void terminate() {
+        mTaskExecutors.terminate();
+    }
+
 
     @Test(timeout = 1000L)
     public void start_shutdown_デッドロックしない() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, mock(ExpireListener.class));
         holder.start();
         Thread.sleep(1);
         holder.shutdownRequest();
@@ -35,7 +49,7 @@ public class DeviceHolderTest {
 
     @Test
     public void add() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -45,7 +59,7 @@ public class DeviceHolderTest {
 
     @Test
     public void remove_device() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -58,7 +72,7 @@ public class DeviceHolderTest {
 
     @Test
     public void remove_udn() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -71,7 +85,7 @@ public class DeviceHolderTest {
 
     @Test
     public void clear() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -84,7 +98,7 @@ public class DeviceHolderTest {
 
     @Test
     public void getDeviceList() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -95,7 +109,7 @@ public class DeviceHolderTest {
 
     @Test
     public void size() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -106,7 +120,7 @@ public class DeviceHolderTest {
     @Test(timeout = 1000)
     public void shutdownRequest() throws Exception {
         final ExpireListener expireListener = mock(ExpireListener.class);
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), expireListener);
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, expireListener);
 
         holder.shutdownRequest();
         holder.run();
@@ -115,7 +129,7 @@ public class DeviceHolderTest {
     @Test(timeout = 20000L)
     public void expireDevice_時間経過後に削除される() throws Exception {
         final ExpireListener expireListener = mock(ExpireListener.class);
-        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), expireListener);
+        final DeviceHolder holder = new DeviceHolder(mTaskExecutors, expireListener);
         final Device device1 = mock(Device.class);
         doReturn(UDN).when(device1).getUdn();
         final Device device2 = mock(Device.class);

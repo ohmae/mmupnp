@@ -18,6 +18,8 @@ import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 import net.mm2d.upnp.util.TestUtils;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -40,10 +42,22 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpServerDelegateTest {
+    private TaskExecutors mTaskExecutors;
+
+    @Before
+    public void setUp() {
+        mTaskExecutors = new TaskExecutors();
+    }
+
+    @After
+    public void terminate() {
+        mTaskExecutors.terminate();
+    }
+
     @Test(timeout = 1000L)
     public void open_close_デッドロックしない() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface);
+        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         server.open();
         server.close();
     }
@@ -51,7 +65,7 @@ public class SsdpServerDelegateTest {
     @Test(timeout = 1000L)
     public void start_stop_デッドロックしない() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface);
+        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         server.open();
         server.start();
         server.stop();
@@ -61,7 +75,7 @@ public class SsdpServerDelegateTest {
     @Test(timeout = 1000L)
     public void start_stop1_デッドロックしない() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface);
+        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         server.open();
         server.start();
         server.stop();
@@ -109,14 +123,14 @@ public class SsdpServerDelegateTest {
     @Test
     public void getInterfaceAddress() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         assertThat(server.getInterfaceAddress(), is(SsdpServerDelegate.findInet4Address(networkInterface.getInterfaceAddresses())));
     }
 
     @Test
     public void open_close() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MulticastSocket socket = mock(MulticastSocket.class);
         doReturn(socket).when(server).createMulticastSocket(anyInt());
         server.open();
@@ -132,7 +146,7 @@ public class SsdpServerDelegateTest {
     @Test
     public void start_stop() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MulticastSocket socket = mock(MulticastSocket.class);
         doReturn(socket).when(server).createMulticastSocket(anyInt());
         server.open();
@@ -146,7 +160,7 @@ public class SsdpServerDelegateTest {
     @Test(expected = IllegalStateException.class)
     public void start_without_open() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MulticastSocket socket = mock(MulticastSocket.class);
         doReturn(socket).when(server).createMulticastSocket(anyInt());
         server.start();
@@ -155,7 +169,7 @@ public class SsdpServerDelegateTest {
     @Test
     public void send_open前は何も起こらない() throws IOException {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MulticastSocket socket = mock(MulticastSocket.class);
         doReturn(socket).when(server).createMulticastSocket(anyInt());
 
@@ -175,7 +189,7 @@ public class SsdpServerDelegateTest {
     @Test
     public void send_socketから送信される() throws IOException {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MockMulticastSocket socket = spy(new MockMulticastSocket());
         doReturn(socket).when(server).createMulticastSocket(anyInt());
 
@@ -201,7 +215,7 @@ public class SsdpServerDelegateTest {
     @Test
     public void send_socketでExceptionが発生したら無視する() throws IOException {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MulticastSocket socket = mock(MulticastSocket.class);
         doReturn(socket).when(server).createMulticastSocket(anyInt());
         doThrow(new IOException()).when(socket).send(ArgumentMatchers.any(DatagramPacket.class));
@@ -227,7 +241,7 @@ public class SsdpServerDelegateTest {
         final MockMulticastSocket socket = new MockMulticastSocket();
         socket.setReceiveData(address, data, 0);
         final Receiver receiver = mock(Receiver.class);
-        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(new TaskExecutors(), receiver, Address.IP_V4, networkInterface));
+        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mTaskExecutors, receiver, Address.IP_V4, networkInterface));
         doReturn(socket).when(delegate).createMulticastSocket(anyInt());
 
         delegate.open();
@@ -261,7 +275,7 @@ public class SsdpServerDelegateTest {
                 }
             }
         };
-        receiveTask.start(new TaskExecutors(), "");
+        receiveTask.start(mTaskExecutors, "");
         receiveTask.shutdownRequest();
     }
 
@@ -277,7 +291,7 @@ public class SsdpServerDelegateTest {
                 }
             }
         };
-        receiveTask.start(new TaskExecutors(), "");
+        receiveTask.start(mTaskExecutors, "");
         receiveTask.shutdownRequest();
     }
 
@@ -297,7 +311,7 @@ public class SsdpServerDelegateTest {
                 }
             }
         };
-        receiveTask.start(new TaskExecutors(), "");
+        receiveTask.start(mTaskExecutors, "");
         final Thread thread = new Thread(() ->
                 receiveTask.shutdownRequest());
         thread.start();
@@ -328,7 +342,7 @@ public class SsdpServerDelegateTest {
         });
         final ReceiveTask receiveTask = spy(new ReceiveTask(mock(Receiver.class), socket, Address.IP_V4.getInetAddress(), 0));
 
-        receiveTask.start(new TaskExecutors(), "");
+        receiveTask.start(mTaskExecutors, "");
         Thread.sleep(500);
         receiveTask.shutdownRequest();
         Thread.sleep(500);
@@ -363,7 +377,7 @@ public class SsdpServerDelegateTest {
         });
         final ReceiveTask receiveTask = spy(new ReceiveTask(mock(Receiver.class), socket, Address.IP_V4.getInetAddress(), 10));
 
-        receiveTask.start(new TaskExecutors(), "");
+        receiveTask.start(mTaskExecutors, "");
         Thread.sleep(500);
         receiveTask.shutdownRequest();
         Thread.sleep(500);
@@ -431,7 +445,7 @@ public class SsdpServerDelegateTest {
     @Test
     public void isInvalidLocation_アドレス一致() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface);
+        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         final SsdpResponse message = makeFromResource("ssdp-search-response0.bin");
         assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(false));
     }
@@ -439,7 +453,7 @@ public class SsdpServerDelegateTest {
     @Test
     public void isInvalidLocation_http以外() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface);
+        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         final SsdpResponse message = makeFromResource("ssdp-search-response-invalid-location0.bin");
         assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(true));
     }
@@ -447,7 +461,7 @@ public class SsdpServerDelegateTest {
     @Test
     public void isInvalidLocation_表記に問題() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface);
+        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         final SsdpResponse message = makeFromResource("ssdp-search-response-invalid-location1.bin");
         assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(true));
     }

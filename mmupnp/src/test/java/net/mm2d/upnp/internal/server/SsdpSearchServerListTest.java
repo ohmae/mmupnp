@@ -12,6 +12,8 @@ import net.mm2d.upnp.internal.server.SsdpSearchServer.ResponseListener;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -25,6 +27,18 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpSearchServerListTest {
+    private TaskExecutors mTaskExecutors;
+
+    @Before
+    public void setUp() {
+        mTaskExecutors = new TaskExecutors();
+    }
+
+    @After
+    public void terminate() {
+        mTaskExecutors.terminate();
+    }
+
     @Test
     public void openAndStart() throws Exception {
         final SsdpSearchServerList list = spy(new SsdpSearchServerList());
@@ -33,7 +47,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(any(), eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(new TaskExecutors(), Protocol.DEFAULT, Collections.singletonList(nif), listener);
+        list.init(mTaskExecutors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.openAndStart();
         verify(server, times(1)).open();
@@ -48,7 +62,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(any(), eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(new TaskExecutors(), Protocol.DEFAULT, Collections.singletonList(nif), listener);
+        list.init(mTaskExecutors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         doThrow(new IOException()).when(server).open();
         list.openAndStart();
@@ -62,7 +76,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(any(), eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(new TaskExecutors(), Protocol.DEFAULT, Collections.singletonList(nif), listener);
+        list.init(mTaskExecutors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.stop();
 
@@ -77,7 +91,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(any(), eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(new TaskExecutors(), Protocol.DEFAULT, Collections.singletonList(nif), listener);
+        list.init(mTaskExecutors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.close();
 
@@ -92,7 +106,7 @@ public class SsdpSearchServerListTest {
         doReturn(server).when(list).newSsdpSearchServer(any(), eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
 
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(new TaskExecutors(), Protocol.DEFAULT, Collections.singletonList(nif), listener);
+        list.init(mTaskExecutors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.search("");
 
