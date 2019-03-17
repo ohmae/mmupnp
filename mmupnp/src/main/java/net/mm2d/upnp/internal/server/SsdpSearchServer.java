@@ -12,6 +12,7 @@ import net.mm2d.upnp.Http;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.upnp.internal.message.SsdpResponse;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.TextUtils;
 
 import java.io.IOException;
@@ -59,9 +60,10 @@ public class SsdpSearchServer implements SsdpServer {
      * @param ni 使用するインターフェース
      */
     SsdpSearchServer(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Address address,
             @Nonnull final NetworkInterface ni) {
-        mDelegate = new SsdpServerDelegate(this::onReceive, address, ni);
+        mDelegate = new SsdpServerDelegate(executors, this::onReceive, address, ni);
     }
 
     // VisibleForTesting

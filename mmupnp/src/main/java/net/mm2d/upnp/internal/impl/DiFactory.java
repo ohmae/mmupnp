@@ -62,22 +62,26 @@ public class DiFactory {
     }
 
     @Nonnull
-    public DeviceHolder createDeviceHolder(@Nonnull final ExpireListener listener) {
-        return new DeviceHolder(listener);
+    public DeviceHolder createDeviceHolder(
+            @Nonnull final TaskExecutors executors,
+            @Nonnull final ExpireListener listener) {
+        return new DeviceHolder(executors, listener);
     }
 
     @Nonnull
     public SsdpSearchServerList createSsdpSearchServerList(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
-        return new SsdpSearchServerList().init(mProtocol, interfaces, listener);
+        return new SsdpSearchServerList().init(executors, mProtocol, interfaces, listener);
     }
 
     @Nonnull
     public SsdpNotifyReceiverList createSsdpNotifyReceiverList(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
-        return new SsdpNotifyReceiverList().init(mProtocol, interfaces, listener);
+        return new SsdpNotifyReceiverList().init(executors, mProtocol, interfaces, listener);
     }
 
     @Nonnull
@@ -88,8 +92,9 @@ public class DiFactory {
     }
 
     @Nonnull
-    public SubscribeHolder createSubscribeHolder() {
-        return new SubscribeHolder();
+    public SubscribeHolder createSubscribeHolder(
+            @Nonnull final TaskExecutors executors) {
+        return new SubscribeHolder(executors);
     }
 
     @Nonnull

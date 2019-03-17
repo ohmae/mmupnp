@@ -10,7 +10,9 @@ package net.mm2d.upnp.internal.server;
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.SsdpMessage;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.IoUtils;
+import net.mm2d.upnp.util.NetworkUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,6 +56,8 @@ class SsdpServerDelegate implements SsdpServer {
     }
 
     @Nonnull
+    private final TaskExecutors mTaskExecutors;
+    @Nonnull
     private final Address mAddress;
     @Nonnull
     private final Receiver mReceiver;
@@ -77,10 +82,11 @@ class SsdpServerDelegate implements SsdpServer {
      * @param address          モード
      */
     SsdpServerDelegate(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Receiver receiver,
             @Nonnull final Address address,
             @Nonnull final NetworkInterface networkInterface) {
-        this(receiver, address, networkInterface, 0);
+        this(executors, receiver, address, networkInterface, 0);
     }
 
     /**
@@ -92,10 +98,12 @@ class SsdpServerDelegate implements SsdpServer {
      * @param address          モード
      */
     SsdpServerDelegate(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Receiver receiver,
             @Nonnull final Address address,
             @Nonnull final NetworkInterface networkInterface,
             final int bindPort) {
+        mTaskExecutors = executors;
         mInterface = networkInterface;
         mInterfaceAddress = address == Address.IP_V4 ?
                 findInet4Address(networkInterface.getInterfaceAddresses()) :
@@ -211,29 +219,19 @@ class SsdpServerDelegate implements SsdpServer {
         if (mReceiveTask != null) {
             stop();
         }
+        final String suffix = (mBindPort == 0 ? "-ssdp-notify-" : "-ssdp-search-")
+                + mInterface.getName() + "-"
+                + NetworkUtils.toSimpleString(mInterfaceAddress.getAddress());
         mReceiveTask = new ReceiveTask(mReceiver, mSocket, getSsdpInetAddress(), mBindPort);
-        mReceiveTask.start();
+        mReceiveTask.start(mTaskExecutors, suffix);
     }
 
     @Override
     public void stop() {
-        stop(false);
-    }
-
-    /**
-     * 受信スレッドの停止と必要があればJoinを行う。
-     *
-     * <p>現在の実装ではIO待ちに割り込むことはできないため、
-     * joinを指定しても偶然ソケットタイムアウトやソケット受信が発生しないかぎりjoinできない。
-     *
-     * @param join trueの時スレッドのJoin待ちを行う。
-     */
-    // VisibleForTesting
-    void stop(final boolean join) {
         if (mReceiveTask == null) {
             return;
         }
-        mReceiveTask.shutdownRequest(join);
+        mReceiveTask.shutdownRequest();
         mReceiveTask = null;
     }
 
@@ -290,11 +288,12 @@ class SsdpServerDelegate implements SsdpServer {
         private final MulticastSocket mSocket;
         @Nonnull
         private final InetAddress mInetAddress;
-        private final int mBindPort;
 
-        private volatile boolean mShutdownRequest;
+        private final int mBindPort;
         @Nullable
-        private Thread mThread;
+        private FutureTask<Void> mFutureTask;
+        @Nullable
+        private String mSuffix;
 
         /**
          * インスタンス作成
@@ -313,37 +312,31 @@ class SsdpServerDelegate implements SsdpServer {
         /**
          * スレッドを作成して処理を開始する。
          */
-        synchronized void start() {
-            mShutdownRequest = false;
-            mThread = new Thread(this, getClass().getSimpleName());
-            mThread.start();
+        synchronized void start(
+                @Nonnull final TaskExecutors executors,
+                @Nonnull final String suffix) {
+            mSuffix = suffix;
+            mFutureTask = new FutureTask<>(this, null);
+            executors.server(mFutureTask);
         }
 
         /**
          * 割り込みを行い、スレッドを終了させる。
          *
          * <p>現在はSocketを使用しているため割り込みは効果がない。
-         *
-         * @param join Threadのjoin待ちを行う場合はtrue
          */
-        synchronized void shutdownRequest(final boolean join) {
-            mShutdownRequest = true;
-            if (mThread == null) {
-                return;
+        synchronized void shutdownRequest() {
+            if (mFutureTask != null) {
+                mFutureTask.cancel(false);
+                mFutureTask = null;
             }
-            mThread.interrupt();
-            if (join) {
-                try {
-                    mThread.join(1000);
-                } catch (final InterruptedException ignored) {
-                }
-            }
-            mThread = null;
         }
 
         @Override
         public void run() {
-            if (mShutdownRequest) {
+            final Thread thread = Thread.currentThread();
+            thread.setName(thread.getName() + mSuffix);
+            if (mFutureTask == null || mFutureTask.isCancelled()) {
                 return;
             }
             try {
@@ -362,11 +355,11 @@ class SsdpServerDelegate implements SsdpServer {
         // VisibleForTesting
         void receiveLoop() throws IOException {
             final byte[] buf = new byte[1500];
-            while (!mShutdownRequest) {
+            while (mFutureTask != null && !mFutureTask.isCancelled()) {
                 try {
                     final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                     mSocket.receive(dp);
-                    if (mShutdownRequest) {
+                    if (mFutureTask == null || mFutureTask.isCancelled()) {
                         break;
                     }
                     mReceiver.onReceive(dp.getAddress(), dp.getData(), dp.getLength());

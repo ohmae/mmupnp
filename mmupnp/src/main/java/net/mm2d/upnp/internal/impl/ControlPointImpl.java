@@ -97,12 +97,12 @@ public class ControlPointImpl implements ControlPoint {
         mDiscoveryListenerList = new DiscoveryListenerList();
         mNotifyEventListenerList = new NotifyEventListenerList();
 
-        mSearchServerList = factory.createSsdpSearchServerList(interfaces, message ->
+        mSearchServerList = factory.createSsdpSearchServerList(mTaskExecutors, interfaces, message ->
                 mTaskExecutors.io(() -> onReceiveSsdpMessage(message)));
-        mNotifyReceiverList = factory.createSsdpNotifyReceiverList(interfaces, message ->
+        mNotifyReceiverList = factory.createSsdpNotifyReceiverList(mTaskExecutors, interfaces, message ->
                 mTaskExecutors.io(() -> onReceiveSsdpMessage(message)));
         mNotifyReceiverList.setSegmentCheckEnabled(notifySegmentCheckEnabled);
-        mDeviceHolder = factory.createDeviceHolder(this::lostDevice);
+        mDeviceHolder = factory.createDeviceHolder(mTaskExecutors, this::lostDevice);
         mSubscribeManager = factory.createSubscribeManager(mTaskExecutors, mNotifyEventListenerList);
     }
 
@@ -322,7 +322,6 @@ public class ControlPointImpl implements ControlPoint {
     }
 
     // VisibleForTesting
-    @SuppressWarnings("WeakerAccess")
     void discoverDevice(@Nonnull final Device device) {
         Logger.d(() -> "discoverDevice:[" + device.getFriendlyName() + "](" + device.getIpAddress() + ")");
         if (isPinnedDevice(mDeviceHolder.get(device.getUdn()))) {
@@ -334,7 +333,7 @@ public class ControlPointImpl implements ControlPoint {
                 mDiscoveryListenerList.onDiscover(device));
     }
 
-    @SuppressWarnings("WeakerAccess")
+    // VisibleForTesting
     void lostDevice(@Nonnull final Device device) {
         Logger.d(() -> "lostDevice:[" + device.getFriendlyName() + "](" + device.getIpAddress() + ")");
         mEmbeddedUdnSet.removeAll(collectEmbeddedUdn(device));
@@ -350,7 +349,6 @@ public class ControlPointImpl implements ControlPoint {
     }
 
     // VisibleForTesting
-    @SuppressWarnings("WeakerAccess")
     public static Set<String> collectEmbeddedUdn(@Nonnull final Device device) {
         final List<Device> deviceList = device.getDeviceList();
         if (deviceList.isEmpty()) {

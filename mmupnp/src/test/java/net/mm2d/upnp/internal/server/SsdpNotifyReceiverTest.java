@@ -12,6 +12,7 @@ import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiver.NotifyListener;
 import net.mm2d.upnp.internal.server.SsdpServerDelegate.Receiver;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 import net.mm2d.upnp.util.TestUtils;
 
@@ -36,7 +37,7 @@ public class SsdpNotifyReceiverTest {
     @Test
     public void setNotifyListener_受信メッセージが通知されること() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mock(Receiver.class), Address.IP_V4, networkInterface));
+        final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(new TaskExecutors(), mock(Receiver.class), Address.IP_V4, networkInterface));
         final InterfaceAddress interfaceAddress = TestUtils.createInterfaceAddress("192.0.2.2", "255.255.255.0", 16);
         doReturn(interfaceAddress).when(delegate).getInterfaceAddress();
         final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(delegate));
@@ -55,7 +56,7 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void onReceive_同一セグメントからのメッセージは通知する() throws Exception {
-        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(new TaskExecutors(), Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
         final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
@@ -69,7 +70,7 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void onReceive_Listenerがnullでもクラッシュしない() throws Exception {
-        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(new TaskExecutors(), Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
         final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
@@ -79,7 +80,7 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void onReceive_異なるセグメントからのメッセージは無視する() throws Exception {
-        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(new TaskExecutors(), Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
         final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
@@ -94,7 +95,7 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void onReceive_M_SEARCHパケットは無視する() throws Exception {
-        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(new TaskExecutors(), Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
         final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
@@ -116,7 +117,7 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void onReceive_ByeByeパケットは通知する() throws Exception {
-        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(new TaskExecutors(), Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
         final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
@@ -131,7 +132,7 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void onReceive_LocationとSourceが不一致のメッセージは無視する() throws Exception {
-        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(new TaskExecutors(), Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
         final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         final NotifyListener listener = mock(NotifyListener.class);
@@ -145,7 +146,7 @@ public class SsdpNotifyReceiverTest {
 
     @Test
     public void onReceive_IOExceptionが発生してもクラッシュしない() throws Exception {
-        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
+        final SsdpNotifyReceiver receiver = spy(new SsdpNotifyReceiver(new TaskExecutors(), Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces().get(0)));
         final InterfaceAddress address = TestUtils.createInterfaceAddress("192.0.2.1", "255.255.0.0", 24);
         doReturn(address).when(receiver).getInterfaceAddress();
         doThrow(new IOException()).when(receiver).createSsdpRequestMessage(ArgumentMatchers.any(byte[].class), anyInt());

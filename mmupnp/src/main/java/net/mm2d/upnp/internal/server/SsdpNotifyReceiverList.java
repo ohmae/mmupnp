@@ -10,6 +10,7 @@ package net.mm2d.upnp.internal.server;
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.Protocol;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiver.NotifyListener;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class SsdpNotifyReceiverList {
 
     @Nonnull
     public SsdpNotifyReceiverList init(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
@@ -38,20 +40,20 @@ public class SsdpNotifyReceiverList {
             switch (protocol) {
                 case IP_V4_ONLY:
                     if (NetworkUtils.isAvailableInet4Interface(nif)) {
-                        mList.add(newSsdpNotifyReceiver(Address.IP_V4, nif, listener));
+                        mList.add(newSsdpNotifyReceiver(executors, Address.IP_V4, nif, listener));
                     }
                     break;
                 case IP_V6_ONLY:
                     if (NetworkUtils.isAvailableInet6Interface(nif)) {
-                        mList.add(newSsdpNotifyReceiver(Address.IP_V6_LINK_LOCAL, nif, listener));
+                        mList.add(newSsdpNotifyReceiver(executors, Address.IP_V6_LINK_LOCAL, nif, listener));
                     }
                     break;
                 case DUAL_STACK:
                     if (NetworkUtils.isAvailableInet4Interface(nif)) {
-                        mList.add(newSsdpNotifyReceiver(Address.IP_V4, nif, listener));
+                        mList.add(newSsdpNotifyReceiver(executors, Address.IP_V4, nif, listener));
                     }
                     if (NetworkUtils.isAvailableInet6Interface(nif)) {
-                        mList.add(newSsdpNotifyReceiver(Address.IP_V6_LINK_LOCAL, nif, listener));
+                        mList.add(newSsdpNotifyReceiver(executors, Address.IP_V6_LINK_LOCAL, nif, listener));
                     }
                     break;
             }
@@ -62,10 +64,11 @@ public class SsdpNotifyReceiverList {
     // VisibleForTesting
     @Nonnull
     SsdpNotifyReceiver newSsdpNotifyReceiver(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Address address,
             @Nonnull final NetworkInterface nif,
             @Nonnull final NotifyListener listener) {
-        final SsdpNotifyReceiver receiver = new SsdpNotifyReceiver(address, nif);
+        final SsdpNotifyReceiver receiver = new SsdpNotifyReceiver(executors, address, nif);
         receiver.setNotifyListener(listener);
         return receiver;
     }

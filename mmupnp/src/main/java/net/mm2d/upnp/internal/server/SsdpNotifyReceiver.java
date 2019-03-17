@@ -10,6 +10,7 @@ package net.mm2d.upnp.internal.server;
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.TextUtils;
 
 import java.io.IOException;
@@ -52,9 +53,10 @@ public class SsdpNotifyReceiver implements SsdpServer {
      * @param ni 使用するインターフェース
      */
     SsdpNotifyReceiver(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Address address,
             @Nonnull final NetworkInterface ni) {
-        mDelegate = new SsdpServerDelegate(this::onReceive, address, ni, SSDP_PORT);
+        mDelegate = new SsdpServerDelegate(executors, this::onReceive, address, ni, SSDP_PORT);
     }
 
     // VisibleForTesting

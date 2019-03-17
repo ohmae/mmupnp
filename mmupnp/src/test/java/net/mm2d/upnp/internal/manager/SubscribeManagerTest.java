@@ -40,7 +40,8 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public SubscribeHolder createSubscribeHolder() {
+            public SubscribeHolder createSubscribeHolder(
+                    @Nonnull final TaskExecutors taskExecutors) {
                 return holder;
             }
         };
@@ -56,7 +57,8 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public SubscribeHolder createSubscribeHolder() {
+            public SubscribeHolder createSubscribeHolder(
+                    @Nonnull final TaskExecutors taskExecutors) {
                 return holder;
             }
         };
@@ -78,7 +80,8 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public SubscribeHolder createSubscribeHolder() {
+            public SubscribeHolder createSubscribeHolder(
+                    @Nonnull final TaskExecutors taskExecutors) {
                 return holder;
             }
         };
@@ -135,7 +138,8 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public SubscribeHolder createSubscribeHolder() {
+            public SubscribeHolder createSubscribeHolder(
+                    @Nonnull final TaskExecutors taskExecutors) {
                 return holder;
             }
 
@@ -164,7 +168,8 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public SubscribeHolder createSubscribeHolder() {
+            public SubscribeHolder createSubscribeHolder(
+                    @Nonnull final TaskExecutors taskExecutors) {
                 return holder;
             }
         };
@@ -204,7 +209,8 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public SubscribeHolder createSubscribeHolder() {
+            public SubscribeHolder createSubscribeHolder(
+                    @Nonnull final TaskExecutors taskExecutors) {
                 return holder;
             }
         };
@@ -226,7 +232,8 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public SubscribeHolder createSubscribeHolder() {
+            public SubscribeHolder createSubscribeHolder(
+                    @Nonnull final TaskExecutors taskExecutors) {
                 return holder;
             }
         };
@@ -265,7 +272,8 @@ public class SubscribeManagerTest {
         final DiFactory factory = new DiFactory() {
             @Nonnull
             @Override
-            public SubscribeHolder createSubscribeHolder() {
+            public SubscribeHolder createSubscribeHolder(
+                    @Nonnull final TaskExecutors taskExecutors) {
                 return holder;
             }
         };

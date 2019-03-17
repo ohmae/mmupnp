@@ -8,6 +8,7 @@
 package net.mm2d.upnp.internal.manager;
 
 import net.mm2d.upnp.Service;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.TextUtils;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -33,35 +35,32 @@ import javax.annotation.Nullable;
 public class SubscribeHolder implements Runnable {
     private static final long MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1);
 
-    private volatile boolean mShutdownRequest = false;
     @Nonnull
-    private final Object mThreadLock = new Object();
+    private final TaskExecutors mTaskExecutors;
     @Nullable
-    private Thread mThread;
+    private FutureTask<Void> mFutureTask;
     @Nonnull
     private final Map<String, SubscribeService> mSubscriptionMap = new HashMap<>();
+
+    public SubscribeHolder(@Nonnull final TaskExecutors executors) {
+        mTaskExecutors = executors;
+    }
 
     /**
      * スレッドを開始する。
      */
     void start() {
-        mShutdownRequest = false;
-        synchronized (mThreadLock) {
-            mThread = new Thread(this, getClass().getSimpleName());
-            mThread.start();
-        }
+        mFutureTask = new FutureTask<>(this, null);
+        mTaskExecutors.manager(mFutureTask);
     }
 
     /**
      * スレッドの停止を要求する。
      */
     void shutdownRequest() {
-        mShutdownRequest = true;
-        synchronized (mThreadLock) {
-            if (mThread != null) {
-                mThread.interrupt();
-                mThread = null;
-            }
+        if (mFutureTask != null) {
+            mFutureTask.cancel(false);
+            mFutureTask = null;
         }
     }
 
@@ -155,8 +154,10 @@ public class SubscribeHolder implements Runnable {
 
     @Override
     public void run() {
+        final Thread thread = Thread.currentThread();
+        thread.setName(thread.getName() + "-subscribe-holder");
         try {
-            while (!mShutdownRequest) {
+            while (mFutureTask != null && !mFutureTask.isCancelled()) {
                 renewSubscribe(waitEntry());
                 removeExpiredService();
                 waitNextRenewTime();

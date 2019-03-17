@@ -39,7 +39,7 @@ public class SubscribeManager implements EventMessageListener {
             @Nonnull final DiFactory factory) {
         mTaskExecutors = taskExecutors;
         mNotifyEventListener = listener;
-        mSubscribeHolder = factory.createSubscribeHolder();
+        mSubscribeHolder = factory.createSubscribeHolder(taskExecutors);
         mEventReceiver = factory.createEventReceiver(taskExecutors, this);
     }
 

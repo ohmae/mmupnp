@@ -9,6 +9,7 @@ package net.mm2d.upnp.internal.server;
 
 import net.mm2d.upnp.Protocol;
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiver.NotifyListener;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 
 import org.junit.Test;
@@ -32,8 +33,9 @@ public class SsdpNotifyReceiverListTest {
         final SsdpNotifyReceiverList list = spy(new SsdpNotifyReceiverList());
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final NotifyListener listener = mock(NotifyListener.class);
-        doReturn(receiver).when(list).newSsdpNotifyReceiver(Address.IP_V4, nif, listener);
-        list.init(Protocol.DEFAULT, Collections.singletonList(nif), listener);
+        final TaskExecutors executors = mock(TaskExecutors.class);
+        doReturn(receiver).when(list).newSsdpNotifyReceiver(executors, Address.IP_V4, nif, listener);
+        list.init(executors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.openAndStart();
 
@@ -48,11 +50,12 @@ public class SsdpNotifyReceiverListTest {
         final SsdpNotifyReceiverList list = spy(new SsdpNotifyReceiverList());
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final NotifyListener listener = mock(NotifyListener.class);
-        when(list.newSsdpNotifyReceiver(Address.IP_V4, nif, listener))
+        final TaskExecutors executors = mock(TaskExecutors.class);
+        when(list.newSsdpNotifyReceiver(executors, Address.IP_V4, nif, listener))
                 .thenReturn(receiver1)
                 .thenReturn(receiver2);
         doThrow(new IOException()).when(receiver1).open();
-        list.init(Protocol.DEFAULT, Arrays.asList(nif, nif), listener);
+        list.init(executors, Protocol.DEFAULT, Arrays.asList(nif, nif), listener);
 
         list.openAndStart();
 
@@ -66,8 +69,9 @@ public class SsdpNotifyReceiverListTest {
         final SsdpNotifyReceiverList list = spy(new SsdpNotifyReceiverList());
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final NotifyListener listener = mock(NotifyListener.class);
-        doReturn(receiver).when(list).newSsdpNotifyReceiver(Address.IP_V4, nif, listener);
-        list.init(Protocol.DEFAULT, Collections.singletonList(nif), listener);
+        final TaskExecutors executors = mock(TaskExecutors.class);
+        doReturn(receiver).when(list).newSsdpNotifyReceiver(executors, Address.IP_V4, nif, listener);
+        list.init(executors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.stop();
 
@@ -80,8 +84,9 @@ public class SsdpNotifyReceiverListTest {
         final SsdpNotifyReceiverList list = spy(new SsdpNotifyReceiverList());
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final NotifyListener listener = mock(NotifyListener.class);
-        doReturn(receiver).when(list).newSsdpNotifyReceiver(Address.IP_V4, nif, listener);
-        list.init(Protocol.DEFAULT, Collections.singletonList(nif), listener);
+        final TaskExecutors executors = mock(TaskExecutors.class);
+        doReturn(receiver).when(list).newSsdpNotifyReceiver(executors, Address.IP_V4, nif, listener);
+        list.init(executors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
         list.close();
 

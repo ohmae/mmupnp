@@ -293,6 +293,13 @@ public final class NetworkUtils {
         return hostAddress + ":" + port;
     }
 
+    public static String toSimpleString(@Nonnull final InetAddress address) {
+        if (address instanceof Inet6Address) {
+            return toNormalizedString((Inet6Address) address);
+        }
+        return address.getHostAddress();
+    }
+
     @Nonnull
     private static String toAddressString(@Nonnull final InetAddress address) {
         if (address instanceof Inet6Address) {

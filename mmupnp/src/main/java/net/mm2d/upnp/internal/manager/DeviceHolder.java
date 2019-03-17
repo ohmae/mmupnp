@@ -8,12 +8,14 @@
 package net.mm2d.upnp.internal.manager;
 
 import net.mm2d.upnp.Device;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -34,10 +36,9 @@ public class DeviceHolder implements Runnable {
     }
 
     @Nonnull
-    private final Object mThreadLock = new Object();
-    private volatile boolean mShutdownRequest = false;
+    private final TaskExecutors mTaskExecutors;
     @Nullable
-    private Thread mThread;
+    private FutureTask<Void> mFutureTask;
 
     @Nonnull
     private final ExpireListener mExpireListener;
@@ -49,7 +50,10 @@ public class DeviceHolder implements Runnable {
      *
      * @param listener 期限切れの通知を受け取るリスナー
      */
-    public DeviceHolder(@Nonnull final ExpireListener listener) {
+    public DeviceHolder(
+            @Nonnull final TaskExecutors executors,
+            @Nonnull final ExpireListener listener) {
+        mTaskExecutors = executors;
         mDeviceMap = new LinkedHashMap<>();
         mExpireListener = listener;
     }
@@ -58,23 +62,17 @@ public class DeviceHolder implements Runnable {
      * スレッドを開始する。
      */
     public void start() {
-        mShutdownRequest = false;
-        synchronized (mThreadLock) {
-            mThread = new Thread(this, getClass().getSimpleName());
-            mThread.start();
-        }
+        mFutureTask = new FutureTask<>(this, null);
+        mTaskExecutors.manager(mFutureTask);
     }
 
     /**
      * スレッドに割り込みをかけ終了させる。
      */
     public void shutdownRequest() {
-        mShutdownRequest = true;
-        synchronized (mThreadLock) {
-            if (mThread != null) {
-                mThread.interrupt();
-                mThread = null;
-            }
+        if (mFutureTask != null) {
+            mFutureTask.cancel(false);
+            mFutureTask = null;
         }
     }
 
@@ -141,8 +139,10 @@ public class DeviceHolder implements Runnable {
 
     @Override
     public synchronized void run() {
+        final Thread thread = Thread.currentThread();
+        thread.setName(thread.getName() + "-device-holder");
         try {
-            while (!mShutdownRequest) {
+            while (mFutureTask != null && !mFutureTask.isCancelled()) {
                 while (mDeviceMap.size() == 0) {
                     wait();
                 }

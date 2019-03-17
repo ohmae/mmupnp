@@ -10,6 +10,7 @@ package net.mm2d.upnp.internal.server;
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.Protocol;
 import net.mm2d.upnp.internal.server.SsdpSearchServer.ResponseListener;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class SsdpSearchServerList {
 
     @Nonnull
     public SsdpSearchServerList init(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Protocol protocol,
             @Nonnull final Collection<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
@@ -39,20 +41,20 @@ public class SsdpSearchServerList {
             switch (protocol) {
                 case IP_V4_ONLY:
                     if (NetworkUtils.isAvailableInet4Interface(nif)) {
-                        mList.add(newSsdpSearchServer(Address.IP_V4, nif, listener));
+                        mList.add(newSsdpSearchServer(executors, Address.IP_V4, nif, listener));
                     }
                     break;
                 case IP_V6_ONLY:
                     if (NetworkUtils.isAvailableInet6Interface(nif)) {
-                        mList.add(newSsdpSearchServer(Address.IP_V6_LINK_LOCAL, nif, listener));
+                        mList.add(newSsdpSearchServer(executors, Address.IP_V6_LINK_LOCAL, nif, listener));
                     }
                     break;
                 case DUAL_STACK:
                     if (NetworkUtils.isAvailableInet4Interface(nif)) {
-                        mList.add(newSsdpSearchServer(Address.IP_V4, nif, listener));
+                        mList.add(newSsdpSearchServer(executors, Address.IP_V4, nif, listener));
                     }
                     if (NetworkUtils.isAvailableInet6Interface(nif)) {
-                        mList.add(newSsdpSearchServer(Address.IP_V6_LINK_LOCAL, nif, listener));
+                        mList.add(newSsdpSearchServer(executors, Address.IP_V6_LINK_LOCAL, nif, listener));
                     }
                     break;
             }
@@ -63,10 +65,11 @@ public class SsdpSearchServerList {
     // VisibleForTesting
     @Nonnull
     SsdpSearchServer newSsdpSearchServer(
+            @Nonnull final TaskExecutors executors,
             @Nonnull final Address address,
             @Nonnull final NetworkInterface nif,
             @Nonnull final ResponseListener listener) {
-        final SsdpSearchServer server = new SsdpSearchServer(address, nif);
+        final SsdpSearchServer server = new SsdpSearchServer(executors, address, nif);
         server.setResponseListener(listener);
         return server;
     }

@@ -9,6 +9,7 @@ package net.mm2d.upnp.internal.manager;
 
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.internal.manager.DeviceHolder.ExpireListener;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +26,7 @@ public class DeviceHolderTest {
 
     @Test(timeout = 1000L)
     public void start_shutdown_デッドロックしない() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
         holder.start();
         Thread.sleep(1);
         holder.shutdownRequest();
@@ -34,7 +35,7 @@ public class DeviceHolderTest {
 
     @Test
     public void add() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -44,7 +45,7 @@ public class DeviceHolderTest {
 
     @Test
     public void remove_device() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -57,7 +58,7 @@ public class DeviceHolderTest {
 
     @Test
     public void remove_udn() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -70,7 +71,7 @@ public class DeviceHolderTest {
 
     @Test
     public void clear() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -83,7 +84,7 @@ public class DeviceHolderTest {
 
     @Test
     public void getDeviceList() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -94,7 +95,7 @@ public class DeviceHolderTest {
 
     @Test
     public void size() throws Exception {
-        final DeviceHolder holder = new DeviceHolder(mock(ExpireListener.class));
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), mock(ExpireListener.class));
         final Device device = mock(Device.class);
         doReturn(UDN).when(device).getUdn();
         holder.add(device);
@@ -105,7 +106,7 @@ public class DeviceHolderTest {
     @Test(timeout = 1000)
     public void shutdownRequest() throws Exception {
         final ExpireListener expireListener = mock(ExpireListener.class);
-        final DeviceHolder holder = new DeviceHolder(expireListener);
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), expireListener);
 
         holder.shutdownRequest();
         holder.run();
@@ -114,7 +115,7 @@ public class DeviceHolderTest {
     @Test(timeout = 20000L)
     public void expireDevice_時間経過後に削除される() throws Exception {
         final ExpireListener expireListener = mock(ExpireListener.class);
-        final DeviceHolder holder = new DeviceHolder(expireListener);
+        final DeviceHolder holder = new DeviceHolder(new TaskExecutors(), expireListener);
         final Device device1 = mock(Device.class);
         doReturn(UDN).when(device1).getUdn();
         final Device device2 = mock(Device.class);

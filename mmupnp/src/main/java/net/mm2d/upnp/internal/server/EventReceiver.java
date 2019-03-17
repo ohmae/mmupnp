@@ -171,7 +171,6 @@ public class EventReceiver {
 
     // VisibleForTesting
     static class ServerTask implements Runnable {
-        private volatile boolean mShutdownRequest = false;
         @Nonnull
         private final TaskExecutors mTaskExecutors;
         @Nonnull
@@ -179,9 +178,9 @@ public class EventReceiver {
         @Nonnull
         private final List<ClientTask> mClientList;
         @Nullable
-        private Thread mThread;
-        @Nullable
         private EventMessageListener mListener;
+        @Nullable
+        private FutureTask<Void> mFutureTask;
 
         /**
          * サーバソケットを指定してインスタンス作成。
@@ -200,8 +199,8 @@ public class EventReceiver {
          * スレッドを作成し開始する。
          */
         void start() {
-            mThread = new Thread(this, "EventReceiver::ServerTask");
-            mThread.start();
+            mFutureTask = new FutureTask<>(this, null);
+            mTaskExecutors.server(mFutureTask);
         }
 
         /**
@@ -211,10 +210,9 @@ public class EventReceiver {
          * それらの受信スレッドを終了させ、クライアントソケットのクローズも行う。
          */
         void shutdownRequest() {
-            mShutdownRequest = true;
-            if (mThread != null) {
-                mThread.interrupt();
-                mThread = null;
+            if (mFutureTask != null) {
+                mFutureTask.cancel(false);
+                mFutureTask = null;
             }
             IoUtils.closeQuietly(mServerSocket);
             synchronized (mClientList) {
@@ -267,8 +265,10 @@ public class EventReceiver {
 
         @Override
         public void run() {
+            final Thread thread = Thread.currentThread();
+            thread.setName(thread.getName() + "-event-receiver");
             try {
-                while (!mShutdownRequest) {
+                while (mFutureTask != null && !mFutureTask.isCancelled()) {
                     final Socket sock = mServerSocket.accept();
                     sock.setSoTimeout(Property.DEFAULT_TIMEOUT);
                     final ClientTask client = new ClientTask(this, sock);

@@ -149,6 +149,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SsdpSearchServerList createSsdpSearchServerList(
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final Collection<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
                             return list;
@@ -252,6 +253,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SsdpSearchServerList createSsdpSearchServerList(
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final Collection<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
                             return mSsdpSearchServerList;
@@ -260,6 +262,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SsdpNotifyReceiverList createSsdpNotifyReceiverList(
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final Collection<NetworkInterface> interfaces,
                                 @Nonnull final NotifyListener listener) {
                             return mSsdpNotifyReceiverList;
@@ -431,9 +434,11 @@ public class ControlPointTest {
 
                         @Nonnull
                         @Override
-                        public DeviceHolder createDeviceHolder(@Nonnull final ExpireListener listener) {
+                        public DeviceHolder createDeviceHolder(
+                                @Nonnull final TaskExecutors taskExecutors,
+                                @Nonnull final ExpireListener listener) {
                             if (mDeviceHolder == null) {
-                                mDeviceHolder = spy(new DeviceHolder(listener));
+                                mDeviceHolder = spy(new DeviceHolder(taskExecutors, listener));
                             }
                             return mDeviceHolder;
                         }
@@ -685,9 +690,11 @@ public class ControlPointTest {
 
                         @Nonnull
                         @Override
-                        public DeviceHolder createDeviceHolder(@Nonnull final ExpireListener listener) {
+                        public DeviceHolder createDeviceHolder(
+                                @Nonnull final TaskExecutors taskExecutors,
+                                @Nonnull final ExpireListener listener) {
                             if (mDeviceHolder == null) {
-                                mDeviceHolder = spy(new DeviceHolder(listener));
+                                mDeviceHolder = spy(new DeviceHolder(taskExecutors, listener));
                             }
                             return mDeviceHolder;
                         }
@@ -695,6 +702,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SsdpSearchServerList createSsdpSearchServerList(
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final Collection<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
                             mResponseListener = listener;
@@ -704,6 +712,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SsdpNotifyReceiverList createSsdpNotifyReceiverList(
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final Collection<NetworkInterface> interfaces,
                                 @Nonnull final NotifyListener listener) {
                             mNotifyListener = listener;
@@ -789,6 +798,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SsdpSearchServerList createSsdpSearchServerList(
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final Collection<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
                             return mock(SsdpSearchServerList.class);
@@ -797,6 +807,7 @@ public class ControlPointTest {
                         @Nonnull
                         @Override
                         public SsdpNotifyReceiverList createSsdpNotifyReceiverList(
+                                @Nonnull final TaskExecutors taskExecutors,
                                 @Nonnull final Collection<NetworkInterface> interfaces,
                                 @Nonnull final NotifyListener listener) {
                             return mock(SsdpNotifyReceiverList.class);
@@ -906,13 +917,13 @@ public class ControlPointTest {
         }
 
         @Test
-        public void デフォルトでは受け付ける() throws Exception {
+        public void デフォルトでは受け付ける() {
             mCp.onReceiveSsdpMessage(mSsdpMessage);
             verify(mCp).onAcceptSsdpMessage(mSsdpMessage);
         }
 
         @Test
-        public void filterが機能する() throws Exception {
+        public void filterが機能する() {
             final ArgumentCaptor<SsdpMessage> captor = ArgumentCaptor.forClass(SsdpMessage.class);
             final SsdpMessageFilter filter = mock(SsdpMessageFilter.class);
             doReturn(false).when(filter).accept(captor.capture());
@@ -923,7 +934,7 @@ public class ControlPointTest {
         }
 
         @Test
-        public void filterにnullを指定すると受け付ける() throws Exception {
+        public void filterにnullを指定すると受け付ける() {
             mCp.setSsdpMessageFilter(message -> false);
             mCp.onReceiveSsdpMessage(mSsdpMessage);
             verify(mCp, never()).onAcceptSsdpMessage(any());
