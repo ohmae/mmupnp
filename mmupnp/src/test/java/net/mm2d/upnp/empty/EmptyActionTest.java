@@ -60,14 +60,14 @@ public class EmptyActionTest {
     }
 
     @Test(expected = IOException.class)
-    public void invoke2() throws Exception {
+    public void invokeCustom() throws Exception {
         final Action action = new EmptyAction();
-        action.invoke(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
+        action.invokeCustom(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
     }
 
     @Test(expected = IOException.class)
-    public void invoke3() throws Exception {
+    public void invokeCustom1() throws Exception {
         final Action action = new EmptyAction();
-        action.invoke(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap(), false);
+        action.invokeCustom(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap(), false);
     }
 }

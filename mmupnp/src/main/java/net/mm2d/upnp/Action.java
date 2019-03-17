@@ -148,8 +148,8 @@ public interface Action {
      * <p>※試験的実装であり、将来的に変更、削除される可能性が高い
      *
      * <p>実行後エラー応答を受け取った場合は、IOExceptionを発生させる。
-     * エラー応答の内容を取得する必要がある場合は{@link #invoke(Map, Map, Map, boolean)}を使用し、第四引数にtrueを指定する。
-     * このメソッドは{@link #invoke(Map, Map, Map, boolean)}の第四引数にfalseを指定した場合と等価である。
+     * エラー応答の内容を取得する必要がある場合は{@link #invokeCustom(Map, Map, Map, boolean)}を使用し、第四引数にtrueを指定する。
+     * このメソッドは{@link #invokeCustom(Map, Map, Map, boolean)}の第四引数にfalseを指定した場合と等価である。
      *
      * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
      * 値はすべてStringで表現する。
@@ -178,10 +178,10 @@ public interface Action {
      * @param customArguments カスタム引数
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
-     * @see #invoke(Map, Map, Map, boolean)
+     * @see #invokeCustom(Map, Map, Map, boolean)
      */
     @Nonnull
-    Map<String, String> invoke(
+    Map<String, String> invokeCustom(
             @Nonnull Map<String, String> argumentValues,
             @Nullable Map<String, String> customNamespace,
             @Nonnull Map<String, String> customArguments)
@@ -234,7 +234,7 @@ public interface Action {
      * @see #ERROR_DESCRIPTION_KEY
      */
     @Nonnull
-    Map<String, String> invoke(
+    Map<String, String> invokeCustom(
             @Nonnull Map<String, String> argumentValues,
             @Nullable Map<String, String> customNamespace,
             @Nonnull Map<String, String> customArguments,

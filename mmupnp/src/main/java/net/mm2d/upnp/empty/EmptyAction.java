@@ -61,7 +61,7 @@ public class EmptyAction implements Action {
 
     @Nonnull
     @Override
-    public Map<String, String> invoke(
+    public Map<String, String> invokeCustom(
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments) throws IOException {
@@ -70,7 +70,7 @@ public class EmptyAction implements Action {
 
     @Nonnull
     @Override
-    public Map<String, String> invoke(
+    public Map<String, String> invokeCustom(
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments,

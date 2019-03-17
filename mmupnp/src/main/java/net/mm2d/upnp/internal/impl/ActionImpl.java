@@ -230,17 +230,17 @@ public class ActionImpl implements Action {
 
     @Override
     @Nonnull
-    public Map<String, String> invoke(
+    public Map<String, String> invokeCustom(
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments)
             throws IOException {
-        return invoke(argumentValues, customNamespace, customArguments, false);
+        return invokeCustom(argumentValues, customNamespace, customArguments, false);
     }
 
     @Override
     @Nonnull
-    public Map<String, String> invoke(
+    public Map<String, String> invokeCustom(
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments,

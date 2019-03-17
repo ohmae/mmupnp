@@ -221,7 +221,7 @@ public class ActionInvokeTest {
     }
 
     @Test
-    public void invoke_リクエストSOAPの引数確認_カスタム引数指定NSなし() throws Exception {
+    public void invokeCustom_リクエストSOAPの引数確認_カスタム引数指定NSなし() throws Exception {
         final String value1 = "value1";
         final String value2 = "value2";
         final String name = "name";
@@ -232,7 +232,7 @@ public class ActionInvokeTest {
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
-        mAction.invoke(arg, null, Collections.singletonMap(name, value));
+        mAction.invokeCustom(arg, null, Collections.singletonMap(name, value));
         final HttpRequest request = captor.getValue();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -253,7 +253,7 @@ public class ActionInvokeTest {
     }
 
     @Test
-    public void invoke_リクエストSOAPの引数確認_カスタム引数指定NSあり() throws Exception {
+    public void invokeCustom_リクエストSOAPの引数確認_カスタム引数指定NSあり() throws Exception {
         final String value1 = "value1";
         final String value2 = "value2";
         final String prefix = "custom";
@@ -266,7 +266,7 @@ public class ActionInvokeTest {
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
-        mAction.invoke(arg,
+        mAction.invokeCustom(arg,
                 Collections.singletonMap(prefix, urn),
                 Collections.singletonMap(prefix + ":" + name, value));
         final HttpRequest request = captor.getValue();
@@ -454,22 +454,22 @@ public class ActionInvokeTest {
     }
 
     @Test(expected = IOException.class)
-    public void invoke_エラーレスポンスのときIOExceptionが発生2() throws Exception {
+    public void invokeCustom_エラーレスポンスのときIOExceptionが発生2() throws Exception {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
         mHttpResponse.setBody(ERROR_RESPONSE);
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(),
+        mAction.invokeCustom(Collections.emptyMap(),
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 false);
     }
 
     @Test
-    public void invoke_エラーレスポンスもパースできる2() throws Exception {
+    public void invokeCustom_エラーレスポンスもパースできる2() throws Exception {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
         mHttpResponse.setBody(ERROR_RESPONSE);
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        final Map<String, String> result = mAction.invoke(Collections.emptyMap(),
+        final Map<String, String> result = mAction.invokeCustom(Collections.emptyMap(),
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 true);
