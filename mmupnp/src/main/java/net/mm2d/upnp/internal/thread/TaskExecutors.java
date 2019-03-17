@@ -54,5 +54,7 @@ public class TaskExecutors {
     public void terminate() {
         mCallbackExecutor.terminate();
         mIoExecutor.terminate();
+        mManagerExecutor.terminate();
+        mServerExecutor.terminate();
     }
 }
