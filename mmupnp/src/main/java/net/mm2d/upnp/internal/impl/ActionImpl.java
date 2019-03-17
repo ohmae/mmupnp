@@ -19,6 +19,7 @@ import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.Property;
 import net.mm2d.upnp.internal.parser.DeviceParser;
 import net.mm2d.upnp.internal.parser.ServiceParser;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.StringPair;
 import net.mm2d.upnp.util.TextUtils;
 import net.mm2d.upnp.util.XmlUtils;
@@ -250,6 +251,65 @@ public class ActionImpl implements Action {
         appendArgument(arguments, customArguments);
         final String soap = makeSoap(customNamespace, arguments);
         return invokeInner(soap, returnErrorResponse);
+    }
+
+    @Override
+    public void invoke(
+            @Nonnull final Map<String, String> argumentValues,
+            @Nullable final ActionCallback callback) {
+        invoke(argumentValues, false, callback);
+    }
+
+    @Override
+    public void invoke(
+            @Nonnull final Map<String, String> argumentValues,
+            final boolean returnErrorResponse,
+            @Nullable final ActionCallback callback) {
+        final TaskExecutors executors = mService.getDevice().getControlPoint().getTaskExecutors();
+        executors.io(() -> {
+            try {
+                final Map<String, String> result = invokeSync(argumentValues, returnErrorResponse);
+                if (callback != null) {
+                    executors.callback(() -> callback.onResult(result));
+                }
+            } catch (final IOException e) {
+                if (callback != null) {
+                    executors.callback(() -> callback.onError(e));
+                }
+            }
+        });
+    }
+
+    @Override
+    public void invokeCustom(
+            @Nonnull final Map<String, String> argumentValues,
+            @Nullable final Map<String, String> customNamespace,
+            @Nonnull final Map<String, String> customArguments,
+            @Nullable final ActionCallback callback) {
+        invokeCustom(argumentValues, customNamespace, customArguments, false, callback);
+    }
+
+    @Override
+    public void invokeCustom(
+            @Nonnull final Map<String, String> argumentValues,
+            @Nullable final Map<String, String> customNamespace,
+            @Nonnull final Map<String, String> customArguments,
+            final boolean returnErrorResponse,
+            @Nullable final ActionCallback callback) {
+        final TaskExecutors executors = mService.getDevice().getControlPoint().getTaskExecutors();
+        executors.io(() -> {
+            try {
+                final Map<String, String> result = invokeCustomSync(
+                        argumentValues, customNamespace, customArguments, returnErrorResponse);
+                if (callback != null) {
+                    executors.callback(() -> callback.onResult(result));
+                }
+            } catch (final IOException e) {
+                if (callback != null) {
+                    executors.callback(() -> callback.onError(e));
+                }
+            }
+        });
     }
 
     /**

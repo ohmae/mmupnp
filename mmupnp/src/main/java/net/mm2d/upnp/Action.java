@@ -78,6 +78,78 @@ public interface Action {
     Argument findArgument(@Nonnull String name);
 
     /**
+     * Actionを同期実行する。
+     *
+     * @param argumentValues 引数への入力値
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see #invokeSync(Map, boolean)
+     * @see #invoke(Map, ActionCallback)
+     */
+    @Nonnull
+    Map<String, String> invokeSync(@Nonnull Map<String, String> argumentValues) throws IOException;
+
+    /**
+     * Actionを同期実行する。
+     *
+     * @param argumentValues      引数への入力値
+     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see #invoke(Map, boolean, ActionCallback)
+     * @see #FAULT_CODE_KEY
+     * @see #FAULT_STRING_KEY
+     * @see #ERROR_CODE_KEY
+     * @see #ERROR_DESCRIPTION_KEY
+     */
+    @Nonnull
+    Map<String, String> invokeSync(
+            @Nonnull Map<String, String> argumentValues,
+            boolean returnErrorResponse)
+            throws IOException;
+
+    /**
+     * Actionを同期実行する。【試験的実装】
+     *
+     * @param argumentValues  引数への入力値
+     * @param customNamespace カスタム引数のNamespace情報、不要な場合null
+     * @param customArguments カスタム引数
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see #invokeCustomSync(Map, Map, Map, boolean)
+     * @see #invokeCustom(Map, Map, Map, ActionCallback)
+     */
+    @Nonnull
+    Map<String, String> invokeCustomSync(
+            @Nonnull Map<String, String> argumentValues,
+            @Nullable Map<String, String> customNamespace,
+            @Nonnull Map<String, String> customArguments)
+            throws IOException;
+
+    /**
+     * Actionを同期実行する。【試験的実装】
+     *
+     * @param argumentValues      引数への入力値
+     * @param customNamespace     カスタム引数のNamespace情報、不要な場合null
+     * @param customArguments     カスタム引数
+     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see #invokeCustom(Map, Map, Map, boolean, ActionCallback)
+     * @see #FAULT_CODE_KEY
+     * @see #FAULT_STRING_KEY
+     * @see #ERROR_CODE_KEY
+     * @see #ERROR_DESCRIPTION_KEY
+     */
+    @Nonnull
+    Map<String, String> invokeCustomSync(
+            @Nonnull Map<String, String> argumentValues,
+            @Nullable Map<String, String> customNamespace,
+            @Nonnull Map<String, String> customArguments,
+            boolean returnErrorResponse)
+            throws IOException;
+
+    /**
      * Actionを実行する。
      *
      * <p>実行後エラー応答を受け取った場合は、IOExceptionを発生させる。
@@ -97,12 +169,13 @@ public interface Action {
      * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
      *
      * @param argumentValues 引数への入力値
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
-     * @see #invokeSync(Map, boolean)
+     * @param callback       実行結果のコールバック。callbackスレッドで実行される。
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see #invoke(Map, boolean, ActionCallback)
      */
-    @Nonnull
-    Map<String, String> invokeSync(@Nonnull Map<String, String> argumentValues) throws IOException;
+    void invoke(
+            @Nonnull Map<String, String> argumentValues,
+            @Nullable ActionCallback callback);
 
     /**
      * Actionを実行する。
@@ -129,18 +202,17 @@ public interface Action {
      *
      * @param argumentValues      引数への入力値
      * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @param callback            実行結果のコールバック。callbackスレッドで実行される。
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
      * @see #FAULT_CODE_KEY
      * @see #FAULT_STRING_KEY
      * @see #ERROR_CODE_KEY
      * @see #ERROR_DESCRIPTION_KEY
      */
-    @Nonnull
-    Map<String, String> invokeSync(
+    void invoke(
             @Nonnull Map<String, String> argumentValues,
-            boolean returnErrorResponse)
-            throws IOException;
+            boolean returnErrorResponse,
+            @Nullable ActionCallback callback);
 
     /**
      * Actionを実行する。【試験的実装】
@@ -176,16 +248,15 @@ public interface Action {
      * @param argumentValues  引数への入力値
      * @param customNamespace カスタム引数のNamespace情報、不要な場合null
      * @param customArguments カスタム引数
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
-     * @see #invokeCustomSync(Map, Map, Map, boolean)
+     * @param callback        実行結果のコールバック。callbackスレッドで実行される。
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see #invokeCustom(Map, Map, Map, boolean, ActionCallback)
      */
-    @Nonnull
-    Map<String, String> invokeCustomSync(
+    void invokeCustom(
             @Nonnull Map<String, String> argumentValues,
             @Nullable Map<String, String> customNamespace,
-            @Nonnull Map<String, String> customArguments)
-            throws IOException;
+            @Nonnull Map<String, String> customArguments,
+            @Nullable ActionCallback callback);
 
     /**
      * Actionを実行する。【試験的実装】
@@ -226,18 +297,23 @@ public interface Action {
      * @param customNamespace     カスタム引数のNamespace情報、不要な場合null
      * @param customArguments     カスタム引数
      * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @param callback            実行結果のコールバック。callbackスレッドで実行される。
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
      * @see #FAULT_CODE_KEY
      * @see #FAULT_STRING_KEY
      * @see #ERROR_CODE_KEY
      * @see #ERROR_DESCRIPTION_KEY
      */
-    @Nonnull
-    Map<String, String> invokeCustomSync(
+    void invokeCustom(
             @Nonnull Map<String, String> argumentValues,
             @Nullable Map<String, String> customNamespace,
             @Nonnull Map<String, String> customArguments,
-            boolean returnErrorResponse)
-            throws IOException;
+            boolean returnErrorResponse,
+            @Nullable ActionCallback callback);
+
+    interface ActionCallback {
+        void onResult(@Nonnull Map<String, String> result);
+
+        void onError(@Nonnull IOException e);
+    }
 }

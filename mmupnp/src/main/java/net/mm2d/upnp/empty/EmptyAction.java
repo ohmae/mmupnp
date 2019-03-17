@@ -77,4 +77,46 @@ public class EmptyAction implements Action {
             final boolean returnErrorResponse) throws IOException {
         throw new IOException("empty object");
     }
+
+    @Override
+    public void invoke(
+            @Nonnull final Map<String, String> argumentValues,
+            @Nullable final ActionCallback callback) {
+        if (callback != null) {
+            callback.onError(new IOException("empty object"));
+        }
+    }
+
+    @Override
+    public void invoke(
+            @Nonnull final Map<String, String> argumentValues,
+            final boolean returnErrorResponse,
+            @Nullable final ActionCallback callback) {
+        if (callback != null) {
+            callback.onError(new IOException("empty object"));
+        }
+    }
+
+    @Override
+    public void invokeCustom(
+            @Nonnull final Map<String, String> argumentValues,
+            @Nullable final Map<String, String> customNamespace,
+            @Nonnull final Map<String, String> customArguments,
+            @Nullable final ActionCallback callback) {
+        if (callback != null) {
+            callback.onError(new IOException("empty object"));
+        }
+    }
+
+    @Override
+    public void invokeCustom(
+            @Nonnull final Map<String, String> argumentValues,
+            @Nullable final Map<String, String> customNamespace,
+            @Nonnull final Map<String, String> customArguments,
+            final boolean returnErrorResponse,
+            @Nullable final ActionCallback callback) {
+        if (callback != null) {
+            callback.onError(new IOException("empty object"));
+        }
+    }
 }

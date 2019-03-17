@@ -82,14 +82,12 @@ public class ServiceNode extends UpnpNode {
         menu.add(open);
         if (mSubscribing) {
             final JMenuItem unsubscribe = new JMenuItem("Unsubscribe");
-            unsubscribe.addActionListener(e -> {
-                mSubscribing = !getUserObject().unsubscribeSync();
-            });
+            unsubscribe.addActionListener(e -> getUserObject().unsubscribe(result -> mSubscribing = !result));
             menu.add(unsubscribe);
         } else {
             final JMenuItem subscribe = new JMenuItem("Subscribe");
             subscribe.addActionListener(e -> {
-                mSubscribing = getUserObject().subscribeSync(true);
+                getUserObject().subscribe(true, result -> mSubscribing = result);
             });
             menu.add(subscribe);
         }

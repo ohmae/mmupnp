@@ -8,6 +8,7 @@
 package net.mm2d.upnp.sample;
 
 import net.mm2d.upnp.Action;
+import net.mm2d.upnp.Action.ActionCallback;
 import net.mm2d.upnp.Argument;
 import net.mm2d.upnp.StateVariable;
 
@@ -91,22 +92,27 @@ public class ActionWindow extends JFrame {
         panel.setLayout(new FlowLayout());
         final JButton invoke = new JButton("Invoke");
         invoke.addActionListener(e -> {
-            try {
-                final Map<String, String> result = mAction.invokeSync(makeArgument(), true);
-                if (result.containsKey(Action.ERROR_CODE_KEY)) {
-                    if (result.containsKey(Action.ERROR_DESCRIPTION_KEY)) {
-                        mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY)
-                                + " " + result.get(Action.ERROR_DESCRIPTION_KEY));
-                    } else {
-                        mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY));
+            mAction.invoke(makeArgument(), true, new ActionCallback() {
+                @Override
+                public void onResult(@Nonnull final Map<String, String> result) {
+                    if (result.containsKey(Action.ERROR_CODE_KEY)) {
+                        if (result.containsKey(Action.ERROR_DESCRIPTION_KEY)) {
+                            mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY)
+                                    + " " + result.get(Action.ERROR_DESCRIPTION_KEY));
+                        } else {
+                            mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY));
+                        }
+                        return;
                     }
-                    return;
+                    updateResult(result);
                 }
-                updateResult(result);
-            } catch (final IOException e1) {
-                e1.printStackTrace();
-                mErrorMessage.setText(e1.getMessage());
-            }
+
+                @Override
+                public void onError(@Nonnull final IOException e) {
+                    e.printStackTrace();
+                    mErrorMessage.setText(e.getMessage());
+                }
+            });
         });
         panel.add(invoke);
         return panel;
