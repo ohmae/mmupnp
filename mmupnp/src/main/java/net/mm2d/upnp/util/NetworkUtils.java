@@ -314,7 +314,7 @@ public final class NetworkUtils {
         final ShortBuffer buffer = ByteBuffer.wrap(address.getAddress()).asShortBuffer();
         final int[] section = new int[8];
         for (int i = 0; i < section.length; i++) {
-            section[i] = buffer.get();
+            section[i] = buffer.get() & 0xffff;
         }
         final int[] toOmission = findSectionToOmission(section);
         final int start = toOmission[0];
