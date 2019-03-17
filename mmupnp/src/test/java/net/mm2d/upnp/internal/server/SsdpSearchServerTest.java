@@ -52,7 +52,7 @@ public class SsdpSearchServerTest {
         mTaskExecutors.terminate();
     }
 
-    @Test
+    @Test(timeout = 2000)
     public void search_ST_ALLでのサーチ() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
@@ -64,6 +64,7 @@ public class SsdpSearchServerTest {
         server.open();
         server.start();
         server.search();
+        Thread.sleep(100);
         server.stop();
         server.close();
 
@@ -75,7 +76,7 @@ public class SsdpSearchServerTest {
         assertThat(message.getHeader(Http.MAN), is(SsdpMessage.SSDP_DISCOVER));
     }
 
-    @Test
+    @Test(timeout = 2000)
     public void search_ST_ROOTDEVICEでのサーチ() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
@@ -87,6 +88,7 @@ public class SsdpSearchServerTest {
         server.open();
         server.start();
         server.search(SsdpSearchServer.ST_ROOTDEVICE);
+        Thread.sleep(100);
         server.stop();
         server.close();
 

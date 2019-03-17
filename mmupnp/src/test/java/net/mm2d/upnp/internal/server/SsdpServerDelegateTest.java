@@ -186,8 +186,8 @@ public class SsdpServerDelegateTest {
         verify(socket, never()).send(ArgumentMatchers.any(DatagramPacket.class));
     }
 
-    @Test
-    public void send_socketから送信される() throws IOException {
+    @Test(timeout = 2000)
+    public void send_socketから送信される() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MockMulticastSocket socket = spy(new MockMulticastSocket());
@@ -202,7 +202,9 @@ public class SsdpServerDelegateTest {
         message.setHeader(Http.ST, SsdpSearchServer.ST_ROOTDEVICE);
 
         server.open();
+        server.start();
         server.send(message);
+        Thread.sleep(100);
 
         verify(socket, times(1)).send(ArgumentMatchers.any(DatagramPacket.class));
 
@@ -345,7 +347,7 @@ public class SsdpServerDelegateTest {
         receiveTask.start(mTaskExecutors, "");
         Thread.sleep(500);
         receiveTask.shutdownRequest();
-        Thread.sleep(500);
+        Thread.sleep(100);
         verify(receiveTask, times(1)).joinGroup();
         verify(receiveTask, times(1)).receiveLoop();
         verify(receiveTask, times(1)).leaveGroup();
@@ -380,7 +382,7 @@ public class SsdpServerDelegateTest {
         receiveTask.start(mTaskExecutors, "");
         Thread.sleep(500);
         receiveTask.shutdownRequest();
-        Thread.sleep(500);
+        Thread.sleep(100);
         verify(receiveTask, times(1)).joinGroup();
         verify(receiveTask, times(1)).receiveLoop();
         verify(receiveTask, times(1)).leaveGroup();

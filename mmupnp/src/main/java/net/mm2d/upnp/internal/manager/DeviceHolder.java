@@ -38,7 +38,7 @@ public class DeviceHolder implements Runnable {
     @Nonnull
     private final TaskExecutors mTaskExecutors;
     @Nullable
-    private FutureTask<Void> mFutureTask;
+    private FutureTask<?> mFutureTask;
 
     @Nonnull
     private final ExpireListener mExpireListener;

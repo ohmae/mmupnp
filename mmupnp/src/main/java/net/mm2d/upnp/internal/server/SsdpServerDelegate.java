@@ -237,7 +237,16 @@ class SsdpServerDelegate implements SsdpServer {
 
     @Override
     public void send(@Nonnull final SsdpMessage message) {
-        if (mSocket == null) {
+        mTaskExecutors.io(() -> sendInner(message));
+    }
+
+    private void sendInner(@Nonnull final SsdpMessage message) {
+        final ReceiveTask task = mReceiveTask;
+        if (task == null || !task.waitReady()) {
+            return;
+        }
+        final MulticastSocket socket = mSocket;
+        if (socket == null) {
             return;
         }
         Logger.d(() -> "send from " + getInterfaceAddress() + ":\n" + message);
@@ -245,7 +254,7 @@ class SsdpServerDelegate implements SsdpServer {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.writeData(baos);
             final byte[] data = baos.toByteArray();
-            mSocket.send(new DatagramPacket(data, data.length, getSsdpSocketAddress()));
+            socket.send(new DatagramPacket(data, data.length, getSsdpSocketAddress()));
         } catch (final IOException e) {
             Logger.w(e);
         }
@@ -291,9 +300,30 @@ class SsdpServerDelegate implements SsdpServer {
 
         private final int mBindPort;
         @Nullable
-        private FutureTask<Void> mFutureTask;
+        private FutureTask<?> mFutureTask;
         @Nullable
         private String mSuffix;
+
+        private boolean mReady;
+
+        private synchronized boolean waitReady() {
+            final FutureTask<?> task = mFutureTask;
+            if (task == null || task.isDone()) {
+                return false;
+            }
+            if (!mReady) {
+                try {
+                    wait(500);
+                } catch (final InterruptedException ignored) {
+                }
+            }
+            return mReady;
+        }
+
+        private synchronized void ready() {
+            mReady = true;
+            notifyAll();
+        }
 
         /**
          * インスタンス作成
@@ -315,6 +345,7 @@ class SsdpServerDelegate implements SsdpServer {
         synchronized void start(
                 @Nonnull final TaskExecutors executors,
                 @Nonnull final String suffix) {
+            mReady = false;
             mSuffix = suffix;
             mFutureTask = new FutureTask<>(this, null);
             executors.server(mFutureTask);
@@ -341,6 +372,7 @@ class SsdpServerDelegate implements SsdpServer {
             }
             try {
                 joinGroup();
+                ready();
                 receiveLoop();
                 leaveGroup();
             } catch (final IOException ignored) {

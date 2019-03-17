@@ -180,7 +180,7 @@ public class EventReceiver {
         @Nullable
         private EventMessageListener mListener;
         @Nullable
-        private FutureTask<Void> mFutureTask;
+        private FutureTask<?> mFutureTask;
 
         /**
          * サーバソケットを指定してインスタンス作成。
@@ -311,7 +311,7 @@ public class EventReceiver {
         @Nonnull
         private final Socket mSocket;
         @Nullable
-        private FutureTask<Void> mFutureTask;
+        private FutureTask<?> mFutureTask;
 
         /**
          * インスタンス作成

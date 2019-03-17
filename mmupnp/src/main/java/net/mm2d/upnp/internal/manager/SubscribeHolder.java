@@ -38,7 +38,7 @@ public class SubscribeHolder implements Runnable {
     @Nonnull
     private final TaskExecutors mTaskExecutors;
     @Nullable
-    private FutureTask<Void> mFutureTask;
+    private FutureTask<?> mFutureTask;
     @Nonnull
     private final Map<String, SubscribeService> mSubscriptionMap = new HashMap<>();
 
