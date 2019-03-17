@@ -565,36 +565,42 @@ public class ServiceImpl implements Service {
     }
 
     @Override
-    public void subscribe(@Nonnull final SubscribeCallback callback) {
+    public void subscribe(@Nullable final SubscribeCallback callback) {
         subscribe(false, callback);
     }
 
     @Override
     public void subscribe(
             final boolean keepRenew,
-            @Nonnull final SubscribeCallback callback) {
+            @Nullable final SubscribeCallback callback) {
         final TaskExecutors executors = mDevice.getControlPoint().getTaskExecutors();
         executors.io(() -> {
             final boolean result = subscribeSync(keepRenew);
-            executors.callback(() -> callback.onResult(result));
+            if (callback != null) {
+                executors.callback(() -> callback.onResult(result));
+            }
         });
     }
 
     @Override
-    public void renewSubscribe(@Nonnull final SubscribeCallback callback) {
+    public void renewSubscribe(@Nullable final SubscribeCallback callback) {
         final TaskExecutors executors = mDevice.getControlPoint().getTaskExecutors();
         executors.io(() -> {
             final boolean result = renewSubscribeSync();
-            executors.callback(() -> callback.onResult(result));
+            if (callback != null) {
+                executors.callback(() -> callback.onResult(result));
+            }
         });
     }
 
     @Override
-    public void unsubscribe(@Nonnull final SubscribeCallback callback) {
+    public void unsubscribe(@Nullable final SubscribeCallback callback) {
         final TaskExecutors executors = mDevice.getControlPoint().getTaskExecutors();
         executors.io(() -> {
             final boolean result = unsubscribeSync();
-            executors.callback(() -> callback.onResult(result));
+            if (callback != null) {
+                executors.callback(() -> callback.onResult(result));
+            }
         });
     }
 

@@ -107,25 +107,33 @@ public class EmptyService implements Service {
     }
 
     @Override
-    public void subscribe(@Nonnull final SubscribeCallback callback) {
-        callback.onResult(false);
+    public void subscribe(@Nullable final SubscribeCallback callback) {
+        if (callback != null) {
+            callback.onResult(false);
+        }
     }
 
     @Override
     public void subscribe(
             final boolean keepRenew,
-            @Nonnull final SubscribeCallback callback) {
-        callback.onResult(false);
+            @Nullable final SubscribeCallback callback) {
+        if (callback != null) {
+            callback.onResult(false);
+        }
     }
 
     @Override
-    public void renewSubscribe(@Nonnull final SubscribeCallback callback) {
-        callback.onResult(false);
+    public void renewSubscribe(@Nullable final SubscribeCallback callback) {
+        if (callback != null) {
+            callback.onResult(false);
+        }
     }
 
     @Override
-    public void unsubscribe(@Nonnull final SubscribeCallback callback) {
-        callback.onResult(false);
+    public void unsubscribe(@Nullable final SubscribeCallback callback) {
+        if (callback != null) {
+            callback.onResult(false);
+        }
     }
 
     @Nullable

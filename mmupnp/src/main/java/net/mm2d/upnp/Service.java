@@ -195,7 +195,7 @@ public interface Service {
      *
      * @param callback 結果を通知するコールバック
      */
-    void subscribe(@Nonnull SubscribeCallback callback);
+    void subscribe(@Nullable SubscribeCallback callback);
 
     /**
      * Subscribeの実行
@@ -205,21 +205,21 @@ public interface Service {
      */
     void subscribe(
             boolean keepRenew,
-            @Nonnull SubscribeCallback callback);
+            @Nullable SubscribeCallback callback);
 
     /**
      * RenewSubscribeを実行する
      *
      * @param callback 結果を通知するコールバック
      */
-    void renewSubscribe(@Nonnull SubscribeCallback callback);
+    void renewSubscribe(@Nullable SubscribeCallback callback);
 
     /**
      * Unsubscribeを実行する
      *
      * @param callback 結果を通知するコールバック
      */
-    void unsubscribe(@Nonnull SubscribeCallback callback);
+    void unsubscribe(@Nullable SubscribeCallback callback);
 
     /**
      * SID(SubscriptionID)を返す。
