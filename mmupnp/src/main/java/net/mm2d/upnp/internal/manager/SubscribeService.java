@@ -9,7 +9,6 @@ package net.mm2d.upnp.internal.manager;
 
 import net.mm2d.upnp.Service;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;

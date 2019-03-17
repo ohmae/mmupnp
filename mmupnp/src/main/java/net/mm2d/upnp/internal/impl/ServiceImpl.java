@@ -9,7 +9,6 @@ package net.mm2d.upnp.internal.impl;
 
 import net.mm2d.log.Logger;
 import net.mm2d.upnp.Action;
-import net.mm2d.upnp.Device;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpClient;
 import net.mm2d.upnp.HttpRequest;
@@ -17,6 +16,7 @@ import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.Service;
 import net.mm2d.upnp.StateVariable;
 import net.mm2d.upnp.internal.manager.SubscribeManager;
+import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 import net.mm2d.upnp.util.TextUtils;
 
@@ -45,7 +45,7 @@ public class ServiceImpl implements Service {
      */
     public static class Builder {
         private SubscribeManager mSubscribeManager;
-        private Device mDevice;
+        private DeviceImpl mDevice;
         private String mServiceType;
         private String mServiceId;
         private String mScpdUrl;
@@ -70,7 +70,7 @@ public class ServiceImpl implements Service {
          * @return Builder
          */
         @Nonnull
-        Builder setDevice(@Nonnull final Device device) {
+        Builder setDevice(@Nonnull final DeviceImpl device) {
             mDevice = device;
             return this;
         }
@@ -236,7 +236,7 @@ public class ServiceImpl implements Service {
     @Nonnull
     private final SubscribeManager mSubscribeManager;
     @Nonnull
-    private final Device mDevice;
+    private final DeviceImpl mDevice;
     @Nonnull
     private final String mDescription;
     @Nonnull
@@ -287,7 +287,7 @@ public class ServiceImpl implements Service {
 
     @Nonnull
     private static Map<String, Action> buildActionMap(
-            @Nonnull final Service service,
+            @Nonnull final ServiceImpl service,
             @Nonnull final Map<String, StateVariable> variableMap,
             @Nonnull final List<ActionImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
@@ -322,7 +322,7 @@ public class ServiceImpl implements Service {
 
     @Override
     @Nonnull
-    public Device getDevice() {
+    public DeviceImpl getDevice() {
         return mDevice;
     }
 
@@ -562,6 +562,40 @@ public class ServiceImpl implements Service {
             Logger.e("fail to unsubscribe", e);
         }
         return false;
+    }
+
+    @Override
+    public void subscribe(@Nonnull final SubscribeCallback callback) {
+        subscribe(false, callback);
+    }
+
+    @Override
+    public void subscribe(
+            final boolean keepRenew,
+            @Nonnull final SubscribeCallback callback) {
+        final TaskExecutors executors = mDevice.getControlPoint().getTaskExecutors();
+        executors.io(() -> {
+            final boolean result = subscribeSync(keepRenew);
+            executors.callback(() -> callback.onResult(result));
+        });
+    }
+
+    @Override
+    public void renewSubscribe(@Nonnull final SubscribeCallback callback) {
+        final TaskExecutors executors = mDevice.getControlPoint().getTaskExecutors();
+        executors.io(() -> {
+            final boolean result = renewSubscribeSync();
+            executors.callback(() -> callback.onResult(result));
+        });
+    }
+
+    @Override
+    public void unsubscribe(@Nonnull final SubscribeCallback callback) {
+        final TaskExecutors executors = mDevice.getControlPoint().getTaskExecutors();
+        executors.io(() -> {
+            final boolean result = unsubscribeSync();
+            executors.callback(() -> callback.onResult(result));
+        });
     }
 
     @Nonnull

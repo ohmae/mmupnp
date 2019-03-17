@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -163,14 +162,14 @@ public interface Service {
     StateVariable findStateVariable(@Nullable String name);
 
     /**
-     * Subscribeの実行
+     * Subscribeの同期実行
      *
      * @return 成功時true
      */
     boolean subscribeSync();
 
     /**
-     * Subscribeの実行
+     * Subscribeの同期実行
      *
      * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
      * @return 成功時true
@@ -178,18 +177,49 @@ public interface Service {
     boolean subscribeSync(boolean keepRenew);
 
     /**
-     * RenewSubscribeを実行する
+     * RenewSubscribeを同期実行する
      *
      * @return 成功時true
      */
     boolean renewSubscribeSync();
 
     /**
-     * Unsubscribeを実行する
+     * Unsubscribeを同期実行する
      *
      * @return 成功時true
      */
     boolean unsubscribeSync();
+
+    /**
+     * Subscribeの実行
+     *
+     * @param callback 結果を通知するコールバック
+     */
+    void subscribe(@Nonnull SubscribeCallback callback);
+
+    /**
+     * Subscribeの実行
+     *
+     * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
+     * @param callback  結果を通知するコールバック
+     */
+    void subscribe(
+            boolean keepRenew,
+            @Nonnull SubscribeCallback callback);
+
+    /**
+     * RenewSubscribeを実行する
+     *
+     * @param callback 結果を通知するコールバック
+     */
+    void renewSubscribe(@Nonnull SubscribeCallback callback);
+
+    /**
+     * Unsubscribeを実行する
+     *
+     * @param callback 結果を通知するコールバック
+     */
+    void unsubscribe(@Nonnull SubscribeCallback callback);
 
     /**
      * SID(SubscriptionID)を返す。
@@ -198,4 +228,8 @@ public interface Service {
      */
     @Nullable
     String getSubscriptionId();
+
+    interface SubscribeCallback {
+        void onResult(boolean result);
+    }
 }

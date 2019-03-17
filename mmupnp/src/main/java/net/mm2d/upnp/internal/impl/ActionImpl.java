@@ -17,7 +17,6 @@ import net.mm2d.upnp.HttpClient;
 import net.mm2d.upnp.HttpRequest;
 import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.Property;
-import net.mm2d.upnp.Service;
 import net.mm2d.upnp.internal.parser.DeviceParser;
 import net.mm2d.upnp.internal.parser.ServiceParser;
 import net.mm2d.upnp.util.StringPair;
@@ -67,7 +66,7 @@ public class ActionImpl implements Action {
      * @see ServiceParser#loadDescription(HttpClient, DeviceImpl.Builder, ServiceImpl.Builder)
      */
     public static class Builder {
-        private Service mService;
+        private ServiceImpl mService;
         private String mName;
         @Nonnull
         private final List<ArgumentImpl.Builder> mArgumentList;
@@ -86,7 +85,7 @@ public class ActionImpl implements Action {
          * @return Builder
          */
         @Nonnull
-        public Builder setService(@Nonnull final Service service) {
+        public Builder setService(@Nonnull final ServiceImpl service) {
             mService = service;
             return this;
         }
@@ -150,7 +149,7 @@ public class ActionImpl implements Action {
     private static final String SOAP_NS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final String SOAP_STYLE = "http://schemas.xmlsoap.org/soap/encoding/";
     @Nonnull
-    private final Service mService;
+    private final ServiceImpl mService;
     @Nonnull
     private final String mName;
     @Nonnull
@@ -170,7 +169,7 @@ public class ActionImpl implements Action {
 
     @Override
     @Nonnull
-    public Service getService() {
+    public ServiceImpl getService() {
         return mService;
     }
 

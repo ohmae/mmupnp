@@ -11,7 +11,6 @@ import net.mm2d.upnp.Service;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.TextUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

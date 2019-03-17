@@ -8,7 +8,6 @@
 package net.mm2d.upnp.internal.impl;
 
 import net.mm2d.upnp.Action;
-import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpClient;
@@ -45,7 +44,7 @@ public class DeviceTest {
     public static class DeviceParserによる生成からのテスト {
         private HttpClient mHttpClient;
         private SsdpMessage mSsdpMessage;
-        private ControlPoint mControlPoint;
+        private ControlPointImpl mControlPoint;
         private SubscribeManager mSubscribeManager;
         private DeviceImpl.Builder mBuilder;
 
@@ -70,7 +69,7 @@ public class DeviceTest {
                     .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             mSsdpMessage = SsdpRequest.create(mock(InetAddress.class), data, data.length);
-            mControlPoint = mock(ControlPoint.class);
+            mControlPoint = mock(ControlPointImpl.class);
             mSubscribeManager = mock(SubscribeManager.class);
             mBuilder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, mSsdpMessage);
             DeviceParser.loadDescription(mHttpClient, mBuilder);
@@ -404,7 +403,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("http://192.168.0.1/").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -421,7 +420,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -439,7 +438,7 @@ public class DeviceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("http://192.168.0.1/").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
+            final Device device = new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")

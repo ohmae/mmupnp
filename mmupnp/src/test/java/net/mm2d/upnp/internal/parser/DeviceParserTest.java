@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.internal.parser;
 
-import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.HttpClient;
 import net.mm2d.upnp.SsdpMessage;
@@ -39,7 +38,7 @@ public class DeviceParserTest {
     public static class 全行程のテスト {
         private HttpClient mHttpClient;
         private SsdpMessage mSsdpMessage;
-        private ControlPoint mControlPoint;
+        private ControlPointImpl mControlPoint;
         private SubscribeManager mSubscribeManager;
 
         @Before
@@ -61,7 +60,7 @@ public class DeviceParserTest {
                     .when(mHttpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             mSsdpMessage = SsdpRequest.create(mock(InetAddress.class), data, data.length);
-            mControlPoint = mock(ControlPoint.class);
+            mControlPoint = mock(ControlPointImpl.class);
             mSubscribeManager = mock(SubscribeManager.class);
         }
 

@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.internal.impl;
 
-import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.Http;
 import net.mm2d.upnp.HttpClient;
@@ -47,7 +46,7 @@ public class ServiceTest {
         @Test
         public void build_成功() throws Exception {
             final Service service = new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -76,7 +75,7 @@ public class ServiceTest {
         @Test(expected = IllegalStateException.class)
         public void build_SubscribeManager不足() throws Exception {
             new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -89,7 +88,7 @@ public class ServiceTest {
         @Test(expected = IllegalStateException.class)
         public void build_ServiceType不足() throws Exception {
             new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
@@ -102,7 +101,7 @@ public class ServiceTest {
         @Test(expected = IllegalStateException.class)
         public void build_ServiceId不足() throws Exception {
             new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setScpdUrl("scpdUrl")
@@ -115,7 +114,7 @@ public class ServiceTest {
         @Test(expected = IllegalStateException.class)
         public void build_ScpdUrl不足() throws Exception {
             new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -128,7 +127,7 @@ public class ServiceTest {
         @Test(expected = IllegalStateException.class)
         public void build_ControlUrl不足() throws Exception {
             new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -141,7 +140,7 @@ public class ServiceTest {
         @Test(expected = IllegalStateException.class)
         public void build_EventSubUrl不足() throws Exception {
             new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -159,7 +158,7 @@ public class ServiceTest {
                             .setName("argumentName")
                             .setDirection("in"));
             final Service service = new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -182,7 +181,7 @@ public class ServiceTest {
                             .setDirection("in")
                             .setRelatedStateVariableName("StateVariableName"));
             final Service service = new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -198,12 +197,12 @@ public class ServiceTest {
 
         @Test
         public void getCallback() throws Exception {
-            final ControlPoint cp = mock(ControlPoint.class);
+            final ControlPointImpl cp = mock(ControlPointImpl.class);
             final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(cp, manager, message)
+            final DeviceImpl device = new DeviceImpl.Builder(cp, manager, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -236,7 +235,7 @@ public class ServiceTest {
         @Test
         public void hashCode_Exceptionが発生しない() throws Exception {
             final Service service = new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -251,7 +250,7 @@ public class ServiceTest {
         @Test
         public void equals_比較可能() throws Exception {
             final Service service = new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -271,7 +270,7 @@ public class ServiceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message)
+            final DeviceImpl device = new DeviceImpl.Builder(mock(ControlPointImpl.class), manager, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -309,7 +308,7 @@ public class ServiceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message)
+            final DeviceImpl device = new DeviceImpl.Builder(mock(ControlPointImpl.class), manager, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -347,7 +346,7 @@ public class ServiceTest {
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
             doReturn("uuid").when(message).getUuid();
-            final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message)
+            final DeviceImpl device = new DeviceImpl.Builder(mock(ControlPointImpl.class), manager, message)
                     .setDescription("description")
                     .setUdn("uuid")
                     .setUpc("upc")
@@ -385,7 +384,7 @@ public class ServiceTest {
             final SsdpMessage message1 = mock(SsdpMessage.class);
             doReturn("location").when(message1).getLocation();
             doReturn("uuid1").when(message1).getUuid();
-            final Device device1 = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message1)
+            final DeviceImpl device1 = new DeviceImpl.Builder(mock(ControlPointImpl.class), manager, message1)
                     .setDescription("description")
                     .setUdn("uuid1")
                     .setUpc("upc")
@@ -397,7 +396,7 @@ public class ServiceTest {
             final SsdpMessage message2 = mock(SsdpMessage.class);
             doReturn("location").when(message2).getLocation();
             doReturn("uuid2").when(message2).getUuid();
-            final Device device2 = new DeviceImpl.Builder(mock(ControlPoint.class), manager, message2)
+            final DeviceImpl device2 = new DeviceImpl.Builder(mock(ControlPointImpl.class), manager, message2)
                     .setDescription("description")
                     .setUdn("uuid2")
                     .setUpc("upc")
@@ -430,9 +429,9 @@ public class ServiceTest {
         }
 
         @Test
-        public void createHttpClient() throws Exception {
+        public void createHttpClient() {
             final Service service = new ServiceImpl.Builder()
-                    .setDevice(mock(Device.class))
+                    .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
@@ -452,7 +451,7 @@ public class ServiceTest {
         private static final String SID = "11234567-89ab-cdef-0123-456789abcdef";
         private static final String INTERFACE_ADDRESS = "192.0.2.3";
         private static final int EVENT_PORT = 100;
-        private ControlPoint mControlPoint;
+        private ControlPointImpl mControlPoint;
         private SubscribeManager mSubscribeManager;
         private Device mDevice;
         private ServiceImpl mCms;
@@ -480,7 +479,7 @@ public class ServiceTest {
                     .when(httpClient).downloadBinary(new URL("http://192.0.2.2:12345/icon/icon48.png"));
             final byte[] data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin");
             final SsdpMessage ssdpMessage = SsdpRequest.create(InetAddress.getByName(INTERFACE_ADDRESS), data, data.length);
-            mControlPoint = mock(ControlPoint.class);
+            mControlPoint = mock(ControlPointImpl.class);
             mSubscribeManager = mock(SubscribeManager.class);
             doReturn(EVENT_PORT).when(mSubscribeManager).getEventPort();
             final DeviceImpl.Builder builder = new DeviceImpl.Builder(mControlPoint, mSubscribeManager, ssdpMessage);
@@ -720,7 +719,7 @@ public class ServiceTest {
 
     @RunWith(JUnit4.class)
     public static class subscribe_機能のテスト {
-        private ControlPoint mControlPoint;
+        private ControlPointImpl mControlPoint;
         private DeviceImpl mDevice;
         private SubscribeManager mSubscribeManager;
         private ServiceImpl mService;
@@ -728,7 +727,7 @@ public class ServiceTest {
 
         @Before
         public void setUp() throws Exception {
-            mControlPoint = mock(ControlPoint.class);
+            mControlPoint = mock(ControlPointImpl.class);
             mDevice = mock(DeviceImpl.class);
             mSubscribeManager = mock(SubscribeManager.class);
             doReturn(mControlPoint).when(mDevice).getControlPoint();

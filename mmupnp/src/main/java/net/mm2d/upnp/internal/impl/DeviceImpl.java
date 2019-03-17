@@ -8,7 +8,6 @@
 package net.mm2d.upnp.internal.impl;
 
 import net.mm2d.upnp.Action;
-import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.HttpClient;
 import net.mm2d.upnp.Icon;
@@ -48,7 +47,7 @@ public class DeviceImpl implements Device {
      */
     public static class Builder {
         @Nonnull
-        private final ControlPoint mControlPoint;
+        private final ControlPointImpl mControlPoint;
         @Nonnull
         private final SubscribeManager mSubscribeManager;
         @Nonnull
@@ -86,7 +85,7 @@ public class DeviceImpl implements Device {
          * @param message          SSDPパケット
          */
         public Builder(
-                @Nonnull final ControlPoint controlPoint,
+                @Nonnull final ControlPointImpl controlPoint,
                 @Nonnull final SubscribeManager subscribeManager,
                 @Nonnull final SsdpMessage message) {
             mControlPoint = controlPoint;
@@ -505,7 +504,7 @@ public class DeviceImpl implements Device {
     @Nullable
     private final Device mParent;
     @Nonnull
-    private final ControlPoint mControlPoint;
+    private final ControlPointImpl mControlPoint;
     @Nonnull
     private SsdpMessage mSsdpMessage;
     @Nonnull
@@ -582,7 +581,7 @@ public class DeviceImpl implements Device {
 
     @Nonnull
     private static List<Service> buildServiceList(
-            @Nonnull final Device device,
+            @Nonnull final DeviceImpl device,
             @Nonnull final SubscribeManager manager,
             @Nonnull final List<ServiceImpl.Builder> builderList) {
         if (builderList.isEmpty()) {
@@ -643,7 +642,7 @@ public class DeviceImpl implements Device {
 
     @Override
     @Nonnull
-    public ControlPoint getControlPoint() {
+    public ControlPointImpl getControlPoint() {
         return mControlPoint;
     }
 

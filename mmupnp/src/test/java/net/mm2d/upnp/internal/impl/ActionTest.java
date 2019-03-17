@@ -10,7 +10,6 @@ package net.mm2d.upnp.internal.impl;
 import net.mm2d.upnp.Action;
 import net.mm2d.upnp.Argument;
 import net.mm2d.upnp.HttpClient;
-import net.mm2d.upnp.Service;
 import net.mm2d.upnp.StateVariable;
 
 import org.junit.Test;
@@ -36,7 +35,7 @@ public class ActionTest {
     @Test(expected = IllegalStateException.class)
     public void build_NameをsetしていないとException() {
         new ActionImpl.Builder()
-                .setService(mock(Service.class))
+                .setService(mock(ServiceImpl.class))
                 .build();
     }
 
@@ -52,7 +51,7 @@ public class ActionTest {
 
     @Test
     public void getService_setした値が取得できる() {
-        final Service service = mock(Service.class);
+        final ServiceImpl service = mock(ServiceImpl.class);
         final String name = "name";
         final Action action = new ActionImpl.Builder()
                 .setService(service)
@@ -63,7 +62,7 @@ public class ActionTest {
 
     @Test
     public void getName_setした値が取得できる() {
-        final Service service = mock(Service.class);
+        final ServiceImpl service = mock(ServiceImpl.class);
         final String name = "name";
         final Action action = new ActionImpl.Builder()
                 .setService(service)
@@ -74,7 +73,7 @@ public class ActionTest {
 
     @Test
     public void getArgumentList_Argumentがない場合はサイズ0() {
-        final Service service = mock(Service.class);
+        final ServiceImpl service = mock(ServiceImpl.class);
         final String name = "name";
         final Action action = new ActionImpl.Builder()
                 .setService(service)
@@ -88,7 +87,7 @@ public class ActionTest {
         final String argumentName = "argumentName";
         final StateVariable stateVariable = mock(StateVariable.class);
         final String name = "name";
-        final Service service = mock(Service.class);
+        final ServiceImpl service = mock(ServiceImpl.class);
         final Action action = new ActionImpl.Builder()
                 .setService(service)
                 .setName(name)
@@ -110,7 +109,7 @@ public class ActionTest {
         final String argumentName = "argumentName";
         final StateVariable stateVariable = mock(StateVariable.class);
         final String name = "name";
-        final Service service = mock(Service.class);
+        final ServiceImpl service = mock(ServiceImpl.class);
         final Action action = new ActionImpl.Builder()
                 .setService(service)
                 .setName(name)
@@ -128,7 +127,7 @@ public class ActionTest {
 
     @Test
     public void createHttpClient() {
-        final Service service = mock(Service.class);
+        final ServiceImpl service = mock(ServiceImpl.class);
         final String name = "name";
         final ActionImpl action = (ActionImpl) new ActionImpl.Builder()
                 .setService(service)

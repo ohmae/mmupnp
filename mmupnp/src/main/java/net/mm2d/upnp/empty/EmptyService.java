@@ -13,7 +13,6 @@ import net.mm2d.upnp.Device;
 import net.mm2d.upnp.Service;
 import net.mm2d.upnp.StateVariable;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -105,6 +104,28 @@ public class EmptyService implements Service {
     @Override
     public boolean unsubscribeSync() {
         return false;
+    }
+
+    @Override
+    public void subscribe(@Nonnull final SubscribeCallback callback) {
+        callback.onResult(false);
+    }
+
+    @Override
+    public void subscribe(
+            final boolean keepRenew,
+            @Nonnull final SubscribeCallback callback) {
+        callback.onResult(false);
+    }
+
+    @Override
+    public void renewSubscribe(@Nonnull final SubscribeCallback callback) {
+        callback.onResult(false);
+    }
+
+    @Override
+    public void unsubscribe(@Nonnull final SubscribeCallback callback) {
+        callback.onResult(false);
     }
 
     @Nullable

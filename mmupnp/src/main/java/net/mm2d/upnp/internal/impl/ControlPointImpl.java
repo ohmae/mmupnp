@@ -216,6 +216,11 @@ public class ControlPointImpl implements ControlPoint {
         }
     }
 
+    @Nonnull
+    TaskExecutors getTaskExecutors() {
+        return mTaskExecutors;
+    }
+
     @Override
     public void initialize() {
         if (mInitialized.getAndSet(true)) {

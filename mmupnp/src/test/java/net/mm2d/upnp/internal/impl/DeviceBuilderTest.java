@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.internal.impl;
 
-import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.Device;
 import net.mm2d.upnp.HttpClient;
 import net.mm2d.upnp.Icon;
@@ -34,7 +33,7 @@ import static org.mockito.Mockito.*;
 public class DeviceBuilderTest {
     @Test
     public void build() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -57,7 +56,7 @@ public class DeviceBuilderTest {
         final Icon icon = mock(Icon.class);
         final Service service = mock(Service.class);
         final ServiceImpl.Builder serviceBuilder = mock(ServiceImpl.Builder.class);
-        doReturn(serviceBuilder).when(serviceBuilder).setDevice(any(Device.class));
+        doReturn(serviceBuilder).when(serviceBuilder).setDevice(any(DeviceImpl.class));
         doReturn(serviceBuilder).when(serviceBuilder).setSubscribeManager(any(SubscribeManager.class));
         doReturn(service).when(serviceBuilder).build();
 
@@ -100,7 +99,7 @@ public class DeviceBuilderTest {
 
     @Test
     public void build_最低限のパラメータ() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -135,7 +134,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void build_Description不足() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -158,7 +157,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void build_DeviceType不足() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -181,7 +180,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void build_FriendlyName不足() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -204,7 +203,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void build_Manufacture不足() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -227,7 +226,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void build_ModelName不足() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -250,7 +249,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void build_Udn不足() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -274,7 +273,7 @@ public class DeviceBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void build_Udn不一致() {
-        final ControlPoint cp = mock(ControlPoint.class);
+        final ControlPointImpl cp = mock(ControlPointImpl.class);
         final SubscribeManager manager = mock(SubscribeManager.class);
         final SsdpMessage message = mock(SsdpMessage.class);
         final String location = "location";
@@ -306,14 +305,14 @@ public class DeviceBuilderTest {
         doReturn("location").when(message).getLocation();
         doReturn(true).when(message).isPinned();
         final SsdpMessage newMessage = mock(SsdpMessage.class);
-        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message);
         builder.updateSsdpMessage(newMessage);
         assertThat(builder.getSsdpMessage(), is(message));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void build_不正なSsdpMessage1() {
-        new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), mock(SsdpMessage.class));
+        new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), mock(SsdpMessage.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -323,7 +322,7 @@ public class DeviceBuilderTest {
         final String uuid = "uuid";
         doReturn(location).when(message).getLocation();
         doReturn(uuid).when(message).getUuid();
-        new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
+        new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message)
                 .updateSsdpMessage(mock(SsdpMessage.class));
     }
 
@@ -335,7 +334,7 @@ public class DeviceBuilderTest {
         doReturn(location).when(message).getLocation();
         doReturn(uuid).when(message).getUuid();
         final DeviceImpl.Builder embeddedDeviceBuilder = mock(DeviceImpl.Builder.class);
-        new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
+        new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message)
                 .setEmbeddedDeviceBuilderList(Collections.singletonList(embeddedDeviceBuilder))
                 .updateSsdpMessage(message);
 
@@ -352,7 +351,7 @@ public class DeviceBuilderTest {
         final String tag2 = "tag2";
         final String value2 = "value2";
 
-        final Device device = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message)
+        final Device device = new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")
@@ -371,7 +370,7 @@ public class DeviceBuilderTest {
     public void onDownloadDescription() throws Exception {
         final FakeSsdpMessage message = mock(FakeSsdpMessage.class);
         doReturn("location").when(message).getLocation();
-        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message);
         final HttpClient client = mock(HttpClient.class);
         final InetAddress address = InetAddress.getByName("127.0.0.1");
         doReturn(address).when(client).getLocalAddress();
@@ -385,7 +384,7 @@ public class DeviceBuilderTest {
     public void onDownloadDescription_before_download() {
         final FakeSsdpMessage message = mock(FakeSsdpMessage.class);
         doReturn("location").when(message).getLocation();
-        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPoint.class), mock(SubscribeManager.class), message);
+        final DeviceImpl.Builder builder = new DeviceImpl.Builder(mock(ControlPointImpl.class), mock(SubscribeManager.class), message);
         final HttpClient client = new HttpClient();
         builder.setDownloadInfo(client);
     }
