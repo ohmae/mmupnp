@@ -88,13 +88,7 @@ public class SubscribeManager implements EventMessageListener {
     public void stop() {
         final List<Service> serviceList = mSubscribeHolder.getServiceList();
         for (final Service service : serviceList) {
-            mTaskExecutors.io(() -> {
-                try {
-                    service.unsubscribe();
-                } catch (final IOException e) {
-                    Logger.w(e);
-                }
-            });
+            mTaskExecutors.io(service::unsubscribeSync);
         }
         mSubscribeHolder.clear();
         mEventReceiver.close();
@@ -137,7 +131,7 @@ public class SubscribeManager implements EventMessageListener {
      * @param timeout タイムアウトするまでの時間
      * @param keep    keep-aliveを行う場合true
      * @see Service
-     * @see Service#subscribe()
+     * @see Service#subscribeSync()
      */
     public void register(
             @Nonnull final Service service,
@@ -163,7 +157,7 @@ public class SubscribeManager implements EventMessageListener {
      *
      * @param service 削除するService
      * @see Service
-     * @see Service#unsubscribe()
+     * @see Service#unsubscribeSync()
      */
     public void unregister(@Nonnull final Service service) {
         mSubscribeHolder.remove(service);

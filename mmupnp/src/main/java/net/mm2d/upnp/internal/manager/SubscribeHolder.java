@@ -210,10 +210,7 @@ public class SubscribeHolder implements Runnable {
             if (s.isExpired(now)) {
                 final Service service = s.getService();
                 remove(service);
-                try {
-                    service.unsubscribe();
-                } catch (final IOException ignored) {
-                }
+                service.unsubscribeSync();
             }
         }
     }

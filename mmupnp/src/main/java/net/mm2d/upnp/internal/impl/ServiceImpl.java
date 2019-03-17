@@ -442,20 +442,25 @@ public class ServiceImpl implements Service {
     }
 
     @Override
-    public boolean subscribe() throws IOException {
-        return subscribe(false);
+    public boolean subscribeSync() {
+        return subscribeSync(false);
     }
 
     @Override
-    public boolean subscribe(final boolean keepRenew) throws IOException {
-        if (!TextUtils.isEmpty(mSubscriptionId)) {
-            if (renewSubscribeInner()) {
-                mSubscribeManager.setKeepRenew(this, keepRenew);
-                return true;
+    public boolean subscribeSync(final boolean keepRenew) {
+        try {
+            if (!TextUtils.isEmpty(mSubscriptionId)) {
+                if (renewSubscribeInner()) {
+                    mSubscribeManager.setKeepRenew(this, keepRenew);
+                    return true;
+                }
+                return false;
             }
-            return false;
+            return subscribeInner(keepRenew);
+        } catch (final IOException e) {
+            Logger.e("fail to subscribe", e);
         }
-        return subscribeInner(keepRenew);
+        return false;
     }
 
     // VisibleForTesting
@@ -492,11 +497,16 @@ public class ServiceImpl implements Service {
     }
 
     @Override
-    public boolean renewSubscribe() throws IOException {
-        if (TextUtils.isEmpty(mSubscriptionId)) {
-            return subscribeInner(false);
+    public boolean renewSubscribeSync() {
+        try {
+            if (TextUtils.isEmpty(mSubscriptionId)) {
+                return subscribeInner(false);
+            }
+            return renewSubscribeInner();
+        } catch (final IOException e) {
+            Logger.e("fail to renewSubscribe", e);
         }
-        return renewSubscribeInner();
+        return false;
     }
 
     // VisibleForTesting
@@ -532,21 +542,26 @@ public class ServiceImpl implements Service {
     }
 
     @Override
-    public boolean unsubscribe() throws IOException {
+    public boolean unsubscribeSync() {
         if (TextUtils.isEmpty(mSubscriptionId)) {
             return false;
         }
-        final HttpClient client = createHttpClient();
-        final HttpRequest request = makeUnsubscribeRequest(mSubscriptionId);
-        final HttpResponse response = client.post(request);
-        mSubscribeManager.unregister(this);
-        mSubscriptionId = null;
-        if (response.getStatus() != Http.Status.HTTP_OK) {
-            Logger.w(() -> "unsubscribe request:\n" + request + "\nresponse:\n" + response);
-            return false;
+        try {
+            final HttpClient client = createHttpClient();
+            final HttpRequest request = makeUnsubscribeRequest(mSubscriptionId);
+            final HttpResponse response = client.post(request);
+            mSubscribeManager.unregister(this);
+            mSubscriptionId = null;
+            if (response.getStatus() != Http.Status.HTTP_OK) {
+                Logger.w(() -> "unsubscribe request:\n" + request + "\nresponse:\n" + response);
+                return false;
+            }
+            Logger.v(() -> "unsubscribe request:\n" + request + "\nresponse:\n" + response);
+            return true;
+        } catch (final IOException e) {
+            Logger.e("fail to unsubscribe", e);
         }
-        Logger.v(() -> "unsubscribe request:\n" + request + "\nresponse:\n" + response);
-        return true;
+        return false;
     }
 
     @Nonnull

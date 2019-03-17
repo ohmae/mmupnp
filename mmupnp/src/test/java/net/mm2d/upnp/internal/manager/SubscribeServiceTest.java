@@ -58,7 +58,7 @@ public class SubscribeServiceTest {
         final Service service = mock(Service.class);
         final long start = System.currentTimeMillis();
         final long timeout = 1000L;
-        doReturn(false).when(service).renewSubscribe();
+        doReturn(false).when(service).renewSubscribeSync();
         final SubscribeService subscribeService = new SubscribeService(service, timeout, true);
 
         subscribeService.renewSubscribe(subscribeService.getNextScanTime());
@@ -72,7 +72,7 @@ public class SubscribeServiceTest {
     public void getNextScanTime_keepである時failCountが0のときより1のほうが大きな値になる() throws Exception {
         final long timeout = 1000L;
         final Service service = mock(Service.class);
-        doReturn(false).when(service).renewSubscribe();
+        doReturn(false).when(service).renewSubscribeSync();
         final SubscribeService subscribeService = new SubscribeService(service, timeout, true);
 
         final long time1 = subscribeService.getNextScanTime();
@@ -85,7 +85,7 @@ public class SubscribeServiceTest {
     @Test
     public void isFailed_2回連続失敗でtrue() throws Exception {
         final Service service = mock(Service.class);
-        doReturn(false).when(service).renewSubscribe();
+        doReturn(false).when(service).renewSubscribeSync();
         final SubscribeService subscribeService = new SubscribeService(service, 0L, true);
         final long start = System.currentTimeMillis();
 
@@ -105,15 +105,15 @@ public class SubscribeServiceTest {
 
         assertThat(subscribeService.isFailed(), is(false));
 
-        doReturn(false).when(service).renewSubscribe();
+        doReturn(false).when(service).renewSubscribeSync();
         subscribeService.renewSubscribe(0);
         assertThat(subscribeService.isFailed(), is(false));
 
-        doReturn(true).when(service).renewSubscribe();
+        doReturn(true).when(service).renewSubscribeSync();
         subscribeService.renewSubscribe(0);
         assertThat(subscribeService.isFailed(), is(false));
 
-        doReturn(false).when(service).renewSubscribe();
+        doReturn(false).when(service).renewSubscribeSync();
         subscribeService.renewSubscribe(0);
         assertThat(subscribeService.isFailed(), is(false));
     }
@@ -134,36 +134,36 @@ public class SubscribeServiceTest {
     public void renewSubscribe_keepがfalseならrenewSubscribeを呼ばない() throws Exception {
         final long timeout = 1000L;
         final Service service = mock(Service.class);
-        doReturn(true).when(service).renewSubscribe();
+        doReturn(true).when(service).renewSubscribeSync();
         final SubscribeService subscribeService = new SubscribeService(service, timeout, false);
 
         final long time = subscribeService.getNextScanTime();
         assertThat(subscribeService.renewSubscribe(time), is(true));
-        verify(service, never()).renewSubscribe();
+        verify(service, never()).renewSubscribeSync();
     }
 
     @Test
     public void renewSubscribe_keepがtrueでも時間の前ではrenewSubscribeを呼ばない() throws Exception {
         final long timeout = 1000L;
         final Service service = mock(Service.class);
-        doReturn(true).when(service).renewSubscribe();
+        doReturn(true).when(service).renewSubscribeSync();
         final SubscribeService subscribeService = new SubscribeService(service, timeout, true);
 
         final long time = subscribeService.getNextScanTime();
         assertThat(subscribeService.renewSubscribe(time - 1), is(true));
-        verify(service, never()).renewSubscribe();
+        verify(service, never()).renewSubscribeSync();
     }
 
     @Test
     public void renewSubscribe_keepがtrueで時間を過ぎていたらrenewSubscribeを呼ぶ() throws Exception {
         final long timeout = 1000L;
         final Service service = mock(Service.class);
-        doReturn(true).when(service).renewSubscribe();
+        doReturn(true).when(service).renewSubscribeSync();
         final SubscribeService subscribeService = new SubscribeService(service, timeout, true);
 
         final long time = subscribeService.getNextScanTime();
         assertThat(subscribeService.renewSubscribe(time), is(true));
-        verify(service, times(1)).renewSubscribe();
+        verify(service, times(1)).renewSubscribeSync();
     }
 
     @Test
@@ -183,7 +183,6 @@ public class SubscribeServiceTest {
     public void renewSubscribe() throws Exception {
         final Service service = mock(Service.class);
         final SubscribeService subscribeService = new SubscribeService(service, TimeUnit.SECONDS.toMillis(300), true);
-        doThrow(new IOException()).when(service).renewSubscribe();
         final long start = System.currentTimeMillis();
 
         subscribeService.renewSubscribe(TimeUnit.SECONDS.toMillis(300) + start);

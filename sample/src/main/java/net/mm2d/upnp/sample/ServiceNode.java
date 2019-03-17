@@ -83,23 +83,13 @@ public class ServiceNode extends UpnpNode {
         if (mSubscribing) {
             final JMenuItem unsubscribe = new JMenuItem("Unsubscribe");
             unsubscribe.addActionListener(e -> {
-                try {
-                    getUserObject().unsubscribe();
-                    mSubscribing = false;
-                } catch (final IOException e1) {
-                    e1.printStackTrace();
-                }
+                mSubscribing = !getUserObject().unsubscribeSync();
             });
             menu.add(unsubscribe);
         } else {
             final JMenuItem subscribe = new JMenuItem("Subscribe");
             subscribe.addActionListener(e -> {
-                try {
-                    getUserObject().subscribe(true);
-                    mSubscribing = true;
-                } catch (final IOException e1) {
-                    e1.printStackTrace();
-                }
+                mSubscribing = getUserObject().subscribeSync(true);
             });
             menu.add(subscribe);
         }

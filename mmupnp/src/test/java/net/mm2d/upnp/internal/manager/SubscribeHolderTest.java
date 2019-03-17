@@ -131,7 +131,6 @@ public class SubscribeHolderTest {
 
     @Test(timeout = 10000L)
     public void expire_時間経過で削除される() throws InterruptedException {
-        final long now = System.currentTimeMillis();
         final String id1 = "id1";
         final Service service1 = mock(Service.class);
         doReturn(id1).when(service1).getSubscriptionId();
@@ -162,13 +161,12 @@ public class SubscribeHolderTest {
 
     @Test(timeout = 10000L)
     public void renew_定期的にrenewが実行される() throws Exception {
-        final long now = System.currentTimeMillis();
         final Service service1 = mock(Service.class);
-        doReturn(true).when(service1).renewSubscribe();
+        doReturn(true).when(service1).renewSubscribeSync();
         doReturn("id1").when(service1).getSubscriptionId();
 
         final Service service2 = mock(Service.class);
-        doReturn(true).when(service2).renewSubscribe();
+        doReturn(true).when(service2).renewSubscribeSync();
         doReturn("id2").when(service2).getSubscriptionId();
 
         final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
@@ -176,10 +174,10 @@ public class SubscribeHolderTest {
 
         subscribeHolder.add(service1, 1000L, true);
         subscribeHolder.add(service2, 500L, true);
-        verify(service1, never()).renewSubscribe();
+        verify(service1, never()).renewSubscribeSync();
 
         Thread.sleep(2000L);
-        verify(service1, atLeastOnce()).renewSubscribe();
+        verify(service1, atLeastOnce()).renewSubscribeSync();
 
         subscribeHolder.shutdownRequest();
     }
@@ -187,10 +185,9 @@ public class SubscribeHolderTest {
 
     @Test(timeout = 10000L)
     public void renew_失敗したら削除される() throws Exception {
-        final long now = System.currentTimeMillis();
         final String id = "id";
         final Service service = mock(Service.class);
-        doReturn(false).when(service).renewSubscribe();
+        doReturn(false).when(service).renewSubscribeSync();
         doReturn(id).when(service).getSubscriptionId();
         final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
         subscribeHolder.start();

@@ -88,23 +88,23 @@ public class EmptyService implements Service {
     }
 
     @Override
-    public boolean subscribe() throws IOException {
-        throw new IOException("empty object");
+    public boolean subscribeSync() {
+        return false;
     }
 
     @Override
-    public boolean subscribe(final boolean keepRenew) throws IOException {
-        throw new IOException("empty object");
+    public boolean subscribeSync(final boolean keepRenew) {
+        return false;
     }
 
     @Override
-    public boolean renewSubscribe() throws IOException {
-        throw new IOException("empty object");
+    public boolean renewSubscribeSync() {
+        return false;
     }
 
     @Override
-    public boolean unsubscribe() throws IOException {
-        throw new IOException("empty object");
+    public boolean unsubscribeSync() {
+        return false;
     }
 
     @Nullable

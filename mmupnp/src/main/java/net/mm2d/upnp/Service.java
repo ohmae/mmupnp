@@ -166,34 +166,30 @@ public interface Service {
      * Subscribeの実行
      *
      * @return 成功時true
-     * @throws IOException 通信エラー
      */
-    boolean subscribe() throws IOException;
+    boolean subscribeSync();
 
     /**
      * Subscribeの実行
      *
      * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
      * @return 成功時true
-     * @throws IOException 通信エラー
      */
-    boolean subscribe(boolean keepRenew) throws IOException;
+    boolean subscribeSync(boolean keepRenew);
 
     /**
      * RenewSubscribeを実行する
      *
      * @return 成功時true
-     * @throws IOException 通信エラー
      */
-    boolean renewSubscribe() throws IOException;
+    boolean renewSubscribeSync();
 
     /**
      * Unsubscribeを実行する
      *
      * @return 成功時true
-     * @throws IOException 通信エラー
      */
-    boolean unsubscribe() throws IOException;
+    boolean unsubscribeSync();
 
     /**
      * SID(SubscriptionID)を返す。

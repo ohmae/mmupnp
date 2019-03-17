@@ -742,24 +742,7 @@ public class ControlPointTest {
             mCp.stop();
             mCp.terminate();
             Thread.sleep(100);
-            verify(service).unsubscribe();
-            verify(mDeviceHolder).remove(device);
-        }
-
-        @Test
-        public void stop時にunsubscribeでexceptionが発生しても無視する() throws Exception {
-            mCp.start();
-            final Device device = mock(Device.class);
-            doReturn("udn").when(device).getUdn();
-            mDeviceHolder.add(device);
-            final Service service = mock(Service.class);
-            doReturn("SubscriptionId").when(service).getSubscriptionId();
-            doThrow(new IOException()).when(service).unsubscribe();
-            mSubscribeManager.register(service, 1000L, false);
-            mCp.stop();
-            mCp.terminate();
-            Thread.sleep(100);
-            verify(service).unsubscribe();
+            verify(service).unsubscribeSync();
             verify(mDeviceHolder).remove(device);
         }
 

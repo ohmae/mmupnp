@@ -137,14 +137,10 @@ class SubscribeService {
         if (!mKeepRenew || calculateRenewTime() > now) {
             return true;
         }
-        try {
-            if (mService.renewSubscribe()) {
-                resetFailCount();
-                return true;
-            } else {
-                increaseFailCount();
-            }
-        } catch (final IOException e) {
+        if (mService.renewSubscribeSync()) {
+            resetFailCount();
+            return true;
+        } else {
             increaseFailCount();
         }
         return false;

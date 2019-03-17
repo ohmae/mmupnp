@@ -87,28 +87,28 @@ public class EmptyServiceTest {
         assertThat(service.findStateVariable(""), is(nullValue()));
     }
 
-    @Test(expected = IOException.class)
-    public void subscribe() throws Exception {
+    @Test
+    public void subscribe() {
         final Service service = new EmptyService();
-        service.subscribe();
+        assertThat(service.subscribeSync(), is(false));
     }
 
-    @Test(expected = IOException.class)
-    public void subscribe1() throws Exception {
+    @Test
+    public void subscribe1() {
         final Service service = new EmptyService();
-        service.subscribe(true);
+        assertThat(service.subscribeSync(true), is(false));
     }
 
-    @Test(expected = IOException.class)
-    public void renewSubscribe() throws Exception {
+    @Test
+    public void renewSubscribe() {
         final Service service = new EmptyService();
-        service.renewSubscribe();
+        assertThat(service.renewSubscribeSync(), is(false));
     }
 
-    @Test(expected = IOException.class)
-    public void unsubscribe() throws Exception {
+    @Test
+    public void unsubscribe() {
         final Service service = new EmptyService();
-        service.unsubscribe();
+        assertThat(service.unsubscribeSync(), is(false));
     }
 
     @Test
