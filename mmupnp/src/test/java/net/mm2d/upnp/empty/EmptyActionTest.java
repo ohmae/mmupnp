@@ -50,24 +50,24 @@ public class EmptyActionTest {
     @Test(expected = IOException.class)
     public void invoke() throws Exception {
         final Action action = new EmptyAction();
-        action.invoke(Collections.emptyMap());
+        action.invokeSync(Collections.emptyMap());
     }
 
     @Test(expected = IOException.class)
     public void invoke1() throws Exception {
         final Action action = new EmptyAction();
-        action.invoke(Collections.emptyMap(), false);
+        action.invokeSync(Collections.emptyMap(), false);
     }
 
     @Test(expected = IOException.class)
     public void invokeCustom() throws Exception {
         final Action action = new EmptyAction();
-        action.invokeCustom(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
+        action.invokeCustomSync(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
     }
 
     @Test(expected = IOException.class)
     public void invokeCustom1() throws Exception {
         final Action action = new EmptyAction();
-        action.invokeCustom(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap(), false);
+        action.invokeCustomSync(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap(), false);
     }
 }

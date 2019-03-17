@@ -117,14 +117,14 @@ public class ActionInvokeTest {
         final HttpClient client = mock(HttpClient.class);
         when(client.post(any())).thenThrow(IOException.class);
         doReturn(client).when(mAction).createHttpClient();
-        mAction.invoke(new HashMap<>());
+        mAction.invokeSync(new HashMap<>());
     }
 
     @Test
     public void invoke_リクエストヘッダの確認() throws Exception {
         final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
         doReturn(mHttpResponse).when(mMockHttpClient).post(captor.capture());
-        mAction.invoke(new HashMap<>());
+        mAction.invokeSync(new HashMap<>());
 
         final HttpRequest request = captor.getValue();
         assertThat(request.getMethod(), is("POST"));
@@ -151,7 +151,7 @@ public class ActionInvokeTest {
     public void invoke_リクエストSOAPフォーマットの確認() throws Exception {
         final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
         doReturn(mHttpResponse).when(mMockHttpClient).post(captor.capture());
-        mAction.invoke(new HashMap<>());
+        mAction.invokeSync(new HashMap<>());
         final HttpRequest request = captor.getValue();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -176,7 +176,7 @@ public class ActionInvokeTest {
     public void invoke_リクエストSOAPの引数確認_指定なしでの実行() throws Exception {
         final ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
         doReturn(mHttpResponse).when(mMockHttpClient).post(captor.capture());
-        mAction.invoke(new HashMap<>());
+        mAction.invokeSync(new HashMap<>());
         final HttpRequest request = captor.getValue();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -203,7 +203,7 @@ public class ActionInvokeTest {
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
-        mAction.invoke(arg);
+        mAction.invokeSync(arg);
         final HttpRequest request = captor.getValue();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -232,7 +232,7 @@ public class ActionInvokeTest {
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
-        mAction.invokeCustom(arg, null, Collections.singletonMap(name, value));
+        mAction.invokeCustomSync(arg, null, Collections.singletonMap(name, value));
         final HttpRequest request = captor.getValue();
 
         final Document doc = XmlUtils.newDocument(true, request.getBody());
@@ -266,7 +266,7 @@ public class ActionInvokeTest {
         arg.put(IN_ARG_NAME_1, value1);
         arg.put(IN_ARG_NAME_2, value2);
 
-        mAction.invokeCustom(arg,
+        mAction.invokeCustomSync(arg,
                 Collections.singletonMap(prefix, urn),
                 Collections.singletonMap(prefix + ":" + name, value));
         final HttpRequest request = captor.getValue();
@@ -296,12 +296,12 @@ public class ActionInvokeTest {
             mHttpResponse.setStatus(status);
             doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
             if (status == Http.Status.HTTP_OK) {
-                mAction.invoke(new HashMap<>());
+                mAction.invokeSync(new HashMap<>());
                 continue;
             }
             try {
                 statusCount++;
-                mAction.invoke(new HashMap<>());
+                mAction.invokeSync(new HashMap<>());
             } catch (final IOException ignored) {
                 exceptionCount++;
             }
@@ -316,7 +316,7 @@ public class ActionInvokeTest {
                 + "</s:Envelope>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
 
-        mAction.invoke(Collections.emptyMap(), false);
+        mAction.invokeSync(Collections.emptyMap(), false);
     }
 
     @Test(expected = IOException.class)
@@ -328,13 +328,13 @@ public class ActionInvokeTest {
                 + "</s:Envelope>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
 
-        mAction.invoke(Collections.emptyMap(), false);
+        mAction.invokeSync(Collections.emptyMap(), false);
     }
 
     @Test
     public void invoke_実行結果をパースしMapとして戻ること() throws Exception {
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        final Map<String, String> result = mAction.invoke(new HashMap<>());
+        final Map<String, String> result = mAction.invokeSync(new HashMap<>());
         assertThat(result.get(OUT_ARG_NAME1), is(OUT_ARG_VALUE1));
     }
 
@@ -350,7 +350,7 @@ public class ActionInvokeTest {
                 + "</s:Body>\n"
                 + "</s:Envelope>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        final Map<String, String> result = mAction.invoke(Collections.emptyMap());
+        final Map<String, String> result = mAction.invokeSync(Collections.emptyMap());
         assertThat(result.get(OUT_ARG_NAME1), is(OUT_ARG_VALUE1));
         assertThat(result.containsKey(OUT_ARG_NAME2), is(true));
     }
@@ -377,7 +377,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
         mHttpResponse.setBody(ERROR_RESPONSE);
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), false);
+        mAction.invokeSync(Collections.emptyMap(), false);
     }
 
     @Test(expected = IOException.class)
@@ -398,7 +398,7 @@ public class ActionInvokeTest {
                 + "</s:Body>\n"
                 + "</s:Envelope>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test(expected = IOException.class)
@@ -416,7 +416,7 @@ public class ActionInvokeTest {
                 + "</s:Body>\n"
                 + "</s:Envelope>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test(expected = IOException.class)
@@ -426,7 +426,7 @@ public class ActionInvokeTest {
                 + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
                 + "</s:Envelope>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test(expected = IOException.class)
@@ -438,7 +438,7 @@ public class ActionInvokeTest {
                 + "</s:Body>\n"
                 + "</s:Envelope>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test
@@ -446,7 +446,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
         mHttpResponse.setBody(ERROR_RESPONSE);
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        final Map<String, String> result = mAction.invoke(Collections.emptyMap(), true);
+        final Map<String, String> result = mAction.invokeSync(Collections.emptyMap(), true);
         assertThat(result.get(Action.FAULT_CODE_KEY), is("s:Client"));
         assertThat(result.get(Action.FAULT_STRING_KEY), is("UPnPError"));
         assertThat(result.get(Action.ERROR_CODE_KEY), is("711"));
@@ -458,7 +458,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
         mHttpResponse.setBody(ERROR_RESPONSE);
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invokeCustom(Collections.emptyMap(),
+        mAction.invokeCustomSync(Collections.emptyMap(),
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 false);
@@ -469,7 +469,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
         mHttpResponse.setBody(ERROR_RESPONSE);
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        final Map<String, String> result = mAction.invokeCustom(Collections.emptyMap(),
+        final Map<String, String> result = mAction.invokeCustomSync(Collections.emptyMap(),
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 true);
@@ -484,7 +484,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_OK);
         mHttpResponse.setBody("");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test(expected = IOException.class)
@@ -492,7 +492,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
         mHttpResponse.setBody("");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test(expected = IOException.class)
@@ -500,7 +500,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_NOT_FOUND);
         mHttpResponse.setBody("");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test(expected = IOException.class)
@@ -508,7 +508,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_OK);
         mHttpResponse.setBody("<>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test(expected = IOException.class)
@@ -516,7 +516,7 @@ public class ActionInvokeTest {
         mHttpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR);
         mHttpResponse.setBody("<>");
         doReturn(mHttpResponse).when(mMockHttpClient).post(ArgumentMatchers.any(HttpRequest.class));
-        mAction.invoke(Collections.emptyMap(), true);
+        mAction.invokeSync(Collections.emptyMap(), true);
     }
 
     @Test(expected = IOException.class)

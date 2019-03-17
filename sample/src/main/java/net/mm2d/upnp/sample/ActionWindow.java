@@ -92,7 +92,7 @@ public class ActionWindow extends JFrame {
         final JButton invoke = new JButton("Invoke");
         invoke.addActionListener(e -> {
             try {
-                final Map<String, String> result = mAction.invoke(makeArgument(), true);
+                final Map<String, String> result = mAction.invokeSync(makeArgument(), true);
                 if (result.containsKey(Action.ERROR_CODE_KEY)) {
                     if (result.containsKey(Action.ERROR_DESCRIPTION_KEY)) {
                         mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY)

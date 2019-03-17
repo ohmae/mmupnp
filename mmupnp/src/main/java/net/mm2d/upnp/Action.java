@@ -81,8 +81,8 @@ public interface Action {
      * Actionを実行する。
      *
      * <p>実行後エラー応答を受け取った場合は、IOExceptionを発生させる。
-     * エラー応答の内容を取得する必要がある場合は{@link #invoke(Map, boolean)}を使用し、第二引数にtrueを指定する。
-     * このメソッドは{@link #invoke(Map, boolean)}の第二引数にfalseを指定した場合と等価である。
+     * エラー応答の内容を取得する必要がある場合は{@link #invokeSync(Map, boolean)}を使用し、第二引数にtrueを指定する。
+     * このメソッドは{@link #invokeSync(Map, boolean)}の第二引数にfalseを指定した場合と等価である。
      *
      * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
      * 値はすべてStringで表現する。
@@ -99,10 +99,10 @@ public interface Action {
      * @param argumentValues 引数への入力値
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
-     * @see #invoke(Map, boolean)
+     * @see #invokeSync(Map, boolean)
      */
     @Nonnull
-    Map<String, String> invoke(@Nonnull Map<String, String> argumentValues) throws IOException;
+    Map<String, String> invokeSync(@Nonnull Map<String, String> argumentValues) throws IOException;
 
     /**
      * Actionを実行する。
@@ -137,7 +137,7 @@ public interface Action {
      * @see #ERROR_DESCRIPTION_KEY
      */
     @Nonnull
-    Map<String, String> invoke(
+    Map<String, String> invokeSync(
             @Nonnull Map<String, String> argumentValues,
             boolean returnErrorResponse)
             throws IOException;
@@ -148,8 +148,8 @@ public interface Action {
      * <p>※試験的実装であり、将来的に変更、削除される可能性が高い
      *
      * <p>実行後エラー応答を受け取った場合は、IOExceptionを発生させる。
-     * エラー応答の内容を取得する必要がある場合は{@link #invokeCustom(Map, Map, Map, boolean)}を使用し、第四引数にtrueを指定する。
-     * このメソッドは{@link #invokeCustom(Map, Map, Map, boolean)}の第四引数にfalseを指定した場合と等価である。
+     * エラー応答の内容を取得する必要がある場合は{@link #invokeCustomSync(Map, Map, Map, boolean)}を使用し、第四引数にtrueを指定する。
+     * このメソッドは{@link #invokeCustomSync(Map, Map, Map, boolean)}の第四引数にfalseを指定した場合と等価である。
      *
      * <p>実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
      * 値はすべてStringで表現する。
@@ -178,10 +178,10 @@ public interface Action {
      * @param customArguments カスタム引数
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
-     * @see #invokeCustom(Map, Map, Map, boolean)
+     * @see #invokeCustomSync(Map, Map, Map, boolean)
      */
     @Nonnull
-    Map<String, String> invokeCustom(
+    Map<String, String> invokeCustomSync(
             @Nonnull Map<String, String> argumentValues,
             @Nullable Map<String, String> customNamespace,
             @Nonnull Map<String, String> customArguments)
@@ -234,7 +234,7 @@ public interface Action {
      * @see #ERROR_DESCRIPTION_KEY
      */
     @Nonnull
-    Map<String, String> invokeCustom(
+    Map<String, String> invokeCustomSync(
             @Nonnull Map<String, String> argumentValues,
             @Nullable Map<String, String> customNamespace,
             @Nonnull Map<String, String> customArguments,

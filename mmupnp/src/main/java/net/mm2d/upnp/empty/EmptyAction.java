@@ -47,13 +47,13 @@ public class EmptyAction implements Action {
 
     @Nonnull
     @Override
-    public Map<String, String> invoke(@Nonnull final Map<String, String> argumentValues) throws IOException {
+    public Map<String, String> invokeSync(@Nonnull final Map<String, String> argumentValues) throws IOException {
         throw new IOException("empty object");
     }
 
     @Nonnull
     @Override
-    public Map<String, String> invoke(
+    public Map<String, String> invokeSync(
             @Nonnull final Map<String, String> argumentValues,
             final boolean returnErrorResponse) throws IOException {
         throw new IOException("empty object");
@@ -61,7 +61,7 @@ public class EmptyAction implements Action {
 
     @Nonnull
     @Override
-    public Map<String, String> invokeCustom(
+    public Map<String, String> invokeCustomSync(
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments) throws IOException {
@@ -70,7 +70,7 @@ public class EmptyAction implements Action {
 
     @Nonnull
     @Override
-    public Map<String, String> invokeCustom(
+    public Map<String, String> invokeCustomSync(
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments,

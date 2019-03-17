@@ -212,14 +212,14 @@ public class ActionImpl implements Action {
 
     @Override
     @Nonnull
-    public Map<String, String> invoke(@Nonnull final Map<String, String> argumentValues)
+    public Map<String, String> invokeSync(@Nonnull final Map<String, String> argumentValues)
             throws IOException {
-        return invoke(argumentValues, false);
+        return invokeSync(argumentValues, false);
     }
 
     @Override
     @Nonnull
-    public Map<String, String> invoke(
+    public Map<String, String> invokeSync(
             @Nonnull final Map<String, String> argumentValues,
             final boolean returnErrorResponse)
             throws IOException {
@@ -230,17 +230,17 @@ public class ActionImpl implements Action {
 
     @Override
     @Nonnull
-    public Map<String, String> invokeCustom(
+    public Map<String, String> invokeCustomSync(
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments)
             throws IOException {
-        return invokeCustom(argumentValues, customNamespace, customArguments, false);
+        return invokeCustomSync(argumentValues, customNamespace, customArguments, false);
     }
 
     @Override
     @Nonnull
-    public Map<String, String> invokeCustom(
+    public Map<String, String> invokeCustomSync(
             @Nonnull final Map<String, String> argumentValues,
             @Nullable final Map<String, String> customNamespace,
             @Nonnull final Map<String, String> customArguments,
