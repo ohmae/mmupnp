@@ -286,14 +286,19 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         }
         try {
             mSocket = createMulticastSocket(mBindPort);
-            mSocket.setNetworkInterface(mInterface);
-            mSocket.setTimeToLive(4);
-            joinGroup();
+            if (mBindPort != 0) {
+                mSocket.joinGroup(getSsdpInetAddress());
+            }
             ready();
             receiveLoop();
         } catch (final IOException ignored) {
         } finally {
-            leaveGroup();
+            if (mBindPort != 0 && mSocket != null) {
+                try {
+                    mSocket.leaveGroup(getSsdpInetAddress());
+                } catch (final IOException ignored) {
+                }
+            }
             mSocket = null;
         }
     }
@@ -319,38 +324,12 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         }
     }
 
-    /**
-     * Joinを行う。
-     *
-     * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
-     *
-     * @throws IOException Joinコールにより発生
-     */
-    // VisibleForTesting
-    void joinGroup() throws IOException {
-        if (mBindPort != 0) {
-            mSocket.joinGroup(getSsdpInetAddress());
-        }
-    }
-
-    /**
-     * Leaveを行う。
-     *
-     * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
-     */
-    // VisibleForTesting
-    void leaveGroup() {
-        if (mBindPort != 0) {
-            try {
-                mSocket.leaveGroup(getSsdpInetAddress());
-            } catch (final IOException ignored) {
-            }
-        }
-    }
-
     // VisibleForTesting
     @Nonnull
     MulticastSocket createMulticastSocket(final int port) throws IOException {
-        return new MulticastSocket(port);
+        final MulticastSocket socket = new MulticastSocket(port);
+        socket.setNetworkInterface(mInterface);
+        socket.setTimeToLive(4);
+        return socket;
     }
 }
