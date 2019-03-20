@@ -338,25 +338,19 @@ public class SsdpServerDelegateTest {
 
     @Test
     public void isInvalidLocation_アドレス一致() throws Exception {
-        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         final SsdpResponse message = makeFromResource("ssdp-search-response0.bin");
-        assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(false));
+        assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(false));
     }
 
     @Test
     public void isInvalidLocation_http以外() throws Exception {
-        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         final SsdpResponse message = makeFromResource("ssdp-search-response-invalid-location0.bin");
-        assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(true));
+        assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(true));
     }
 
     @Test
     public void isInvalidLocation_表記に問題() throws Exception {
-        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         final SsdpResponse message = makeFromResource("ssdp-search-response-invalid-location1.bin");
-        assertThat(server.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(true));
+        assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2")), is(true));
     }
 }

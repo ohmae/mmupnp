@@ -139,7 +139,7 @@ public class SsdpSearchServer implements SsdpServer {
             final SsdpResponse message = SsdpResponse.create(getLocalAddress(), data, length);
             Logger.v(() -> "receive ssdp search response from " + sourceAddress +
                     " to " + mDelegate.getLocalAddress() + ":\n" + message);
-            if (mDelegate.isInvalidLocation(message, sourceAddress)) {
+            if (SsdpServerDelegate.isInvalidLocation(message, sourceAddress)) {
                 return;
             }
             if (mListener != null) {
