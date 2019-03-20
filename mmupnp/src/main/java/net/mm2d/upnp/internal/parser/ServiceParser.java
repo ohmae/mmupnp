@@ -117,6 +117,7 @@ public final class ServiceParser {
         return builder;
     }
 
+    @SuppressWarnings("Duplicates")
     @Nonnull
     private static ArgumentImpl.Builder parseArgument(@Nonnull final Element element) {
         final ArgumentImpl.Builder builder = new ArgumentImpl.Builder();
@@ -184,6 +185,7 @@ public final class ServiceParser {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     private static void parseAllowedValueRange(
             @Nonnull final StateVariableImpl.Builder builder,
             @Nonnull final Element element) {

@@ -167,6 +167,7 @@ public final class DeviceParser {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     @Nonnull
     private static Icon parseIcon(@Nonnull final Node iconNode) {
         final IconImpl.Builder builder = new IconImpl.Builder();
@@ -211,6 +212,7 @@ public final class DeviceParser {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     @Nonnull
     private static ServiceImpl.Builder parseService(@Nonnull final Node serviceNode) {
         final ServiceImpl.Builder serviceBuilder = new ServiceImpl.Builder();

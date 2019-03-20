@@ -208,6 +208,7 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         return mInterfaceAddress.getAddress();
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void start() {
         if (mFutureTask != null) {
@@ -255,6 +256,7 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     private synchronized boolean waitReady() {
         final FutureTask<?> task = mFutureTask;
         if (task == null || task.isDone()) {

@@ -23,7 +23,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     @Nullable
     private ExecutorService mExecutor;
 
-    private boolean mIo;
+    private final boolean mIo;
 
     DefaultTaskExecutor(@Nonnull final ExecutorService executor) {
         this(executor, false);
