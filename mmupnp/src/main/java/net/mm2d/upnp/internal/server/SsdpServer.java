@@ -9,8 +9,6 @@ package net.mm2d.upnp.internal.server;
 
 import net.mm2d.upnp.SsdpMessage;
 
-import java.io.IOException;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -23,18 +21,6 @@ public interface SsdpServer {
      * SSDPに使用するポート番号。
      */
     int SSDP_PORT = 1900;
-
-    /**
-     * ソケットのオープンを行う。
-     *
-     * @throws IOException ソケット作成に失敗
-     */
-    void open() throws IOException;
-
-    /**
-     * ソケットのクローズを行う
-     */
-    void close();
 
     /**
      * 受信スレッドの開始を行う。

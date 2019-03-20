@@ -252,8 +252,8 @@ public class ControlPointImpl implements ControlPoint {
             return;
         }
         mSubscribeManager.start();
-        mSearchServerList.openAndStart();
-        mNotifyReceiverList.openAndStart();
+        mSearchServerList.start();
+        mNotifyReceiverList.start();
     }
 
     @Override
@@ -264,8 +264,6 @@ public class ControlPointImpl implements ControlPoint {
         mSubscribeManager.stop();
         mSearchServerList.stop();
         mNotifyReceiverList.stop();
-        mSearchServerList.close();
-        mNotifyReceiverList.close();
         final List<Device> list = getDeviceList();
         for (final Device device : list) {
             lostDevice(device);

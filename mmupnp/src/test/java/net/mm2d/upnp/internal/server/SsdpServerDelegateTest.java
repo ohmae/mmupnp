@@ -12,7 +12,6 @@ import net.mm2d.upnp.MockMulticastSocket;
 import net.mm2d.upnp.SsdpMessage;
 import net.mm2d.upnp.internal.message.SsdpRequest;
 import net.mm2d.upnp.internal.message.SsdpResponse;
-import net.mm2d.upnp.internal.server.SsdpServerDelegate.ReceiveTask;
 import net.mm2d.upnp.internal.server.SsdpServerDelegate.Receiver;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
@@ -55,31 +54,27 @@ public class SsdpServerDelegateTest {
     }
 
     @Test(timeout = 1000L)
-    public void open_close_デッドロックしない() throws Exception {
-        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
-        server.open();
-        server.close();
-    }
-
-    @Test(timeout = 1000L)
     public void start_stop_デッドロックしない() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
-        server.open();
         server.start();
         server.stop();
-        server.close();
     }
 
     @Test(timeout = 1000L)
     public void start_stop1_デッドロックしない() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
-        server.open();
         server.start();
         server.stop();
-        server.close();
+        server.stop();
+    }
+
+    @Test(timeout = 1000L)
+    public void start_stop2_デッドロックしない() throws Exception {
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
+        server.stop();
     }
 
     @Test
@@ -121,26 +116,10 @@ public class SsdpServerDelegateTest {
     }
 
     @Test
-    public void getInterfaceAddress() throws Exception {
+    public void getInterfaceAddress() {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         assertThat(server.getInterfaceAddress(), is(SsdpServerDelegate.findInet4Address(networkInterface.getInterfaceAddresses())));
-    }
-
-    @Test
-    public void open_close() throws Exception {
-        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
-        final MulticastSocket socket = mock(MulticastSocket.class);
-        doReturn(socket).when(server).createMulticastSocket(anyInt());
-        server.open();
-        verify(socket, times(1)).setNetworkInterface(networkInterface);
-        verify(socket, times(1)).setTimeToLive(4);
-        server.open();
-        verify(server, times(1)).close();
-        verify(server, times(1)).stop();
-        verify(socket, times(1)).close();
-        server.close();
     }
 
     @Test
@@ -149,21 +128,10 @@ public class SsdpServerDelegateTest {
         final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MulticastSocket socket = mock(MulticastSocket.class);
         doReturn(socket).when(server).createMulticastSocket(anyInt());
-        server.open();
         server.start();
         server.start();
         verify(server, times(1)).stop();
         server.stop();
-        server.close();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void start_without_open() throws Exception {
-        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
-        final MulticastSocket socket = mock(MulticastSocket.class);
-        doReturn(socket).when(server).createMulticastSocket(anyInt());
-        server.start();
     }
 
     @Test
@@ -201,10 +169,10 @@ public class SsdpServerDelegateTest {
         message.setHeader(Http.MX, "1");
         message.setHeader(Http.ST, SsdpSearchServer.ST_ROOTDEVICE);
 
-        server.open();
         server.start();
         server.send(message);
         Thread.sleep(100);
+        server.stop();
 
         verify(socket, times(1)).send(ArgumentMatchers.any(DatagramPacket.class));
 
@@ -215,7 +183,7 @@ public class SsdpServerDelegateTest {
     }
 
     @Test
-    public void send_socketでExceptionが発生したら無視する() throws IOException {
+    public void send_socketでExceptionが発生したら無視する() throws Exception {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
         final MulticastSocket socket = mock(MulticastSocket.class);
@@ -230,8 +198,10 @@ public class SsdpServerDelegateTest {
         message.setHeader(Http.MX, "1");
         message.setHeader(Http.ST, SsdpSearchServer.ST_ROOTDEVICE);
 
-        server.open();
+        server.start();
         server.send(message);
+        Thread.sleep(100);
+        server.stop();
     }
 
     @Test
@@ -246,79 +216,13 @@ public class SsdpServerDelegateTest {
         final SsdpServerDelegate delegate = spy(new SsdpServerDelegate(mTaskExecutors, receiver, Address.IP_V4, networkInterface));
         doReturn(socket).when(delegate).createMulticastSocket(anyInt());
 
-        delegate.open();
         delegate.start();
         Thread.sleep(1900);
         delegate.stop();
-        delegate.close();
 
         final byte[] packetData = new byte[1500];
         System.arraycopy(data, 0, packetData, 0, data.length);
         verify(receiver, times(1)).onReceive(address, packetData, data.length);
-    }
-
-    @Test(timeout = 1000)
-    public void ReceiveTask_shutdownRequest_start前にコールしても何も起こらない() throws Exception {
-        final MulticastSocket socket = mock(MulticastSocket.class);
-        final ReceiveTask receiveTask = new ReceiveTask(mock(Receiver.class), socket, Address.IP_V4.getInetAddress(), 0);
-
-        receiveTask.shutdownRequest();
-    }
-
-    @Test(timeout = 1000)
-    public void ReceiveTask_shutdownRequest_即抜け() throws Exception {
-        final MulticastSocket socket = mock(MulticastSocket.class);
-        final ReceiveTask receiveTask = new ReceiveTask(mock(Receiver.class), socket, Address.IP_V4.getInetAddress(), 0) {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (final InterruptedException ignored) {
-                }
-            }
-        };
-        receiveTask.start(mTaskExecutors, "");
-        receiveTask.shutdownRequest();
-    }
-
-    @Test(timeout = 1000)
-    public void ReceiveTask_shutdownRequest_割り込みで終了() throws Exception {
-        final MulticastSocket socket = mock(MulticastSocket.class);
-        final ReceiveTask receiveTask = new ReceiveTask(mock(Receiver.class), socket, Address.IP_V4.getInetAddress(), 0) {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (final InterruptedException ignored) {
-                }
-            }
-        };
-        receiveTask.start(mTaskExecutors, "");
-        receiveTask.shutdownRequest();
-    }
-
-    @Test(timeout = 1000)
-    public void ReceiveTask_shutdownRequest_終了待ちに割り込める() throws Exception {
-        final MulticastSocket socket = mock(MulticastSocket.class);
-        final ReceiveTask receiveTask = new ReceiveTask(mock(Receiver.class), socket, Address.IP_V4.getInetAddress(), 0) {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (final InterruptedException ignored) {
-                }
-                try {
-                    Thread.sleep(2000);
-                } catch (final InterruptedException ignored) {
-                }
-            }
-        };
-        receiveTask.start(mTaskExecutors, "");
-        final Thread thread = new Thread(() ->
-                receiveTask.shutdownRequest());
-        thread.start();
-        thread.interrupt();
-        thread.join();
     }
 
     @Test(timeout = 5000)
@@ -342,15 +246,16 @@ public class SsdpServerDelegateTest {
                 p.setData(new byte[1]);
             }
         });
-        final ReceiveTask receiveTask = spy(new ReceiveTask(mock(Receiver.class), socket, Address.IP_V4.getInetAddress(), 0));
-
-        receiveTask.start(mTaskExecutors, "");
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface));
+        doReturn(socket).when(server).createMulticastSocket(anyInt());
+        server.start();
         Thread.sleep(500);
-        receiveTask.shutdownRequest();
+        server.stop();
         Thread.sleep(100);
-        verify(receiveTask, times(1)).joinGroup();
-        verify(receiveTask, times(1)).receiveLoop();
-        verify(receiveTask, times(1)).leaveGroup();
+        verify(server, times(1)).joinGroup();
+        verify(server, times(1)).receiveLoop();
+        verify(server, times(1)).leaveGroup();
 
         verify(socket, never()).joinGroup(ArgumentMatchers.any(InetAddress.class));
         verify(socket, never()).leaveGroup(ArgumentMatchers.any(InetAddress.class));
@@ -377,37 +282,28 @@ public class SsdpServerDelegateTest {
                 p.setData(new byte[1]);
             }
         });
-        final ReceiveTask receiveTask = spy(new ReceiveTask(mock(Receiver.class), socket, Address.IP_V4.getInetAddress(), 10));
 
-        receiveTask.start(mTaskExecutors, "");
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface, 10));
+        doReturn(socket).when(server).createMulticastSocket(anyInt());
+        server.start();
         Thread.sleep(500);
-        receiveTask.shutdownRequest();
+        server.stop();
         Thread.sleep(100);
-        verify(receiveTask, times(1)).joinGroup();
-        verify(receiveTask, times(1)).receiveLoop();
-        verify(receiveTask, times(1)).leaveGroup();
+
+        verify(server, times(1)).joinGroup();
+        verify(server, times(1)).receiveLoop();
+        verify(server, times(1)).leaveGroup();
 
         verify(socket, times(1)).joinGroup(ArgumentMatchers.any(InetAddress.class));
         verify(socket, times(1)).leaveGroup(ArgumentMatchers.any(InetAddress.class));
     }
 
-    @Test(timeout = 1000)
-    public void ReceiveTask_receiveLoop_shutdown済みなら何もせず抜ける() throws Exception {
-        final Receiver receiver = mock(Receiver.class);
-        final MulticastSocket socket = mock(MulticastSocket.class);
-        final ReceiveTask receiveTask = spy(new ReceiveTask(receiver, socket, Address.IP_V4.getInetAddress(), 10));
-
-        receiveTask.shutdownRequest();
-        receiveTask.receiveLoop();
-
-        verify(socket, never()).receive(ArgumentMatchers.any(DatagramPacket.class));
-        verify(receiver, never()).onReceive(ArgumentMatchers.any(InetAddress.class), ArgumentMatchers.any(byte[].class), anyInt());
-    }
-
-    @Test(timeout = 1000)
+    @Test(timeout = 5000)
     public void ReceiveTask_receiveLoop_exceptionが発生してもループを続ける() throws Exception {
         final Receiver receiver = mock(Receiver.class);
-        final ReceiveTask[] tasks = new ReceiveTask[1];
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = spy(new SsdpServerDelegate(mTaskExecutors, receiver, Address.IP_V4, networkInterface));
         final MulticastSocket socket = spy(new MulticastSocket() {
             private int mCount;
 
@@ -417,13 +313,13 @@ public class SsdpServerDelegateTest {
                 if (mCount == 1) {
                     throw new SocketTimeoutException();
                 }
-                tasks[0].shutdownRequest();
+                server.stop();
             }
         });
-        final ReceiveTask receiveTask = spy(new ReceiveTask(receiver, socket, Address.IP_V4.getInetAddress(), 0));
-        tasks[0] = receiveTask;
-        receiveTask.start(mock(TaskExecutors.class), "");
-        receiveTask.receiveLoop();
+        doReturn(socket).when(server).createMulticastSocket(anyInt());
+        server.start();
+        Thread.sleep(500);
+        server.stop();
 
         verify(socket, times(2)).receive(ArgumentMatchers.any(DatagramPacket.class));
         verify(receiver, never()).onReceive(ArgumentMatchers.any(InetAddress.class), ArgumentMatchers.any(byte[].class), anyInt());
@@ -431,12 +327,12 @@ public class SsdpServerDelegateTest {
 
     @Test(timeout = 1000)
     public void ReceiveTask_run_exceptionが発生したらループを抜ける() throws Exception {
-        final Receiver receiver = mock(Receiver.class);
+        final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
+        final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         final MulticastSocket socket = mock(MulticastSocket.class);
-        final ReceiveTask receiveTask = spy(new ReceiveTask(receiver, socket, Address.IP_V4.getInetAddress(), 10));
         doThrow(new IOException()).when(socket).receive(ArgumentMatchers.any(DatagramPacket.class));
 
-        receiveTask.run();
+        server.run();
     }
 
     private static SsdpResponse makeFromResource(final String name) throws IOException {

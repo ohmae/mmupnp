@@ -61,12 +61,10 @@ public class SsdpSearchServerTest {
         final MockMulticastSocket socket = new MockMulticastSocket();
         doReturn(socket).when(delegate).createMulticastSocket(anyInt());
         final SsdpSearchServer server = Mockito.spy(new SsdpSearchServer(delegate));
-        server.open();
         server.start();
         server.search();
         Thread.sleep(100);
         server.stop();
-        server.close();
 
         final DatagramPacket packet = socket.getSendPacket();
         final SsdpRequest message = SsdpRequest.create(
@@ -85,12 +83,10 @@ public class SsdpSearchServerTest {
         final MockMulticastSocket socket = new MockMulticastSocket();
         doReturn(socket).when(delegate).createMulticastSocket(anyInt());
         final SsdpSearchServer server = Mockito.spy(new SsdpSearchServer(delegate));
-        server.open();
         server.start();
         server.search(SsdpSearchServer.ST_ROOTDEVICE);
         Thread.sleep(100);
         server.stop();
-        server.close();
 
         final DatagramPacket packet = socket.getSendPacket();
         final SsdpRequest message = SsdpRequest.create(

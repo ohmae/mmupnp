@@ -7,13 +7,11 @@
 
 package net.mm2d.upnp.internal.server;
 
-import net.mm2d.log.Logger;
 import net.mm2d.upnp.Protocol;
 import net.mm2d.upnp.internal.server.SsdpSearchServer.ResponseListener;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.NetworkUtils;
 
-import java.io.IOException;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,26 +72,15 @@ public class SsdpSearchServerList {
         return server;
     }
 
-    public void openAndStart() {
+    public void start() {
         for (final SsdpSearchServer server : mList) {
-            try {
-                server.open();
-                server.start();
-            } catch (final IOException e) {
-                Logger.w(e);
-            }
+            server.start();
         }
     }
 
     public void stop() {
         for (final SsdpSearchServer server : mList) {
             server.stop();
-        }
-    }
-
-    public void close() {
-        for (final SsdpSearchServer server : mList) {
-            server.close();
         }
     }
 

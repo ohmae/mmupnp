@@ -224,8 +224,7 @@ public class ActionImpl implements Action {
             @Nonnull final Map<String, String> argumentValues,
             final boolean returnErrorResponse)
             throws IOException {
-        final List<StringPair> arguments = makeArguments(argumentValues);
-        final String soap = makeSoap(null, arguments);
+        final String soap = makeSoap(null, makeArguments(argumentValues));
         return invokeInner(soap, returnErrorResponse);
     }
 

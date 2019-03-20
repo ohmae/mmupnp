@@ -20,7 +20,6 @@ import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
 import java.net.MulticastSocket;
@@ -40,7 +39,7 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 // TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
-class SsdpServerDelegate implements SsdpServer {
+class SsdpServerDelegate implements SsdpServer, Runnable {
     interface Receiver {
         /**
          * メッセージ受信後の処理、サブクラスにより実装する。
@@ -58,19 +57,21 @@ class SsdpServerDelegate implements SsdpServer {
     @Nonnull
     private final TaskExecutors mTaskExecutors;
     @Nonnull
-    private final Address mAddress;
+    private final InterfaceAddress mInterfaceAddress;
     @Nonnull
     private final Receiver mReceiver;
     @Nonnull
-    private final NetworkInterface mInterface;
+    private final Address mAddress;
     @Nonnull
-    private final InterfaceAddress mInterfaceAddress;
+    private final NetworkInterface mInterface;
 
     private final int mBindPort;
     @Nullable
-    private MulticastSocket mSocket;
+    private FutureTask<?> mFutureTask;
+
+    private boolean mReady;
     @Nullable
-    private ReceiveTask mReceiveTask;
+    private MulticastSocket mSocket;
 
     /**
      * 使用するインターフェースを指定してインスタンス作成。
@@ -103,14 +104,43 @@ class SsdpServerDelegate implements SsdpServer {
             @Nonnull final Address address,
             @Nonnull final NetworkInterface networkInterface,
             final int bindPort) {
-        mTaskExecutors = executors;
-        mInterface = networkInterface;
         mInterfaceAddress = address == Address.IP_V4 ?
                 findInet4Address(networkInterface.getInterfaceAddresses()) :
                 findInet6Address(networkInterface.getInterfaceAddresses());
-        mBindPort = bindPort;
+        mTaskExecutors = executors;
         mReceiver = receiver;
         mAddress = address;
+        mInterface = networkInterface;
+        mBindPort = bindPort;
+    }
+
+    /**
+     * SsdpMessageのLocationに正常なURLが記述されており、
+     * 記述のアドレスとパケットの送信元アドレスに不一致がないか検査する。
+     *
+     * @param message       確認するSsdpMessage
+     * @param sourceAddress 送信元アドレス
+     * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
+     */
+    public static boolean isInvalidLocation(
+            @Nonnull final SsdpMessage message,
+            @Nonnull final InetAddress sourceAddress) {
+        return !isValidLocation(message, sourceAddress);
+    }
+
+    private static boolean isValidLocation(
+            @Nonnull final SsdpMessage message,
+            @Nonnull final InetAddress sourceAddress) {
+        final String location = message.getLocation();
+        if (!Http.isHttpUrl(location)) {
+            return false;
+        }
+        try {
+            final InetAddress locationAddress = InetAddress.getByName(new URL(location).getHost());
+            return sourceAddress.equals(locationAddress);
+        } catch (final MalformedURLException | UnknownHostException ignored) {
+        }
+        return false;
     }
 
     /**
@@ -121,16 +151,6 @@ class SsdpServerDelegate implements SsdpServer {
     @Nonnull
     Address getAddress() {
         return mAddress;
-    }
-
-    /**
-     * SSDPに使用するSocketAddress。
-     *
-     * @return SSDPで使用するInetSocketAddress
-     */
-    @Nonnull
-    private InetSocketAddress getSsdpSocketAddress() {
-        return mAddress.getSocketAddress();
     }
 
     /**
@@ -189,243 +209,148 @@ class SsdpServerDelegate implements SsdpServer {
     }
 
     @Override
-    public void open() throws IOException {
-        if (mSocket != null) {
-            close();
-        }
-        mSocket = createMulticastSocket(mBindPort);
-        mSocket.setNetworkInterface(mInterface);
-        mSocket.setTimeToLive(4);
-    }
-
-    // VisibleForTesting
-    @Nonnull
-    MulticastSocket createMulticastSocket(final int port) throws IOException {
-        return new MulticastSocket(port);
-    }
-
-    @Override
-    public void close() {
-        stop();
-        IoUtils.closeQuietly(mSocket);
-        mSocket = null;
-    }
-
-    @Override
     public void start() {
-        if (mSocket == null) {
-            throw new IllegalStateException("socket is null");
-        }
-        if (mReceiveTask != null) {
+        if (mFutureTask != null) {
             stop();
         }
-        final String suffix = (mBindPort == 0 ? "-ssdp-notify-" : "-ssdp-search-")
-                + mInterface.getName() + "-"
-                + NetworkUtils.toSimpleString(mInterfaceAddress.getAddress());
-        mReceiveTask = new ReceiveTask(mReceiver, mSocket, getSsdpInetAddress(), mBindPort);
-        mReceiveTask.start(mTaskExecutors, suffix);
+        mReady = false;
+        mFutureTask = new FutureTask<>(this, null);
+        mTaskExecutors.server(mFutureTask);
     }
 
     @Override
     public void stop() {
-        if (mReceiveTask == null) {
+        if (mFutureTask == null) {
             return;
         }
-        mReceiveTask.shutdownRequest();
-        mReceiveTask = null;
+        mFutureTask.cancel(false);
+        mFutureTask = null;
+        IoUtils.closeQuietly(mSocket);
     }
 
     @Override
     public void send(@Nonnull final SsdpMessage message) {
-        mTaskExecutors.io(() -> sendInner(message));
+        mTaskExecutors.io(() -> {
+            sendInner(message);
+        });
     }
 
     private void sendInner(@Nonnull final SsdpMessage message) {
-        final ReceiveTask task = mReceiveTask;
-        if (task == null || !task.waitReady()) {
+        if (!waitReady()) {
+            Logger.w("socket is not ready");
             return;
         }
         final MulticastSocket socket = mSocket;
         if (socket == null) {
             return;
         }
-        Logger.d(() -> "send from " + getInterfaceAddress() + ":\n" + message);
+        Logger.d(() -> "send from " + mInterfaceAddress + ":\n" + message);
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             message.writeData(baos);
             final byte[] data = baos.toByteArray();
-            socket.send(new DatagramPacket(data, data.length, getSsdpSocketAddress()));
+            socket.send(new DatagramPacket(data, data.length, mAddress.getSocketAddress()));
         } catch (final IOException e) {
             Logger.w(e);
         }
     }
 
-    /**
-     * SsdpMessageのLocationに正常なURLが記述されており、
-     * 記述のアドレスとパケットの送信元アドレスに不一致がないか検査する。
-     *
-     * @param message       確認するSsdpMessage
-     * @param sourceAddress 送信元アドレス
-     * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
-     */
-    public boolean isInvalidLocation(
-            @Nonnull final SsdpMessage message,
-            @Nonnull final InetAddress sourceAddress) {
-        return !isValidLocation(message, sourceAddress);
-    }
-
-    private boolean isValidLocation(
-            @Nonnull final SsdpMessage message,
-            @Nonnull final InetAddress sourceAddress) {
-        final String location = message.getLocation();
-        if (!Http.isHttpUrl(location)) {
+    private synchronized boolean waitReady() {
+        final FutureTask<?> task = mFutureTask;
+        if (task == null || task.isDone()) {
             return false;
         }
-        try {
-            final InetAddress locationAddress = InetAddress.getByName(new URL(location).getHost());
-            return sourceAddress.equals(locationAddress);
-        } catch (final MalformedURLException | UnknownHostException ignored) {
+        if (!mReady) {
+            try {
+                wait(1000);
+            } catch (final InterruptedException ignored) {
+            }
         }
-        return false;
+        return mReady;
     }
 
+    private synchronized void ready() {
+        mReady = true;
+        notifyAll();
+    }
+
+    @Override
+    public void run() {
+        final String suffix = (mBindPort == 0 ? "-ssdp-notify-" : "-ssdp-search-")
+                + mInterface.getName() + "-"
+                + NetworkUtils.toSimpleString(mInterfaceAddress.getAddress());
+        final Thread thread = Thread.currentThread();
+        thread.setName(thread.getName() + suffix);
+        if (mFutureTask == null || mFutureTask.isCancelled()) {
+            return;
+        }
+        try {
+            mSocket = createMulticastSocket(mBindPort);
+            mSocket.setNetworkInterface(mInterface);
+            mSocket.setTimeToLive(4);
+            joinGroup();
+            ready();
+            receiveLoop();
+        } catch (final IOException ignored) {
+        } finally {
+            leaveGroup();
+            mSocket = null;
+        }
+    }
+
+    /**
+     * 受信処理を行う。
+     *
+     * @throws IOException 入出力処理で例外発生
+     */
     // VisibleForTesting
-    static class ReceiveTask implements Runnable {
-        @Nonnull
-        private final Receiver mReceiver;
-        @Nonnull
-        private final MulticastSocket mSocket;
-        @Nonnull
-        private final InetAddress mInetAddress;
-
-        private final int mBindPort;
-        @Nullable
-        private FutureTask<?> mFutureTask;
-        @Nullable
-        private String mSuffix;
-
-        private boolean mReady;
-
-        private synchronized boolean waitReady() {
-            final FutureTask<?> task = mFutureTask;
-            if (task == null || task.isDone()) {
-                return false;
-            }
-            if (!mReady) {
-                try {
-                    wait(500);
-                } catch (final InterruptedException ignored) {
-                }
-            }
-            return mReady;
-        }
-
-        private synchronized void ready() {
-            mReady = true;
-            notifyAll();
-        }
-
-        /**
-         * インスタンス作成
-         */
-        ReceiveTask(
-                @Nonnull final Receiver receiver,
-                @Nonnull final MulticastSocket socket,
-                @Nonnull final InetAddress address,
-                final int port) {
-            mReceiver = receiver;
-            mSocket = socket;
-            mInetAddress = address;
-            mBindPort = port;
-        }
-
-        /**
-         * スレッドを作成して処理を開始する。
-         */
-        synchronized void start(
-                @Nonnull final TaskExecutors executors,
-                @Nonnull final String suffix) {
-            mReady = false;
-            mSuffix = suffix;
-            mFutureTask = new FutureTask<>(this, null);
-            executors.server(mFutureTask);
-        }
-
-        /**
-         * 割り込みを行い、スレッドを終了させる。
-         *
-         * <p>現在はSocketを使用しているため割り込みは効果がない。
-         */
-        synchronized void shutdownRequest() {
-            if (mFutureTask != null) {
-                mFutureTask.cancel(false);
-                mFutureTask = null;
-            }
-        }
-
-        @Override
-        public void run() {
-            final Thread thread = Thread.currentThread();
-            thread.setName(thread.getName() + mSuffix);
-            if (mFutureTask == null || mFutureTask.isCancelled()) {
-                return;
-            }
+    void receiveLoop() throws IOException {
+        final byte[] buf = new byte[1500];
+        while (mFutureTask != null && !mFutureTask.isCancelled()) {
             try {
-                joinGroup();
-                ready();
-                receiveLoop();
-                leaveGroup();
+                final DatagramPacket dp = new DatagramPacket(buf, buf.length);
+                mSocket.receive(dp);
+                if (mFutureTask == null || mFutureTask.isCancelled()) {
+                    break;
+                }
+                mReceiver.onReceive(dp.getAddress(), dp.getData(), dp.getLength());
+            } catch (final SocketTimeoutException ignored) {
+            }
+        }
+    }
+
+    /**
+     * Joinを行う。
+     *
+     * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
+     *
+     * @throws IOException Joinコールにより発生
+     */
+    // VisibleForTesting
+    void joinGroup() throws IOException {
+        if (mBindPort != 0) {
+            mSocket.joinGroup(getSsdpInetAddress());
+        }
+    }
+
+    /**
+     * Leaveを行う。
+     *
+     * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
+     */
+    // VisibleForTesting
+    void leaveGroup() {
+        if (mBindPort != 0) {
+            try {
+                mSocket.leaveGroup(getSsdpInetAddress());
             } catch (final IOException ignored) {
             }
         }
+    }
 
-        /**
-         * 受信処理を行う。
-         *
-         * @throws IOException 入出力処理で例外発生
-         */
-        // VisibleForTesting
-        void receiveLoop() throws IOException {
-            final byte[] buf = new byte[1500];
-            while (mFutureTask != null && !mFutureTask.isCancelled()) {
-                try {
-                    final DatagramPacket dp = new DatagramPacket(buf, buf.length);
-                    mSocket.receive(dp);
-                    if (mFutureTask == null || mFutureTask.isCancelled()) {
-                        break;
-                    }
-                    mReceiver.onReceive(dp.getAddress(), dp.getData(), dp.getLength());
-                } catch (final SocketTimeoutException ignored) {
-                }
-            }
-        }
-
-        /**
-         * Joinを行う。
-         *
-         * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
-         *
-         * @throws IOException Joinコールにより発生
-         */
-        // VisibleForTesting
-        void joinGroup() throws IOException {
-            if (mBindPort != 0) {
-                mSocket.joinGroup(mInetAddress);
-            }
-        }
-
-        /**
-         * Leaveを行う。
-         *
-         * <p>特定ポートにBindしていない（マルチキャスト受信ソケットでない）場合は何も行わない
-         *
-         * @throws IOException Leaveコールにより発生
-         */
-        // VisibleForTesting
-        void leaveGroup() throws IOException {
-            if (mBindPort != 0) {
-                mSocket.leaveGroup(mInetAddress);
-            }
-        }
+    // VisibleForTesting
+    @Nonnull
+    MulticastSocket createMulticastSocket(final int port) throws IOException {
+        return new MulticastSocket(port);
     }
 }

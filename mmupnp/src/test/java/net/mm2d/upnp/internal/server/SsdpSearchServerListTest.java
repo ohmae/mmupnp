@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.io.IOException;
 import java.net.NetworkInterface;
 import java.util.Collections;
 
@@ -40,7 +39,7 @@ public class SsdpSearchServerListTest {
     }
 
     @Test
-    public void openAndStart() throws Exception {
+    public void start() {
         final SsdpSearchServerList list = spy(new SsdpSearchServerList());
         final SsdpSearchServer server = mock(SsdpSearchServer.class);
         final ResponseListener listener = mock(ResponseListener.class);
@@ -49,23 +48,8 @@ public class SsdpSearchServerListTest {
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
         list.init(mTaskExecutors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
 
-        list.openAndStart();
-        verify(server, times(1)).open();
+        list.start();
         verify(server, times(1)).start();
-    }
-
-    @Test
-    public void openAndStart_Exceptionが発生しても無視する() throws Exception {
-        final SsdpSearchServerList list = spy(new SsdpSearchServerList());
-        final SsdpSearchServer server = mock(SsdpSearchServer.class);
-        final ResponseListener listener = mock(ResponseListener.class);
-        doReturn(server).when(list).newSsdpSearchServer(any(), eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
-
-        final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(mTaskExecutors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
-
-        doThrow(new IOException()).when(server).open();
-        list.openAndStart();
     }
 
     @Test
@@ -81,21 +65,6 @@ public class SsdpSearchServerListTest {
         list.stop();
 
         verify(server, times(1)).stop();
-    }
-
-    @Test
-    public void close() {
-        final SsdpSearchServerList list = spy(new SsdpSearchServerList());
-        final SsdpSearchServer server = mock(SsdpSearchServer.class);
-        final ResponseListener listener = mock(ResponseListener.class);
-        doReturn(server).when(list).newSsdpSearchServer(any(), eq(Address.IP_V4), any(NetworkInterface.class), eq(listener));
-
-        final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);
-        list.init(mTaskExecutors, Protocol.DEFAULT, Collections.singletonList(nif), listener);
-
-        list.close();
-
-        verify(server, times(1)).close();
     }
 
     @Test

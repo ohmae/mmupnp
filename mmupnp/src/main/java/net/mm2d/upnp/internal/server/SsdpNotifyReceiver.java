@@ -89,16 +89,6 @@ public class SsdpNotifyReceiver implements SsdpServer {
     }
 
     @Override
-    public void open() throws IOException {
-        mDelegate.open();
-    }
-
-    @Override
-    public void close() {
-        mDelegate.close();
-    }
-
-    @Override
     public void start() {
         mDelegate.start();
     }
