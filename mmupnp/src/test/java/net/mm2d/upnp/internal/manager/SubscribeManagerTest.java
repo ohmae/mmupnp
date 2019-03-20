@@ -105,28 +105,8 @@ public class SubscribeManagerTest {
             }
         };
         final SubscribeManager manager = new SubscribeManager(executors, listener, factory);
-        doThrow(new IOException()).when(receiver).open();
         manager.start();
-        verify(receiver).open();
-    }
-
-    @Test
-    public void start_exception() throws Exception {
-        final EventReceiver receiver = mock(EventReceiver.class);
-        final TaskExecutors executors = mock(TaskExecutors.class);
-        final NotifyEventListener listener = mock(NotifyEventListener.class);
-        final DiFactory factory = new DiFactory() {
-            @Nonnull
-            @Override
-            public EventReceiver createEventReceiver(
-                    @Nonnull final TaskExecutors taskExecutors,
-                    @Nonnull final EventMessageListener listener) {
-                return receiver;
-            }
-        };
-        final SubscribeManager manager = new SubscribeManager(executors, listener, factory);
-        manager.start();
-        verify(receiver).open();
+        verify(receiver).start();
     }
 
     @Test
@@ -157,7 +137,7 @@ public class SubscribeManagerTest {
 
         verify(executors).io(ArgumentMatchers.any(Runnable.class));
         verify(holder).clear();
-        verify(receiver).close();
+        verify(receiver).stop();
     }
 
     @Test

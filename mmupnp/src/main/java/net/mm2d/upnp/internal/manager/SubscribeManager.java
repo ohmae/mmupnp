@@ -17,7 +17,6 @@ import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.StringPair;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -78,11 +77,7 @@ public class SubscribeManager implements EventMessageListener {
     }
 
     public void start() {
-        try {
-            mEventReceiver.open();
-        } catch (final IOException e) {
-            Logger.w(e);
-        }
+        mEventReceiver.start();
     }
 
     public void stop() {
@@ -91,7 +86,7 @@ public class SubscribeManager implements EventMessageListener {
             mTaskExecutors.io(service::unsubscribeSync);
         }
         mSubscribeHolder.clear();
-        mEventReceiver.close();
+        mEventReceiver.stop();
     }
 
     public void terminate() {

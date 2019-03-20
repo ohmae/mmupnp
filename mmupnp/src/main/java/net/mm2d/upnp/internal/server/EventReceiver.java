@@ -46,7 +46,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-public class EventReceiver {
+public class EventReceiver implements Runnable {
     /**
      * イベントデータの受信を受け取るリスナー。
      */
@@ -67,12 +67,16 @@ public class EventReceiver {
 
     @Nullable
     private ServerSocket mServerSocket;
-    @Nullable
-    private ServerTask mServerTask;
     @Nonnull
     private final TaskExecutors mTaskExecutors;
     @Nullable
     private final EventMessageListener mListener;
+    @Nonnull
+    private final List<ClientTask> mClientList = Collections.synchronizedList(new LinkedList<>());
+    @Nullable
+    private FutureTask<?> mFutureTask;
+
+    private boolean mReady;
 
     /**
      * インスタンス作成。
@@ -88,14 +92,32 @@ public class EventReceiver {
 
     /**
      * サーバソケットのオープンと受信スレッドの開始を行う。
-     *
-     * @throws IOException ソケットの作成に失敗
      */
-    public void open() throws IOException {
-        mServerSocket = createServerSocket();
-        mServerTask = new ServerTask(mTaskExecutors, mServerSocket);
-        mServerTask.setEventMessageListener(mListener);
-        mServerTask.start();
+    @SuppressWarnings("Duplicates")
+    public void start() {
+        if (mFutureTask != null) {
+            stop();
+        }
+        mReady = false;
+        mFutureTask = new FutureTask<>(this, null);
+        mTaskExecutors.server(mFutureTask);
+    }
+
+    /**
+     * 受信スレッドを終了させる。
+     */
+    public void stop() {
+        if (mFutureTask != null) {
+            mFutureTask.cancel(false);
+            mFutureTask = null;
+        }
+        IoUtils.closeQuietly(mServerSocket);
+        synchronized (mClientList) {
+            for (final ClientTask client : mClientList) {
+                client.shutdownRequest();
+            }
+            mClientList.clear();
+        }
     }
 
     // VisibleForTesting
@@ -110,20 +132,81 @@ public class EventReceiver {
      * @return サーバソケットのポート番号
      */
     public int getLocalPort() {
-        if (mServerSocket == null) {
+        if (!waitReady() || mServerSocket == null) {
             return 0;
         }
         return mServerSocket.getLocalPort();
     }
 
-    /**
-     * 受信スレッドを終了させる。
-     */
-    public void close() {
-        if (mServerTask != null) {
-            mServerTask.shutdownRequest();
-            mServerTask = null;
+    @SuppressWarnings("Duplicates")
+    private synchronized boolean waitReady() {
+        final FutureTask<?> task = mFutureTask;
+        if (task == null || task.isDone()) {
+            return false;
         }
+        if (!mReady) {
+            try {
+                wait(1000);
+            } catch (final InterruptedException ignored) {
+            }
+        }
+        return mReady;
+    }
+
+    private synchronized void ready() {
+        mReady = true;
+        notifyAll();
+    }
+
+    @Override
+    public void run() {
+        final Thread thread = Thread.currentThread();
+        thread.setName(thread.getName() + "-event-receiver");
+        try {
+            mServerSocket = createServerSocket();
+            ready();
+            while (mFutureTask != null && !mFutureTask.isCancelled()) {
+                final Socket sock = mServerSocket.accept();
+                sock.setSoTimeout(Property.DEFAULT_TIMEOUT);
+                final ClientTask client = new ClientTask(this, sock);
+                mClientList.add(client);
+                client.start(mTaskExecutors);
+            }
+        } catch (final IOException ignored) {
+        } finally {
+            IoUtils.closeQuietly(mServerSocket);
+        }
+    }
+
+    /**
+     * Clientスレッドからの終了通知
+     *
+     * @param client 終了したClientスレッド
+     */
+    void notifyClientFinished(@Nonnull final ClientTask client) {
+        mClientList.remove(client);
+    }
+
+    /**
+     * イベントリスナーのコール
+     *
+     * @param sid     Subscribe ID
+     * @param request 受信したHTTPメッセージ
+     * @return HTTPメッセージが正常であればtrue
+     */
+    // VisibleForTesting
+    synchronized boolean notifyEvent(
+            @Nonnull final String sid,
+            @Nonnull final HttpRequest request) {
+        if (mListener == null) {
+            return false;
+        }
+        final List<StringPair> list = parsePropertyPairs(request);
+        if (list.isEmpty()) {
+            return false;
+        }
+        final long seq = TextParseUtils.parseLongSafely(request.getHeader(Http.SEQ), 0);
+        return mListener.onEventReceived(sid, seq, list);
     }
 
     // VisibleForTesting
@@ -170,119 +253,6 @@ public class EventReceiver {
     }
 
     // VisibleForTesting
-    static class ServerTask implements Runnable {
-        @Nonnull
-        private final TaskExecutors mTaskExecutors;
-        @Nonnull
-        private final ServerSocket mServerSocket;
-        @Nonnull
-        private final List<ClientTask> mClientList;
-        @Nullable
-        private EventMessageListener mListener;
-        @Nullable
-        private FutureTask<?> mFutureTask;
-
-        /**
-         * サーバソケットを指定してインスタンス作成。
-         *
-         * @param sock サーバソケット
-         */
-        ServerTask(
-                @Nonnull final TaskExecutors taskExecutors,
-                @Nonnull final ServerSocket sock) {
-            mTaskExecutors = taskExecutors;
-            mServerSocket = sock;
-            mClientList = Collections.synchronizedList(new LinkedList<>());
-        }
-
-        /**
-         * スレッドを作成し開始する。
-         */
-        void start() {
-            mFutureTask = new FutureTask<>(this, null);
-            mTaskExecutors.server(mFutureTask);
-        }
-
-        /**
-         * 受信スレッドを終了させ、サーバソケットのクローズを行う。
-         *
-         * <p>クライアントからの接続がある場合は、
-         * それらの受信スレッドを終了させ、クライアントソケットのクローズも行う。
-         */
-        void shutdownRequest() {
-            if (mFutureTask != null) {
-                mFutureTask.cancel(false);
-                mFutureTask = null;
-            }
-            IoUtils.closeQuietly(mServerSocket);
-            synchronized (mClientList) {
-                for (final ClientTask client : mClientList) {
-                    client.shutdownRequest();
-                }
-                mClientList.clear();
-            }
-        }
-
-        /**
-         * Clientスレッドからの終了通知
-         *
-         * @param client 終了したClientスレッド
-         */
-        void notifyClientFinished(@Nonnull final ClientTask client) {
-            mClientList.remove(client);
-        }
-
-        /**
-         * イベントリスナーの登録
-         *
-         * @param listener リスナー
-         */
-        synchronized void setEventMessageListener(@Nullable final EventMessageListener listener) {
-            mListener = listener;
-        }
-
-        /**
-         * イベントリスナーのコール
-         *
-         * @param sid     Subscribe ID
-         * @param request 受信したHTTPメッセージ
-         * @return HTTPメッセージが正常であればtrue
-         */
-        // VisibleForTesting
-        synchronized boolean notifyEvent(
-                @Nonnull final String sid,
-                @Nonnull final HttpRequest request) {
-            if (mListener == null) {
-                return false;
-            }
-            final List<StringPair> list = parsePropertyPairs(request);
-            if (list.isEmpty()) {
-                return false;
-            }
-            final long seq = TextParseUtils.parseLongSafely(request.getHeader(Http.SEQ), 0);
-            return mListener.onEventReceived(sid, seq, list);
-        }
-
-        @Override
-        public void run() {
-            final Thread thread = Thread.currentThread();
-            thread.setName(thread.getName() + "-event-receiver");
-            try {
-                while (mFutureTask != null && !mFutureTask.isCancelled()) {
-                    final Socket sock = mServerSocket.accept();
-                    sock.setSoTimeout(Property.DEFAULT_TIMEOUT);
-                    final ClientTask client = new ClientTask(this, sock);
-                    mClientList.add(client);
-                    client.start(mTaskExecutors);
-                }
-            } catch (final IOException ignored) {
-            } finally {
-                IoUtils.closeQuietly(mServerSocket);
-            }
-        }
-    }
-
-    // VisibleForTesting
     static class ClientTask implements Runnable {
         private static final HttpResponse RESPONSE_OK;
         private static final HttpResponse RESPONSE_BAD;
@@ -307,7 +277,7 @@ public class EventReceiver {
         }
 
         @Nonnull
-        private final ServerTask mServer;
+        private final EventReceiver mEventReceiver;
         @Nonnull
         private final Socket mSocket;
         @Nullable
@@ -316,13 +286,13 @@ public class EventReceiver {
         /**
          * インスタンス作成
          *
-         * @param server サーバスレッド
+         * @param eventReceiver サーバスレッド
          * @param sock   クライアントソケット
          */
         ClientTask(
-                @Nonnull final ServerTask server,
+                @Nonnull final EventReceiver eventReceiver,
                 @Nonnull final Socket sock) {
-            mServer = server;
+            mEventReceiver = eventReceiver;
             mSocket = sock;
         }
 
@@ -348,7 +318,7 @@ public class EventReceiver {
         private boolean notifyEvent(
                 @Nonnull final String sid,
                 @Nonnull final HttpRequest request) {
-            return mServer.notifyEvent(sid, request);
+            return mEventReceiver.notifyEvent(sid, request);
         }
 
         @Override
@@ -365,7 +335,7 @@ public class EventReceiver {
                 IoUtils.closeQuietly(is);
                 IoUtils.closeQuietly(os);
                 IoUtils.closeQuietly(mSocket);
-                mServer.notifyClientFinished(this);
+                mEventReceiver.notifyClientFinished(this);
             }
         }
 

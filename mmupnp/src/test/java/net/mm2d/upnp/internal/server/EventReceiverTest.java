@@ -12,7 +12,6 @@ import net.mm2d.upnp.HttpRequest;
 import net.mm2d.upnp.HttpResponse;
 import net.mm2d.upnp.internal.server.EventReceiver.ClientTask;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
-import net.mm2d.upnp.internal.server.EventReceiver.ServerTask;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 import net.mm2d.upnp.util.StringPair;
 import net.mm2d.upnp.util.TestUtils;
@@ -83,14 +82,14 @@ public class EventReceiverTest {
     @Test(timeout = 10000L)
     public void open_close_デッドロックしない() throws Exception {
         final EventReceiver receiver = new EventReceiver(mTaskExecutors, null);
-        receiver.open();
-        receiver.close();
+        receiver.start();
+        receiver.stop();
     }
 
     @Test(timeout = 1000L)
     public void close_open前なら即終了() throws Exception {
         final EventReceiver receiver = new EventReceiver(mTaskExecutors, null);
-        receiver.close();
+        receiver.stop();
     }
 
     @Test
@@ -102,9 +101,9 @@ public class EventReceiverTest {
         final EventReceiver receiver = spy(new EventReceiver(mTaskExecutors, null));
         doReturn(serverSocket).when(receiver).createServerSocket();
 
-        receiver.open();
+        receiver.start();
         assertThat(receiver.getLocalPort(), is(port));
-        receiver.close();
+        receiver.stop();
     }
 
     @Test
@@ -155,9 +154,9 @@ public class EventReceiverTest {
                 return serverSocket;
             }
         };
-        receiver.open();
+        receiver.start();
         Thread.sleep(100);
-        receiver.close();
+        receiver.stop();
         Thread.sleep(10);
 
         assertThat(result.sid, is(SID));
@@ -200,9 +199,9 @@ public class EventReceiverTest {
                 return serverSocket;
             }
         };
-        receiver.open();
+        receiver.start();
         Thread.sleep(100);
-        receiver.close();
+        receiver.stop();
         Thread.sleep(10);
 
         final HttpResponse response = HttpResponse.create();
@@ -240,9 +239,9 @@ public class EventReceiverTest {
                 return serverSocket;
             }
         };
-        receiver.open();
+        receiver.start();
         Thread.sleep(100);
-        receiver.close();
+        receiver.stop();
         Thread.sleep(10);
 
         final HttpResponse response = HttpResponse.create();
@@ -280,9 +279,9 @@ public class EventReceiverTest {
                 return serverSocket;
             }
         };
-        receiver.open();
+        receiver.start();
         Thread.sleep(100);
-        receiver.close();
+        receiver.stop();
         Thread.sleep(10);
 
         final HttpResponse response = HttpResponse.create();
@@ -326,9 +325,9 @@ public class EventReceiverTest {
                 return serverSocket;
             }
         };
-        receiver.open();
+        receiver.start();
         Thread.sleep(100);
-        receiver.close();
+        receiver.stop();
         Thread.sleep(10);
     }
 
@@ -385,30 +384,23 @@ public class EventReceiverTest {
     }
 
     @Test
-    public void ServerTask_shutdownRequest_開始前にコール() throws Exception {
-        new ServerTask(mTaskExecutors, mock(ServerSocket.class)).shutdownRequest();
-    }
-
-    @Test
     public void ServerTask_notifyEvent_空ならfalse() throws Exception {
         final String sid = "sid";
-        final ServerTask task = new ServerTask(mTaskExecutors, mock(ServerSocket.class));
         final EventMessageListener listener = mock(EventMessageListener.class);
-        task.setEventMessageListener(listener);
+        final EventReceiver receiver = new EventReceiver(mTaskExecutors, listener);
 
         final HttpRequest request = HttpRequest.create();
         doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
-        assertThat(task.notifyEvent(sid, request), is(false));
+        assertThat(receiver.notifyEvent(sid, request), is(false));
         verify(listener, never()).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
     }
 
     @Test
     public void ServerTask_notifyEvent_listenerの戻り値と等しい() throws Exception {
         final String sid = "sid";
-        final ServerTask task = new ServerTask(mTaskExecutors, mock(ServerSocket.class));
         final EventMessageListener listener = mock(EventMessageListener.class);
-        task.setEventMessageListener(listener);
+        final EventReceiver receiver = new EventReceiver(mTaskExecutors, listener);
 
         final HttpRequest request = HttpRequest.create();
         request.setHeader(Http.SEQ, "0");
@@ -416,24 +408,26 @@ public class EventReceiverTest {
 
         doReturn(true).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
-        assertThat(task.notifyEvent(sid, request), is(true));
+        assertThat(receiver.notifyEvent(sid, request), is(true));
         verify(listener, times(1)).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
         doReturn(false).when(listener).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
 
-        assertThat(task.notifyEvent(sid, request), is(false));
+        assertThat(receiver.notifyEvent(sid, request), is(false));
         verify(listener, times(2)).onEventReceived(anyString(), anyLong(), ArgumentMatchers.anyList());
     }
 
     @Test
     public void ServerTask_notifyEvent_listenerがなければfalse() throws Exception {
         final String sid = "sid";
-        final ServerTask task = new ServerTask(mTaskExecutors, mock(ServerSocket.class));
+        final EventMessageListener listener = mock(EventMessageListener.class);
+        final EventReceiver receiver = new EventReceiver(mTaskExecutors, listener);
+
         final HttpRequest request = HttpRequest.create();
         request.setHeader(Http.SEQ, "0");
         request.setBody(TestUtils.getResourceAsString("propchange.xml"), true);
 
-        assertThat(task.notifyEvent(sid, request), is(false));
+        assertThat(receiver.notifyEvent(sid, request), is(false));
     }
 
     @Test
@@ -441,12 +435,12 @@ public class EventReceiverTest {
         final Socket socket = mock(Socket.class);
         doReturn(mock(InputStream.class)).when(socket).getInputStream();
         doReturn(mock(OutputStream.class)).when(socket).getOutputStream();
-        final ServerTask serverTask = mock(ServerTask.class);
-        final ClientTask clientTask = spy(new ClientTask(serverTask, socket));
+        final EventReceiver eventReceiver = mock(EventReceiver.class);
+        final ClientTask clientTask = spy(new ClientTask(eventReceiver, socket));
         doThrow(new IOException()).when(clientTask).receiveAndReply(ArgumentMatchers.any(InputStream.class), ArgumentMatchers.any(OutputStream.class));
 
         clientTask.run();
 
-        verify(serverTask, times(1)).notifyClientFinished(clientTask);
+        verify(eventReceiver, times(1)).notifyClientFinished(clientTask);
     }
 }
