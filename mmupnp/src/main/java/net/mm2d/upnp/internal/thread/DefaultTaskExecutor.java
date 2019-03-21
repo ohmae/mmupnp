@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class DefaultTaskExecutor implements TaskExecutor {
+class DefaultTaskExecutor implements TaskExecutor {
     private static final long AWAIT_TIMEOUT = Property.DEFAULT_TIMEOUT;
     @Nullable
     private ExecutorService mExecutor;
