@@ -6,4 +6,4 @@ net.mm2d.upnp.internal.message
 net.mm2d.upnp.internal.parser
 net.mm2d.upnp.internal.server
 net.mm2d.upnp.internal.thread
-net.mm2d.util
+net.mm2d.upnp.util
