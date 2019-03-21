@@ -20,7 +20,7 @@ import net.mm2d.upnp.Property;
 import net.mm2d.upnp.internal.parser.DeviceParser;
 import net.mm2d.upnp.internal.parser.ServiceParser;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
-import net.mm2d.upnp.util.StringPair;
+import net.mm2d.upnp.internal.util.StringPair;
 import net.mm2d.upnp.util.TextUtils;
 import net.mm2d.upnp.util.XmlUtils;
 

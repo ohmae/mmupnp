@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 
 @SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
-public class TestParseUtilsTest {
+public class TextParseUtilsTest {
     @Test
     public void parseIntSafely_10進数異常値指定() {
         assertThat(TextParseUtils.parseIntSafely(null, -1), is(-1));

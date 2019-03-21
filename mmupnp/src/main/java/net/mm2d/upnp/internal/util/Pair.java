@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.util;
+package net.mm2d.upnp.internal.util;
 
 import javax.annotation.Nullable;
 

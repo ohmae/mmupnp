@@ -8,7 +8,7 @@
 package net.mm2d.upnp;
 
 import net.mm2d.log.Logger;
-import net.mm2d.upnp.util.IoUtils;
+import net.mm2d.upnp.internal.util.IoUtils;
 import net.mm2d.upnp.util.TextUtils;
 
 import java.io.BufferedInputStream;

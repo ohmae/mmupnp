@@ -13,14 +13,13 @@ import net.mm2d.upnp.internal.impl.DiFactory;
 import net.mm2d.upnp.internal.server.EventReceiver;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
-import net.mm2d.upnp.util.StringPair;
+import net.mm2d.upnp.internal.util.StringPair;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
 
-import java.io.IOException;
 import java.util.Collections;
 
 import javax.annotation.Nonnull;

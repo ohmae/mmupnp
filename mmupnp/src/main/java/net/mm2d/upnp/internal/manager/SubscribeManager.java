@@ -15,7 +15,7 @@ import net.mm2d.upnp.internal.impl.DiFactory;
 import net.mm2d.upnp.internal.server.EventReceiver;
 import net.mm2d.upnp.internal.server.EventReceiver.EventMessageListener;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
-import net.mm2d.upnp.util.StringPair;
+import net.mm2d.upnp.internal.util.StringPair;
 
 import java.util.List;
 

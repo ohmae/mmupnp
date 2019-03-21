@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp;
 
-import net.mm2d.upnp.util.IoUtils;
+import net.mm2d.upnp.internal.util.IoUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
