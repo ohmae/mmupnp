@@ -81,12 +81,13 @@ public class EventReceiver implements Runnable {
     /**
      * インスタンス作成。
      *
-     * @param listener イベントを通知するリスナー
+     * @param executors スレッドのExecutorを与える
+     * @param listener  イベントを通知するリスナー
      */
     public EventReceiver(
-            @Nonnull final TaskExecutors taskExecutors,
+            @Nonnull final TaskExecutors executors,
             @Nullable final EventMessageListener listener) {
-        mTaskExecutors = taskExecutors;
+        mTaskExecutors = executors;
         mListener = listener;
     }
 
@@ -287,7 +288,7 @@ public class EventReceiver implements Runnable {
          * インスタンス作成
          *
          * @param eventReceiver サーバスレッド
-         * @param sock   クライアントソケット
+         * @param sock          クライアントソケット
          */
         ClientTask(
                 @Nonnull final EventReceiver eventReceiver,

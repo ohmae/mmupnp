@@ -13,10 +13,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TaskExecutors {
+    @Nonnull
     private final TaskExecutor mCallbackExecutor;
+    @Nonnull
     private final TaskExecutor mIoExecutor;
-    private final TaskExecutor mManagerExecutor = ExecutorFactory.createManager();
-    private final TaskExecutor mServerExecutor = ExecutorFactory.createServer();
+    @Nonnull
+    private final TaskExecutor mManagerExecutor;
+    @Nonnull
+    private final TaskExecutor mServerExecutor;
 
     public TaskExecutors() {
         this(null);
@@ -33,6 +37,8 @@ public class TaskExecutors {
             @Nullable final TaskExecutor io) {
         mCallbackExecutor = callback != null ? callback : ExecutorFactory.createCallback();
         mIoExecutor = io != null ? io : ExecutorFactory.createIo();
+        mManagerExecutor = ExecutorFactory.createManager();
+        mServerExecutor = ExecutorFactory.createServer();
     }
 
     public boolean callback(@Nonnull final Runnable task) {

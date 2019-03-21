@@ -231,9 +231,7 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
 
     @Override
     public void send(@Nonnull final SsdpMessage message) {
-        mTaskExecutors.io(() -> {
-            sendInner(message);
-        });
+        mTaskExecutors.io(() -> sendInner(message));
     }
 
     private void sendInner(@Nonnull final SsdpMessage message) {

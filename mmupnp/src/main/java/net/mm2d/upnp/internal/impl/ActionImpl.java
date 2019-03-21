@@ -267,9 +267,9 @@ public class ActionImpl implements Action {
         final TaskExecutors executors = mService.getDevice().getControlPoint().getTaskExecutors();
         executors.io(() -> {
             try {
-                final Map<String, String> result = invokeSync(argumentValues, returnErrorResponse);
+                final Map<String, String> response = invokeSync(argumentValues, returnErrorResponse);
                 if (callback != null) {
-                    executors.callback(() -> callback.onResult(result));
+                    executors.callback(() -> callback.onResponse(response));
                 }
             } catch (final IOException e) {
                 if (callback != null) {
@@ -298,10 +298,10 @@ public class ActionImpl implements Action {
         final TaskExecutors executors = mService.getDevice().getControlPoint().getTaskExecutors();
         executors.io(() -> {
             try {
-                final Map<String, String> result = invokeCustomSync(
+                final Map<String, String> response = invokeCustomSync(
                         argumentValues, customNamespace, customArguments, returnErrorResponse);
                 if (callback != null) {
-                    executors.callback(() -> callback.onResult(result));
+                    executors.callback(() -> callback.onResponse(response));
                 }
             } catch (final IOException e) {
                 if (callback != null) {

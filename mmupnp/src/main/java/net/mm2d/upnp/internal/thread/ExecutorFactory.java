@@ -24,12 +24,14 @@ class ExecutorFactory {
     private static final int PRIORITY_MANAGER = Thread.MIN_PRIORITY;
     private static final int PRIORITY_SERVER = Thread.MIN_PRIORITY + 1;
 
+    @Nonnull
     static TaskExecutor createCallback() {
         final ThreadFactory factory = new ExecutorThreadFactory("cb-", PRIORITY_CALLBACK);
         final ExecutorService executor = Executors.newSingleThreadExecutor(factory);
         return new DefaultTaskExecutor(executor);
     }
 
+    @Nonnull
     static TaskExecutor createIo() {
         return createIo(calculateMaximumPoolSize());
     }
@@ -38,6 +40,7 @@ class ExecutorFactory {
         return Math.max(2, Runtime.getRuntime().availableProcessors()) * 2;
     }
 
+    @Nonnull
     static TaskExecutor createIo(final int maxThread) {
         final ThreadFactory factory = new ExecutorThreadFactory("io-", PRIORITY_IO);
         final ThreadWorkQueue queue = new ThreadWorkQueue();
@@ -45,16 +48,19 @@ class ExecutorFactory {
         return new DefaultTaskExecutor(executor, true);
     }
 
+    @Nonnull
     static TaskExecutor createManager() {
         final ExecutorService executor = createServiceExecutor("mg-", PRIORITY_MANAGER);
         return new DefaultTaskExecutor(executor);
     }
 
+    @Nonnull
     static TaskExecutor createServer() {
         final ExecutorService executor = createServiceExecutor("sv-", PRIORITY_SERVER);
         return new DefaultTaskExecutor(executor, true);
     }
 
+    @Nonnull
     private static ExecutorService createServiceExecutor(
             @Nonnull final String prefix,
             final int priority) {

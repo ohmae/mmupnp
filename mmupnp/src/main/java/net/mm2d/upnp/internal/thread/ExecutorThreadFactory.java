@@ -27,6 +27,7 @@ class ExecutorThreadFactory implements ThreadFactory {
         mThreadGroup = getThreadGroup();
     }
 
+    @Nonnull
     private static ThreadGroup getThreadGroup() {
         SecurityManager s = System.getSecurityManager();
         return (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();

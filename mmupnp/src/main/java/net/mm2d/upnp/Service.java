@@ -233,7 +233,15 @@ public interface Service {
     @Nullable
     String getSubscriptionId();
 
+    /**
+     * Subscribeの結果を受けとるコールバックインターフェース
+     */
     interface SubscribeCallback {
+        /**
+         * 実行後にコールされる
+         *
+         * @param result 成功した場合true
+         */
         void onResult(boolean result);
     }
 }

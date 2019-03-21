@@ -311,9 +311,22 @@ public interface Action {
             boolean returnErrorResponse,
             @Nullable ActionCallback callback);
 
+    /**
+     * Actionの実行結果を通知するコールバックインターフェース
+     */
     interface ActionCallback {
-        void onResult(@Nonnull Map<String, String> result);
+        /**
+         * 実行結果を通知する。
+         *
+         * @param response 実行結果
+         */
+        void onResponse(@Nonnull Map<String, String> response);
 
+        /**
+         * 実行時に発生したExceptionを通知する
+         *
+         * @param e 実行時に発生したException
+         */
         void onError(@Nonnull IOException e);
     }
 }

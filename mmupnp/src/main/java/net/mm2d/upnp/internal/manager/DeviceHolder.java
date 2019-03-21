@@ -48,6 +48,7 @@ public class DeviceHolder implements Runnable {
     /**
      * インスタンス作成。
      *
+     * @param executors スレッドのExecutorを与える
      * @param listener 期限切れの通知を受け取るリスナー
      */
     public DeviceHolder(

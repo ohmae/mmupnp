@@ -94,17 +94,17 @@ public class ActionWindow extends JFrame {
         invoke.addActionListener(e -> {
             mAction.invoke(makeArgument(), true, new ActionCallback() {
                 @Override
-                public void onResult(@Nonnull final Map<String, String> result) {
-                    if (result.containsKey(Action.ERROR_CODE_KEY)) {
-                        if (result.containsKey(Action.ERROR_DESCRIPTION_KEY)) {
-                            mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY)
-                                    + " " + result.get(Action.ERROR_DESCRIPTION_KEY));
+                public void onResponse(@Nonnull final Map<String, String> response) {
+                    if (response.containsKey(Action.ERROR_CODE_KEY)) {
+                        if (response.containsKey(Action.ERROR_DESCRIPTION_KEY)) {
+                            mErrorMessage.setText("error:" + response.get(Action.ERROR_CODE_KEY)
+                                    + " " + response.get(Action.ERROR_DESCRIPTION_KEY));
                         } else {
-                            mErrorMessage.setText("error:" + result.get(Action.ERROR_CODE_KEY));
+                            mErrorMessage.setText("error:" + response.get(Action.ERROR_CODE_KEY));
                         }
                         return;
                     }
-                    updateResult(result);
+                    updateResult(response);
                 }
 
                 @Override

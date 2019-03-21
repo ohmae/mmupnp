@@ -47,7 +47,9 @@ import javax.annotation.Nonnull;
  * <p>という特徴のQueueが必要となる</p>
  */
 class ThreadWorkQueue implements BlockingQueue<Runnable>, RejectedExecutionHandler {
+    @Nonnull
     private final BlockingQueue<Runnable> mDelegate;
+    @Nonnull
     private final AtomicInteger mIdleThreads = new AtomicInteger(0);
 
     ThreadWorkQueue() {
