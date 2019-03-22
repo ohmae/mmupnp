@@ -12,6 +12,7 @@ import net.mm2d.upnp.internal.impl.DiFactory;
 
 import java.net.NetworkInterface;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -72,6 +73,20 @@ public final class ControlPointFactory {
             return this;
         }
 
+        /**
+         * 使用するインターフェースを指定する。
+         *
+         * <p>未指定の場合、プロトコルスタックから自動選択される。
+         *
+         * @param nif 使用するインターフェース
+         * @return このインスタンス
+         */
+        @Nonnull
+        public Params setInterface(@Nullable final NetworkInterface nif) {
+            mInterfaces = Collections.singletonList(nif);
+            return this;
+        }
+
         @Nullable
         Collection<NetworkInterface> getInterfaces() {
             return mInterfaces;
@@ -108,9 +123,50 @@ public final class ControlPointFactory {
             return this;
         }
 
+        /**
+         * コールバックを実行する{@link CallbackHandler}を指定する。
+         *
+         * コールバックのスレッドを指定したい場合に指定する。
+         * 未指定の場合singleThreadのExecutorが使用される。
+         *
+         * {@link #setCallbackExecutor(TaskExecutor)}と排他利用であり、後で設定したものが優先される。
+         * {@link ControlPoint#terminate()}を実行しても何ら終了処理は行われないため、必要であれば利用側で後始末を実行する。
+         *
+         * Androidプラットホームであれば、android.os.Handlerを使うことで簡単にUIスレッドでコールバックが実行できる。
+         * <pre>
+         * param.setCallbackHandler(handler::post)
+         * </pre>
+         *
+         * @param handler コールバックを実行するCallbackHandler
+         * @return このインスタンス
+         * @see #setCallbackExecutor(TaskExecutor)
+         */
+        @Nonnull
+        public Params setCallbackHandler(@Nonnull final CallbackHandler handler) {
+            mCallbackExecutor = new TaskExecutorWrapper(handler);
+            return this;
+        }
+
         @Nullable
         TaskExecutor getCallbackExecutor() {
             return mCallbackExecutor;
+        }
+    }
+
+    private static class TaskExecutorWrapper implements TaskExecutor {
+        private final CallbackHandler mHandler;
+
+        TaskExecutorWrapper(@Nonnull final CallbackHandler handler) {
+            mHandler = handler;
+        }
+
+        @Override
+        public boolean execute(@Nonnull final Runnable task) {
+            return mHandler.execute(task);
+        }
+
+        @Override
+        public void terminate() {
         }
     }
 
