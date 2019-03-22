@@ -19,7 +19,7 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 Of course, this also can be used from kotlin.
 
 ## Requirements
-- Java 8 or later (or Java 6 or later with retrolambda)
+- Java 8 or later (or Java 6 / 7 with retrolambda)
 - Android Gradle Plugin 3.0.0 or later
 
 ## Restrictions
@@ -57,6 +57,8 @@ dependencies {
 }
 ```
 
+see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
+
 ### Test release
 
 This library is currently under development of 2.0.0.
@@ -71,7 +73,7 @@ repositories {
     }
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:2.0.0-alpha6'
+    implementation 'net.mm2d:mmupnp:2.0.0-alpha11'
 }
 ```
 
@@ -90,18 +92,20 @@ cp.start();
 If you want to specify the network interface, describe the following.
 
 ```java
-NetworkInterface ni = NetworkInterface.getByName("eth0");
-ControlPoint cp = ControlPointFactory.create(ni);
+NetworkInterface nif = NetworkInterface.getByName("eth0");
+Params params = new Params().setInterface(nif);
+ControlPoint cp = ControlPointFactory.create(nif);
 ```
 
 By default ControlPoint will work with dual stack of IPv4 and IPv6.
 If you want to operate with IPv4 only, specify the protocol as follows.
 
 ```java
-ControlPoint cp = ControlPointFactory.create(Protocol.IP_V4_ONLY);
+Params params = new Params().setProtocol(Protocol.IP_V4_ONLY);
+ControlPoint controlPoint = ControlPointFactory.create(params);
 ```
 
-You can specify callback and thread of IO processing.
+You can change the callback thread.
 For example in Android, you may want to run callbacks with MainThread.
 In that case write as follows.
 
@@ -116,6 +120,13 @@ Params params = new Params().setCallbackExecutor(new TaskExecutor() {
     public void terminate() {
     }
 });
+ControlPoint cp = ControlPointFactory.create(params);
+```
+
+Or more simply as follows.
+
+```java
+Params params = new Params().setCallbackHandler(handler::post);
 ControlPoint cp = ControlPointFactory.create(params);
 ```
 
@@ -146,9 +157,17 @@ arg.put("Filter", "*");
 arg.put("StartingIndex", "0");
 arg.put("RequestedCount", "0");
 arg.put("SortCriteria", "");
-Map<String, String> result = browse.invoke(arg);  // invoke action
-String resultXml = result.get("Result");          // get result
-...
+browse.invoke(arg, new ActionCallback() {         // invoke action
+    @Override
+    public void onResponse(@Nonnull final Map<String, String> response) {
+        String resultXml = result.get("Result");  // get result
+        ...
+    }
+    @Override
+    public void onError(@Nonnull final IOException e) {
+        ...                                       // on error
+    }
+});
 ```
 
 ### Event Subscription
