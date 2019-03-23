@@ -16,7 +16,7 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 - Easy to use
 - High response
 
-Of course, this also can be used from kotlin.
+This can also be used from kotlin.
 
 ## Requirements
 - Java 8 or later (or Java 6 / 7 with retrolambda)
@@ -41,7 +41,7 @@ Sample App
 
 ## How to use
 
-You can download this library from jCenter. (since Ver.1.7.0)
+Download this library from jCenter. (since Ver.1.7.0)
 
 ```gradle
 repositories {
@@ -49,7 +49,7 @@ repositories {
 }
 ```
 
-Add dependencies, as following.
+Add dependencies, such as the following.
 
 ```gradle
 dependencies {
@@ -62,7 +62,7 @@ see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
 ### Test release
 
 This library is currently under development of 2.0.0.
-Currently alpha version, and I'm making destructive change.
+Currently alpha version and undergoing destructive change.
 
 It is distributed in this maven repository.
 
@@ -89,7 +89,7 @@ cp.start();
 ...
 ```
 
-If you want to specify the network interface, describe the following.
+To specify the network interface, describe the following.
 
 ```java
 NetworkInterface nif = NetworkInterface.getByName("eth0");
@@ -98,7 +98,7 @@ ControlPoint cp = ControlPointFactory.create(nif);
 ```
 
 By default ControlPoint will work with dual stack of IPv4 and IPv6.
-If you want to operate with IPv4 only, specify the protocol as follows.
+To operate with IPv4 only, specify the protocol as follows.
 
 ```java
 Params params = new Params().setProtocol(Protocol.IP_V4_ONLY);
@@ -215,8 +215,7 @@ Logger.setSender(Senders.create());
 
 In this case output to `System.out`
 
-If you want send log to some library.
-
+To send log to a library,
 eg. Simply change the output method.
 
 ```java
@@ -227,7 +226,7 @@ Logger.setSender(new DefaultSender((level, tag, message) -> {
 }));
 ```
 
-eg. If you want to handle exception.
+eg. To handle exception
 
 ```java
 Logger.setSender((level, message, throwable) -> {
