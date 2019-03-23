@@ -162,23 +162,28 @@ public class ThreadWorkQueueTest {
         executor.shutdownNow();
     }
 
-    @Test(timeout = 500, expected = RejectedExecutionException.class)
-    public void executeInParallel_shutdownNow後にexecuteでRejectedExecutionException() {
+    @Test(timeout = 5000)
+    public void executeInParallel_shutdownNow後にexecuteしてもRejectedExecutionExceptionは発生しない() throws Exception {
         final ThreadWorkQueue queue = new ThreadWorkQueue();
         final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
                 5L, TimeUnit.SECONDS, queue, queue);
         executor.shutdownNow();
-        executor.execute(mock(Runnable.class));
+        final Runnable runnable = mock(Runnable.class);
+        executor.execute(runnable);
+        Thread.sleep(500);
+        verify(runnable, never()).run();
     }
 
-    @Test(timeout = 500, expected = RejectedExecutionException.class)
-    public void executeInParallel_shutdown後にexecuteでRejectedExecutionException() {
+    @Test(timeout = 5000)
+    public void executeInParallel_shutdown後にexecuteでRejectedExecutionExceptionは発生しない() throws Exception {
         final ThreadWorkQueue queue = new ThreadWorkQueue();
         final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
                 5L, TimeUnit.SECONDS, queue, queue);
         executor.shutdown();
-        executor.execute(() -> {
-        });
+        final Runnable runnable = mock(Runnable.class);
+        executor.execute(runnable);
+        Thread.sleep(500);
+        verify(runnable, never()).run();
     }
 
     @Test(timeout = 5000)

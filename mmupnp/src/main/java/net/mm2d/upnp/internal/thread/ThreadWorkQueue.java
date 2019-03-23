@@ -7,11 +7,12 @@
 
 package net.mm2d.upnp.internal.thread;
 
+import net.mm2d.log.Logger;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -97,10 +98,12 @@ class ThreadWorkQueue implements BlockingQueue<Runnable>, RejectedExecutionHandl
             final Runnable r,
             final ThreadPoolExecutor executor) {
         if (executor.isShutdown()) {
-            throw new RejectedExecutionException("Task " + r.toString()
-                    + " rejected from " + executor.toString());
+            Logger.e("already shutdown: task " + r + " is rejected from " + executor);
+            return;
         }
-        mDelegate.offer(r);
+        if (!mDelegate.offer(r)) {
+            Logger.e("Unexpected problem: task " + r + " is rejected from " + executor);
+        }
     }
 
     // 以下、デリゲートのためのボイラープレートコード
