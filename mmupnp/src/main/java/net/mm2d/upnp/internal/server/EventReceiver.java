@@ -65,6 +65,8 @@ public class EventReceiver implements Runnable {
                 @Nonnull List<StringPair> properties);
     }
 
+    private static final long PREPARE_TIMEOUT = 1000L;
+
     @Nullable
     private ServerSocket mServerSocket;
     @Nonnull
@@ -94,11 +96,14 @@ public class EventReceiver implements Runnable {
     /**
      * サーバソケットのオープンと受信スレッドの開始を行う。
      */
+    @SuppressWarnings("Duplicates")
     public void start() {
         if (mFutureTask != null) {
             stop();
         }
-        mReady = false;
+        synchronized (this) {
+            mReady = false;
+        }
         mFutureTask = new FutureTask<>(this, null);
         mTaskExecutors.server(mFutureTask);
     }
@@ -138,6 +143,7 @@ public class EventReceiver implements Runnable {
         return mServerSocket.getLocalPort();
     }
 
+    @SuppressWarnings("Duplicates")
     private synchronized boolean waitReady() {
         final FutureTask<?> task = mFutureTask;
         if (task == null || task.isDone()) {
@@ -145,7 +151,7 @@ public class EventReceiver implements Runnable {
         }
         if (!mReady) {
             try {
-                wait(1000);
+                wait(PREPARE_TIMEOUT);
             } catch (final InterruptedException ignored) {
             }
         }

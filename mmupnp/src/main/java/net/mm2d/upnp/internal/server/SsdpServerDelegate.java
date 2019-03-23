@@ -54,6 +54,8 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
                 int length);
     }
 
+    private static final long PREPARE_TIMEOUT = 3000L;
+
     @Nonnull
     private final TaskExecutors mTaskExecutors;
     @Nonnull
@@ -214,7 +216,9 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         if (mFutureTask != null) {
             stop();
         }
-        mReady = false;
+        synchronized (this) {
+            mReady = false;
+        }
         mFutureTask = new FutureTask<>(this, null);
         mTaskExecutors.server(mFutureTask);
     }
@@ -262,7 +266,7 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         }
         if (!mReady) {
             try {
-                wait(1000);
+                wait(PREPARE_TIMEOUT);
             } catch (final InterruptedException ignored) {
             }
         }
