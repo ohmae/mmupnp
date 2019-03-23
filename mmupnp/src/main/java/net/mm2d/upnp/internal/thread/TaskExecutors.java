@@ -28,15 +28,8 @@ public class TaskExecutors {
 
     public TaskExecutors(
             @Nullable final TaskExecutor callback) {
-        this(callback, null);
-    }
-
-    // VisibleForTesting
-    TaskExecutors(
-            @Nullable final TaskExecutor callback,
-            @Nullable final TaskExecutor io) {
         mCallbackExecutor = callback != null ? callback : ExecutorFactory.createCallback();
-        mIoExecutor = io != null ? io : ExecutorFactory.createIo();
+        mIoExecutor = ExecutorFactory.createIo();
         mManagerExecutor = ExecutorFactory.createManager();
         mServerExecutor = ExecutorFactory.createServer();
     }

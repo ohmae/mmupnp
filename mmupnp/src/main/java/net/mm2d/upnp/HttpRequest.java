@@ -59,20 +59,20 @@ public class HttpRequest implements HttpMessage {
         }
 
         @Nonnull
-        public String getMethod() {
+        String getMethod() {
             return mMethod;
         }
 
-        public void setMethod(@Nonnull final String method) {
+        void setMethod(@Nonnull final String method) {
             mMethod = method;
         }
 
         @Nonnull
-        public String getUri() {
+        String getUri() {
             return mUri;
         }
 
-        public void setUri(@Nonnull final String uri) {
+        void setUri(@Nonnull final String uri) {
             mUri = uri;
         }
 

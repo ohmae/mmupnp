@@ -82,7 +82,7 @@ public class HttpResponse implements HttpMessage {
         }
 
         @Nonnull
-        public Status getStatus() {
+        Status getStatus() {
             return mStatus;
         }
 

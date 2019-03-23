@@ -41,7 +41,7 @@ class ExecutorFactory {
     }
 
     @Nonnull
-    static TaskExecutor createIo(final int maxThread) {
+    private static TaskExecutor createIo(final int maxThread) {
         final ThreadFactory factory = new ExecutorThreadFactory("io-", PRIORITY_IO);
         final ThreadWorkQueue queue = new ThreadWorkQueue();
         final ExecutorService executor = new ThreadPoolExecutor(0, maxThread, 15L, TimeUnit.SECONDS, queue, factory, queue);
