@@ -18,7 +18,6 @@ import javax.annotation.Nonnull;
 
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class DiscoveryListenerListTest {
     @Test

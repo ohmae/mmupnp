@@ -67,19 +67,19 @@ public class ControlPointTest {
     @RunWith(JUnit4.class)
     public static class mock未使用 {
         @Test(expected = IllegalStateException.class)
-        public void constructor_インターフェース空で指定() throws Exception {
+        public void constructor_インターフェース空で指定() {
             new ControlPointImpl(Protocol.DEFAULT, Collections.emptyList(), false, mock(DiFactory.class));
         }
 
         @Test(timeout = 2000L)
-        public void initialize_terminate() throws Exception {
+        public void initialize_terminate() {
             final ControlPoint cp = ControlPointFactory.create();
             cp.initialize();
             cp.terminate();
         }
 
         @Test(timeout = 2000L)
-        public void initialize_initialize_terminate() throws Exception {
+        public void initialize_initialize_terminate() {
             final ControlPoint cp = ControlPointFactory.create();
             cp.initialize();
             cp.initialize();
@@ -100,32 +100,32 @@ public class ControlPointTest {
         }
 
         @Test(timeout = 1000L)
-        public void terminate() throws Exception {
+        public void terminate() {
             final ControlPoint cp = ControlPointFactory.create();
             cp.terminate();
         }
 
         @Test(timeout = 10000L)
-        public void start_stop() throws Exception {
-            final ControlPoint cp = ControlPointFactory.create();
-            cp.initialize();
-            cp.start();
-            cp.stop();
-            cp.terminate();
-        }
-
-        @Test(timeout = 10000L)
-        public void start_stop2() throws Exception {
+        public void start_stop() {
             final ControlPoint cp = ControlPointFactory.create();
             cp.initialize();
             cp.start();
             cp.stop();
+            cp.terminate();
+        }
+
+        @Test(timeout = 10000L)
+        public void start_stop2() {
+            final ControlPoint cp = ControlPointFactory.create();
+            cp.initialize();
+            cp.start();
+            cp.stop();
             cp.stop();
             cp.terminate();
         }
 
         @Test(timeout = 10000L)
-        public void start_stop_illegal() throws Exception {
+        public void start_stop_illegal() {
             final ControlPoint cp = ControlPointFactory.create();
             cp.start();
             cp.start();
@@ -134,13 +134,13 @@ public class ControlPointTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void search_not_started() throws Exception {
+        public void search_not_started() {
             final ControlPoint cp = ControlPointFactory.create();
             cp.search();
         }
 
         @Test
-        public void search() throws Exception {
+        public void search() {
             final SsdpSearchServerList list = mock(SsdpSearchServerList.class);
             final ControlPoint cp = new ControlPointImpl(Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
@@ -164,7 +164,7 @@ public class ControlPointTest {
         }
 
         @Test
-        public void createHttpClient() throws Exception {
+        public void createHttpClient() {
             final ControlPointImpl cp = (ControlPointImpl) ControlPointFactory.create();
             final HttpClient client = cp.createHttpClient();
             assertThat(client.isKeepAlive(), is(true));
@@ -229,7 +229,7 @@ public class ControlPointTest {
         }
 
         @Test
-        public void setIconFilter_nullを指定しても問題ない() throws Exception {
+        public void setIconFilter_nullを指定しても問題ない() {
             final ControlPoint cp = ControlPointFactory.create();
             cp.setIconFilter(null);
         }
@@ -246,7 +246,7 @@ public class ControlPointTest {
         private final SubscribeManager mSubscribeManager = spy(new SubscribeManager(mTaskExecutors, mNotifyEventListener, mDiFactory));
 
         @Before
-        public void setUp() throws Exception {
+        public void setUp() {
             mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
@@ -393,7 +393,7 @@ public class ControlPointTest {
 
 
         @Test
-        public void registerSubscribeService_による登録() throws Exception {
+        public void registerSubscribeService_による登録() {
             final String sid = "sid";
             final Service service = mock(Service.class);
             doReturn(sid).when(service).getSubscriptionId();
@@ -404,7 +404,7 @@ public class ControlPointTest {
 
 
         @Test
-        public void unregisterSubscribeService_による削除() throws Exception {
+        public void unregisterSubscribeService_による削除() {
             final String sid = "sid";
             final Service service = mock(Service.class);
             doReturn(sid).when(service).getSubscriptionId();
@@ -422,7 +422,7 @@ public class ControlPointTest {
         private DeviceHolder mDeviceHolder;
 
         @Before
-        public void setUp() throws Exception {
+        public void setUp() {
             mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
@@ -480,7 +480,7 @@ public class ControlPointTest {
                 public HttpResponse download(@Nonnull final URL url) throws IOException {
                     try {
                         Thread.sleep(100);
-                    } catch (final InterruptedException e) {
+                    } catch (final InterruptedException ignored) {
                     }
                     throw new IOException();
                 }
@@ -678,7 +678,7 @@ public class ControlPointTest {
         private NotifyListener mNotifyListener;
 
         @Before
-        public void setUp() throws Exception {
+        public void setUp() {
             mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {
@@ -774,7 +774,7 @@ public class ControlPointTest {
         private SubscribeManager mSubscribeManager;
 
         @Before
-        public void setUp() throws Exception {
+        public void setUp() {
             mCp = spy(new ControlPointImpl(Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(), false,
                     new DiFactory(Protocol.DEFAULT) {

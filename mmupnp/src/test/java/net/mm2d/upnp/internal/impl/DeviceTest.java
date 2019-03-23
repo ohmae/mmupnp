@@ -76,7 +76,7 @@ public class DeviceTest {
         }
 
         @Test
-        public void loadIconBinary_NONE() throws Exception {
+        public void loadIconBinary_NONE() {
             final Device device = mBuilder.build();
             device.loadIconBinary(mHttpClient, IconFilter.NONE);
             final List<Icon> list = device.getIconList();
@@ -86,7 +86,7 @@ public class DeviceTest {
         }
 
         @Test
-        public void loadIconBinary_ALL() throws Exception {
+        public void loadIconBinary_ALL() {
             final Device device = mBuilder.build();
             device.loadIconBinary(mHttpClient, IconFilter.ALL);
             final List<Icon> list = device.getIconList();
@@ -111,7 +111,7 @@ public class DeviceTest {
         }
 
         @Test
-        public void getControlPoint() throws Exception {
+        public void getControlPoint() {
             final Device device = mBuilder.build();
             assertThat(device.getControlPoint(), is(mControlPoint));
         }
@@ -160,13 +160,13 @@ public class DeviceTest {
         }
 
         @Test
-        public void getSsdpMessage() throws Exception {
+        public void getSsdpMessage() {
             final Device device = mBuilder.build();
             assertThat(device.getSsdpMessage(), is(mSsdpMessage));
         }
 
         @Test
-        public void getExpireTime() throws Exception {
+        public void getExpireTime() {
             final Device device = mBuilder.build();
             assertThat(device.getExpireTime(), is(mSsdpMessage.getExpireTime()));
         }
@@ -206,113 +206,113 @@ public class DeviceTest {
         }
 
         @Test
-        public void getValue() throws Exception {
+        public void getValue() {
             final Device device = mBuilder.build();
             assertThat(device.getValue("deviceType"),
                     is("urn:schemas-upnp-org:device:MediaServer:1"));
         }
 
         @Test
-        public void getValue_存在しないタグはnull() throws Exception {
+        public void getValue_存在しないタグはnull() {
             final Device device = mBuilder.build();
             assertThat(device.getValue("deviceType1"),
                     is(nullValue()));
         }
 
         @Test
-        public void getValueWithNamespace() throws Exception {
+        public void getValueWithNamespace() {
             final Device device = mBuilder.build();
             assertThat(device.getValueWithNamespace("urn:schemas-upnp-org:device-1-0", "deviceType"),
                     is("urn:schemas-upnp-org:device:MediaServer:1"));
         }
 
         @Test
-        public void getValueWithNamespace_namespace間違ったらnull() throws Exception {
+        public void getValueWithNamespace_namespace間違ったらnull() {
             final Device device = mBuilder.build();
             assertThat(device.getValueWithNamespace("urn:schemas-upnp-org:device-1-1", "deviceType"),
                     is(nullValue()));
         }
 
         @Test
-        public void getLocation() throws Exception {
+        public void getLocation() {
             final Device device = mBuilder.build();
             assertThat(device.getLocation(), is(mSsdpMessage.getLocation()));
         }
 
         @Test
-        public void getIpAddress() throws Exception {
+        public void getIpAddress() {
             final Device device = mBuilder.build();
             assertThat(device.getIpAddress(), is("192.0.2.2"));
         }
 
         @Test
-        public void getUdn() throws Exception {
+        public void getUdn() {
             final Device device = mBuilder.build();
             assertThat(device.getUdn(), is("uuid:01234567-89ab-cdef-0123-456789abcdef"));
         }
 
         @Test
-        public void getDeviceType() throws Exception {
+        public void getDeviceType() {
             final Device device = mBuilder.build();
             assertThat(device.getDeviceType(), is("urn:schemas-upnp-org:device:MediaServer:1"));
         }
 
         @Test
-        public void getFriendlyName() throws Exception {
+        public void getFriendlyName() {
             final Device device = mBuilder.build();
             assertThat(device.getFriendlyName(), is("mmupnp"));
         }
 
         @Test
-        public void getManufacture() throws Exception {
+        public void getManufacture() {
             final Device device = mBuilder.build();
             assertThat(device.getManufacture(), is("mm2d.net"));
         }
 
         @Test
-        public void getManufactureUrl() throws Exception {
+        public void getManufactureUrl() {
             final Device device = mBuilder.build();
             assertThat(device.getManufactureUrl(), is("http://www.mm2d.net/"));
         }
 
         @Test
-        public void getModelName() throws Exception {
+        public void getModelName() {
             final Device device = mBuilder.build();
             assertThat(device.getModelName(), is("mmupnp"));
         }
 
         @Test
-        public void getModelUrl() throws Exception {
+        public void getModelUrl() {
             final Device device = mBuilder.build();
             assertThat(device.getModelUrl(), is("http://www.mm2d.net/"));
         }
 
         @Test
-        public void getModelDescription() throws Exception {
+        public void getModelDescription() {
             final Device device = mBuilder.build();
             assertThat(device.getModelDescription(), is("mmupnp test server"));
         }
 
         @Test
-        public void getModelNumber() throws Exception {
+        public void getModelNumber() {
             final Device device = mBuilder.build();
             assertThat(device.getModelNumber(), is("ABCDEFG"));
         }
 
         @Test
-        public void getSerialNumber() throws Exception {
+        public void getSerialNumber() {
             final Device device = mBuilder.build();
             assertThat(device.getSerialNumber(), is("0123456789ABC"));
         }
 
         @Test
-        public void getPresentationUrl() throws Exception {
+        public void getPresentationUrl() {
             final Device device = mBuilder.build();
             assertThat(device.getPresentationUrl(), is("http://192.0.2.2:12346/"));
         }
 
         @Test
-        public void getIconList() throws Exception {
+        public void getIconList() {
             final Device device = mBuilder.build();
             final List<Icon> list = device.getIconList();
             for (final Icon icon : list) {
@@ -329,13 +329,13 @@ public class DeviceTest {
         }
 
         @Test
-        public void getServiceList() throws Exception {
+        public void getServiceList() {
             final Device device = mBuilder.build();
             assertThat(device.getServiceList(), hasSize(3));
         }
 
         @Test
-        public void findServiceById() throws Exception {
+        public void findServiceById() {
             final Device device = mBuilder.build();
             final Service cds = device.findServiceById("urn:upnp-org:serviceId:ContentDirectory");
 
@@ -344,13 +344,13 @@ public class DeviceTest {
         }
 
         @Test
-        public void findServiceById_見つからなければnull() throws Exception {
+        public void findServiceById_見つからなければnull() {
             final Device device = mBuilder.build();
             assertThat(device.findServiceById("urn:upnp-org:serviceId:ContentDirectory1"), is(nullValue()));
         }
 
         @Test
-        public void findServiceByType() throws Exception {
+        public void findServiceByType() {
             final Device device = mBuilder.build();
             final Service cds = device.findServiceByType("urn:schemas-upnp-org:service:ContentDirectory:1");
 
@@ -359,13 +359,13 @@ public class DeviceTest {
         }
 
         @Test
-        public void findServiceByType_見つからなければnull() throws Exception {
+        public void findServiceByType_見つからなければnull() {
             final Device device = mBuilder.build();
             assertThat(device.findServiceByType("urn:schemas-upnp-org:service:ContentDirectory:11"), is(nullValue()));
         }
 
         @Test
-        public void findAction() throws Exception {
+        public void findAction() {
             final Device device = mBuilder.build();
             final Action browse = device.findAction("Browse");
 
@@ -378,19 +378,19 @@ public class DeviceTest {
         }
 
         @Test
-        public void toString_Nullでない() throws Exception {
+        public void toString_Nullでない() {
             final Device device = mBuilder.build();
             assertThat(device.toString(), is(notNullValue()));
         }
 
         @Test
-        public void hashCode_Exceptionが発生しない() throws Exception {
+        public void hashCode_Exceptionが発生しない() {
             final Device device = mBuilder.build();
             device.hashCode();
         }
 
         @Test
-        public void equals_null比較可能() throws Exception {
+        public void equals_null比較可能() {
             final Device device = mBuilder.build();
             assertThat(device.equals(null), is(false));
         }

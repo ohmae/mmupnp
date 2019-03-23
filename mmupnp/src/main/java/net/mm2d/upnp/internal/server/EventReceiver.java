@@ -94,7 +94,6 @@ public class EventReceiver implements Runnable {
     /**
      * サーバソケットのオープンと受信スレッドの開始を行う。
      */
-    @SuppressWarnings("Duplicates")
     public void start() {
         if (mFutureTask != null) {
             stop();
@@ -139,7 +138,6 @@ public class EventReceiver implements Runnable {
         return mServerSocket.getLocalPort();
     }
 
-    @SuppressWarnings("Duplicates")
     private synchronized boolean waitReady() {
         final FutureTask<?> task = mFutureTask;
         if (task == null || task.isDone()) {

@@ -21,11 +21,10 @@ import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpNotifyReceiverListTest {
     @Test
-    public void openAndStart() throws Exception {
+    public void openAndStart() {
         final SsdpNotifyReceiver receiver = mock(SsdpNotifyReceiver.class);
         final SsdpNotifyReceiverList list = spy(new SsdpNotifyReceiverList());
         final NetworkInterface nif = NetworkUtils.getAvailableInet4Interfaces().get(0);

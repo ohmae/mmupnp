@@ -23,7 +23,6 @@ import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpSearchServerListTest {
     private TaskExecutors mTaskExecutors;

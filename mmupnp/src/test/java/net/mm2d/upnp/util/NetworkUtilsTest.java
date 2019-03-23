@@ -62,7 +62,7 @@ public class NetworkUtilsTest {
         }
 
         @Test
-        public void getNetworkInterfaceList_Exceptionが発生しないこと() throws Exception {
+        public void getNetworkInterfaceList_Exceptionが発生しないこと() {
             assertThat(NetworkUtils.getNetworkInterfaceList(), is(notNullValue()));
         }
     }

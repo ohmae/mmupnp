@@ -163,7 +163,7 @@ public class ThreadWorkQueueTest {
     }
 
     @Test(timeout = 500, expected = RejectedExecutionException.class)
-    public void executeInParallel_shutdownNow後にexecuteでRejectedExecutionException() throws Exception {
+    public void executeInParallel_shutdownNow後にexecuteでRejectedExecutionException() {
         final ThreadWorkQueue queue = new ThreadWorkQueue();
         final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
                 5L, TimeUnit.SECONDS, queue, queue);
@@ -172,7 +172,7 @@ public class ThreadWorkQueueTest {
     }
 
     @Test(timeout = 500, expected = RejectedExecutionException.class)
-    public void executeInParallel_shutdown後にexecuteでRejectedExecutionException() throws Exception {
+    public void executeInParallel_shutdown後にexecuteでRejectedExecutionException() {
         final ThreadWorkQueue queue = new ThreadWorkQueue();
         final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
                 5L, TimeUnit.SECONDS, queue, queue);

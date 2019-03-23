@@ -22,7 +22,6 @@ import java.io.OutputStream;
 
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class HttpRequestDelegateTest {
     private HttpMessageDelegate mDelegate;
@@ -171,7 +170,7 @@ public class HttpRequestDelegateTest {
     }
 
     @Test
-    public void toString_() throws Exception {
+    public void toString_() {
         mMessage.toString();
     }
 }

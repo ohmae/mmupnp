@@ -210,7 +210,7 @@ public class HttpRequestTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void getAddressString_未設定ならException() throws Exception {
+    public void getAddressString_未設定ならException() {
         final HttpRequest request = HttpRequest.create();
         request.getAddressString();
     }
@@ -242,27 +242,27 @@ public class HttpRequestTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void getSocketAddress_未設定ならException() throws Exception {
+    public void getSocketAddress_未設定ならException() {
         final HttpRequest request = HttpRequest.create();
         request.getSocketAddress();
     }
 
     @Test
-    public void setHeaderLine_設定できる() throws Exception {
+    public void setHeaderLine_設定できる() {
         final HttpRequest request = HttpRequest.create();
         request.setHeaderLine("SOAPACTION: " + ACTION);
         assertThat(request.getHeader(Http.SOAPACTION), is(ACTION));
     }
 
     @Test
-    public void setHeaderLine_フォーマットエラーでもExceptionは発生しない() throws Exception {
+    public void setHeaderLine_フォーマットエラーでもExceptionは発生しない() {
         final HttpRequest request = HttpRequest.create();
         request.setHeaderLine("SOAPACTION");
         assertThat(request.getHeader(Http.SOAPACTION), is(nullValue()));
     }
 
     @Test
-    public void isKeepAlive() throws Exception {
+    public void isKeepAlive() {
         final HttpRequest request = HttpRequest.create();
         request.setVersion(Http.HTTP_1_0);
         assertThat(request.isKeepAlive(), is(false));
@@ -283,14 +283,14 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void getContentLength_正常系() throws Exception {
+    public void getContentLength_正常系() {
         final HttpRequest request = HttpRequest.create();
         request.setHeader(Http.CONTENT_LENGTH, "10");
         assertThat(request.getContentLength(), is(10));
     }
 
     @Test
-    public void getContentLength_異常系() throws Exception {
+    public void getContentLength_異常系() {
         final HttpRequest request = HttpRequest.create();
         request.setHeader(Http.CONTENT_LENGTH, "length");
         assertThat(request.getContentLength(), is(0));

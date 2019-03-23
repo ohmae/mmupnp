@@ -16,7 +16,6 @@ import org.w3c.dom.Element;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class XmlUtilsTest {
     @Test

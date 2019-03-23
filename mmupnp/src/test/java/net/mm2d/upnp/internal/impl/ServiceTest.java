@@ -44,7 +44,7 @@ public class ServiceTest {
     @RunWith(JUnit4.class)
     public static class Builderによる生成からのテスト {
         @Test
-        public void build_成功() throws Exception {
+        public void build_成功() {
             final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
@@ -60,7 +60,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_Device不足() throws Exception {
+        public void build_Device不足() {
             new ServiceImpl.Builder()
                     .setSubscribeManager(mock(SubscribeManager.class))
                     .setServiceType("serviceType")
@@ -73,7 +73,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_SubscribeManager不足() throws Exception {
+        public void build_SubscribeManager不足() {
             new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setServiceType("serviceType")
@@ -86,7 +86,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_ServiceType不足() throws Exception {
+        public void build_ServiceType不足() {
             new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
@@ -99,7 +99,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_ServiceId不足() throws Exception {
+        public void build_ServiceId不足() {
             new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
@@ -112,7 +112,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_ScpdUrl不足() throws Exception {
+        public void build_ScpdUrl不足() {
             new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
@@ -125,7 +125,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_ControlUrl不足() throws Exception {
+        public void build_ControlUrl不足() {
             new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
@@ -138,7 +138,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_EventSubUrl不足() throws Exception {
+        public void build_EventSubUrl不足() {
             new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
@@ -151,7 +151,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_argumentのRelatedStateVariableNameが指定されていない() throws Exception {
+        public void build_argumentのRelatedStateVariableNameが指定されていない() {
             final ActionImpl.Builder actionBuilder = new ActionImpl.Builder()
                     .setName("action")
                     .addArgumentBuilder(new ArgumentImpl.Builder()
@@ -173,7 +173,7 @@ public class ServiceTest {
         }
 
         @Test(expected = IllegalStateException.class)
-        public void build_argumentのRelatedStateVariableNameがに対応するStateVariableがない() throws Exception {
+        public void build_argumentのRelatedStateVariableNameがに対応するStateVariableがない() {
             final ActionImpl.Builder actionBuilder = new ActionImpl.Builder()
                     .setName("action")
                     .addArgumentBuilder(new ArgumentImpl.Builder()
@@ -233,7 +233,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void hashCode_Exceptionが発生しない() throws Exception {
+        public void hashCode_Exceptionが発生しない() {
             final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
@@ -248,7 +248,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void equals_比較可能() throws Exception {
+        public void equals_比較可能() {
             final Service service = new ServiceImpl.Builder()
                     .setDevice(mock(DeviceImpl.class))
                     .setSubscribeManager(mock(SubscribeManager.class))
@@ -265,7 +265,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void equals_同一の情報() throws Exception {
+        public void equals_同一の情報() {
             final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
@@ -303,7 +303,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void equals_不一致を無視() throws Exception {
+        public void equals_不一致を無視() {
             final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
@@ -341,7 +341,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void equals_ServiceId不一致() throws Exception {
+        public void equals_ServiceId不一致() {
             final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message = mock(SsdpMessage.class);
             doReturn("location").when(message).getLocation();
@@ -379,7 +379,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void equals_device不一致() throws Exception {
+        public void equals_device不一致() {
             final SubscribeManager manager = mock(SubscribeManager.class);
             final SsdpMessage message1 = mock(SsdpMessage.class);
             doReturn("location").when(message1).getLocation();
@@ -491,40 +491,40 @@ public class ServiceTest {
         }
 
         @Test
-        public void getDevice() throws Exception {
+        public void getDevice() {
             assertThat(mCms.getDevice(), is(mDevice));
         }
 
         @Test
-        public void getServiceType() throws Exception {
+        public void getServiceType() {
             assertThat(mCms.getServiceType(), is("urn:schemas-upnp-org:service:ConnectionManager:1"));
             assertThat(mCds.getServiceType(), is("urn:schemas-upnp-org:service:ContentDirectory:1"));
             assertThat(mMmupnp.getServiceType(), is("urn:schemas-mm2d-net:service:X_mmupnp:1"));
         }
 
         @Test
-        public void getServiceId() throws Exception {
+        public void getServiceId() {
             assertThat(mCms.getServiceId(), is("urn:upnp-org:serviceId:ConnectionManager"));
             assertThat(mCds.getServiceId(), is("urn:upnp-org:serviceId:ContentDirectory"));
             assertThat(mMmupnp.getServiceId(), is("urn:upnp-org:serviceId:X_mmupnp"));
         }
 
         @Test
-        public void getScpdUrl() throws Exception {
+        public void getScpdUrl() {
             assertThat(mCms.getScpdUrl(), is("/cms.xml"));
             assertThat(mCds.getScpdUrl(), is("/cds.xml"));
             assertThat(mMmupnp.getScpdUrl(), is("/mmupnp.xml"));
         }
 
         @Test
-        public void getControlUrl() throws Exception {
+        public void getControlUrl() {
             assertThat(mCms.getControlUrl(), is("/cms/control"));
             assertThat(mCds.getControlUrl(), is("/cds/control"));
             assertThat(mMmupnp.getControlUrl(), is("/mmupnp/control"));
         }
 
         @Test
-        public void getEventSubUrl() throws Exception {
+        public void getEventSubUrl() {
             assertThat(mCms.getEventSubUrl(), is("/cms/event"));
             assertThat(mCds.getEventSubUrl(), is("/cds/event"));
             assertThat(mMmupnp.getEventSubUrl(), is("/mmupnp/event"));
@@ -538,7 +538,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void getActionList() throws Exception {
+        public void getActionList() {
             assertThat(mCms.getActionList(), hasSize(3));
             assertThat(mCds.getActionList(), hasSize(4));
             assertThat(mMmupnp.getActionList(), hasSize(1));
@@ -546,19 +546,19 @@ public class ServiceTest {
         }
 
         @Test
-        public void findAction() throws Exception {
+        public void findAction() {
             assertThat(mCms.findAction("Browse"), is(nullValue()));
             assertThat(mCds.findAction("Browse"), is(notNullValue()));
         }
 
         @Test
-        public void getStateVariableList() throws Exception {
+        public void getStateVariableList() {
             assertThat(mCds.getStateVariableList(), hasSize(11));
             assertThat(mCds.getStateVariableList(), is(mCds.getStateVariableList()));
         }
 
         @Test
-        public void getStateVariableParam() throws Exception {
+        public void getStateVariableParam() {
             final StateVariable type = mMmupnp.findStateVariable("A_ARG_TYPE_Type");
             assertThat(type.getName(), is("A_ARG_TYPE_Type"));
             assertThat(type.isSendEvents(), is(false));
@@ -575,7 +575,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void findStateVariable() throws Exception {
+        public void findStateVariable() {
             final String name = "A_ARG_TYPE_BrowseFlag";
             final StateVariable variable = mCds.findStateVariable(name);
             assertThat(variable.getName(), is(name));
@@ -876,7 +876,7 @@ public class ServiceTest {
         }
 
         @Test
-        public void unsubscribeSync_subscribeする前に実行すると失敗() throws Exception {
+        public void unsubscribeSync_subscribeする前に実行すると失敗() {
             assertThat(mService.unsubscribeSync(), is(false));
         }
 

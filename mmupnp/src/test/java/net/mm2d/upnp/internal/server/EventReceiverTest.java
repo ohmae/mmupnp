@@ -80,14 +80,14 @@ public class EventReceiverTest {
     }
 
     @Test(timeout = 10000L)
-    public void open_close_デッドロックしない() throws Exception {
+    public void open_close_デッドロックしない() {
         final EventReceiver receiver = new EventReceiver(mTaskExecutors, null);
         receiver.start();
         receiver.stop();
     }
 
     @Test(timeout = 1000L)
-    public void close_open前なら即終了() throws Exception {
+    public void close_open前なら即終了() {
         final EventReceiver receiver = new EventReceiver(mTaskExecutors, null);
         receiver.stop();
     }
@@ -146,7 +146,7 @@ public class EventReceiverTest {
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (final InterruptedException e) {
+                        } catch (final InterruptedException ignored) {
                         }
                         throw new IOException();
                     }
@@ -191,7 +191,7 @@ public class EventReceiverTest {
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (final InterruptedException e) {
+                        } catch (final InterruptedException ignored) {
                         }
                         throw new IOException();
                     }
@@ -231,7 +231,7 @@ public class EventReceiverTest {
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (final InterruptedException e) {
+                        } catch (final InterruptedException ignored) {
                         }
                         throw new IOException();
                     }
@@ -271,7 +271,7 @@ public class EventReceiverTest {
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (final InterruptedException e) {
+                        } catch (final InterruptedException ignored) {
                         }
                         throw new IOException();
                     }
@@ -296,7 +296,7 @@ public class EventReceiverTest {
         final EventReceiver receiver = new EventReceiver(mTaskExecutors, (sid, seq, properties) -> {
             try {
                 Thread.sleep(1000);
-            } catch (final InterruptedException e) {
+            } catch (final InterruptedException ignored) {
             }
             return false;
         }) {
@@ -317,7 +317,7 @@ public class EventReceiverTest {
                         }
                         try {
                             Thread.sleep(1000);
-                        } catch (final InterruptedException e) {
+                        } catch (final InterruptedException ignored) {
                         }
                         throw new IOException();
                     }
@@ -332,14 +332,14 @@ public class EventReceiverTest {
     }
 
     @Test
-    public void parsePropertyPairs_中身が空なら空のリスト() throws Exception {
+    public void parsePropertyPairs_中身が空なら空のリスト() {
         final HttpRequest request = HttpRequest.create();
 
         assertThat(EventReceiver.parsePropertyPairs(request), empty());
     }
 
     @Test
-    public void parsePropertyPairs_rootがpropertysetでない場合リスト() throws Exception {
+    public void parsePropertyPairs_rootがpropertysetでない場合リスト() {
         final HttpRequest request = HttpRequest.create();
         request.setBody("<e:property xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
                 "<e:property>\n" +
@@ -354,7 +354,7 @@ public class EventReceiverTest {
     }
 
     @Test
-    public void parsePropertyPairs_property以外の要素は無視() throws Exception {
+    public void parsePropertyPairs_property以外の要素は無視() {
         final HttpRequest request = HttpRequest.create();
         request.setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
                 "<e:property>\n" +
@@ -369,7 +369,7 @@ public class EventReceiverTest {
     }
 
     @Test
-    public void parsePropertyPairs_xml異常() throws Exception {
+    public void parsePropertyPairs_xml異常() {
         final HttpRequest request = HttpRequest.create();
         request.setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
                 "<e:property>\n" +
@@ -384,7 +384,7 @@ public class EventReceiverTest {
     }
 
     @Test
-    public void ServerTask_notifyEvent_空ならfalse() throws Exception {
+    public void ServerTask_notifyEvent_空ならfalse() {
         final String sid = "sid";
         final EventMessageListener listener = mock(EventMessageListener.class);
         final EventReceiver receiver = new EventReceiver(mTaskExecutors, listener);

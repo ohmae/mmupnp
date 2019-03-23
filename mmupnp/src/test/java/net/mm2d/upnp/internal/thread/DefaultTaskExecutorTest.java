@@ -36,7 +36,7 @@ public class DefaultTaskExecutorTest {
     }
 
     @Test
-    public void execute_shutdown済みなら何もしないでfalse() throws Exception {
+    public void execute_shutdown済みなら何もしないでfalse() {
         final ExecutorService executorService = mock(ExecutorService.class);
         final TaskExecutor taskExecutor = new DefaultTaskExecutor(executorService);
         final Runnable command = mock(Runnable.class);
@@ -48,7 +48,7 @@ public class DefaultTaskExecutorTest {
     }
 
     @Test
-    public void execute_exceptionが発生すればfalse() throws Exception {
+    public void execute_exceptionが発生すればfalse() {
         final ExecutorService executorService = mock(ExecutorService.class);
         final TaskExecutor taskExecutor = new DefaultTaskExecutor(executorService);
         final Runnable command = mock(Runnable.class);
@@ -58,7 +58,7 @@ public class DefaultTaskExecutorTest {
     }
 
     @Test
-    public void execute_terminate後はfalse() throws Exception {
+    public void execute_terminate後はfalse() {
         final ExecutorService executorService = mock(ExecutorService.class);
         final TaskExecutor taskExecutor = new DefaultTaskExecutor(executorService);
         final Runnable command = mock(Runnable.class);
@@ -111,7 +111,7 @@ public class DefaultTaskExecutorTest {
     }
 
     @Test
-    public void execute_io_shutdown済みなら何もしないでfalse() throws Exception {
+    public void execute_io_shutdown済みなら何もしないでfalse() {
         final ExecutorService executorService = mock(ExecutorService.class);
         final TaskExecutor taskExecutor = new DefaultTaskExecutor(executorService, true);
         final Runnable command = mock(Runnable.class);
@@ -123,7 +123,7 @@ public class DefaultTaskExecutorTest {
     }
 
     @Test
-    public void execute_io_exceptionが発生すればfalse() throws Exception {
+    public void execute_io_exceptionが発生すればfalse() {
         final ExecutorService executorService = mock(ExecutorService.class);
         final TaskExecutor taskExecutor = new DefaultTaskExecutor(executorService, true);
         final Runnable command = mock(Runnable.class);
@@ -133,7 +133,7 @@ public class DefaultTaskExecutorTest {
     }
 
     @Test
-    public void execute_io_terminate後はfalse() throws Exception {
+    public void execute_io_terminate後はfalse() {
         final ExecutorService executorService = mock(ExecutorService.class);
         final TaskExecutor taskExecutor = new DefaultTaskExecutor(executorService, true);
         final Runnable command = mock(Runnable.class);

@@ -70,12 +70,12 @@ public class HttpTest {
     }
 
     @Test
-    public void parseDate_Error() throws Exception {
+    public void parseDate_Error() {
         assertThat(Http.parseDate("2018-1-28 13:45:55"), is(nullValue()));
     }
 
     @Test
-    public void parseDate_nullを渡してもException発生しない() throws Exception {
+    public void parseDate_nullを渡してもException発生しない() {
         assertThat(Http.parseDate(null), is(nullValue()));
     }
 

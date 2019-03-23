@@ -176,7 +176,7 @@ public class HttpServerMock {
                 is = mSocket.getInputStream();
                 os = mSocket.getOutputStream();
                 while (mServer.receiveAndReply(mSocket, is, os)) ;
-            } catch (final IOException e) {
+            } catch (final IOException ignored) {
             } finally {
                 IoUtils.closeQuietly(is);
                 IoUtils.closeQuietly(os);

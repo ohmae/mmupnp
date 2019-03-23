@@ -16,7 +16,6 @@ import org.junit.runners.JUnit4;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class EmptyServiceTest {
     @Test

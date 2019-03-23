@@ -18,13 +18,13 @@ import static org.junit.Assert.*;
 @RunWith(JUnit4.class)
 public class PairTest {
     @Test
-    public void constructor_nullでも可() throws Exception {
+    public void constructor_nullでも可() {
         new Pair<String, String>(null, null);
         new Pair<Integer, Integer>(null, null);
     }
 
     @Test
-    public void getKey_Keyが取り出せる() throws Exception {
+    public void getKey_Keyが取り出せる() {
         final String key = "key";
         final String value = "value";
         final Pair<String, String> pair = new Pair<>(key, value);
@@ -33,7 +33,7 @@ public class PairTest {
     }
 
     @Test
-    public void getValue_Valueが取り出せる() throws Exception {
+    public void getValue_Valueが取り出せる() {
         final String key = "key";
         final String value = "value";
         final Pair<String, String> pair = new Pair<>(key, value);
@@ -42,14 +42,14 @@ public class PairTest {
     }
 
     @Test
-    public void equals_同一インスタンス() throws Exception {
+    public void equals_同一インスタンス() {
         final Pair<String, String> pair1 = new Pair<>("1", "2");
 
         assertThat(pair1.equals(pair1), is(true));
     }
 
     @Test
-    public void equals_フィールドが同一() throws Exception {
+    public void equals_フィールドが同一() {
         final Pair<String, String> pair1 = new Pair<>("1", "2");
         final Pair<String, String> pair2 = new Pair<>("1", "2");
 
@@ -57,7 +57,7 @@ public class PairTest {
     }
 
     @Test
-    public void equals_フィールドが異なる() throws Exception {
+    public void equals_フィールドが異なる() {
         final Pair<String, String> pair1 = new Pair<>("1", "2");
         final Pair<String, String> pair2 = new Pair<>("1", "3");
 
@@ -65,14 +65,14 @@ public class PairTest {
     }
 
     @Test
-    public void equals_nullとの比較() throws Exception {
+    public void equals_nullとの比較() {
         final Pair<String, String> pair1 = new Pair<>("1", "2");
 
         assertThat(pair1.equals(null), is(false));
     }
 
     @Test
-    public void hashCode_equalsが真なら同一() throws Exception {
+    public void hashCode_equalsが真なら同一() {
         final Pair<String, String> pair1 = new Pair<>("1", "2");
         final Pair<String, String> pair2 = new Pair<>("1", "2");
 
@@ -80,7 +80,7 @@ public class PairTest {
     }
 
     @Test
-    public void toString_両方の値が含まれる() throws Exception {
+    public void toString_両方の値が含まれる() {
         final Pair<String, String> pair1 = new Pair<>("1", "2");
 
         assertThat(pair1.toString(), containsString("1"));
@@ -88,7 +88,7 @@ public class PairTest {
     }
 
     @Test
-    public void nullalbel() throws Exception {
+    public void nullalbel() {
         final Pair<String, String> pair1 = new Pair<>(null, "1");
         final Pair<String, String> pair2 = new Pair<>("1", null);
         final Pair<String, String> pair3 = new Pair<>(null, null);

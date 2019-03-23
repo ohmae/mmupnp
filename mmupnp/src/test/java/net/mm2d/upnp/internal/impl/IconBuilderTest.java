@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 @RunWith(JUnit4.class)
 public class IconBuilderTest {
     @Test
-    public void build() throws Exception {
+    public void build() {
         final String mimeType = "mimeType";
         final int height = 200;
         final int width = 300;
@@ -42,7 +42,7 @@ public class IconBuilderTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void build_mimeTypeなし() throws Exception {
+    public void build_mimeTypeなし() {
         final int height = 200;
         final int width = 300;
         final int depth = 24;
@@ -56,7 +56,7 @@ public class IconBuilderTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void build_width異常() throws Exception {
+    public void build_width異常() {
         final String mimeType = "mimeType";
         final int height = 200;
         final int depth = 24;
@@ -71,7 +71,7 @@ public class IconBuilderTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void build_height異常() throws Exception {
+    public void build_height異常() {
         final String mimeType = "mimeType";
         final int width = 300;
         final int depth = 24;
@@ -86,7 +86,7 @@ public class IconBuilderTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void build_depth異常() throws Exception {
+    public void build_depth異常() {
         final String mimeType = "mimeType";
         final int height = 200;
         final int width = 300;
@@ -101,7 +101,7 @@ public class IconBuilderTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void build_urlなし() throws Exception {
+    public void build_urlなし() {
         final String mimeType = "mimeType";
         final int height = 200;
         final int width = 300;

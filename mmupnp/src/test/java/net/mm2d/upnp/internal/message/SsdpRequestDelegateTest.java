@@ -19,14 +19,13 @@ import java.io.OutputStream;
 
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SsdpRequestDelegateTest {
     private SsdpMessageDelegate mDelegate;
     private SsdpRequest mMessage;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mDelegate = mock(SsdpMessageDelegate.class);
         doReturn("").when(mDelegate).getType();
         doReturn("").when(mDelegate).getUuid();

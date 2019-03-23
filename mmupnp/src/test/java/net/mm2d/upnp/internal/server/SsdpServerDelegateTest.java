@@ -54,7 +54,7 @@ public class SsdpServerDelegateTest {
     }
 
     @Test(timeout = 1000L)
-    public void start_stop_デッドロックしない() throws Exception {
+    public void start_stop_デッドロックしない() {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         server.start();
@@ -62,7 +62,7 @@ public class SsdpServerDelegateTest {
     }
 
     @Test(timeout = 1000L)
-    public void start_stop1_デッドロックしない() throws Exception {
+    public void start_stop1_デッドロックしない() {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         server.start();
@@ -71,7 +71,7 @@ public class SsdpServerDelegateTest {
     }
 
     @Test(timeout = 1000L)
-    public void start_stop2_デッドロックしない() throws Exception {
+    public void start_stop2_デッドロックしない() {
         final NetworkInterface networkInterface = NetworkUtils.getAvailableInet4Interfaces().get(0);
         final SsdpServerDelegate server = new SsdpServerDelegate(mTaskExecutors, mock(Receiver.class), Address.IP_V4, networkInterface);
         server.stop();
@@ -92,7 +92,7 @@ public class SsdpServerDelegateTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void findInet4Address_見つからなければException2() throws Exception {
+    public void findInet4Address_見つからなければException2() {
         SsdpServerDelegate.findInet4Address(Collections.emptyList());
     }
 
@@ -111,7 +111,7 @@ public class SsdpServerDelegateTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void findInet6Address_見つからなければException2() throws Exception {
+    public void findInet6Address_見つからなければException2() {
         SsdpServerDelegate.findInet6Address(Collections.emptyList());
     }
 
@@ -229,11 +229,11 @@ public class SsdpServerDelegateTest {
     public void ReceiveTask_スレッド内の処理_port0() throws Exception {
         final MulticastSocket socket = spy(new MulticastSocket() {
             @Override
-            public void joinGroup(final InetAddress mcastaddr) throws IOException {
+            public void joinGroup(final InetAddress mcastaddr) {
             }
 
             @Override
-            public void leaveGroup(final InetAddress mcastaddr) throws IOException {
+            public void leaveGroup(final InetAddress mcastaddr) {
             }
 
             @Override
@@ -263,11 +263,11 @@ public class SsdpServerDelegateTest {
     public void ReceiveTask_スレッド内の処理_port_non0() throws Exception {
         final MulticastSocket socket = spy(new MulticastSocket() {
             @Override
-            public void joinGroup(final InetAddress mcastaddr) throws IOException {
+            public void joinGroup(final InetAddress mcastaddr) {
             }
 
             @Override
-            public void leaveGroup(final InetAddress mcastaddr) throws IOException {
+            public void leaveGroup(final InetAddress mcastaddr) {
             }
 
             @Override

@@ -25,23 +25,23 @@ public class MockMulticastSocket extends MulticastSocket {
     }
 
     @Override
-    public void setTimeToLive(final int ttl) throws IOException {
+    public void setTimeToLive(final int ttl) {
     }
 
     @Override
-    public void joinGroup(final InetAddress mcastaddr) throws IOException {
+    public void joinGroup(final InetAddress mcastaddr) {
     }
 
     @Override
-    public void leaveGroup(final InetAddress mcastaddr) throws IOException {
+    public void leaveGroup(final InetAddress mcastaddr) {
     }
 
     @Override
-    public void setNetworkInterface(final NetworkInterface netIf) throws SocketException {
+    public void setNetworkInterface(final NetworkInterface netIf) {
     }
 
     @Override
-    public void send(final DatagramPacket p) throws IOException {
+    public void send(final DatagramPacket p) {
         mDatagramPacket = p;
     }
 

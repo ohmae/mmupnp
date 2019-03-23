@@ -28,11 +28,10 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("NonAsciiCharacters")
 @RunWith(JUnit4.class)
 public class SubscribeManagerTest {
     @Test
-    public void onEventReceived_has_no_service() throws Exception {
+    public void onEventReceived_has_no_service() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final TaskExecutors executors = mock(TaskExecutors.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
@@ -49,7 +48,7 @@ public class SubscribeManagerTest {
     }
 
     @Test
-    public void onEventReceived() throws Exception {
+    public void onEventReceived() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final TaskExecutors executors = new TaskExecutors();
         final NotifyEventListener listener = mock(NotifyEventListener.class);
@@ -72,7 +71,7 @@ public class SubscribeManagerTest {
     }
 
     @Test
-    public void initialize() throws Exception {
+    public void initialize() {
         final SubscribeHolder holder = mock(SubscribeHolder.class);
         final TaskExecutors executors = mock(TaskExecutors.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);
@@ -90,7 +89,7 @@ public class SubscribeManagerTest {
     }
 
     @Test
-    public void start() throws Exception {
+    public void start() {
         final EventReceiver receiver = mock(EventReceiver.class);
         final TaskExecutors executors = mock(TaskExecutors.class);
         final NotifyEventListener listener = mock(NotifyEventListener.class);

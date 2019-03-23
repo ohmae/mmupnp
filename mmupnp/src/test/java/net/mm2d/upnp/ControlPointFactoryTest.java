@@ -20,12 +20,12 @@ import java.util.Collections;
 @RunWith(JUnit4.class)
 public class ControlPointFactoryTest {
     @Test
-    public void create_引数無しでコール() throws Exception {
+    public void create_引数無しでコール() {
         ControlPointFactory.create();
     }
 
     @Test
-    public void create_インターフェース指定() throws Exception {
+    public void create_インターフェース指定() {
         ControlPointFactory.create(new Params()
                 .setInterfaces(NetworkUtils.getAvailableInet4Interfaces())
         );
@@ -35,7 +35,7 @@ public class ControlPointFactoryTest {
     }
 
     @Test
-    public void create_インターフェース選別() throws Exception {
+    public void create_インターフェース選別() {
         ControlPointFactory.create(new Params()
                 .setProtocol(Protocol.IP_V4_ONLY)
                 .setInterfaces(NetworkUtils.getNetworkInterfaceList())
@@ -51,7 +51,7 @@ public class ControlPointFactoryTest {
     }
 
     @Test
-    public void create_プロトコルスタックのみ指定() throws Exception {
+    public void create_プロトコルスタックのみ指定() {
         ControlPointFactory.create(new Params()
                 .setProtocol(Protocol.IP_V4_ONLY)
         );
@@ -64,7 +64,7 @@ public class ControlPointFactoryTest {
     }
 
     @Test
-    public void create_Params() throws Exception {
+    public void create_Params() {
         ControlPointFactory.create(new Params()
                 .setProtocol(Protocol.DEFAULT)
                 .setInterfaces(NetworkUtils.getNetworkInterfaceList())
