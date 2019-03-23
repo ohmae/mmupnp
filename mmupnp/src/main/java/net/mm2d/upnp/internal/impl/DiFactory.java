@@ -23,7 +23,6 @@ import net.mm2d.upnp.internal.server.SsdpSearchServerList;
 import net.mm2d.upnp.internal.thread.TaskExecutors;
 
 import java.net.NetworkInterface;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +70,7 @@ public class DiFactory {
     @Nonnull
     public SsdpSearchServerList createSsdpSearchServerList(
             @Nonnull final TaskExecutors executors,
-            @Nonnull final Collection<NetworkInterface> interfaces,
+            @Nonnull final Iterable<NetworkInterface> interfaces,
             @Nonnull final ResponseListener listener) {
         return new SsdpSearchServerList().init(executors, mProtocol, interfaces, listener);
     }
@@ -79,7 +78,7 @@ public class DiFactory {
     @Nonnull
     public SsdpNotifyReceiverList createSsdpNotifyReceiverList(
             @Nonnull final TaskExecutors executors,
-            @Nonnull final Collection<NetworkInterface> interfaces,
+            @Nonnull final Iterable<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
         return new SsdpNotifyReceiverList().init(executors, mProtocol, interfaces, listener);
     }

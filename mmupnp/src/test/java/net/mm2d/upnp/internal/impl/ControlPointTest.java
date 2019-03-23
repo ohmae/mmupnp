@@ -48,7 +48,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -150,7 +149,7 @@ public class ControlPointTest {
                         @Override
                         public SsdpSearchServerList createSsdpSearchServerList(
                                 @Nonnull final TaskExecutors taskExecutors,
-                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final Iterable<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
                             return list;
                         }
@@ -254,7 +253,7 @@ public class ControlPointTest {
                         @Override
                         public SsdpSearchServerList createSsdpSearchServerList(
                                 @Nonnull final TaskExecutors taskExecutors,
-                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final Iterable<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
                             return mSsdpSearchServerList;
                         }
@@ -263,7 +262,7 @@ public class ControlPointTest {
                         @Override
                         public SsdpNotifyReceiverList createSsdpNotifyReceiverList(
                                 @Nonnull final TaskExecutors taskExecutors,
-                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final Iterable<NetworkInterface> interfaces,
                                 @Nonnull final NotifyListener listener) {
                             return mSsdpNotifyReceiverList;
                         }
@@ -703,7 +702,7 @@ public class ControlPointTest {
                         @Override
                         public SsdpSearchServerList createSsdpSearchServerList(
                                 @Nonnull final TaskExecutors taskExecutors,
-                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final Iterable<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
                             mResponseListener = listener;
                             return mSsdpSearchServerList;
@@ -713,7 +712,7 @@ public class ControlPointTest {
                         @Override
                         public SsdpNotifyReceiverList createSsdpNotifyReceiverList(
                                 @Nonnull final TaskExecutors taskExecutors,
-                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final Iterable<NetworkInterface> interfaces,
                                 @Nonnull final NotifyListener listener) {
                             mNotifyListener = listener;
                             return mSsdpNotifyReceiverList;
@@ -782,7 +781,7 @@ public class ControlPointTest {
                         @Override
                         public SsdpSearchServerList createSsdpSearchServerList(
                                 @Nonnull final TaskExecutors taskExecutors,
-                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final Iterable<NetworkInterface> interfaces,
                                 @Nonnull final ResponseListener listener) {
                             return mock(SsdpSearchServerList.class);
                         }
@@ -791,7 +790,7 @@ public class ControlPointTest {
                         @Override
                         public SsdpNotifyReceiverList createSsdpNotifyReceiverList(
                                 @Nonnull final TaskExecutors taskExecutors,
-                                @Nonnull final Collection<NetworkInterface> interfaces,
+                                @Nonnull final Iterable<NetworkInterface> interfaces,
                                 @Nonnull final NotifyListener listener) {
                             return mock(SsdpNotifyReceiverList.class);
                         }

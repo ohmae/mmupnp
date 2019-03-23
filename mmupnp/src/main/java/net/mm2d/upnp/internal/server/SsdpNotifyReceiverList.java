@@ -14,7 +14,6 @@ import net.mm2d.upnp.util.NetworkUtils;
 
 import java.net.NetworkInterface;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -32,7 +31,7 @@ public class SsdpNotifyReceiverList {
     public SsdpNotifyReceiverList init(
             @Nonnull final TaskExecutors executors,
             @Nonnull final Protocol protocol,
-            @Nonnull final Collection<NetworkInterface> interfaces,
+            @Nonnull final Iterable<NetworkInterface> interfaces,
             @Nonnull final NotifyListener listener) {
         for (final NetworkInterface nif : interfaces) {
             switch (protocol) {

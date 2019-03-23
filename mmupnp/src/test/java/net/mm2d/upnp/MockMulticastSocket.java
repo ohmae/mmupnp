@@ -12,7 +12,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 
 public class MockMulticastSocket extends MulticastSocket {
     private DatagramPacket mDatagramPacket;
