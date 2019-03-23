@@ -289,17 +289,20 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
             return;
         }
         try {
-            mSocket = createMulticastSocket(mBindPort);
+            final MulticastSocket socket = createMulticastSocket(mBindPort);
+            mSocket = socket;
             if (mBindPort != 0) {
-                mSocket.joinGroup(getSsdpInetAddress());
+                socket.joinGroup(getSsdpInetAddress());
             }
             ready();
-            receiveLoop();
+            receiveLoop(socket);
         } catch (final IOException ignored) {
         } finally {
-            if (mBindPort != 0 && mSocket != null) {
+            final MulticastSocket socket = mSocket;
+            if (mBindPort != 0 && socket != null) {
                 try {
-                    mSocket.leaveGroup(getSsdpInetAddress());
+                    socket.leaveGroup(getSsdpInetAddress());
+                    socket.close();
                 } catch (final IOException ignored) {
                 }
             }
@@ -313,12 +316,12 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
      * @throws IOException 入出力処理で例外発生
      */
     // VisibleForTesting
-    void receiveLoop() throws IOException {
+    void receiveLoop(@Nonnull final MulticastSocket socket) throws IOException {
         final byte[] buf = new byte[1500];
         while (mFutureTask != null && !mFutureTask.isCancelled()) {
             try {
                 final DatagramPacket dp = new DatagramPacket(buf, buf.length);
-                mSocket.receive(dp);
+                socket.receive(dp);
                 if (mFutureTask == null || mFutureTask.isCancelled()) {
                     break;
                 }

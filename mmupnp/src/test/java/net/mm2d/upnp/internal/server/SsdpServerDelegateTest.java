@@ -253,7 +253,7 @@ public class SsdpServerDelegateTest {
         Thread.sleep(500);
         server.stop();
         Thread.sleep(100);
-        verify(server, times(1)).receiveLoop();
+        verify(server, times(1)).receiveLoop(socket);
 
         verify(socket, never()).joinGroup(ArgumentMatchers.any(InetAddress.class));
         verify(socket, never()).leaveGroup(ArgumentMatchers.any(InetAddress.class));
@@ -289,7 +289,7 @@ public class SsdpServerDelegateTest {
         server.stop();
         Thread.sleep(100);
 
-        verify(server, times(1)).receiveLoop();
+        verify(server, times(1)).receiveLoop(socket);
 
         verify(socket, times(1)).joinGroup(ArgumentMatchers.any(InetAddress.class));
         verify(socket, times(1)).leaveGroup(ArgumentMatchers.any(InetAddress.class));
