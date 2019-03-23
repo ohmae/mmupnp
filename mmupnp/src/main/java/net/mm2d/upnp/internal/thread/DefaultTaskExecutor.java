@@ -23,7 +23,7 @@ class DefaultTaskExecutor implements TaskExecutor {
     @Nullable
     private ExecutorService mExecutor;
 
-    private final boolean mIo;
+    private final boolean mAwaitTermination;
 
     DefaultTaskExecutor(@Nonnull final ExecutorService executor) {
         this(executor, false);
@@ -31,9 +31,9 @@ class DefaultTaskExecutor implements TaskExecutor {
 
     DefaultTaskExecutor(
             @Nonnull final ExecutorService executor,
-            final boolean io) {
+            final boolean awaitTermination) {
         mExecutor = executor;
-        mIo = io;
+        mAwaitTermination = awaitTermination;
     }
 
     @Override
@@ -56,7 +56,7 @@ class DefaultTaskExecutor implements TaskExecutor {
         if (executor == null || executor.isShutdown()) {
             return;
         }
-        if (!mIo) {
+        if (!mAwaitTermination) {
             executor.shutdownNow();
             mExecutor = null;
             return;
