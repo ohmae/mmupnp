@@ -43,8 +43,8 @@ public class DeviceHolderTest {
         final DeviceHolder holder = new DeviceHolder(mTaskExecutors, mock(ExpireListener.class));
         holder.start();
         Thread.sleep(1);
-        holder.shutdownRequest();
-        holder.shutdownRequest();
+        holder.stop();
+        holder.stop();
     }
 
     @Test
@@ -122,7 +122,7 @@ public class DeviceHolderTest {
         final ExpireListener expireListener = mock(ExpireListener.class);
         final DeviceHolder holder = new DeviceHolder(mTaskExecutors, expireListener);
 
-        holder.shutdownRequest();
+        holder.stop();
         holder.run();
     }
 
@@ -149,6 +149,6 @@ public class DeviceHolderTest {
 
         assertThat(holder.size(), is(0));
         verify(expireListener).onExpire(device1);
-        holder.shutdownRequest();
+        holder.stop();
     }
 }

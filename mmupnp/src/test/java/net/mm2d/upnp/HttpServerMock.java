@@ -63,7 +63,7 @@ public class HttpServerMock {
 
     void close() {
         if (mServerTask != null) {
-            mServerTask.shutdownRequest();
+            mServerTask.stop();
             mServerTask = null;
         }
     }
@@ -93,7 +93,7 @@ public class HttpServerMock {
             mThread.start();
         }
 
-        void shutdownRequest() {
+        void stop() {
             mShutdownRequest = true;
             if (mThread != null) {
                 mThread.interrupt();

@@ -70,7 +70,7 @@ public class DeviceHolder implements Runnable {
     /**
      * スレッドに割り込みをかけ終了させる。
      */
-    public void shutdownRequest() {
+    public void stop() {
         if (mFutureTask != null) {
             mFutureTask.cancel(false);
             mFutureTask = null;

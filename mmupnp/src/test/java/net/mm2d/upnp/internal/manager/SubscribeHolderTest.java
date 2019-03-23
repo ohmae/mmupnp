@@ -39,7 +39,7 @@ public class SubscribeHolderTest {
     public void start_shutdownRequest_でロックしない() {
         final SubscribeHolder subscribeHolder = new SubscribeHolder(mTaskExecutors);
         subscribeHolder.start();
-        subscribeHolder.shutdownRequest();
+        subscribeHolder.stop();
     }
 
     @Test
@@ -156,7 +156,7 @@ public class SubscribeHolderTest {
         assertThat(subscribeHolder.getService(id1), is(nullValue()));
         assertThat(subscribeHolder.getService(id2), is(nullValue()));
 
-        subscribeHolder.shutdownRequest();
+        subscribeHolder.stop();
     }
 
     @Test(timeout = 10000L)
@@ -179,7 +179,7 @@ public class SubscribeHolderTest {
         Thread.sleep(2000L);
         verify(service1, atLeastOnce()).renewSubscribeSync();
 
-        subscribeHolder.shutdownRequest();
+        subscribeHolder.stop();
     }
 
 
@@ -196,6 +196,6 @@ public class SubscribeHolderTest {
         Thread.sleep(3000L);
         assertThat(subscribeHolder.getService(id), is(nullValue()));
 
-        subscribeHolder.shutdownRequest();
+        subscribeHolder.stop();
     }
 }

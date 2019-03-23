@@ -90,7 +90,7 @@ public class SubscribeManager implements EventMessageListener {
     }
 
     public void terminate() {
-        mSubscribeHolder.shutdownRequest();
+        mSubscribeHolder.stop();
     }
 
     /**

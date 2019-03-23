@@ -290,7 +290,7 @@ public class EventReceiverTest {
     }
 
     @Test(timeout = 10000L)
-    public void close_shutdownRequest() throws Exception {
+    public void stop() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteArrayInputStream bais = new ByteArrayInputStream(mNotifyRequest);
         final EventReceiver receiver = new EventReceiver(mTaskExecutors, (sid, seq, properties) -> {

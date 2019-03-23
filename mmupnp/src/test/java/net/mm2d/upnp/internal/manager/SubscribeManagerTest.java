@@ -153,7 +153,7 @@ public class SubscribeManagerTest {
         };
         final SubscribeManager manager = new SubscribeManager(executors, listener, factory);
         manager.terminate();
-        verify(holder).shutdownRequest();
+        verify(holder).stop();
     }
 
     @Test

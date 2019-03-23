@@ -119,7 +119,7 @@ public class EventReceiver implements Runnable {
         IoUtils.closeQuietly(mServerSocket);
         synchronized (mClientList) {
             for (final ClientTask client : mClientList) {
-                client.shutdownRequest();
+                client.stop();
             }
             mClientList.clear();
         }
@@ -312,7 +312,7 @@ public class EventReceiver implements Runnable {
         /**
          * スレッドを終了させ、ソケットのクローズを行う。
          */
-        void shutdownRequest() {
+        void stop() {
             if (mFutureTask != null) {
                 mFutureTask.cancel(false);
                 mFutureTask = null;

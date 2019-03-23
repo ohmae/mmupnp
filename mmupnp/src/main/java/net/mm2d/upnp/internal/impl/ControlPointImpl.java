@@ -240,7 +240,7 @@ public class ControlPointImpl implements ControlPoint {
         }
         mTaskExecutors.terminate();
         mSubscribeManager.terminate();
-        mDeviceHolder.shutdownRequest();
+        mDeviceHolder.stop();
     }
 
     @Override

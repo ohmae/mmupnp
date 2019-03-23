@@ -56,7 +56,7 @@ public class SubscribeHolder implements Runnable {
     /**
      * スレッドの停止を要求する。
      */
-    void shutdownRequest() {
+    void stop() {
         if (mFutureTask != null) {
             mFutureTask.cancel(false);
             mFutureTask = null;
