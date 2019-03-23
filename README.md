@@ -62,7 +62,7 @@ see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
 ### Test release
 
 This library is currently under development of 2.0.0.
-Currently alpha version and undergoing destructive change.
+Currently beta version and undergoing destructive change.
 
 It is distributed in this maven repository.
 
@@ -73,7 +73,7 @@ repositories {
     }
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:2.0.0-alpha11'
+    implementation 'net.mm2d:mmupnp:2.0.0-beta1'
 }
 ```
 

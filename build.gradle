@@ -2,7 +2,7 @@ buildscript {
     def versionMajor = 2
     def versionMinor = 0
     def versionPatch = 0
-    def versionSuffix = "-alpha11"
+    def versionSuffix = "-beta1"
     ext {
         pj = [
                 versions : [
