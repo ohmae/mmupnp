@@ -302,10 +302,10 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
             if (mBindPort != 0 && socket != null) {
                 try {
                     socket.leaveGroup(getSsdpInetAddress());
-                    socket.close();
                 } catch (final IOException ignored) {
                 }
             }
+            IoUtils.closeQuietly(mSocket);
             mSocket = null;
         }
     }
