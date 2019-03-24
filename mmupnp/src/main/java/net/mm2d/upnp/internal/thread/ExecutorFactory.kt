@@ -45,8 +45,10 @@ internal object ExecutorFactory {
 
     private fun createServiceExecutor(prefix: String, priority: Int): ExecutorService {
         val factory = ExecutorThreadFactory(prefix, priority)
-        return ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                0L, TimeUnit.NANOSECONDS,
-                SynchronousQueue(), factory)
+        return ThreadPoolExecutor(
+            0, Integer.MAX_VALUE,
+            0L, TimeUnit.NANOSECONDS,
+            SynchronousQueue(), factory
+        )
     }
 }

@@ -318,8 +318,9 @@ interface Device {
      * @return タグの値
      */
     fun getValueWithNamespace(
-            namespace: String,
-            name: String): String?
+        namespace: String,
+        name: String
+    ): String?
 
     /**
      * 指定文字列とServiceIDが合致するサービスを返す。

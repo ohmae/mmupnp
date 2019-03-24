@@ -19,8 +19,8 @@ import kotlin.math.min
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class HttpMessageDelegate(
-        private val startLineDelegate: StartLineDelegate,
-        original: HttpMessageDelegate? = null
+    private val startLineDelegate: StartLineDelegate,
+    original: HttpMessageDelegate? = null
 ) : HttpMessage {
     internal interface StartLineDelegate {
         var version: String

@@ -20,22 +20,22 @@ class ActionTest {
     @Test(expected = IllegalStateException::class)
     fun build_ServiceをsetしていないとException() {
         ActionImpl.Builder()
-                .setName("name")
-                .build()
+            .setName("name")
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
     fun build_NameをsetしていないとException() {
         ActionImpl.Builder()
-                .setService(mockk(relaxed = true))
-                .build()
+            .setService(mockk(relaxed = true))
+            .build()
     }
 
     @Test
     fun addArgumentBuilder_setした値が取得できる() {
         val argumentBuilder: ArgumentImpl.Builder = mockk(relaxed = true)
         val builder = ActionImpl.Builder()
-                .addArgumentBuilder(argumentBuilder)
+            .addArgumentBuilder(argumentBuilder)
         val list = builder.getArgumentBuilderList()
         assertThat(list).hasSize(1)
         assertThat(list).contains(argumentBuilder)
@@ -46,9 +46,9 @@ class ActionTest {
         val service: ServiceImpl = mockk(relaxed = true)
         val name = "name"
         val action = ActionImpl.Builder()
-                .setService(service)
-                .setName(name)
-                .build()
+            .setService(service)
+            .setName(name)
+            .build()
         assertThat(action.service).isSameAs(service)
     }
 
@@ -57,9 +57,9 @@ class ActionTest {
         val service: ServiceImpl = mockk(relaxed = true)
         val name = "name"
         val action = ActionImpl.Builder()
-                .setService(service)
-                .setName(name)
-                .build()
+            .setService(service)
+            .setName(name)
+            .build()
         assertThat(action.name).isEqualTo(name)
     }
 
@@ -68,9 +68,9 @@ class ActionTest {
         val service: ServiceImpl = mockk(relaxed = true)
         val name = "name"
         val action = ActionImpl.Builder()
-                .setService(service)
-                .setName(name)
-                .build()
+            .setService(service)
+            .setName(name)
+            .build()
         assertThat(action.argumentList.size).isEqualTo(0)
     }
 
@@ -81,13 +81,15 @@ class ActionTest {
         val name = "name"
         val service: ServiceImpl = mockk(relaxed = true)
         val action = ActionImpl.Builder()
-                .setService(service)
-                .setName(name)
-                .addArgumentBuilder(ArgumentImpl.Builder()
-                        .setName(argumentName)
-                        .setDirection("in")
-                        .setRelatedStateVariable(stateVariable))
-                .build()
+            .setService(service)
+            .setName(name)
+            .addArgumentBuilder(
+                ArgumentImpl.Builder()
+                    .setName(argumentName)
+                    .setDirection("in")
+                    .setRelatedStateVariable(stateVariable)
+            )
+            .build()
 
         assertThat(action.argumentList.size).isEqualTo(1)
         val argument = action.argumentList[0]
@@ -103,13 +105,15 @@ class ActionTest {
         val name = "name"
         val service: ServiceImpl = mockk(relaxed = true)
         val action = ActionImpl.Builder()
-                .setService(service)
-                .setName(name)
-                .addArgumentBuilder(ArgumentImpl.Builder()
-                        .setName(argumentName)
-                        .setDirection("in")
-                        .setRelatedStateVariable(stateVariable))
-                .build()
+            .setService(service)
+            .setName(name)
+            .addArgumentBuilder(
+                ArgumentImpl.Builder()
+                    .setName(argumentName)
+                    .setDirection("in")
+                    .setRelatedStateVariable(stateVariable)
+            )
+            .build()
         val argument = action.findArgument(argumentName)
 
         assertThat(argument!!.name).isEqualTo(argumentName)
@@ -122,9 +126,9 @@ class ActionTest {
         val service: ServiceImpl = mockk(relaxed = true)
         val name = "name"
         val action = ActionImpl.Builder()
-                .setService(service)
-                .setName(name)
-                .build() as ActionImpl
+            .setService(service)
+            .setName(name)
+            .build() as ActionImpl
         val client = action.createHttpClient()
         assertThat(client.isKeepAlive).isEqualTo(false)
     }

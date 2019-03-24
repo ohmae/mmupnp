@@ -15,13 +15,14 @@ import net.mm2d.upnp.internal.server.EventReceiver
 import net.mm2d.upnp.internal.thread.TaskExecutors
 
 internal class SubscribeManager(
-        private val taskExecutors: TaskExecutors,
-        private val listeners: Set<NotifyEventListener>,
-        factory: DiFactory
+    private val taskExecutors: TaskExecutors,
+    private val listeners: Set<NotifyEventListener>,
+    factory: DiFactory
 ) {
     private val subscribeHolder: SubscribeHolder = factory.createSubscribeHolder(taskExecutors)
     private val eventReceiver: EventReceiver = factory.createEventReceiver(
-            taskExecutors, this::onEventReceived)
+        taskExecutors, this::onEventReceived
+    )
 
     /**
      * イベント通知を受け取るポートを返す。

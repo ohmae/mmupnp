@@ -139,7 +139,8 @@ class SsdpMessageDelegateTest {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
         val request = HttpRequest.create()
         request.readData(ByteArrayInputStream(data, 0, data.size))
-        val address = Inet6Address.getByAddress(null, InetAddress.getByName("fe80::a831:801b:8dc6:421f").address, scopeId)
+        val address =
+            Inet6Address.getByAddress(null, InetAddress.getByName("fe80::a831:801b:8dc6:421f").address, scopeId)
         val delegate = SsdpMessageDelegate(request, address)
 
         assertThat(delegate.scopeId).isEqualTo(scopeId)

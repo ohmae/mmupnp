@@ -11,13 +11,13 @@ import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
 
 internal class ExecutorThreadFactory(
-        namePrefix: String,
-        private val priority: Int
+    namePrefix: String,
+    private val priority: Int
 ) : ThreadFactory {
     private val namePrefix = "mmupnp-$namePrefix"
     private val threadNumber = AtomicInteger(1)
     private val threadGroup = System.getSecurityManager()?.threadGroup
-            ?: Thread.currentThread().threadGroup
+        ?: Thread.currentThread().threadGroup
 
     override fun newThread(runnable: Runnable): Thread {
         val threadName = namePrefix + threadNumber.getAndIncrement()

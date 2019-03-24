@@ -27,8 +27,8 @@ import javax.xml.transform.stream.StreamResult
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 open class UpnpNode(
-        userObject: Any,
-        allowsChildren: Boolean = true
+    userObject: Any,
+    allowsChildren: Boolean = true
 ) : DefaultMutableTreeNode(userObject, allowsChildren) {
     open fun getDetailXml(): String {
         return ""
@@ -44,7 +44,7 @@ open class UpnpNode(
                 it.isNamespaceAware = true
             }
             val doc = dbf.newDocumentBuilder()
-                    .parse(ByteArrayInputStream(xml.toByteArray(charset("utf-8"))))
+                .parse(ByteArrayInputStream(xml.toByteArray(charset("utf-8"))))
             val sw = StringWriter()
             TransformerFactory.newInstance().newTransformer().also {
                 it.setOutputProperty(OutputKeys.INDENT, "yes")

@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 internal class DefaultTaskExecutor(
-        executor: ExecutorService,
-        private val awaitTermination: Boolean = false
+    executor: ExecutorService,
+    private val awaitTermination: Boolean = false
 ) : TaskExecutor {
     private val executorReference = AtomicReference<ExecutorService?>(executor)
 

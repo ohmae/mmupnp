@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * という特徴のQueueが必要となる
  */
 internal class ThreadWorkQueue(
-        private val delegate: BlockingQueue<Runnable> = LinkedBlockingQueue()
+    private val delegate: BlockingQueue<Runnable> = LinkedBlockingQueue()
 ) : BlockingQueue<Runnable> by delegate, RejectedExecutionHandler {
     private val idleThreads = AtomicInteger(0)
 

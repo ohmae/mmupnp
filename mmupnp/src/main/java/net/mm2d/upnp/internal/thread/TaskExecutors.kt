@@ -10,8 +10,8 @@ package net.mm2d.upnp.internal.thread
 import net.mm2d.upnp.TaskExecutor
 
 internal class TaskExecutors(
-        callback: TaskExecutor? = null,
-        io: TaskExecutor? = null
+    callback: TaskExecutor? = null,
+    io: TaskExecutor? = null
 ) {
     private val callbackExecutor = callback ?: ExecutorFactory.createCallback()
     private val ioExecutor = io ?: ExecutorFactory.createIo()

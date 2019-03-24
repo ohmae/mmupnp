@@ -23,12 +23,12 @@ class IconBuilderTest {
         val depth = 24
         val url = "http://192.168.0.1/"
         val icon = IconImpl.Builder()
-                .setMimeType(mimeType)
-                .setWidth(width.toString())
-                .setHeight(height.toString())
-                .setDepth(depth.toString())
-                .setUrl(url)
-                .build()
+            .setMimeType(mimeType)
+            .setWidth(width.toString())
+            .setHeight(height.toString())
+            .setDepth(depth.toString())
+            .setUrl(url)
+            .build()
 
         assertThat(icon.mimeType).isEqualTo(mimeType)
         assertThat(icon.width).isEqualTo(width)
@@ -44,11 +44,11 @@ class IconBuilderTest {
         val depth = 24
         val url = "http://192.168.0.1/"
         IconImpl.Builder()
-                .setWidth(width.toString())
-                .setHeight(height.toString())
-                .setDepth(depth.toString())
-                .setUrl(url)
-                .build()
+            .setWidth(width.toString())
+            .setHeight(height.toString())
+            .setDepth(depth.toString())
+            .setUrl(url)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -58,12 +58,12 @@ class IconBuilderTest {
         val depth = 24
         val url = "http://192.168.0.1/"
         IconImpl.Builder()
-                .setMimeType(mimeType)
-                .setWidth("width")
-                .setHeight(height.toString())
-                .setDepth(depth.toString())
-                .setUrl(url)
-                .build()
+            .setMimeType(mimeType)
+            .setWidth("width")
+            .setHeight(height.toString())
+            .setDepth(depth.toString())
+            .setUrl(url)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -73,12 +73,12 @@ class IconBuilderTest {
         val depth = 24
         val url = "http://192.168.0.1/"
         IconImpl.Builder()
-                .setMimeType(mimeType)
-                .setWidth(width.toString())
-                .setHeight("height")
-                .setDepth(depth.toString())
-                .setUrl(url)
-                .build()
+            .setMimeType(mimeType)
+            .setWidth(width.toString())
+            .setHeight("height")
+            .setDepth(depth.toString())
+            .setUrl(url)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -88,12 +88,12 @@ class IconBuilderTest {
         val width = 300
         val url = "http://192.168.0.1/"
         IconImpl.Builder()
-                .setMimeType(mimeType)
-                .setWidth(width.toString())
-                .setHeight(height.toString())
-                .setDepth("depth")
-                .setUrl(url)
-                .build()
+            .setMimeType(mimeType)
+            .setWidth(width.toString())
+            .setHeight(height.toString())
+            .setDepth("depth")
+            .setUrl(url)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -103,10 +103,10 @@ class IconBuilderTest {
         val width = 300
         val depth = 24
         IconImpl.Builder()
-                .setMimeType(mimeType)
-                .setWidth(width.toString())
-                .setHeight(height.toString())
-                .setDepth(depth.toString())
-                .build()
+            .setMimeType(mimeType)
+            .setWidth(width.toString())
+            .setHeight(height.toString())
+            .setDepth(depth.toString())
+            .build()
     }
 }

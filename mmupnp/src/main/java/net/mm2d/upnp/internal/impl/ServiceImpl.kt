@@ -23,16 +23,16 @@ import java.util.concurrent.TimeUnit
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class ServiceImpl(
-        override val device: DeviceImpl,
-        private val subscribeManager: SubscribeManager,
-        override val description: String,
-        override val serviceType: String,
-        override val serviceId: String,
-        override val scpdUrl: String,
-        override val controlUrl: String,
-        override val eventSubUrl: String,
-        actionBuilderList: List<ActionImpl.Builder>,
-        stateVariables: List<StateVariable>
+    override val device: DeviceImpl,
+    private val subscribeManager: SubscribeManager,
+    override val description: String,
+    override val serviceType: String,
+    override val serviceId: String,
+    override val scpdUrl: String,
+    override val controlUrl: String,
+    override val eventSubUrl: String,
+    actionBuilderList: List<ActionImpl.Builder>,
+    stateVariables: List<StateVariable>
 ) : Service {
     private val actionMap: Map<String, Action>
     private val stateVariableMap = stateVariables.map { it.name to it }.toMap()
@@ -239,9 +239,10 @@ internal class ServiceImpl(
         private const val SECOND_PREFIX = "second-"
 
         private fun buildActionMap(
-                service: ServiceImpl,
-                variableMap: Map<String, StateVariable>,
-                builderList: List<ActionImpl.Builder>): Map<String, Action> {
+            service: ServiceImpl,
+            variableMap: Map<String, StateVariable>,
+            builderList: List<ActionImpl.Builder>
+        ): Map<String, Action> {
             if (builderList.isEmpty()) {
                 return emptyMap()
             }
@@ -252,19 +253,22 @@ internal class ServiceImpl(
                 }
             }
             return builderList
-                    .map { it.build() }
-                    .map { it.name to it }
-                    .toMap()
+                .map { it.build() }
+                .map { it.name to it }
+                .toMap()
         }
 
-        private fun ArgumentImpl.Builder.setRelatedStateVariable(service: Service, variableMap: Map<String, StateVariable>) {
+        private fun ArgumentImpl.Builder.setRelatedStateVariable(
+            service: Service,
+            variableMap: Map<String, StateVariable>
+        ) {
             val name = getRelatedStateVariableName()
-                    ?: throw IllegalStateException("relatedStateVariable name is null")
+                ?: throw IllegalStateException("relatedStateVariable name is null")
             val variable = variableMap[name] ?: {
                 // for AN-WLTU1
                 val trimmedName = name.trim { it <= ' ' }
                 val trimmedVariable = variableMap[trimmedName]
-                        ?: throw IllegalStateException("There is no StateVariable $name")
+                    ?: throw IllegalStateException("There is no StateVariable $name")
                 setRelatedStateVariableName(trimmedName)
                 Logger.w { "Invalid description. relatedStateVariable name has unnecessary blanks [$name] on ${service.serviceId}" }
                 trimmedVariable
@@ -284,8 +288,8 @@ internal class ServiceImpl(
                 return DEFAULT_SUBSCRIPTION_TIMEOUT
             }
             val secondSection = timeout.substring(pos + SECOND_PREFIX.length)
-                    .toLongOrNull()
-                    ?: return DEFAULT_SUBSCRIPTION_TIMEOUT
+                .toLongOrNull()
+                ?: return DEFAULT_SUBSCRIPTION_TIMEOUT
             return TimeUnit.SECONDS.toMillis(secondSection)
         }
     }
@@ -314,31 +318,31 @@ internal class ServiceImpl(
         @Throws(IllegalStateException::class)
         fun build(): Service {
             val device = device
-                    ?: throw IllegalStateException("device must be set.")
+                ?: throw IllegalStateException("device must be set.")
             val subscribeManager = subscribeManager
-                    ?: throw IllegalStateException("subscribeManager must be set.")
+                ?: throw IllegalStateException("subscribeManager must be set.")
             val serviceType = serviceType
-                    ?: throw IllegalStateException("serviceType must be set.")
+                ?: throw IllegalStateException("serviceType must be set.")
             val serviceId = serviceId
-                    ?: throw IllegalStateException("serviceId must be set.")
+                ?: throw IllegalStateException("serviceId must be set.")
             val scpdUrl = scpdUrl
-                    ?: throw IllegalStateException("SCPDURL must be set.")
+                ?: throw IllegalStateException("SCPDURL must be set.")
             val controlUrl = controlUrl
-                    ?: throw IllegalStateException("controlURL must be set.")
+                ?: throw IllegalStateException("controlURL must be set.")
             val eventSubUrl = eventSubUrl
-                    ?: throw IllegalStateException("eventSubURL must be set.")
+                ?: throw IllegalStateException("eventSubURL must be set.")
             val description = description ?: ""
             return ServiceImpl(
-                    device = device,
-                    subscribeManager = subscribeManager,
-                    serviceType = serviceType,
-                    serviceId = serviceId,
-                    scpdUrl = scpdUrl,
-                    controlUrl = controlUrl,
-                    eventSubUrl = eventSubUrl,
-                    description = description,
-                    actionBuilderList = actionBuilderList,
-                    stateVariables = stateVariables
+                device = device,
+                subscribeManager = subscribeManager,
+                serviceType = serviceType,
+                serviceId = serviceId,
+                scpdUrl = scpdUrl,
+                controlUrl = controlUrl,
+                eventSubUrl = eventSubUrl,
+                description = description,
+                actionBuilderList = actionBuilderList,
+                stateVariables = stateVariables
             )
         }
 

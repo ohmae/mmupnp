@@ -22,14 +22,14 @@ import java.net.URL
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 class HttpRequest internal constructor(
-        private val startLineDelegate: StartLine,
-        private val delegate: HttpMessageDelegate
+    private val startLineDelegate: StartLine,
+    private val delegate: HttpMessageDelegate
 ) : HttpMessage by delegate {
 
     internal data class StartLine(
-            var method: String = Http.GET,
-            var uri: String = "",
-            override var version: String = Http.DEFAULT_HTTP_VERSION
+        var method: String = Http.GET,
+        var uri: String = "",
+        override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
         override var startLine: String
             get() = "$method $uri $version"

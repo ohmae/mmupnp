@@ -256,7 +256,7 @@ class NetworkUtilsTest {
             if (pos >= 16) {
                 val address = InetAddress.getByAddress(bin) as Inet6Address
                 assertThat(InetAddress.getByName(address.toNormalizedString()))
-                        .isEqualTo(address)
+                    .isEqualTo(address)
                 return
             }
             val sections = intArrayOf(0, 0x1, 0x11, 0x111, 0x1111)
@@ -270,17 +270,17 @@ class NetworkUtilsTest {
         @Test
         fun toAddressString() {
             assertThat(InetSocketAddress("192.168.0.1", 80).toAddressString())
-                    .isEqualTo("192.168.0.1")
+                .isEqualTo("192.168.0.1")
             assertThat(InetSocketAddress("192.168.0.1", 0).toAddressString())
-                    .isEqualTo("192.168.0.1")
+                .isEqualTo("192.168.0.1")
             assertThat(InetSocketAddress("192.168.0.1", 8080).toAddressString())
-                    .isEqualTo("192.168.0.1:8080")
+                .isEqualTo("192.168.0.1:8080")
             assertThat(InetSocketAddress("2001:db8:1::1", 80).toAddressString())
-                    .isEqualTo("[2001:db8:1::1]")
+                .isEqualTo("[2001:db8:1::1]")
             assertThat(InetSocketAddress("2001:db8:1::1", 0).toAddressString())
-                    .isEqualTo("[2001:db8:1::1]")
+                .isEqualTo("[2001:db8:1::1]")
             assertThat(InetSocketAddress("2001:db8:1::1", 8080).toAddressString())
-                    .isEqualTo("[2001:db8:1::1]:8080")
+                .isEqualTo("[2001:db8:1::1]:8080")
         }
     }
 }

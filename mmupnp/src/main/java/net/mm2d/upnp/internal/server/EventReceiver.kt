@@ -38,8 +38,8 @@ import kotlin.concurrent.withLock
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class EventReceiver(
-        private val taskExecutors: TaskExecutors,
-        private val listener: ((sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean)?
+    private val taskExecutors: TaskExecutors,
+    private val listener: ((sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean)?
 ) : Runnable {
     private var serverSocket: ServerSocket? = null
     private val clientList: MutableList<ClientTask> = Collections.synchronizedList(LinkedList())
@@ -169,8 +169,8 @@ internal class EventReceiver(
 
     // VisibleForTesting
     internal class ClientTask(
-            private val eventReceiver: EventReceiver,
-            private val socket: Socket
+        private val eventReceiver: EventReceiver,
+        private val socket: Socket
     ) : Runnable {
         private var futureTask: FutureTask<Nothing?>? = null
 

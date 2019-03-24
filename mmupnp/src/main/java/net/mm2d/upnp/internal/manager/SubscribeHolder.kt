@@ -24,7 +24,7 @@ import kotlin.math.max
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SubscribeHolder(
-        private val taskExecutors: TaskExecutors
+    private val taskExecutors: TaskExecutors
 ) : Runnable {
     private var futureTask: FutureTask<*>? = null
     private val lock = ReentrantLock()
@@ -86,14 +86,14 @@ internal class SubscribeHolder(
     fun renew(service: Service, timeout: Long) {
         lock.withLock {
             subscriptionMap[service.subscriptionId]
-                    ?.renew(timeout)
+                ?.renew(timeout)
         }
     }
 
     fun setKeepRenew(service: Service, keep: Boolean) {
         lock.withLock {
             subscriptionMap[service.subscriptionId]
-                    ?.setKeepRenew(keep)
+                ?.setKeepRenew(keep)
             condition.signalAll()
         }
     }
@@ -189,13 +189,13 @@ internal class SubscribeHolder(
         lock.withLock {
             val now = System.currentTimeMillis()
             subscriptionMap.values
-                    .toList()
-                    .filter { it.isExpired(now) }
-                    .map { it.getService() }
-                    .forEach {
-                        remove(it)
-                        it.unsubscribeSync()
-                    }
+                .toList()
+                .filter { it.isExpired(now) }
+                .map { it.getService() }
+                .forEach {
+                    remove(it)
+                    it.unsubscribeSync()
+                }
         }
     }
 
@@ -223,7 +223,7 @@ internal class SubscribeHolder(
      */
     private fun findMostRecentTime(): Long {
         return subscriptionMap.values.minBy { it.getNextScanTime() }
-                ?.getNextScanTime() ?: 0L
+            ?.getNextScanTime() ?: 0L
     }
 
     companion object {

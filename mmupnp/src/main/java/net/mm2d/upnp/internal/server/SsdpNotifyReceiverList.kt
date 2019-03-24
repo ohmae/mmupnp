@@ -20,25 +20,25 @@ import java.net.NetworkInterface
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SsdpNotifyReceiverList(
-        taskExecutors: TaskExecutors,
-        protocol: Protocol,
-        interfaces: Iterable<NetworkInterface>,
-        listener: (SsdpMessage) -> Unit
+    taskExecutors: TaskExecutors,
+    protocol: Protocol,
+    interfaces: Iterable<NetworkInterface>,
+    listener: (SsdpMessage) -> Unit
 ) {
     private val list: List<SsdpNotifyReceiver> = when (protocol) {
         Protocol.IP_V4_ONLY -> {
             interfaces.filter { it.isAvailableInet4Interface() }
-                    .map { newReceiver(taskExecutors, Address.IP_V4, it, listener) }
+                .map { newReceiver(taskExecutors, Address.IP_V4, it, listener) }
         }
         Protocol.IP_V6_ONLY -> {
             interfaces.filter { it.isAvailableInet6Interface() }
-                    .map { newReceiver(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
+                .map { newReceiver(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
         }
         Protocol.DUAL_STACK -> {
             val v4 = interfaces.filter { it.isAvailableInet4Interface() }
-                    .map { newReceiver(taskExecutors, Address.IP_V4, it, listener) }
+                .map { newReceiver(taskExecutors, Address.IP_V4, it, listener) }
             val v6 = interfaces.filter { it.isAvailableInet6Interface() }
-                    .map { newReceiver(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
+                .map { newReceiver(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
             v4.toMutableList().also { it.addAll(v6) }
         }
     }
@@ -58,10 +58,10 @@ internal class SsdpNotifyReceiverList(
     companion object {
         // VisibleForTesting
         fun newReceiver(
-                taskExecutors: TaskExecutors,
-                address: Address,
-                nif: NetworkInterface,
-                listener: (SsdpMessage) -> Unit
+            taskExecutors: TaskExecutors,
+            address: Address,
+            nif: NetworkInterface,
+            listener: (SsdpMessage) -> Unit
         ): SsdpNotifyReceiver {
             return SsdpNotifyReceiver(taskExecutors, address, nif).also {
                 it.setNotifyListener(listener)

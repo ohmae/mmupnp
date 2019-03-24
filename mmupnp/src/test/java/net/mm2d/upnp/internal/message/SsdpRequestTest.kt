@@ -122,12 +122,12 @@ internal object SsdpRequestTest {
             @DataPoints
             @JvmField
             val message: Array<SsdpRequest> = arrayOf(
-                    makeFromResource("ssdp-notify-alive0.bin"),
-                    makeFromResource("ssdp-notify-alive1.bin"),
-                    makeFromResource("ssdp-notify-alive2.bin"),
-                    makeFromResource("ssdp-notify-byebye0.bin"),
-                    makeFromResource("ssdp-notify-byebye1.bin"),
-                    makeFromResource("ssdp-notify-byebye2.bin")
+                makeFromResource("ssdp-notify-alive0.bin"),
+                makeFromResource("ssdp-notify-alive1.bin"),
+                makeFromResource("ssdp-notify-alive2.bin"),
+                makeFromResource("ssdp-notify-byebye0.bin"),
+                makeFromResource("ssdp-notify-byebye1.bin"),
+                makeFromResource("ssdp-notify-byebye2.bin")
             )
         }
     }
@@ -153,9 +153,9 @@ internal object SsdpRequestTest {
             @DataPoints
             @JvmField
             val message: Array<SsdpRequest> = arrayOf(
-                    makeFromResource("ssdp-notify-alive0.bin"),
-                    makeFromResource("ssdp-notify-alive1.bin"),
-                    makeFromResource("ssdp-notify-alive2.bin")
+                makeFromResource("ssdp-notify-alive0.bin"),
+                makeFromResource("ssdp-notify-alive1.bin"),
+                makeFromResource("ssdp-notify-alive2.bin")
             )
         }
     }
@@ -171,9 +171,9 @@ internal object SsdpRequestTest {
             @DataPoints
             @JvmField
             val message: Array<SsdpRequest> = arrayOf(
-                    makeFromResource("ssdp-notify-byebye0.bin"),
-                    makeFromResource("ssdp-notify-byebye1.bin"),
-                    makeFromResource("ssdp-notify-byebye2.bin")
+                makeFromResource("ssdp-notify-byebye0.bin"),
+                makeFromResource("ssdp-notify-byebye1.bin"),
+                makeFromResource("ssdp-notify-byebye2.bin")
             )
         }
     }

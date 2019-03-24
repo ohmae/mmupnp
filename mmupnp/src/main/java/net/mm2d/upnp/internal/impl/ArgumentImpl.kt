@@ -18,9 +18,9 @@ import net.mm2d.upnp.internal.parser.ServiceParser
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class ArgumentImpl(
-        override val name: String,
-        override val isInputDirection: Boolean,
-        override val relatedStateVariable: StateVariable
+    override val name: String,
+    override val isInputDirection: Boolean,
+    override val relatedStateVariable: StateVariable
 ) : Argument {
 
     /**
@@ -45,13 +45,13 @@ internal class ArgumentImpl(
         @Throws(IllegalStateException::class)
         fun build(): Argument {
             val name = name
-                    ?: throw IllegalStateException("name must be set.")
+                ?: throw IllegalStateException("name must be set.")
             val relatedStateVariable = relatedStateVariable
-                    ?: throw IllegalStateException("related state variable must be set.")
+                ?: throw IllegalStateException("related state variable must be set.")
             return ArgumentImpl(
-                    name = name,
-                    isInputDirection = inputDirection,
-                    relatedStateVariable = relatedStateVariable
+                name = name,
+                isInputDirection = inputDirection,
+                relatedStateVariable = relatedStateVariable
             )
         }
 

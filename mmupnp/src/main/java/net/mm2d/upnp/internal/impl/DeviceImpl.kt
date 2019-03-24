@@ -20,29 +20,29 @@ import java.net.URL
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class DeviceImpl private constructor(
-        override val controlPoint: ControlPointImpl,
-        private val subscribeManager: SubscribeManager,
-        override val parent: Device?,
-        private var _ssdpMessage: SsdpMessage,
-        private var _location: String,
-        override val description: String,
-        override val udn: String,
-        override val upc: String?,
-        override val deviceType: String,
-        override val friendlyName: String,
-        override val manufacture: String?,
-        override val manufactureUrl: String?,
-        override val modelName: String,
-        override val modelUrl: String?,
-        override val modelDescription: String?,
-        override val modelNumber: String?,
-        override val serialNumber: String?,
-        override val presentationUrl: String?,
-        private val urlBase: String?,
-        private val tagMap: Map<String, Map<String, String>>,
-        override val iconList: List<Icon>,
-        private val serviceBuilderList: List<ServiceImpl.Builder>,
-        private val deviceBuilderList: List<DeviceImpl.Builder>
+    override val controlPoint: ControlPointImpl,
+    private val subscribeManager: SubscribeManager,
+    override val parent: Device?,
+    private var _ssdpMessage: SsdpMessage,
+    private var _location: String,
+    override val description: String,
+    override val udn: String,
+    override val upc: String?,
+    override val deviceType: String,
+    override val friendlyName: String,
+    override val manufacture: String?,
+    override val manufactureUrl: String?,
+    override val modelName: String,
+    override val modelUrl: String?,
+    override val modelDescription: String?,
+    override val modelNumber: String?,
+    override val serialNumber: String?,
+    override val presentationUrl: String?,
+    private val urlBase: String?,
+    private val tagMap: Map<String, Map<String, String>>,
+    override val iconList: List<Icon>,
+    private val serviceBuilderList: List<ServiceImpl.Builder>,
+    private val deviceBuilderList: List<DeviceImpl.Builder>
 ) : Device {
     override val ssdpMessage: SsdpMessage
         get() = _ssdpMessage
@@ -163,9 +163,9 @@ internal class DeviceImpl private constructor(
      * @param ssdpMessage      SSDPパケット
      */
     internal class Builder(
-            private val controlPoint: ControlPointImpl,
-            private val subscribeManager: SubscribeManager,
-            private var ssdpMessage: SsdpMessage
+        private val controlPoint: ControlPointImpl,
+        private val subscribeManager: SubscribeManager,
+        private var ssdpMessage: SsdpMessage
     ) {
         private var location: String
         private var description: String? = null
@@ -218,29 +218,29 @@ internal class DeviceImpl private constructor(
                 }
             }
             return DeviceImpl(
-                    controlPoint = controlPoint,
-                    subscribeManager = subscribeManager,
-                    parent = parent,
-                    _ssdpMessage = ssdpMessage,
-                    _location = location,
-                    description = description,
-                    udn = udn,
-                    upc = upc,
-                    deviceType = deviceType,
-                    friendlyName = friendlyName,
-                    manufacture = manufacture,
-                    manufactureUrl = manufactureUrl,
-                    modelName = modelName,
-                    modelUrl = modelUrl,
-                    modelDescription = modelDescription,
-                    modelNumber = modelNumber,
-                    serialNumber = serialNumber,
-                    presentationUrl = presentationUrl,
-                    urlBase = urlBase,
-                    tagMap = tagMap,
-                    iconList = iconList,
-                    serviceBuilderList = serviceBuilderList,
-                    deviceBuilderList = deviceBuilderList
+                controlPoint = controlPoint,
+                subscribeManager = subscribeManager,
+                parent = parent,
+                _ssdpMessage = ssdpMessage,
+                _location = location,
+                description = description,
+                udn = udn,
+                upc = upc,
+                deviceType = deviceType,
+                friendlyName = friendlyName,
+                manufacture = manufacture,
+                manufactureUrl = manufactureUrl,
+                modelName = modelName,
+                modelUrl = modelUrl,
+                modelDescription = modelDescription,
+                modelNumber = modelNumber,
+                serialNumber = serialNumber,
+                presentationUrl = presentationUrl,
+                urlBase = urlBase,
+                tagMap = tagMap,
+                iconList = iconList,
+                serviceBuilderList = serviceBuilderList,
+                deviceBuilderList = deviceBuilderList
             )
         }
 
@@ -523,9 +523,9 @@ internal class DeviceImpl private constructor(
 
         fun toDumpString(): String {
             val sb = StringBuilder()
-                    .append("DeviceBuilder")
-                    .append("\nSSDP:").append(ssdpMessage)
-                    .append("\nDESCRIPTION:").append(description)
+                .append("DeviceBuilder")
+                .append("\nSSDP:").append(ssdpMessage)
+                .append("\nDESCRIPTION:").append(description)
             if (serviceBuilderList.size != 0) {
                 sb.append("\n")
                 serviceBuilderList.forEach {

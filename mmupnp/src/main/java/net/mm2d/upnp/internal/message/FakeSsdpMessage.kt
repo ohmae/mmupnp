@@ -18,9 +18,9 @@ import java.net.InetAddress
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class FakeSsdpMessage(
-        override val location: String,
-        private var _uuid: String = "",
-        override val isPinned: Boolean = true
+    override val location: String,
+    private var _uuid: String = "",
+    override val isPinned: Boolean = true
 ) : SsdpMessage {
     override var localAddress: InetAddress? = null
     override val scopeId: Int = 0

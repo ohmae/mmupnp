@@ -19,16 +19,16 @@ class StateVariableTest {
     fun build_Nameを指定していなければException() {
         val dataType = "ui4"
         StateVariableImpl.Builder()
-                .setDataType(dataType)
-                .build()
+            .setDataType(dataType)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
     fun build_DataTypeを指定していなければException() {
         val name = "name"
         StateVariableImpl.Builder()
-                .setName(name)
-                .build()
+            .setName(name)
+            .build()
     }
 
     @Test
@@ -36,9 +36,9 @@ class StateVariableTest {
         val name = "name"
         val dataType = "ui4"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .build()
         assertThat(stateVariable.name).isEqualTo(name)
     }
 
@@ -47,9 +47,9 @@ class StateVariableTest {
         val name = "name"
         val dataType = "ui4"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .build()
         assertThat(stateVariable.dataType).isEqualTo(dataType)
     }
 
@@ -58,10 +58,10 @@ class StateVariableTest {
         val name = "name"
         val dataType = "ui4"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .setSendEvents("yes")
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .setSendEvents("yes")
+            .build()
         assertThat(stateVariable.isSendEvents).isTrue()
     }
 
@@ -70,10 +70,10 @@ class StateVariableTest {
         val name = "name"
         val dataType = "ui4"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .setMulticast("yes")
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .setMulticast("yes")
+            .build()
         assertThat(stateVariable.isMulticast).isTrue()
     }
 
@@ -83,10 +83,10 @@ class StateVariableTest {
         val dataType = "ui4"
         val value = "1"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .addAllowedValue(value)
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .addAllowedValue(value)
+            .build()
         assertThat(stateVariable.allowedValueList).contains(value)
     }
 
@@ -96,10 +96,10 @@ class StateVariableTest {
         val dataType = "ui4"
         val value = "1"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .setDefaultValue(value)
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .setDefaultValue(value)
+            .build()
         assertThat(stateVariable.defaultValue).isEqualTo(value)
     }
 
@@ -109,10 +109,10 @@ class StateVariableTest {
         val dataType = "ui4"
         val value = "1"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .setMinimum(value)
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .setMinimum(value)
+            .build()
         assertThat(stateVariable.minimum).isEqualTo(value)
     }
 
@@ -122,10 +122,10 @@ class StateVariableTest {
         val dataType = "ui4"
         val value = "1"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .setMaximum(value)
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .setMaximum(value)
+            .build()
         assertThat(stateVariable.maximum).isEqualTo(value)
     }
 
@@ -135,10 +135,10 @@ class StateVariableTest {
         val dataType = "ui4"
         val value = "1"
         val stateVariable = StateVariableImpl.Builder()
-                .setName(name)
-                .setDataType(dataType)
-                .setStep(value)
-                .build()
+            .setName(name)
+            .setDataType(dataType)
+            .setStep(value)
+            .build()
         assertThat(stateVariable.step).isEqualTo(value)
     }
 }

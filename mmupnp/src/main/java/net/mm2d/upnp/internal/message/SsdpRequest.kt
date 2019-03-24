@@ -20,8 +20,8 @@ import java.net.InetAddress
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SsdpRequest(
-        val message: HttpRequest,
-        private val delegate: SsdpMessageDelegate
+    val message: HttpRequest,
+    private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
     /**
      * リクエストメソッド

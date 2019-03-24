@@ -24,14 +24,14 @@ import java.net.NetworkInterface
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SsdpSearchServer(
-        private val delegate: SsdpServerDelegate
+    private val delegate: SsdpServerDelegate
 ) : SsdpServer by delegate {
     private var listener: ((SsdpMessage) -> Unit)? = null
 
     constructor(
-            taskExecutors: TaskExecutors,
-            address: Address,
-            ni: NetworkInterface
+        taskExecutors: TaskExecutors,
+        address: Address,
+        ni: NetworkInterface
     ) : this(SsdpServerDelegate(taskExecutors, address, ni)) {
         delegate.setReceiver { sourceAddress, data, length -> onReceive(sourceAddress, data, length) }
     }

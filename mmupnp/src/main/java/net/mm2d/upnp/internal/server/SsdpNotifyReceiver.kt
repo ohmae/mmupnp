@@ -20,7 +20,7 @@ import java.net.*
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SsdpNotifyReceiver(
-        private val delegate: SsdpServerDelegate
+    private val delegate: SsdpServerDelegate
 ) : SsdpServer by delegate {
     private var listener: ((SsdpMessage) -> Unit)? = null
     private var segmentCheckEnabled: Boolean = false
@@ -34,9 +34,9 @@ internal class SsdpNotifyReceiver(
      * @param ni 使用するインターフェース
      */
     constructor(
-            taskExecutors: TaskExecutors,
-            address: Address,
-            ni: NetworkInterface
+        taskExecutors: TaskExecutors,
+        address: Address,
+        ni: NetworkInterface
     ) : this(SsdpServerDelegate(taskExecutors, address, ni, SsdpServer.SSDP_PORT)) {
         delegate.setReceiver { sourceAddress, data, length ->
             onReceive(sourceAddress, data, length)
@@ -71,7 +71,11 @@ internal class SsdpNotifyReceiver(
                 "receive ssdp notify from $sourceAddress in ${delegate.getLocalAddress()}:\n$message"
             }
             // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
-            if (message.nts != SsdpMessage.SSDP_BYEBYE && SsdpServerDelegate.isInvalidLocation(message, sourceAddress)) {
+            if (message.nts != SsdpMessage.SSDP_BYEBYE && SsdpServerDelegate.isInvalidLocation(
+                    message,
+                    sourceAddress
+                )
+            ) {
                 return
             }
             listener?.invoke(message)
@@ -94,8 +98,9 @@ internal class SsdpNotifyReceiver(
         // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
         // 受け取っても無駄なので破棄する。
         if (segmentCheckEnabled
-                && delegate.address == Address.IP_V4
-                && invalidSegment(interfaceAddress, sourceAddress)) {
+            && delegate.address == Address.IP_V4
+            && invalidSegment(interfaceAddress, sourceAddress)
+        ) {
             Logger.w { "Invalid segment:$sourceAddress $interfaceAddress" }
             return true
         }

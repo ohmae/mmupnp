@@ -288,14 +288,16 @@ class EventReceiverTest {
     @Test
     fun parsePropertyPairs_rootがpropertysetでない場合リスト() {
         val request = HttpRequest.create()
-        request.setBody("<e:property xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
-                "<e:property>\n" +
-                "<SystemUpdateID>0</SystemUpdateID>\n" +
-                "</e:property>\n" +
-                "<e:property>\n" +
-                "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
-                "</e:property>\n" +
-                "</e:property>", true)
+        request.setBody(
+            "<e:property xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                    "<e:property>\n" +
+                    "<SystemUpdateID>0</SystemUpdateID>\n" +
+                    "</e:property>\n" +
+                    "<e:property>\n" +
+                    "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                    "</e:property>\n" +
+                    "</e:property>", true
+        )
 
         assertThat(EventReceiver.parsePropertyPairs(request)).isEmpty()
     }
@@ -303,14 +305,16 @@ class EventReceiverTest {
     @Test
     fun parsePropertyPairs_property以外の要素は無視() {
         val request = HttpRequest.create()
-        request.setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
-                "<e:property>\n" +
-                "<SystemUpdateID>0</SystemUpdateID>\n" +
-                "</e:property>\n" +
-                "<e:proper>\n" +
-                "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
-                "</e:proper>\n" +
-                "</e:propertyset>", true)
+        request.setBody(
+            "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                    "<e:property>\n" +
+                    "<SystemUpdateID>0</SystemUpdateID>\n" +
+                    "</e:property>\n" +
+                    "<e:proper>\n" +
+                    "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                    "</e:proper>\n" +
+                    "</e:propertyset>", true
+        )
 
         assertThat(EventReceiver.parsePropertyPairs(request)).hasSize(1)
     }
@@ -318,14 +322,16 @@ class EventReceiverTest {
     @Test
     fun parsePropertyPairs_xml異常() {
         val request = HttpRequest.create()
-        request.setBody("<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
-                "<e:property>\n" +
-                "<>0</>\n" +
-                "</e:property>\n" +
-                "<e:property>\n" +
-                "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
-                "</e:property>\n" +
-                "</e:propertyset>", true)
+        request.setBody(
+            "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n" +
+                    "<e:property>\n" +
+                    "<>0</>\n" +
+                    "</e:property>\n" +
+                    "<e:property>\n" +
+                    "<ContainerUpdateIDs></ContainerUpdateIDs>\n" +
+                    "</e:property>\n" +
+                    "</e:propertyset>", true
+        )
 
         assertThat(EventReceiver.parsePropertyPairs(request)).isEmpty()
     }

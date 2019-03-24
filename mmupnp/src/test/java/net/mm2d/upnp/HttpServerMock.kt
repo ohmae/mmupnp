@@ -46,7 +46,7 @@ class HttpServerMock {
     }
 
     private class ServerTask(
-            private val serverSocket: ServerSocket
+        private val serverSocket: ServerSocket
     ) : Runnable {
         @Volatile
         private var shutdownRequest = false
@@ -103,8 +103,8 @@ class HttpServerMock {
     }
 
     private class ClientTask(
-            private val server: ServerTask,
-            private val socket: Socket
+        private val server: ServerTask,
+        private val socket: Socket
     ) : Runnable {
         private var thread: Thread? = null
 

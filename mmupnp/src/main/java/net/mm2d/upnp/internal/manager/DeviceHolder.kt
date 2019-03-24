@@ -25,8 +25,8 @@ import kotlin.math.max
  * @param expireListener 期限切れの通知を受け取るリスナー
  */
 internal class DeviceHolder(
-        private val taskExecutors: TaskExecutors,
-        private val expireListener: (Device) -> Unit
+    private val taskExecutors: TaskExecutors,
+    private val expireListener: (Device) -> Unit
 ) : Runnable {
     private var futureTask: FutureTask<*>? = null
     private val lock = ReentrantLock()
@@ -148,12 +148,12 @@ internal class DeviceHolder(
     private fun expireDevice() {
         val now = System.currentTimeMillis()
         deviceMap.values
-                .toList()
-                .filter { it.expireTime < now }
-                .forEach {
-                    deviceMap.remove(it.udn)
-                    expireListener.invoke(it)
-                }
+            .toList()
+            .filter { it.expireTime < now }
+            .forEach {
+                deviceMap.remove(it.udn)
+                expireListener.invoke(it)
+            }
     }
 
     @Throws(InterruptedException::class)
@@ -162,14 +162,15 @@ internal class DeviceHolder(
             return
         }
         val sleep = max(
-                findMostRecentExpireTime() - System.currentTimeMillis() + MARGIN_TIME,
-                MARGIN_TIME) // 負の値となる可能性を排除
+            findMostRecentExpireTime() - System.currentTimeMillis() + MARGIN_TIME,
+            MARGIN_TIME
+        ) // 負の値となる可能性を排除
         condition.await(sleep, TimeUnit.MILLISECONDS)
     }
 
     private fun findMostRecentExpireTime(): Long {
         return deviceMap.values.minBy { it.expireTime }
-                ?.expireTime ?: 0L
+            ?.expireTime ?: 0L
     }
 
     companion object {

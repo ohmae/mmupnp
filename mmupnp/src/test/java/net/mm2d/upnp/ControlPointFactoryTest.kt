@@ -25,48 +25,48 @@ class ControlPointFactoryTest {
     @Throws(Exception::class)
     fun create_インターフェース指定() {
         ControlPointFactory.create(
-                interfaces = NetworkUtils.availableInet4Interfaces
+            interfaces = NetworkUtils.availableInet4Interfaces
         )
         ControlPointFactory.create(
-                interfaces = emptyList()
+            interfaces = emptyList()
         )
     }
 
     @Test
     fun create_インターフェース選別() {
         ControlPointFactory.create(
-                protocol = Protocol.IP_V4_ONLY,
-                interfaces = NetworkUtils.networkInterfaceList
+            protocol = Protocol.IP_V4_ONLY,
+            interfaces = NetworkUtils.networkInterfaceList
         )
         ControlPointFactory.create(
-                protocol = Protocol.IP_V6_ONLY,
-                interfaces = NetworkUtils.networkInterfaceList
+            protocol = Protocol.IP_V6_ONLY,
+            interfaces = NetworkUtils.networkInterfaceList
         )
         ControlPointFactory.create(
-                protocol = Protocol.DUAL_STACK,
-                interfaces = NetworkUtils.networkInterfaceList
+            protocol = Protocol.DUAL_STACK,
+            interfaces = NetworkUtils.networkInterfaceList
         )
     }
 
     @Test
     fun create_プロトコルスタックのみ指定() {
         ControlPointFactory.create(
-                protocol = Protocol.IP_V4_ONLY
+            protocol = Protocol.IP_V4_ONLY
         )
         ControlPointFactory.create(
-                protocol = Protocol.IP_V6_ONLY
+            protocol = Protocol.IP_V6_ONLY
         )
         ControlPointFactory.create(
-                protocol = Protocol.DUAL_STACK
+            protocol = Protocol.DUAL_STACK
         )
     }
 
     @Test
     fun create_Params() {
         ControlPointFactory.create(
-                protocol = Protocol.DEFAULT,
-                interfaces = NetworkUtils.networkInterfaceList,
-                notifySegmentCheckEnabled = true
+            protocol = Protocol.DEFAULT,
+            interfaces = NetworkUtils.networkInterfaceList,
+            notifySegmentCheckEnabled = true
         )
     }
 }

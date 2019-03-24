@@ -20,21 +20,21 @@ class ArgumentTest {
     @Test(expected = IllegalStateException::class)
     fun build_Nameを設定していないとException() {
         ArgumentImpl.Builder()
-                .build()
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
     fun build_RelatedStateVariableを設定していないとException() {
         ArgumentImpl.Builder()
-                .setName("")
-                .build()
+            .setName("")
+            .build()
     }
 
     @Test
     fun getRelatedStateVariableName_setした値が返る() {
         val name = "name"
         val builder = ArgumentImpl.Builder()
-                .setRelatedStateVariableName(name)
+            .setRelatedStateVariableName(name)
         assertThat(builder.getRelatedStateVariableName()).isEqualTo(name)
     }
 
@@ -43,10 +43,10 @@ class ArgumentTest {
         val name = "name"
         val stateVariable: StateVariable = mockk(relaxed = true)
         val argument = ArgumentImpl.Builder()
-                .setName(name)
-                .setDirection("in")
-                .setRelatedStateVariable(stateVariable)
-                .build()
+            .setName(name)
+            .setDirection("in")
+            .setRelatedStateVariable(stateVariable)
+            .build()
         assertThat(argument.relatedStateVariable).isEqualTo(stateVariable)
         assertThat(argument.name).isEqualTo(name)
         assertThat(argument.isInputDirection).isTrue()
@@ -57,10 +57,10 @@ class ArgumentTest {
         val name = "name"
         val stateVariable: StateVariable = mockk(relaxed = true)
         val argument = ArgumentImpl.Builder()
-                .setName(name)
-                .setDirection("out")
-                .setRelatedStateVariable(stateVariable)
-                .build()
+            .setName(name)
+            .setDirection("out")
+            .setRelatedStateVariable(stateVariable)
+            .build()
         assertThat(argument.isInputDirection).isFalse()
     }
 }

@@ -32,10 +32,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class ControlPointImpl(
-        private val protocol: Protocol,
-        interfaces: Iterable<NetworkInterface>,
-        notifySegmentCheckEnabled: Boolean,
-        factory: DiFactory
+    private val protocol: Protocol,
+    interfaces: Iterable<NetworkInterface>,
+    notifySegmentCheckEnabled: Boolean,
+    factory: DiFactory
 ) : ControlPoint {
     private var ssdpMessageFilter: (SsdpMessage) -> Boolean = { true }
     private var iconFilter: (List<Icon>) -> List<Icon> = { emptyList() }
@@ -310,7 +310,8 @@ internal class ControlPointImpl(
             return
         }
         val builder = Builder(
-                this, subscribeManager, FakeSsdpMessage(location))
+            this, subscribeManager, FakeSsdpMessage(location)
+        )
         loadingPinnedDevices.add(builder)
         taskExecutors.io { loadPinnedDevice(builder) }
     }
@@ -348,7 +349,7 @@ internal class ControlPointImpl(
             }
         }
         deviceList.find { it.location == location }
-                ?.let { lostDevice(it) }
+            ?.let { lostDevice(it) }
     }
 
     companion object {

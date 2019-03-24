@@ -22,8 +22,8 @@ internal class HttpHeaders {
      * nameは大文字小文字の差異のみがある場合に限る
      */
     class Entry(
-            private var _name: String,
-            private var _value: String
+        private var _name: String,
+        private var _value: String
     ) {
         constructor(original: Entry) : this(original._name, original._value)
 

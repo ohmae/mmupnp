@@ -34,30 +34,31 @@ object ControlPointFactory {
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     fun create(
-            protocol: Protocol = Protocol.DEFAULT,
-            interfaces: Iterable<NetworkInterface>? = null,
-            callbackExecutor: TaskExecutor? = null,
-            callbackHandler: ((Runnable) -> Boolean)? = null,
-            notifySegmentCheckEnabled: Boolean = false
+        protocol: Protocol = Protocol.DEFAULT,
+        interfaces: Iterable<NetworkInterface>? = null,
+        callbackExecutor: TaskExecutor? = null,
+        callbackHandler: ((Runnable) -> Boolean)? = null,
+        notifySegmentCheckEnabled: Boolean = false
     ): ControlPoint {
         val executor = callbackExecutor
-                ?: callbackHandler?.let { TaskExecutorWrapper(it) }
+            ?: callbackHandler?.let { TaskExecutorWrapper(it) }
         return ControlPointImpl(
-                protocol,
-                getDefaultInterfacesIfEmpty(protocol, interfaces),
-                notifySegmentCheckEnabled,
-                DiFactory(protocol, executor))
+            protocol,
+            getDefaultInterfacesIfEmpty(protocol, interfaces),
+            notifySegmentCheckEnabled,
+            DiFactory(protocol, executor)
+        )
     }
 
     private class TaskExecutorWrapper(
-            private val handler: (Runnable) -> Boolean
+        private val handler: (Runnable) -> Boolean
     ) : TaskExecutor {
         override fun execute(task: Runnable): Boolean = handler(task)
     }
 
     private fun getDefaultInterfacesIfEmpty(
-            protocol: Protocol,
-            interfaces: Iterable<NetworkInterface>?
+        protocol: Protocol,
+        interfaces: Iterable<NetworkInterface>?
     ): Iterable<NetworkInterface> {
         return if (interfaces?.none() != false) {
             protocol.availableInterfaces

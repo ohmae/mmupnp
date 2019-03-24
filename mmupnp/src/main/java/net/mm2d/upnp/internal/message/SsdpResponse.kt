@@ -21,8 +21,8 @@ import java.net.InetAddress
  */
 internal class SsdpResponse(
 // VisibleForTesting
-        val message: HttpResponse,
-        private val delegate: SsdpMessageDelegate
+    val message: HttpResponse,
+    private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
     /**
      * ステータスコード

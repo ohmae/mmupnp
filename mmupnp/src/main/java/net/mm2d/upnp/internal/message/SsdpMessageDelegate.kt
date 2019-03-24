@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SsdpMessageDelegate(
-        val message: HttpMessage,
-        override val localAddress: InetAddress? = null
+    val message: HttpMessage,
+    override val localAddress: InetAddress? = null
 ) : SsdpMessage {
     override val maxAge: Int
     override val expireTime: Long

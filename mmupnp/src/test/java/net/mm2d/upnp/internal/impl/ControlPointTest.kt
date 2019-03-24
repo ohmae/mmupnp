@@ -114,10 +114,12 @@ class ControlPointTest {
             val list: SsdpSearchServerList = mockk(relaxed = true)
             val factory: DiFactory = mockk(relaxed = true)
             every { factory.createSsdpSearchServerList(any(), any(), any()) } returns list
-            val cp = ControlPointImpl(Protocol.DEFAULT,
-                    NetworkUtils.availableInet4Interfaces,
-                    false,
-                    factory)
+            val cp = ControlPointImpl(
+                Protocol.DEFAULT,
+                NetworkUtils.availableInet4Interfaces,
+                false,
+                factory
+            )
             cp.initialize()
             cp.start()
             cp.search()
@@ -136,161 +138,187 @@ class ControlPointTest {
         @Test
         fun needToUpdateSsdpMessage_DUAL_STACK() {
             val cp = ControlPointFactory.create(
-                    protocol = Protocol.DUAL_STACK,
-                    interfaces = NetworkUtils.networkInterfaceList
+                protocol = Protocol.DUAL_STACK,
+                interfaces = NetworkUtils.networkInterfaceList
             ) as ControlPointImpl
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isTrue()
-            assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isFalse()
-            assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("192.168.1.1")
-                    )
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
             ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("192.168.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("192.168.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isTrue()
+            assertThat(
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isTrue()
+            assertThat(
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
+            ).isFalse()
         }
 
         @Test
         fun needToUpdateSsdpMessage_IP_V4_ONLY() {
             val cp = ControlPointFactory.create(
-                    protocol = Protocol.IP_V4_ONLY,
-                    interfaces = NetworkUtils.networkInterfaceList
+                protocol = Protocol.IP_V4_ONLY,
+                interfaces = NetworkUtils.networkInterfaceList
             ) as ControlPointImpl
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("192.168.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("192.168.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("192.168.1.1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
+            ).isFalse()
         }
 
         @Test
         fun needToUpdateSsdpMessage_IP_V6_ONLY() {
             val cp = ControlPointFactory.create(
-                    protocol = Protocol.IP_V6_ONLY,
-                    interfaces = NetworkUtils.networkInterfaceList
+                protocol = Protocol.IP_V6_ONLY,
+                interfaces = NetworkUtils.networkInterfaceList
             ) as ControlPointImpl
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("fe80::1:1:1:1"),
-                            makeAddressMock("192.168.1.1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("fe80::1:1:1:1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("192.168.1.1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("169.254.1.1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("169.254.1.1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
+            ).isTrue()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("169.254.1.1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("169.254.1.1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("192.168.1.1")
-                    )).isFalse()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("192.168.1.1")
+                )
+            ).isFalse()
             assertThat(
-                    cp.needToUpdateSsdpMessage(
-                            makeAddressMock("192.168.1.1"),
-                            makeAddressMock("fe80::1:1:1:1")
-                    )).isTrue()
+                cp.needToUpdateSsdpMessage(
+                    makeAddressMock("192.168.1.1"),
+                    makeAddressMock("fe80::1:1:1:1")
+                )
+            ).isTrue()
         }
 
         private fun makeAddressMock(address: String): SsdpMessage {
@@ -323,9 +351,13 @@ class ControlPointTest {
             every { factory.createSsdpSearchServerList(any(), any(), any()) } returns ssdpSearchServerList
             every { factory.createSsdpNotifyReceiverList(any(), any(), any()) } returns ssdpNotifyReceiverList
             every { factory.createSubscribeManager(any(), any()) } returns subscribeManager
-            cp = spyk(ControlPointImpl(Protocol.DEFAULT,
+            cp = spyk(
+                ControlPointImpl(
+                    Protocol.DEFAULT,
                     NetworkUtils.availableInet4Interfaces, false,
-                    factory))
+                    factory
+                )
+            )
         }
 
         @Test
@@ -476,12 +508,22 @@ class ControlPointTest {
             loadingDeviceMap = spyk(HashMap())
             val factory = spyk(DiFactory())
             every { factory.createLoadingDeviceMap() } returns loadingDeviceMap
-            every { factory.createDeviceHolder(any(), any()) } answers { spyk(DeviceHolder(arg(0), arg(1))).also { deviceHolder = it } }
-            cp = spyk(ControlPointImpl(
+            every { factory.createDeviceHolder(any(), any()) } answers {
+                spyk(
+                    DeviceHolder(
+                        arg(0),
+                        arg(1)
+                    )
+                ).also { deviceHolder = it }
+            }
+            cp = spyk(
+                ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.availableInet4Interfaces,
                     false,
-                    factory))
+                    factory
+                )
+            )
         }
 
         @Test
@@ -607,10 +649,14 @@ class ControlPointTest {
 
         @Before
         fun setUp() {
-            cp = spyk(ControlPointImpl(Protocol.DEFAULT,
+            cp = spyk(
+                ControlPointImpl(
+                    Protocol.DEFAULT,
                     NetworkUtils.availableInet4Interfaces,
                     false,
-                    DiFactory(Protocol.DEFAULT)))
+                    DiFactory(Protocol.DEFAULT)
+                )
+            )
             httpClient = mockk(relaxed = true)
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
@@ -722,7 +768,14 @@ class ControlPointTest {
         fun setUp() {
             val factory = spyk(DiFactory())
             every { factory.createLoadingDeviceMap() } returns loadingDeviceMap
-            every { factory.createDeviceHolder(any(), any()) } answers { spyk(DeviceHolder(arg(0), arg(1))).also { deviceHolder = it } }
+            every { factory.createDeviceHolder(any(), any()) } answers {
+                spyk(
+                    DeviceHolder(
+                        arg(0),
+                        arg(1)
+                    )
+                ).also { deviceHolder = it }
+            }
             every { factory.createSsdpSearchServerList(any(), any(), any()) } answers {
                 responseListener = arg(2)
                 ssdpSearchServerList
@@ -734,11 +787,14 @@ class ControlPointTest {
             every { factory.createSubscribeManager(any(), any()) } answers {
                 spyk(SubscribeManager(arg(0), arg(1), factory)).also { subscribeManager = it }
             }
-            cp = spyk(ControlPointImpl(
+            cp = spyk(
+                ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.availableInet4Interfaces,
                     false,
-                    factory))
+                    factory
+                )
+            )
         }
 
         @Test
@@ -792,10 +848,14 @@ class ControlPointTest {
             every { factory.createSubscribeManager(any(), any()) } answers {
                 spyk(SubscribeManager(arg(0), arg(1), factory)).also { subscribeManager = it }
             }
-            cp = spyk(ControlPointImpl(Protocol.DEFAULT,
+            cp = spyk(
+                ControlPointImpl(
+                    Protocol.DEFAULT,
                     NetworkUtils.availableInet4Interfaces,
                     false,
-                    factory))
+                    factory
+                )
+            )
         }
 
         @Test
@@ -880,10 +940,14 @@ class ControlPointTest {
 
         @Before
         fun setUp() {
-            cp = spyk(ControlPointImpl(Protocol.DEFAULT,
+            cp = spyk(
+                ControlPointImpl(
+                    Protocol.DEFAULT,
                     NetworkUtils.availableInet4Interfaces,
                     false,
-                    DiFactory(Protocol.DEFAULT)))
+                    DiFactory(Protocol.DEFAULT)
+                )
+            )
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             val addr = InetAddress.getByName("192.0.2.3")
             ssdpMessage = SsdpRequest.create(addr, data, data.size)

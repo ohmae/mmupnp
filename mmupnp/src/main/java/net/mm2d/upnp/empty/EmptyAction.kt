@@ -21,38 +21,38 @@ object EmptyAction : Action {
 
     @Throws(IOException::class)
     override fun invokeSync(
-            argumentValues: Map<String, String>,
-            returnErrorResponse: Boolean
+        argumentValues: Map<String, String>,
+        returnErrorResponse: Boolean
     ): Map<String, String> {
         throw IOException("empty object")
     }
 
     @Throws(IOException::class)
     override fun invokeCustomSync(
-            argumentValues: Map<String, String>,
-            customNamespace: Map<String, String>,
-            customArguments: Map<String, String>,
-            returnErrorResponse: Boolean
+        argumentValues: Map<String, String>,
+        customNamespace: Map<String, String>,
+        customArguments: Map<String, String>,
+        returnErrorResponse: Boolean
     ): Map<String, String> {
         throw IOException("empty object")
     }
 
     override fun invoke(
-            argumentValues: Map<String, String>,
-            returnErrorResponse: Boolean,
-            onResult: ((Map<String, String>) -> Unit)?,
-            onError: ((IOException) -> Unit)?
+        argumentValues: Map<String, String>,
+        returnErrorResponse: Boolean,
+        onResult: ((Map<String, String>) -> Unit)?,
+        onError: ((IOException) -> Unit)?
     ) {
         onError?.invoke(IOException("empty object"))
     }
 
     override fun invokeCustom(
-            argumentValues: Map<String, String>,
-            customNamespace: Map<String, String>,
-            customArguments: Map<String, String>,
-            returnErrorResponse: Boolean,
-            onResult: ((Map<String, String>) -> Unit)?,
-            onError: ((IOException) -> Unit)?
+        argumentValues: Map<String, String>,
+        customNamespace: Map<String, String>,
+        customArguments: Map<String, String>,
+        returnErrorResponse: Boolean,
+        onResult: ((Map<String, String>) -> Unit)?,
+        onError: ((IOException) -> Unit)?
     ) {
         onError?.invoke(IOException("empty object"))
     }

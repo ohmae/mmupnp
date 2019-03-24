@@ -19,9 +19,9 @@ import java.util.concurrent.TimeUnit
  * @param keepRenew           定期的にrenewを実行する場合true
  */
 internal class SubscribeService(
-        private val service: Service,
-        private var subscriptionTimeout: Long,
-        private var keepRenew: Boolean
+    private val service: Service,
+    private var subscriptionTimeout: Long,
+    private var keepRenew: Boolean
 ) {
     private var failCount: Int = 0
     private var subscriptionStart: Long = System.currentTimeMillis()

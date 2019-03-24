@@ -29,7 +29,7 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
     }
 
     private class TextContainer(
-            private val component: JTextComponent
+        private val component: JTextComponent
     ) : Container {
         override var value: String
             get() = component.text
@@ -39,7 +39,7 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
     }
 
     private class ComboBoxContainer(
-            private val box: JComboBox<String>
+        private val box: JComboBox<String>
     ) : Container {
         override var value: String
             get() = box.selectedItem as String
@@ -92,8 +92,8 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
 
     private fun makeArgument(): Map<String, String> {
         return map.filterKeys { it.isInputDirection }
-                .map { it.key.name to it.value.value }
-                .toMap()
+            .map { it.key.name to it.value.value }
+            .toMap()
     }
 
     private fun updateResult(result: Map<String, String>) {

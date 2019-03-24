@@ -56,9 +56,9 @@ class EmptyActionTest {
     fun invoke2() {
         val action = EmptyAction
         action.invokeCustomSync(
-                emptyMap(),
-                customNamespace = emptyMap(),
-                customArguments = emptyMap()
+            emptyMap(),
+            customNamespace = emptyMap(),
+            customArguments = emptyMap()
         )
     }
 
@@ -66,10 +66,10 @@ class EmptyActionTest {
     fun invoke3() {
         val action = EmptyAction
         action.invokeCustomSync(
-                emptyMap(),
-                customNamespace = emptyMap(),
-                customArguments = emptyMap(),
-                returnErrorResponse = false
+            emptyMap(),
+            customNamespace = emptyMap(),
+            customArguments = emptyMap(),
+            returnErrorResponse = false
         )
     }
 }

@@ -13,11 +13,11 @@ package net.mm2d.upnp.sample
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 enum class DataType(
-        val symbol: String,
-        val default: String,
-        val isNumber: Boolean,
-        val isInteger: Boolean,
-        val isMultiLine: Boolean
+    val symbol: String,
+    val default: String,
+    val isNumber: Boolean,
+    val isInteger: Boolean,
+    val isMultiLine: Boolean
 ) {
     /**
      * Unsigned 1 Byte int. Same format as int without leading sign.
@@ -146,8 +146,8 @@ enum class DataType(
 
     companion object {
         private val MAP = values()
-                .map { it.symbol to it }
-                .toMap()
+            .map { it.symbol to it }
+            .toMap()
 
         fun of(symbol: String): DataType {
             return MAP.getOrElse(symbol) { UNKNOWN }

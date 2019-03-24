@@ -173,7 +173,7 @@ class DeviceParserTest {
             assertThat(device1.isEmbeddedDevice).isEqualTo(true)
 
             val device2 = device.findDeviceByTypeRecursively("urn:schemas-upnp-org:device:WANConnectionDevice:1")
-                    ?: return fail()
+                ?: return fail()
             assertThat(device2.findServiceById("urn:upnp-org:serviceId:WANIPConn1")).isNotNull()
 
             assertThat(device2.upc).isEqualTo("000000000000")
@@ -231,10 +231,12 @@ class DeviceParserTest {
 
         @Test(expected = IOException::class)
         fun parseDescription_deviceノードのないXMLを渡すとException() {
-            DeviceParser.parseDescription(mockk(relaxed = true),
-                    "<?xml version=\"1.0\"?>\n" +
-                            "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">\n" +
-                            "</root>")
+            DeviceParser.parseDescription(
+                mockk(relaxed = true),
+                "<?xml version=\"1.0\"?>\n" +
+                        "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">\n" +
+                        "</root>"
+            )
         }
     }
 }

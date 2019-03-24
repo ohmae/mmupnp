@@ -55,23 +55,23 @@ class DeviceBuilderTest {
         every { serviceBuilder.build() } returns service
 
         val device = DeviceImpl.Builder(cp, manager, message)
-                .setDescription(description)
-                .setUdn(uuid)
-                .setUpc(upc)
-                .setDeviceType(deviceType)
-                .setFriendlyName(friendlyName)
-                .setManufacture(manufacture)
-                .setManufactureUrl(manufactureUrl)
-                .setModelName(modelName)
-                .setModelUrl(modelUrl)
-                .setModelDescription(modelDescription)
-                .setModelNumber(modelNumber)
-                .setSerialNumber(serialNumber)
-                .setPresentationUrl(presentationUrl)
-                .setUrlBase(urlBase)
-                .addIcon(icon)
-                .addServiceBuilder(serviceBuilder)
-                .build()
+            .setDescription(description)
+            .setUdn(uuid)
+            .setUpc(upc)
+            .setDeviceType(deviceType)
+            .setFriendlyName(friendlyName)
+            .setManufacture(manufacture)
+            .setManufactureUrl(manufactureUrl)
+            .setModelName(modelName)
+            .setModelUrl(modelUrl)
+            .setModelDescription(modelDescription)
+            .setModelNumber(modelNumber)
+            .setSerialNumber(serialNumber)
+            .setPresentationUrl(presentationUrl)
+            .setUrlBase(urlBase)
+            .addIcon(icon)
+            .addServiceBuilder(serviceBuilder)
+            .build()
 
         assertThat(device.description).isEqualTo(description)
         assertThat(device.udn).isEqualTo(uuid)
@@ -108,14 +108,14 @@ class DeviceBuilderTest {
         val modelName = "modelName"
 
         val device = DeviceImpl.Builder(cp, manager, message)
-                .setDescription(description)
-                .setUdn(uuid)
-                .setUpc(upc)
-                .setDeviceType(deviceType)
-                .setFriendlyName(friendlyName)
-                .setManufacture(manufacture)
-                .setModelName(modelName)
-                .build()
+            .setDescription(description)
+            .setUdn(uuid)
+            .setUpc(upc)
+            .setDeviceType(deviceType)
+            .setFriendlyName(friendlyName)
+            .setManufacture(manufacture)
+            .setModelName(modelName)
+            .build()
 
         assertThat(device.description).isEqualTo(description)
         assertThat(device.udn).isEqualTo(uuid)
@@ -141,12 +141,12 @@ class DeviceBuilderTest {
         val modelName = "modelName"
 
         DeviceImpl.Builder(cp, manager, message)
-                .setUdn(uuid)
-                .setDeviceType(deviceType)
-                .setFriendlyName(friendlyName)
-                .setManufacture(manufacture)
-                .setModelName(modelName)
-                .build()
+            .setUdn(uuid)
+            .setDeviceType(deviceType)
+            .setFriendlyName(friendlyName)
+            .setManufacture(manufacture)
+            .setModelName(modelName)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -164,12 +164,12 @@ class DeviceBuilderTest {
         val modelName = "modelName"
 
         DeviceImpl.Builder(cp, manager, message)
-                .setDescription(description)
-                .setUdn(uuid)
-                .setFriendlyName(friendlyName)
-                .setManufacture(manufacture)
-                .setModelName(modelName)
-                .build()
+            .setDescription(description)
+            .setUdn(uuid)
+            .setFriendlyName(friendlyName)
+            .setManufacture(manufacture)
+            .setModelName(modelName)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -187,12 +187,12 @@ class DeviceBuilderTest {
         val modelName = "modelName"
 
         DeviceImpl.Builder(cp, manager, message)
-                .setDescription(description)
-                .setUdn(uuid)
-                .setDeviceType(deviceType)
-                .setManufacture(manufacture)
-                .setModelName(modelName)
-                .build()
+            .setDescription(description)
+            .setUdn(uuid)
+            .setDeviceType(deviceType)
+            .setManufacture(manufacture)
+            .setModelName(modelName)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -210,12 +210,12 @@ class DeviceBuilderTest {
         val modelName = "modelName"
 
         DeviceImpl.Builder(cp, manager, message)
-                .setDescription(description)
-                .setUdn(uuid)
-                .setDeviceType(deviceType)
-                .setFriendlyName(friendlyName)
-                .setModelName(modelName)
-                .build()
+            .setDescription(description)
+            .setUdn(uuid)
+            .setDeviceType(deviceType)
+            .setFriendlyName(friendlyName)
+            .setModelName(modelName)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -233,12 +233,12 @@ class DeviceBuilderTest {
         val manufacture = "manufacture"
 
         DeviceImpl.Builder(cp, manager, message)
-                .setDescription(description)
-                .setUdn(uuid)
-                .setDeviceType(deviceType)
-                .setFriendlyName(friendlyName)
-                .setManufacture(manufacture)
-                .build()
+            .setDescription(description)
+            .setUdn(uuid)
+            .setDeviceType(deviceType)
+            .setFriendlyName(friendlyName)
+            .setManufacture(manufacture)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -257,12 +257,12 @@ class DeviceBuilderTest {
         val modelName = "modelName"
 
         DeviceImpl.Builder(cp, manager, message)
-                .setDescription(description)
-                .setDeviceType(deviceType)
-                .setFriendlyName(friendlyName)
-                .setManufacture(manufacture)
-                .setModelName(modelName)
-                .build()
+            .setDescription(description)
+            .setDeviceType(deviceType)
+            .setFriendlyName(friendlyName)
+            .setManufacture(manufacture)
+            .setModelName(modelName)
+            .build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -283,14 +283,14 @@ class DeviceBuilderTest {
         val modelName = "modelName"
 
         DeviceImpl.Builder(cp, manager, message)
-                .setDescription(description)
-                .setUdn(udn)
-                .setUpc(upc)
-                .setDeviceType(deviceType)
-                .setFriendlyName(friendlyName)
-                .setManufacture(manufacture)
-                .setModelName(modelName)
-                .build()
+            .setDescription(description)
+            .setUdn(udn)
+            .setUpc(upc)
+            .setDeviceType(deviceType)
+            .setFriendlyName(friendlyName)
+            .setManufacture(manufacture)
+            .setModelName(modelName)
+            .build()
     }
 
     @Test
@@ -321,7 +321,7 @@ class DeviceBuilderTest {
         val illegalMessage: SsdpMessage = mockk(relaxed = true)
         every { illegalMessage.location } returns null
         DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
-                .updateSsdpMessage(illegalMessage)
+            .updateSsdpMessage(illegalMessage)
     }
 
     @Test
@@ -333,8 +333,8 @@ class DeviceBuilderTest {
         every { message.uuid } returns uuid
         val embeddedDeviceBuilder: DeviceImpl.Builder = mockk(relaxed = true)
         DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
-                .setEmbeddedDeviceBuilderList(listOf(embeddedDeviceBuilder))
-                .updateSsdpMessage(message)
+            .setEmbeddedDeviceBuilderList(listOf(embeddedDeviceBuilder))
+            .updateSsdpMessage(message)
 
         verify(exactly = 1) { embeddedDeviceBuilder.updateSsdpMessage(message) }
     }
@@ -350,16 +350,16 @@ class DeviceBuilderTest {
         val value2 = "value2"
 
         val device = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
-                .setDescription("description")
-                .setUdn("uuid")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .putTag(null, tag1, value1)
-                .putTag("", tag2, value2)
-                .build()
+            .setDescription("description")
+            .setUdn("uuid")
+            .setUpc("upc")
+            .setDeviceType("deviceType")
+            .setFriendlyName("friendlyName")
+            .setManufacture("manufacture")
+            .setModelName("modelName")
+            .putTag(null, tag1, value1)
+            .putTag("", tag2, value2)
+            .build()
         assertThat(device.getValueWithNamespace("", tag1)).isEqualTo(value1)
         assertThat(device.getValueWithNamespace("", tag2)).isEqualTo(value2)
     }

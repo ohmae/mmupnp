@@ -206,28 +206,28 @@ class DeviceTest {
         fun getValue() {
             val device = builder.build()
             assertThat(device.getValue("deviceType"))
-                    .isEqualTo("urn:schemas-upnp-org:device:MediaServer:1")
+                .isEqualTo("urn:schemas-upnp-org:device:MediaServer:1")
         }
 
         @Test
         fun getValue_存在しないタグはnull() {
             val device = builder.build()
             assertThat(device.getValue("deviceType1"))
-                    .isNull()
+                .isNull()
         }
 
         @Test
         fun getValueWithNamespace() {
             val device = builder.build()
             assertThat(device.getValueWithNamespace("urn:schemas-upnp-org:device-1-0", "deviceType"))
-                    .isEqualTo("urn:schemas-upnp-org:device:MediaServer:1")
+                .isEqualTo("urn:schemas-upnp-org:device:MediaServer:1")
         }
 
         @Test
         fun getValueWithNamespace_namespace間違ったらnull() {
             val device = builder.build()
             assertThat(device.getValueWithNamespace("urn:schemas-upnp-org:device-1-1", "deviceType"))
-                    .isNull()
+                .isNull()
         }
 
         @Test
@@ -318,10 +318,11 @@ class DeviceTest {
                 assertThat(icon.height).isAnyOf(48, 120)
                 assertThat(icon.depth).isEqualTo(24)
                 assertThat(icon.url).isAnyOf(
-                        "/icon/icon120.jpg",
-                        "/icon/icon48.jpg",
-                        "/icon/icon120.png",
-                        "/icon/icon48.png")
+                    "/icon/icon120.jpg",
+                    "/icon/icon48.jpg",
+                    "/icon/icon120.png",
+                    "/icon/icon48.png"
+                )
             }
         }
 
@@ -401,14 +402,14 @@ class DeviceTest {
             every { message.location } returns "http://192.168.0.1/"
             every { message.uuid } returns "uuid"
             val device = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
-                    .setDescription("description")
-                    .setUdn("uuid")
-                    .setUpc("upc")
-                    .setDeviceType("deviceType")
-                    .setFriendlyName("friendlyName")
-                    .setManufacture("manufacture")
-                    .setModelName("modelName")
-                    .build()
+                .setDescription("description")
+                .setUdn("uuid")
+                .setUpc("upc")
+                .setDeviceType("deviceType")
+                .setFriendlyName("friendlyName")
+                .setManufacture("manufacture")
+                .setModelName("modelName")
+                .build()
             assertThat(device.ipAddress).isEqualTo("192.168.0.1")
         }
 
@@ -418,14 +419,14 @@ class DeviceTest {
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
             val device = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
-                    .setDescription("description")
-                    .setUdn("uuid")
-                    .setUpc("upc")
-                    .setDeviceType("deviceType")
-                    .setFriendlyName("friendlyName")
-                    .setManufacture("manufacture")
-                    .setModelName("modelName")
-                    .build()
+                .setDescription("description")
+                .setUdn("uuid")
+                .setUpc("upc")
+                .setDeviceType("deviceType")
+                .setFriendlyName("friendlyName")
+                .setManufacture("manufacture")
+                .setModelName("modelName")
+                .build()
 
             assertThat(device.ipAddress).isEqualTo("")
         }
@@ -436,14 +437,14 @@ class DeviceTest {
             every { message.location } returns "http://192.168.0.1/"
             every { message.uuid } returns "uuid"
             val device = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
-                    .setDescription("description")
-                    .setUdn("uuid")
-                    .setUpc("upc")
-                    .setDeviceType("deviceType")
-                    .setFriendlyName("friendlyName")
-                    .setManufacture("manufacture")
-                    .setModelName("modelName")
-                    .build()
+                .setDescription("description")
+                .setUdn("uuid")
+                .setUpc("upc")
+                .setDeviceType("deviceType")
+                .setFriendlyName("friendlyName")
+                .setManufacture("manufacture")
+                .setModelName("modelName")
+                .build()
 
             device.loadIconBinary(mockk(relaxed = true)) { it }
         }

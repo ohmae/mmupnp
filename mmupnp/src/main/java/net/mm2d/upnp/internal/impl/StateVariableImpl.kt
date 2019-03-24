@@ -17,15 +17,15 @@ import net.mm2d.upnp.internal.parser.ServiceParser
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class StateVariableImpl(
-        override val isSendEvents: Boolean,
-        override val isMulticast: Boolean,
-        override val name: String,
-        override val dataType: String,
-        override val allowedValueList: List<String>,
-        override val defaultValue: String?,
-        override val minimum: String?,
-        override val maximum: String?,
-        override val step: String?
+    override val isSendEvents: Boolean,
+    override val isMulticast: Boolean,
+    override val name: String,
+    override val dataType: String,
+    override val allowedValueList: List<String>,
+    override val defaultValue: String?,
+    override val minimum: String?,
+    override val maximum: String?,
+    override val step: String?
 ) : StateVariable {
 
     /**
@@ -52,20 +52,20 @@ internal class StateVariableImpl(
          */
         fun build(): StateVariable {
             val name = name
-                    ?: throw IllegalStateException("name must be set.")
+                ?: throw IllegalStateException("name must be set.")
             val dataType = dataType
-                    ?: throw IllegalStateException("dataType must be set.")
+                ?: throw IllegalStateException("dataType must be set.")
 
             return StateVariableImpl(
-                    isSendEvents = sendEvents,
-                    isMulticast = multicast,
-                    name = name,
-                    dataType = dataType,
-                    allowedValueList = allowedValueList,
-                    defaultValue = defaultValue,
-                    minimum = minimum,
-                    maximum = maximum,
-                    step = step
+                isSendEvents = sendEvents,
+                isMulticast = multicast,
+                name = name,
+                dataType = dataType,
+                allowedValueList = allowedValueList,
+                defaultValue = defaultValue,
+                minimum = minimum,
+                maximum = maximum,
+                step = step
             )
         }
 

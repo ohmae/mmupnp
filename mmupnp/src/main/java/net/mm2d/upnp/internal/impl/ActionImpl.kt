@@ -36,9 +36,9 @@ import javax.xml.transform.stream.StreamResult
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class ActionImpl(
-        override val service: ServiceImpl,
-        override val name: String,
-        private val argumentMap: Map<String, Argument>
+    override val service: ServiceImpl,
+    override val name: String,
+    private val argumentMap: Map<String, Argument>
 ) : Action {
     private val _argumentList: List<Argument> by lazy {
         argumentMap.values.toList()
@@ -58,8 +58,8 @@ internal class ActionImpl(
 
     @Throws(IOException::class)
     override fun invokeSync(
-            argumentValues: Map<String, String>,
-            returnErrorResponse: Boolean
+        argumentValues: Map<String, String>,
+        returnErrorResponse: Boolean
     ): Map<String, String> {
         val soap = makeSoap(emptyMap(), makeArguments(argumentValues))
         return invoke(soap, returnErrorResponse)
@@ -67,10 +67,10 @@ internal class ActionImpl(
 
     @Throws(IOException::class)
     override fun invokeCustomSync(
-            argumentValues: Map<String, String>,
-            customNamespace: Map<String, String>,
-            customArguments: Map<String, String>,
-            returnErrorResponse: Boolean
+        argumentValues: Map<String, String>,
+        customNamespace: Map<String, String>,
+        customArguments: Map<String, String>,
+        returnErrorResponse: Boolean
     ): Map<String, String> {
         val arguments = makeArguments(argumentValues)
         appendArgument(arguments, customArguments)
@@ -79,10 +79,10 @@ internal class ActionImpl(
     }
 
     override fun invoke(
-            argumentValues: Map<String, String>,
-            returnErrorResponse: Boolean,
-            onResult: ((Map<String, String>) -> Unit)?,
-            onError: ((IOException) -> Unit)?
+        argumentValues: Map<String, String>,
+        returnErrorResponse: Boolean,
+        onResult: ((Map<String, String>) -> Unit)?,
+        onError: ((IOException) -> Unit)?
     ) {
         val executors = service.device.controlPoint.taskExecutors
         executors.io {
@@ -96,12 +96,12 @@ internal class ActionImpl(
     }
 
     override fun invokeCustom(
-            argumentValues: Map<String, String>,
-            customNamespace: Map<String, String>,
-            customArguments: Map<String, String>,
-            returnErrorResponse: Boolean,
-            onResult: ((Map<String, String>) -> Unit)?,
-            onError: ((IOException) -> Unit)?
+        argumentValues: Map<String, String>,
+        customNamespace: Map<String, String>,
+        customArguments: Map<String, String>,
+        returnErrorResponse: Boolean,
+        onResult: ((Map<String, String>) -> Unit)?,
+        onError: ((IOException) -> Unit)?
     ) {
         val executors = service.device.controlPoint.taskExecutors
         executors.io {
@@ -122,9 +122,9 @@ internal class ActionImpl(
      */
     private fun makeArguments(argumentValues: Map<String, String>): MutableList<Pair<String, String?>> {
         return argumentMap.values
-                .filter { it.isInputDirection }
-                .map { it.name to selectArgumentValue(it, argumentValues) }
-                .toMutableList()
+            .filter { it.isInputDirection }
+            .map { it.name to selectArgumentValue(it, argumentValues) }
+            .toMutableList()
     }
 
     /**
@@ -385,10 +385,10 @@ internal class ActionImpl(
     @Throws(IOException::class)
     private fun parseErrorDetail(result: MutableMap<String, String>, detailNode: Node) {
         detailNode.findChildElementByLocalName("UPnPError")
-                ?.firstChild
-                ?.forEachElement {
-                    result["UPnPError/${it.localName}"] = it.textContent
-                } ?: throw IOException("no UPnPError tag")
+            ?.firstChild
+            ?.forEachElement {
+                result["UPnPError/${it.localName}"] = it.textContent
+            } ?: throw IOException("no UPnPError tag")
     }
 
     /**
@@ -408,8 +408,8 @@ internal class ActionImpl(
     @Throws(IOException::class, ParserConfigurationException::class, SAXException::class)
     private fun findElement(xml: String, tag: String): Element {
         return XmlUtils.newDocument(true, xml).documentElement
-                .findChildElementByLocalName("Body")
-                ?.findChildElementByLocalName(tag) ?: throw IOException("no response tag")
+            .findChildElementByLocalName("Body")
+            ?.findChildElementByLocalName(tag) ?: throw IOException("no response tag")
     }
 
     /**
@@ -432,16 +432,16 @@ internal class ActionImpl(
         @Throws(IllegalStateException::class)
         fun build(): Action {
             val service = service
-                    ?: throw IllegalStateException("service must be set.")
+                ?: throw IllegalStateException("service must be set.")
             val name = name
-                    ?: throw IllegalStateException("name must be set.")
+                ?: throw IllegalStateException("name must be set.")
             return ActionImpl(
-                    service = service,
-                    name = name,
-                    argumentMap = argumentList
-                            .map { it.build() }
-                            .map { it.name to it }
-                            .toMap()
+                service = service,
+                name = name,
+                argumentMap = argumentList
+                    .map { it.build() }
+                    .map { it.name to it }
+                    .toMap()
             )
         }
 

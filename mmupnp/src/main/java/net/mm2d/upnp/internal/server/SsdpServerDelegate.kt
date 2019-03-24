@@ -32,10 +32,10 @@ import kotlin.concurrent.withLock
  */
 internal class SsdpServerDelegate
 @JvmOverloads constructor(
-        private val taskExecutors: TaskExecutors,
-        val address: Address,
-        private val networkInterface: NetworkInterface,
-        private val bindPort: Int = 0
+    private val taskExecutors: TaskExecutors,
+    val address: Address,
+    private val networkInterface: NetworkInterface,
+    private val bindPort: Int = 0
 ) : SsdpServer, Runnable {
     val interfaceAddress: InterfaceAddress
     private var socket: MulticastSocket? = null
@@ -203,12 +203,12 @@ internal class SsdpServerDelegate
 
         fun findInet4Address(addressList: List<InterfaceAddress>): InterfaceAddress {
             return addressList.find { it.address is Inet4Address }
-                    ?: throw IllegalArgumentException("ni does not have IPv4 address.")
+                ?: throw IllegalArgumentException("ni does not have IPv4 address.")
         }
 
         fun findInet6Address(addressList: List<InterfaceAddress>): InterfaceAddress {
             return addressList.find { it.address is Inet6Address && it.address.isLinkLocalAddress }
-                    ?: throw IllegalArgumentException("ni does not have IPv6 address.")
+                ?: throw IllegalArgumentException("ni does not have IPv6 address.")
         }
 
         /**

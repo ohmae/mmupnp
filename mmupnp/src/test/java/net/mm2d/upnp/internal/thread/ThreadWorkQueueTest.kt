@@ -14,7 +14,10 @@ import io.mockk.verify
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.util.concurrent.*
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
@@ -23,8 +26,10 @@ class ThreadWorkQueueTest {
     fun executeInParallel_プロセッサ数まで並列化が可能() {
         val processorsCount = NUMBER_OF_PROCESSORS
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, processorsCount,
-                5L, TimeUnit.SECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            0, processorsCount,
+            5L, TimeUnit.SECONDS, queue, queue
+        )
         val latch = CountDownLatch(processorsCount)
         for (i in 0 until processorsCount) {
             executor.execute {
@@ -46,8 +51,10 @@ class ThreadWorkQueueTest {
     fun executeInParallel_プロセッサ数を超えるタスクを積むとあまりがQueueに積まれる() {
         val processorsCount = NUMBER_OF_PROCESSORS
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, processorsCount,
-                5L, TimeUnit.SECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            0, processorsCount,
+            5L, TimeUnit.SECONDS, queue, queue
+        )
         val latch = CountDownLatch(processorsCount)
         for (i in 0 until processorsCount + 1) {
             executor.execute {
@@ -69,8 +76,10 @@ class ThreadWorkQueueTest {
     @Test(timeout = 500)
     fun executeInParallel_プロセッサ数未満のスレッドでアイドルスレッドが使用されスレッド数が増えないこと() {
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
-                5L, TimeUnit.SECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            0, NUMBER_OF_PROCESSORS,
+            5L, TimeUnit.SECONDS, queue, queue
+        )
         val latch = CountDownLatch(1)
         executor.execute { latch.countDown() }
         latch.await()
@@ -87,8 +96,10 @@ class ThreadWorkQueueTest {
     @Test(timeout = 500)
     fun executeInParallel_プロセッサ数未満のスレッドでアイドルスレッドが使用されスレッド数が増えないこと2() {
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
-                5L, TimeUnit.SECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            0, NUMBER_OF_PROCESSORS,
+            5L, TimeUnit.SECONDS, queue, queue
+        )
         val count = 2
         val latch = CountDownLatch(count)
         for (i in 0 until count) {
@@ -110,8 +121,10 @@ class ThreadWorkQueueTest {
     @Test(timeout = 5000)
     fun executeInParallel_スレッド増減の確認() {
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
-                1L, TimeUnit.SECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            0, NUMBER_OF_PROCESSORS,
+            1L, TimeUnit.SECONDS, queue, queue
+        )
         val count = 2
         val latch = CountDownLatch(count)
         for (i in 0 until count) {
@@ -134,8 +147,10 @@ class ThreadWorkQueueTest {
     fun executeInParallel_プロセッサ数を大幅に超えるタスクを積んでも破綻しない() {
         val processorsCount = NUMBER_OF_PROCESSORS
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, processorsCount,
-                5L, TimeUnit.SECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            0, processorsCount,
+            5L, TimeUnit.SECONDS, queue, queue
+        )
         val latch = CountDownLatch(processorsCount)
         for (i in 0 until processorsCount * 100) {
             executor.execute {
@@ -155,8 +170,10 @@ class ThreadWorkQueueTest {
     @Test(timeout = 5000)
     fun executeInParallel_shutdownNow後にexecuteしてもRejectedExecutionExceptionは発生しない() {
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
-                5L, TimeUnit.SECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            0, NUMBER_OF_PROCESSORS,
+            5L, TimeUnit.SECONDS, queue, queue
+        )
         executor.shutdownNow()
         val runnable: Runnable = mockk()
         executor.execute(runnable)
@@ -167,8 +184,10 @@ class ThreadWorkQueueTest {
     @Test(timeout = 5000)
     fun executeInParallel_shutdown後にexecuteしてもRejectedExecutionExceptionは発生しない() {
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, NUMBER_OF_PROCESSORS,
-                5L, TimeUnit.SECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            0, NUMBER_OF_PROCESSORS,
+            5L, TimeUnit.SECONDS, queue, queue
+        )
         executor.shutdown()
         val runnable: Runnable = mockk()
         executor.execute(runnable)
@@ -180,8 +199,10 @@ class ThreadWorkQueueTest {
     fun fixedThreadPool() {
         val processorsCount = NUMBER_OF_PROCESSORS
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(processorsCount, processorsCount,
-                0L, TimeUnit.MILLISECONDS, queue, queue)
+        val executor = ThreadPoolExecutor(
+            processorsCount, processorsCount,
+            0L, TimeUnit.MILLISECONDS, queue, queue
+        )
         val latch = CountDownLatch(processorsCount)
         for (i in 0 until processorsCount + 1) {
             executor.execute { latch.countDown() }

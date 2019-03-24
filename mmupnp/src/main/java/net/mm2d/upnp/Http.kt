@@ -115,14 +115,14 @@ object Http {
      * HTTPのステータスコードを表現するEnum
      */
     enum class Status(
-            /**
-             * HTTPステータスコード
-             */
-            val code: Int,
-            /**
-             * HTTPステータスフレーズ
-             */
-            val phrase: String
+        /**
+         * HTTPステータスコード
+         */
+        val code: Int,
+        /**
+         * HTTPステータスフレーズ
+         */
+        val phrase: String
     ) {
         /**
          * Invalid status
@@ -232,8 +232,8 @@ object Http {
     fun parseDate(string: String?): Date? {
         if (string.isNullOrEmpty()) return null
         return RFC_1123_FORMAT.parseOrNull(string)
-                ?: RFC_1036_FORMAT.parseOrNull(string)
-                ?: ASC_TIME_FORMAT.parseOrNull(string)
+            ?: RFC_1036_FORMAT.parseOrNull(string)
+            ?: ASC_TIME_FORMAT.parseOrNull(string)
     }
 
     private fun DateFormat.parseOrNull(source: String): Date? {

@@ -108,8 +108,8 @@ internal object SsdpResponseTest {
             @DataPoints
             @JvmField
             val messages: Array<SsdpResponse> = arrayOf(
-                    makeFromResource("ssdp-search-response0.bin"),
-                    makeFromResource("ssdp-search-response1.bin")
+                makeFromResource("ssdp-search-response0.bin"),
+                makeFromResource("ssdp-search-response1.bin")
             )
         }
     }

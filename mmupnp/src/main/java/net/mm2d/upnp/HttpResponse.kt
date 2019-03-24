@@ -18,15 +18,15 @@ import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate
  */
 class HttpResponse
 internal constructor(
-        private val startLineDelegate: StartLine,
-        private val delegate: HttpMessageDelegate
+    private val startLineDelegate: StartLine,
+    private val delegate: HttpMessageDelegate
 ) : HttpMessage by delegate {
 
     internal data class StartLine(
-            private var _status: Status = Status.HTTP_INVALID,
-            private var _statusCode: Int = 0,
-            var reasonPhrase: String = "",
-            override var version: String = Http.DEFAULT_HTTP_VERSION
+        private var _status: Status = Status.HTTP_INVALID,
+        private var _statusCode: Int = 0,
+        var reasonPhrase: String = "",
+        override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
         var statusCode: Int
             get() = _statusCode

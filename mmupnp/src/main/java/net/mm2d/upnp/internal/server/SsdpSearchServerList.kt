@@ -20,25 +20,25 @@ import java.net.NetworkInterface
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SsdpSearchServerList(
-        taskExecutors: TaskExecutors,
-        protocol: Protocol,
-        interfaces: Iterable<NetworkInterface>,
-        listener: (SsdpMessage) -> Unit
+    taskExecutors: TaskExecutors,
+    protocol: Protocol,
+    interfaces: Iterable<NetworkInterface>,
+    listener: (SsdpMessage) -> Unit
 ) {
     private val list: List<SsdpSearchServer> = when (protocol) {
         Protocol.IP_V4_ONLY -> {
             interfaces.filter { it.isAvailableInet4Interface() }
-                    .map { newServer(taskExecutors, Address.IP_V4, it, listener) }
+                .map { newServer(taskExecutors, Address.IP_V4, it, listener) }
         }
         Protocol.IP_V6_ONLY -> {
             interfaces.filter { it.isAvailableInet6Interface() }
-                    .map { newServer(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
+                .map { newServer(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
         }
         Protocol.DUAL_STACK -> {
             val v4 = interfaces.filter { it.isAvailableInet4Interface() }
-                    .map { newServer(taskExecutors, Address.IP_V4, it, listener) }
+                .map { newServer(taskExecutors, Address.IP_V4, it, listener) }
             val v6 = interfaces.filter { it.isAvailableInet6Interface() }
-                    .map { newServer(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
+                .map { newServer(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
             v4.toMutableList().also { it.addAll(v6) }
         }
     }
@@ -58,10 +58,10 @@ internal class SsdpSearchServerList(
     companion object {
         // VisibleForTesting
         internal fun newServer(
-                taskExecutors: TaskExecutors,
-                address: Address,
-                nif: NetworkInterface,
-                listener: (SsdpMessage) -> Unit
+            taskExecutors: TaskExecutors,
+            address: Address,
+            nif: NetworkInterface,
+            listener: (SsdpMessage) -> Unit
         ): SsdpSearchServer {
             return SsdpSearchServer(taskExecutors, address, nif).also {
                 it.setResponseListener(listener)

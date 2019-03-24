@@ -160,8 +160,9 @@ interface HttpMessage {
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
     fun setBodyBinary(
-            body: ByteArray?,
-            withContentLength: Boolean)
+        body: ByteArray?,
+        withContentLength: Boolean
+    )
 
     /**
      * 指定されたOutputStreamにメッセージの内容を書き出す。

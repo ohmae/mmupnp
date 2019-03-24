@@ -164,7 +164,7 @@ class HttpClient(keepAlive: Boolean = true) {
             setHeader(Http.CONNECTION, Http.CLOSE)
         }
         return HttpClient(false)
-                .post(newRequest, redirectDepth + 1)
+            .post(newRequest, redirectDepth + 1)
     }
 
     // VisibleForTesting
