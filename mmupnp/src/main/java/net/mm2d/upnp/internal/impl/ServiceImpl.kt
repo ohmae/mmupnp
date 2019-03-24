@@ -16,6 +16,8 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * [Service]の実装
@@ -220,6 +222,24 @@ internal class ServiceImpl(
         executors.io {
             val result = unsubscribeSync()
             callback?.let { executors.callback { it(result) } }
+        }
+    }
+
+    override suspend fun subscribeAsync(keepRenew: Boolean): Boolean {
+        return suspendCoroutine {continuation ->
+            subscribe(keepRenew) { continuation.resume(it) }
+        }
+    }
+
+    override suspend fun renewSubscribeAsync(): Boolean {
+        return suspendCoroutine {continuation ->
+            renewSubscribe { continuation.resume(it) }
+        }
+    }
+
+    override suspend fun unsubscribeAsync(): Boolean {
+        return suspendCoroutine {continuation ->
+            unsubscribe { continuation.resume(it) }
         }
     }
 

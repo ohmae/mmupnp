@@ -29,6 +29,9 @@ import javax.xml.transform.TransformerException
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * [Action]の実装。
@@ -113,6 +116,31 @@ internal class ActionImpl(
             }
         }
     }
+
+    override suspend fun invokeAsync(
+        argumentValues: Map<String, String>,
+        returnErrorResponse: Boolean
+    ): Map<String, String> {
+        return suspendCoroutine { continuation ->
+            invoke(argumentValues, returnErrorResponse,
+                { continuation.resume(it) },
+                { continuation.resumeWithException(it) })
+        }
+    }
+
+    override suspend fun invokeCustomAsync(
+        argumentValues: Map<String, String>,
+        customNamespace: Map<String, String>,
+        customArguments: Map<String, String>,
+        returnErrorResponse: Boolean
+    ): Map<String, String> {
+        return suspendCoroutine { continuation ->
+            invokeCustom(argumentValues, customNamespace, customArguments, returnErrorResponse,
+                { continuation.resume(it) },
+                { continuation.resumeWithException(it) })
+        }
+    }
+
 
     /**
      * 入力をもとに引数リストを作成する。

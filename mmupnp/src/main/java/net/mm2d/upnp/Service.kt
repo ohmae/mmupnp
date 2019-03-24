@@ -198,4 +198,26 @@ interface Service {
      * @see ControlPointFactory.create
      */
     fun unsubscribe(callback: ((Boolean) -> Unit)? = null)
+
+    /**
+     * Subscribeの非同期実行
+     *
+     * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
+     * @see ControlPointFactory.create
+     */
+    suspend fun subscribeAsync(keepRenew: Boolean = false): Boolean
+
+    /**
+     * RenewSubscribeを非同期実行する
+     *
+     * @see ControlPointFactory.create
+     */
+    suspend fun renewSubscribeAsync(): Boolean
+
+    /**
+     * Unsubscribeを非同期実行する
+     *
+     * @see ControlPointFactory.create
+     */
+    suspend fun unsubscribeAsync(): Boolean
 }

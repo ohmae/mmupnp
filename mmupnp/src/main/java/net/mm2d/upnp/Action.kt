@@ -231,6 +231,44 @@ interface Action {
         onError: ((IOException) -> Unit)? = null
     )
 
+    /**
+     * Actionを非同期実行する。
+     *
+     * @param argumentValues      引数への入力値
+     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see FAULT_CODE_KEY
+     * @see FAULT_STRING_KEY
+     * @see ERROR_CODE_KEY
+     * @see ERROR_DESCRIPTION_KEY
+     */
+    suspend fun invokeAsync(
+        argumentValues: Map<String, String>,
+        returnErrorResponse: Boolean = false
+    ): Map<String, String>
+
+    /**
+     * Actionを非同期実行する。【試験的実装】
+     *
+     * @param argumentValues      引数への入力値
+     * @param customNamespace     カスタム引数のNamespace情報、不要な場合null
+     * @param customArguments     カスタム引数
+     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
+     * @return 実行結果
+     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see FAULT_CODE_KEY
+     * @see FAULT_STRING_KEY
+     * @see ERROR_CODE_KEY
+     * @see ERROR_DESCRIPTION_KEY
+     */
+    suspend fun invokeCustomAsync(
+        argumentValues: Map<String, String>,
+        customNamespace: Map<String, String> = emptyMap(),
+        customArguments: Map<String, String> = emptyMap(),
+        returnErrorResponse: Boolean = false
+    ): Map<String, String>
+
     companion object {
         /**
          * エラーレスポンスの faultcode を格納するkey。

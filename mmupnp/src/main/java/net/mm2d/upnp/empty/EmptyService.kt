@@ -26,6 +26,9 @@ object EmptyService : Service {
     override fun subscribeSync(keepRenew: Boolean): Boolean = false
     override fun renewSubscribeSync(): Boolean = false
     override fun unsubscribeSync(): Boolean = false
+    override suspend fun subscribeAsync(keepRenew: Boolean): Boolean = false
+    override suspend fun renewSubscribeAsync(): Boolean = false
+    override suspend fun unsubscribeAsync(): Boolean = false
 
     override fun subscribe(keepRenew: Boolean, callback: ((Boolean) -> Unit)?) {
         callback?.invoke(false)

@@ -56,4 +56,20 @@ object EmptyAction : Action {
     ) {
         onError?.invoke(IOException("empty object"))
     }
+
+    override suspend fun invokeAsync(
+        argumentValues: Map<String, String>,
+        returnErrorResponse: Boolean
+    ): Map<String, String> {
+        throw IOException("empty object")
+    }
+
+    override suspend fun invokeCustomAsync(
+        argumentValues: Map<String, String>,
+        customNamespace: Map<String, String>,
+        customArguments: Map<String, String>,
+        returnErrorResponse: Boolean
+    ): Map<String, String> {
+        throw IOException("empty object")
+    }
 }
