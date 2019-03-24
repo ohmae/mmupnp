@@ -200,9 +200,9 @@ public class EventReceiverTest {
             }
         };
         receiver.start();
-        Thread.sleep(100);
+        Thread.sleep(500);
         receiver.stop();
-        Thread.sleep(10);
+        Thread.sleep(100);
 
         final HttpResponse response = HttpResponse.create();
         response.readData(new ByteArrayInputStream(baos.toByteArray()));

@@ -49,18 +49,21 @@ public class SubscribeHolder implements Runnable {
      * スレッドを開始する。
      */
     void start() {
-        mFutureTask = new FutureTask<>(this, null);
-        mTaskExecutors.manager(mFutureTask);
+        final FutureTask<?> task = new FutureTask<>(this, null);
+        mFutureTask = task;
+        mTaskExecutors.manager(task);
     }
 
     /**
      * スレッドの停止を要求する。
      */
     void stop() {
-        if (mFutureTask != null) {
-            mFutureTask.cancel(false);
-            mFutureTask = null;
+        final FutureTask<?> task = mFutureTask;
+        if (task == null) {
+            return;
         }
+        task.cancel(false);
+        mFutureTask = null;
     }
 
     /**
@@ -151,12 +154,17 @@ public class SubscribeHolder implements Runnable {
         mSubscriptionMap.clear();
     }
 
+    private boolean isCancelled() {
+        final FutureTask<?> task = mFutureTask;
+        return task == null || task.isCancelled();
+    }
+
     @Override
     public void run() {
         final Thread thread = Thread.currentThread();
         thread.setName(thread.getName() + "-subscribe-holder");
         try {
-            while (mFutureTask != null && !mFutureTask.isCancelled()) {
+            while (!isCancelled()) {
                 renewSubscribe(waitEntry());
                 removeExpiredService();
                 waitNextRenewTime();

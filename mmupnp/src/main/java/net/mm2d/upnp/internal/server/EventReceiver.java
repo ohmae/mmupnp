@@ -104,18 +104,22 @@ public class EventReceiver implements Runnable {
         synchronized (this) {
             mReady = false;
         }
-        mFutureTask = new FutureTask<>(this, null);
+        final FutureTask<?> task = new FutureTask<>(this, null);
+        mFutureTask = task;
         mTaskExecutors.server(mFutureTask);
     }
 
     /**
      * 受信スレッドを終了させる。
      */
+    @SuppressWarnings("Duplicates")
     public void stop() {
-        if (mFutureTask != null) {
-            mFutureTask.cancel(false);
-            mFutureTask = null;
+        final FutureTask<?> task = mFutureTask;
+        if (task == null) {
+            return;
         }
+        task.cancel(false);
+        mFutureTask = null;
         IoUtils.closeQuietly(mServerSocket);
         synchronized (mClientList) {
             for (final ClientTask client : mClientList) {
@@ -163,6 +167,11 @@ public class EventReceiver implements Runnable {
         notifyAll();
     }
 
+    private boolean isCancelled() {
+        final FutureTask<?> task = mFutureTask;
+        return task == null || task.isCancelled();
+    }
+
     @Override
     public void run() {
         final Thread thread = Thread.currentThread();
@@ -170,7 +179,7 @@ public class EventReceiver implements Runnable {
         try {
             mServerSocket = createServerSocket();
             ready();
-            while (mFutureTask != null && !mFutureTask.isCancelled()) {
+            while (!isCancelled()) {
                 final Socket sock = mServerSocket.accept();
                 sock.setSoTimeout(Property.DEFAULT_TIMEOUT);
                 final ClientTask client = new ClientTask(this, sock);
@@ -305,18 +314,22 @@ public class EventReceiver implements Runnable {
          * スレッドを作成し開始する。
          */
         void start(@Nonnull final TaskExecutors taskExecutors) {
-            mFutureTask = new FutureTask<>(this, null);
-            taskExecutors.io(mFutureTask);
+            final FutureTask<?> task = new FutureTask<>(this, null);
+            mFutureTask = task;
+            taskExecutors.io(task);
         }
 
         /**
          * スレッドを終了させ、ソケットのクローズを行う。
          */
+        @SuppressWarnings("Duplicates")
         void stop() {
-            if (mFutureTask != null) {
-                mFutureTask.cancel(false);
-                mFutureTask = null;
+            final FutureTask<?> task = mFutureTask;
+            if (task == null) {
+                return;
             }
+            task.cancel(false);
+            mFutureTask = null;
             IoUtils.closeQuietly(mSocket);
         }
 

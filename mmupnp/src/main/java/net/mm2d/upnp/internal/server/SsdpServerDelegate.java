@@ -71,7 +71,7 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
     @Nullable
     private FutureTask<?> mFutureTask;
 
-    private boolean mReady;
+    private volatile boolean mReady;
     @Nullable
     private MulticastSocket mSocket;
 
@@ -216,19 +216,19 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         if (mFutureTask != null) {
             stop();
         }
-        synchronized (this) {
-            mReady = false;
-        }
+        mReady = false;
         mFutureTask = new FutureTask<>(this, null);
         mTaskExecutors.server(mFutureTask);
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void stop() {
-        if (mFutureTask == null) {
+        final FutureTask<?> task = mFutureTask;
+        if (task == null) {
             return;
         }
-        mFutureTask.cancel(false);
+        task.cancel(false);
         mFutureTask = null;
         IoUtils.closeQuietly(mSocket);
     }
@@ -310,6 +310,11 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         }
     }
 
+    private boolean isCancelled() {
+        final FutureTask<?> task = mFutureTask;
+        return task == null || task.isCancelled();
+    }
+
     /**
      * 受信処理を行う。
      *
@@ -318,11 +323,11 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
     // VisibleForTesting
     void receiveLoop(@Nonnull final MulticastSocket socket) throws IOException {
         final byte[] buf = new byte[1500];
-        while (mFutureTask != null && !mFutureTask.isCancelled()) {
+        while (!isCancelled()) {
             try {
                 final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                 socket.receive(dp);
-                if (mFutureTask == null || mFutureTask.isCancelled()) {
+                if (isCancelled()) {
                     break;
                 }
                 mReceiver.onReceive(dp.getAddress(), dp.getData(), dp.getLength());

@@ -63,18 +63,21 @@ public class DeviceHolder implements Runnable {
      * スレッドを開始する。
      */
     public void start() {
-        mFutureTask = new FutureTask<>(this, null);
-        mTaskExecutors.manager(mFutureTask);
+        final FutureTask<?> task = new FutureTask<>(this, null);
+        mFutureTask = task;
+        mTaskExecutors.manager(task);
     }
 
     /**
      * スレッドに割り込みをかけ終了させる。
      */
     public void stop() {
-        if (mFutureTask != null) {
-            mFutureTask.cancel(false);
-            mFutureTask = null;
+        final FutureTask<?> task = mFutureTask;
+        if (task == null) {
+            return;
         }
+        task.cancel(false);
+        mFutureTask = null;
     }
 
     /**
@@ -138,12 +141,17 @@ public class DeviceHolder implements Runnable {
         return mDeviceMap.size();
     }
 
+    private boolean isCancelled() {
+        final FutureTask<?> task = mFutureTask;
+        return task == null || task.isCancelled();
+    }
+
     @Override
     public synchronized void run() {
         final Thread thread = Thread.currentThread();
         thread.setName(thread.getName() + "-device-holder");
         try {
-            while (mFutureTask != null && !mFutureTask.isCancelled()) {
+            while (!isCancelled()) {
                 while (mDeviceMap.size() == 0) {
                     wait();
                 }
