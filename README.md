@@ -61,9 +61,9 @@ see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
 
 ### Test release
 
-This library is currently under development of 2.0.0.
-Currently beta version and undergoing destructive change.
-
+This library is under development of 2.0.0.
+Currently release candidate.
+If no big bug is found, it will be released as it is.
 It is distributed in this maven repository.
 
 ```gradle
@@ -73,9 +73,14 @@ repositories {
     }
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:2.0.0-beta1'
+    implementation 'net.mm2d:mmupnp:2.0.0-rc1'
 }
 ```
+
+And also starting to develop the next major version, 3.0.
+There are no plans to make major changes to the specification, but it will be rewritten with Kotlin.
+It has not been released yet, undergoing destructive change.
+Development branch is [here](https://github.com/ohmae/mmupnp/tree/development/3.0.0-kotlin).
 
 ### Initialize and Start
 
