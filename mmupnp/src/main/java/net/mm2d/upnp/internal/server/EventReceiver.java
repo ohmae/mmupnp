@@ -141,10 +141,13 @@ public class EventReceiver implements Runnable {
      * @return サーバソケットのポート番号
      */
     public int getLocalPort() {
-        if (!waitReady() || mServerSocket == null) {
-            return 0;
+        if (waitReady()) {
+            final ServerSocket socket = mServerSocket;
+            if (socket != null) {
+                return socket.getLocalPort();
+            }
         }
-        return mServerSocket.getLocalPort();
+        return 0;
     }
 
     @SuppressWarnings("Duplicates")
@@ -162,7 +165,7 @@ public class EventReceiver implements Runnable {
         return mReady;
     }
 
-    private synchronized void ready() {
+    private synchronized void notifyReady() {
         mReady = true;
         notifyAll();
     }
@@ -178,7 +181,7 @@ public class EventReceiver implements Runnable {
         thread.setName(thread.getName() + "-event-receiver");
         try {
             mServerSocket = createServerSocket();
-            ready();
+            notifyReady();
             while (!isCancelled()) {
                 final Socket sock = mServerSocket.accept();
                 sock.setSoTimeout(Property.DEFAULT_TIMEOUT);

@@ -38,7 +38,6 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
-// TODO: SocketChannelを使用した受信(MulticastChannelはAndroid N以降のため保留)
 class SsdpServerDelegate implements SsdpServer, Runnable {
     interface Receiver {
         /**
@@ -273,7 +272,7 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
         return mReady;
     }
 
-    private synchronized void ready() {
+    private synchronized void notifyReady() {
         mReady = true;
         notifyAll();
     }
@@ -294,7 +293,7 @@ class SsdpServerDelegate implements SsdpServer, Runnable {
             if (mBindPort != 0) {
                 socket.joinGroup(getSsdpInetAddress());
             }
-            ready();
+            notifyReady();
             receiveLoop(socket);
         } catch (final IOException ignored) {
         } finally {
