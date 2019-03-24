@@ -1,5 +1,7 @@
 apply plugin: 'java'
+apply plugin: 'kotlin'
 apply plugin: 'maven'
+apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'jacoco'
 
@@ -19,11 +21,17 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation 'net.mm2d:log:0.2.0'
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.hamcrest:hamcrest-library:1.3'
-    testImplementation 'org.mockito:mockito-core:2.18.3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "net.mm2d:log:0.8.0"
+
+    testImplementation "io.mockk:mockk:1.9.1"
+    testImplementation "com.google.truth:truth:0.43"
+    testRuntimeOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+}
+
+dokka {
+    outputFormat = 'html'
+    // outputDirectory = "../docs/dokka"
 }
 
 bintray {
@@ -92,17 +100,6 @@ uploadArchives {
     }
 }
 
-javadoc {
-    title = "mmupnp $version API"
-    description "Generates Javadoc."
-    options {
-        charSet = 'UTF-8'
-        encoding = "UTF-8"
-        links("https://docs.oracle.com/javase/jp/7/api/")
-        stylesheetFile = new File("stylesheet.css")
-    }
-}
-
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -113,12 +110,22 @@ artifacts {
 }
 
 jacoco {
-    toolVersion = '0.8.1'
+    toolVersion = '0.8.3'
 }
 
 jacocoTestReport {
     reports {
         xml.enabled true
         html.enabled true
+    }
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.6"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.6"
     }
 }

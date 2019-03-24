@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'kotlin'
 
 group 'net.mm2d'
 version 1.0
@@ -12,7 +13,8 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation project(':mmupnp')
-    implementation 'net.mm2d:log:0.2.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'net.mm2d:log:0.8.0'
     testImplementation 'junit:junit:4.12'
 }
 
@@ -22,4 +24,14 @@ jar {
     }
     from configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}
     from "$buildDir/classes/main"
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.6"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.6"
+    }
 }
