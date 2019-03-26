@@ -47,26 +47,50 @@ public class EmptyActionTest {
     }
 
     @Test(expected = IOException.class)
-    public void invoke() throws Exception {
+    public void invokeSync() throws Exception {
         final Action action = new EmptyAction();
         action.invokeSync(Collections.emptyMap());
     }
 
     @Test(expected = IOException.class)
-    public void invoke1() throws Exception {
+    public void invokeSync1() throws Exception {
         final Action action = new EmptyAction();
         action.invokeSync(Collections.emptyMap(), false);
     }
 
     @Test(expected = IOException.class)
-    public void invokeCustom() throws Exception {
+    public void invokeCustomSync() throws Exception {
         final Action action = new EmptyAction();
         action.invokeCustomSync(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
     }
 
     @Test(expected = IOException.class)
-    public void invokeCustom1() throws Exception {
+    public void invokeCustomSync1() throws Exception {
         final Action action = new EmptyAction();
         action.invokeCustomSync(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap(), false);
+    }
+
+    @Test
+    public void invoke() {
+        final Action action = new EmptyAction();
+        action.invoke(Collections.emptyMap(), null);
+    }
+
+    @Test
+    public void invoke1() {
+        final Action action = new EmptyAction();
+        action.invoke(Collections.emptyMap(), false, null);
+    }
+
+    @Test
+    public void invokeCustom() {
+        final Action action = new EmptyAction();
+        action.invokeCustom(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap(), null);
+    }
+
+    @Test
+    public void invokeCustom1() {
+        final Action action = new EmptyAction();
+        action.invokeCustom(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap(), false, null);
     }
 }
