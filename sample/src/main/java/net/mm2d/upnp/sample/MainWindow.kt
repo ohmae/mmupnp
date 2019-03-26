@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp.sample
 
+import com.google.gson.Gson
 import net.mm2d.log.Logger
 import net.mm2d.log.Senders
 import net.mm2d.upnp.ControlPoint
@@ -18,6 +19,8 @@ import net.mm2d.upnp.Service
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.io.File
+import java.io.FileOutputStream
 import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
@@ -132,12 +135,44 @@ class MainWindow private constructor() : JFrame() {
         it.addActionListener { controlPoint.search() }
     }
 
+    private fun makeDumpButton(): JButton = JButton("DMS/DMR Dump").also {
+        it.addActionListener { dump() }
+    }
+
+    private fun selectSaveDirectory(): File? {
+        val chooser = JFileChooser().also {
+            it.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+            it.dialogTitle = "select directory"
+        }
+        val selected = chooser.showSaveDialog(this)
+        return if (selected == JFileChooser.APPROVE_OPTION) {
+            chooser.selectedFile
+        } else null
+    }
+
+    private fun dump() {
+        val dir = selectSaveDirectory() ?: return
+        val json = controlPoint.deviceList
+            .filter { it.deviceType.startsWith(DMS_PREFIX) || it.deviceType.startsWith(DMR_PREFIX) }
+            .map { Server(it.location, it.friendlyName) }
+            .let { Gson().toJson(it) }
+        FileOutputStream(File(dir, "locations.json")).use {
+            it.write(json.toByteArray())
+        }
+    }
+
+    private data class Server(
+        val location: String,
+        val friendlyName: String
+    )
+
     private fun makeControlPanel(): JPanel = JPanel().also {
         it.layout = FlowLayout()
         it.add(makeStartButton())
         it.add(makeStopButton())
         it.add(makeClearButton())
         it.add(makeSearchButton())
+        it.add(makeDumpButton())
     }
 
     private fun makeTextArea(): JTextArea = JTextArea().also {
@@ -182,6 +217,9 @@ class MainWindow private constructor() : JFrame() {
     }
 
     companion object {
+        private const val DMS_PREFIX = "urn:schemas-upnp-org:device:MediaServer"
+        private const val DMR_PREFIX = "urn:schemas-upnp-org:device:MediaRenderer"
+
         @JvmStatic
         fun main(args: Array<String>) {
             Logger.setLogLevel(Logger.VERBOSE)
