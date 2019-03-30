@@ -166,6 +166,7 @@ interface Action {
      * @param onResult            結果を通知するコールバック。callbackスレッドで実行される。
      * @param onError             エラー発生を通知するコールバック。callbackスレッドで実行される。
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @see ControlPointFactory.create
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
      * @see ERROR_CODE_KEY
@@ -217,6 +218,7 @@ interface Action {
      * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
      * @param onResult            結果を通知するコールバック。callbackスレッドで実行される。
      * @param onError             エラー発生を通知するコールバック。callbackスレッドで実行される。
+     * @see ControlPointFactory.create
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
      * @see ERROR_CODE_KEY

@@ -16,9 +16,9 @@ interface ControlPoint {
     /**
      * 機器発見イベント通知用リスナー。
      *
-     * [onDiscover] [onLost]及び、
-     * [NotifyEventListener.onNotifyEvent]は、いずれも同一のスレッドからコールされる。
+     * リスナー通知はcallbackスレッドで実行される。
      *
+     * @see ControlPointFactory.create
      * @see NotifyEventListener
      */
     interface DiscoveryListener {
@@ -44,11 +44,9 @@ interface ControlPoint {
     /**
      * NotifyEvent通知を受け取るリスナー。
      *
-     * [onNotifyEvent]及び、
-     * [DiscoveryListener.onDiscover]
-     * [DiscoveryListener.onLost]
-     * は、いずれも同一のスレッドからコールされる。
+     * リスナー通知はcallbackスレッドで実行される。
      *
+     * @see ControlPointFactory.create
      * @see DiscoveryListener
      */
     interface NotifyEventListener {
@@ -164,8 +162,11 @@ interface ControlPoint {
     /**
      * 機器発見のリスナーを登録する。
      *
+     * リスナー通知はcallbackスレッドで実行される。
+     *
      * @param listener リスナー
      * @see DiscoveryListener
+     * @see ControlPointFactory.create
      */
     fun addDiscoveryListener(listener: DiscoveryListener)
 
@@ -180,8 +181,11 @@ interface ControlPoint {
     /**
      * NotifyEvent受信リスナーを登録する。
      *
+     * リスナー通知はcallbackスレッドで実行される。
+     *
      * @param listener リスナー
      * @see NotifyEventListener
+     * @see ControlPointFactory.create
      */
     fun addNotifyEventListener(listener: NotifyEventListener)
 
