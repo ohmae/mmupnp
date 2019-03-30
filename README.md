@@ -53,7 +53,7 @@ Add dependencies, such as the following.
 
 ```gradle
 dependencies {
-    implementation 'net.mm2d:mmupnp:1.8.1'
+    implementation 'net.mm2d:mmupnp:2.0.0'
 }
 ```
 
@@ -61,10 +61,12 @@ see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
 
 ### Test release
 
-This library is under development of 2.0.0.
-Currently release candidate.
-If no big bug is found, it will be released as it is.
-It is distributed in this maven repository.
+This library is under development of 3.0.0.
+There are no plans to make major changes to the specification, but it will be rewritten with Kotlin.
+And undergoing destructive change.
+Development branch is [here](https://github.com/ohmae/mmupnp/tree/development/3.0.0-kotlin).
+
+It will be distributed in this maven repository. (Not yet released)
 
 ```gradle
 repositories {
@@ -73,14 +75,9 @@ repositories {
     }
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:2.0.0-rc1'
+    implementation 'net.mm2d:mmupnp:3.0.0-alpha1'
 }
 ```
-
-And also starting to develop the next major version, 3.0.
-There are no plans to make major changes to the specification, but it will be rewritten with Kotlin.
-It has not been released yet, undergoing destructive change.
-Development branch is [here](https://github.com/ohmae/mmupnp/tree/development/3.0.0-kotlin).
 
 ### Initialize and Start
 
