@@ -9,11 +9,8 @@ package net.mm2d.upnp.sample;
 
 import net.mm2d.upnp.Action;
 import net.mm2d.upnp.Argument;
-import net.mm2d.upnp.StateVariable;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -38,23 +35,8 @@ public class ActionNode extends UpnpNode {
     }
 
     @Override
-    public String getDetailText() {
-        final Action action = getUserObject();
-        final StringBuilder sb = new StringBuilder();
-        sb.append("Name: ");
-        sb.append(action.getName());
-        sb.append('\n');
-        final List<Argument> args = action.getArgumentList();
-        for (final Argument arg : args) {
-            final StateVariable v = arg.getRelatedStateVariable();
-            sb.append(arg.isInputDirection() ? "in:" : "out:");
-            sb.append("(");
-            sb.append(v.getDataType());
-            sb.append(")");
-            sb.append(arg.getName());
-            sb.append('\n');
-        }
-        return sb.toString();
+    public String formatDescription() {
+        return Formatter.format(getUserObject());
     }
 
     @Override
@@ -70,12 +52,7 @@ public class ActionNode extends UpnpNode {
             final int y) {
         final JPopupMenu menu = new JPopupMenu();
         final JMenuItem invoke = new JMenuItem("Invoke Action");
-        invoke.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                new ActionWindow(getUserObject()).show(frame.getX() + x, frame.getY() + y);
-            }
-        });
+        invoke.addActionListener(e -> new ActionWindow(getUserObject()).show(frame.getX() + x, frame.getY() + y));
         menu.add(invoke);
         menu.show(invoker, x, y);
     }

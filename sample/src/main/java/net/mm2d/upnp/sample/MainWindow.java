@@ -7,7 +7,8 @@
 
 package net.mm2d.upnp.sample;
 
-import net.mm2d.log.Log;
+import net.mm2d.log.Logger;
+import net.mm2d.log.Senders;
 import net.mm2d.upnp.ControlPoint;
 import net.mm2d.upnp.ControlPoint.DiscoveryListener;
 import net.mm2d.upnp.ControlPoint.NotifyEventListener;
@@ -21,8 +22,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -51,15 +50,14 @@ import javax.swing.tree.TreeSelectionModel;
  * @author <a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a>
  */
 public class MainWindow extends JFrame {
-    private static final String TAG = "MainWindow";
-
     public static void main(final String[] args) {
-        Log.initialize(true, true);
+        Logger.setLogLevel(Logger.VERBOSE);
+        Logger.setSender(Senders.create());
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
-            Log.w(TAG, e);
+            e.printStackTrace();
         }
         new MainWindow();
     }
@@ -158,7 +156,7 @@ public class MainWindow extends JFrame {
         @Override
         public void valueChanged(final TreeSelectionEvent event) {
             final UpnpNode node = (UpnpNode) mTree.getLastSelectedPathComponent();
-            mDetail1.setText(node.getDetailText());
+            mDetail1.setText(node.formatDescription());
             mDetail2.setText(node.getDetailXml());
         }
     };
@@ -174,46 +172,28 @@ public class MainWindow extends JFrame {
 
     private JButton makeStartButton() {
         final JButton button = new JButton("START");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mControlPoint.start();
-                mControlPoint.search();
-            }
+        button.addActionListener(e -> {
+            mControlPoint.start();
+            mControlPoint.search();
         });
         return button;
     }
 
     private JButton makeStopButton() {
         final JButton button = new JButton("STOP");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mControlPoint.stop();
-            }
-        });
+        button.addActionListener(e -> mControlPoint.stop());
         return button;
     }
 
     private JButton makeClearButton() {
         final JButton button = new JButton("CLEAR");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mControlPoint.clearDeviceList();
-            }
-        });
+        button.addActionListener(e -> mControlPoint.clearDeviceList());
         return button;
     }
 
     private JButton makeSearchButton() {
         final JButton button = new JButton("M-SEARCH");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mControlPoint.search();
-            }
-        });
+        button.addActionListener(e -> mControlPoint.search());
         return button;
     }
 
@@ -265,7 +245,7 @@ public class MainWindow extends JFrame {
         }
     };
 
-    public MainWindow() {
+    private MainWindow() {
         super();
         mControlPoint = initControlPoint();
         setTitle("UPnP");

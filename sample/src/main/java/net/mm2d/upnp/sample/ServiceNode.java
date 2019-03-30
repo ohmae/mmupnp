@@ -8,13 +8,14 @@
 package net.mm2d.upnp.sample;
 
 import net.mm2d.upnp.Action;
+import net.mm2d.upnp.Device;
+import net.mm2d.upnp.Http;
 import net.mm2d.upnp.Service;
 
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -43,22 +44,8 @@ public class ServiceNode extends UpnpNode {
     }
 
     @Override
-    public String getDetailText() {
-        final Service service = getUserObject();
-        return "ServiceType: " +
-                service.getServiceType() +
-                '\n' +
-                "ServiceId: " +
-                service.getServiceId() +
-                '\n' +
-                "ScpdUrl: " +
-                service.getScpdUrl() +
-                '\n' +
-                "ControlUrl: " +
-                service.getControlUrl() +
-                '\n' +
-                "EventSubUrl: " +
-                service.getEventSubUrl();
+    public String formatDescription() {
+        return Formatter.format(getUserObject());
     }
 
     @Override
@@ -79,44 +66,28 @@ public class ServiceNode extends UpnpNode {
             final int y) {
         final JPopupMenu menu = new JPopupMenu();
         final JMenuItem open = new JMenuItem("Open Service Description");
-        open.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Service service = getUserObject();
-                try {
-                    Desktop.getDesktop().browse(service.getAbsoluteUrl(service.getScpdUrl()).toURI());
-                } catch (final IOException | URISyntaxException e1) {
-                    e1.printStackTrace();
-                }
+        open.addActionListener(e -> {
+            final Service service = getUserObject();
+            final Device device = service.getDevice();
+            final String baseUrl = device.getBaseUrl();
+            final String scpdUrl = service.getScpdUrl();
+            final int scopeId = device.getScopeId();
+            try {
+                final URI uri = Http.makeAbsoluteUrl(baseUrl, scpdUrl, scopeId).toURI();
+                Desktop.getDesktop().browse(uri);
+            } catch (final IOException | URISyntaxException e1) {
+                e1.printStackTrace();
             }
         });
         menu.add(open);
         if (mSubscribing) {
             final JMenuItem unsubscribe = new JMenuItem("Unsubscribe");
-            unsubscribe.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    try {
-                        getUserObject().unsubscribe();
-                        mSubscribing = false;
-                    } catch (final IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            });
+            unsubscribe.addActionListener(e -> getUserObject().unsubscribe(result -> mSubscribing = !result));
             menu.add(unsubscribe);
         } else {
             final JMenuItem subscribe = new JMenuItem("Subscribe");
-            subscribe.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    try {
-                        getUserObject().subscribe(true);
-                        mSubscribing = true;
-                    } catch (final IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
+            subscribe.addActionListener(e -> {
+                getUserObject().subscribe(true, result -> mSubscribing = result);
             });
             menu.add(subscribe);
         }

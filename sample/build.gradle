@@ -1,18 +1,18 @@
 apply plugin: 'java'
 
 group 'net.mm2d'
-version versionName
+version 1.0
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 dependencies {
-    implementation project(':lib')
-    implementation 'net.mm2d:log:0.0.3'
+    implementation project(':mmupnp')
+    implementation 'net.mm2d:log:0.2.0'
     testImplementation 'junit:junit:4.12'
 }
 

@@ -16,16 +16,11 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 - Easy to use
 - High response
 
-Of course, this also can be used from kotlin.
+This can also be used from kotlin.
 
 ## Requirements
-- Java SE 7 or later
-- Android API Level 15 (Android 4.0.3) or later
-
-As you know, Android Studio (2.2 or later) supports Java 8 development.
-But it is NOT fully support. Several statements depend on the API level.
-For example, try-with-resource statement requires API level 19.
-Therefore, this library restricts the use of such statement.
+- Java 8 or later (or Java 6 / 7 with retrolambda)
+- Android Gradle Plugin 3.0.0 or later
 
 ## Restrictions
 - This library support only ControlPoint functions.
@@ -46,17 +41,41 @@ Sample App
 
 ## How to use
 
-You can download this library from jCenter. (since Ver.1.7.0)
+Download this library from jCenter. (since Ver.1.7.0)
+
 ```gradle
 repositories {
     jcenter()
 }
 ```
 
-Add dependencies, as following.
+Add dependencies, such as the following.
+
 ```gradle
 dependencies {
-    compile 'net.mm2d:mmupnp:1.8.1'
+    implementation 'net.mm2d:mmupnp:2.0.0'
+}
+```
+
+see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
+
+### Test release
+
+This library is under development of 3.0.0.
+There are no plans to make major changes to the specification, but it will be rewritten with Kotlin.
+And undergoing destructive change.
+Development branch is [here](https://github.com/ohmae/mmupnp/tree/development/3.0.0-kotlin).
+
+It will be distributed in this maven repository. (Not yet released)
+
+```gradle
+repositories {
+    maven {
+        url 'https://ohmae.github.com/mmupnp/maven'
+    }
+}
+dependencies {
+    implementation 'net.mm2d:mmupnp:3.0.0-alpha1'
 }
 ```
 
@@ -72,18 +91,45 @@ cp.start();
 ...
 ```
 
-If you want to specify the network interface, describe the following.
+To specify the network interface, describe the following.
 
 ```java
-NetworkInterface ni = NetworkInterface.getByName("eth0");
-ControlPoint cp = ControlPointFactory.create(ni);
+NetworkInterface nif = NetworkInterface.getByName("eth0");
+Params params = new Params().setInterface(nif);
+ControlPoint cp = ControlPointFactory.create(nif);
 ```
 
 By default ControlPoint will work with dual stack of IPv4 and IPv6.
-If you want to operate with IPv4 only, specify the protocol as follows.
+To operate with IPv4 only, specify the protocol as follows.
 
 ```java
-ControlPoint cp = ControlPointFactory.create(Protocol.IP_V4_ONLY);
+Params params = new Params().setProtocol(Protocol.IP_V4_ONLY);
+ControlPoint controlPoint = ControlPointFactory.create(params);
+```
+
+You can change the callback thread.
+For example in Android, you may want to run callbacks with MainThread.
+In that case write as follows.
+
+```java
+Params params = new Params().setCallbackExecutor(new TaskExecutor() {
+    @Override
+    public boolean execute(@Nonnull final Runnable task) {
+        return handler.post(task);
+    }
+
+    @Override
+    public void terminate() {
+    }
+});
+ControlPoint cp = ControlPointFactory.create(params);
+```
+
+Or more simply as follows.
+
+```java
+Params params = new Params().setCallbackHandler(handler::post);
+ControlPoint cp = ControlPointFactory.create(params);
 ```
 
 ### M-SEARCH
@@ -113,9 +159,17 @@ arg.put("Filter", "*");
 arg.put("StartingIndex", "0");
 arg.put("RequestedCount", "0");
 arg.put("SortCriteria", "");
-Map<String, String> result = browse.invoke(arg);  // invoke action
-String resultXml = result.get("Result");          // get result
-...
+browse.invoke(arg, new ActionCallback() {         // invoke action
+    @Override
+    public void onResponse(@Nonnull final Map<String, String> response) {
+        String resultXml = result.get("Result");  // get result
+        ...
+    }
+    @Override
+    public void onError(@Nonnull final IOException e) {
+        ...                                       // on error
+    }
+});
 ```
 
 ### Event Subscription
@@ -152,12 +206,39 @@ When you want to reset, try again from the constructor call.
 
 ### Debug log output
 
-This library use [useful library for log output](https://github.com/ohmae/Log),
-If you want to see debug log. write as follows.
+This library use [log library](https://github.com/ohmae/log),
+
+If you want to enable debug log.
 
 ```java
-Log.initialize(true, true);
+Logger.setLogLevel(Logger.VERBOSE);
+Logger.setSender(Senders.create());
 ```
+
+In this case output to `System.out`
+
+To send log to a library,
+eg. Simply change the output method.
+
+```java
+Logger.setSender(new DefaultSender((level, tag, message) -> {
+    for (final String line : message.split("\n")) {
+        android.util.Log.println(level, tag, line);
+    }
+}));
+```
+
+eg. To handle exception
+
+```java
+Logger.setSender((level, message, throwable) -> {
+    if (level >= Log.DEBUG) {
+        SomeLogger.send(...)
+    }
+});
+```
+
+Please see [log library](https://github.com/ohmae/log) for more details
 
 ### Documents
 

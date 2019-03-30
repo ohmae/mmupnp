@@ -1,10 +1,26 @@
 buildscript {
+    def versionMajor = 2
+    def versionMinor = 0
+    def versionPatch = 0
+    def versionSuffix = ""
+    ext {
+        pj = [
+                versions : [
+                        name: "${versionMajor}.${versionMinor}.${versionPatch}${versionSuffix}",
+                        code: versionMajor * 10000 + versionMinor * 100 + versionPatch
+                ],
+                groupId  : 'net.mm2d',
+                siteUrl  : 'https://github.com/ohmae/mmupnp',
+                githubUrl: 'https://github.com/ohmae/mmupnp'
+        ]
+    }
     repositories {
         mavenCentral()
         jcenter()
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.21.0"
     }
 }
 

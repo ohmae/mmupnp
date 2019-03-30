@@ -1,2 +1,2 @@
-rootProject.name = 'mmupnp'
-include ':lib', ':sample'
+include ':mmupnp'
+include ':sample'

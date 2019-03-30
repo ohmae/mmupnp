@@ -12,8 +12,6 @@ import net.mm2d.upnp.Service;
 
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,40 +45,8 @@ public class DeviceNode extends UpnpNode {
     }
 
     @Override
-    public String getDetailText() {
-        final Device device = getUserObject();
-        return "UDN:  " +
-                device.getUdn() +
-                '\n' +
-                "DeviceType: " +
-                device.getDeviceType() +
-                '\n' +
-                "FriendlyName: " +
-                device.getFriendlyName() +
-                '\n' +
-                "Manufacture: " +
-                device.getManufacture() +
-                '\n' +
-                "ManufactureUrl: " +
-                device.getManufactureUrl() +
-                '\n' +
-                "ModelName: " +
-                device.getModelName() +
-                '\n' +
-                "ModelUrl: " +
-                device.getModelUrl() +
-                '\n' +
-                "ModelDescription: " +
-                device.getModelDescription() +
-                '\n' +
-                "ModelNumber: " +
-                device.getModelNumber() +
-                '\n' +
-                "SerialNumber: " +
-                device.getSerialNumber() +
-                '\n' +
-                "PresentationUrl: " +
-                device.getPresentationUrl();
+    public String formatDescription() {
+        return Formatter.format(getUserObject());
     }
 
     @Override
@@ -96,15 +62,12 @@ public class DeviceNode extends UpnpNode {
             final int y) {
         final JPopupMenu menu = new JPopupMenu();
         final JMenuItem open = new JMenuItem("Open Device Description");
-        open.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Device device = getUserObject();
-                try {
-                    Desktop.getDesktop().browse(new URI(device.getLocation()));
-                } catch (final IOException | URISyntaxException e1) {
-                    e1.printStackTrace();
-                }
+        open.addActionListener(e -> {
+            final Device device = getUserObject();
+            try {
+                Desktop.getDesktop().browse(new URI(device.getLocation()));
+            } catch (final IOException | URISyntaxException e1) {
+                e1.printStackTrace();
             }
         });
         menu.add(open);
