@@ -195,6 +195,7 @@ public interface Service {
      *
      * @param callback 結果を通知するコールバック。callbackスレッドで実行される。
      * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     void subscribe(@Nullable SubscribeCallback callback);
 
@@ -204,6 +205,7 @@ public interface Service {
      * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
      * @param callback  結果を通知するコールバック。callbackスレッドで実行される。
      * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     void subscribe(
             boolean keepRenew,
@@ -214,6 +216,7 @@ public interface Service {
      *
      * @param callback 結果を通知するコールバック。callbackスレッドで実行される。
      * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     void renewSubscribe(@Nullable SubscribeCallback callback);
 
@@ -222,6 +225,7 @@ public interface Service {
      *
      * @param callback 結果を通知するコールバック。callbackスレッドで実行される。
      * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     void unsubscribe(@Nullable SubscribeCallback callback);
 
@@ -235,6 +239,11 @@ public interface Service {
 
     /**
      * Subscribeの結果を受けとるコールバックインターフェース
+     *
+     * <p>callbackスレッドで実行される。
+     *
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     interface SubscribeCallback {
         /**

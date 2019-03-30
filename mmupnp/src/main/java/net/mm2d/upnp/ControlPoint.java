@@ -21,14 +21,11 @@ public interface ControlPoint {
     /**
      * 機器発見イベント通知用リスナー。
      *
-     * <p>
-     * {@link #onDiscover(Device)}
-     * {@link #onLost(Device)}
-     * 及び、
-     * {@link NotifyEventListener#onNotifyEvent(Service, long, String, String)}
-     * は、いずれも同一のスレッドからコールされる。
+     * <p>リスナーメソッドはcallbackスレッドからコールされる。
      *
      * @see NotifyEventListener
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     interface DiscoveryListener {
         /**
@@ -53,14 +50,11 @@ public interface ControlPoint {
     /**
      * NotifyEvent通知を受け取るリスナー。
      *
-     * <p>
-     * {@link #onNotifyEvent(Service, long, String, String)}
-     * 及び、
-     * {@link DiscoveryListener#onDiscover(Device)}
-     * {@link DiscoveryListener#onLost(Device)}
-     * は、いずれも同一のスレッドからコールされる。
+     * <p>リスナーメソッドはcallbackスレッドからコールされる。
      *
      * @see DiscoveryListener
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     interface NotifyEventListener {
         /**
@@ -170,8 +164,12 @@ public interface ControlPoint {
     /**
      * 機器発見のリスナーを登録する。
      *
+     * <p>リスナーメソッドはcallbackスレッドからコールされる。
+     *
      * @param listener リスナー
      * @see DiscoveryListener
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     void addDiscoveryListener(@Nonnull DiscoveryListener listener);
 
@@ -186,8 +184,12 @@ public interface ControlPoint {
     /**
      * NotifyEvent受信リスナーを登録する。
      *
+     * <p>リスナーメソッドはcallbackスレッドからコールされる。
+     *
      * @param listener リスナー
      * @see NotifyEventListener
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     void addNotifyEventListener(@Nonnull NotifyEventListener listener);
 

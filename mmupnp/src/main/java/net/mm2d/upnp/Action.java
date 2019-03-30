@@ -80,6 +80,8 @@ public interface Action {
     /**
      * Actionを同期実行する。
      *
+     * ブロッキング動作のためワーカースレッドからコールすること。
+     *
      * @param argumentValues 引数への入力値
      * @return 実行結果
      * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
@@ -91,6 +93,8 @@ public interface Action {
 
     /**
      * Actionを同期実行する。
+     *
+     * ブロッキング動作のためワーカースレッドからコールすること。
      *
      * @param argumentValues      引数への入力値
      * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
@@ -111,6 +115,8 @@ public interface Action {
     /**
      * Actionを同期実行する。【試験的実装】
      *
+     * ブロッキング動作のためワーカースレッドからコールすること。
+     *
      * @param argumentValues  引数への入力値
      * @param customNamespace カスタム引数のNamespace情報、不要な場合null
      * @param customArguments カスタム引数
@@ -128,6 +134,8 @@ public interface Action {
 
     /**
      * Actionを同期実行する。【試験的実装】
+     *
+     * ブロッキング動作のためワーカースレッドからコールすること。
      *
      * @param argumentValues      引数への入力値
      * @param customNamespace     カスタム引数のNamespace情報、不要な場合null
@@ -204,6 +212,7 @@ public interface Action {
      * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
      * @param callback            実行結果のコールバック。callbackスレッドで実行される。
      * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      * @see #FAULT_CODE_KEY
      * @see #FAULT_STRING_KEY
      * @see #ERROR_CODE_KEY
@@ -250,6 +259,7 @@ public interface Action {
      * @param customArguments カスタム引数
      * @param callback        実行結果のコールバック。callbackスレッドで実行される。
      * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      * @see #invokeCustom(Map, Map, Map, boolean, ActionCallback)
      */
     void invokeCustom(
@@ -299,6 +309,7 @@ public interface Action {
      * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
      * @param callback            実行結果のコールバック。callbackスレッドで実行される。
      * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      * @see #FAULT_CODE_KEY
      * @see #FAULT_STRING_KEY
      * @see #ERROR_CODE_KEY
@@ -313,6 +324,11 @@ public interface Action {
 
     /**
      * Actionの実行結果を通知するコールバックインターフェース
+     *
+     * <p>callbackスレッドで実行される。
+     *
+     * @see ControlPointFactory.Params#setCallbackExecutor(TaskExecutor)
+     * @see ControlPointFactory.Params#setCallbackHandler(CallbackHandler)
      */
     interface ActionCallback {
         /**
