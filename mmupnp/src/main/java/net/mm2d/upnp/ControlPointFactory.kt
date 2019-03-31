@@ -7,9 +7,9 @@
 
 package net.mm2d.upnp
 
+import net.mm2d.upnp.Adapter.adapter
 import net.mm2d.upnp.internal.impl.ControlPointImpl
 import net.mm2d.upnp.internal.impl.DiFactory
-
 import java.net.NetworkInterface
 
 /**
@@ -33,6 +33,7 @@ object ControlPointFactory {
      * @return ControlPointのインスタンス
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
+    @JvmStatic
     fun create(
         protocol: Protocol = Protocol.DEFAULT,
         interfaces: Iterable<NetworkInterface>? = null,
@@ -41,19 +42,13 @@ object ControlPointFactory {
         notifySegmentCheckEnabled: Boolean = false
     ): ControlPoint {
         val executor = callbackExecutor
-            ?: callbackHandler?.let { TaskExecutorWrapper(it) }
+            ?: callbackHandler?.let { adapter(it) }
         return ControlPointImpl(
             protocol,
             getDefaultInterfacesIfEmpty(protocol, interfaces),
             notifySegmentCheckEnabled,
             DiFactory(protocol, executor)
         )
-    }
-
-    private class TaskExecutorWrapper(
-        private val handler: (Runnable) -> Boolean
-    ) : TaskExecutor {
-        override fun execute(task: Runnable): Boolean = handler(task)
     }
 
     private fun getDefaultInterfacesIfEmpty(

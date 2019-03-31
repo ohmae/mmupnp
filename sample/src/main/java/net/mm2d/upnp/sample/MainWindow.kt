@@ -10,12 +10,9 @@ package net.mm2d.upnp.sample
 import com.google.gson.Gson
 import net.mm2d.log.Logger
 import net.mm2d.log.Senders
+import net.mm2d.upnp.Adapter.adapter
 import net.mm2d.upnp.ControlPoint
-import net.mm2d.upnp.ControlPoint.DiscoveryListener
-import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.ControlPointFactory
-import net.mm2d.upnp.Device
-import net.mm2d.upnp.Service
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -67,29 +64,19 @@ class MainWindow private constructor() : JFrame() {
     }
 
     private fun setUpControlPoint() {
-        controlPoint.addDiscoveryListener(object : DiscoveryListener {
-            override fun onDiscover(device: Device) {
-                update()
-            }
-
-            override fun onLost(device: Device) {
-                update()
-            }
-
-            private fun update() {
-                rootNode.removeAllChildren()
-                controlPoint.deviceList.forEach {
-                    rootNode.add(DeviceNode(it))
-                }
-                val model = tree.model as DefaultTreeModel
-                model.reload()
-            }
+        controlPoint.addDiscoveryListener(adapter({ update() }, { update() }))
+        controlPoint.addNotifyEventListener(adapter { service, seq, variable, value ->
+            eventArea.text = "${eventArea.text}${service.serviceType} : $seq : $variable : $value\n"
         })
-        controlPoint.addNotifyEventListener(object : NotifyEventListener {
-            override fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String) {
-                eventArea.text = "${eventArea.text}${service.serviceType} : $seq : $variable : $value\n"
-            }
-        })
+    }
+
+    private fun update() {
+        rootNode.removeAllChildren()
+        controlPoint.deviceList.forEach {
+            rootNode.add(DeviceNode(it))
+        }
+        val model = tree.model as DefaultTreeModel
+        model.reload()
     }
 
     private fun setUpTree() {
