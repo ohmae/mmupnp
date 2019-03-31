@@ -12,9 +12,6 @@ group pj.groupId
 archivesBaseName = libraryName
 version pj.versions.name
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 test.maxParallelForks = 4
 
 tasks.withType(JavaCompile) {

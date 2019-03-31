@@ -19,8 +19,8 @@ Universal Plug and Play (UPnP) ControlPoint library for Java.
 This can also be used from kotlin.
 
 ## Requirements
-- Java 8 or later (or Java 6 / 7 with retrolambda)
-- Android Gradle Plugin 3.0.0 or later
+- kotlin 1.3 or later
+- Java 6 or later
 
 ## Restrictions
 - This library support only ControlPoint functions.
@@ -145,7 +145,7 @@ val cp = ControlPointFactory.create(
 Call ControlPoint#search() or ControlPoint#search(String).
 
 ```kotlin
-cp.search()                   // Default ST is ssdp:all
+cp.search()                  // Default ST is ssdp:all
 ```
 
 ```kotlin
@@ -158,17 +158,17 @@ These methods send one M-SEARCH packet to all interfaces.
 For example, to invoke "Browse" (ContentDirectory) action...
 
 ```kotlin
-val mediaServer = cp.getDevice(UDN)         // get device by UDN
+val mediaServer = cp.getDevice(UDN)           // get device by UDN
 val browse = mediaServer.findAction("Browse") // find "Browse" action
-val arg = mapOf(                              // setup arguments
-    "ObjectID" to "0",
-    "BrowseFlag" to "BrowseDirectChildren",
-    "Filter" to "*",
-    "StartingIndex" to "0",
-    "RequestedCount" to "0",
-    "SortCriteria" to ""
-)
-browse.invoke(arg,
+browse?.invoke(
+    mapOf(
+        "ObjectID" to "0",
+        "BrowseFlag" to "BrowseDirectChildren",
+        "Filter" to "*",
+        "StartingIndex" to "0",
+        "RequestedCount" to "0",
+        "SortCriteria" to ""
+    ),
     onResult = {
         val resultXml = it.get("Result")// get result
         ...
@@ -176,7 +176,8 @@ browse.invoke(arg,
     onError = {
         // on error
         ...
-    })
+    }
+)
 ```
 
 ### Event Subscription
