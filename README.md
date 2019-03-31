@@ -62,12 +62,14 @@ Some API are not compatible with 1.x.x
 1.x.x support has been discontinued.
 To access 1.x.x see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
 
+This branch is developing 3.0.0.
+To access 2.x.x see [2.x.x branch](https://github.com/ohmae/mmupnp/tree/support/2.x.x)
+
 ### Test release
 
 This library is under development of 3.0.0.
 There are no plans to make major changes to the specification, but it will be rewritten with Kotlin.
 And undergoing destructive change.
-Development branch is [here](https://github.com/ohmae/mmupnp/tree/development/3.0.0-kotlin).
 
 It will be distributed in this maven repository. (Not yet released)
 
@@ -84,66 +86,70 @@ dependencies {
 
 ### Initialize and Start
 
-```java
-ControlPoint cp = ControlPointFactory.create();
-cp.initialize();
-// adding listener if necessary.
-cp.addDiscoveryListener(...);
-cp.addNotifyEventListener(...);
-cp.start();
+```kotlin
+val cp = ControlPointFactory.create().also {
+    // adding listener if necessary.
+    it.addDiscoveryListener(...)
+    it.addNotifyEventListener(...)
+    it.initialize()
+    it.start()
+}
 ...
 ```
 
 To specify the network interface, describe the following.
 
-```java
-NetworkInterface nif = NetworkInterface.getByName("eth0");
-Params params = new Params().setInterface(nif);
-ControlPoint cp = ControlPointFactory.create(nif);
+```kotlin
+val cp = ControlPointFactory.create(
+    interfaces = listOf(NetworkInterface.getByName("eth0"))
+)
 ```
 
 By default ControlPoint will work with dual stack of IPv4 and IPv6.
 To operate with IPv4 only, specify the protocol as follows.
 
-```java
-Params params = new Params().setProtocol(Protocol.IP_V4_ONLY);
-ControlPoint controlPoint = ControlPointFactory.create(params);
+```kotlin
+val cp = ControlPointFactory.create(
+    protocol = IP_V4_ONLY
+)
 ```
 
 You can change the callback thread.
 For example in Android, you may want to run callbacks with MainThread.
 In that case write as follows.
 
-```java
-Params params = new Params().setCallbackExecutor(new TaskExecutor() {
-    @Override
-    public boolean execute(@Nonnull final Runnable task) {
-        return handler.post(task);
-    }
-
-    @Override
-    public void terminate() {
-    }
-});
-ControlPoint cp = ControlPointFactory.create(params);
+```kotlin
+val cp = ControlPointFactory.create(
+    callbackHandler = { handler.post(it) }
+)
 ```
 
-Or more simply as follows.
+Or If use executor
 
-```java
-Params params = new Params().setCallbackHandler(handler::post);
-ControlPoint cp = ControlPointFactory.create(params);
+```kotlin
+val cp = ControlPointFactory.create(
+    callbackExecutor = object : TaskExecutor{
+        private val executor = Executors.newSingleThreadExecutor()
+        override fun execute(task: Runnable): Boolean {
+            executor.execute(task)
+        }
+
+        override fun terminate() {
+            executor.shutdownNow()
+        }
+    }
+)
 ```
 
 ### M-SEARCH
 Call ControlPoint#search() or ControlPoint#search(String).
 
-```java
-cp.search();                   // Default ST is ssdp:all
+```kotlin
+cp.search()                   // Default ST is ssdp:all
 ```
 
-```java
-cp.search("upnp:rootdevice"); // To use specific ST. In this case "upnp:rootdevice"
+```kotlin
+cp.search("upnp:rootdevice") // To use specific ST. In this case "upnp:rootdevice"
 ```
 
 These methods send one M-SEARCH packet to all interfaces.
@@ -151,57 +157,51 @@ These methods send one M-SEARCH packet to all interfaces.
 ### Invoke Action
 For example, to invoke "Browse" (ContentDirectory) action...
 
-```java
-...
-Device mediaServer = cp.getDevice(UDN);           // get device by UDN
-Action browse = mediaServer.findAction("Browse"); // find "Browse" action
-Map<String, String> arg = new HashMap<>();        // setup arguments
-arg.put("ObjectID", "0");
-arg.put("BrowseFlag", "BrowseDirectChildren");
-arg.put("Filter", "*");
-arg.put("StartingIndex", "0");
-arg.put("RequestedCount", "0");
-arg.put("SortCriteria", "");
-browse.invoke(arg, new ActionCallback() {         // invoke action
-    @Override
-    public void onResponse(@Nonnull final Map<String, String> response) {
-        String resultXml = result.get("Result");  // get result
+```kotlin
+val mediaServer = cp.getDevice(UDN)         // get device by UDN
+val browse = mediaServer.findAction("Browse") // find "Browse" action
+val arg = mapOf(                              // setup arguments
+    "ObjectID" to "0",
+    "BrowseFlag" to "BrowseDirectChildren",
+    "Filter" to "*",
+    "StartingIndex" to "0",
+    "RequestedCount" to "0",
+    "SortCriteria" to ""
+)
+browse.invoke(arg,
+    onResult = {
+        val resultXml = it.get("Result")// get result
         ...
-    }
-    @Override
-    public void onError(@Nonnull final IOException e) {
-        ...                                       // on error
-    }
-});
+    },
+    onError = {
+        // on error
+        ...
+    })
 ```
 
 ### Event Subscription
 For example, to subscribe ContentDirectory's events...
 
-```java
-...
+```kotlin
 // add listener to receive event
-cp.addNotifyEventListener(new NotifyEventListener(){
-  public void onNotifyEvent(Service service, long seq, String variable, String value) {
-    ...
-  }
-});
-Device mediaServer = cp.getDevice(UDN);          // get device by UDN
-Service cds = mediaServer.findServiceById(
-  "urn:upnp-org:serviceId:ContentDirectory");    // find Service by ID
-cds.subscribe(); // Start subscribe
+controlPoint.addNotifyEventListener(adapter { service, seq, variable, value ->
+    eventArea.text = "${eventArea.text}${service.serviceType} : $seq : $variable : $value\n"
+})
+val mediaServer = cp.getDevice(UDN)          // get device by UDN
+val cds = mediaServer.findServiceById(
+  "urn:upnp-org:serviceId:ContentDirectory") // find Service by ID
+cds.subscribe()                              // Start subscribe
 ...
-cds.unsubscribe(); // End subscribe
+cds.unsubscribe()                            // End subscribe
 ```
 
 ### Stop and Terminate
 
-```java
-...
-cp.stop();
-cp.removeDiscoveryListener(...);
-cp.removeNotifyEventListener(...);
-cp.terminate();
+```kotlin
+cp.stop()
+cp.removeDiscoveryListener(...)
+cp.removeNotifyEventListener(...)
+cp.terminate()
 ```
 
 It is not possible to re-initialize.
@@ -213,9 +213,9 @@ This library use [log library](https://github.com/ohmae/log),
 
 If you want to enable debug log.
 
-```java
-Logger.setLogLevel(Logger.VERBOSE);
-Logger.setSender(Senders.create());
+```kotlin
+Logger.setLogLevel(Logger.VERBOSE)
+Logger.setSender(Senders.create())
 ```
 
 In this case output to `System.out`
@@ -223,22 +223,22 @@ In this case output to `System.out`
 To send log to a library,
 eg. Simply change the output method.
 
-```java
-Logger.setSender(new DefaultSender((level, tag, message) -> {
-    for (final String line : message.split("\n")) {
-        android.util.Log.println(level, tag, line);
+```kotlin
+Logger.setSender(DefaultSender.create({ level, tag, message ->
+    message.split('\n').forEach {
+        android.util.Log.println(level, tag, it)
     }
-}));
+}))
 ```
 
 eg. To handle exception
 
-```java
-Logger.setSender((level, message, throwable) -> {
+```kotlin
+Logger.setSender { level, message, throwable -> 
     if (level >= Log.DEBUG) {
         SomeLogger.send(...)
     }
-});
+}
 ```
 
 Please see [log library](https://github.com/ohmae/log) for more details
