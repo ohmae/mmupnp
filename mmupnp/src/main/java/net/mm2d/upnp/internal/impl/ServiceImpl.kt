@@ -227,19 +227,29 @@ internal class ServiceImpl(
 
     override suspend fun subscribeAsync(keepRenew: Boolean): Boolean {
         return suspendCoroutine {continuation ->
-            subscribe(keepRenew) { continuation.resume(it) }
+            device.controlPoint.taskExecutors.io {
+                val result = subscribeSync(keepRenew)
+                continuation.resume(result)
+            }
         }
     }
 
     override suspend fun renewSubscribeAsync(): Boolean {
         return suspendCoroutine {continuation ->
+            device.controlPoint.taskExecutors.io {
+                val result = renewSubscribeSync()
+                continuation.resume(result)
+            }
             renewSubscribe { continuation.resume(it) }
         }
     }
 
     override suspend fun unsubscribeAsync(): Boolean {
         return suspendCoroutine {continuation ->
-            unsubscribe { continuation.resume(it) }
+            device.controlPoint.taskExecutors.io {
+                val result = unsubscribeSync()
+                continuation.resume(result)
+            }
         }
     }
 

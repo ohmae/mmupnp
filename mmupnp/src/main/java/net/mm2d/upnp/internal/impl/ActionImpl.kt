@@ -122,9 +122,14 @@ internal class ActionImpl(
         returnErrorResponse: Boolean
     ): Map<String, String> {
         return suspendCoroutine { continuation ->
-            invoke(argumentValues, returnErrorResponse,
-                { continuation.resume(it) },
-                { continuation.resumeWithException(it) })
+            service.device.controlPoint.taskExecutors.io {
+                try {
+                    val result = invokeSync(argumentValues, returnErrorResponse)
+                    continuation.resume(result)
+                } catch (e: IOException) {
+                    continuation.resumeWithException(e)
+                }
+            }
         }
     }
 
@@ -135,9 +140,14 @@ internal class ActionImpl(
         returnErrorResponse: Boolean
     ): Map<String, String> {
         return suspendCoroutine { continuation ->
-            invokeCustom(argumentValues, customNamespace, customArguments, returnErrorResponse,
-                { continuation.resume(it) },
-                { continuation.resumeWithException(it) })
+            service.device.controlPoint.taskExecutors.io {
+                try {
+                    val result = invokeCustomSync(argumentValues, customNamespace, customArguments, returnErrorResponse)
+                    continuation.resume(result)
+                } catch (e: IOException) {
+                    continuation.resumeWithException(e)
+                }
+            }
         }
     }
 
