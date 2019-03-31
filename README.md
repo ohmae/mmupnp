@@ -57,7 +57,10 @@ dependencies {
 }
 ```
 
-see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
+Some API are not compatible with 1.x.x
+
+1.x.x support has been discontinued.
+To access 1.x.x see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
 
 ### Test release
 
