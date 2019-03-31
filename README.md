@@ -199,8 +199,6 @@ cds.unsubscribe(); // End subscribe
 ```java
 ...
 cp.stop();
-cp.removeDiscoveryListener(...);
-cp.removeNotifyEventListener(...);
 cp.terminate();
 ```
 
