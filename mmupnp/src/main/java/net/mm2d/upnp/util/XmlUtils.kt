@@ -13,7 +13,6 @@ import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
-
 import java.io.IOException
 import java.io.StringReader
 import javax.xml.parsers.DocumentBuilder
@@ -40,7 +39,6 @@ object XmlUtils {
         }.newDocumentBuilder()
     }
 
-    @Synchronized
     @Throws(ParserConfigurationException::class)
     private fun getDocumentBuilder(awareness: Boolean): DocumentBuilder {
         return if (awareness) documentBuilderNs else documentBuilder
@@ -53,7 +51,6 @@ object XmlUtils {
      * @return Document
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
-    @Synchronized
     @Throws(ParserConfigurationException::class)
     @JvmStatic
     fun newDocument(awareness: Boolean): Document {
@@ -70,7 +67,6 @@ object XmlUtils {
      * @throws IOException                  入出力エラーが発生した
      * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
      */
-    @Synchronized
     @Throws(SAXException::class, IOException::class, ParserConfigurationException::class)
     @JvmStatic
     fun newDocument(awareness: Boolean, xml: String): Document {

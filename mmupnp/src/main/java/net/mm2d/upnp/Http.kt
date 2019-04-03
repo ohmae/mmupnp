@@ -12,6 +12,8 @@ import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /**
  * HTTPに必要な各種定義とユーティリティを提供する。
@@ -92,6 +94,7 @@ object Http {
     const val DEFAULT_PORT = 80
 
     const val HTTP_SCHEME = "http://"
+    private val formatLock = ReentrantLock()
     private val RFC_1123_FORMAT: DateFormat
     private val RFC_1036_FORMAT: DateFormat
     private val ASC_TIME_FORMAT: DateFormat
@@ -102,14 +105,6 @@ object Http {
         RFC_1036_FORMAT = SimpleDateFormat("EEEE, dd-MMM-yy HH:mm:ss z", Locale.US).also { it.timeZone = tz }
         ASC_TIME_FORMAT = SimpleDateFormat("E MMM d HH:mm:ss yyyy", Locale.US).also { it.timeZone = tz }
     }
-
-    /**
-     * 現在時刻の日付文字列を作成して返す。
-     *
-     * @return RFC1123形式の日付文字列
-     */
-    val currentDate: String
-        @Synchronized get() = formatDate(System.currentTimeMillis())
 
     /**
      * HTTPのステータスコードを表現するEnum
@@ -228,12 +223,13 @@ object Http {
      * @param string Dateヘッダ
      * @return パース結果、失敗した場合null
      */
-    @Synchronized
     fun parseDate(string: String?): Date? {
         if (string.isNullOrEmpty()) return null
-        return RFC_1123_FORMAT.parseOrNull(string)
-            ?: RFC_1036_FORMAT.parseOrNull(string)
-            ?: ASC_TIME_FORMAT.parseOrNull(string)
+        return formatLock.withLock {
+            RFC_1123_FORMAT.parseOrNull(string)
+                ?: RFC_1036_FORMAT.parseOrNull(string)
+                ?: ASC_TIME_FORMAT.parseOrNull(string)
+        }
     }
 
     private fun DateFormat.parseOrNull(source: String): Date? {
@@ -245,12 +241,18 @@ object Http {
     }
 
     /**
+     * 現在時刻の日付文字列を作成して返す。
+     *
+     * @return RFC1123形式の日付文字列
+     */
+    fun getCurrentDate(): String = formatDate(System.currentTimeMillis())
+
+    /**
      * 日付文字列を作成して返す。
      *
      * @param date 日付
      * @return RFC1123形式の日付文字列
      */
-    @Synchronized
     fun formatDate(date: Long): String {
         return formatDate(Date(date))
     }
@@ -261,9 +263,8 @@ object Http {
      * @param date 日付
      * @return RFC1123形式の日付文字列
      */
-    @Synchronized
-    fun formatDate(date: Date): String {
-        return RFC_1123_FORMAT.format(date)
+    fun formatDate(date: Date): String = formatLock.withLock {
+        RFC_1123_FORMAT.format(date)
     }
 
     /**

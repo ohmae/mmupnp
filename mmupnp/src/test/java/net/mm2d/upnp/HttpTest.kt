@@ -76,7 +76,7 @@ class HttpTest {
 
     @Test
     fun getCurrentDate() {
-        assertThat(Http.parseDate(Http.currentDate)).isNotNull()
+        assertThat(Http.parseDate(Http.getCurrentDate())).isNotNull()
     }
 
     @Test

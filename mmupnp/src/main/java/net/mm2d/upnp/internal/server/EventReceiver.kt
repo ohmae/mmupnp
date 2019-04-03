@@ -156,7 +156,6 @@ internal class EventReceiver(
      * @return HTTPメッセージが正常であればtrue
      */
     // VisibleForTesting
-    @Synchronized
     fun notifyEvent(sid: String, request: HttpRequest): Boolean {
         val listener = listener ?: return false
         val list = parsePropertyPairs(request)

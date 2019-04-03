@@ -27,6 +27,7 @@ internal class SubscribeHolder(
     private val taskExecutors: TaskExecutors
 ) : Runnable {
     private var futureTask: FutureTask<*>? = null
+    private val threadLock = ReentrantLock()
     private val lock = ReentrantLock()
     private val condition = lock.newCondition()
     private val subscriptionMap = mutableMapOf<String, SubscribeService>()
@@ -45,21 +46,23 @@ internal class SubscribeHolder(
     /**
      * スレッドを開始する。
      */
-    @Synchronized
     fun start() {
-        FutureTask(this, null).also {
-            futureTask = it
-            taskExecutors.manager(it)
+        threadLock.withLock {
+            FutureTask(this, null).also {
+                futureTask = it
+                taskExecutors.manager(it)
+            }
         }
     }
 
     /**
      * スレッドの停止を要求する。
      */
-    @Synchronized
     fun stop() {
-        futureTask?.cancel(false)
-        futureTask = null
+        threadLock.withLock {
+            futureTask?.cancel(false)
+            futureTask = null
+        }
     }
 
     private fun isCanceled(): Boolean {
