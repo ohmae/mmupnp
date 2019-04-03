@@ -11,6 +11,9 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
@@ -55,6 +58,16 @@ class NetworkUtilsTest {
 
     @RunWith(JUnit4::class)
     class NetworkInterfaceの取得 {
+        @Before
+        fun setUp() {
+            mockkStatic(NetworkInterface::class)
+        }
+
+        @After
+        fun teardown() {
+            unmockkStatic(NetworkInterface::class)
+        }
+
         @Test
         fun `networkInterfaces nullになることはない`() {
             assertThat(NetworkUtils.networkInterfaceList).isNotNull()
@@ -62,14 +75,12 @@ class NetworkUtilsTest {
 
         @Test
         fun getNetworkInterfaceList_Exceptionが発生すればemptyListが返る() {
-            mockkStatic(NetworkInterface::class)
             every { NetworkInterface.getNetworkInterfaces() } throws SocketException()
             assertThat(NetworkUtils.networkInterfaceList).isEmpty()
         }
 
         @Test
         fun getNetworkInterfaceList_nullが戻ればemptyListが返る() {
-            mockkStatic(NetworkInterface::class)
             every { NetworkInterface.getNetworkInterfaces() } returns null
             assertThat(NetworkUtils.networkInterfaceList).isEmpty()
         }
@@ -79,7 +90,6 @@ class NetworkUtilsTest {
             val enumeration: Enumeration<NetworkInterface> = mockk()
             every { enumeration.hasMoreElements() } returns false
             every { enumeration.nextElement() } returns null
-            mockkStatic(NetworkInterface::class)
             every { NetworkInterface.getNetworkInterfaces() } returns enumeration
             assertThat(NetworkUtils.networkInterfaceList).isEmpty()
         }
