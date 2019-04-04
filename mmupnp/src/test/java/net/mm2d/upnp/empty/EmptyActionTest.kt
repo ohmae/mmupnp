@@ -8,6 +8,10 @@
 package net.mm2d.upnp.empty
 
 import com.google.common.truth.Truth.assertThat
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -18,58 +22,82 @@ class EmptyActionTest {
 
     @Test
     fun getService() {
-        val action = EmptyAction
-        assertThat(action.service).isNotNull()
+        assertThat(EmptyAction.service).isNotNull()
     }
 
     @Test
     fun getName() {
-        val action = EmptyAction
-        assertThat(action.name).isNotNull()
+        assertThat(EmptyAction.name).isNotNull()
     }
 
     @Test
     fun getArgumentList() {
-        val action = EmptyAction
-        assertThat(action.argumentList).isNotNull()
+        assertThat(EmptyAction.argumentList).isNotNull()
     }
 
     @Test
     fun findArgument() {
-        val action = EmptyAction
-        assertThat(action.findArgument("")).isNull()
+        assertThat(EmptyAction.findArgument("")).isNull()
     }
 
     @Test(expected = IOException::class)
-    operator fun invoke() {
-        val action = EmptyAction
-        action.invokeSync(emptyMap())
+    fun invokeSync() {
+        EmptyAction.invokeSync(emptyMap())
     }
 
     @Test(expected = IOException::class)
-    fun invoke1() {
-        val action = EmptyAction
-        action.invokeSync(emptyMap(), false)
+    fun invokeCustomSync() {
+        EmptyAction.invokeCustomSync(emptyMap())
     }
 
-    @Test(expected = IOException::class)
+    @Test
+    fun invoke() {
+        EmptyAction.invoke(emptyMap())
+    }
+
+    @Test
     fun invoke2() {
-        val action = EmptyAction
-        action.invokeCustomSync(
+        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
+        val onError: (IOException) -> Unit = spyk({ _ -> })
+        EmptyAction.invoke(
             emptyMap(),
-            customNamespace = emptyMap(),
-            customArguments = emptyMap()
+            onResult = onResult,
+            onError = onError
         )
+        verify(inverse = true) { onResult.invoke(any()) }
+        verify(exactly = 1) { onError.invoke(any()) }
+    }
+
+    @Test
+    fun invokeCustom() {
+        EmptyAction.invokeCustom(emptyMap())
+    }
+
+    @Test
+    fun invokeCustom2() {
+        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
+        val onError: (IOException) -> Unit = spyk({ _ -> })
+        EmptyAction.invokeCustom(
+            emptyMap(),
+            onResult = onResult,
+            onError = onError
+        )
+        verify(inverse = true) { onResult.invoke(any()) }
+        verify(exactly = 1) { onError.invoke(any()) }
     }
 
     @Test(expected = IOException::class)
-    fun invoke3() {
-        val action = EmptyAction
-        action.invokeCustomSync(
-            emptyMap(),
-            customNamespace = emptyMap(),
-            customArguments = emptyMap(),
-            returnErrorResponse = false
-        )
+    fun invokeAsync() {
+        runBlocking {
+            EmptyAction.invokeAsync(emptyMap())
+        }
     }
+
+    @Test(expected = IOException::class)
+    fun invokeCustomAsync() {
+        runBlocking {
+            EmptyAction.invokeCustomAsync(emptyMap())
+        }
+    }
+
 }
