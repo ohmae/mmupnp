@@ -43,12 +43,9 @@ internal class ActionImpl(
     override val name: String,
     private val argumentMap: Map<String, Argument>
 ) : Action {
-    private val _argumentList: List<Argument> by lazy {
+    override val argumentList: List<Argument> by lazy {
         argumentMap.values.toList()
     }
-
-    override val argumentList: List<Argument>
-        get() = _argumentList
 
     override fun findArgument(name: String): Argument? {
         return argumentMap[name]

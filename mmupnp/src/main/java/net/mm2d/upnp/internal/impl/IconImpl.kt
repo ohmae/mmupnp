@@ -26,9 +26,8 @@ internal class IconImpl(
     override val depth: Int,
     override val url: String
 ) : Icon {
-    private var _binary: ByteArray? = null
-    override val binary: ByteArray?
-        get() = _binary
+    override var binary: ByteArray? = null
+        private set
 
     /**
      * URLからバイナリデータを読み込む。
@@ -41,7 +40,7 @@ internal class IconImpl(
     @Throws(IOException::class)
     fun loadBinary(client: HttpClient, baseUrl: String, scopeId: Int) {
         val url = Http.makeAbsoluteUrl(baseUrl, url, scopeId)
-        _binary = client.downloadBinary(url)
+        binary = client.downloadBinary(url)
     }
 
     /**
