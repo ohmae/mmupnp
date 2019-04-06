@@ -88,7 +88,7 @@ interface HttpMessage {
      *
      * @return メッセージ文字列
      */
-    val messageString: String
+    fun getMessageString(): String
 
     /**
      * Start Lineを設定する。

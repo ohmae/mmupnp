@@ -29,15 +29,16 @@ internal class HttpMessageDelegate(
     }
 
     private val headers: HttpHeaders
-    private var _bodyBinary: ByteArray? = null
     private var _body: String? = null
+    override var bodyBinary: ByteArray? = null
+        private set
 
     init {
         if (original == null) {
             headers = HttpHeaders()
         } else {
             headers = HttpHeaders(original.headers)
-            _bodyBinary = original._bodyBinary?.copyOf()
+            bodyBinary = original.bodyBinary?.copyOf()
             _body = original._body
         }
     }
@@ -55,19 +56,8 @@ internal class HttpMessageDelegate(
             !headers.containsValue(Http.CONNECTION, Http.CLOSE)
     override val contentLength: Int
         get() = headers[Http.CONTENT_LENGTH]?.toIntOrNull() ?: 0
-    override val bodyBinary: ByteArray?
-        get() = _bodyBinary
-    override val messageString: String
-        get() {
-            val body = _body
-            return getHeaderStringBuilder().also {
-                if (!body.isNullOrEmpty()) {
-                    it.append(body)
-                }
-            }.toString()
-        }
     override val body: String?
-        get() = _body ?: _bodyBinary?.decode()?.also { _body = it }
+        get() = _body ?: bodyBinary?.decode()?.also { _body = it }
 
     private fun ByteArray.decode(): String? {
         if (isEmpty()) return ""
@@ -114,6 +104,15 @@ internal class HttpMessageDelegate(
         return ByteArray(0)
     }
 
+    override fun getMessageString(): String {
+        val body = _body
+        return getHeaderStringBuilder().also {
+            if (!body.isNullOrEmpty()) {
+                it.append(body)
+            }
+        }.toString()
+    }
+
     override fun setStartLine(line: String) {
         startLineDelegate.startLine = line
     }
@@ -158,11 +157,11 @@ internal class HttpMessageDelegate(
         _body = string
         when {
             string == null ->
-                _bodyBinary = binary
+                bodyBinary = binary
             string.isEmpty() ->
-                _bodyBinary = ByteArray(0)
+                bodyBinary = ByteArray(0)
             else -> try {
-                _bodyBinary = getBytes(string)
+                bodyBinary = getBytes(string)
             } catch (e: UnsupportedEncodingException) {
                 Logger.w(e)
             }
@@ -181,7 +180,7 @@ internal class HttpMessageDelegate(
     @Throws(IOException::class)
     override fun writeData(outputStream: OutputStream) {
         outputStream.write(getHeaderBytes())
-        _bodyBinary?.let {
+        bodyBinary?.let {
             if (isChunked) {
                 writeChunkedBody(outputStream, it)
             } else {
@@ -250,7 +249,7 @@ internal class HttpMessageDelegate(
     private fun readBody(inputStream: InputStream) {
         val baos = ByteArrayOutputStream()
         readInputStream(inputStream, baos, contentLength)
-        _bodyBinary = baos.toByteArray()
+        bodyBinary = baos.toByteArray()
     }
 
     @Throws(IOException::class)
@@ -265,7 +264,7 @@ internal class HttpMessageDelegate(
             readInputStream(inputStream, baos, length)
             readLine(inputStream)
         }
-        _bodyBinary = baos.toByteArray()
+        bodyBinary = baos.toByteArray()
     }
 
     @Throws(IOException::class)
@@ -294,7 +293,7 @@ internal class HttpMessageDelegate(
     }
 
     override fun toString(): String {
-        return messageString
+        return getMessageString()
     }
 
     companion object {

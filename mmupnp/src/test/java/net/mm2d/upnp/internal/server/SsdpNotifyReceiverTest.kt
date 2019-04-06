@@ -113,7 +113,7 @@ class SsdpNotifyReceiverTest {
         message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER)
         message.setHeader(Http.MX, "1")
         message.setHeader(Http.ST, SsdpSearchServer.ST_ALL)
-        val data = message.message.messageString.toByteArray()
+        val data = message.message.getMessageString().toByteArray()
 
         receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
 

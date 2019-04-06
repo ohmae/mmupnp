@@ -132,8 +132,8 @@ class HttpRequestDelegateTest {
 
     @Test
     fun getMessageString() {
-        message.messageString
-        verify(exactly = 1) { delegate.messageString }
+        message.getMessageString()
+        verify(exactly = 1) { delegate.getMessageString() }
     }
 
     @Test
