@@ -28,37 +28,36 @@ internal constructor(
         var reasonPhrase: String = "",
         override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
-        var statusCode: Int
-            get() = _statusCode
-            set(code) {
-                val status = Status.valueOf(code)
-                if (status == Status.HTTP_INVALID) {
-                    throw IllegalArgumentException("unexpected status code:$code")
-                }
-                _status = status
-                _statusCode = code
-                reasonPhrase = status.phrase
+        fun getStatusCode(): Int = _statusCode
+        fun setStatusCode(code: Int) {
+            val status = Status.valueOf(code)
+            if (status == Status.HTTP_INVALID) {
+                throw IllegalArgumentException("unexpected status code:$code")
             }
+            _status = status
+            _statusCode = code
+            reasonPhrase = status.phrase
+        }
 
-        var status: Status
-            get() = _status
-            set(status) {
-                _status = status
-                _statusCode = status.code
-                reasonPhrase = status.phrase
-            }
+        fun getStatus(): Status = _status
+        fun setStatus(status: Status) {
+            _status = status
+            _statusCode = status.code
+            reasonPhrase = status.phrase
+        }
 
-        override var startLine: String
-            get() = "$version $_statusCode $reasonPhrase"
-            set(line) {
-                val params = line.split(" ", limit = 3)
-                if (params.size < 3) {
-                    throw IllegalArgumentException()
-                }
-                version = params[0]
-                statusCode = Integer.parseInt(params[1])
-                reasonPhrase = params[2]
+        override fun getStartLine(): String = "$version $_statusCode $reasonPhrase"
+
+        override fun setStartLine(startLine: String) {
+            val params = startLine.split(" ", limit = 3)
+            if (params.size < 3) {
+                throw IllegalArgumentException()
             }
+            version = params[0]
+            val code = params[1].toIntOrNull() ?: throw IllegalArgumentException()
+            setStatusCode(code)
+            reasonPhrase = params[2]
+        }
     }
 
     /**
@@ -68,7 +67,7 @@ internal constructor(
      * @see status
      */
     val statusCode: Int
-        get() = startLineDelegate.statusCode
+        get() = startLineDelegate.getStatusCode()
 
     /**
      * レスポンスフレーズを取得する
@@ -85,7 +84,7 @@ internal constructor(
      * @return ステータス
      */
     val status: Status
-        get() = startLineDelegate.status
+        get() = startLineDelegate.getStatus()
 
     /**
      * ステータスコードを設定する。
@@ -94,7 +93,7 @@ internal constructor(
      * @see setStatus
      */
     fun setStatusCode(code: Int) {
-        startLineDelegate.statusCode = code
+        startLineDelegate.setStatusCode(code)
     }
 
     /**
@@ -114,7 +113,7 @@ internal constructor(
      * @return HttpResponse
      */
     fun setStatus(status: Status) {
-        startLineDelegate.status = status
+        startLineDelegate.setStatus(status)
     }
 
     override fun toString(): String {

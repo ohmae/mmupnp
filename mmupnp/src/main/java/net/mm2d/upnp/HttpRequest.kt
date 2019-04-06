@@ -31,17 +31,17 @@ class HttpRequest internal constructor(
         var uri: String = "",
         override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
-        override var startLine: String
-            get() = "$method $uri $version"
-            set(line) {
-                val params = line.split(" ", limit = 3)
-                if (params.size < 3) {
-                    throw IllegalArgumentException()
-                }
-                method = params[0]
-                uri = params[1]
-                version = params[2]
+        override fun getStartLine(): String = "$method $uri $version"
+
+        override fun setStartLine(startLine: String) {
+            val params = startLine.split(" ", limit = 3)
+            if (params.size < 3) {
+                throw IllegalArgumentException()
             }
+            method = params[0]
+            uri = params[1]
+            version = params[2]
+        }
     }
 
     /**

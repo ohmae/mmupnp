@@ -31,7 +31,7 @@ class HttpRequestDelegateTest {
     fun setUp() {
         val startLine: StartLineDelegate = mockk(relaxed = true)
         every { startLine.version } returns ""
-        every { startLine.startLine } returns ""
+        every { startLine.getStartLine() } returns ""
         delegate = spyk(HttpMessageDelegate(startLine))
         message = HttpRequest(StartLine(), delegate)
     }

@@ -25,7 +25,9 @@ internal class HttpMessageDelegate(
     internal interface StartLineDelegate {
         var version: String
 
-        var startLine: String
+        fun getStartLine(): String
+
+        fun setStartLine(startLine: String)
     }
 
     private val headers: HttpHeaders
@@ -44,7 +46,7 @@ internal class HttpMessageDelegate(
     }
 
     override val startLine: String?
-        get() = startLineDelegate.startLine
+        get() = startLineDelegate.getStartLine()
     override val version: String
         get() = startLineDelegate.version
     override val isChunked: Boolean
@@ -114,7 +116,7 @@ internal class HttpMessageDelegate(
     }
 
     override fun setStartLine(line: String) {
-        startLineDelegate.startLine = line
+        startLineDelegate.setStartLine(line)
     }
 
     override fun setVersion(version: String) {
