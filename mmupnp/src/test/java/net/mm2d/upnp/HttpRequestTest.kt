@@ -249,21 +249,21 @@ class HttpRequestTest {
     fun isKeepAlive() {
         val request = HttpRequest.create()
         request.setVersion(Http.HTTP_1_0)
-        assertThat(request.isKeepAlive).isFalse()
+        assertThat(request.isKeepAlive()).isFalse()
         request.setVersion(Http.HTTP_1_1)
-        assertThat(request.isKeepAlive).isTrue()
+        assertThat(request.isKeepAlive()).isTrue()
 
         request.setHeader(Http.CONNECTION, Http.KEEP_ALIVE)
         request.setVersion(Http.HTTP_1_0)
-        assertThat(request.isKeepAlive).isTrue()
+        assertThat(request.isKeepAlive()).isTrue()
         request.setVersion(Http.HTTP_1_1)
-        assertThat(request.isKeepAlive).isTrue()
+        assertThat(request.isKeepAlive()).isTrue()
 
         request.setHeader(Http.CONNECTION, Http.CLOSE)
         request.setVersion(Http.HTTP_1_0)
-        assertThat(request.isKeepAlive).isFalse()
+        assertThat(request.isKeepAlive()).isFalse()
         request.setVersion(Http.HTTP_1_1)
-        assertThat(request.isKeepAlive).isFalse()
+        assertThat(request.isKeepAlive()).isFalse()
     }
 
     @Test

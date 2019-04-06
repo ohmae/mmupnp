@@ -78,8 +78,8 @@ class HttpResponseDelegateTest {
 
     @Test
     fun isKeepAlive() {
-        message.isKeepAlive
-        verify(exactly = 1) { delegate.isKeepAlive }
+        message.isKeepAlive()
+        verify(exactly = 1) { delegate.isKeepAlive() }
     }
 
     @Test

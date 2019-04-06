@@ -35,7 +35,7 @@ class HttpClientTest {
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, true)
-            if (request.isKeepAlive) {
+            if (request.isKeepAlive()) {
                 response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE)
                 response.writeData(outputStream)
                 true
@@ -71,7 +71,7 @@ class HttpClientTest {
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBodyBinary(responseBody, true)
-            if (request.isKeepAlive) {
+            if (request.isKeepAlive()) {
                 response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE)
                 response.writeData(outputStream)
                 true
@@ -108,7 +108,7 @@ class HttpClientTest {
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, true)
-            if (request.isKeepAlive) {
+            if (request.isKeepAlive()) {
                 response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE)
                 response.writeData(outputStream)
                 false // コネクション切断

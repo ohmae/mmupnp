@@ -48,17 +48,6 @@ interface HttpMessage {
     val isChunked: Boolean
 
     /**
-     * ヘッダの値からKeepAliveか否かを返す。
-     *
-     * HTTP/1.0の場合、Connection: keep-aliveの場合に、
-     * HTTP/1.1の場合、Connection: closeでない場合に、
-     * KeepAliveと判定し、trueを返す。
-     *
-     * @return KeepAliveの場合true
-     */
-    val isKeepAlive: Boolean
-
-    /**
      * Content-Lengthの値を返す。
      *
      * 不明な場合0
@@ -84,11 +73,15 @@ interface HttpMessage {
     val bodyBinary: ByteArray?
 
     /**
-     * メッセージを文字列として返す。
+     * ヘッダの値からKeepAliveか否かを返す。
      *
-     * @return メッセージ文字列
+     * HTTP/1.0の場合、Connection: keep-aliveの場合に、
+     * HTTP/1.1の場合、Connection: closeでない場合に、
+     * KeepAliveと判定し、trueを返す。
+     *
+     * @return KeepAliveの場合true
      */
-    fun getMessageString(): String
+    fun isKeepAlive(): Boolean
 
     /**
      * Start Lineを設定する。
@@ -163,6 +156,13 @@ interface HttpMessage {
         body: ByteArray?,
         withContentLength: Boolean
     )
+
+    /**
+     * メッセージを文字列として返す。
+     *
+     * @return メッセージ文字列
+     */
+    fun getMessageString(): String
 
     /**
      * 指定されたOutputStreamにメッセージの内容を書き出す。

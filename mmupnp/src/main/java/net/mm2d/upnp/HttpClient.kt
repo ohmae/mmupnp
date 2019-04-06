@@ -97,7 +97,7 @@ class HttpClient(keepAlive: Boolean = true) {
             closeSocket()
             throw e
         }
-        if (!isKeepAlive || !response.isKeepAlive) {
+        if (!isKeepAlive || !response.isKeepAlive()) {
             closeSocket()
         }
         return redirectIfNeeded(request, response, redirectDepth)

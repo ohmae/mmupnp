@@ -51,11 +51,6 @@ internal class HttpMessageDelegate(
         get() = startLineDelegate.version
     override val isChunked: Boolean
         get() = headers.containsValue(Http.TRANSFER_ENCODING, Http.CHUNKED)
-    override val isKeepAlive: Boolean
-        get() = if (version == Http.HTTP_1_0)
-            headers.containsValue(Http.CONNECTION, Http.KEEP_ALIVE)
-        else
-            !headers.containsValue(Http.CONNECTION, Http.CLOSE)
     override val contentLength: Int
         get() = headers[Http.CONTENT_LENGTH]?.toIntOrNull() ?: 0
     override val body: String?
@@ -106,13 +101,10 @@ internal class HttpMessageDelegate(
         return ByteArray(0)
     }
 
-    override fun getMessageString(): String {
-        val body = _body
-        return getHeaderStringBuilder().also {
-            if (!body.isNullOrEmpty()) {
-                it.append(body)
-            }
-        }.toString()
+    override fun isKeepAlive(): Boolean = if (version == Http.HTTP_1_0) {
+        headers.containsValue(Http.CONNECTION, Http.KEEP_ALIVE)
+    } else {
+        !headers.containsValue(Http.CONNECTION, Http.CLOSE)
     }
 
     override fun setStartLine(line: String) {
@@ -177,6 +169,15 @@ internal class HttpMessageDelegate(
     @Throws(UnsupportedEncodingException::class)
     fun getBytes(string: String): ByteArray {
         return string.toByteArray(CHARSET)
+    }
+
+    override fun getMessageString(): String {
+        val body = _body
+        return getHeaderStringBuilder().also {
+            if (!body.isNullOrEmpty()) {
+                it.append(body)
+            }
+        }.toString()
     }
 
     @Throws(IOException::class)
