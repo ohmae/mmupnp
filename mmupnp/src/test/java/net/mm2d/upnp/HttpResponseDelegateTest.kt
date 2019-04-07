@@ -118,14 +118,14 @@ class HttpResponseDelegateTest {
 
     @Test
     fun getBody() {
-        message.body
-        verify(exactly = 1) { delegate.body }
+        message.getBody()
+        verify(exactly = 1) { delegate.getBody() }
     }
 
     @Test
     fun getBodyBinary() {
-        message.bodyBinary
-        verify(exactly = 1) { delegate.bodyBinary }
+        message.getBodyBinary()
+        verify(exactly = 1) { delegate.getBodyBinary() }
     }
 
     @Test

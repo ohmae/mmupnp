@@ -86,7 +86,7 @@ class HttpRequestTest {
         assertThat(request.getHeader(Http.SOAPACTION)).isEqualTo(ACTION)
         assertThat(request.getHeader(Http.CONNECTION)).isEqualTo(Http.CLOSE)
         assertThat(request.getHeader(Http.CONTENT_TYPE)).isEqualTo(Http.CONTENT_TYPE_DEFAULT)
-        assertThat(request.body).isEqualTo(TestUtils.getResourceAsString("browse-request.xml"))
+        assertThat(request.getBody()).isEqualTo(TestUtils.getResourceAsString("browse-request.xml"))
     }
 
     @Test
@@ -100,7 +100,7 @@ class HttpRequestTest {
         assertThat(request.getHeader(Http.CONNECTION)).isEqualTo(Http.CLOSE)
         assertThat(request.getHeader(Http.CONTENT_TYPE)).isEqualTo(Http.CONTENT_TYPE_DEFAULT)
         assertThat(request.getHeader(Http.TRANSFER_ENCODING)).isEqualTo(Http.CHUNKED)
-        assertThat(request.body).isEqualTo(TestUtils.getResourceAsString("browse-request.xml"))
+        assertThat(request.getBody()).isEqualTo(TestUtils.getResourceAsString("browse-request.xml"))
     }
 
     @Test
@@ -123,7 +123,7 @@ class HttpRequestTest {
         readRequest.readData(bais)
 
         assertThat(readRequest.startLine).isEqualTo(request.startLine)
-        assertThat(readRequest.body).isEqualTo(request.body)
+        assertThat(readRequest.getBody()).isEqualTo(request.getBody())
     }
 
     @Test
@@ -147,7 +147,7 @@ class HttpRequestTest {
         readRequest.readData(bais)
 
         assertThat(readRequest.startLine).isEqualTo(request.startLine)
-        assertThat(readRequest.body).isEqualTo(request.body)
+        assertThat(readRequest.getBody()).isEqualTo(request.getBody())
     }
 
     @Test
@@ -186,7 +186,7 @@ class HttpRequestTest {
         assertThat(readRequest.getHeader(Http.SOAPACTION)).isEqualTo(request.getHeader(Http.SOAPACTION))
         assertThat(readRequest.getHeader(Http.CONNECTION)).isEqualTo(request.getHeader(Http.CONNECTION))
         assertThat(readRequest.getHeader(Http.CONTENT_TYPE)).isEqualTo(request.getHeader(Http.CONTENT_TYPE))
-        assertThat(readRequest.body).isEqualTo(request.body)
+        assertThat(readRequest.getBody()).isEqualTo(request.getBody())
 
         readRequest.setMethod(Http.GET)
         assertThat(request.method).isEqualTo(Http.POST)
@@ -285,7 +285,7 @@ class HttpRequestTest {
         val body = "body"
         val request = HttpRequest.create()
         request.setBody(body)
-        assertThat(request.body).isEqualTo(body)
+        assertThat(request.getBody()).isEqualTo(body)
     }
 
     @Test
@@ -293,8 +293,8 @@ class HttpRequestTest {
         val body = ""
         val request = HttpRequest.create()
         request.setBody(body, true)
-        assertThat(request.body).isEqualTo(body)
-        assertThat(request.bodyBinary!!.size).isEqualTo(0)
+        assertThat(request.getBody()).isEqualTo(body)
+        assertThat(request.getBodyBinary()!!.size).isEqualTo(0)
         assertThat(request.getHeader(Http.CONTENT_LENGTH)).isEqualTo("0")
     }
 
@@ -302,8 +302,8 @@ class HttpRequestTest {
     fun setBodyBinary_長さ0() {
         val request = HttpRequest.create()
         request.setBodyBinary(ByteArray(0))
-        assertThat(request.body!!.length).isEqualTo(0)
-        assertThat(request.bodyBinary!!.size).isEqualTo(0)
+        assertThat(request.getBody()!!.length).isEqualTo(0)
+        assertThat(request.getBodyBinary()!!.size).isEqualTo(0)
     }
 
     companion object {

@@ -28,7 +28,7 @@ class HttpMessageDelegateTest {
         val message = spyk(HttpMessageDelegate(mockk(relaxed = true)))
         every { message.getBytes(any()) } throws UnsupportedEncodingException()
         message.setBody(body, true)
-        assertThat(message.body).isEqualTo(body)
+        assertThat(message.getBody()).isEqualTo(body)
     }
 
     @Test
@@ -39,7 +39,7 @@ class HttpMessageDelegateTest {
         with(message) {
             every { byteArray.newString() } throws UnsupportedEncodingException()
         }
-        assertThat(message.body).isNull()
+        assertThat(message.getBody()).isNull()
     }
 
 

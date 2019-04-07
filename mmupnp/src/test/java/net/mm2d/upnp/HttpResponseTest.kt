@@ -28,7 +28,7 @@ class HttpResponseTest {
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
         assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
         assertThat(Http.parseDate(response.getHeader(Http.DATE))).isEqualTo(DATE)
-        assertThat(response.body).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
+        assertThat(response.getBody()).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
     }
 
     @Test
@@ -40,11 +40,11 @@ class HttpResponseTest {
         assertThat(response1.startLine).isEqualTo(response2.startLine)
         assertThat(response1.status).isEqualTo(response2.status)
         assertThat(response1.getHeader(Http.DATE)).isEqualTo(response2.getHeader(Http.DATE))
-        assertThat(response1.body).isEqualTo(response2.body)
-        assertThat(response1.bodyBinary).isEqualTo(response2.bodyBinary)
+        assertThat(response1.getBody()).isEqualTo(response2.getBody())
+        assertThat(response1.getBodyBinary()).isEqualTo(response2.getBodyBinary())
 
-        response1.bodyBinary!![0] = 0
-        assertThat(response1.bodyBinary).isNotEqualTo(response2.bodyBinary)
+        response1.getBodyBinary()!![0] = 0
+        assertThat(response1.getBodyBinary()).isNotEqualTo(response2.getBodyBinary())
     }
 
     @Test
@@ -55,7 +55,7 @@ class HttpResponseTest {
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
         assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
         assertThat(Http.parseDate(response.getHeader(Http.DATE))).isEqualTo(DATE)
-        assertThat(response.body).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
+        assertThat(response.getBody()).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
     }
 
     @Test
@@ -66,7 +66,7 @@ class HttpResponseTest {
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
         assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
         assertThat(Http.parseDate(response.getHeader(Http.DATE))).isEqualTo(DATE)
-        assertThat(response.body).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
+        assertThat(response.getBody()).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
     }
 
     @Test(expected = IOException::class)
@@ -130,7 +130,7 @@ class HttpResponseTest {
         readResponse.readData(bais)
 
         assertThat(readResponse.startLine).isEqualTo(response.startLine)
-        assertThat(readResponse.body).isEqualTo(response.body)
+        assertThat(readResponse.getBody()).isEqualTo(response.getBody())
     }
 
     @Test
@@ -152,7 +152,7 @@ class HttpResponseTest {
         readResponse.readData(bais)
 
         assertThat(readResponse.startLine).isEqualTo(response.startLine)
-        assertThat(readResponse.body).isEqualTo(response.body)
+        assertThat(readResponse.getBody()).isEqualTo(response.getBody())
     }
 
     @Test

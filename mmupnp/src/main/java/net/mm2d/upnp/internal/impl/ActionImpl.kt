@@ -210,7 +210,7 @@ internal class ActionImpl(
     private fun invoke(soap: String): Map<String, String> {
         val request = makeHttpRequest(makeAbsoluteControlUrl(), soap)
         val response = createHttpClient().post(request)
-        val body = response.body
+        val body = response.getBody()
         if (response.status == Status.HTTP_INTERNAL_ERROR && !body.isNullOrEmpty()) {
             try {
                 return parseErrorResponse(body)

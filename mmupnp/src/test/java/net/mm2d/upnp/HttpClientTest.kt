@@ -124,10 +124,10 @@ class HttpClientTest {
         try {
             val client = HttpClient(true)
             var response = client.download(URL("http://127.0.0.1:$port/"))
-            assertThat(response.body).isEqualTo(responseBody)
+            assertThat(response.getBody()).isEqualTo(responseBody)
             assertThat(client.isKeepAlive).isTrue()
             response = client.download(URL("http://127.0.0.1:$port/"))
-            assertThat(response.body).isEqualTo(responseBody)
+            assertThat(response.getBody()).isEqualTo(responseBody)
             assertThat(client.isKeepAlive).isFalse()
             client.close()
         } finally {
@@ -154,7 +154,7 @@ class HttpClientTest {
         try {
             val client = HttpClient(true)
             val response = client.download(URL("http://127.0.0.1:$port/"))
-            assertThat(response.body).isEqualTo(responseBody)
+            assertThat(response.getBody()).isEqualTo(responseBody)
             assertThat(client.isKeepAlive).isTrue()
             assertThat(client.isClosed).isTrue()
             client.close()
@@ -223,7 +223,7 @@ class HttpClientTest {
                 setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
                 setHeader(Http.CONNECTION, Http.CLOSE)
             })
-            assertThat(response.body).isEqualTo("b")
+            assertThat(response.getBody()).isEqualTo("b")
             client.close()
         } finally {
             server.close()
@@ -261,7 +261,7 @@ class HttpClientTest {
                 setHeader(Http.CONNECTION, Http.CLOSE)
             })
             assertThat(response.status).isEqualTo(Status.HTTP_MOVED_PERM)
-            assertThat(response.body).isEqualTo("a")
+            assertThat(response.getBody()).isEqualTo("a")
             client.close()
         } finally {
             server.close()

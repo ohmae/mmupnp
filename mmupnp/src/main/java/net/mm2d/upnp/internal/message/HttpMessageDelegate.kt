@@ -31,17 +31,16 @@ internal class HttpMessageDelegate(
     }
 
     private val headers: HttpHeaders
-    private var _body: String? = null
-    override var bodyBinary: ByteArray? = null
-        private set
+    private var body: String? = null
+    private var bodyBinary: ByteArray? = null
 
     init {
         if (original == null) {
             headers = HttpHeaders()
         } else {
             headers = HttpHeaders(original.headers)
+            body = original.body
             bodyBinary = original.bodyBinary?.copyOf()
-            _body = original._body
         }
     }
 
@@ -53,19 +52,6 @@ internal class HttpMessageDelegate(
         get() = headers.containsValue(Http.TRANSFER_ENCODING, Http.CHUNKED)
     override val contentLength: Int
         get() = headers[Http.CONTENT_LENGTH]?.toIntOrNull() ?: 0
-    override val body: String?
-        get() = _body ?: bodyBinary?.decode()?.also { _body = it }
-
-    private fun ByteArray.decode(): String? {
-        if (isEmpty()) return ""
-        try {
-            return newString()
-        } catch (e: Exception) {
-            // for bug in Android Sdk, ArrayIndexOutOfBoundsException may occur.
-            Logger.w(e)
-        }
-        return null
-    }
 
     // VisibleForTesting
     @Throws(UnsupportedEncodingException::class)
@@ -131,12 +117,31 @@ internal class HttpMessageDelegate(
         return headers[name]
     }
 
+    override fun getBody(): String? {
+        return body ?: bodyBinary?.decode()?.also { body = it }
+    }
+
+    private fun ByteArray.decode(): String? {
+        if (isEmpty()) return ""
+        try {
+            return newString()
+        } catch (e: Exception) {
+            // for bug in Android Sdk, ArrayIndexOutOfBoundsException may occur.
+            Logger.w(e)
+        }
+        return null
+    }
+
     override fun setBody(body: String?) {
         setBody(body, false)
     }
 
     override fun setBody(body: String?, withContentLength: Boolean) {
         setBodyInner(body, null, withContentLength)
+    }
+
+    override fun getBodyBinary(): ByteArray? {
+        return bodyBinary
     }
 
     override fun setBodyBinary(body: ByteArray?) {
@@ -148,7 +153,7 @@ internal class HttpMessageDelegate(
     }
 
     private fun setBodyInner(string: String?, binary: ByteArray?, withContentLength: Boolean) {
-        _body = string
+        body = string
         when {
             string == null ->
                 bodyBinary = binary
@@ -172,7 +177,7 @@ internal class HttpMessageDelegate(
     }
 
     override fun getMessageString(): String {
-        val body = _body
+        val body = body
         return getHeaderStringBuilder().also {
             if (!body.isNullOrEmpty()) {
                 it.append(body)

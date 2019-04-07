@@ -256,7 +256,7 @@ internal class EventReceiver(
         private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(1)
 
         internal fun parsePropertyPairs(request: HttpRequest): List<Pair<String, String>> {
-            val xml = request.body
+            val xml = request.getBody()
             if (xml.isNullOrEmpty()) {
                 return emptyList()
             }

@@ -57,22 +57,6 @@ interface HttpMessage {
     val contentLength: Int
 
     /**
-     * メッセージボディを返す。
-     *
-     * @return メッセージボディ
-     */
-    val body: String?
-
-    /**
-     * メッセージボディを返す。
-     *
-     * 取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
-     *
-     * @return メッセージボディ
-     */
-    val bodyBinary: ByteArray?
-
-    /**
      * ヘッダの値からKeepAliveか否かを返す。
      *
      * HTTP/1.0の場合、Connection: keep-aliveの場合に、
@@ -122,6 +106,13 @@ interface HttpMessage {
     fun getHeader(name: String): String?
 
     /**
+     * メッセージボディを返す。
+     *
+     * @return メッセージボディ
+     */
+    fun getBody(): String?
+
+    /**
      * メッセージボディを設定する。
      *
      * @param body メッセージボディ
@@ -135,6 +126,15 @@ interface HttpMessage {
      * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
      */
     fun setBody(body: String?, withContentLength: Boolean)
+
+    /**
+     * メッセージボディを返す。
+     *
+     * 取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
+     *
+     * @return メッセージボディ
+     */
+    fun getBodyBinary(): ByteArray?
 
     /**
      * メッセージボディを設定する。

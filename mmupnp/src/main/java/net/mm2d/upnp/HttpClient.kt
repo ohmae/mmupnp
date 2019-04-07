@@ -211,7 +211,7 @@ class HttpClient(keepAlive: Boolean = true) {
     @Throws(IOException::class)
     fun downloadString(url: URL): String {
         // download()の中でgetBody()がnullで無いことはチェック済み
-        return download(url).body!!
+        return download(url).getBody()!!
     }
 
     /**
@@ -224,7 +224,7 @@ class HttpClient(keepAlive: Boolean = true) {
     @Throws(IOException::class)
     fun downloadBinary(url: URL): ByteArray {
         // download()の中でgetBody()がnullで無いことはチェック済み
-        return download(url).bodyBinary!!
+        return download(url).getBodyBinary()!!
     }
 
     /**
@@ -239,7 +239,7 @@ class HttpClient(keepAlive: Boolean = true) {
         val request = makeHttpRequest(url)
         val response = post(request)
         // response bodyがemptyであることは正常
-        if (response.status !== Http.Status.HTTP_OK || response.body == null) {
+        if (response.status !== Http.Status.HTTP_OK || response.getBody() == null) {
             Logger.i { "request:\n$request\nresponse:\n$response" }
             throw IOException(response.startLine)
         }

@@ -119,7 +119,7 @@ class ActionInvokeTest {
         assertThat(request.version).isEqualTo("HTTP/1.1")
         assertThat(request.getHeader(Http.HOST)).isEqualTo(url.host + ":" + url.port)
         assertThat<String>(request.getHeader(Http.CONTENT_LENGTH))
-            .isEqualTo(request.bodyBinary?.size.toString())
+            .isEqualTo(request.getBodyBinary()?.size.toString())
     }
 
     private fun createChildElementList(parent: Element): List<Element> {
@@ -140,7 +140,7 @@ class ActionInvokeTest {
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         action.invokeSync(emptyMap())
         val request = slot.captured
-        val doc = XmlUtils.newDocument(true, request.body!!)
+        val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
 
         assertThat(envelope.localName).isEqualTo("Envelope")
@@ -165,7 +165,7 @@ class ActionInvokeTest {
         action.invokeSync(emptyMap())
         val request = slot.captured
 
-        val doc = XmlUtils.newDocument(true, request.body!!)
+        val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
         val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
         val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
@@ -192,7 +192,7 @@ class ActionInvokeTest {
         action.invokeSync(argument)
         val request = slot.captured
 
-        val doc = XmlUtils.newDocument(true, request.body!!)
+        val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
         val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
         val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
@@ -221,7 +221,7 @@ class ActionInvokeTest {
         action.invokeCustomSync(argument, customArguments = Collections.singletonMap(name, value))
         val request = slot.captured
 
-        val doc = XmlUtils.newDocument(true, request.body!!)
+        val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
         val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
         val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
@@ -260,7 +260,7 @@ class ActionInvokeTest {
         )
         val request = slot.captured
 
-        val doc = XmlUtils.newDocument(true, request.body!!)
+        val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
         val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
         val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
