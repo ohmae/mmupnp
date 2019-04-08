@@ -148,7 +148,7 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     private fun needToRedirect(response: HttpResponse): Boolean {
-        return when (response.status) {
+        return when (response.getStatus()) {
             Http.Status.HTTP_MOVED_PERM,
             Http.Status.HTTP_FOUND,
             Http.Status.HTTP_SEE_OTHER,
@@ -239,7 +239,7 @@ class HttpClient(keepAlive: Boolean = true) {
         val request = makeHttpRequest(url)
         val response = post(request)
         // response bodyがemptyであることは正常
-        if (response.status !== Http.Status.HTTP_OK || response.getBody() == null) {
+        if (response.getStatus() !== Http.Status.HTTP_OK || response.getBody() == null) {
             Logger.i { "request:\n$request\nresponse:\n$response" }
             throw IOException(response.startLine)
         }

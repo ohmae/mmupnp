@@ -139,7 +139,7 @@ class EventReceiverTest {
 
         val response = HttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
     }
 
     @Test(timeout = 10000L)
@@ -173,7 +173,7 @@ class EventReceiverTest {
 
         val response = HttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_PRECON_FAILED)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_PRECON_FAILED)
     }
 
     @Test(timeout = 10000L)
@@ -206,7 +206,7 @@ class EventReceiverTest {
 
         val response = HttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_PRECON_FAILED)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_PRECON_FAILED)
     }
 
     @Test(timeout = 10000L)
@@ -239,7 +239,7 @@ class EventReceiverTest {
 
         val response = HttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_BAD_REQUEST)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_BAD_REQUEST)
     }
 
     @Test(timeout = 10000L)

@@ -23,30 +23,30 @@ internal constructor(
 ) : HttpMessage by delegate {
 
     internal data class StartLine(
-        private var _status: Status = Status.HTTP_INVALID,
-        private var _statusCode: Int = 0,
+        private var status: Status = Status.HTTP_INVALID,
+        private var statusCode: Int = 0,
         var reasonPhrase: String = "",
         override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
-        fun getStatusCode(): Int = _statusCode
+        fun getStatusCode(): Int = statusCode
         fun setStatusCode(code: Int) {
             val status = Status.valueOf(code)
             if (status == Status.HTTP_INVALID) {
                 throw IllegalArgumentException("unexpected status code:$code")
             }
-            _status = status
-            _statusCode = code
+            this.status = status
+            statusCode = code
             reasonPhrase = status.phrase
         }
 
-        fun getStatus(): Status = _status
+        fun getStatus(): Status = status
         fun setStatus(status: Status) {
-            _status = status
-            _statusCode = status.code
+            this.status = status
+            statusCode = status.code
             reasonPhrase = status.phrase
         }
 
-        override fun getStartLine(): String = "$version $_statusCode $reasonPhrase"
+        override fun getStartLine(): String = "$version $statusCode $reasonPhrase"
 
         override fun setStartLine(startLine: String) {
             val params = startLine.split(" ", limit = 3)
@@ -66,25 +66,7 @@ internal constructor(
      * @return ステータスコード
      * @see status
      */
-    val statusCode: Int
-        get() = startLineDelegate.getStatusCode()
-
-    /**
-     * レスポンスフレーズを取得する
-     *
-     * @return レスポンスフレーズ
-     * @see status
-     */
-    val reasonPhrase: String
-        get() = startLineDelegate.reasonPhrase
-
-    /**
-     * ステータスを取得する。
-     *
-     * @return ステータス
-     */
-    val status: Status
-        get() = startLineDelegate.getStatus()
+    fun getStatusCode(): Int = startLineDelegate.getStatusCode()
 
     /**
      * ステータスコードを設定する。
@@ -97,6 +79,14 @@ internal constructor(
     }
 
     /**
+     * レスポンスフレーズを取得する
+     *
+     * @return レスポンスフレーズ
+     * @see status
+     */
+    fun getReasonPhrase(): String = startLineDelegate.reasonPhrase
+
+    /**
      * レスポンスフレーズを設定する。
      *
      * @param reasonPhrase レスポンスフレーズ
@@ -105,6 +95,13 @@ internal constructor(
     fun setReasonPhrase(reasonPhrase: String) {
         startLineDelegate.reasonPhrase = reasonPhrase
     }
+
+    /**
+     * ステータスを取得する。
+     *
+     * @return ステータス
+     */
+    fun getStatus(): Status = startLineDelegate.getStatus()
 
     /**
      * ステータスを設定する。

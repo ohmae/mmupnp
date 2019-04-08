@@ -28,7 +28,7 @@ internal class SsdpResponse(
      * ステータスコード
      */
     var statusCode: Int
-        get() = message.statusCode
+        get() = message.getStatusCode()
         set(code) {
             message.setStatusCode(code)
         }
@@ -36,7 +36,7 @@ internal class SsdpResponse(
      * レスポンスフレーズ
      */
     var reasonPhrase: String
-        get() = message.reasonPhrase
+        get() = message.getReasonPhrase()
         set(reasonPhrase) {
             message.setReasonPhrase(reasonPhrase)
         }
@@ -44,7 +44,7 @@ internal class SsdpResponse(
      * ステータス
      */
     var status: Status
-        get() = message.status
+        get() = message.getStatus()
         set(status) {
             message.setStatus(status)
         }

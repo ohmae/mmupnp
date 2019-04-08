@@ -260,7 +260,7 @@ class HttpClientTest {
                 setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
                 setHeader(Http.CONNECTION, Http.CLOSE)
             })
-            assertThat(response.status).isEqualTo(Status.HTTP_MOVED_PERM)
+            assertThat(response.getStatus()).isEqualTo(Status.HTTP_MOVED_PERM)
             assertThat(response.getBody()).isEqualTo("a")
             client.close()
         } finally {

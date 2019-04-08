@@ -100,7 +100,7 @@ internal class ServiceImpl(
     internal fun subscribeInner(keepRenew: Boolean): Boolean {
         val request = makeSubscribeRequest()
         val response = createHttpClient().post(request)
-        if (response.status != Http.Status.HTTP_OK) {
+        if (response.getStatus() != Http.Status.HTTP_OK) {
             Logger.w { "error subscribe request:\n$request\nresponse:\n$response" }
             return false
         }
@@ -144,7 +144,7 @@ internal class ServiceImpl(
     internal fun renewSubscribeInner(): Boolean {
         val request = makeRenewSubscribeRequest(subscriptionId!!)
         val response = createHttpClient().post(request)
-        if (response.status != Http.Status.HTTP_OK) {
+        if (response.getStatus() != Http.Status.HTTP_OK) {
             Logger.w { "renewSubscribe request:\n$request\nresponse:\n$response" }
             return false
         }
@@ -179,7 +179,7 @@ internal class ServiceImpl(
             val response = createHttpClient().post(request)
             subscribeManager.unregister(this)
             subscriptionId = null
-            if (response.status != Http.Status.HTTP_OK) {
+            if (response.getStatus() != Http.Status.HTTP_OK) {
                 Logger.w { "unsubscribe request:\n$request\nresponse:\n$response" }
                 return false
             }

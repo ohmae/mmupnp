@@ -211,14 +211,14 @@ internal class ActionImpl(
         val request = makeHttpRequest(makeAbsoluteControlUrl(), soap)
         val response = createHttpClient().post(request)
         val body = response.getBody()
-        if (response.status == Status.HTTP_INTERNAL_ERROR && !body.isNullOrEmpty()) {
+        if (response.getStatus() == Status.HTTP_INTERNAL_ERROR && !body.isNullOrEmpty()) {
             try {
                 return parseErrorResponse(body)
             } catch (e: Exception) {
                 throw IOException(body, e)
             }
         }
-        if (response.status != Http.Status.HTTP_OK || body.isNullOrEmpty()) {
+        if (response.getStatus() != Http.Status.HTTP_OK || body.isNullOrEmpty()) {
             Logger.w { "action invoke error\n$response" }
             throw IOException(response.startLine)
         }

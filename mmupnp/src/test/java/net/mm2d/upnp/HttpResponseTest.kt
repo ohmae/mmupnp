@@ -26,7 +26,7 @@ class HttpResponseTest {
         response.readData(TestUtils.getResourceAsStream("cds-length.bin"))
 
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
         assertThat(Http.parseDate(response.getHeader(Http.DATE))).isEqualTo(DATE)
         assertThat(response.getBody()).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
     }
@@ -38,7 +38,7 @@ class HttpResponseTest {
 
         val response2 = HttpResponse.copy(response1)
         assertThat(response1.startLine).isEqualTo(response2.startLine)
-        assertThat(response1.status).isEqualTo(response2.status)
+        assertThat(response1.getStatus()).isEqualTo(response2.getStatus())
         assertThat(response1.getHeader(Http.DATE)).isEqualTo(response2.getHeader(Http.DATE))
         assertThat(response1.getBody()).isEqualTo(response2.getBody())
         assertThat(response1.getBodyBinary()).isEqualTo(response2.getBodyBinary())
@@ -53,7 +53,7 @@ class HttpResponseTest {
         response.readData(TestUtils.getResourceAsStream("cds-chunked.bin"))
 
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
         assertThat(Http.parseDate(response.getHeader(Http.DATE))).isEqualTo(DATE)
         assertThat(response.getBody()).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
     }
@@ -64,7 +64,7 @@ class HttpResponseTest {
         response.readData(TestUtils.getResourceAsStream("cds-chunked-large.bin"))
 
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
         assertThat(Http.parseDate(response.getHeader(Http.DATE))).isEqualTo(DATE)
         assertThat(response.getBody()).isEqualTo(TestUtils.getResourceAsString("cds.xml"))
     }
@@ -161,9 +161,9 @@ class HttpResponseTest {
         response.setStartLine("HTTP/1.1 200 OK")
 
         assertThat(response.version).isEqualTo(Http.HTTP_1_1)
-        assertThat(response.statusCode).isEqualTo(200)
-        assertThat(response.reasonPhrase).isEqualTo("OK")
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
+        assertThat(response.getStatusCode()).isEqualTo(200)
+        assertThat(response.getReasonPhrase()).isEqualTo("OK")
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
     }
 
     @Test
@@ -172,9 +172,9 @@ class HttpResponseTest {
         response.setStartLine("HTTP/1.1 404 Not Found")
 
         assertThat(response.version).isEqualTo(Http.HTTP_1_1)
-        assertThat(response.statusCode).isEqualTo(404)
-        assertThat(response.reasonPhrase).isEqualTo("Not Found")
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_NOT_FOUND)
+        assertThat(response.getStatusCode()).isEqualTo(404)
+        assertThat(response.getReasonPhrase()).isEqualTo("Not Found")
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_NOT_FOUND)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -188,7 +188,7 @@ class HttpResponseTest {
         val response = HttpResponse.create()
         response.setStatusCode(200)
 
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
     }
 
     @Test(expected = IllegalArgumentException::class)
