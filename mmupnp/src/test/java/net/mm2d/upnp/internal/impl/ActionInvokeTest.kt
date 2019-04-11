@@ -114,8 +114,8 @@ class ActionInvokeTest {
         action.invokeSync(emptyMap())
 
         val request = slot.captured
-        assertThat(request.method).isEqualTo("POST")
-        assertThat(request.uri).isEqualTo(url.path)
+        assertThat(request.getMethod()).isEqualTo("POST")
+        assertThat(request.getUri()).isEqualTo(url.path)
         assertThat(request.version).isEqualTo("HTTP/1.1")
         assertThat(request.getHeader(Http.HOST)).isEqualTo(url.host + ":" + url.port)
         assertThat<String>(request.getHeader(Http.CONTENT_LENGTH))

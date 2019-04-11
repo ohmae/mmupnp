@@ -29,17 +29,17 @@ internal constructor(
         override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
         fun getStatusCode(): Int = statusCode
+
         fun setStatusCode(code: Int) {
             val status = Status.valueOf(code)
             if (status == Status.HTTP_INVALID) {
                 throw IllegalArgumentException("unexpected status code:$code")
             }
-            this.status = status
-            statusCode = code
-            reasonPhrase = status.phrase
+            setStatus(status)
         }
 
         fun getStatus(): Status = status
+
         fun setStatus(status: Status) {
             this.status = status
             statusCode = status.code
@@ -64,7 +64,7 @@ internal constructor(
      * ステータスコードを返す
      *
      * @return ステータスコード
-     * @see status
+     * @see getStatus
      */
     fun getStatusCode(): Int = startLineDelegate.getStatusCode()
 
@@ -82,7 +82,7 @@ internal constructor(
      * レスポンスフレーズを取得する
      *
      * @return レスポンスフレーズ
-     * @see status
+     * @see getStatus
      */
     fun getReasonPhrase(): String = startLineDelegate.reasonPhrase
 

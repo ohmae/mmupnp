@@ -202,7 +202,7 @@ class HttpClientTest {
             request.readData(inputStream)
             val response = HttpResponse.create()
             response.setHeader(Http.CONNECTION, Http.CLOSE)
-            if (request.uri == "/b") {
+            if (request.getUri() == "/b") {
                 response.setStartLine("HTTP/1.1 200 OK")
                 response.setBody("b", true)
                 response.writeData(outputStream)
@@ -238,7 +238,7 @@ class HttpClientTest {
             request.readData(inputStream)
             val response = HttpResponse.create()
             response.setHeader(Http.CONNECTION, Http.CLOSE)
-            if (request.uri == "/b") {
+            if (request.getUri() == "/b") {
                 response.setStartLine("HTTP/1.1 200 OK")
                 response.setBody("b", true)
                 response.writeData(outputStream)

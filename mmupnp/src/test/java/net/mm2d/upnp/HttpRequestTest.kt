@@ -26,7 +26,7 @@ class HttpRequestTest {
     fun setMethod_getMethodに反映される() {
         val request = HttpRequest.create()
         request.setMethod(Http.GET)
-        assertThat(request.method).isEqualTo(Http.GET)
+        assertThat(request.getMethod()).isEqualTo(Http.GET)
     }
 
     @Test
@@ -41,7 +41,7 @@ class HttpRequestTest {
         assertThat(request.address).isEqualTo(address)
         assertThat(request.port).isEqualTo(port)
         assertThat(request.getSocketAddress()).isEqualTo(socketAddress)
-        assertThat(request.uri).isEqualTo("/cds/control")
+        assertThat(request.getUri()).isEqualTo("/cds/control")
     }
 
     @Test
@@ -56,7 +56,7 @@ class HttpRequestTest {
         assertThat(request.address).isEqualTo(address)
         assertThat(request.port).isEqualTo(port)
         assertThat(request.getSocketAddress()).isEqualTo(socketAddress)
-        assertThat(request.uri).isEqualTo("/cds/control")
+        assertThat(request.getUri()).isEqualTo("/cds/control")
     }
 
     @Test(expected = IOException::class)
@@ -81,8 +81,8 @@ class HttpRequestTest {
         val inputStream = TestUtils.getResourceAsStream("browse-request-length.bin")
         val request = HttpRequest.create()
         request.readData(inputStream)
-        assertThat(request.method).isEqualTo(Http.POST)
-        assertThat(request.uri).isEqualTo("/cds/control")
+        assertThat(request.getMethod()).isEqualTo(Http.POST)
+        assertThat(request.getUri()).isEqualTo("/cds/control")
         assertThat(request.getHeader(Http.SOAPACTION)).isEqualTo(ACTION)
         assertThat(request.getHeader(Http.CONNECTION)).isEqualTo(Http.CLOSE)
         assertThat(request.getHeader(Http.CONTENT_TYPE)).isEqualTo(Http.CONTENT_TYPE_DEFAULT)
@@ -94,8 +94,8 @@ class HttpRequestTest {
         val inputStream = TestUtils.getResourceAsStream("browse-request-chunked.bin")
         val request = HttpRequest.create()
         request.readData(inputStream)
-        assertThat(request.method).isEqualTo(Http.POST)
-        assertThat(request.uri).isEqualTo("/cds/control")
+        assertThat(request.getMethod()).isEqualTo(Http.POST)
+        assertThat(request.getUri()).isEqualTo("/cds/control")
         assertThat(request.getHeader(Http.SOAPACTION)).isEqualTo(ACTION)
         assertThat(request.getHeader(Http.CONNECTION)).isEqualTo(Http.CLOSE)
         assertThat(request.getHeader(Http.CONTENT_TYPE)).isEqualTo(Http.CONTENT_TYPE_DEFAULT)
@@ -163,8 +163,8 @@ class HttpRequestTest {
         val request = HttpRequest.create()
         request.setStartLine("GET /cds/control HTTP/1.1")
 
-        assertThat(request.method).isEqualTo(Http.GET)
-        assertThat(request.uri).isEqualTo("/cds/control")
+        assertThat(request.getMethod()).isEqualTo(Http.GET)
+        assertThat(request.getUri()).isEqualTo("/cds/control")
         assertThat(request.version).isEqualTo(Http.HTTP_1_1)
     }
 
@@ -181,16 +181,16 @@ class HttpRequestTest {
         request.readData(inputStream)
 
         val readRequest = HttpRequest.copy(request)
-        assertThat(readRequest.method).isEqualTo(request.method)
-        assertThat(readRequest.uri).isEqualTo(request.uri)
+        assertThat(readRequest.getMethod()).isEqualTo(request.getMethod())
+        assertThat(readRequest.getUri()).isEqualTo(request.getUri())
         assertThat(readRequest.getHeader(Http.SOAPACTION)).isEqualTo(request.getHeader(Http.SOAPACTION))
         assertThat(readRequest.getHeader(Http.CONNECTION)).isEqualTo(request.getHeader(Http.CONNECTION))
         assertThat(readRequest.getHeader(Http.CONTENT_TYPE)).isEqualTo(request.getHeader(Http.CONTENT_TYPE))
         assertThat(readRequest.getBody()).isEqualTo(request.getBody())
 
         readRequest.setMethod(Http.GET)
-        assertThat(request.method).isEqualTo(Http.POST)
-        assertThat(readRequest.method).isEqualTo(Http.GET)
+        assertThat(request.getMethod()).isEqualTo(Http.POST)
+        assertThat(readRequest.getMethod()).isEqualTo(Http.GET)
     }
 
     @Test(expected = IllegalStateException::class)

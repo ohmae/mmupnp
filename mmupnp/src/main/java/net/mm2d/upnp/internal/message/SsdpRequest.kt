@@ -27,7 +27,7 @@ internal class SsdpRequest(
      * リクエストメソッド
      */
     var method: String
-        get() = message.method
+        get() = message.getMethod()
         set(method) {
             message.setMethod(method)
         }
@@ -35,7 +35,7 @@ internal class SsdpRequest(
      * URI
      */
     var uri: String
-        get() = message.uri
+        get() = message.getUri()
         set(uri) {
             message.setUri(uri)
         }

@@ -597,7 +597,7 @@ class ServiceTest {
             cds.subscribeSync()
 
             val request = slot.captured
-            assertThat(request.uri).isEqualTo(cds.eventSubUrl)
+            assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
             verify(exactly = 1) { subscribeManager.register(cds, TimeUnit.SECONDS.toMillis(300), false) }
 
             val callback = request.getHeader(Http.CALLBACK)
@@ -617,7 +617,7 @@ class ServiceTest {
             cds.subscribeSync(true)
 
             val request = slot.captured
-            assertThat(request.uri).isEqualTo(cds.eventSubUrl)
+            assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
             verify(exactly = 1) { subscribeManager.register(cds, TimeUnit.SECONDS.toMillis(300), true) }
         }
 
@@ -631,7 +631,7 @@ class ServiceTest {
             cds.renewSubscribeSync()
 
             val request = slot.captured
-            assertThat(request.uri).isEqualTo(cds.eventSubUrl)
+            assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
         }
 
         @Test
@@ -644,7 +644,7 @@ class ServiceTest {
             cds.subscribeSync()
 
             val request = slot.captured
-            assertThat(request.uri).isEqualTo(cds.eventSubUrl)
+            assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
         }
 
         @Test
@@ -657,7 +657,7 @@ class ServiceTest {
             cds.unsubscribeSync()
 
             val request = slot.captured
-            assertThat(request.uri).isEqualTo(cds.eventSubUrl)
+            assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
             verify(exactly = 1) { subscribeManager.unregister(cds) }
         }
 

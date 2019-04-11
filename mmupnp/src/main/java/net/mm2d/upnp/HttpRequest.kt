@@ -55,22 +55,6 @@ class HttpRequest internal constructor(
     var port: Int = 0
 
     /**
-     * リクエストメソッドを返す。
-     *
-     * @return リクエストメソッド
-     */
-    val method: String
-        get() = startLineDelegate.method
-
-    /**
-     * URI（リクエストパス）を返す。
-     *
-     * @return URI
-     */
-    val uri: String
-        get() = startLineDelegate.uri
-
-    /**
      * アドレスとポート番号の組み合わせ文字列。
      */
     @Throws(IllegalStateException::class)
@@ -131,6 +115,13 @@ class HttpRequest internal constructor(
     }
 
     /**
+     * リクエストメソッドを返す。
+     *
+     * @return リクエストメソッド
+     */
+    fun getMethod(): String = startLineDelegate.method
+
+    /**
      * リクエストメソッドを設定する。
      *
      * @param method リクエストメソッド
@@ -138,6 +129,13 @@ class HttpRequest internal constructor(
     fun setMethod(method: String) {
         startLineDelegate.method = method
     }
+
+    /**
+     * URI（リクエストパス）を返す。
+     *
+     * @return URI
+     */
+    fun getUri(): String = startLineDelegate.uri
 
     /**
      * URI（リクエストパス）を設定する。
