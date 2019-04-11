@@ -25,7 +25,7 @@ object EmptySsdpMessage : SsdpMessage {
     override val location: String? = null
 
     override fun getHeader(name: String): String? = null
-    override fun setHeader(name: String, value: String) {}
+    override fun setHeader(name: String, value: String) = Unit
 
     @Throws(IOException::class)
     override fun writeData(os: OutputStream) {

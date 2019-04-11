@@ -35,6 +35,6 @@ internal class FakeSsdpMessage(
         }
 
     override fun getHeader(name: String): String? = null
-    override fun setHeader(name: String, value: String) {}
-    override fun writeData(os: OutputStream) {}
+    override fun setHeader(name: String, value: String) = Unit
+    override fun writeData(os: OutputStream) = Unit
 }

@@ -26,5 +26,5 @@ interface TaskExecutor {
      *
      * スレッドの停止などが必要な場合はここで実装する。
      */
-    fun terminate() {}
+    fun terminate() = Unit
 }
