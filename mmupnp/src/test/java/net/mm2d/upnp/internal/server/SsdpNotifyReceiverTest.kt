@@ -107,8 +107,8 @@ class SsdpNotifyReceiverTest {
         receiver.setNotifyListener(listener)
 
         val message = SsdpRequest.create()
-        message.method = SsdpMessage.M_SEARCH
-        message.uri = "*"
+        message.setMethod(SsdpMessage.M_SEARCH)
+        message.setUri("*")
         message.setHeader(Http.HOST, Address.IP_V4.addressString)
         message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER)
         message.setHeader(Http.MX, "1")

@@ -23,22 +23,40 @@ internal class SsdpRequest(
     val message: HttpRequest,
     private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
+
     /**
-     * リクエストメソッド
+     * リクエストメソッドを返す。
+     *
+     * @return リクエストメソッド
      */
-    var method: String
-        get() = message.getMethod()
-        set(method) {
-            message.setMethod(method)
-        }
+    fun getMethod(): String = message.getMethod()
+
     /**
-     * URI
+     * リクエストメソッドを設定する。
+     *
+     * @param method リクエストメソッド
      */
-    var uri: String
-        get() = message.getUri()
-        set(uri) {
-            message.setUri(uri)
-        }
+    fun setMethod(method: String) {
+        message.setMethod(method)
+    }
+
+    /**
+     * URI（リクエストパス）を返す。
+     *
+     * @return URI
+     */
+    fun getUri(): String = message.getUri()
+
+    /**
+     * URI（リクエストパス）を設定する。
+     *
+     * 接続先の設定ではなくパスのみの設定
+     *
+     * @param uri URI
+     */
+    fun setUri(uri: String) {
+        message.setUri(uri)
+    }
 
     fun updateLocation() {
         delegate.updateLocation()

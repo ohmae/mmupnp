@@ -56,7 +56,7 @@ class SsdpSearchServerTest {
 
         val packet = socket.sendPacket!!
         val message = SsdpRequest.create(mockk(relaxed = true), packet.data, packet.length)
-        assertThat(message.method).isEqualTo(SsdpMessage.M_SEARCH)
+        assertThat(message.getMethod()).isEqualTo(SsdpMessage.M_SEARCH)
         assertThat(message.getHeader(Http.ST)).isEqualTo(SsdpSearchServer.ST_ALL)
         assertThat(message.getHeader(Http.MAN)).isEqualTo(SsdpMessage.SSDP_DISCOVER)
     }
@@ -78,7 +78,7 @@ class SsdpSearchServerTest {
 
         val packet = socket.sendPacket!!
         val message = SsdpRequest.create(mockk(relaxed = true), packet.data, packet.length)
-        assertThat(message.method).isEqualTo(SsdpMessage.M_SEARCH)
+        assertThat(message.getMethod()).isEqualTo(SsdpMessage.M_SEARCH)
         assertThat(message.getHeader(Http.ST)).isEqualTo(SsdpSearchServer.ST_ROOTDEVICE)
         assertThat(message.getHeader(Http.MAN)).isEqualTo(SsdpMessage.SSDP_DISCOVER)
     }

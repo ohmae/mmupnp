@@ -55,6 +55,40 @@ class HttpRequest internal constructor(
     var port: Int = 0
 
     /**
+     * リクエストメソッドを返す。
+     *
+     * @return リクエストメソッド
+     */
+    fun getMethod(): String = startLineDelegate.method
+
+    /**
+     * リクエストメソッドを設定する。
+     *
+     * @param method リクエストメソッド
+     */
+    fun setMethod(method: String) {
+        startLineDelegate.method = method
+    }
+
+    /**
+     * URI（リクエストパス）を返す。
+     *
+     * @return URI
+     */
+    fun getUri(): String = startLineDelegate.uri
+
+    /**
+     * URI（リクエストパス）を設定する。
+     *
+     * 接続先の設定ではなくパスのみの設定
+     *
+     * @param uri URI
+     */
+    fun setUri(uri: String) {
+        startLineDelegate.uri = uri
+    }
+
+    /**
      * アドレスとポート番号の組み合わせ文字列。
      */
     @Throws(IllegalStateException::class)
@@ -112,41 +146,6 @@ class HttpRequest internal constructor(
         address?.let {
             return InetSocketAddress(it, port)
         } ?: throw IllegalStateException("address must be set")
-    }
-
-    /**
-     * リクエストメソッドを返す。
-     *
-     * @return リクエストメソッド
-     */
-    fun getMethod(): String = startLineDelegate.method
-
-    /**
-     * リクエストメソッドを設定する。
-     *
-     * @param method リクエストメソッド
-     */
-    fun setMethod(method: String) {
-        startLineDelegate.method = method
-    }
-
-    /**
-     * URI（リクエストパス）を返す。
-     *
-     * @return URI
-     */
-    fun getUri(): String = startLineDelegate.uri
-
-    /**
-     * URI（リクエストパス）を設定する。
-     *
-     * 接続先の設定ではなくパスのみの設定
-     *
-     * @param uri URI
-     * @see setUrl
-     */
-    fun setUri(uri: String) {
-        startLineDelegate.uri = uri
     }
 
     override fun toString(): String {

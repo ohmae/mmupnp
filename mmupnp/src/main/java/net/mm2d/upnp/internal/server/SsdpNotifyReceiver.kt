@@ -64,7 +64,7 @@ internal class SsdpNotifyReceiver(
         try {
             val message = createSsdpRequestMessage(data, length)
             // M-SEARCHパケットは無視する
-            if (message.method == SsdpMessage.M_SEARCH) {
+            if (message.getMethod() == SsdpMessage.M_SEARCH) {
                 return
             }
             Logger.v {
