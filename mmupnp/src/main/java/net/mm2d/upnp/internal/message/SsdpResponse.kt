@@ -25,29 +25,57 @@ internal class SsdpResponse(
     private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
     /**
-     * ステータスコード
+     * ステータスコードを返す
+     *
+     * @return ステータスコード
+     * @see getStatus
      */
-    var statusCode: Int
-        get() = message.getStatusCode()
-        set(code) {
-            message.setStatusCode(code)
-        }
+    fun getStatusCode(): Int = message.getStatusCode()
+
     /**
-     * レスポンスフレーズ
+     * ステータスコードを設定する。
+     *
+     * @param code ステータスコード
+     * @see setStatus
      */
-    var reasonPhrase: String
-        get() = message.getReasonPhrase()
-        set(reasonPhrase) {
-            message.setReasonPhrase(reasonPhrase)
-        }
+    fun setStatusCode(code: Int) {
+        message.setStatusCode(code)
+    }
+
     /**
-     * ステータス
+     * レスポンスフレーズを取得する
+     *
+     * @return レスポンスフレーズ
+     * @see getStatus
      */
-    var status: Status
-        get() = message.getStatus()
-        set(status) {
-            message.setStatus(status)
-        }
+    fun getReasonPhrase(): String = message.getReasonPhrase()
+
+    /**
+     * レスポンスフレーズを設定する。
+     *
+     * @param reasonPhrase レスポンスフレーズ
+     * @see setStatus
+     */
+    fun setReasonPhrase(reasonPhrase: String) {
+        message.setReasonPhrase(reasonPhrase)
+    }
+
+    /**
+     * ステータスを取得する。
+     *
+     * @return ステータス
+     */
+    fun getStatus(): Status = message.getStatus()
+
+    /**
+     * ステータスを設定する。
+     *
+     * @param status ステータス
+     * @return HttpResponse
+     */
+    fun setStatus(status: Status) {
+        message.setStatus(status)
+    }
 
     override fun toString(): String {
         return delegate.toString()

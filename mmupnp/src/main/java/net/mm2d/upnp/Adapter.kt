@@ -10,7 +10,14 @@ package net.mm2d.upnp
 import net.mm2d.upnp.ControlPoint.DiscoveryListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 
+/**
+ * ラムダからインターフェース実装を返すアダプター
+ */
 object Adapter {
+
+    /**
+     * TaskExecutorのアダプター
+     */
     @JvmStatic
     fun adapter(
         handler: (Runnable) -> Boolean
@@ -18,6 +25,9 @@ object Adapter {
         override fun execute(task: Runnable): Boolean = handler(task)
     }
 
+    /**
+     * DiscoveryListenerのアダプター
+     */
     @JvmStatic
     fun adapter(
         discover: (Device) -> Unit,
@@ -32,6 +42,9 @@ object Adapter {
         }
     }
 
+    /**
+     * NotifyEventListenerのアダプター
+     */
     @JvmStatic
     fun adapter(
         notifyEvent: (service: Service, seq: Long, variable: String, value: String) -> Unit

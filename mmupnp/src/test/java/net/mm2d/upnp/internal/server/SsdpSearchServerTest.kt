@@ -101,7 +101,7 @@ class SsdpSearchServerTest {
         server.onReceive(address, data, data.size)
 
         val response = slot.captured
-        assertThat(response.status).isEqualTo(Http.Status.HTTP_OK)
+        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
         assertThat(response.uuid).isEqualTo("uuid:01234567-89ab-cdef-0123-456789abcdef")
     }
 

@@ -47,22 +47,22 @@ internal object SsdpResponseTest {
         @Test
         fun setStatusCode() {
             val message = makeFromResource("ssdp-search-response0.bin")
-            message.statusCode = 404
-            assertThat(message.statusCode).isEqualTo(404)
+            message.setStatusCode(404)
+            assertThat(message.getStatusCode()).isEqualTo(404)
         }
 
         @Test
         fun setReasonPhrase() {
             val message = makeFromResource("ssdp-search-response0.bin")
-            message.reasonPhrase = "Not Found"
-            assertThat(message.reasonPhrase).isEqualTo("Not Found")
+            message.setReasonPhrase("Not Found")
+            assertThat(message.getReasonPhrase()).isEqualTo("Not Found")
         }
 
         @Test
         fun setStatus() {
             val message = makeFromResource("ssdp-search-response0.bin")
-            message.status = Http.Status.HTTP_NOT_FOUND
-            assertThat(message.status).isEqualTo(Http.Status.HTTP_NOT_FOUND)
+            message.setStatus(Http.Status.HTTP_NOT_FOUND)
+            assertThat(message.getStatus()).isEqualTo(Http.Status.HTTP_NOT_FOUND)
         }
 
         @Test
@@ -76,17 +76,17 @@ internal object SsdpResponseTest {
     class Responseメッセージ {
         @Theory
         fun getStatus(message: SsdpResponse) {
-            assertThat(message.status).isEqualTo(Http.Status.HTTP_OK)
+            assertThat(message.getStatus()).isEqualTo(Http.Status.HTTP_OK)
         }
 
         @Theory
         fun getStatusCode(message: SsdpResponse) {
-            assertThat(message.statusCode).isEqualTo(200)
+            assertThat(message.getStatusCode()).isEqualTo(200)
         }
 
         @Theory
         fun getReasonPhrase(message: SsdpResponse) {
-            assertThat(message.reasonPhrase).isEqualTo("OK")
+            assertThat(message.getReasonPhrase()).isEqualTo("OK")
         }
 
         @Theory
