@@ -41,7 +41,7 @@ Sample App
 
 ## How to use
 
-Download this library from jCenter. (since Ver.1.7.0)
+Download from jCenter.
 
 ```gradle
 repositories {
@@ -71,7 +71,7 @@ This library is under development of 3.0.0.
 There are no plans to make major changes to the specification, but it will be rewritten with Kotlin.
 And undergoing destructive change.
 
-It will be distributed in this maven repository. (Not yet released)
+Distributed in the following maven repository.
 
 ```gradle
 repositories {
