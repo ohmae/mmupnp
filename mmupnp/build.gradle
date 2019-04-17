@@ -29,7 +29,7 @@ dependencies {
 }
 
 dokka {
-    outputFormat = 'html'
+    outputFormat = 'javadoc'
     // outputDirectory = "../docs/dokka"
 }
 

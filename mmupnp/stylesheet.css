@@ -7,9 +7,7 @@
 body {
   background-color: #ffffff;
   color: #212121;
-  font-family: 'Roboto', 'Mplus 1p', 'ヒラギノ角ゴ ProN W3',
-    'Hiragino Kaku Gothic ProN', 'メイリオ', Meiryo, Arial, Helvetica,
-    sans-serif;
+  font-family: 'Roboto', 'Mplus 1p', sans-serif;
   font-size: 12pt;
   margin: 0;
 }
@@ -39,8 +37,12 @@ a[name]:hover {
 }
 
 pre {
-  font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
+  font-family: 'Inconsolata', monospace;
   font-size: 12pt;
+  background: #f8f8f8;
+  padding: 16px;
+  margin-right: 8px;
+  border-radius: 8px;
 }
 
 h1 {
@@ -73,7 +75,7 @@ ul {
 }
 
 code, tt {
-  font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
+  font-family: 'Inconsolata', monospace;
   font-size: 12pt;
   padding-top: 4px;
   margin-top: 8px;
@@ -81,13 +83,13 @@ code, tt {
 }
 
 dt code {
-  font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
+  font-family: 'Inconsolata', monospace;
   font-size: 12pt;
   padding-top: 4px;
 }
 
 table tr td dt code {
-  font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
+  font-family: 'Inconsolata', monospace;
   font-size: 12pt;
   vertical-align: top;
   padding-top: 4px;
@@ -342,7 +344,7 @@ Page layout container styles
   .serializedFormContainer dl dd {
   margin: 5px 0 10px 0;
   font-size: 12pt;
-  font-family: 'Inconsolata', 'Ricty', "ＭＳ ゴシック", monospace;
+  font-family: 'Inconsolata', monospace;
 }
 
 .serializedFormContainer dl.nameValue dt {
@@ -629,9 +631,7 @@ ul.blockList ul.blockList ul.blockList li.blockList h3 {
 
 div.block {
   font-size: 12pt;
-  font-family: 'Roboto', 'Mplus 1p', 'ヒラギノ角ゴ ProN W3',
-    'Hiragino Kaku Gothic ProN', 'メイリオ', Meiryo, Arial, Helvetica,
-    sans-serif;
+  font-family: 'Roboto', 'Mplus 1p', sans-serif;
 }
 
 td.colLast div {
