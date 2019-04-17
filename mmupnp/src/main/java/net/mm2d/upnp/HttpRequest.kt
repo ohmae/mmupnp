@@ -148,6 +148,9 @@ class HttpRequest internal constructor(
         } ?: throw IllegalStateException("address must be set")
     }
 
+    /**
+     * Message as String
+     */
     override fun toString(): String {
         return delegate.toString()
     }

@@ -9,6 +9,9 @@ package net.mm2d.upnp.empty
 
 import net.mm2d.upnp.*
 
+/**
+ * Empty implementation of [Service].
+ */
 object EmptyService : Service {
     override val device: Device = ControlPoints.emptyDevice()
     override val serviceType: String = ""

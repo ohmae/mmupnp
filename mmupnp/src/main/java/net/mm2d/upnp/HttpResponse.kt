@@ -113,11 +113,17 @@ internal constructor(
         startLineDelegate.setStatus(status)
     }
 
+    /**
+     * Message as String
+     */
     override fun toString(): String {
         return delegate.toString()
     }
 
     companion object {
+        /**
+         * インスタンスを作成。
+         */
         @JvmStatic
         fun create(): HttpResponse {
             return StartLine().let {
@@ -125,6 +131,9 @@ internal constructor(
             }
         }
 
+        /**
+         * 同一内容のインスタンスを作成する。
+         */
         @JvmStatic
         fun copy(original: HttpResponse): HttpResponse {
             return original.startLineDelegate.copy().let {

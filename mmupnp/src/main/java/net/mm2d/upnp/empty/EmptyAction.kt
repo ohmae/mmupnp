@@ -13,6 +13,9 @@ import net.mm2d.upnp.ControlPoints
 import net.mm2d.upnp.Service
 import java.io.IOException
 
+/**
+ * Empty implementation of [Action].
+ */
 object EmptyAction : Action {
     override val service: Service = ControlPoints.emptyService()
     override val name: String = ""

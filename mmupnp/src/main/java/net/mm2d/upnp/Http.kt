@@ -67,32 +67,50 @@ object Http {
     const val SEQ = "SEQ"
     /** Search Target */
     const val ST = "ST"
+    /** Used in SUBSCRIBE. CSV of StateVariables */
     const val STATEVAR = "STATEVAR"
+    /** Used in SUBSCRIBE response. CSV of StateVariables */
     const val ACCEPTED_STATEVAR = "ACCEPTED-STATEVAR"
+    /** Used in SUBSCRIBE/response. duration until subscription expires. */
     const val TIMEOUT = "TIMEOUT"
+    /** Date */
     const val DATE = "DATE"
+    /** Required for backwards compatibility with UPnP 1.0. (Header field name only; no field value.) */
     const val EXT = "EXT"
+    /** URL to the UPnP description */
     const val LOCATION = "LOCATION"
-    /**
-     * Unique Service Name
-     */
+    /** Unique Service Name */
     const val USN = "USN"
+    /** number increased each time device sends an initial announce or update message */
     const val BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG"
+    /** number used for caching description information */
     const val CONFIGID_UPNP_ORG = "CONFIGID.UPNP.ORG"
+    /** number identifies port on which device responds to unicast M-SEARCH */
     const val SEARCHPORT_UPNP_ORG = "SEARCHPORT.UPNP.ORG"
+    /** a base URL with "https:" */
     const val SECURELOCATION_UPNP_ORG = "SECURELOCATION.UPNP.ORG"
+    /** SOAPACTION */
     const val SOAPACTION = "SOAPACTION"
+    /** Notification Type: upnp:event */
     const val UPNP_EVENT = "upnp:event"
+    /** Notification Sub Type: upnp:propchange */
     const val UPNP_PROPCHANGE = "upnp:propchange"
 
+    /** Method name of SUBSCRIBE */
     const val SUBSCRIBE = "SUBSCRIBE"
+    /** Method name of UNSUBSCRIBE */
     const val UNSUBSCRIBE = "UNSUBSCRIBE"
+    /** Method name of GET */
     const val GET = "GET"
+    /** Method name of POST */
     const val POST = "POST"
+    /** Method name of NOTIFY */
     const val NOTIFY = "NOTIFY"
 
+    /** Default Http port */
     const val DEFAULT_PORT = 80
 
+    /** http scheme */
     const val HTTP_SCHEME = "http://"
     private val formatLock = ReentrantLock()
     private val RFC_1123_FORMAT: DateFormat

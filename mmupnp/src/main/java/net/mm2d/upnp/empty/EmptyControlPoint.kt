@@ -12,6 +12,9 @@ import net.mm2d.upnp.Device
 import net.mm2d.upnp.Icon
 import net.mm2d.upnp.SsdpMessage
 
+/**
+ * Empty implementation of [ControlPoint].
+ */
 object EmptyControlPoint : ControlPoint {
     override val deviceListSize: Int = 0
     override val deviceList: List<Device> = emptyList()

@@ -13,6 +13,9 @@ import java.io.IOException
 import java.io.OutputStream
 import java.net.InetAddress
 
+/**
+ * Empty implementation of [SsdpMessage].
+ */
 object EmptySsdpMessage : SsdpMessage {
     override val isPinned: Boolean = false
     override val scopeId: Int = 0

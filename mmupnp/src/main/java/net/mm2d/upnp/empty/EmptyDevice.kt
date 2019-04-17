@@ -9,6 +9,9 @@ package net.mm2d.upnp.empty
 
 import net.mm2d.upnp.*
 
+/**
+ * Empty implementation of [Device].
+ */
 object EmptyDevice : Device {
     override val controlPoint: ControlPoint
         get() = ControlPoints.emptyControlPoint()
