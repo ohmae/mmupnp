@@ -11,12 +11,15 @@ import net.mm2d.upnp.ControlPoint.DiscoveryListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 
 /**
- * ラムダからインターフェース実装を返すアダプター
+ * Adapter to convert lambda to interface.
  */
 object Adapter {
 
     /**
-     * TaskExecutorのアダプター
+     * Adapter for [TaskExecutor].
+     *
+     * @param handler execution callback
+     * @return TaskExecutor
      */
     @JvmStatic
     fun adapter(
@@ -26,7 +29,11 @@ object Adapter {
     }
 
     /**
-     * DiscoveryListenerのアダプター
+     * Adapter for [DiscoveryListener].
+     *
+     * @param discover onDiscover callback
+     * @param lost     onLost callback
+     * @return DiscoveryListener
      */
     @JvmStatic
     fun adapter(
@@ -43,7 +50,10 @@ object Adapter {
     }
 
     /**
-     * NotifyEventListenerのアダプター
+     * Adapter for [NotifyEventListener].
+     *
+     * @param notifyEvent onNotifyEvent callback.
+     * @return NotifyEventListener
      */
     @JvmStatic
     fun adapter(
