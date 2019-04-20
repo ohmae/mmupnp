@@ -13,12 +13,14 @@ import net.mm2d.upnp.*
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.parser.DeviceParser
+import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.TestUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.io.IOException
 import java.net.InetAddress
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -432,6 +434,20 @@ class ServiceTest {
             val client = (service as ServiceImpl).createHttpClient()
             assertThat(client.isKeepAlive).isFalse()
         }
+
+        @Test
+        fun toDumpString() {
+            ServiceImpl.Builder()
+                .setDevice(mockk(relaxed = true))
+                .setSubscribeManager(mockk(relaxed = true))
+                .setServiceType("serviceType")
+                .setServiceId("serviceId")
+                .setScpdUrl("scpdUrl")
+                .setControlUrl("controlUrl")
+                .setEventSubUrl("eventSubUrl")
+                .setDescription("description")
+                .toDumpString()
+        }
     }
 
     @RunWith(JUnit4::class)
@@ -713,6 +729,9 @@ class ServiceTest {
 
             response.setHeader(Http.TIMEOUT, "second-ff")
             assertThat(ServiceImpl.parseTimeout(response)).isEqualTo(DEFAULT_SUBSCRIPTION_TIMEOUT)
+
+            response.setHeader(Http.TIMEOUT, "")
+            assertThat(ServiceImpl.parseTimeout(response)).isEqualTo(DEFAULT_SUBSCRIPTION_TIMEOUT)
         }
 
         companion object {
@@ -731,6 +750,7 @@ class ServiceTest {
         @Before
         fun setUp() {
             controlPoint = mockk(relaxed = true)
+            every { controlPoint.taskExecutors } returns TaskExecutors()
             device = mockk(relaxed = true)
             subscribeManager = mockk(relaxed = true)
             every { device.controlPoint } returns controlPoint
@@ -753,7 +773,7 @@ class ServiceTest {
         }
 
         @Test
-        fun subscribe_成功() {
+        fun subscribeSync_成功() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -765,7 +785,7 @@ class ServiceTest {
 
         @Test
         @Throws(Exception::class)
-        fun subscribe_SIDなし() {
+        fun subscribeSync_SIDなし() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -775,7 +795,7 @@ class ServiceTest {
         }
 
         @Test
-        fun subscribe_Timeout値異常() {
+        fun subscribeSync_Timeout値異常() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -786,7 +806,7 @@ class ServiceTest {
         }
 
         @Test
-        fun subscribe_Http応答異常() {
+        fun subscribeSync_Http応答異常() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
             response.setHeader(Http.SID, "sid")
@@ -797,7 +817,14 @@ class ServiceTest {
         }
 
         @Test
-        fun subscribe_2回目はrenewがコールされfalseが返されると失敗() {
+        fun subscribeSync_Exception() {
+            every { httpClient.post(any()) } throws IOException()
+
+            assertThat(service.subscribeSync()).isFalse()
+        }
+
+        @Test
+        fun subscribeSync_2回目はrenewがコールされfalseが返されると失敗() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -814,7 +841,7 @@ class ServiceTest {
         }
 
         @Test
-        fun renewSubscribe_subscribe前はsubscribeが実行される() {
+        fun renewSubscribeSync_subscribe前はsubscribeが実行される() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -827,7 +854,7 @@ class ServiceTest {
         }
 
         @Test
-        fun renewSubscribe_2回目はrenewが実行される() {
+        fun renewSubscribeSync_2回目はrenewが実行される() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -842,7 +869,7 @@ class ServiceTest {
         }
 
         @Test
-        fun renewSubscribe_renewの応答ステータス異常で失敗() {
+        fun renewSubscribeSync_renewの応答ステータス異常で失敗() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -856,7 +883,7 @@ class ServiceTest {
         }
 
         @Test
-        fun renewSubscribe_sid不一致() {
+        fun renewSubscribeSync_sid不一致() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -870,7 +897,7 @@ class ServiceTest {
         }
 
         @Test
-        fun renewSubscribe_Timeout値異常() {
+        fun renewSubscribeSync_Timeout値異常() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -884,12 +911,27 @@ class ServiceTest {
         }
 
         @Test
-        fun unsubscribe_subscribeする前に実行すると失敗() {
+        fun renewSubscribeSync_Exception() {
+            val response = HttpResponse.create()
+            response.setStatus(Http.Status.HTTP_OK)
+            response.setHeader(Http.SID, "sid")
+            response.setHeader(Http.TIMEOUT, "second-300")
+            every { httpClient.post(any()) } returns response
+
+            assertThat(service.subscribeSync()).isTrue()
+
+            every { httpClient.post(any()) } throws IOException()
+
+            assertThat(service.renewSubscribeSync()).isFalse()
+        }
+
+        @Test
+        fun unsubscribeSync_subscribeする前に実行すると失敗() {
             assertThat(service.unsubscribeSync()).isFalse()
         }
 
         @Test
-        fun unsubscribe_正常() {
+        fun unsubscribeSync_正常() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -901,7 +943,7 @@ class ServiceTest {
         }
 
         @Test
-        fun unsubscribe_OK以外は失敗() {
+        fun unsubscribeSync_OK以外は失敗() {
             val response = HttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
@@ -912,6 +954,48 @@ class ServiceTest {
             response.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
 
             assertThat(service.unsubscribeSync()).isFalse()
+        }
+
+        @Test
+        fun unsubscribeSync_Exception() {
+            val response = HttpResponse.create()
+            response.setStatus(Http.Status.HTTP_OK)
+            response.setHeader(Http.SID, "sid")
+            response.setHeader(Http.TIMEOUT, "second-300")
+            every { httpClient.post(any()) } returns response
+
+            assertThat(service.subscribeSync()).isTrue()
+
+            every { httpClient.post(any()) } throws IOException()
+
+            assertThat(service.unsubscribeSync()).isFalse()
+        }
+
+        @Test
+        fun subscribe() {
+            every { service.subscribeSync(any()) } returns true
+            val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
+            service.subscribe(false, callback)
+            Thread.sleep(100)
+            verify { callback(true) }
+        }
+
+        @Test
+        fun renewSubscribe() {
+            every { service.renewSubscribeSync() } returns true
+            val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
+            service.renewSubscribe(callback)
+            Thread.sleep(100)
+            verify { callback(true) }
+        }
+
+        @Test
+        fun unsubscribe() {
+            every { service.unsubscribeSync() } returns true
+            val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
+            service.unsubscribe(callback)
+            Thread.sleep(100)
+            verify { callback(true) }
         }
     }
 }
