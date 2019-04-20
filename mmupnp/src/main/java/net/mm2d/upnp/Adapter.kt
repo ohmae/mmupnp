@@ -36,7 +36,7 @@ object Adapter {
      * @return DiscoveryListener
      */
     @JvmStatic
-    fun adapter(
+    fun discoveryListener(
         discover: (Device) -> Unit,
         lost: (Device) -> Unit
     ): DiscoveryListener = object : DiscoveryListener {
@@ -56,7 +56,7 @@ object Adapter {
      * @return NotifyEventListener
      */
     @JvmStatic
-    fun adapter(
+    fun notifyEventListener(
         notifyEvent: (service: Service, seq: Long, variable: String, value: String) -> Unit
     ): NotifyEventListener = object : NotifyEventListener {
         override fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String) {

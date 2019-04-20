@@ -10,7 +10,8 @@ package net.mm2d.upnp.sample
 import com.google.gson.Gson
 import net.mm2d.log.Logger
 import net.mm2d.log.Senders
-import net.mm2d.upnp.Adapter.adapter
+import net.mm2d.upnp.Adapter.notifyEventListener
+import net.mm2d.upnp.Adapter.discoveryListener
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPointFactory
@@ -65,8 +66,8 @@ class MainWindow private constructor() : JFrame() {
     }
 
     private fun setUpControlPoint() {
-        controlPoint.addDiscoveryListener(adapter({ update() }, { update() }))
-        controlPoint.addNotifyEventListener(adapter { service, seq, variable, value ->
+        controlPoint.addDiscoveryListener(discoveryListener({ update() }, { update() }))
+        controlPoint.addNotifyEventListener(notifyEventListener { service, seq, variable, value ->
             eventArea.text = "${eventArea.text}${service.serviceType} : $seq : $variable : $value\n"
         })
     }
