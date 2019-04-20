@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp
 
-import net.mm2d.upnp.Adapter.adapter
+import net.mm2d.upnp.Adapter.taskExecutor
 import net.mm2d.upnp.internal.impl.ControlPointImpl
 import net.mm2d.upnp.internal.impl.DiFactory
 import java.net.NetworkInterface
@@ -42,7 +42,7 @@ object ControlPointFactory {
         notifySegmentCheckEnabled: Boolean = false
     ): ControlPoint {
         val executor = callbackExecutor
-            ?: callbackHandler?.let { adapter(it) }
+            ?: callbackHandler?.let { taskExecutor(it) }
         return ControlPointImpl(
             protocol,
             getDefaultInterfacesIfEmpty(protocol, interfaces),

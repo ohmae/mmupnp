@@ -22,7 +22,7 @@ object Adapter {
      * @return TaskExecutor
      */
     @JvmStatic
-    fun adapter(
+    fun taskExecutor(
         handler: (Runnable) -> Boolean
     ): TaskExecutor = object : TaskExecutor {
         override fun execute(task: Runnable): Boolean = handler(task)
