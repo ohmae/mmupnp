@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import net.mm2d.log.Logger
 import net.mm2d.log.Senders
 import net.mm2d.upnp.Adapter.adapter
+import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPointFactory
 import java.awt.*
@@ -28,7 +29,7 @@ import javax.swing.tree.TreeSelectionModel
  */
 class MainWindow private constructor() : JFrame() {
     private val controlPoint: ControlPoint = ControlPointFactory.create().also {
-        it.setIconFilter { list -> list }
+        it.setIconFilter(iconFilter { list -> list })
         it.initialize()
     }
     private val rootNode: UpnpNode = UpnpNode("Device").also {

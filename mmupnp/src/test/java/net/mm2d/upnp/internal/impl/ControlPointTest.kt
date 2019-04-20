@@ -10,6 +10,7 @@ package net.mm2d.upnp.internal.impl
 import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import net.mm2d.upnp.*
+import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint.DiscoveryListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.internal.manager.DeviceHolder
@@ -601,7 +602,7 @@ class ControlPointTest {
             val message = SsdpRequest.create(address, data, data.size)
             val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"
             every { cp.createHttpClient() } returns httpClient
-            val iconFilter = spyk<(List<Icon>) -> List<Icon>>({ listOf(it[0]) })
+            val iconFilter = spyk(iconFilter { listOf(it[0]) })
             cp.setIconFilter(iconFilter)
             cp.onAcceptSsdpMessage(message)
             Thread.sleep(1000) // 読み込みを待つ

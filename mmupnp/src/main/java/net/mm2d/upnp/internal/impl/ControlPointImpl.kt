@@ -9,6 +9,7 @@ package net.mm2d.upnp.internal.impl
 
 import net.mm2d.log.Logger
 import net.mm2d.upnp.*
+import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint.DiscoveryListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.internal.impl.DeviceImpl.Builder
@@ -38,7 +39,7 @@ internal class ControlPointImpl(
     factory: DiFactory
 ) : ControlPoint {
     private var ssdpMessageFilter: (SsdpMessage) -> Boolean = { true }
-    private var iconFilter: (List<Icon>) -> List<Icon> = { emptyList() }
+    private var iconFilter: IconFilter = EMPTY_FILTER
     private val discoveryListenerList: MutableSet<DiscoveryListener>
     private val notifyEventListenerList: MutableSet<NotifyEventListener>
     private val searchServerList: SsdpSearchServerList
@@ -241,8 +242,8 @@ internal class ControlPointImpl(
         ssdpMessageFilter = filter ?: { true }
     }
 
-    override fun setIconFilter(filter: ((List<Icon>) -> List<Icon>)?) {
-        iconFilter = filter ?: { emptyList() }
+    override fun setIconFilter(filter: IconFilter?) {
+        iconFilter = filter ?: EMPTY_FILTER
     }
 
     override fun addDiscoveryListener(listener: DiscoveryListener) {
@@ -353,6 +354,7 @@ internal class ControlPointImpl(
     }
 
     companion object {
+        private val EMPTY_FILTER = iconFilter { emptyList() }
         // VisibleForTesting
         fun collectEmbeddedUdn(device: Device): Set<String> {
             if (device.deviceList.isEmpty()) {

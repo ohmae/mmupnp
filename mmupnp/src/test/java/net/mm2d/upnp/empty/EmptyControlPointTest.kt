@@ -9,6 +9,7 @@ package net.mm2d.upnp.empty
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
+import net.mm2d.upnp.Adapter.iconFilter
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -66,7 +67,7 @@ class EmptyControlPointTest {
     @Test
     fun setIconFilter() {
         val controlPoint = EmptyControlPoint
-        controlPoint.setIconFilter { emptyList() }
+        controlPoint.setIconFilter(iconFilter { emptyList() })
     }
 
     @Test

@@ -9,6 +9,7 @@ package net.mm2d.upnp.empty
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
+import net.mm2d.upnp.Adapter.iconFilter
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -19,7 +20,7 @@ class EmptyDeviceTest {
     @Test
     fun loadIconBinary() {
         val device = EmptyDevice
-        device.loadIconBinary(mockk()) { it }
+        device.loadIconBinary(mockk(), iconFilter { it })
     }
 
     @Test

@@ -277,7 +277,7 @@ interface Device {
      * @param client 通信に使用するHttpClient
      * @param filter 読み込むIconを選別するFilter
      */
-    fun loadIconBinary(client: HttpClient, filter: (List<Icon>) -> List<Icon>)
+    fun loadIconBinary(client: HttpClient, filter: IconFilter)
 
     /**
      * SSDPパケットを設定する。

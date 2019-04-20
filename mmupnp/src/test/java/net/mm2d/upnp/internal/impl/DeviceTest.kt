@@ -11,6 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
+import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.SsdpMessage
@@ -76,7 +77,7 @@ class DeviceTest {
         @Test
         fun loadIconBinary_NONE() {
             val device = builder.build()
-            device.loadIconBinary(httpClient) { emptyList() }
+            device.loadIconBinary(httpClient, iconFilter { emptyList() })
             device.iconList.forEach {
                 assertThat(it.binary).isNull()
             }
@@ -85,7 +86,7 @@ class DeviceTest {
         @Test
         fun loadIconBinary_ALL() {
             val device = builder.build()
-            device.loadIconBinary(httpClient) { it }
+            device.loadIconBinary(httpClient, iconFilter { it })
             device.iconList.forEach {
                 assertThat(it.binary).isNotNull()
             }
@@ -97,7 +98,7 @@ class DeviceTest {
                 httpClient.downloadBinary(URL("http://192.0.2.2:12345/icon/icon120.jpg"))
             } throws IOException()
             val device = builder.build()
-            device.loadIconBinary(httpClient) { it }
+            device.loadIconBinary(httpClient, iconFilter { it })
             device.iconList.forEach {
                 if (it.url == "/icon/icon120.jpg") {
                     assertThat(it.binary).isNull()
@@ -446,7 +447,7 @@ class DeviceTest {
                 .setModelName("modelName")
                 .build()
 
-            device.loadIconBinary(mockk(relaxed = true)) { it }
+            device.loadIconBinary(mockk(relaxed = true), iconFilter { it })
         }
     }
 }

@@ -70,7 +70,7 @@ internal class DeviceImpl private constructor(
     override val isPinned: Boolean
         get() = ssdpMessage.isPinned
 
-    override fun loadIconBinary(client: HttpClient, filter: (List<Icon>) -> List<Icon>) {
+    override fun loadIconBinary(client: HttpClient, filter: IconFilter) {
         if (iconList.isEmpty()) return
         filter(iconList).mapNotNull { it as? IconImpl }.forEach {
             try {

@@ -157,7 +157,7 @@ interface ControlPoint {
      *
      * @param filter 設定するフィルタ、nullを指定すると何も取得しない。
      */
-    fun setIconFilter(filter: ((List<Icon>) -> List<Icon>)?)
+    fun setIconFilter(filter: IconFilter?)
 
     /**
      * 機器発見のリスナーを登録する。

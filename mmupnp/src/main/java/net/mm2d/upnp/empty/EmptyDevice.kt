@@ -66,7 +66,7 @@ object EmptyDevice : Device {
     override val isPinned: Boolean
         get() = false
 
-    override fun loadIconBinary(client: HttpClient, filter: (List<Icon>) -> List<Icon>) = Unit
+    override fun loadIconBinary(client: HttpClient, filter: IconFilter) = Unit
     override fun updateSsdpMessage(message: SsdpMessage) = Unit
     override fun getValue(name: String): String? = null
     override fun getValueWithNamespace(namespace: String, name: String): String? = null

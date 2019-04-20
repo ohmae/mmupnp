@@ -63,4 +63,17 @@ object Adapter {
             notifyEvent(service, seq, variable, value)
         }
     }
+
+    /**
+     * Adapter for [IconFilter].
+     *
+     * @param filter filter method
+     * @return IconFilter
+     */
+    @JvmStatic
+    fun iconFilter(
+        filter: (List<Icon>) -> List<Icon>
+    ): IconFilter = object : IconFilter {
+        override fun invoke(list: List<Icon>): List<Icon> = filter.invoke(list)
+    }
 }

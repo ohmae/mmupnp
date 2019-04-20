@@ -9,7 +9,7 @@ package net.mm2d.upnp.empty
 
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.Device
-import net.mm2d.upnp.Icon
+import net.mm2d.upnp.IconFilter
 import net.mm2d.upnp.SsdpMessage
 
 /**
@@ -26,7 +26,7 @@ object EmptyControlPoint : ControlPoint {
     override fun search() = Unit
     override fun search(st: String?) = Unit
     override fun setSsdpMessageFilter(filter: ((SsdpMessage) -> Boolean)?) = Unit
-    override fun setIconFilter(filter: ((List<Icon>) -> List<Icon>)?) = Unit
+    override fun setIconFilter(filter: IconFilter?) = Unit
     override fun addDiscoveryListener(listener: ControlPoint.DiscoveryListener) = Unit
     override fun removeDiscoveryListener(listener: ControlPoint.DiscoveryListener) = Unit
     override fun addNotifyEventListener(listener: ControlPoint.NotifyEventListener) = Unit
