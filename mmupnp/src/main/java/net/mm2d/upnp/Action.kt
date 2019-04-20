@@ -10,71 +10,71 @@ package net.mm2d.upnp
 import java.io.IOException
 
 /**
- * Actionを表現するインターフェース。
+ * Interface of UPnP Action.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 interface Action {
 
     /**
-     * このActionを保持するServiceを返す。
+     * Return the Service that is the owner of this Action.
      *
-     * @return このActionを保持するService
+     * @return Service
      */
     val service: Service
 
     /**
-     * Action名を返す。
+     * Return the Action name.
      *
-     * @return Action名
+     * @return Action name
      */
     val name: String
 
     /**
-     * Argumentリストを返す。
+     * Return the Argument list.
      *
-     * リストは変更不可であり、
-     * 変更しようとするとUnsupportedOperationExceptionが発生する。
+     * List is the immutable.
+     * When the modification method is called, UnsupportedOperationException will be thrown.
      *
-     * @return Argumentリスト
+     * @return Argument list
      */
     val argumentList: List<Argument>
 
     /**
-     * 指定名に合致するArgumentを返す。
+     * Find the Argument by name
      *
-     * @param name Argument名
+     * @param name Argument name
      * @return Argument
      */
     fun findArgument(name: String): Argument?
 
     /**
-     * Actionを同期実行する。
+     * Invoke this Action synchronously.
      *
-     * 実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
-     * 値はすべてStringで表現する。
+     * Execution arguments and execution results are represented by Map with argument name as key and value as value.
+     * All values ​​are treat as String.
      *
-     * 引数、戻り値ともに、Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われないが、
+     * Both arguments and return values ​​are not checked according to DataType and AllowedValue of Argument (StateVariable),
+     * but the values that are not described in Argument are ignored even if it is in [argumentValues].
      *
-     * [argumentValues]にArgumentに記載のない値を設定していても無視される。
-     * 引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
-     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     * When there are no required arguments, the value is set only if a default value is defined in StateVariable.
+     * If not, it is treated as empty even if it violates DataType.
      *
-     * 実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
-     * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
+     * If the execution result contains a value not described in Argument, it will not be ignored,
+     * and its key / value will be set in the map of return values in the same way as the one described in Argument.
      *
-     * [returnErrorResponse]がfalseの場合、エラーレスポンスが返却された場合は、IOExceptionを発生させる。
-     * trueを指定すると、エラーレスポンスもパースして戻り値として返却する。
-     * この場合、戻り値のMapのkeyとして
-     * エラーレスポンスが仕様に従うなら'faultcode','faultstring','UPnPError/errorCode',が含まれ
-     * 'UPnPError/errorDescription'も含まれている場合がある。
-     * このメソッドでは'UPnPError/errorCode'が含まれていない場合は、
-     * エラーレスポンスの異常として、IOExceptionを発生させる。
+     * If [returnErrorResponse] is false, IOException is thrown when an error response is returned.
+     * If true, error response will be parsed and returned as return value.
+     * In this case, if the error response conforms to the specification,
+     * 'faultcode','faultstring','UPnPError/errorCode', are included as a key of the return value Map,
+     * and 'UPnPError/errorDescription' may also be included.
+     * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
      *
-     * @param argumentValues      引数への入力値
-     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @param argumentValues      Input value to argument
+     * @param returnErrorResponse When an error response is received, if true,
+     * the error is also parsed and returned as a return value. If false, throws IOException.
+     * @return Invocation result
+     * @throws IOException If any exception occurs while communication or there is an error response
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
      * @see ERROR_CODE_KEY
@@ -87,44 +87,42 @@ interface Action {
     ): Map<String, String>
 
     /**
-     * Actionを同期実行する。【試験的実装】
+     * Invoke this Action synchronously. (Experimental function)
      *
-     * 実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
-     * 値はすべてStringで表現する。
+     * Execution arguments and execution results are represented by Map with argument name as key and value as value.
+     * All values ​​are treat as String.
      *
-     * 引数、戻り値ともに、Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われないが、
+     * Both arguments and return values ​​are not checked according to DataType and AllowedValue of Argument (StateVariable),
+     * but the values that are not described in Argument are ignored even if it is in [argumentValues].
      *
-     * [argumentValues]にArgumentに記載のない値を設定していても無視される。
-     * 引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
-     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     * When there are no required arguments, the value is set only if a default value is defined in StateVariable.
+     * If not, it is treated as empty even if it violates DataType.
      *
-     * 実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
-     * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
+     * If the execution result contains a value not described in Argument, it will not be ignored,
+     * and its key / value will be set in the map of return values in the same way as the one described in Argument.
      *
-     * [returnErrorResponse]がfalseの場合、エラーレスポンスが返却された場合は、IOExceptionを発生させる。
-     * trueを指定すると、エラーレスポンスもパースして戻り値として返却する。
-     * この場合、戻り値のMapのkeyとして
-     * エラーレスポンスが仕様に従うなら'faultcode','faultstring','UPnPError/errorCode',が含まれ
-     * 'UPnPError/errorDescription'も含まれている場合がある。
-     * このメソッドでは'UPnPError/errorCode'が含まれていない場合は、
-     * エラーレスポンスの異常として、IOExceptionを発生させる。
+     * If [returnErrorResponse] is false, IOException is thrown when an error response is returned.
+     * If true, error response will be parsed and returned as return value.
+     * In this case, if the error response conforms to the specification,
+     * 'faultcode','faultstring','UPnPError/errorCode', are included as a key of the return value Map,
+     * and 'UPnPError/errorDescription' may also be included.
+     * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
      *
-     * [customNamespace]として[customArguments]で使用するNamespaceを指定する。
-     * Map<String, String>で指定し、keyにprefixを、valueにURIを指定する。
-     * この引数によって与えたNamespaceはAction Elementに追加される。
+     * Use [customArguments] if you want to add non-existent arguments to [argumentValues].
+     * This is added as a child element of SOAP XML Action Element.
+     * If a prefix that is not in the existing namespace is specified, it fails and throws IOException.
      *
-     * [customArguments]として渡したMap<String, String>は純粋にSOAP XMLのAction Elementの子要素として追加される。
-     * keyとして引数名、valueとして値を指定する。
-     * Argumentの値との関係性はチェックされずすべてがそのまま追加される。
-     * ただし、Namespaceとして登録されないprefixを持っているなどXMLとして不正な引数を与えると失敗し、
-     * IOExceptionを発生させる。
+     * When using [customArguments], if there is an additional namespace required, specify it with [customNamespace]
+     * Designate with `Map<String, String>`, specify prefix as key and URI as value.
+     * The Namespace given by this argument is added to the Action Element.
      *
-     * @param argumentValues      引数への入力値
-     * @param customNamespace     カスタム引数のNamespace情報、不要な場合null
-     * @param customArguments     カスタム引数
-     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @param argumentValues      Input value to argument
+     * @param customNamespace     Namespace of custom argument
+     * @param customArguments     Custom argument
+     * @param returnErrorResponse When an error response is received, if true,
+     * the error is also parsed and returned as a return value. If false, throws IOException.
+     * @return Invocation result
+     * @throws IOException If any exception occurs while communication or there is an error response
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
      * @see ERROR_CODE_KEY
@@ -139,33 +137,33 @@ interface Action {
     ): Map<String, String>
 
     /**
-     * Actionを非同期実行する。
+     * Invoke this Action asynchronously.
      *
-     * 実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
-     * 値はすべてStringで表現する。
+     * Execution arguments and execution results are represented by Map with argument name as key and value as value.
+     * All values ​​are treat as String.
      *
-     * 引数、結果ともに、Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われないが、
+     * Both arguments and return values ​​are not checked according to DataType and AllowedValue of Argument (StateVariable),
+     * but the values that are not described in Argument are ignored even if it is in [argumentValues].
      *
-     * [argumentValues]にArgumentに記載のない値を設定していても無視される。
-     * 引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
-     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     * When there are no required arguments, the value is set only if a default value is defined in StateVariable.
+     * If not, it is treated as empty even if it violates DataType.
      *
-     * 実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
-     * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
+     * If the execution result contains a value not described in Argument, it will not be ignored,
+     * and its key / value will be set in the map of return values in the same way as the one described in Argument.
      *
-     * [returnErrorResponse]がfalseの場合で、エラーレスポンスが返却された場合は、IOExceptionを通知する。
-     * trueを指定すると、エラーレスポンスもパースして通知する。
-     * この場合、戻り値のMapのkeyとして
-     * エラーレスポンスが仕様に従うなら'faultcode','faultstring','UPnPError/errorCode',が含まれ
-     * 'UPnPError/errorDescription'も含まれている場合がある。
-     * このメソッドでは'UPnPError/errorCode'が含まれていない場合は、
-     * エラーレスポンスの異常として、IOExceptionを通知する。
+     * If [returnErrorResponse] is false, IOException is thrown when an error response is returned.
+     * If true, error response will be parsed and returned as return value.
+     * In this case, if the error response conforms to the specification,
+     * 'faultcode','faultstring','UPnPError/errorCode', are included as a key of the return value Map,
+     * and 'UPnPError/errorDescription' may also be included.
+     * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
      *
-     * @param argumentValues      引数への入力値
-     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
-     * @param onResult            結果を通知するコールバック。callbackスレッドで実行される。
-     * @param onError             エラー発生を通知するコールバック。callbackスレッドで実行される。
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @param argumentValues      Input value to argument
+     * @param returnErrorResponse When an error response is received, if true,
+     * the error is also parsed and returned as a return value. If false, throws IOException.
+     * @param onResult            Callback to notify the result. It will be Executed in callback thread.
+     * @param onError             Callback to notify error. It will be Executed in callback thread.
+     * @throws IOException If any exception occurs while communication or there is an error response
      * @see ControlPointFactory.create
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
@@ -180,44 +178,42 @@ interface Action {
     )
 
     /**
-     * Actionを非同期実行する。【試験的実装】
+     * Invoke this Action asynchronously. (Experimental function)
      *
-     * 実行引数及び実行結果は引数名をkeyとし、値をvalueとしたMapで表現する。
-     * 値はすべてStringで表現する。
+     * Execution arguments and execution results are represented by Map with argument name as key and value as value.
+     * All values ​​are treat as String.
      *
-     * 引数、結果ともに、Argument(StateVariable)のDataTypeやAllowedValueに応じた値チェックは行われないが、
+     * Both arguments and return values ​​are not checked according to DataType and AllowedValue of Argument (StateVariable),
+     * but the values that are not described in Argument are ignored even if it is in [argumentValues].
      *
-     * [argumentValues]にArgumentに記載のない値を設定していても無視される。
-     * 引数に不足があった場合、StateVariableにデフォルト値が定義されている場合に限り、その値が設定される。
-     * デフォルト値が定義されていない場合は、DataTypeに違反していても空として扱う。
+     * When there are no required arguments, the value is set only if a default value is defined in StateVariable.
+     * If not, it is treated as empty even if it violates DataType.
      *
-     * 実行結果にArgumentに記載のない値が入っていた場合は無視することはなく、
-     * Argumentに記載のあったものと同様にkey/valueの形で戻り値のMapに設定される。
+     * If the execution result contains a value not described in Argument, it will not be ignored,
+     * and its key / value will be set in the map of return values in the same way as the one described in Argument.
      *
-     * [returnErrorResponse]がfalseの場合で、エラーレスポンスが返却された場合は、IOExceptionを通知する。
-     * trueを指定すると、エラーレスポンスもパースして通知する。
-     * この場合、戻り値のMapのkeyとして
-     * エラーレスポンスが仕様に従うなら'faultcode','faultstring','UPnPError/errorCode',が含まれ
-     * 'UPnPError/errorDescription'も含まれている場合がある。
-     * このメソッドでは'UPnPError/errorCode'が含まれていない場合は、
-     * エラーレスポンスの異常として、IOExceptionを通知する。
+     * If [returnErrorResponse] is false, IOException is thrown when an error response is returned.
+     * If true, error response will be parsed and returned as return value.
+     * In this case, if the error response conforms to the specification,
+     * 'faultcode','faultstring','UPnPError/errorCode', are included as a key of the return value Map,
+     * and 'UPnPError/errorDescription' may also be included.
+     * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
      *
-     * [customNamespace]として[customArguments]で使用するNamespaceを指定する。
-     * Map<String, String>で指定し、keyにprefixを、valueにURIを指定する。
-     * この引数によって与えたNamespaceはAction Elementに追加される。
+     * Use [customArguments] if you want to add non-existent arguments to [argumentValues].
+     * This is added as a child element of SOAP XML Action Element.
+     * If a prefix that is not in the existing namespace is specified, it fails and throws IOException.
      *
-     * [customArguments]として渡したMap<String, String>は純粋にSOAP XMLのAction Elementの子要素として追加される。
-     * keyとして引数名、valueとして値を指定する。
-     * Argumentの値との関係性はチェックされずすべてがそのまま追加される。
-     * ただし、Namespaceとして登録されないprefixを持っているなどXMLとして不正な引数を与えると失敗し、
-     * IOExceptionを通知する。
+     * When using [customArguments], if there is an additional namespace required, specify it with [customNamespace]
+     * Designate with `Map<String, String>`, specify prefix as key and URI as value.
+     * The Namespace given by this argument is added to the Action Element.
      *
-     * @param argumentValues      引数への入力値
-     * @param customNamespace     カスタム引数のNamespace情報、不要な場合null
-     * @param customArguments     カスタム引数
-     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
-     * @param onResult            結果を通知するコールバック。callbackスレッドで実行される。
-     * @param onError             エラー発生を通知するコールバック。callbackスレッドで実行される。
+     * @param argumentValues      Input value to argument
+     * @param customNamespace     Namespace of custom argument
+     * @param customArguments     Custom argument
+     * @param returnErrorResponse When an error response is received, if true,
+     * the error is also parsed and returned as a return value. If false, throws IOException.
+     * @param onResult            Callback to notify the result. It will be Executed in callback thread.
+     * @param onError             Callback to notify error. It will be Executed in callback thread.
      * @see ControlPointFactory.create
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
@@ -234,12 +230,32 @@ interface Action {
     )
 
     /**
-     * Actionを非同期実行する。
+     * Invoke this Action asynchronously.
      *
-     * @param argumentValues      引数への入力値
-     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * Execution arguments and execution results are represented by Map with argument name as key and value as value.
+     * All values ​​are treat as String.
+     *
+     * Both arguments and return values ​​are not checked according to DataType and AllowedValue of Argument (StateVariable),
+     * but the values that are not described in Argument are ignored even if it is in [argumentValues].
+     *
+     * When there are no required arguments, the value is set only if a default value is defined in StateVariable.
+     * If not, it is treated as empty even if it violates DataType.
+     *
+     * If the execution result contains a value not described in Argument, it will not be ignored,
+     * and its key / value will be set in the map of return values in the same way as the one described in Argument.
+     *
+     * If [returnErrorResponse] is false, IOException is thrown when an error response is returned.
+     * If true, error response will be parsed and returned as return value.
+     * In this case, if the error response conforms to the specification,
+     * 'faultcode','faultstring','UPnPError/errorCode', are included as a key of the return value Map,
+     * and 'UPnPError/errorDescription' may also be included.
+     * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
+     *
+     * @param argumentValues      Input value to argument
+     * @param returnErrorResponse When an error response is received, if true,
+     * the error is also parsed and returned as a return value. If false, throws IOException.
+     * @return Invocation result
+     * @throws IOException If any exception occurs while communication or there is an error response
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
      * @see ERROR_CODE_KEY
@@ -251,14 +267,42 @@ interface Action {
     ): Map<String, String>
 
     /**
-     * Actionを非同期実行する。【試験的実装】
+     * Invoke this Action asynchronously. (Experimental function)
      *
-     * @param argumentValues      引数への入力値
-     * @param customNamespace     カスタム引数のNamespace情報、不要な場合null
-     * @param customArguments     カスタム引数
-     * @param returnErrorResponse エラーレスポンス受信時の処理を指定、trueにするとエラーもパースして戻り値で返す。falseにするとIOExceptionを発生させる。
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * Execution arguments and execution results are represented by Map with argument name as key and value as value.
+     * All values ​​are treat as String.
+     *
+     * Both arguments and return values ​​are not checked according to DataType and AllowedValue of Argument (StateVariable),
+     * but the values that are not described in Argument are ignored even if it is in [argumentValues].
+     *
+     * When there are no required arguments, the value is set only if a default value is defined in StateVariable.
+     * If not, it is treated as empty even if it violates DataType.
+     *
+     * If the execution result contains a value not described in Argument, it will not be ignored,
+     * and its key / value will be set in the map of return values in the same way as the one described in Argument.
+     *
+     * If [returnErrorResponse] is false, IOException is thrown when an error response is returned.
+     * If true, error response will be parsed and returned as return value.
+     * In this case, if the error response conforms to the specification,
+     * 'faultcode','faultstring','UPnPError/errorCode', are included as a key of the return value Map,
+     * and 'UPnPError/errorDescription' may also be included.
+     * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
+     *
+     * Use [customArguments] if you want to add non-existent arguments to [argumentValues].
+     * This is added as a child element of SOAP XML Action Element.
+     * If a prefix that is not in the existing namespace is specified, it fails and throws IOException.
+     *
+     * When using [customArguments], if there is an additional namespace required, specify it with [customNamespace]
+     * Designate with `Map<String, String>`, specify prefix as key and URI as value.
+     * The Namespace given by this argument is added to the Action Element.
+     *
+     * @param argumentValues      Input value to argument
+     * @param customNamespace     Namespace of custom argument
+     * @param customArguments     Custom argument
+     * @param returnErrorResponse When an error response is received, if true,
+     * the error is also parsed and returned as a return value. If false, throws IOException.
+     * @return Invocation result
+     * @throws IOException If any exception occurs while communication or there is an error response
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
      * @see ERROR_CODE_KEY
@@ -273,23 +317,23 @@ interface Action {
 
     companion object {
         /**
-         * エラーレスポンスの faultcode を格納するkey。
+         * The key used to store the error response of `faultcode`.
          *
-         * 正常な応答であれば、SOAPのnamespaceがついた"Client"が格納されている。
+         * If it is a normal error response, "Client" with a namespace of SOAP is stored.
          */
         const val FAULT_CODE_KEY = "faultcode"
         /**
-         * エラーレスポンスの faultstring を格納するkey。
+         * The key used to store the error response of `faultstring`.
          *
-         * 正常な応答であれば、"UPnPError"が格納されている。
+         * If it is a normal error response, "UPnPError" is stored.
          */
         const val FAULT_STRING_KEY = "faultstring"
         /**
-         * エラーレスポンスの detail/UPnPError/errorCode を格納するkey。
+         * The key used to store the error response of `detail/UPnPError/errorCode`.
          */
         const val ERROR_CODE_KEY = "UPnPError/errorCode"
         /**
-         * エラーレスポンスの detail/UPnPError/errorDescription を格納するkey.
+         * The key used to store the error response of `detail/UPnPError/errorDescription`.
          */
         const val ERROR_DESCRIPTION_KEY = "UPnPError/errorDescription"
     }
