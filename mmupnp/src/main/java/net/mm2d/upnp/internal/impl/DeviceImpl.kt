@@ -154,14 +154,6 @@ internal class DeviceImpl private constructor(
         return friendlyName
     }
 
-    /**
-     * DeviceのBuilder。
-     *
-     * XMLファイルの読み込み処理もBuilderに対して行う。
-     * @param controlPoint     ControlPoint
-     * @param subscribeManager 購読状態マネージャ
-     * @param ssdpMessage      SSDPパケット
-     */
     internal class Builder(
         private val controlPoint: ControlPointImpl,
         private val subscribeManager: SubscribeManager,
@@ -193,12 +185,6 @@ internal class DeviceImpl private constructor(
             tagMap = mutableMapOf("" to mutableMapOf())
         }
 
-        /**
-         * Deviceのインスタンスを作成する。
-         *
-         * @param parent 親Device、EmbeddedDeviceの場合に指定
-         * @return Deviceのインスタンス
-         */
         fun build(parent: Device? = null): DeviceImpl {
             val description = description ?: throw IllegalStateException("description must be set.")
             val deviceType = deviceType ?: throw IllegalStateException("deviceType must be set.")
@@ -244,48 +230,16 @@ internal class DeviceImpl private constructor(
             )
         }
 
-        /**
-         * 最新のSSDPパケットを返す。
-         *
-         * @return 最新のSSDPパケット
-         */
         fun getSsdpMessage(): SsdpMessage = ssdpMessage
 
-        /**
-         * SSDPに記述されたLocationの値を返す。
-         *
-         * @return SSDPに記述されたLocationの値
-         */
         fun getLocation(): String = location
 
-        /**
-         * SSDPに記述されたUUIDを返す。
-         *
-         * @return SSDPに記述されたUUID
-         */
         fun getUuid(): String = ssdpMessage.uuid
 
-        /**
-         * URLのベースとして使用する値を返す。
-         *
-         * URLBaseの値が存在する場合はURLBase、存在しない場合はLocationの値を利用する。
-         *
-         * @return URLのベースとして使用する値
-         */
         fun getBaseUrl(): String = urlBase ?: location
 
-        /**
-         * ServiceのBuilderのリストを返す。
-         *
-         * @return ServiceのBuilderのリスト
-         */
         fun getServiceBuilderList(): List<ServiceImpl.Builder> = serviceBuilderList
 
-        /**
-         * EmbeddedDevice用のBuilderを作成する。
-         *
-         * @return EmbeddedDevice用のBuilder
-         */
         fun createEmbeddedDeviceBuilder(): Builder {
             val builder = Builder(controlPoint, subscribeManager, ssdpMessage)
             builder.setDescription(description!!)
@@ -305,11 +259,6 @@ internal class DeviceImpl private constructor(
             } ?: throw IllegalStateException("HttpClient is not connected yet.")
         }
 
-        /**
-         * SSDPパケットを登録する。
-         *
-         * @param message SSDPパケット
-         */
         internal fun updateSsdpMessage(message: SsdpMessage) {
             if (ssdpMessage.isPinned) return
             location = message.location ?: throw IllegalArgumentException()
@@ -319,199 +268,97 @@ internal class DeviceImpl private constructor(
             }
         }
 
-        /**
-         * パース前のDescriptionXMLを登録する。
-         *
-         * @param description DescriptionXML
-         */
         fun setDescription(description: String): Builder {
             this.description = description
             return this
         }
 
-        /**
-         * UDNの値を登録する。
-         *
-         * @param udn UDN
-         */
         fun setUdn(udn: String): Builder {
             this.udn = udn
             return this
         }
 
-        /**
-         * UPCの値を登録する。
-         *
-         * @param upc UPC
-         */
         fun setUpc(upc: String): Builder {
             this.upc = upc
             return this
         }
 
-        /**
-         * DeviceTypeの値を登録する。
-         *
-         * @param deviceType DeviceType
-         */
         fun setDeviceType(deviceType: String): Builder {
             this.deviceType = deviceType
             return this
         }
 
-        /**
-         * FriendlyNameの値を登録する。
-         *
-         * @param friendlyName FriendlyName
-         */
         fun setFriendlyName(friendlyName: String): Builder {
             this.friendlyName = friendlyName
             return this
         }
 
-        /**
-         * Manufactureの値を登録する。
-         *
-         * @param manufacture Manufacture
-         */
         fun setManufacture(manufacture: String): Builder {
             this.manufacture = manufacture
             return this
         }
 
-        /**
-         * ManufactureUrlの値を登録する。
-         *
-         * @param manufactureUrl ManufactureUrl
-         */
         fun setManufactureUrl(manufactureUrl: String): Builder {
             this.manufactureUrl = manufactureUrl
             return this
         }
 
-        /**
-         * ModelNameの値を登録する。
-         *
-         * @param modelName ModelName
-         */
         fun setModelName(modelName: String): Builder {
             this.modelName = modelName
             return this
         }
 
-        /**
-         * ModelUrlの値を登録する。
-         *
-         * @param modelUrl ModelUrl
-         */
         fun setModelUrl(modelUrl: String): Builder {
             this.modelUrl = modelUrl
             return this
         }
 
-        /**
-         * ModelDescriptionの値を登録する。
-         *
-         * @param modelDescription ModelDescription
-         */
         fun setModelDescription(modelDescription: String): Builder {
             this.modelDescription = modelDescription
             return this
         }
 
-        /**
-         * ModelNumberの値を登録する。
-         *
-         * @param modelNumber ModelNumber
-         */
         fun setModelNumber(modelNumber: String): Builder {
             this.modelNumber = modelNumber
             return this
         }
 
-        /**
-         * SerialNumberの値を登録する。
-         *
-         * @param serialNumber SerialNumber
-         */
         fun setSerialNumber(serialNumber: String): Builder {
             this.serialNumber = serialNumber
             return this
         }
 
-        /**
-         * PresentationUrlの値を登録する。
-         *
-         * @param presentationUrl PresentationUrl
-         * @return Builder
-         */
         fun setPresentationUrl(presentationUrl: String): Builder {
             this.presentationUrl = presentationUrl
             return this
         }
 
-        /**
-         * URLBaseの値を登録する。
-         *
-         * URLBaseは1.1以降Deprecated
-         *
-         * @param urlBase URLBaseの値
-         * @return Builder
-         */
+        // URLBaseは1.1以降Deprecated
         fun setUrlBase(urlBase: String?): Builder {
             this.urlBase = urlBase
             return this
         }
 
-        /**
-         * IconのBuilderを登録する。
-         *
-         * @param icon Icon
-         */
         fun addIcon(icon: Icon): Builder {
             iconList.add(icon)
             return this
         }
 
-        /**
-         * ServiceのBuilderを登録する。
-         *
-         * @param builder ServiceのBuilder
-         */
         fun addServiceBuilder(builder: ServiceImpl.Builder): Builder {
             serviceBuilderList.add(builder)
             return this
         }
 
-        /**
-         * Embedded DeviceのBuilderを登録する。
-         *
-         * @param builderList Embedded DeviceのBuilderリスト
-         */
         fun setEmbeddedDeviceBuilderList(builderList: List<Builder>): Builder {
             deviceBuilderList = builderList
             return this
         }
 
-        /**
-         * Embedded DeviceのBuilderのリストを返す。
-         *
-         * @return Embedded DeviceのBuilderのリスト
-         */
         fun getEmbeddedDeviceBuilderList(): List<DeviceImpl.Builder> {
             return deviceBuilderList
         }
 
-        /**
-         * XMLタグの情報を登録する。
-         *
-         * DeviceDescriptionにはAttributeは使用されていないため
-         * Attributeには非対応
-         *
-         * @param namespace namespace uri
-         * @param tag       タグ名
-         * @param value     タグの値
-         */
+        // DeviceDescriptionにはAttributeは使用されていないためAttributeには非対応
         fun putTag(namespace: String?, tag: String, value: String): Builder {
             val namespaceUri = namespace ?: ""
             val map = tagMap[namespaceUri] ?: mutableMapOf<String, String>().also {

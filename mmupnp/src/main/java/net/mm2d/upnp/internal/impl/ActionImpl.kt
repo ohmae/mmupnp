@@ -10,8 +10,6 @@ package net.mm2d.upnp.internal.impl
 import net.mm2d.log.Logger
 import net.mm2d.upnp.*
 import net.mm2d.upnp.Http.Status
-import net.mm2d.upnp.internal.parser.DeviceParser
-import net.mm2d.upnp.internal.parser.ServiceParser
 import net.mm2d.upnp.util.XmlUtils
 import net.mm2d.upnp.util.findChildElementByLocalName
 import net.mm2d.upnp.util.forEachElement
@@ -447,23 +445,11 @@ internal class ActionImpl(
             ?.findChildElementByLocalName(tag) ?: throw IOException("no response tag")
     }
 
-    /**
-     * ServiceDescriptionのパース時に使用するビルダー。
-     *
-     * @see DeviceParser.loadDescription
-     * @see ServiceParser.loadDescription
-     */
     class Builder {
         private var service: ServiceImpl? = null
         private var name: String? = null
         private val argumentList: MutableList<ArgumentImpl.Builder> = mutableListOf()
 
-        /**
-         * Actionのインスタンスを作成する。
-         *
-         * @return Actionのインスタンス
-         * @throws IllegalStateException 必須パラメータが設定されていない場合
-         */
         @Throws(IllegalStateException::class)
         fun build(): Action {
             val service = service
@@ -480,42 +466,21 @@ internal class ActionImpl(
             )
         }
 
-        /**
-         * Argumentのビルダーリストを返す。
-         *
-         * @return Argumentのビルダーリスト
-         */
         fun getArgumentBuilderList(): List<ArgumentImpl.Builder> {
             return argumentList
         }
 
-        /**
-         * このActionを保持するServiceへの参照を登録。
-         *
-         * @param service このActionを保持するService
-         */
         fun setService(service: ServiceImpl): Builder {
             this.service = service
             return this
         }
 
-        /**
-         * Action名を登録する。
-         *
-         * @param name Action名
-         */
         fun setName(name: String): Builder {
             this.name = name
             return this
         }
 
-        /**
-         * Argumentのビルダーを登録する。
-         *
-         * Actionのインスタンス作成後にArgumentを登録することはできない
-         *
-         * @param argument Argumentのビルダー
-         */
+        // Actionのインスタンス作成後にArgumentを登録することはできない
         fun addArgumentBuilder(argument: ArgumentImpl.Builder): Builder {
             argumentList.add(argument)
             return this

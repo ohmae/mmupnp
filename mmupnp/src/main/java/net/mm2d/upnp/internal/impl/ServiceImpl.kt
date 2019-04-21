@@ -324,9 +324,6 @@ internal class ServiceImpl(
         }
     }
 
-    /**
-     * DeviceDescriptionのパース時に使用するビルダー
-     */
     internal class Builder {
         private var subscribeManager: SubscribeManager? = null
         private var device: DeviceImpl? = null
@@ -339,12 +336,6 @@ internal class ServiceImpl(
         private val actionBuilderList = mutableListOf<ActionImpl.Builder>()
         private val stateVariables = mutableListOf<StateVariable>()
 
-        /**
-         * Serviceのインスタンスを作成する。
-         *
-         * @return Serviceのインスタンス
-         * @throws IllegalStateException 必須パラメータが設定されていない場合
-         */
         @Throws(IllegalStateException::class)
         fun build(): Service {
             val device = device
@@ -376,51 +367,26 @@ internal class ServiceImpl(
             )
         }
 
-        /**
-         * このServiceを保持するDeviceを登録する。
-         *
-         * @param device このServiceを保持するDevice
-         */
         fun setDevice(device: DeviceImpl): Builder {
             this.device = device
             return this
         }
 
-        /**
-         * 購読状態マネージャを設定する。
-         *
-         * @param manager 購読状態マネージャ
-         */
         fun setSubscribeManager(manager: SubscribeManager): Builder {
             subscribeManager = manager
             return this
         }
 
-        /**
-         * serviceTypeを登録する。
-         *
-         * @param serviceType serviceType
-         */
         fun setServiceType(serviceType: String): Builder {
             this.serviceType = serviceType
             return this
         }
 
-        /**
-         * serviceIdを登録する
-         *
-         * @param serviceId serviceId
-         */
         fun setServiceId(serviceId: String): Builder {
             this.serviceId = serviceId
             return this
         }
 
-        /**
-         * SCPDURLを登録する
-         *
-         * @param scpdUrl ScpdURL
-         */
         fun setScpdUrl(scpdUrl: String): Builder {
             this.scpdUrl = scpdUrl
             return this
@@ -430,51 +396,26 @@ internal class ServiceImpl(
             return scpdUrl
         }
 
-        /**
-         * controlURLを登録する。
-         *
-         * @param controlUrl controlURL
-         */
         fun setControlUrl(controlUrl: String): Builder {
             this.controlUrl = controlUrl
             return this
         }
 
-        /**
-         * eventSubURLを登録する。
-         *
-         * @param eventSubUrl eventSubURL
-         */
         fun setEventSubUrl(eventSubUrl: String): Builder {
             this.eventSubUrl = eventSubUrl
             return this
         }
 
-        /**
-         * Description XMLを登録する。
-         *
-         * @param description Description XML全内容
-         */
         fun setDescription(description: String): Builder {
             this.description = description
             return this
         }
 
-        /**
-         * ActionのBuilderを登録する。
-         *
-         * @param builder Serviceで定義されているActionのBuilder
-         */
         fun addActionBuilder(builder: ActionImpl.Builder): Builder {
             actionBuilderList.add(builder)
             return this
         }
 
-        /**
-         * StateVariableのBuilderを登録する。
-         *
-         * @param builder Serviceで定義されているStateVariableのBuilder
-         */
         fun addStateVariable(builder: StateVariable): Builder {
             stateVariables.add(builder)
             return this
