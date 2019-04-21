@@ -18,7 +18,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * [SsdpMessage]の共通実装。
+ * Common implementation of [SsdpMessage].
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -33,9 +33,9 @@ internal class SsdpMessageDelegate(
     override val nts: String?
     override var location: String? = null
         private set
-    override val isPinned: Boolean = false
     override val scopeId: Int
         get() = (localAddress as? Inet6Address)?.scopeId ?: 0
+    override val isPinned: Boolean = false
 
     init {
         if (localAddress == null) {

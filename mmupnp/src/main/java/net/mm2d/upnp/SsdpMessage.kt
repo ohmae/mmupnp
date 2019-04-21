@@ -12,126 +12,124 @@ import java.io.OutputStream
 import java.net.InetAddress
 
 /**
- * SSDP(Simple Service Discovery Protocol)メッセージを表現するインターフェース。
+ * Interface of SSDP(Simple Service Discovery Protocol) message.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 interface SsdpMessage {
-
     /**
-     * 固定用メッセージかを返す。
-     *
-     * @return 固定用メッセージの時true
-     */
-    val isPinned: Boolean
-
-    /**
-     * 受信したインターフェースのScopeIDを返す。
-     *
-     * @return ScopeID、設定されていない場合(IPv4含む)は0
-     */
-    val scopeId: Int
-
-    /**
-     * このパケットを受信したインターフェースのアドレスを返す。
-     *
-     * @return このパケットを受信したインターフェースのアドレス
-     */
-    val localAddress: InetAddress?
-
-    /**
-     * USNに記述されたUUIDを返す。
+     * Return UUID described in USN.
      *
      * @return UUID
      */
     val uuid: String
 
     /**
-     * USNに記述されたTypeを返す。
+     * Return Type described in USN.
      *
      * @return Type
      */
     val type: String
 
     /**
-     * NTSフィールドの値を返す。
+     * Return the value of NTS field.
      *
-     * @return NTSフィールドの値
+     * @return value of NTF field
      */
     val nts: String?
 
     /**
-     * max-ageの値を返す。
+     * Return the value of max-age.
      *
-     * @return max-ageの値
+     * @return value of max-age
      */
     val maxAge: Int
 
     /**
-     * 有効期限が切れる時刻を返す。
+     * Returns the time when the expiration limit will expire.
      *
+     * The time when max-age is added to the reception time.
      *
-     * 受信時刻からmax-ageを加算した時刻
-     *
-     * @return 有効期限が切れる時刻
+     * @return time of expire
      */
     val expireTime: Long
 
     /**
-     * Locationの値を返す。
+     * Return the value of Location.
      *
-     * @return Locationの値
+     * @return Location
      */
     val location: String?
 
     /**
-     * ヘッダの値を返す。
+     * Returns the address of the interface that received this packet.
      *
-     * @param name ヘッダ名
-     * @return 値
+     * @return the address of the interface that received this packet
+     */
+    val localAddress: InetAddress?
+
+    /**
+     * Returns the ScopeID of the interface that received this packet.
+     *
+     * @return ScopeID, 0 if not set (including IPv4)
+     */
+    val scopeId: Int
+
+    /**
+     * Returns whether this is a message for pinned.
+     *
+     * @return true this is a message for pinned.
+     */
+    val isPinned: Boolean
+
+    /**
+     * Returns the value of header
+     *
+     * @param name header name
+     * @return value
      */
     fun getHeader(name: String): String?
 
     /**
-     * ヘッダの値を設定する。
+     * Set the value of header
      *
-     * @param name  ヘッダ名
-     * @param value 値
+     * @param name  header name
+     * @param value value
      */
     fun setHeader(name: String, value: String)
 
     /**
-     * 指定されたOutputStreamにメッセージの内容を書き出す。
+     * Write the message to the OutputStream.
      *
-     * @param os 出力先
-     * @throws IOException 入出力エラー
+     * @param os OutputStream
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     fun writeData(os: OutputStream)
 
     companion object {
         /**
-         * M-SEARCHのリスエストメソッド
+         * Request method of M-SEARCH
          */
         const val M_SEARCH = "M-SEARCH"
         /**
-         * NOTIFYのリクエストメソッド
+         * Request method of NOTIFY
          */
         const val NOTIFY = "NOTIFY"
         /**
-         * NTSの値：ssdp:alive
+         * NTS: ssdp:alive
          */
         const val SSDP_ALIVE = "ssdp:alive"
         /**
-         * NTSの値：ssdp:byebye
+         * NTS: ssdp:byebye
          */
         const val SSDP_BYEBYE = "ssdp:byebye"
         /**
-         * NTSの値：ssdp:update
+         * NTS: ssdp:update
          */
         const val SSDP_UPDATE = "ssdp:update"
         /**
-         * MANの値：ssdp:discover
+         * MAN: ssdp:discover
          */
         const val SSDP_DISCOVER = "\"ssdp:discover\""
     }

@@ -17,15 +17,15 @@ import java.net.InetAddress
  * Empty implementation of [SsdpMessage].
  */
 object EmptySsdpMessage : SsdpMessage {
-    override val isPinned: Boolean = false
-    override val scopeId: Int = 0
-    override val localAddress: InetAddress? = null
     override val uuid: String = ""
     override val type: String = ""
     override val nts: String? = null
     override val maxAge: Int = 0
     override val expireTime: Long = 0L
     override val location: String? = null
+    override val localAddress: InetAddress? = null
+    override val scopeId: Int = 0
+    override val isPinned: Boolean = false
 
     override fun getHeader(name: String): String? = null
     override fun setHeader(name: String, value: String) = Unit
