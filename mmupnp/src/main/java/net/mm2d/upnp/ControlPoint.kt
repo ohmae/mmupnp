@@ -8,90 +8,89 @@
 package net.mm2d.upnp
 
 /**
- * UPnP ControlPointのインターフェース。
+ * Interface of UPnP ControlPoint.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 interface ControlPoint {
     /**
-     * 機器発見イベント通知用リスナー。
+     * Listener to notify discovery event.
      *
-     * リスナー通知はcallbackスレッドで実行される。
+     * Notified in callback thread
      *
      * @see ControlPointFactory.create
      * @see NotifyEventListener
      */
     interface DiscoveryListener {
         /**
-         * 機器発見時にコールされる。
+         * Called on device discovery.
          *
-         * @param device 発見したDevice
+         * @param device Discovered device
          * @see Device
          */
         fun onDiscover(device: Device)
 
         /**
-         * 機器喪失時にコールされる。
+         * Called on device lost.
          *
-         * 有効期限切れ、SSDP byebye受信、ControlPointの停止によって発生する
+         * Caused by expiration, SSDP byebye reception, ControlPoint stop,
          *
-         * @param device 喪失したDevice
+         * @param device Lost device
          * @see Device
          */
         fun onLost(device: Device)
     }
 
     /**
-     * NotifyEvent通知を受け取るリスナー。
+     * Listener to notify event of "NotifyEvent".
      *
-     * リスナー通知はcallbackスレッドで実行される。
+     * Notified in callback thread
      *
      * @see ControlPointFactory.create
      * @see DiscoveryListener
      */
     interface NotifyEventListener {
         /**
-         * NotifyEvent受信時にコールされる。
+         * Called on receive NotifyEvent
          *
-         * @param service  対応するService
-         * @param seq      シーケンス番号
-         * @param variable 変数名
-         * @param value    値
+         * @param service  Target Service
+         * @param seq      Sequence number
+         * @param variable variable name
+         * @param value    value
          * @see Service
          */
         fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String)
     }
 
     /**
-     * 発見したデバイスの数
+     * Number of discovered devices
      */
     val deviceListSize: Int
 
     /**
-     * 発見したデバイスのリストを返す。
+     * List of discovered devices.
      *
      * @see Device
      */
     val deviceList: List<Device>
 
     /**
-     * 初期化を行う。
+     * Do initialize.
      *
-     * 利用前にかならず実行する。
-     * 一度初期化を行うと再初期化は不可能。
-     * インターフェースの変更など、再初期化が必要な場合はインスタンスの生成からやり直すこと。
-     * また、終了する際は必ず[terminate]をコールすること。
+     * Always run before using.
+     * Once initialized, reinitialization is impossible.
+     * If reinitialization is required, such as changing the interface, start over from creating an instance.
+     * Also, be sure to call [terminate] when ending.
      *
      * @see terminate
      */
     fun initialize()
 
     /**
-     * 終了処理を行う。
+     * Do terminate.
      *
-     * 動作中の場合、停止処理を行う。
-     * 一度終了処理を行ったあとは再初期化は不可能。
-     * インスタンス参照を破棄すること。
+     * If it is in operation, stop processing is performed.
+     * The instance can not be used after terminate.
      *
      * @see stop
      * @see initialize
@@ -99,119 +98,110 @@ interface ControlPoint {
     fun terminate()
 
     /**
-     * 処理を開始する。
+     * start.
      *
-     * 本メソッドのコール前はネットワークに関連する処理を実行することはできない。
-     * 既に開始状態の場合は何も行われない。
-     * 一度開始したあとであっても、停止処理後であれば再度開始可能。
+     * It is not possible to execute network related processing before calling this method.
+     * Nothing is done if it is already started.
+     * Even after it has been started once, it can be started again if it is after stop processing.
      *
      * @see initialize
      */
     fun start()
 
     /**
-     * 処理を停止する。
+     * stop.
      *
-     * 開始していない状態、既に停止済みの状態の場合なにも行われない。
-     * 停止に伴い発見済みDeviceはLost扱いとなる。
-     * 停止後は発見済みDeviceのインスタンスを保持していても正常に動作しない。
+     * Nothing happens if it is not started or already stopped.
+     * The discovered Device is treated as Lost.
+     * After stopping, even if it holds an instance of discovered Device, it does not operate normally.
      *
      * @see start
      */
     fun stop()
 
     /**
-     * 保持している発見済みのデバイスリストをクリアする。
+     * Clear the discovered device list.
      *
-     * コール時点で保持されているデバイスはlost扱いとして通知される。
+     * Devices held at the time of the call are notified as lost.
      */
     fun clearDeviceList()
 
     /**
-     * Searchパケットを送出する。
+     * Send Search packet.
      *
-     * [search]を引数nullでコールするのと等価。
+     * When st is null, it works as "ssdp:all".
+     *
+     * @param st ST field of Search packet
      */
-    fun search()
+    fun search(st: String? = null)
 
     /**
-     * Searchパケットを送出する。
+     * Set the method to judge whether to accept SsdpMessage.
      *
-     * stがnullの場合、"ssdp:all"として動作する。
-     *
-     * @param st SearchパケットのSTフィールド
-     */
-    fun search(st: String?)
-
-    /**
-     * SsdpMessageを受け入れるかどうかの判定メソッドを設定する。
-     *
-     * @param filter 判定メソッド、nullはすべて受け付け。
+     * @param filter Judgment method, if null, accept all.
      */
     fun setSsdpMessageFilter(filter: ((SsdpMessage) -> Boolean)?)
 
     /**
-     * ダウンロードするIconを選択するフィルタを設定する。
+     * Set a filter to select Icon to download.
      *
-     * 未指定の場合は何も取得しない。
-     *
-     * @param filter 設定するフィルタ、nullを指定すると何も取得しない。
+     * @param filter the filter to be set, null will not download anything.
      */
     fun setIconFilter(filter: IconFilter?)
 
     /**
-     * 機器発見のリスナーを登録する。
+     * Add a listener for device discovery.
      *
-     * リスナー通知はcallbackスレッドで実行される。
+     * Listener notification is performed in the callback thread.
      *
-     * @param listener リスナー
+     * @param listener Listener to add
      * @see DiscoveryListener
      * @see ControlPointFactory.create
      */
     fun addDiscoveryListener(listener: DiscoveryListener)
 
     /**
-     * 機器発見リスナーを削除する。
+     * Remove a listener for device discovery.
      *
-     * @param listener リスナー
+     * @param listener Listener to remove
      * @see DiscoveryListener
      */
     fun removeDiscoveryListener(listener: DiscoveryListener)
 
     /**
-     * NotifyEvent受信リスナーを登録する。
+     * Add a NotifyEvent listener.
      *
-     * リスナー通知はcallbackスレッドで実行される。
+     * Listener notification is performed in the callback thread.
      *
-     * @param listener リスナー
+     * @param listener Listener to add
      * @see NotifyEventListener
      * @see ControlPointFactory.create
      */
     fun addNotifyEventListener(listener: NotifyEventListener)
 
     /**
-     * NotifyEvent受信リスナーを削除する。
+     * Remove a NotifyEvent listener.
      *
-     * @param listener リスナー
+     * @param listener Listener to remove
      * @see NotifyEventListener
      */
     fun removeNotifyEventListener(listener: NotifyEventListener)
 
     /**
-     * 指定UDNのデバイスを返す。
+     * Find Device by UDN.
      *
-     * 見つからない場合nullが返る。
+     * If not found null will be returned.
      *
      * @param udn UDN
-     * @return 指定UDNのデバイス
+     * @return Device
      * @see Device
      */
     fun getDevice(udn: String): Device?
 
     /**
-     * デバイスの追加を試みる。
+     * Try to add a device.
      *
-     * キャッシュしておいた情報を元に読み込ませるなどに利用。
+     * This is used to read the cached information based on it.
      *
      * @param uuid     UDN
      * @param location location
@@ -219,19 +209,18 @@ interface ControlPoint {
     fun tryAddDevice(uuid: String, location: String)
 
     /**
-     * 固定デバイスを設定する。
+     * Try to add the pinned device
      *
-     * 設定したデバイスの取得ができた後は時間経過やByeByeで削除されることはない。
+     * After devices can be added, they will not be deleted by time lapse or ByeBye.
      *
-     * @param location locationのURL。正確な値である必要がある。
+     * @param location URL of location. It needs to be an accurate value.
      */
     fun tryAddPinnedDevice(location: String)
 
     /**
-     * 固定デバイスを削除する。
+     * Remove the pinned device
      *
-     * 固定デバイスを削除する。
-     * 該当するlocationを持つデバイスがあったとしても固定デバイスでない場合は削除されない。
+     * Even if there is a device with the same location, it will not be deleted if it is not a pinned device.
      *
      * @param location locationのURL
      */

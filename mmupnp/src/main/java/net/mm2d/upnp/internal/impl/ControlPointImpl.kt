@@ -227,10 +227,6 @@ internal class ControlPointImpl(
         }
     }
 
-    override fun search() {
-        search(null)
-    }
-
     override fun search(st: String?) {
         if (!started.get()) {
             throw IllegalStateException("ControlPoint is not started.")

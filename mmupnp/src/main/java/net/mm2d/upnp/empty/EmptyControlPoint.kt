@@ -23,7 +23,6 @@ object EmptyControlPoint : ControlPoint {
     override fun start() = Unit
     override fun stop() = Unit
     override fun clearDeviceList() = Unit
-    override fun search() = Unit
     override fun search(st: String?) = Unit
     override fun setSsdpMessageFilter(filter: ((SsdpMessage) -> Boolean)?) = Unit
     override fun setIconFilter(filter: IconFilter?) = Unit
