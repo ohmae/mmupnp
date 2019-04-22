@@ -20,7 +20,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * [Service]の実装
+ * Implements for [Service].
  *
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

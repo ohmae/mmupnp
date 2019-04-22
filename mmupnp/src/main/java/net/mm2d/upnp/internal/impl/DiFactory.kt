@@ -22,7 +22,7 @@ import net.mm2d.upnp.internal.thread.TaskExecutors
 import java.net.NetworkInterface
 
 /**
- * ControlPointのテストを容易にするためのDependency injection
+ * Dependency injection for ControlPoint
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

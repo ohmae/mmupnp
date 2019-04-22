@@ -11,7 +11,7 @@ import net.mm2d.upnp.Argument
 import net.mm2d.upnp.StateVariable
 
 /**
- * [Argument]の実装
+ * Implements for [Argument].
  *
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

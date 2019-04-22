@@ -10,7 +10,7 @@ package net.mm2d.upnp.internal.impl
 import net.mm2d.upnp.StateVariable
 
 /**
- * [StateVariable]の実装
+ * Implements for [StateVariable].
  *
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

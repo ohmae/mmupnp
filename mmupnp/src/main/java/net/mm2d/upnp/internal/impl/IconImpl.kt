@@ -13,7 +13,7 @@ import net.mm2d.upnp.Icon
 import java.io.IOException
 
 /**
- * [Icon]の実装。
+ * Implements for [Icon].
  *
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

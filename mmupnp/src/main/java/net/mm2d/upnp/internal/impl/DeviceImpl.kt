@@ -15,7 +15,7 @@ import java.net.MalformedURLException
 import java.net.URL
 
 /**
- * Deviceの実装。
+ * Implements for [Device].
  *
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

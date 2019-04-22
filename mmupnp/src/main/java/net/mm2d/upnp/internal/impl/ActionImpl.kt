@@ -32,7 +32,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * [Action]の実装。
+ * Implements for [Action].
  *
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -146,12 +146,11 @@ internal class ActionImpl(
         }
     }
 
-
     /**
-     * 入力をもとに引数リストを作成する。
+     * Create an argument list.
      *
-     * @param argumentValues 引数への入力値
-     * @return 引数リスト
+     * @param argumentValues Argument values
+     * @return Argument list
      */
     private fun makeArguments(argumentValues: Map<String, String>): MutableList<Pair<String, String?>> {
         return argumentMap.values
@@ -161,24 +160,24 @@ internal class ActionImpl(
     }
 
     /**
-     * Argumentの値を選択する。
+     * Select the value of Argument.
      *
-     * 入力に値があればそれを採用し、なければデフォルト値を採用する。
-     * どちらもなければnullが返る。
+     * If there is a value in the input, adopt it, otherwise adopt the default value.
+     * If there is neither, it will be null.
      *
      * @param argument       Argument
-     * @param argumentValues 引数への入力値
-     * @return 選択されたArgumentの値
+     * @param argumentValues Argument values
+     * @return Selected argument value
      */
     private fun selectArgumentValue(argument: Argument, argumentValues: Map<String, String>): String? {
         return argumentValues[argument.name] ?: argument.relatedStateVariable.defaultValue
     }
 
     /**
-     * StringPairのリストに変換した引数にカスタム引数を追加する。
+     * Append custom arguments.
      *
-     * @param base      引数の追加先
-     * @param arguments 追加するカスタム引数
+     * @param base      append target
+     * @param arguments custom arguments to append.
      */
     private fun appendArgument(base: MutableList<Pair<String, String?>>, arguments: Map<String, String>) {
         arguments.entries.forEach {
@@ -198,11 +197,11 @@ internal class ActionImpl(
     }
 
     /**
-     * Actionの実行を行う。
+     * invoke this Action
      *
-     * @param soap 送信するSOAP XML文字列
-     * @return 実行結果
-     * @throws IOException 実行時の何らかの通信例外及びエラー応答があった場合
+     * @param soap SOAP XML String to send
+     * @return result
+     * @throws IOException if an I/O error occurs or receive the error response.
      */
     @Throws(IOException::class)
     private fun invoke(soap: String): Map<String, String> {
@@ -242,7 +241,7 @@ internal class ActionImpl(
      * @param url  接続先URL
      * @param soap SOAPの文字列
      * @return SOAP送信用HttpRequest
-     * @throws IOException 通信で問題が発生した場合
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     private fun makeHttpRequest(url: URL, soap: String): HttpRequest {
@@ -258,11 +257,11 @@ internal class ActionImpl(
     }
 
     /**
-     * SOAP ActionのXML文字列を作成する。
+     * Create a SOAP Action XML string.
      *
-     * @param arguments 引数
-     * @return SOAP ActionのXML文字列
-     * @throws IOException 通信で問題が発生した場合
+     * @param arguments Arguments
+     * @return SOAP Action XML string
+     * @throws IOException if an I/O error occurs.
      */
     // VisibleForTesting
     @Throws(IOException::class)
@@ -285,11 +284,11 @@ internal class ActionImpl(
     }
 
     /**
-     * Actionの引数をXMLへ組み込む
+     * Include Action's arguments in XML
      *
      * @param document  XML Document
-     * @param action    actionのElement
-     * @param arguments 引数
+     * @param action    Element of action
+     * @param arguments Arguments
      */
     private fun setArgument(document: Document, action: Element, arguments: List<Pair<String, String?>>) {
         arguments.forEach { pair ->
@@ -303,7 +302,7 @@ internal class ActionImpl(
     }
 
     /**
-     * SOAP ActionのXMLのActionElementまでを作成する
+     * Create SOAP Action XML up to ActionElement.
      *
      * @param document XML Document
      * @return ActionElement
@@ -324,11 +323,11 @@ internal class ActionImpl(
     }
 
     /**
-     * XML Documentを文字列に変換する
+     * Convert XML Document to String.
      *
-     * @param document 変換するXML Document
-     * @return 変換された文字列
-     * @throws TransformerException 変換処理に問題が発生した場合
+     * @param document XML Document to convert
+     * @return Converted string
+     * @throws TransformerException If a conversion error occurs
      */
     // VisibleForTesting
     @Throws(TransformerException::class)
@@ -342,13 +341,13 @@ internal class ActionImpl(
     }
 
     /**
-     * Actionに対する応答をパースする
+     * Parses the response of this Action.
      *
-     * @param xml 応答となるXML
-     * @return Actionに対する応答、argument名をkeyとする。
-     * @throws ParserConfigurationException XMLパーサのインスタンス化に問題がある場合
-     * @throws SAXException                 XMLパース処理に問題がある場合
-     * @throws IOException                  入力値に問題がある場合
+     * @param xml XML string that is the response of Action
+     * @return the response of this Action. Map with argument name as key and value as value
+     * @throws SAXException                 if an parse error occurs.
+     * @throws IOException                  if an I/O error occurs.
+     * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
     private fun parseResponse(xml: String): Map<String, String> {
@@ -369,13 +368,13 @@ internal class ActionImpl(
         get() = "${name}Response"
 
     /**
-     * Actionに対する応答をパースし、ResponseタグのElementを探して返す。
+     * Parses the error response of this Action, finds and returns the Element of the Response tag.
      *
-     * @param xml Actionに対する応答であるXML文字列
-     * @return ResponseタグのElement
-     * @throws ParserConfigurationException XMLパーサのインスタンス化に問題がある場合
-     * @throws SAXException                 XMLパース処理に問題がある場合
-     * @throws IOException                  入力値に問題がある場合
+     * @param xml XML string that is the response of Action
+     * @return Element of the Response tag
+     * @throws SAXException                 if an parse error occurs.
+     * @throws IOException                  if an I/O error occurs.
+     * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
     private fun findResponseElement(xml: String): Element {
@@ -383,13 +382,13 @@ internal class ActionImpl(
     }
 
     /**
-     * Actionに対するエラー応答をパースする
+     * Parses the error response of this Action.
      *
-     * @param xml 応答となるXML
-     * @return エラー応答の情報、'faultcode','faultstring','UPnPError/errorCode','UPnPError/errorDescription'
-     * @throws ParserConfigurationException XMLパーサのインスタンス化に問題がある場合
-     * @throws SAXException                 XMLパース処理に問題がある場合
-     * @throws IOException                  入力値に問題がある場合
+     * @param xml XML string that is the response of Action
+     * @return error response such as 'faultcode','faultstring','UPnPError/errorCode','UPnPError/errorDescription'
+     * @throws SAXException                 if an parse error occurs.
+     * @throws IOException                  if an I/O error occurs.
+     * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
     private fun parseErrorResponse(xml: String): Map<String, String> {
@@ -409,11 +408,11 @@ internal class ActionImpl(
     }
 
     /**
-     * エラー応答のdetailタグ以下をパースする。
+     * Parse the descendants of the detail tag of the error response.
      *
-     * @param detailNode detailノード
-     * @return パース結果
-     * @throws IOException 入力値に問題がある場合
+     * @param result Output destination of parse result
+     * @param detailNode detail node
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     private fun parseErrorDetail(result: MutableMap<String, String>, detailNode: Node) {
@@ -425,13 +424,13 @@ internal class ActionImpl(
     }
 
     /**
-     * Actionに対するエラー応答をパースし、FaultタグのElementを探して返す。
+     * Parses the error response of this Action, finds and returns the Element of the Fault tag.
      *
-     * @param xml Actionに対する応答であるXML文字列
-     * @return FaultタグのElement
-     * @throws ParserConfigurationException XMLパーサのインスタンス化に問題がある場合
-     * @throws SAXException                 XMLパース処理に問題がある場合
-     * @throws IOException                  入力値に問題がある場合
+     * @param xml XML string that is the response of Action
+     * @return Element of the Fault tag
+     * @throws SAXException                 if an parse error occurs.
+     * @throws IOException                  if an I/O error occurs.
+     * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
     private fun findFaultElement(xml: String): Element {
