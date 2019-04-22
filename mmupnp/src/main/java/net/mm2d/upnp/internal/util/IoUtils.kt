@@ -14,18 +14,18 @@ import java.net.ServerSocket
 import java.net.Socket
 
 /**
- * IO関係のユーティリティメソッドを提供する。
+ * Provide IO related utility methods.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 
 /**
- * Nullチェック、Exceptionキャッチ付きでclose処理を行う。
+ * Perform close processing with null check and exception catch.
  *
- * nullの場合は何も行わない、
- * closeで[IOException]が発生した場合はログ出力をする。
+ * Does not do anything if it is null,
+ * it outputs log when [IOException] occurs in close.
  *
- * @receiver close処理をする[Closeable]
+ * @receiver close target of [Closeable]
  */
 internal fun Closeable?.closeQuietly() {
     try {
@@ -35,12 +35,12 @@ internal fun Closeable?.closeQuietly() {
 }
 
 /**
- * Nullチェック、Exceptionキャッチ付きでclose処理を行う。
+ * Perform close processing with null check and exception catch.
  *
- * nullの場合は何も行わない、
- * closeで[IOException]が発生した場合はログ出力をする。
+ * Does not do anything if it is null,
+ * it outputs log when [IOException] occurs in close.
  *
- * @receiver close処理をする[Socket]
+ * @receiver close target of [Socket]
  */
 internal fun Socket?.closeQuietly() {
     try {
@@ -50,24 +50,24 @@ internal fun Socket?.closeQuietly() {
 }
 
 /**
- * Nullチェック、Exceptionキャッチ付きでclose処理を行う。
+ * Perform close processing with null check and exception catch.
  *
- * nullの場合は何も行わない、
- * closeで[IOException]が発生した場合はログ出力をする。
+ * Does not do anything if it is null,
+ * it outputs log when [IOException] occurs in close.
  *
- * @receiver close処理をする[DatagramSocket]
+ * @receiver close target of [DatagramSocket]
  */
 internal fun DatagramSocket?.closeQuietly() {
     this?.close()
 }
 
 /**
- * Nullチェック、Exceptionキャッチ付きでclose処理を行う。
+ * Perform close processing with null check and exception catch.
  *
- * nullの場合は何も行わない、
- * closeで[IOException]が発生した場合はログ出力をする。
+ * Does not do anything if it is null,
+ * it outputs log when [IOException] occurs in close.
  *
- * @receiver close処理をする[ServerSocket]
+ * @receiver close target of [ServerSocket]
  */
 internal fun ServerSocket?.closeQuietly() {
     try {

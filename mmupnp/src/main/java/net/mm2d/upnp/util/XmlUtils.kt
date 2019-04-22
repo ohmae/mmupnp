@@ -20,7 +20,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
 
 /**
- * XMLのユーティリティメソッドを提供する。
+ * Provide XML utility methods.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -45,11 +45,11 @@ object XmlUtils {
     }
 
     /**
-     * 空のDocumentを作成する。
+     * Create an empty Document.
      *
-     * @param awareness trueのときXML namespaceに対応
+     * @param awareness if true, XML namespace aware
      * @return Document
-     * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
+     * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class)
     @JvmStatic
@@ -58,14 +58,14 @@ object XmlUtils {
     }
 
     /**
-     * 引数のStringをもとにしたDocumentを作成する。
+     * Create new Document that contains the argument string.
      *
-     * @param awareness trueのときXML namespaceに対応
-     * @param xml       XML文字列
+     * @param awareness if true, XML namespace aware
+     * @param xml       XML string
      * @return Document
-     * @throws SAXException                 構文解析エラーが発生した
-     * @throws IOException                  入出力エラーが発生した
-     * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
+     * @throws SAXException                 if an parse error occurs.
+     * @throws IOException                  if an I/O error occurs.
+     * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(SAXException::class, IOException::class, ParserConfigurationException::class)
     @JvmStatic
@@ -75,11 +75,11 @@ object XmlUtils {
     }
 
     /**
-     * ノード以下にある特定の名前を持つ最初のエレメントノードを返す
+     * Returns the first element node with a specific name below the parent node.
      *
-     * @param parent    親ノード
-     * @param localName 検索するローカル名
-     * @return 見つかったエレメントノード、見つからなければnull
+     * @param parent    parent node
+     * @param localName local name to search
+     * @return Element node found, null if not found
      */
     @JvmStatic
     fun findChildElementByLocalName(parent: Node, localName: String): Element? {
@@ -93,10 +93,10 @@ object XmlUtils {
 }
 
 /**
- * 指定ノードの兄弟ノード全体をイテレートする。
+ * Iterate over all sibling nodes of the specified node.
  *
- * @receiver イテレーションを行う親ノード
- * @param action 各要素について実行されるaction
+ * @receiver Node performing iteration
+ * @param action Action to be performed on each element
  */
 inline fun Node.forEachElement(action: (Element) -> Unit) {
     var node: Node? = this
@@ -109,10 +109,10 @@ inline fun Node.forEachElement(action: (Element) -> Unit) {
 }
 
 /**
- * 指定ノードの子ノードの中から指定ローカル名のノードを探す。
+ * Search for a node with the specified local name among the child nodes of the receiver node.
  *
- * @receiver 探索対象ノード
- * @param localName ローカル名
+ * @receiver Search target node
+ * @param localName local name
  */
 fun Node.findChildElementByLocalName(localName: String): Element? {
     firstChild?.forEachElement {
@@ -124,10 +124,10 @@ fun Node.findChildElementByLocalName(localName: String): Element? {
 }
 
 /**
- * ノードリストをイテレートする。
+ * Iterate the node list.
  *
- * @receiver NodeList
- * @param action 各要素について実行されるaction
+ * @receiver node list
+ * @param action Action to be performed on each node
  */
 inline fun NodeList.forEach(action: (Node) -> Unit) {
     for (i in 0 until length) action(item(i))

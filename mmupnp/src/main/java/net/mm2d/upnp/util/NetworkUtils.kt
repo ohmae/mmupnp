@@ -13,47 +13,40 @@ import java.nio.ByteBuffer
 import java.util.*
 
 /**
- * ネットワーク関係のユーティリティメソッドを提供する。
+ * Provide network related utility methods.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 object NetworkUtils {
     /**
-     * 外部と通信可能なIPv4アドレスをもつインターフェースを返す。
-     *
-     * @return 外部と通信可能なIPv4アドレスを持つインターフェース。
+     * Return interfaces with an address that can communicate with the network.
      */
     @JvmStatic
     val availableInterfaces: List<NetworkInterface>
         get() = networkInterfaceList.filter { it.isConnectedToNetwork() }
 
     /**
-     * 外部と通信可能なIPv4アドレスをもつインターフェースを返す。
-     *
-     * @return 外部と通信可能なIPv4アドレスを持つインターフェース。
+     * Return interfaces with an IPv4 address that can communicate with the network.
      */
     @JvmStatic
     val availableInet4Interfaces: List<NetworkInterface>
         get() = networkInterfaceList.filter { it.isAvailableInet4Interface() }
 
     /**
-     * 外部と通信可能なIPv4アドレスをもつインターフェースを返す。
-     *
-     * @return 外部と通信可能なIPv4アドレスを持つインターフェース。
+     * Return interfaces with an IPv6 address that can communicate with the network.
      */
     @JvmStatic
     val availableInet6Interfaces: List<NetworkInterface>
         get() = networkInterfaceList.filter { it.isAvailableInet6Interface() }
 
     /**
-     * システムのすべてのネットワークインターフェースのリストを返す。
+     * Return a list of all network interfaces in the system.
      *
-     * [java.net.NetworkInterface.getNetworkInterfaces]
-     * の戻り値を[java.util.Enumeration]ではなく[java.util.List]にしたもの。
-     * インターフェースがない場合、及び、[java.net.SocketException]が発生するような場合は、
-     * 空のListが返り、nullが返ることはない。
+     * The return value of [java.net.NetworkInterface.getNetworkInterfaces]
+     * is changed to [java.util.List] instead of [java.util.Enumeration].
+     * If there is no interface or if [java.net.SocketException] occurs, an empty List is returned.
      *
-     * @return システムのすべてのネットワークインターフェース
+     * @return all network interfaces in the system.
      * @see java.net.NetworkInterface.getNetworkInterfaces
      */
     val networkInterfaceList: List<NetworkInterface>
@@ -65,30 +58,30 @@ object NetworkUtils {
 }
 
 /**
- * 外部と通信可能なIPv4アドレスを持つか否かを返す。
+ * Returns whether receiver has an IPv4 address that can communicate with the network.
  *
- * @receiver 検査するNetworkInterface
- * @return true:外部と通信可能なIPv4アドレスを持つ。false:それ以外
+ * @receiver NetworkInterface to inspect
+ * @return true: receiver has an IPv4 address that can communicate with the network. false: otherwise
  */
 fun NetworkInterface.isAvailableInet4Interface(): Boolean {
     return isConnectedToNetwork() && hasInet4Address()
 }
 
 /**
- * 外部と通信可能なIPv6アドレスを持つか否かを返す。
+ * Returns whether receiver has an IPv6 address that can communicate with the network.
  *
- * @receiver 検査するNetworkInterface
- * @return true:外部と通信可能なIPv4アドレスを持つ。false:それ以外
+ * @receiver NetworkInterface to inspect
+ * @return true: receiver has an IPv6 address that can communicate with the network. false: otherwise
  */
 fun NetworkInterface.isAvailableInet6Interface(): Boolean {
     return isConnectedToNetwork() && hasInet6Address()
 }
 
 /**
- * ネットワークに接続している状態か否かを返す。
+ * Returns whether receiver has an address that can communicate with the network.
  *
- * @receiver 検査するNetworkInterface
- * @return true:ネットワークに接続している。false:それ以外
+ * @receiver NetworkInterface to inspect
+ * @return true: receiver has an address that can communicate with the network. false: otherwise
  */
 private fun NetworkInterface.isConnectedToNetwork(): Boolean {
     return try {
@@ -99,30 +92,30 @@ private fun NetworkInterface.isConnectedToNetwork(): Boolean {
 }
 
 /**
- * IPv4のアドレスを持つか否かを返す。
+ * Returns whether receiver has an IPv4 address.
  *
- * @receiver 検査するNetworkInterface
- * @return true:IPv4アドレスを持つ。false:それ以外
+ * @receiver NetworkInterface to inspect
+ * @return true: receiver has an IPv4 address false: otherwise
  */
 private fun NetworkInterface.hasInet4Address(): Boolean {
     return interfaceAddresses.any { it.address is Inet4Address }
 }
 
 /**
- * IPv6のアドレスを持つか否かを返す。
+ * Returns whether receiver has an IPv6 address.
  *
- * @receiver 検査するNetworkInterface
- * @return true:IPv6アドレスを持つ。false:それ以外
+ * @receiver NetworkInterface to inspect
+ * @return true: receiver has an IPv6 address false: otherwise
  */
 private fun NetworkInterface.hasInet6Address(): Boolean {
     return interfaceAddresses.any { it.address is Inet6Address }
 }
 
 /**
- * アドレスとポート番号の組み合わせ文字列を返す。
+ * Returns a combined string of address and port number.
  *
- * @receiver 変換するアドレス
- * @return アドレスとポート番号の組み合わせ文字列
+ * @receiver Address to convert
+ * @return a combined string of address and port number
  */
 @Throws(IllegalStateException::class)
 fun InetSocketAddress.toAddressString(): String {
@@ -130,11 +123,11 @@ fun InetSocketAddress.toAddressString(): String {
 }
 
 /**
- * アドレスとポート番号の組み合わせ文字列を返す。
+ * Returns a combined string of address and port number.
  *
- * @receiver 変換するアドレス
- * @param port    ポート番号
- * @return アドレスとポート番号の組み合わせ文字列
+ * @receiver Address to convert
+ * @param port port number
+ * @return a combined string of address and port number
  */
 @Throws(IllegalStateException::class)
 fun InetAddress.toAddressString(port: Int): String {
