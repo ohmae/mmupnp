@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * HTTPに必要な各種定義とユーティリティを提供する。
+ * Provides various definitions and utilities required for HTTP.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -125,21 +125,19 @@ object Http {
     }
 
     /**
-     * HTTPのステータスコードを表現するEnum
+     * Enum for HTTP status
      */
     enum class Status(
         /**
-         * HTTPステータスコード
+         * HTTP status code
          */
         val code: Int,
         /**
-         * HTTPステータスフレーズ
+         * HTTP status phrase
          */
         val phrase: String
     ) {
-        /**
-         * Invalid status
-         */
+        /** Invalid status */
         HTTP_INVALID(0, "Invalid"),
         /** HTTP 100 */
         HTTP_CONTINUE(100, "Continue"),
@@ -224,10 +222,10 @@ object Http {
 
         companion object {
             /**
-             * ステータスコードのint値から該当するステータスコードを返す。
+             * Returns Status from int value of status code.
              *
-             * @param code ステータスコード
-             * @return 該当するStatus
+             * @param code status code
+             * @return Status
              */
             fun valueOf(code: Int): Status {
                 return values().find { it.code == code } ?: HTTP_INVALID
@@ -236,10 +234,10 @@ object Http {
     }
 
     /**
-     * Dateヘッダのパースを行う。
+     * Parse the Date header.
      *
-     * @param string Dateヘッダ
-     * @return パース結果、失敗した場合null
+     * @param string Date header
+     * @return result of parse, null, if fail
      */
     fun parseDate(string: String?): Date? {
         if (string.isNullOrEmpty()) return null
@@ -259,37 +257,37 @@ object Http {
     }
 
     /**
-     * 現在時刻の日付文字列を作成して返す。
+     * Creates a date string for the current time.
      *
-     * @return RFC1123形式の日付文字列
+     * @return Date string in RFC1123 format
      */
     fun getCurrentDate(): String = formatDate(System.currentTimeMillis())
 
     /**
-     * 日付文字列を作成して返す。
+     * Creates a date string.
      *
-     * @param date 日付
-     * @return RFC1123形式の日付文字列
+     * @param date date in Long
+     * @return Date string in RFC1123 format
      */
     fun formatDate(date: Long): String {
         return formatDate(Date(date))
     }
 
     /**
-     * 日付文字列を作成して返す。
+     * Creates a date string.
      *
-     * @param date 日付
-     * @return RFC1123形式の日付文字列
+     * @param date date in Date
+     * @return Date string in RFC1123 format
      */
     fun formatDate(date: Date): String = formatLock.withLock {
         RFC_1123_FORMAT.format(date)
     }
 
     /**
-     * HTTPのURLか否かを返す。
+     * Determine HTTP URL or not.
      *
      * @param url URL
-     * @return HTTPのURLのときtrue
+     * @return true: HTTP URL, false otherwise
      */
     fun isHttpUrl(url: String?): Boolean {
         return (url != null && url.length > HTTP_SCHEME.length
@@ -297,10 +295,10 @@ object Http {
     }
 
     /**
-     * URLについているqueryを削除して返す。
+     * Delete the query attached to the URL.
      *
      * @param url URL
-     * @return queryを削除した
+     * @return URL without query
      */
     private fun removeQuery(url: String): String {
         val pos = url.indexOf('?')
@@ -308,11 +306,11 @@ object Http {
     }
 
     /**
-     * BaseURLと絶対パスからURLを作成する。
+     * Create URL from BaseURL and absolute path.
      *
      * @param baseUrl BaseURL
-     * @param path    絶対パス
-     * @return 結合されたURL
+     * @param path    Absolute path
+     * @return Combined URL
      */
     private fun makeUrlWithAbsolutePath(baseUrl: String, path: String): String {
         val pos = baseUrl.indexOf('/', HTTP_SCHEME.length)
@@ -320,11 +318,11 @@ object Http {
     }
 
     /**
-     * BaseURLと相対パスからURLを作成する。
+     * Create URL from BaseURL and relative path.
      *
      * @param baseUrl BaseURL
-     * @param path    相対パス
-     * @return 結合されたURL
+     * @param path    Relative path
+     * @return Combined URL
      */
     private fun makeUrlWithRelativePath(baseUrl: String, path: String): String {
         if (baseUrl.endsWith("/")) {
@@ -335,12 +333,12 @@ object Http {
     }
 
     /**
-     * URLにScopeIDを追加する
+     * Add ScopeID to URL.
      *
-     * @param urlString URL文字列
+     * @param urlString String URL
      * @param scopeId   ScopeID
-     * @return ScopeIDが付加されたURL
-     * @throws MalformedURLException 不正なURL
+     * @return URL with ScopeID added
+     * @throws MalformedURLException Bad URL
      */
     @Throws(MalformedURLException::class)
     fun makeUrlWithScopeId(urlString: String, scopeId: Int): URL {
@@ -389,35 +387,35 @@ object Http {
     }
 
     /**
-     * URL情報を正規化して返す。
+     * Normalize URL information.
      *
-     * URLとして渡される情報は以下のバリエーションがある
+     * URL has the following variations
      *
-     * - "http://"から始まる完全なURL
-     * - "/"から始まる絶対パス
-     * - "/"以外から始まる相対パス
+     * - Complete URL starting with "http: //"
+     * - Absolute path starting with "/"
+     * - Relative path starting from other than "/"
      *
-     * 一方、baseUrlの情報としては以下のバリエーションを考慮する
+     * On the other hand, consider the following variations as baseUrl
      *
-     * - "http://10.0.0.1:1000/" ホスト名のみ
-     * - "http://10.0.0.1:1000" ホスト名のみだが末尾の"/"がない。
-     * - "http://10.0.0.1:1000/hoge/fuga" ファイル名で終わる
-     * - "http://10.0.0.1:1000/hoge/fuga/" ディレクトリ名で終わる
-     * - "http://10.0.0.1:1000/hoge/fuga?a=foo&amp;b=bar" 上記に対してクエリーが付いている
+     * - "http://10.0.0.1:1000/" Host name only
+     * - "http://10.0.0.1:1000" Host name only but without "/" at the end
+     * - "http://10.0.0.1:1000/hoge/fuga" Ends with a file name
+     * - "http://10.0.0.1:1000/hoge/fuga/" Ends with a directory name
+     * - "http://10.0.0.1:1000/hoge/fuga?a=foo&amp;b=bar" With query above
      *
-     * URLが"http://"から始まっていればそのまま利用する。
-     * "/"から始まっていればbaseUrlホストの絶対パスとして
-     * baseUrlの"://"以降の最初の"/"までと結合する。
-     * それ以外の場合はLocationからの相対パスであり、
-     * baseUrlから抽出したディレクトリ名と結合する。
+     * If the URL starts with "http: //", it will be used as it is.
+     * If it starts with "/",
+     * it will be combined with the first "/" after "://" of baseUrl as an absolute path of baseUrl host.
+     * Otherwise, it is a relative path from Location,
+     * and is combined with the directory name extracted from baseUrl.
      *
-     * またscopeIdの付与も行う。
+     * And this also gives scopeId.
      *
-     * @param baseUrl URLパスのベースとなる値
-     * @param url     URLパス情報
-     * @param scopeId スコープID
-     * @return 正規化したURL
-     * @throws MalformedURLException 不正なURL
+     * @param baseUrl baseUrl
+     * @param url     URL
+     * @param scopeId ScopeID
+     * @return Normalized URL
+     * @throws MalformedURLException Bad URL
      */
     @Throws(MalformedURLException::class)
     fun makeAbsoluteUrl(baseUrl: String, url: String, scopeId: Int): URL {
@@ -426,10 +424,10 @@ object Http {
 }
 
 /**
- * HTTP URLかを判定する。
+ * Determine HTTP URL or not.
  *
- * @receiver 検査文字列
- * @return HTTP URLの場合true
+ * @receiver target string
+ * @return true: HTTP URL, false otherwise
  */
 fun String?.isHttpUrl(): Boolean {
     return (this != null && this.startsWith(Http.HTTP_SCHEME, ignoreCase = true))

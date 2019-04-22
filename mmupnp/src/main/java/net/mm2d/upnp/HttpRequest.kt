@@ -17,7 +17,7 @@ import java.net.SocketAddress
 import java.net.URL
 
 /**
- * HTTPリクエストメッセージを表現するクラス。
+ * HTTP request message.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -45,51 +45,53 @@ class HttpRequest internal constructor(
     }
 
     /**
-     * 宛先アドレス情報。
+     * Destination address.
      */
     var address: InetAddress? = null
 
     /**
-     * 宛先ポート番号。
+     * Destination port number.
      */
     var port: Int = 0
 
     /**
-     * リクエストメソッドを返す。
+     * Returns the request method.
      *
-     * @return リクエストメソッド
+     * @return request method
      */
     fun getMethod(): String = startLineDelegate.method
 
     /**
-     * リクエストメソッドを設定する。
+     * Set the request method.
      *
-     * @param method リクエストメソッド
+     * @param method recuest method
      */
     fun setMethod(method: String) {
         startLineDelegate.method = method
     }
 
     /**
-     * URI（リクエストパス）を返す。
+     * Return the URI (request path)
      *
-     * @return URI
+     * @return URI (request path)
      */
     fun getUri(): String = startLineDelegate.uri
 
     /**
-     * URI（リクエストパス）を設定する。
+     * Set the URI (request path)
      *
-     * 接続先の設定ではなくパスのみの設定
+     * Setting of path only, not setting of connection destination.
      *
-     * @param uri URI
+     * @param uri URI (request path)
      */
     fun setUri(uri: String) {
         startLineDelegate.uri = uri
     }
 
     /**
-     * アドレスとポート番号の組み合わせ文字列。
+     * Return address and port number combination string
+     *
+     * @return address and port string
      */
     @Throws(IllegalStateException::class)
     fun getAddressString(): String {
@@ -99,25 +101,14 @@ class HttpRequest internal constructor(
     }
 
     /**
-     * 送信先URLを設定する。
+     * Set the destination URL.
      *
-     * @param url 接続先URL
-     * @throws IOException http以外を指定した場合、URLのパースエラー
+     * @param url            destination URL
+     * @param withHostHeader true: also set the HOST header based on the URL. default is false
+     * @throws IOException specify something other than http, or error occurs while the URL parse
      */
     @Throws(IOException::class)
-    fun setUrl(url: URL) {
-        setUrl(url, false)
-    }
-
-    /**
-     * 接続先URLを設定する。
-     *
-     * @param url            接続先URL
-     * @param withHostHeader trueを指定するとURLにもとづいてHOSTヘッダの設定も行う
-     * @throws IOException http以外を指定した場合、URLのパースエラー
-     */
-    @Throws(IOException::class)
-    fun setUrl(url: URL, withHostHeader: Boolean) {
+    fun setUrl(url: URL, withHostHeader: Boolean = false) {
         if (url.protocol != "http") {
             throw IOException("unsupported protocol." + url.protocol)
         }
@@ -137,9 +128,9 @@ class HttpRequest internal constructor(
     }
 
     /**
-     * 宛先SocketAddressを返す
+     * Return destination SocketAddress
      *
-     * @return 宛先SocketAddress
+     * @return destination SocketAddress
      */
     @Throws(IllegalStateException::class)
     fun getSocketAddress(): SocketAddress {
@@ -157,7 +148,7 @@ class HttpRequest internal constructor(
 
     companion object {
         /**
-         * インスタンス作成。
+         * Create a new instance.
          */
         @JvmStatic
         fun create(): HttpRequest {
@@ -167,9 +158,9 @@ class HttpRequest internal constructor(
         }
 
         /**
-         * 引数のインスタンスと同一の内容を持つインスタンスを作成する。
+         * Create a new instance with the same contents as the argument.
          *
-         * @param original コピー元
+         * @param original original message
          */
         @JvmStatic
         fun copy(original: HttpRequest): HttpRequest {

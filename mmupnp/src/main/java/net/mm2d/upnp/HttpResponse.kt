@@ -12,7 +12,7 @@ import net.mm2d.upnp.internal.message.HttpMessageDelegate
 import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate
 
 /**
- * HTTPレスポンスメッセージを表現するクラス。
+ * HTTP response message.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -61,17 +61,17 @@ internal constructor(
     }
 
     /**
-     * ステータスコードを返す
+     * Return the status code
      *
-     * @return ステータスコード
+     * @return status code
      * @see getStatus
      */
     fun getStatusCode(): Int = startLineDelegate.getStatusCode()
 
     /**
-     * ステータスコードを設定する。
+     * Set the status code
      *
-     * @param code ステータスコード
+     * @param code status code
      * @see setStatus
      */
     fun setStatusCode(code: Int) {
@@ -79,17 +79,17 @@ internal constructor(
     }
 
     /**
-     * レスポンスフレーズを取得する
+     * Return the response phrase.
      *
-     * @return レスポンスフレーズ
+     * @return response phrase
      * @see getStatus
      */
     fun getReasonPhrase(): String = startLineDelegate.reasonPhrase
 
     /**
-     * レスポンスフレーズを設定する。
+     * Set the response phrase.
      *
-     * @param reasonPhrase レスポンスフレーズ
+     * @param reasonPhrase response phrase
      * @see setStatus
      */
     fun setReasonPhrase(reasonPhrase: String) {
@@ -97,16 +97,16 @@ internal constructor(
     }
 
     /**
-     * ステータスを取得する。
+     * Return the status.
      *
-     * @return ステータス
+     * @return status
      */
     fun getStatus(): Status = startLineDelegate.getStatus()
 
     /**
-     * ステータスを設定する。
+     * Set the status.
      *
-     * @param status ステータス
+     * @param status status
      * @return HttpResponse
      */
     fun setStatus(status: Status) {
@@ -122,7 +122,7 @@ internal constructor(
 
     companion object {
         /**
-         * インスタンスを作成。
+         * Create a new instance.
          */
         @JvmStatic
         fun create(): HttpResponse {
@@ -132,7 +132,9 @@ internal constructor(
         }
 
         /**
-         * 同一内容のインスタンスを作成する。
+         * Create a new instance with the same contents as the argument.
+         *
+         * @params original original message
          */
         @JvmStatic
         fun copy(original: HttpResponse): HttpResponse {

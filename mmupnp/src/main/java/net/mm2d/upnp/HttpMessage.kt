@@ -12,63 +12,48 @@ import java.io.InputStream
 import java.io.OutputStream
 
 /**
- * HTTPのメッセージを表現するinterface。
+ * Interface of HTTP message.
  *
- * ResponseとRequestでStart Lineのフォーマットが異なるため
- * その部分については個別に実装する。
+ * Since the format of Start Line differs between Response and Request, separately implement that part.
  *
- * UPnPの通信でよく利用される小さなデータのやり取りに特化したもので、
- * 長大なデータのやり取りは想定していない。
+ * This specializes in the exchange of small data often used in UPnP communication,
+ * and does not assume the exchange of large data.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  * @see HttpResponse
  * @see HttpRequest
  */
 interface HttpMessage {
-
     /**
-     * Start Lineを返す。
-     *
-     * @return Start Line
+     * Start Line.
      */
     val startLine: String?
-
     /**
-     * HTTPバージョンの値を返す。
-     *
-     * @return HTTPバージョン
+     * HTTP Version.
      */
     val version: String
-
     /**
-     * ヘッダの値からチャンク伝送か否かを返す。
-     *
-     * @return チャンク伝送の場合true
+     * Whether this is chunked transmission from the header value.
      */
     val isChunked: Boolean
-
     /**
-     * Content-Lengthの値を返す。
-     *
-     * 不明な場合0
-     *
-     * @return Content-Lengthの値
+     * Content-Length. 0 if unknown
      */
     val contentLength: Int
 
     /**
-     * ヘッダの値からKeepAliveか否かを返す。
+     * Returns whether this is Keep-Alive from the header value
      *
-     * HTTP/1.0の場合、Connection: keep-aliveの場合に、
-     * HTTP/1.1の場合、Connection: closeでない場合に、
-     * KeepAliveと判定し、trueを返す。
+     * In case of HTTP/1.0, "Connection" is "keep-alive"
+     * In case of HTTP/1.1, "Connection" is not "close"
+     * Judge as KeepAlive and return true.
      *
-     * @return KeepAliveの場合true
+     * @return true if KeepAlive
      */
     fun isKeepAlive(): Boolean
 
     /**
-     * Start Lineを設定する。
+     * Set the Start Line.
      *
      * @param line Start Line
      */
@@ -76,108 +61,88 @@ interface HttpMessage {
     fun setStartLine(line: String)
 
     /**
-     * HTTPバージョンを設定する。
+     * Set HTTP version
      *
-     * @param version HTTPバージョン
+     * @param version HTTP version
      */
     fun setVersion(version: String)
 
     /**
-     * ヘッダを設定する。
+     * Set the header value
      *
-     * @param name  ヘッダ名
-     * @param value 値
+     * @param name  header name
+     * @param value value
      */
     fun setHeader(name: String, value: String)
 
     /**
-     * ヘッダの各行からヘッダの設定を行う
+     * Set the header value for line
      *
-     * @param line ヘッダの1行
+     * @param line header line
      */
     fun setHeaderLine(line: String)
 
     /**
-     * ヘッダの値を返す。
+     * Return the header value
      *
-     * @param name ヘッダ名
-     * @return ヘッダの値
+     * @param name header name
+     * @return value
      */
     fun getHeader(name: String): String?
 
     /**
-     * メッセージボディを返す。
+     * Return message body as String.
      *
-     * @return メッセージボディ
+     * @return message body
      */
     fun getBody(): String?
 
     /**
-     * メッセージボディを設定する。
+     * Set message body by String.
      *
-     * @param body メッセージボディ
+     * @param body              message body
+     * @param withContentLength If true, Content-Length will be registered from the registered body value and registered.
      */
-    fun setBody(body: String?)
+    fun setBody(body: String?, withContentLength: Boolean = false)
 
     /**
-     * メッセージボディを設定する。
+     * Return message body as binary.
      *
-     * @param body              メッセージボディ
-     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
-     */
-    fun setBody(body: String?, withContentLength: Boolean)
-
-    /**
-     * メッセージボディを返す。
+     * Handling Caution: Binary data is shared with the outside to save memory.
      *
-     * 取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
-     *
-     * @return メッセージボディ
+     * @return message body
      */
     fun getBodyBinary(): ByteArray?
 
     /**
-     * メッセージボディを設定する。
+     * Set message body by binary.
      *
-     *
-     * 取扱注意：メモリ節約のためバイナリデータは外部と共有させる。
-     *
-     * @param body メッセージボディ
+     * @param body              message body
+     * @param withContentLength If true, Content-Length will be registered from the registered body value and registered.
      */
-    fun setBodyBinary(body: ByteArray?)
+    fun setBodyBinary(body: ByteArray?, withContentLength: Boolean = false)
 
     /**
-     * メッセージボディを設定する。
+     * Convert this message to a string
      *
-     * @param body              メッセージボディ
-     * @param withContentLength trueを指定すると登録されたボディの値からContent-Lengthを合わせて登録する。
-     */
-    fun setBodyBinary(
-        body: ByteArray?,
-        withContentLength: Boolean
-    )
-
-    /**
-     * メッセージを文字列として返す。
-     *
-     * @return メッセージ文字列
+     * @return message string
      */
     fun getMessageString(): String
 
     /**
-     * 指定されたOutputStreamにメッセージの内容を書き出す。
+     * Write data to OutputStream
      *
-     * @param outputStream 出力先
-     * @throws IOException 入出力エラー
+     * @param outputStream Output destination
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     fun writeData(outputStream: OutputStream)
 
     /**
-     * 指定されたInputStreamからデータの読み出しを行う。
+     * Read data from InputStream.
      *
-     * @param inputStream 入力元
-     * @throws IOException 入出力エラー
+     * @param inputStream Input source
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     fun readData(inputStream: InputStream)

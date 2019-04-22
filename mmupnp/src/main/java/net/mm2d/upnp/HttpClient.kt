@@ -15,18 +15,16 @@ import java.net.Socket
 import java.net.URL
 
 /**
- * HTTP通信を行うクライアントソケット。
+ * Client that performs HTTP communication.
  *
- * UPnPの通信でよく利用される小さなデータのやり取りに特化したもの。
- * 長大なデータのやり取りは想定していない。
- * 手軽に利用できることを優先し、効率などはあまり考慮されていない。
- * 原則同一のサーバに対する一連の通信ごとにインスタンスを作成する想定。
+ * Specialized in the exchange of small data often used in UPnP communication.
+ * It does not assume the exchange of huge data.
+ * Priority is given to being easy to use, and efficiency is not considered much.
+ * In principle, it is assumed that an instance is created for each series of communication to the same server.
  *
- * 相手の応答がkeep-alive可能な応答であった場合はコネクションを切断せず、
- * 継続して利用するという、消極的なkeep-alive機能も提供する。
- *
- * keep-alive状態であっても、post時に維持したコネクションと
- * 同一のホスト・ポートでない場合は切断、再接続を行う。
+ * It also provides a passive keep-alive function that make keep-alive behavior only when the response is keep-alive.
+ * Naturally even in the keep-alive state,
+ * if it is not the same host port as the connection maintained at post, disconnect and reconnect.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -35,43 +33,43 @@ class HttpClient(keepAlive: Boolean = true) {
     private var inputStream: InputStream? = null
     private var outputStream: OutputStream? = null
     /**
-     * ソケットが使用したローカルアドレスを返す。
+     * Returns the local address used by the socket.
      *
-     * connectの後保存し、次の接続まで保持される。
-     *
-     * @return ソケットが使用したローカルアドレス
+     * Save after connect and hold until the next connection.
      */
     var localAddress: InetAddress? = null
         private set
+
     /**
-     * keep-alive設定。
+     * keep-alive
      *
-     * デフォルトはtrue。
-     * trueを指定した場合、応答がkeep-alive可能なものであればコネクションを継続する。
-     * trueを指定しても、応答がkeep-alive可能でない場合はコネクションを切断する。
-     * falseを指定した場合、応答の内容によらずコネクションは切断する。
+     * Default is true.
+     * If true, the connection is continued if the response can be keep-alive.
+     * Even if true, the connection is disconnected if the response is not capable of keep-alive.
+     * If false, the connection is disconnected regardless of the response.
      *
-     * また、true/falseどちらを指定した場合であっても、
-     * postの引数で渡された[HttpRequest]の内容を変更することはない。
-     * ヘッダへkeep-aliveの記述が必要な場合はpostをコールする前に、
-     * [HttpRequest]へ設定しておく必要がある。
+     * Also, even if true or false,
+     * the contents of [HttpRequest] passed in the post argument will not be changed.
+     *
+     * If you need to describe keep-alive in the header,
+     * you need to set it in [HttpRequest] before calling post.
      */
     var isKeepAlive: Boolean = keepAlive
 
     /**
-     * ソケットが閉じている場合true
+     * true if the socket is closed
      */
     val isClosed: Boolean
         get() = socket == null
 
     /**
-     * リクエストを送信し、レスポンスを受信する。
+     * Send a request and receive a response.
      *
-     * 利用するHTTPメソッドは引数に依存する。
+     * The HTTP method to use depends on the argument.
      *
-     * @param request 送信するリクエスト
-     * @return 受信したレスポンス
-     * @throws IOException 通信エラー
+     * @param request Request to send
+     * @return Received response
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     fun post(request: HttpRequest): HttpResponse {
@@ -79,14 +77,14 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     /**
-     * リクエストを送信し、レスポンスを受信する。
+     * Send a request and receive a response.
      *
-     * 利用するHTTPメソッドは引数に依存する。
+     * The HTTP method to use depends on the argument.
      *
-     * @param request       送信するリクエスト
-     * @param redirectDepth リダイレクトの深さ
-     * @return 受信したレスポンス
-     * @throws IOException 通信エラー
+     * @param request Request to send
+     * @param redirectDepth Depth of redirect
+     * @return Received response
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     private fun post(request: HttpRequest, redirectDepth: Int): HttpResponse {
@@ -195,18 +193,18 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     /**
-     * ソケットのクローズを行う。
+     * close socket.
      */
     fun close() {
         closeSocket()
     }
 
     /**
-     * 単純なHTTP GETにより文字列を取得する。
+     * Get a string by simple HTTP GET.
      *
-     * @param url 取得先URL
-     * @return 取得できた文字列
-     * @throws IOException 取得に問題があった場合
+     * @param url Destination URL
+     * @return Received String
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     fun downloadString(url: URL): String {
@@ -215,11 +213,11 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     /**
-     * 単純なHTTP GETによりバイナリを取得する。
+     * Get a binary by simple HTTP GET.
      *
-     * @param url 取得先URL
-     * @return 取得できたバイナリ
-     * @throws IOException 取得に問題があった場合
+     * @param url Destination URL
+     * @return Received binary
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     fun downloadBinary(url: URL): ByteArray {
@@ -228,11 +226,11 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     /**
-     * 単純なHTTP GETを実行する。
+     * Invoke simple HTTP GET.
      *
-     * @param url 取得先URL
-     * @return HTTPレスポンス
-     * @throws IOException 取得に問題があった場合
+     * @param url Destination URL
+     * @return Received response
+     * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
     fun download(url: URL): HttpResponse {
