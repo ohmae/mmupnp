@@ -64,7 +64,7 @@ class HttpRequest internal constructor(
     /**
      * Set the request method.
      *
-     * @param method recuest method
+     * @param method request method
      */
     fun setMethod(method: String) {
         startLineDelegate.method = method

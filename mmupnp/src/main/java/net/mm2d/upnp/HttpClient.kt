@@ -27,6 +27,10 @@ import java.net.URL
  * if it is not the same host port as the connection maintained at post, disconnect and reconnect.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
+ *
+ * @constructor initialize
+ *
+ * @param keepAlive true: keep-alive
  */
 class HttpClient(keepAlive: Boolean = true) {
     private var socket: Socket? = null

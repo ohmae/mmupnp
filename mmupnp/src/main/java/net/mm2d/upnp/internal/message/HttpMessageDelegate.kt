@@ -14,7 +14,7 @@ import java.io.*
 import kotlin.math.min
 
 /**
- * [HttpMessage]の共通実装。
+ * Common implementation of [HttpMessage].
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -132,20 +132,12 @@ internal class HttpMessageDelegate(
         return null
     }
 
-    override fun setBody(body: String?) {
-        setBody(body, false)
-    }
-
     override fun setBody(body: String?, withContentLength: Boolean) {
         setBodyInner(body, null, withContentLength)
     }
 
     override fun getBodyBinary(): ByteArray? {
         return bodyBinary
-    }
-
-    override fun setBodyBinary(body: ByteArray?) {
-        setBodyBinary(body, false)
     }
 
     override fun setBodyBinary(body: ByteArray?, withContentLength: Boolean) {
