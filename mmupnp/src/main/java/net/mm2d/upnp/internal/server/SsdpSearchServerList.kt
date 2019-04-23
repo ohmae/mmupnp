@@ -15,7 +15,7 @@ import net.mm2d.upnp.util.isAvailableInet6Interface
 import java.net.NetworkInterface
 
 /**
- * 全インターフェース分の[SsdpSearchServer]をまとめるためのクラス。
+ * Class for putting together [SsdpSearchServer] for all interfaces.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

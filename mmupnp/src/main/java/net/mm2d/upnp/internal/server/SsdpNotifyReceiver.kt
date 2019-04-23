@@ -15,7 +15,7 @@ import java.io.IOException
 import java.net.*
 
 /**
- * SSDP NOTIFYを受信するクラス
+ * Receiver for SSDP NOTIFY
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -28,11 +28,6 @@ internal class SsdpNotifyReceiver(
     internal val interfaceAddress: InterfaceAddress
         get() = delegate.interfaceAddress
 
-    /**
-     * インスタンス作成。
-     *
-     * @param ni 使用するインターフェース
-     */
     constructor(
         taskExecutors: TaskExecutors,
         address: Address,
@@ -47,11 +42,6 @@ internal class SsdpNotifyReceiver(
         segmentCheckEnabled = enabled
     }
 
-    /**
-     * NOTIFY受信リスナーを登録する。
-     *
-     * @param listener リスナー
-     */
     fun setNotifyListener(listener: ((SsdpMessage) -> Unit)?) {
         this.listener = listener
     }
@@ -63,14 +53,14 @@ internal class SsdpNotifyReceiver(
         }
         try {
             val message = createSsdpRequestMessage(data, length)
-            // M-SEARCHパケットは無視する
+            // ignore M-SEARCH packet
             if (message.getMethod() == SsdpMessage.M_SEARCH) {
                 return
             }
             Logger.v {
                 "receive ssdp notify from $sourceAddress in ${delegate.getLocalAddress()}:\n$message"
             }
-            // ByeByeは通信を行わないためアドレスの問題有無にかかわらず受け入れる
+            // ByeBye accepts it regardless of address problems because it does not communicate
             if (message.nts != SsdpMessage.SSDP_BYEBYE && SsdpServerDelegate.isInvalidLocation(
                     message,
                     sourceAddress
@@ -94,9 +84,9 @@ internal class SsdpNotifyReceiver(
             Logger.w { "IP version mismatch:$sourceAddress $interfaceAddress" }
             return true
         }
-        // アドレス設定が間違っている場合でもマルチキャストパケットの送信はできてしまう。
-        // セグメント情報が間違っており、マルチキャスト以外のやり取りができない相手からのパケットは
-        // 受け取っても無駄なので破棄する。
+        // Even if the address setting is incorrect, multicast packets can be sent.
+        // Since the segment information is incorrect and packets from parties
+        // that can not be exchanged except for multicast are useless even if received, they are discarded.
         if (segmentCheckEnabled
             && delegate.address == Address.IP_V4
             && invalidSegment(interfaceAddress, sourceAddress)

@@ -12,21 +12,19 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 
 /**
- * マルチキャストアドレス。
+ * Multicast address
  */
 internal enum class Address(address: String) {
     /**
-     * IPv4用マルチキャストアドレス
+     * Multicast address for IPv4
      */
     IP_V4("239.255.255.250"),
     /**
-     * IPv6用リンクローカルマルチキャストアドレス
+     * Multicast address for IPv6 (link local)
      */
     IP_V6_LINK_LOCAL("FF02::C"),
     /**
-     * IPv6用サイトローカルマルチキャストアドレス
-     *
-     * 未使用
+     * Multicast address for IPv6 (cite local)
      */
     IP_V6_SITE_LOCAL("FF05::C");
 

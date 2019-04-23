@@ -19,7 +19,7 @@ import java.net.InetAddress
 import java.net.NetworkInterface
 
 /**
- * SSDP M-SEARCHとそのレスポンス受信を行うクラス。
+ * SSDP M-SEARCH and receives the response.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -36,20 +36,10 @@ internal class SsdpSearchServer(
         delegate.setReceiver { sourceAddress, data, length -> onReceive(sourceAddress, data, length) }
     }
 
-    /**
-     * レスポンス受信リスナーを登録する。
-     *
-     * @param listener リスナー
-     */
     fun setResponseListener(listener: ((SsdpMessage) -> Unit)?) {
         this.listener = listener
     }
 
-    /**
-     * M-SEARCHを実行する。
-     *
-     * @param st STの値
-     */
     fun search(st: String? = null) {
         send { makeSearchMessage(if (st.isNullOrEmpty()) ST_ALL else st) }
     }
@@ -83,11 +73,11 @@ internal class SsdpSearchServer(
 
     companion object {
         /**
-         * ST(SearchType) 全機器。
+         * ST(SearchType) all.
          */
         const val ST_ALL = "ssdp:all"
         /**
-         * ST(SearchType) rootdevice。
+         * ST(SearchType) rootdevice.
          */
         const val ST_ROOTDEVICE = "upnp:rootdevice"
     }

@@ -30,10 +30,10 @@ import javax.xml.parsers.ParserConfigurationException
 import kotlin.concurrent.withLock
 
 /**
- * イベント購読によって通知されるEventを受信するクラス。
+ * Class to receive Event notified by event subscription.
  *
- * HTTPのサーバとしてリクエストの受付のみを行う。
- * HTTPメッセージのパースはリスナーの実装側が行う。
+ * It only accepts requests as an HTTP server.
+ * The listener parses HTTP messages.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -48,9 +48,6 @@ internal class EventReceiver(
     private val condition = lock.newCondition()
     private var ready = false
 
-    /**
-     * サーバソケットのオープンと受信スレッドの開始を行う。
-     */
     fun start() {
         lock.withLock {
             ready = false
@@ -61,9 +58,6 @@ internal class EventReceiver(
         }
     }
 
-    /**
-     * 受信スレッドを終了させる。
-     */
     fun stop() {
         futureTask?.cancel(false)
         futureTask = null
@@ -80,11 +74,6 @@ internal class EventReceiver(
         return ServerSocket(0)
     }
 
-    /**
-     * サーバーソケットに割り当てられたポート番号を返す。
-     *
-     * @return サーバソケットのポート番号
-     */
     fun getLocalPort(): Int {
         if (!waitReady()) return 0
         return serverSocket?.localPort ?: 0
@@ -139,22 +128,10 @@ internal class EventReceiver(
         }
     }
 
-    /**
-     * Clientスレッドからの終了通知
-     *
-     * @param client 終了したClientスレッド
-     */
     fun notifyClientFinished(client: ClientTask) {
         clientList.remove(client)
     }
 
-    /**
-     * イベントリスナーのコール
-     *
-     * @param sid     Subscribe ID
-     * @param request 受信したHTTPメッセージ
-     * @return HTTPメッセージが正常であればtrue
-     */
     // VisibleForTesting
     fun notifyEvent(sid: String, request: HttpRequest): Boolean {
         val listener = listener ?: return false
@@ -173,9 +150,6 @@ internal class EventReceiver(
     ) : Runnable {
         private var futureTask: FutureTask<Nothing?>? = null
 
-        /**
-         * スレッドを作成し開始する。
-         */
         fun start(taskExecutors: TaskExecutors) {
             FutureTask(this, null).also {
                 futureTask = it
@@ -183,9 +157,6 @@ internal class EventReceiver(
             }
         }
 
-        /**
-         * スレッドを終了させ、ソケットのクローズを行う。
-         */
         fun stop() {
             futureTask?.cancel(false)
             futureTask = null

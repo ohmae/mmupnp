@@ -10,33 +10,33 @@ package net.mm2d.upnp.internal.server
 import net.mm2d.upnp.SsdpMessage
 
 /**
- * SSDPパケットの受信を行うインターフェース
+ * Interface for receiving SSDP packets
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal interface SsdpServer {
     /**
-     * 受信スレッドの開始を行う。
+     * Start a receiving thread.
      */
     fun start()
 
     /**
-     * 受信スレッドの停止を行う。
+     * Stop a receiving thread.
      *
-     * 停止のリクエストを送るのみで待ち合わせは行わない。
+     * It only sends a request for a stop and does not wait.
      */
     fun stop()
 
     /**
-     * このソケットを使用してメッセージ送信を行う。
+     * Send a message using this socket.
      *
-     * @param messageSupplier 送信するメッセージを作成するラムダ
+     * @param messageSupplier Lambda to create a message to send
      */
     fun send(messageSupplier: () -> SsdpMessage)
 
     companion object {
         /**
-         * SSDPに使用するポート番号。
+         * Port number used for SSDP.
          */
         const val SSDP_PORT = 1900
     }

@@ -22,13 +22,14 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * [SsdpServer]の共通処理を実装するクラス。
+ * A class that implements the common part of [SsdpServer].
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  *
- * @param address          モード
- * @param networkInterface 使用するインターフェース
- * @param bindPort         使用するポート
+ * @param taskExecutors    taskExecutors
+ * @param address          Multicast address
+ * @param networkInterface network interface
+ * @param bindPort         port number
  */
 internal class SsdpServerDelegate
 @JvmOverloads constructor(
@@ -57,18 +58,8 @@ internal class SsdpServerDelegate
         this.receiver = receiver
     }
 
-    /**
-     * SSDPに使用するアドレス。
-     *
-     * @return SSDPで使用する[InetAddress]
-     */
     fun getSsdpInetAddress(): InetAddress = address.inetAddress
 
-    /**
-     * SSDPに使用するアドレス＋ポートの文字列。
-     *
-     * @return SSDPに使用するアドレス＋ポートの文字列。
-     */
     fun getSsdpAddressString(): String = address.addressString
 
     fun getLocalAddress(): InetAddress = interfaceAddress.address
@@ -176,11 +167,6 @@ internal class SsdpServerDelegate
         }
     }
 
-    /**
-     * 受信処理を行う。
-     *
-     * @throws IOException 入出力処理で例外発生
-     */
     // VisibleForTesting
     @Throws(IOException::class)
     internal fun receiveLoop(socket: MulticastSocket) {
@@ -212,12 +198,12 @@ internal class SsdpServerDelegate
         }
 
         /**
-         * SsdpMessageのLocationに正常なURLが記述されており、
-         * 記述のアドレスとパケットの送信元アドレスに不一致がないか検査する。
+         * A normal URL is described in the Location of SsdpMessage,
+         * and it is checked whether there is a mismatch between the description address and the packet source address.
          *
-         * @param message       確認するSsdpMessage
-         * @param sourceAddress 送信元アドレス
-         * @return true:送信元との不一致を含めてLocationに不正がある場合。false:それ以外
+         * @param message       SsdpMessage to check
+         * @param sourceAddress source address
+         * @return true: if there is an invalid Location, such as a mismatch with the sender. false: otherwise
          */
         fun isInvalidLocation(message: SsdpMessage, sourceAddress: InetAddress): Boolean {
             return !isValidLocation(message, sourceAddress)
