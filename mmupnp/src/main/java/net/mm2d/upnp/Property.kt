@@ -10,38 +10,38 @@ package net.mm2d.upnp
 import java.util.concurrent.TimeUnit
 
 /**
- * ライブラリのプロパティ情報を管理するクラス。
+ * Class that manages library property.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 object Property {
     /**
-     * ライブラリバージョン
+     * Library version
      */
-    const val LIB_VERSION = "mmupnp/2.0.0"
+    const val LIB_VERSION = "mmupnp/3.0.0"
     /**
-     * OSバージョン
+     * OS Version
      */
     @JvmField
     val OS_VERSION = "${System.getProperty("os.name").split(" ")[0]}/${System.getProperty("os.version")}"
     /**
-     * UPnPバージョン
+     * UPnP Version
      */
     const val UPNP_VERSION = "UPnP/1.0"
     /**
-     * ライブラリで使用するUserAgentの値
+     * User-Agent
      */
     @JvmField
     val USER_AGENT_VALUE = "$OS_VERSION $UPNP_VERSION $LIB_VERSION"
     /**
-     * ライブラリで使用するServer名
+     * Server name
      */
     @JvmField
     val SERVER_VALUE = "$OS_VERSION $UPNP_VERSION $LIB_VERSION"
     /**
-     * デフォルトタイムアウト値(ms)（30秒）
+     * Default timeout (ms)
      *
-     * [java.net.Socket.setSoTimeout]に渡すためint値で定義
+     * Defined as int value for use with [java.net.Socket.setSoTimeout].
      */
     @JvmField
     val DEFAULT_TIMEOUT = TimeUnit.SECONDS.toMillis(30).toInt()

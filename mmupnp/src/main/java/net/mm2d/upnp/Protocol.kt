@@ -9,38 +9,38 @@ import net.mm2d.upnp.util.NetworkUtils
 import java.net.NetworkInterface
 
 /**
- * 使用するプロトコルスタックを指定するためのenum。
+ * Enum to specify the protocol stack to use.
  *
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 enum class Protocol {
     /**
-     * IPv4のみ使用します。
+     * Use only IPv4.
      */
     IP_V4_ONLY {
         override val availableInterfaces: List<NetworkInterface>
             get() = NetworkUtils.availableInet4Interfaces
     },
     /**
-     * IPv6のみ使用します。
+     * Use only IPv6.
      *
-     * UPnPではIPv4の対応がMUSTなので検証用としてのみ使用します。
+     * Since UPnP support for IPv4 is a MUST, it is used only for verification.
      *
-     * IPv6のアドレス体系としてはリンクローカルアドレスのみ使用します。
-     * サイトローカルアドレスでのマルチキャストには対応していません。
+     * Only link local addresses are used as an IPv6 address system.
+     * It does not support multicast on site local addresses.
      */
     IP_V6_ONLY {
         override val availableInterfaces: List<NetworkInterface>
             get() = NetworkUtils.availableInet6Interfaces
     },
     /**
-     * IPv4/IPv6のデュアルスタックで動作します。
+     * Use dual stack of IPv4 / IPv6.
      *
-     * IPv6よりIPv4を優先しますが、
-     * IPv4アドレスがリンクローカルアドレス（APIPAによる割り当て）だった場合はIPv6を優先します。
+     * Prioritizes IPv4 over IPv6,
+     * but prefers IPv6 if the IPv4 address is a link local address (assigned by APIPA).
      *
-     * IPv6のアドレス体系としてはリンクローカルアドレスのみ使用します。
-     * サイトローカルアドレスでのマルチキャストには対応していません。
+     * Only link local addresses are used as an IPv6 address system.
+     * It does not support multicast on site local addresses.
      */
     DUAL_STACK {
         override val availableInterfaces: List<NetworkInterface>
@@ -48,15 +48,13 @@ enum class Protocol {
     };
 
     /**
-     * 該当するプロトコルスタックで使用可能なNetworkInterfaceを返す。
-     *
-     * @return 使用可能なNetworkInterface
+     * Returns the NetworkInterface available for that protocol stack.
      */
     internal abstract val availableInterfaces: List<NetworkInterface>
 
     companion object {
         /**
-         * デフォルトのプロトコルスタック。
+         * Default protocol stack.
          */
         val DEFAULT = DUAL_STACK
     }
