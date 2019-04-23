@@ -8,23 +8,23 @@
 package net.mm2d.upnp
 
 /**
- * タスクを指定スレッドで実行するExecutorのインターフェース
+ * Executor interface that executes tasks in a specified thread.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 interface TaskExecutor {
     /**
-     * タスクを特定のスレッドで実行する。
+     * Execute a task in a specific thread.
      *
-     * @param task 実行するタスク
-     * @return 実行をできた場合、もしくは実行待ちキューに積むことができた場合true
+     * @param task task to execute
+     * @return true if execution could be done or if it could be queued up
      */
     fun execute(task: Runnable): Boolean
 
     /**
-     * ControlPointの終了処理中にコールされる。
+     * Called during ControlPoint exit processing.
      *
-     * スレッドの停止などが必要な場合はここで実装する。
+     * If need to stop threads etc., implement it here.
      */
     fun terminate() = Unit
 }

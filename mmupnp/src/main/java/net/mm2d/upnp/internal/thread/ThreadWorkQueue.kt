@@ -12,26 +12,24 @@ import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * ThreadPoolExecutorに渡すためのWorkQueue。
+ * WorkQueue to pass to ThreadPoolExecutor.
  *
- * 並列実行用に以下のような特徴のスレッドプールを作る
+ * Create a thread pool with the following features for parallel execution
  *
- * - 必要な時には最大数までのスレッドを作成する
- * - 一定時間アイドル状態であればスレッド数を減らす
- * - ワーカースレッドを作る前にアイドルスレッドを優先的に使用する
+ * - Create up to the maximum number of threads when needed
+ * - Reduce the number of threads if idle for a certain time
+ * - Prioritize idle threads before creating worker threads
  *
- * ThreadPoolExecutorはcorePoolSizeとmaximumPoolSizeの間のワーカースレッドについては、
- * execute時にworkQueue#offerをコールしfalseの場合にスレッドを作成する。
- * このときワーカースレッド数がmaximumPoolSizeを超える場合は、rejectされ、
- * RejectedExecutionHandlerがコールされる。
+ * For a worker thread between corePoolSize and maximumPoolSize,
+ * ThreadPoolExecutor calls workQueue#offer at execute time, and creates a thread if false.
+ * At this time, if the number of worker threads exceeds maximumPoolSize,
+ * it is rejected and RejectedExecutionHandler is called.
  *
- * そのため、上記特徴のスレッドプールを作成するには
+ * Therefore, the following Queue is required to create the thread pool with the above features
  *
- * - offer()がコールされたとき、アイドルスレッド（takeもしくはpoll内でwait状態のスレッド）がいる場合、キューに積みtrueを返す
- * - 上記以外でfalseを返す
- * - RejectedExecutionHandlerを実装し、rejectedExecutionがコールされたとき、shutdown状態でなければキューに積む
- *
- * という特徴のQueueが必要となる
+ * - If an idle thread (a thread in wait state in take or poll) exists when offer() is called, it will be queued and return true.
+ * - Return false otherwise
+ * - Implement RejectedExecutionHandler and queue if it is not shutdown state when rejectedExecution is called.
  */
 internal class ThreadWorkQueue(
     private val delegate: BlockingQueue<Runnable> = LinkedBlockingQueue()
