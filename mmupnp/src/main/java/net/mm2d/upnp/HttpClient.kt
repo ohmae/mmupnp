@@ -113,12 +113,12 @@ class HttpClient(keepAlive: Boolean = true) {
 
     @Throws(IOException::class)
     private fun doRequest(request: HttpRequest): HttpResponse {
-        if (isClosed) {
+        return if (isClosed) {
             openSocket(request)
-            return writeAndRead(request)
+            writeAndRead(request)
         } else {
             try {
-                return writeAndRead(request)
+                writeAndRead(request)
             } catch (e: IOException) {
                 // コネクションを再利用した場合はpeerから既に切断されていた可能性がある。
                 // KeepAliveできないサーバである可能性があるのでKeepAliveを無効にしてリトライ
@@ -126,7 +126,7 @@ class HttpClient(keepAlive: Boolean = true) {
                 isKeepAlive = false
                 closeSocket()
                 openSocket(request)
-                return writeAndRead(request)
+                writeAndRead(request)
             }
         }
     }

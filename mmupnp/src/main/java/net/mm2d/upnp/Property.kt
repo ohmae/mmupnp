@@ -18,16 +18,15 @@ object Property {
     /**
      * Library version
      */
-    const val LIB_VERSION = "mmupnp/3.0.0"
-    /**
-     * OS Version
-     */
-    @JvmField
-    val OS_VERSION = "${System.getProperty("os.name").split(" ")[0]}/${System.getProperty("os.version")}"
+    private const val LIB_VERSION = "mmupnp/3.0.0"
     /**
      * UPnP Version
      */
-    const val UPNP_VERSION = "UPnP/1.0"
+    private const val UPNP_VERSION = "UPnP/1.0"
+    /**
+     * OS Version
+     */
+    private val OS_VERSION = "${System.getProperty("os.name").split(" ")[0]}/${System.getProperty("os.version")}"
     /**
      * User-Agent
      */

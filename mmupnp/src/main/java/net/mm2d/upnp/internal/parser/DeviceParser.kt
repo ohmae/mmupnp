@@ -74,8 +74,7 @@ internal object DeviceParser {
 
     private fun parseDevice(builder: DeviceImpl.Builder, deviceNode: Node) {
         deviceNode.firstChild.forEachElement {
-            val tag = it.localName
-            when (tag) {
+            when (val tag = it.localName) {
                 "iconList" ->
                     parseIconList(builder, it)
                 "serviceList" ->
