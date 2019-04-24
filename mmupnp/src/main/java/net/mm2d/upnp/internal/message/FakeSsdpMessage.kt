@@ -13,7 +13,7 @@ import java.io.OutputStream
 import java.net.InetAddress
 
 /**
- * 固定デバイス用の[SsdpMessage]
+ * [SsdpMessage] for pinned device
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

@@ -10,16 +10,15 @@ package net.mm2d.upnp.internal.message
 import java.util.*
 
 /**
- * HTTPヘッダを表現するクラス。
+ * HTTP header.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class HttpHeaders {
     /**
-     * ヘッダのエントリー情報。
+     * Entry of header
      *
-     * name/valueともにsetterがあるが、
-     * nameは大文字小文字の差異のみがある場合に限る
+     * name can only be updated if there is only a case difference
      */
     class Entry(
         private var _name: String,
@@ -60,17 +59,14 @@ internal class HttpHeaders {
 
     private val map: MutableMap<String, Entry>
 
-    /**
-     * インスタンス初期化。
-     */
     constructor() {
         map = mutableMapOf()
     }
 
     /**
-     * 引数のHeaderと同一の内容を持つHeaderを作成する。
+     * Create a new instance with the same contents as the argument instance.
      *
-     * @param original コピー元
+     * @param original original header
      */
     constructor(original: HttpHeaders) {
         // EntryはmutableなのでDeep copyが必要
@@ -80,57 +76,57 @@ internal class HttpHeaders {
     }
 
     /**
-     * ヘッダ情報が空か否かを返す。
+     * Returns whether the header information is empty.
      *
-     * @return ヘッダが空のときtrue
+     * @return true: if empty
      */
     val isEmpty: Boolean
         get() = map.isEmpty()
 
     /**
-     * ヘッダエントリー数を返す。
+     * Return the number of header entries.
      *
-     * @return ヘッダエントリー数
+     * @return the number of header entries
      */
     fun size(): Int {
         return map.size
     }
 
     /**
-     * 指定されたヘッダ名の値を返す。
+     * Return the header value.
      *
-     * ヘッダの検索において大文字小文字の区別は行わない。
+     * Search header without case sensitivity.
      *
-     * @param name ヘッダ名
-     * @return ヘッダの値
+     * @param name header name
+     * @return header value
      */
     operator fun get(name: String): String? {
         return map[name.toKey()]?.value
     }
 
     /**
-     * ヘッダの削除を行う。
+     * remove header.
      *
-     * ヘッダの検索において大文字小文字の区別は行わない。
+     * Search header without case sensitivity.
      *
-     * @param name ヘッダ名
-     * @return 削除されたヘッダがあった場合、ヘッダの値、なかった場合null
+     * @param name header name
+     * @return If deleted, header value, if not null
      */
     fun remove(name: String): String? {
         return map.remove(name.toKey())?.value
     }
 
     /**
-     * ヘッダ情報を登録する。
+     * Add header entry.
      *
-     * ヘッダ名は登録においては大文字小文字の区別を保持して登録される。
-     * 既に同一名のヘッダが登録されている場合置換される。
-     * ヘッダの重複は大文字小文字の区別を行わない。
-     * 置換された場合、ヘッダ名も引数のもので置き換えられる。
+     * Header names are registered with case sensitivity in registration.
+     * If a header with the same name has already been registered, it will be replaced.
+     * Header duplication is not case sensitive.
+     * If replaced, the header name is also replaced with that of the argument.
      *
-     * @param name  ヘッダ名
-     * @param value ヘッダの値
-     * @return 重複があった場合、既に登録されていた値。
+     * @param name  header name
+     * @param value header value
+     * @return If there is a duplicate, the value already registered
      */
     fun put(name: String, value: String): String? {
         val key = name.toKey()
@@ -145,29 +141,27 @@ internal class HttpHeaders {
     }
 
     /**
-     * 指定ヘッダに指定文字列が含まれるかを大文字小文字の区別なく判定する。
+     * Determines whether the specified header contains the specified value regardless of case.
      *
-     * 該当ヘッダ名の検索も大文字小文字の区別を行わない。
-     *
-     * @param name  ヘッダ名
-     * @param value 含まれるか
-     * @return 指定ヘッダにvalueが含まれる場合true
+     * @param name  header name
+     * @param value header value
+     * @return true: contains specified header value
      */
     fun containsValue(name: String, value: String): Boolean {
         return get(name)?.contains(value, true) ?: false
     }
 
     /**
-     * 登録情報のクリアを行う。
+     * clear all header
      */
     fun clear() {
         map.clear()
     }
 
     /**
-     * 登録されているヘッダ情報へのCollectionビューを返す。
+     * Returns a Collection view for registered header information.
      *
-     * @return 登録されているヘッダ情報へのCollectionビュー
+     * @return Collection view for registered header information.
      */
     fun values(): Collection<Entry> {
         return map.values
@@ -186,11 +180,6 @@ internal class HttpHeaders {
     }
 
     companion object {
-        /**
-         * 名前をもとにKeyとして使用できる文字列を作成して返す。
-         *
-         * @return Key
-         */
         private fun String.toKey(): String {
             return toLowerCase(Locale.US)
         }

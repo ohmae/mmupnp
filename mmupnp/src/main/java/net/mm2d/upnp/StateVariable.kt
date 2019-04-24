@@ -8,37 +8,37 @@
 package net.mm2d.upnp
 
 /**
- * StateVariableを表現するクラス
+ * Interface of UPnP StateVariable.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 interface StateVariable {
     /**
-     * SendEventsの状態を返す。
+     * Return the status of SendEvents.
      *
-     * @return SendEventsがyesの場合true
+     * @return true: SendEvents is "yes", false: "no"
      */
     val isSendEvents: Boolean
 
     /**
-     * Multicastの状態を返す。
+     * Return the status of Multicast.
      *
-     * @return Multicastがyesの場合true
+     * @return true: Multicast is "yes", false: "no"
      */
     val isMulticast: Boolean
 
     /**
-     * StateVariable名を返す。
+     * Return the name of StateVariable.
      *
      * @return StateVariable名
      */
     val name: String
 
     /**
-     * DataTypeを返す。
+     * Return the value of DataType.
      *
-     * UPnPでは以下のデータタイプが定義されている。
-     * これらのどれにも当てはまらない場合もチェックは行われない。
+     * The following data types are defined in UPnP.
+     * If none of these apply, no check is made.
      *
      * table: DataType
      *
@@ -76,37 +76,37 @@ interface StateVariable {
     val dataType: String
 
     /**
-     * AllowedValueListを返す。
+     * Return the value of AllowedValueList.
      *
      * @return AllowedValueList
      */
     val allowedValueList: List<String>
 
     /**
-     * DefaultValueの値を返す。
+     * Return the value of DefaultValue.
      *
      * @return DefaultValue
      */
     val defaultValue: String?
 
     /**
-     * Minimumの値を返す。
+     * Return the value of Minimum.
      *
      * @return Minimum
      */
     val minimum: String?
 
     /**
-     * Maximumの値を返す。
+     * Return the value of Maximum.
      *
      * @return Maximum
      */
     val maximum: String?
 
     /**
-     * Stepの値を返す。
+     * Return the value of Step.
      *
-     * @return Stepの値
+     * @return Step
      */
     val step: String?
 }

@@ -8,25 +8,19 @@
 package net.mm2d.upnp
 
 /**
- * Deviceのロード時にIconのバイナリデータをダウンロードするIconを指定するためのフィルター。
- *
- * デフォルトでは何もダウンロードしない[.NONE]が設定されている。
- * すべてをダウンロードする場合は[.ALL]が定義されているためそれを利用する。
- * 特定のIconだけをダウンロードしたり、特定の条件でのみダウンロードする場合は、
- * このインターフェースを実装し、[ControlPoint.setIconFilter]に渡す。
+ * Filter for specifying Icon to download Icon binary data when loading Device.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 interface IconFilter {
     /**
-     * ダウンロード時にバイナリデータをダウンロードするIconを選択する。
+     * Select Icon to download binary data.
      *
-     * 戻り値で返したListに含まれるIconがダウンロードされる。
-     * Iconの情報がない場合はコールされない。
+     * Icon included in the List returned by return value is downloaded.
+     * It is not called if there is no Icon information.
      *
-     * @param list Deviceに記述されたIconのリスト、nullやemptyでコールされることはない。
-     * @return ダウンロードするIconのリスト、nullを返してはならない。
-     * 取得すべきiconがない場合はemptyListを返す必要がある。
+     * @param list List of Icon described in Device. It can not be null or empty.
+     * @return List of Icon to download
      */
     operator fun invoke(list: List<Icon>): List<Icon>
 }

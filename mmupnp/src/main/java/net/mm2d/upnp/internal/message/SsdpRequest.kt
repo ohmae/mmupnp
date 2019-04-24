@@ -15,7 +15,7 @@ import java.io.IOException
 import java.net.InetAddress
 
 /**
- * SSDPリクエストメッセージを表現するクラス
+ * SSDP Request message
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -24,36 +24,14 @@ internal class SsdpRequest(
     private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
 
-    /**
-     * リクエストメソッドを返す。
-     *
-     * @return リクエストメソッド
-     */
     fun getMethod(): String = message.getMethod()
 
-    /**
-     * リクエストメソッドを設定する。
-     *
-     * @param method リクエストメソッド
-     */
     fun setMethod(method: String) {
         message.setMethod(method)
     }
 
-    /**
-     * URI（リクエストパス）を返す。
-     *
-     * @return URI
-     */
     fun getUri(): String = message.getUri()
 
-    /**
-     * URI（リクエストパス）を設定する。
-     *
-     * 接続先の設定ではなくパスのみの設定
-     *
-     * @param uri URI
-     */
     fun setUri(uri: String) {
         message.setUri(uri)
     }
@@ -67,9 +45,6 @@ internal class SsdpRequest(
     }
 
     companion object {
-        /**
-         * インスタンス作成。
-         */
         @JvmStatic
         fun create(): SsdpRequest {
             return HttpRequest.create().let {
@@ -77,14 +52,6 @@ internal class SsdpRequest(
             }
         }
 
-        /**
-         * 受信した情報からインスタンス作成。
-         *
-         * @param address 受信したインターフェースのアドレス
-         * @param data    受信したデータ
-         * @param length  受信したデータの長さ
-         * @throws IOException 入出力エラー
-         */
         @JvmStatic
         @Throws(IOException::class)
         fun create(address: InetAddress, data: ByteArray, length: Int): SsdpRequest {

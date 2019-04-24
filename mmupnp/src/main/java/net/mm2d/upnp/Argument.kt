@@ -8,29 +8,29 @@
 package net.mm2d.upnp
 
 /**
- * Argumentを表現するインターフェース。
+ * Interface of UPnP Argument.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 interface Argument {
     /**
-     * Argument名を返す。
+     * Return the Argument name
      *
-     * @return Argument名
+     * @return Argument name
      */
     val name: String
 
     /**
-     * Input方向か否かを返す。
+     * Return direction is input or not.
      *
-     * @return Inputの場合true
+     * @return true: input, false: output
      */
     val isInputDirection: Boolean
 
     /**
-     * RelatedStateVariableで指定されたStateVariableのインスタンスを返す。
+     * Return an instance of StateVariable that is specified in RelatedStateVariable.
      *
-     * @return StateVariableのインスタンス
+     * @return instance of StateVariable
      */
     val relatedStateVariable: StateVariable
 }

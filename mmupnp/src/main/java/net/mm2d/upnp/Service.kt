@@ -8,20 +8,18 @@
 package net.mm2d.upnp
 
 /**
- * Serviceを表すインターフェース。
+ * Interface of UPnP Service.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 interface Service {
     /**
-     * このServiceを保持するDeviceを返す。
-     *
-     * @return このServiceを保持するDevice
+     * Device that is owner of this Service.
      */
     val device: Device
 
     /**
-     * serviceTypeを返す。
+     * The value of serviceType.
      *
      * Required. UPnP service type. Shall not contain a hash character (#, 23 Hex in UTF-8). Single URI.
      *
@@ -37,13 +35,11 @@ interface Service {
      *
      * The service type suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be
      * &lt;= 64 characters, not counting the version suffix and separating colon.
-     *
-     * @return serviceType
      */
     val serviceType: String
 
     /**
-     * serviceIdを返す。
+     * The value of serviceId.
      *
      * Required. Service identifier. Shall be unique within this device description. Single URI.
      *
@@ -63,159 +59,149 @@ interface Service {
      *
      * The service ID suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be &lt;= 64
      * characters.
-     *
-     * @return serviceId
      */
     val serviceId: String
 
     /**
-     * SCPDURLを返す。
+     * The value of SCPDURL.
      *
      * Required. URL for service description. (See clause 2.5, “Service description” below.) shall be relative to
      * the URL at which the device description is located in accordance with clause 5 of RFC 3986. Specified by
      * UPnP vendor. Single URL.
-     *
-     * @return SCPDURL
      */
     val scpdUrl: String
 
     /**
-     * controlURLを返す。
+     * The value of controlURL.
      *
      * Required. URL for control (see clause 3, "Control"). shall be relative to the URL at which the device
      * description is located in accordance with clause 5 of RFC 3986. Specified by UPnP vendor. Single URL.
-     *
-     * @return controlURL
      */
     val controlUrl: String
 
     /**
-     * eventSubURLを返す。
+     * The value of eventSubURL.
      *
      * Required. URL for eventing (see clause 4, "Eventing"). shall be relative to the URL at which the device
      * description is located in accordance with clause 5 of RFC 3986. shall be unique within the device;
      * any two services shall not have the same URL for eventing. If the service has no evented variables,
      * this element shall be present but shall be empty (i.e., &lt;eventSubURL\&gt;&lt;/eventSubURL&gt;.)
      * Specified by UPnP vendor. Single URL.
-     *
-     * @return eventSubURL
      */
     val eventSubUrl: String
 
     /**
-     * ServiceDescriptionのXMLを返す。
-     *
-     * @return ServiceDescription
+     * XML String of ServiceDescription
      */
     val description: String
 
     /**
-     * このサービスが保持する全Actionのリストを返す。
+     * List of all Actions held by this service.
      *
-     * リストは変更不可。
+     * This list is unmodifiable.
      *
-     * @return 全Actionのリスト
+     * @return List of all Actions
      */
     val actionList: List<Action>
 
     /**
-     * 全StateVariableのリストを返す。
+     * List of all StateVariable held by this service.
      *
-     * @return 全StateVariableのリスト
+     * This list is unmodifiable.
+     *
+     * @return List of all StateVariable
      */
     val stateVariableList: List<StateVariable>
 
     /**
-     * SID(SubscriptionID)を返す。
-     *
-     * @return SubscriptionID
+     * SID (SubscriptionID)
      */
     val subscriptionId: String?
 
     /**
-     * 名前から該当するActionを探す。
+     * Find the Action by name.
      *
-     * 見つからない場合はnullが返る。
+     * null If it can not be found.
      *
-     * @param name Action名
-     * @return 該当するAction、見つからない場合null
+     * @param name name of Action
+     * @return Action, null If it can not be found.
      */
     fun findAction(name: String): Action?
 
     /**
-     * 名前から該当するStateVariableを探す。
+     * Find the StateVariable by name.
      *
-     * 見つからない場合はnullが返る。
+     * null If it can not be found.
      *
-     * @param name StateVariable名
-     * @return 該当するStateVariable、見つからない場合null
+     * @param name name of StateVariable
+     * @return StateVariable, null If it can not be found.
      */
     fun findStateVariable(name: String?): StateVariable?
 
     /**
-     * Subscribeの同期実行
+     * Invoke subscribe synchronously.
      *
-     * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
-     * @return 成功時true
+     * @param keepRenew true: renew will be performed periodically before Expire.
+     * @return true: success, false: otherwise
      */
     fun subscribeSync(keepRenew: Boolean = false): Boolean
 
     /**
-     * RenewSubscribeを同期実行する
+     * Invoke renew subscribe synchronously.
      *
-     * @return 成功時true
+     * @return true: success, false: otherwise
      */
     fun renewSubscribeSync(): Boolean
 
     /**
-     * Unsubscribeを同期実行する
+     * Invoke unsubscribe synchronously.
      *
-     * @return 成功時true
+     * @return true: success, false: otherwise
      */
     fun unsubscribeSync(): Boolean
 
     /**
-     * Subscribeの非同期実行
+     * Invoke subscribe asynchronously.
      *
-     * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
-     * @param callback  結果を通知するコールバック。callbackスレッドで実行される。
+     * @param keepRenew true: renew will be performed periodically before Expire.
+     * @param callback  Callback to notify the result. Executed in callback thread.
      * @see ControlPointFactory.create
      */
     fun subscribe(keepRenew: Boolean = false, callback: ((Boolean) -> Unit)? = null)
 
     /**
-     * RenewSubscribeを非同期実行する
+     * Invoke renew subscribe asynchronously.
      *
-     * @param callback  結果を通知するコールバック。callbackスレッドで実行される。
+     * @param callback Callback to notify the result. Executed in callback thread.
      * @see ControlPointFactory.create
      */
     fun renewSubscribe(callback: ((Boolean) -> Unit)? = null)
 
     /**
-     * Unsubscribeを非同期実行する
+     * Invoke unsubscribe asynchronously.
      *
-     * @param callback  結果を通知するコールバック。callbackスレッドで実行される。
+     * @param callback Callback to notify the result. Executed in callback thread.
      * @see ControlPointFactory.create
      */
     fun unsubscribe(callback: ((Boolean) -> Unit)? = null)
 
     /**
-     * Subscribeの非同期実行
+     * Invoke subscribe asynchronously.
      *
-     * @param keepRenew trueを指定すると成功後、Expire前に定期的にrenewを行う。
+     * @param keepRenew true: renew will be performed periodically before Expire.
      * @see ControlPointFactory.create
      */
     suspend fun subscribeAsync(keepRenew: Boolean = false): Boolean
 
     /**
-     * RenewSubscribeを非同期実行する
+     * Invoke renew subscribe asynchronously.
      *
      * @see ControlPointFactory.create
      */
     suspend fun renewSubscribeAsync(): Boolean
 
     /**
-     * Unsubscribeを非同期実行する
+     * Invoke unsubscribe asynchronously.
      *
      * @see ControlPointFactory.create
      */

@@ -10,43 +10,43 @@ package net.mm2d.upnp
 import net.mm2d.upnp.empty.*
 
 /**
- * EmptyObjectを提供する。
+ * Provide EmptyObject.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 object ControlPoints {
     /**
-     * ControlPointのEmpty実装を返す。
+     * Returns the ControlPoint's Empty Object.
      *
-     * @return ControlPointのEmpty実装
+     * @return ControlPoint's Empty Object
      */
     fun emptyControlPoint(): ControlPoint = EmptyControlPoint
 
     /**
-     * DeviceのEmpty実装を返す。
+     * Returns the Device's Empty Object.
      *
-     * @return DeviceのEmpty実装
+     * @return Device's Empty Object
      */
     fun emptyDevice(): Device = EmptyDevice
 
     /**
-     * ServiceのEmpty実装を返す。
+     * Returns the Service's Empty Object.
      *
-     * @return ServiceのEmpty実装
+     * @return Service's Empty Object
      */
     fun emptyService(): Service = EmptyService
 
     /**
-     * ActionのEmpty実装を返す。
+     * Returns the Action's Empty Object.
      *
-     * @return ActionのEmpty実装
+     * @return Action's Empty Object
      */
     fun emptyAction(): Action = EmptyAction
 
     /**
-     * SsdpMessageのEmpty実装を返す。
+     * Returns the SsdpMessage's Empty Object.
      *
-     * @return SsdpMessageのEmpty実装
+     * @return SsdpMessage's Empty Object
      */
     fun emptySsdpMessage(): SsdpMessage = EmptySsdpMessage
 }
