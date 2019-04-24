@@ -22,25 +22,25 @@ import java.util.*
 import javax.xml.parsers.ParserConfigurationException
 
 /**
- * デバイスをパースする。
+ * Parser for Device.
  *
- * Description XMLのダウンロード、パース、Builderへの値の設定をstatic methodで定義。
+ * Download Description XML, parse it, set value to builder.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal object DeviceParser {
     /**
-     * DeviceDescriptionを読み込む。
+     * load DeviceDescription.
      *
-     * Descriptionのパースを行い、Builderに登録する。
-     * また、内部で記述されているicon/serviceのDescriptionの取得、パースも行い、
-     * それぞれのBuilderも作成する。
+     * Parse the Description and register it with the Builder.
+     * In addition, download Icon / description of Service described internally, parses it,
+     * and creates each Builder.
      *
-     * @param client  通信に使用するHttpClient
+     * @param client  HttpClient
      * @param builder DeviceのBuilder
-     * @throws IOException                  通信上での何らかの問題
-     * @throws SAXException                 XMLのパースに失敗
-     * @throws ParserConfigurationException XMLパーサが利用できない場合
+     * @throws SAXException                 if an parse error occurs.
+     * @throws IOException                  if an I/O error occurs.
+     * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
     fun loadDescription(client: HttpClient, builder: DeviceImpl.Builder) {

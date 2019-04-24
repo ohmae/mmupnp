@@ -21,24 +21,24 @@ import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 
 /**
- * Serviceのパース処理。
+ * Parser for Service.
  *
- * Description XMLのダウンロード、パース、Builderへの値の設定をstatic methodで定義。
+ * Download Description XML, parse it, set value to builder.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal object ServiceParser {
     /**
-     * SCPDURLからDescriptionを取得し、パースする。
+     * Download Description from SCPDURL and parse it.
      *
-     * 可能であればKeepAliveを行う。
+     * KeepAlive, if possible.
      *
-     * @param client        通信に使用するHttpClient
+     * @param client        HttpClient
      * @param deviceBuilder DeviceのBuilder
      * @param builder       ServiceのBuilder
-     * @throws IOException                  通信エラー
-     * @throws SAXException                 XMLパースエラー
-     * @throws ParserConfigurationException 実装が使用できないかインスタンス化できない
+     * @throws SAXException                 if an parse error occurs.
+     * @throws IOException                  if an I/O error occurs.
+     * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
     fun loadDescription(client: HttpClient, deviceBuilder: DeviceImpl.Builder, builder: ServiceImpl.Builder) {
