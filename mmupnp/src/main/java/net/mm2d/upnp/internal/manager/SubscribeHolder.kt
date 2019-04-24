@@ -16,10 +16,10 @@ import kotlin.concurrent.withLock
 import kotlin.math.max
 
 /**
- * Subscribe状態となったServiceを管理するクラス。
+ * Class to manage the Service that became subscribed state.
  *
- * 指定すればSubscribeの期限が切れないように定期的にrenewを実行する。
- * また、期限が切れたサービスは削除される。
+ * If specified, renew will be executed periodically so that the Subscription will not expire.
+ * Also, expired services are deleted.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -32,20 +32,12 @@ internal class SubscribeHolder(
     private val condition = lock.newCondition()
     private val subscriptionMap = mutableMapOf<String, SubscribeService>()
 
-    /**
-     * 保持している[Service]すべてを含むListを返す。
-     *
-     * @return [Service]リスト
-     */
     fun getServiceList(): List<Service> {
         lock.withLock {
             return subscriptionMap.values.map { it.getService() }
         }
     }
 
-    /**
-     * スレッドを開始する。
-     */
     fun start() {
         threadLock.withLock {
             FutureTask(this, null).also {
@@ -55,9 +47,6 @@ internal class SubscribeHolder(
         }
     }
 
-    /**
-     * スレッドの停止を要求する。
-     */
     fun stop() {
         threadLock.withLock {
             futureTask?.cancel(false)
@@ -69,12 +58,6 @@ internal class SubscribeHolder(
         return futureTask?.isCancelled ?: true
     }
 
-    /**
-     * Subscribeを開始した[Service]を登録する。
-     *
-     * @param service   登録する[Service]
-     * @param keepRenew 期限が切れる前にrenewSubscribeを続ける場合true
-     */
     fun add(service: Service, timeout: Long, keepRenew: Boolean) {
         lock.withLock {
             val id = service.subscriptionId
@@ -101,11 +84,6 @@ internal class SubscribeHolder(
         }
     }
 
-    /**
-     * 指定したサービスを削除する。
-     *
-     * @param service 削除するサービス
-     */
     fun remove(service: Service) {
         lock.withLock {
             subscriptionMap.remove(service.subscriptionId)?.let {
@@ -114,21 +92,12 @@ internal class SubscribeHolder(
         }
     }
 
-    /**
-     * Subscription IDに該当するServiceを返す。
-     *
-     * @param subscriptionId Subscription ID
-     * @return 該当するService
-     */
     fun getService(subscriptionId: String): Service? {
         lock.withLock {
             return subscriptionMap[subscriptionId]?.getService()
         }
     }
 
-    /**
-     * 保持しているServiceをすべて削除する。
-     */
     fun clear() {
         lock.withLock {
             subscriptionMap.clear()
@@ -150,13 +119,14 @@ internal class SubscribeHolder(
     }
 
     /**
-     * ServiceListに何らかのエントリーが追加されるまで待機する。
+     * Wait until some entry is added to ServiceList.
      *
-     * 戻り値としてrenewのトリガをかけるServiceのコレクションを返す。
-     * renew処理は排他を行わず実行するため、排他する必要が無いように、他に影響のないコピーを返す。
+     * Returns a collection of Service that triggers renew as return value.
+     * Since the renew process is executed without exclusion,
+     * it returns a copy which has no other effect so that there is no need for exclusion.
      *
-     * @return renewのトリガをかけるServiceのコレクション
-     * @throws InterruptedException 割り込みが発生した
+     * @return collection of Service that triggers renew
+     * @throws InterruptedException An interrupt occurred
      */
     @Throws(InterruptedException::class)
     private fun waitEntry(): Collection<SubscribeService> {
@@ -170,12 +140,12 @@ internal class SubscribeHolder(
     }
 
     /**
-     * 引数の[Service]郡に対し、renewのトリガをかける。
+     * Trigger renew on the argument [Service].
      *
-     * この処理はネットワーク通信を含むため全体を排他しない。
-     * その為引数となるリストは他からアクセスされないコレクションとする。
+     * This process does not exclude the whole because it includes network communication.
+     * Therefore, the argument list is a collection that is not accessed by others.
      *
-     * @param serviceList renewのトリガをかける[Service]のコレクション
+     * @param serviceList [Service] collection
      */
     private fun renewSubscribe(serviceList: Collection<SubscribeService>) {
         serviceList.forEach {
@@ -186,7 +156,7 @@ internal class SubscribeHolder(
     }
 
     /**
-     * 期限切れの[Service]を削除する。
+     * Remove expired [Service].
      */
     private fun removeExpiredService() {
         lock.withLock {
@@ -203,9 +173,9 @@ internal class SubscribeHolder(
     }
 
     /**
-     * 直近のRenew実行時間まで待機する。
+     * Wait until the latest Renew execution time.
      *
-     * @throws InterruptedException 割り込みが発生した
+     * @throws InterruptedException An interrupt occurred
      */
     @Throws(InterruptedException::class)
     private fun waitNextRenewTime() {
@@ -220,9 +190,9 @@ internal class SubscribeHolder(
     }
 
     /**
-     * スキャンすべき時刻の内最も小さな時刻を返す。
+     * Returns the closest one of the times to scan.
      *
-     * @return 直近のスキャン時刻
+     * @return Next time to scan
      */
     private fun findMostRecentTime(): Long {
         return subscriptionMap.values.minBy { it.getNextScanTime() }

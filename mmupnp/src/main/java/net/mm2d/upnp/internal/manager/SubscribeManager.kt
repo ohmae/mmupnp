@@ -24,12 +24,6 @@ internal class SubscribeManager(
         taskExecutors, this::onEventReceived
     )
 
-    /**
-     * イベント通知を受け取るポートを返す。
-     *
-     * @return イベント通知受信用ポート番号
-     * @see EventReceiver
-     */
     fun getEventPort(): Int = eventReceiver.getLocalPort()
 
     fun onEventReceived(sid: String, seq: Long, properties: List<Pair<String, String>>): Boolean {
@@ -77,30 +71,10 @@ internal class SubscribeManager(
         subscribeHolder.stop()
     }
 
-    /**
-     * SubscriptionIDに合致する[Service]を返す。
-     *
-     * 合致するServiceがない場合null
-     *
-     * @param subscriptionId SubscriptionID
-     * @return 該当Service
-     * @see Service
-     */
     fun getSubscribeService(subscriptionId: String): Service? {
         return subscribeHolder.getService(subscriptionId)
     }
 
-    /**
-     * SubscriptionIDが確定した[Service]を購読リストに登録する
-     *
-     * [Service]のsubscribeが実行された後に[Service]からコールされる。
-     *
-     * @param service 登録するService
-     * @param timeout タイムアウトするまでの時間
-     * @param keep    keep-aliveを行う場合true
-     * @see Service
-     * @see Service.subscribeSync
-     */
     fun register(service: Service, timeout: Long, keep: Boolean) {
         subscribeHolder.add(service, timeout, keep)
     }
@@ -113,13 +87,6 @@ internal class SubscribeManager(
         subscribeHolder.setKeepRenew(service, keep)
     }
 
-    /**
-     * 指定SubscriptionIDのサービスを購読リストから削除する。
-     *
-     * @param service 削除する[Service]
-     * @see Service
-     * @see Service.unsubscribeSync
-     */
     fun unregister(service: Service) {
         subscribeHolder.remove(service)
     }

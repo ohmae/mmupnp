@@ -16,13 +16,14 @@ import kotlin.concurrent.withLock
 import kotlin.math.max
 
 /**
- * [net.mm2d.upnp.ControlPoint]で発見した[Device]を保持するクラス。
+ * A class holding [Device] found in [net.mm2d.upnp.ControlPoint].
  *
- * Deviceの有効期限を確認し、有効期限が切れたDeviceをLostとして通知する。
+ * Check the expiration date of Device, and notify the expired Device as Lost.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  *
- * @param expireListener 期限切れの通知を受け取るリスナー
+ * @constructor initialize
+ * @param expireListener Listener to receive expired notifications
  */
 internal class DeviceHolder(
     private val taskExecutors: TaskExecutors,
@@ -34,28 +35,15 @@ internal class DeviceHolder(
     private val condition = lock.newCondition()
     private val deviceMap = mutableMapOf<String, Device>()
 
-    /**
-     * 現在保持している[Device]の順序を保持したリストを作成して返す。
-     *
-     * @return [Device]のリスト
-     */
     val deviceList: List<Device>
         get() = lock.withLock {
             return deviceMap.values.toList()
         }
-    /**
-     * 保持している[Device]の数を返す。
-     *
-     * @return [Device]の数
-     */
     val size: Int
         get() = lock.withLock {
             return deviceMap.size
         }
 
-    /**
-     * スレッドを開始する。
-     */
     fun start() {
         threadLock.withLock {
             FutureTask(this, null).also {
@@ -65,9 +53,6 @@ internal class DeviceHolder(
         }
     }
 
-    /**
-     * スレッドに割り込みをかけ終了させる。
-     */
     fun stop() {
         threadLock.withLock {
             futureTask?.cancel(false)
@@ -79,11 +64,6 @@ internal class DeviceHolder(
         return futureTask?.isCancelled ?: true
     }
 
-    /**
-     * [Device]追加。
-     *
-     * @param device 追加される[Device]
-     */
     fun add(device: Device) {
         lock.withLock {
             deviceMap[device.udn] = device
@@ -97,33 +77,18 @@ internal class DeviceHolder(
         }
     }
 
-    /**
-     * [Device]削除。
-     *
-     * @param device 削除される[Device]
-     * @return 削除された[Device]
-     */
     fun remove(device: Device): Device? {
         lock.withLock {
             return deviceMap.remove(device.udn)
         }
     }
 
-    /**
-     * [Device]削除。
-     *
-     * @param udn 削除される[Device]のudn。
-     * @return 削除された[Device]
-     */
     fun remove(udn: String): Device? {
         lock.withLock {
             return deviceMap.remove(udn)
         }
     }
 
-    /**
-     * 登録された[Device]をクリア。
-     */
     fun clear() {
         lock.withLock {
             deviceMap.clear()
@@ -167,7 +132,7 @@ internal class DeviceHolder(
         val sleep = max(
             findMostRecentExpireTime() - System.currentTimeMillis() + MARGIN_TIME,
             MARGIN_TIME
-        ) // 負の値となる可能性を排除
+        ) // avoid negative value
         condition.await(sleep, TimeUnit.MILLISECONDS)
     }
 

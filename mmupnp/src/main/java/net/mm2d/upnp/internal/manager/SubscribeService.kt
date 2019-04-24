@@ -11,12 +11,14 @@ import net.mm2d.upnp.Service
 import java.util.concurrent.TimeUnit
 
 /**
- * [Service]のSubscribe状態を管理するクラス。
+ * Class that manages Subscribe status of [Service].
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
+ *
+ * @constructor initialize
  * @param service             [Service]
- * @param subscriptionTimeout タイムアウトするまでの時間
- * @param keepRenew           定期的にrenewを実行する場合true
+ * @param subscriptionTimeout Time to time out
+ * @param keepRenew           true: periodically execute renew
  */
 internal class SubscribeService(
     private val service: Service,
@@ -32,21 +34,21 @@ internal class SubscribeService(
     }
 
     /**
-     * リトライ回数の上限を超えて失敗した状態かを返す。
+     * Returns whether the status has exceeded the upper limit of the number of retries.
      *
-     * @return リトライ回数の上限をこえている場合true
+     * @return true: failed, false: otherwise
      */
     fun isFailed(): Boolean {
         return failCount >= RETRY_COUNT
     }
 
     /**
-     * 次にスキャンする時刻を返す。
+     * Returns the next scan time.
      *
-     * keep指定している場合は次にRenewを実行する時刻、
-     * そうでない場合は、Expireする時刻
+     * The time to execute Renew next if keep is specified,
+     * otherwise the time to expire
      *
-     * @return スキャンする時刻
+     * @return The next scan time
      */
     fun getNextScanTime(): Long {
         return if (!keepRenew) subscriptionExpiryTime else calculateRenewTime()
@@ -63,16 +65,16 @@ internal class SubscribeService(
     }
 
     /**
-     * Renewを実行する時間(UTC(ms))を計算して返す。
+     * Calculate and return the time to execute Renew (UTC(ms)).
      *
-     * Subscribeのtimeoutの半分の時間を基準に実行、
-     * 実行に失敗した場合はtimeoutの時間を基準に実行し、
-     * 1回までの通信失敗は許容する。
+     * Execute on the basis of Halftime of Subscribe's timeout.
+     * If execution is unsuccessful, execute on the basis of Timeout's time.
+     * Allow up to one communication failure.
      *
-     * また、基準時間から一定時間引いた時間に実行することで
-     * デバイスごとに時間が多少ずれていても動作できるようにする。
+     * Also, by executing slightly before the reference time,
+     * it is possible to operate even if the time is slightly offset for each device.
      *
-     * @return Renewを行う時間
+     * @return Time to do Renew
      */
     fun calculateRenewTime(): Long {
         var interval = subscriptionTimeout * (failCount + 1) / RETRY_COUNT
@@ -85,20 +87,20 @@ internal class SubscribeService(
     }
 
     /**
-     * 有効期限が切れているかを確認する
+     * Return whether it is expired.
      *
-     * @param now 現在時刻
-     * @return 有効期限切れの場合true
+     * @param now Current time
+     * @return true: expired, false: otherwise
      */
     fun isExpired(now: Long): Boolean {
         return subscriptionExpiryTime < now
     }
 
     /**
-     * 条件であればSubscribeを実行する。
+     * Execute renewSubscribe if there is a condition.
      *
-     * @param now 現在時刻
-     * @return 実行に失敗した場合false
+     * @param now Current time
+     * @return false: failed, true: otherwise
      */
     fun renewSubscribe(now: Long): Boolean {
         if (!keepRenew || calculateRenewTime() > now) {
