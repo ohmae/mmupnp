@@ -8,11 +8,10 @@
 package net.mm2d.upnp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.spyk
+import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.*
+import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.XmlUtils
 import org.junit.Before
 import org.junit.Test
@@ -39,6 +38,7 @@ class ActionInvokeTest {
         val service: ServiceImpl = mockk(relaxed = true)
         every { service.serviceType } returns SERVICE_TYPE
         every { service.controlUrl } returns ""
+        every { service.device.controlPoint.taskExecutors } returns TaskExecutors()
         action = spyk(
             ActionImpl.Builder()
                 .setService(service)
@@ -100,7 +100,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_postでIOExceptionが発生() {
+    fun invokeSync_postでIOExceptionが発生() {
         val client: HttpClient = mockk(relaxed = true)
         every { client.post(any()) } throws IOException()
         every { action.createHttpClient() } returns client
@@ -108,7 +108,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_リクエストヘッダの確認() {
+    fun invokeSync_リクエストヘッダの確認() {
         val slot = slot<HttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         action.invokeSync(emptyMap())
@@ -135,7 +135,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_リクエストSOAPフォーマットの確認() {
+    fun invokeSync_リクエストSOAPフォーマットの確認() {
         val slot = slot<HttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         action.invokeSync(emptyMap())
@@ -159,7 +159,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_リクエストSOAPの引数確認_指定なしでの実行() {
+    fun invokeSync_リクエストSOAPの引数確認_指定なしでの実行() {
         val slot = slot<HttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         action.invokeSync(emptyMap())
@@ -180,7 +180,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_リクエストSOAPの引数確認_指定ありでの実行() {
+    fun invokeSync_リクエストSOAPの引数確認_指定ありでの実行() {
         val value1 = "value1"
         val value2 = "value2"
         val slot = slot<HttpRequest>()
@@ -207,7 +207,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_リクエストSOAPの引数確認_カスタム引数指定NSなし() {
+    fun invokeSync_リクエストSOAPの引数確認_カスタム引数指定NSなし() {
         val value1 = "value1"
         val value2 = "value2"
         val name = "name"
@@ -239,7 +239,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_リクエストSOAPの引数確認_カスタム引数指定NSあり() {
+    fun invokeSync_リクエストSOAPの引数確認_カスタム引数指定NSあり() {
         val value1 = "value1"
         val value2 = "value2"
         val prefix = "custom"
@@ -278,7 +278,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_200以外のレスポンスでIOExceptionが発生() {
+    fun invokeSync_200以外のレスポンスでIOExceptionが発生() {
         var statusCount = 0
         var exceptionCount = 0
         for (status in Http.Status.values()) {
@@ -300,7 +300,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_BodyタグがないとIOExceptionが発生() {
+    fun invokeSync_BodyタグがないとIOExceptionが発生() {
         httpResponse.setBody(
             "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
                     + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
@@ -312,7 +312,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_ActionタグがないとIOExceptionが発生() {
+    fun invokeSync_ActionタグがないとIOExceptionが発生() {
         httpResponse.setBody(
             "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
                     + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
@@ -326,14 +326,14 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_実行結果をパースしMapとして戻ること() {
+    fun invokeSync_実行結果をパースしMapとして戻ること() {
         every { mockHttpClient.post(any()) } returns httpResponse
         val result = action.invokeSync(emptyMap())
         assertThat(result[OUT_ARG_NAME1]).isEqualTo(OUT_ARG_VALUE1)
     }
 
     @Test
-    fun invoke_argumentListにない結果が含まれていても結果に含まれる() {
+    fun invokeSync_argumentListにない結果が含まれていても結果に含まれる() {
         httpResponse.setBody(
             "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
                     + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
@@ -352,7 +352,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_エラーレスポンスのときIOExceptionが発生() {
+    fun invokeSync_エラーレスポンスのときIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(ERROR_RESPONSE)
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -360,7 +360,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_エラーレスポンスにerrorCodeがないとIOExceptionが発生() {
+    fun invokeSync_エラーレスポンスにerrorCodeがないとIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(
             "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -383,7 +383,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_エラーレスポンスにUPnPErrorがないとIOExceptionが発生() {
+    fun invokeSync_エラーレスポンスにUPnPErrorがないとIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(
             "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -403,7 +403,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_エラーレスポンスにBodyがないとIOExceptionが発生() {
+    fun invokeSync_エラーレスポンスにBodyがないとIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(
             "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -415,7 +415,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_エラーレスポンスにFaultがないとIOExceptionが発生() {
+    fun invokeSync_エラーレスポンスにFaultがないとIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(
             "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -429,7 +429,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_エラーレスポンスもパースできる() {
+    fun invokeSync_エラーレスポンスもパースできる() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(ERROR_RESPONSE)
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -441,7 +441,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_エラーレスポンスのときIOExceptionが発生2() {
+    fun invokeSync_エラーレスポンスのときIOExceptionが発生2() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(ERROR_RESPONSE)
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -449,7 +449,7 @@ class ActionInvokeTest {
     }
 
     @Test
-    fun invoke_エラーレスポンスもパースできる2() {
+    fun invokeSync_エラーレスポンスもパースできる2() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(ERROR_RESPONSE)
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -461,7 +461,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_ステータスコードがOKで中身が空のときIOExceptionが発生() {
+    fun invokeSync_ステータスコードがOKで中身が空のときIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_OK)
         httpResponse.setBody("")
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -469,7 +469,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_ステータスコードがエラーで中身が空のときIOExceptionが発生() {
+    fun invokeSync_ステータスコードがエラーで中身が空のときIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody("")
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -477,7 +477,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_ステータスコードがその他で中身が空のときIOExceptionが発生() {
+    fun invokeSync_ステータスコードがその他で中身が空のときIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_NOT_FOUND)
         httpResponse.setBody("")
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -485,7 +485,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_ステータスコードがOKで中身がxmlとして異常のときIOExceptionが発生() {
+    fun invokeSync_ステータスコードがOKで中身がxmlとして異常のときIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_OK)
         httpResponse.setBody("<>")
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -493,7 +493,7 @@ class ActionInvokeTest {
     }
 
     @Test(expected = IOException::class)
-    fun invoke_ステータスコードがエラーで中身がxmlとして異常のときIOExceptionが発生() {
+    fun invokeSync_ステータスコードがエラーで中身がxmlとして異常のときIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody("<>")
         every { mockHttpClient.post(any()) } returns httpResponse
@@ -504,6 +504,110 @@ class ActionInvokeTest {
     fun makeSoap_xml作成でExceptionが発生したらIOException() {
         every { action.formatXmlString(any()) } throws TransformerException("")
         action.makeSoap(emptyMap(), emptyList())
+    }
+
+    @Test
+    fun invoke_success() {
+        every { action.invokeSync(any(), any()) } returns emptyMap()
+        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
+        val onError: (IOException) -> Unit = mockk(relaxed = true)
+        action.invoke(emptyMap(), true, onResult, onError)
+        Thread.sleep(100)
+        verify(exactly = 1) { onResult.invoke(any()) }
+        verify(inverse = true) { onError.invoke(any()) }
+    }
+
+    @Test
+    fun invoke_exception() {
+        every { action.invokeSync(any(), any()) } throws IOException()
+        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
+        val onError: (IOException) -> Unit = mockk(relaxed = true)
+        action.invoke(emptyMap(), true, onResult, onError)
+        Thread.sleep(100)
+        verify(inverse = true) { onResult.invoke(any()) }
+        verify(exactly = 1) { onError.invoke(any()) }
+    }
+
+    @Test
+    fun invoke_no_callback_success() {
+        every { action.invokeSync(any(), any()) } returns emptyMap()
+        action.invoke(emptyMap())
+        Thread.sleep(100)
+    }
+
+    @Test
+    fun invoke_no_callback_exception() {
+        every { action.invokeSync(any(), any()) } throws IOException()
+        action.invoke(emptyMap())
+        Thread.sleep(100)
+    }
+
+    @Test
+    fun invokeCustom_success() {
+        every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
+        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
+        val onError: (IOException) -> Unit = mockk(relaxed = true)
+        action.invokeCustom(emptyMap(), emptyMap(), emptyMap(), true, onResult, onError)
+        Thread.sleep(100)
+        verify(exactly = 1) { onResult.invoke(any()) }
+        verify(inverse = true) { onError.invoke(any()) }
+    }
+
+    @Test
+    fun invokeCustom_exception() {
+        every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
+        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
+        val onError: (IOException) -> Unit = mockk(relaxed = true)
+        action.invokeCustom(emptyMap(), emptyMap(), emptyMap(), true, onResult, onError)
+        Thread.sleep(100)
+        verify(inverse = true) { onResult.invoke(any()) }
+        verify(exactly = 1) { onError.invoke(any()) }
+    }
+
+    @Test
+    fun invokeCustom_no_callback_success() {
+        every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
+        action.invokeCustom(emptyMap())
+        Thread.sleep(100)
+    }
+
+    @Test
+    fun invokeCustom_no_callback_exception() {
+        every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
+        action.invokeCustom(emptyMap())
+        Thread.sleep(100)
+    }
+
+    @Test
+    fun invokeAsync_success() {
+        every { action.invokeSync(any(), any()) } returns emptyMap()
+        runBlocking {
+            assertThat(action.invokeAsync(emptyMap())).isNotNull()
+        }
+    }
+
+    @Test(expected = IOException::class)
+    fun invokeAsync_exception() {
+        every { action.invokeSync(any(), any()) } throws IOException()
+        runBlocking {
+            action.invokeAsync(emptyMap())
+        }
+    }
+
+    @Test
+    fun invokeCustomAsync_success() {
+        every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
+        runBlocking {
+            assertThat(action.invokeCustomAsync(emptyMap())).isNotNull()
+        }
+    }
+
+    @Test(expected = IOException::class)
+    fun invokeCustomAsync_exception() {
+        every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
+        runBlocking {
+            action.invokeCustomAsync(emptyMap())
+        }
     }
 
     companion object {
