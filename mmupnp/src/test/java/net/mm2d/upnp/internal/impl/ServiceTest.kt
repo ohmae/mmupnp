@@ -1000,6 +1000,27 @@ class ServiceTest {
         }
 
         @Test
+        fun subscribe_no_callback() {
+            every { service.subscribeSync(any()) } returns true
+            service.subscribe()
+            Thread.sleep(100)
+        }
+
+        @Test
+        fun renewSubscribe_no_callback() {
+            every { service.renewSubscribeSync() } returns true
+            service.renewSubscribe()
+            Thread.sleep(100)
+        }
+
+        @Test
+        fun unsubscribe_no_callback() {
+            every { service.unsubscribeSync() } returns true
+            service.unsubscribe()
+            Thread.sleep(100)
+        }
+
+        @Test
         fun subscribeAsync() {
             every { service.subscribeSync(any()) } returns true
             runBlocking {
