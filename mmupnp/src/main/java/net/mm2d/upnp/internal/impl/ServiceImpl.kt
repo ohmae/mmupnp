@@ -333,7 +333,7 @@ internal class ServiceImpl(
         private val stateVariables = mutableListOf<StateVariable>()
 
         @Throws(IllegalStateException::class)
-        fun build(): Service {
+        fun build(): ServiceImpl {
             val device = device
                 ?: throw IllegalStateException("device must be set.")
             val subscribeManager = subscribeManager

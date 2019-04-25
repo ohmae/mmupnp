@@ -13,7 +13,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
-import net.mm2d.upnp.Service
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
@@ -48,7 +47,7 @@ class DeviceBuilderTest {
         val presentationUrl = "presentationUrl"
         val urlBase = "urlBase"
         val icon: Icon = mockk(relaxed = true)
-        val service: Service = mockk(relaxed = true)
+        val service: ServiceImpl = mockk(relaxed = true)
         val serviceBuilder: ServiceImpl.Builder = mockk(relaxed = true)
         every { serviceBuilder.setDevice(any()) } returns serviceBuilder
         every { serviceBuilder.setSubscribeManager(any()) } returns serviceBuilder

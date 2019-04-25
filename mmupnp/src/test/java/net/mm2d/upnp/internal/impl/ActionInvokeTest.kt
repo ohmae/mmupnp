@@ -81,7 +81,7 @@ class ActionInvokeTest {
                         )
                 )
                 .build()
-        ) as ActionImpl
+        )
         every { action.makeAbsoluteControlUrl() } returns url
         mockHttpClient = spyk(HttpClient())
         httpResponse = HttpResponse.create()

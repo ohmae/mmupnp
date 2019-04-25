@@ -41,7 +41,7 @@ internal class IconImpl(
         private var url: String? = null
 
         @Throws(IllegalStateException::class)
-        fun build(): Icon {
+        fun build(): IconImpl {
             val mimeType = mimeType
                 ?: throw IllegalStateException("mimetype must be set.")
             if (width <= 0)

@@ -226,6 +226,7 @@ internal class ActionImpl(
         }
     }
 
+    // VisibleForTesting
     @Throws(MalformedURLException::class)
     fun makeAbsoluteControlUrl(): URL {
         val device = service.device
@@ -450,7 +451,7 @@ internal class ActionImpl(
         private val argumentList: MutableList<ArgumentImpl.Builder> = mutableListOf()
 
         @Throws(IllegalStateException::class)
-        fun build(): Action {
+        fun build(): ActionImpl {
             val service = service
                 ?: throw IllegalStateException("service must be set.")
             val name = name

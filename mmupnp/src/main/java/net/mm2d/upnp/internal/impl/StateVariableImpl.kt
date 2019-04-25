@@ -36,7 +36,7 @@ internal class StateVariableImpl(
         private var maximum: String? = null
         private var step: String? = null
 
-        fun build(): StateVariable {
+        fun build(): StateVariableImpl {
             val name = name
                 ?: throw IllegalStateException("name must be set.")
             val dataType = dataType

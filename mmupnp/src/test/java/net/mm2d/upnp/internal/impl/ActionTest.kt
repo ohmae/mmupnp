@@ -8,7 +8,9 @@
 package net.mm2d.upnp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import net.mm2d.upnp.StateVariable
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -128,8 +130,29 @@ class ActionTest {
         val action = ActionImpl.Builder()
             .setService(service)
             .setName(name)
-            .build() as ActionImpl
+            .build()
         val client = action.createHttpClient()
         assertThat(client.isKeepAlive).isEqualTo(false)
+    }
+
+    @Test
+    fun makeAbsoluteControlUrl() {
+        val device: DeviceImpl = mockk(relaxed = true)
+        val service: ServiceImpl = mockk(relaxed = true)
+        every { service.device } returns device
+        val action = spyk(
+            ActionImpl.Builder()
+                .setService(service)
+                .setName("name")
+                .build()
+        )
+        every { device.baseUrl } returns "http://10.0.0.1:1000/"
+        every { device.scopeId } returns 0
+        every { service.controlUrl } returns "/control"
+        assertThat(
+            action.makeAbsoluteControlUrl().toString()
+        ).isEqualTo(
+            "http://10.0.0.1:1000/control"
+        )
     }
 }
