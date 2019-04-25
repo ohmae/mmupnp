@@ -9,6 +9,7 @@ package net.mm2d.upnp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.*
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.SsdpRequest
@@ -996,6 +997,30 @@ class ServiceTest {
             service.unsubscribe(callback)
             Thread.sleep(100)
             verify { callback(true) }
+        }
+
+        @Test
+        fun subscribeAsync() {
+            every { service.subscribeSync(any()) } returns true
+            runBlocking {
+                assertThat(service.subscribeAsync()).isTrue()
+            }
+        }
+
+        @Test
+        fun renewSubscribeAsync() {
+            every { service.renewSubscribeSync() } returns true
+            runBlocking {
+                assertThat(service.renewSubscribeAsync()).isTrue()
+            }
+        }
+
+        @Test
+        fun unsubscribeAsync() {
+            every { service.unsubscribeSync() } returns true
+            runBlocking {
+                assertThat(service.unsubscribeAsync()).isTrue()
+            }
         }
     }
 }
