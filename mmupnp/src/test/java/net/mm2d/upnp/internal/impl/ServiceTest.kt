@@ -216,7 +216,7 @@ class ServiceTest {
             every { message.localAddress } returns InetAddress.getByName("192.168.0.1")
             every { manager.getEventPort() } returns 80
 
-            assertThat((service as ServiceImpl).callback).isEqualTo("<http://192.168.0.1/>")
+            assertThat(service.callback).isEqualTo("<http://192.168.0.1/>")
 
             every { manager.getEventPort() } returns 8080
 
@@ -432,7 +432,7 @@ class ServiceTest {
                 .setDescription("description")
                 .build()
 
-            val client = (service as ServiceImpl).createHttpClient()
+            val client = service.createHttpClient()
             assertThat(client.isKeepAlive).isFalse()
         }
 
@@ -766,7 +766,7 @@ class ServiceTest {
                     .setEventSubUrl("eventSubUrl")
                     .setDescription("description")
                     .build()
-            ) as ServiceImpl
+            )
             every { service.makeAbsoluteUrl(any()) } returns URL("http://192.0.2.2/")
             every { service.callback } returns ""
             httpClient = mockk(relaxed = true)
