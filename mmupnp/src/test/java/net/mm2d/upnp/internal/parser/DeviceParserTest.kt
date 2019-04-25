@@ -86,7 +86,7 @@ class DeviceParserTest {
         fun loadDescription_想定外のタグは無視する() {
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
-            } returns TestUtils.getResourceAsString("device-with-gabage.xml")
+            } returns TestUtils.getResourceAsString("device-with-garbage.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
