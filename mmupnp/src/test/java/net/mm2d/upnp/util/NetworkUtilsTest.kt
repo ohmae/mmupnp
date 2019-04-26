@@ -28,7 +28,7 @@ class NetworkUtilsTest {
     class NetworkInterfaceをデバイスから取得 {
         @Test
         fun availableInterfaces() {
-            NetworkUtils.availableInterfaces.forEach {
+            NetworkUtils.getAvailableInterfaces().forEach {
                 assertThat(it.isLoopback).isFalse()
                 assertThat(it.isUp).isTrue()
                 assertThat(it.supportsMulticast()).isTrue()
@@ -37,7 +37,7 @@ class NetworkUtilsTest {
 
         @Test
         fun availableInet4Interfaces() {
-            NetworkUtils.availableInet4Interfaces.forEach {
+            NetworkUtils.getAvailableInet4Interfaces().forEach {
                 assertThat(it.isLoopback).isFalse()
                 assertThat(it.isUp).isTrue()
                 assertThat(it.supportsMulticast()).isTrue()
@@ -47,7 +47,7 @@ class NetworkUtilsTest {
 
         @Test
         fun availableInet6Interfaces() {
-            NetworkUtils.availableInet6Interfaces.forEach {
+            NetworkUtils.getAvailableInet6Interfaces().forEach {
                 assertThat(it.isLoopback).isFalse()
                 assertThat(it.isUp).isTrue()
                 assertThat(it.supportsMulticast()).isTrue()
@@ -70,19 +70,19 @@ class NetworkUtilsTest {
 
         @Test
         fun `networkInterfaces nullになることはない`() {
-            assertThat(NetworkUtils.networkInterfaceList).isNotNull()
+            assertThat(NetworkUtils.getNetworkInterfaceList()).isNotNull()
         }
 
         @Test
         fun getNetworkInterfaceList_Exceptionが発生すればemptyListが返る() {
             every { NetworkInterface.getNetworkInterfaces() } throws SocketException()
-            assertThat(NetworkUtils.networkInterfaceList).isEmpty()
+            assertThat(NetworkUtils.getNetworkInterfaceList()).isEmpty()
         }
 
         @Test
         fun getNetworkInterfaceList_nullが戻ればemptyListが返る() {
             every { NetworkInterface.getNetworkInterfaces() } returns null
-            assertThat(NetworkUtils.networkInterfaceList).isEmpty()
+            assertThat(NetworkUtils.getNetworkInterfaceList()).isEmpty()
         }
 
         @Test
@@ -91,7 +91,7 @@ class NetworkUtilsTest {
             every { enumeration.hasMoreElements() } returns false
             every { enumeration.nextElement() } returns null
             every { NetworkInterface.getNetworkInterfaces() } returns enumeration
-            assertThat(NetworkUtils.networkInterfaceList).isEmpty()
+            assertThat(NetworkUtils.getNetworkInterfaceList()).isEmpty()
         }
     }
 

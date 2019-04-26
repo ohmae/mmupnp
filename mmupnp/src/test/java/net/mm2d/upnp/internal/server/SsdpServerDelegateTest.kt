@@ -49,7 +49,7 @@ class SsdpServerDelegateTest {
 
     @Test(timeout = 1000L)
     fun start_stop_デッドロックしない() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface)
         server.setReceiver(mockk(relaxed = true))
         server.start()
@@ -58,7 +58,7 @@ class SsdpServerDelegateTest {
 
     @Test(timeout = 1000L)
     fun stop_デッドロックしない() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface)
         server.setReceiver(mockk(relaxed = true))
         server.stop()
@@ -104,14 +104,14 @@ class SsdpServerDelegateTest {
 
     @Test
     fun getInterfaceAddress() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         assertThat(server.interfaceAddress).isEqualTo(SsdpServerDelegate.findInet4Address(networkInterface.interfaceAddresses))
     }
 
     @Test
     fun start_stop() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         server.setReceiver(mockk(relaxed = true))
         val socket: MulticastSocket = mockk(relaxed = true)
@@ -124,7 +124,7 @@ class SsdpServerDelegateTest {
 
     @Test(expected = IllegalStateException::class)
     fun start_without_open() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         val socket: MulticastSocket = mockk(relaxed = true)
         every { server.createMulticastSocket(any()) } returns socket
@@ -134,7 +134,7 @@ class SsdpServerDelegateTest {
     @Test
     @Throws(IOException::class)
     fun send_open前は何も起こらない() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         val socket: MulticastSocket = mockk(relaxed = true)
         every { server.createMulticastSocket(any()) } returns socket
@@ -155,7 +155,7 @@ class SsdpServerDelegateTest {
     @Test
     @Throws(IOException::class)
     fun send_socketから送信される() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         server.setReceiver { _, _, _ -> }
         val socket = spyk(MockMulticastSocket())
@@ -184,7 +184,7 @@ class SsdpServerDelegateTest {
     @Test
     @Throws(IOException::class)
     fun send_socketでExceptionが発生したら無視する() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         server.setReceiver(mockk())
         val socket: MulticastSocket = mockk(relaxed = true)
@@ -207,7 +207,7 @@ class SsdpServerDelegateTest {
     @Test
     fun setNotifyListener_受信メッセージが通知されること() {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val address = InetAddress.getByName("192.0.2.2")
 
         val socket = MockMulticastSocket()
@@ -248,7 +248,7 @@ class SsdpServerDelegateTest {
                 p.data = ByteArray(1)
             }
         })
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         server.setReceiver(mockk(relaxed = true))
         every { server.createMulticastSocket(any()) } returns socket
@@ -285,7 +285,7 @@ class SsdpServerDelegateTest {
                 p.data = ByteArray(1)
             }
         })
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface, 10))
         server.setReceiver(mockk(relaxed = true))
         every { server.createMulticastSocket(any()) } returns socket
@@ -302,7 +302,7 @@ class SsdpServerDelegateTest {
 
     @Test(timeout = 10000)
     fun ReceiveTask_receiveLoop_exceptionが発生してもループを続ける() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         val receiver: (InetAddress, ByteArray, Int) -> Unit = mockk(relaxed = true)
         server.setReceiver(receiver)
@@ -328,7 +328,7 @@ class SsdpServerDelegateTest {
 
     @Test(timeout = 1000)
     fun ReceiveTask_run_exceptionが発生したらループを抜ける() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         val socket: MulticastSocket = mockk(relaxed = true)
         every { socket.receive(any()) } throws IOException()

@@ -41,7 +41,7 @@ class SsdpSearchServerTest {
 
     @Test
     fun search_ST_ALLでのサーチ() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val delegate = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         delegate.setReceiver(mockk(relaxed = true))
         val interfaceAddress = createInterfaceAddress("192.0.2.2", "255.255.255.0", 16)
@@ -63,7 +63,7 @@ class SsdpSearchServerTest {
 
     @Test
     fun search_ST_ROOTDEVICEでのサーチ() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val delegate = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         delegate.setReceiver(mockk(relaxed = true))
         val interfaceAddress = createInterfaceAddress("192.0.2.2", "255.255.255.0", 16)
@@ -107,7 +107,7 @@ class SsdpSearchServerTest {
 
     @Test
     fun onReceive_listenerがコールされる() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpSearchServer(taskExecutors, Address.IP_V4, networkInterface)
         val listener: (SsdpMessage) -> Unit = spyk({ _ -> })
         server.setResponseListener(listener)
@@ -121,7 +121,7 @@ class SsdpSearchServerTest {
 
     @Test
     fun onReceive_アドレス不一致ならlistenerコールされない() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpSearchServer(taskExecutors, Address.IP_V4, networkInterface)
         val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
         server.setResponseListener(listener)
@@ -135,7 +135,7 @@ class SsdpSearchServerTest {
 
     @Test
     fun onReceive_データに問題がある場合listenerコールされない() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpSearchServer(taskExecutors, Address.IP_V4, networkInterface)
         val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
         server.setResponseListener(listener)
@@ -149,7 +149,7 @@ class SsdpSearchServerTest {
 
     @Test
     fun onReceive_listenerが登録されていなくてもクラッシュしない() {
-        val networkInterface = NetworkUtils.availableInet4Interfaces[0]
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpSearchServer(taskExecutors, Address.IP_V4, networkInterface)
 
         val address = InetAddress.getByName("192.0.2.2")

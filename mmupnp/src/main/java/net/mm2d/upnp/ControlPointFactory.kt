@@ -61,7 +61,7 @@ object ControlPointFactory {
         interfaces: Iterable<NetworkInterface>?
     ): Iterable<NetworkInterface> {
         return if (interfaces?.none() != false) {
-            protocol.availableInterfaces
+            protocol.getAvailableInterfaces()
         } else interfaces
     }
 
@@ -103,7 +103,7 @@ object ControlPointFactory {
          * @param ifs Network interface
          * @return builder
          */
-        fun setInterfaces(ifs: Iterable<NetworkInterface>): ControlPointBuilder {
+        fun setInterfaces(ifs: Iterable<NetworkInterface>?): ControlPointBuilder {
             interfaces = ifs
             return this
         }

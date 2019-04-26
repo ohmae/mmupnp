@@ -18,8 +18,7 @@ enum class Protocol {
      * Use only IPv4.
      */
     IP_V4_ONLY {
-        override val availableInterfaces: List<NetworkInterface>
-            get() = NetworkUtils.availableInet4Interfaces
+        override fun getAvailableInterfaces(): List<NetworkInterface> = NetworkUtils.getAvailableInet4Interfaces()
     },
     /**
      * Use only IPv6.
@@ -30,8 +29,7 @@ enum class Protocol {
      * It does not support multicast on site local addresses.
      */
     IP_V6_ONLY {
-        override val availableInterfaces: List<NetworkInterface>
-            get() = NetworkUtils.availableInet6Interfaces
+        override fun getAvailableInterfaces(): List<NetworkInterface> = NetworkUtils.getAvailableInet6Interfaces()
     },
     /**
      * Use dual stack of IPv4 / IPv6.
@@ -43,14 +41,13 @@ enum class Protocol {
      * It does not support multicast on site local addresses.
      */
     DUAL_STACK {
-        override val availableInterfaces: List<NetworkInterface>
-            get() = NetworkUtils.availableInterfaces
+        override fun getAvailableInterfaces(): List<NetworkInterface> = NetworkUtils.getAvailableInterfaces()
     };
 
     /**
      * Returns the NetworkInterface available for that protocol stack.
      */
-    internal abstract val availableInterfaces: List<NetworkInterface>
+    internal abstract fun getAvailableInterfaces(): List<NetworkInterface>
 
     companion object {
         /**

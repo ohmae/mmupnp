@@ -16,9 +16,9 @@ class ProtocolTest {
     @Test
     @Throws(Exception::class)
     fun getAvailableInterfaces() {
-        assertThat(Protocol.IP_V4_ONLY.availableInterfaces.any { !it.isAvailableInet4Interface() }).isFalse()
-        assertThat(Protocol.IP_V6_ONLY.availableInterfaces.any { !it.isAvailableInet6Interface() }).isFalse()
-        assertThat(Protocol.DUAL_STACK.availableInterfaces.any {
+        assertThat(Protocol.IP_V4_ONLY.getAvailableInterfaces().any { !it.isAvailableInet4Interface() }).isFalse()
+        assertThat(Protocol.IP_V6_ONLY.getAvailableInterfaces().any { !it.isAvailableInet6Interface() }).isFalse()
+        assertThat(Protocol.DUAL_STACK.getAvailableInterfaces().any {
             !it.isAvailableInet4Interface() && !it.isAvailableInet6Interface()
         }).isFalse()
     }

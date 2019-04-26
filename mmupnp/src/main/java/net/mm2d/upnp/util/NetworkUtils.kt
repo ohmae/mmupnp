@@ -22,22 +22,22 @@ object NetworkUtils {
      * Return interfaces with an address that can communicate with the network.
      */
     @JvmStatic
-    val availableInterfaces: List<NetworkInterface>
-        get() = networkInterfaceList.filter { it.isConnectedToNetwork() }
+    fun getAvailableInterfaces(): List<NetworkInterface>
+            = getNetworkInterfaceList().filter { it.isConnectedToNetwork() }
 
     /**
      * Return interfaces with an IPv4 address that can communicate with the network.
      */
     @JvmStatic
-    val availableInet4Interfaces: List<NetworkInterface>
-        get() = networkInterfaceList.filter { it.isAvailableInet4Interface() }
+    fun getAvailableInet4Interfaces(): List<NetworkInterface>
+            = getNetworkInterfaceList().filter { it.isAvailableInet4Interface() }
 
     /**
      * Return interfaces with an IPv6 address that can communicate with the network.
      */
     @JvmStatic
-    val availableInet6Interfaces: List<NetworkInterface>
-        get() = networkInterfaceList.filter { it.isAvailableInet6Interface() }
+    fun getAvailableInet6Interfaces(): List<NetworkInterface>
+            = getNetworkInterfaceList().filter { it.isAvailableInet6Interface() }
 
     /**
      * Return a list of all network interfaces in the system.
@@ -49,12 +49,14 @@ object NetworkUtils {
      * @return all network interfaces in the system.
      * @see java.net.NetworkInterface.getNetworkInterfaces
      */
-    val networkInterfaceList: List<NetworkInterface>
-        get() = try {
+    @JvmStatic
+    fun getNetworkInterfaceList(): List<NetworkInterface> {
+        return try {
             NetworkInterface.getNetworkInterfaces()
         } catch (ignored: SocketException) {
             null
         }?.let { Collections.list(it) } ?: emptyList()
+    }
 }
 
 /**

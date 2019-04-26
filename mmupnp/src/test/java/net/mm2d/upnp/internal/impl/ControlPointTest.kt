@@ -117,7 +117,7 @@ class ControlPointTest {
             every { factory.createSsdpSearchServerList(any(), any(), any()) } returns list
             val cp = ControlPointImpl(
                 Protocol.DEFAULT,
-                NetworkUtils.availableInet4Interfaces,
+                NetworkUtils.getAvailableInet4Interfaces(),
                 false,
                 factory
             )
@@ -140,7 +140,7 @@ class ControlPointTest {
         fun needToUpdateSsdpMessage_DUAL_STACK() {
             val cp = ControlPointFactory.create(
                 protocol = Protocol.DUAL_STACK,
-                interfaces = NetworkUtils.networkInterfaceList
+                interfaces = NetworkUtils.getAvailableInterfaces()
             ) as ControlPointImpl
             assertThat(
                 cp.needToUpdateSsdpMessage(
@@ -202,7 +202,7 @@ class ControlPointTest {
         fun needToUpdateSsdpMessage_IP_V4_ONLY() {
             val cp = ControlPointFactory.create(
                 protocol = Protocol.IP_V4_ONLY,
-                interfaces = NetworkUtils.networkInterfaceList
+                interfaces = NetworkUtils.getAvailableInterfaces()
             ) as ControlPointImpl
             assertThat(
                 cp.needToUpdateSsdpMessage(
@@ -264,7 +264,7 @@ class ControlPointTest {
         fun needToUpdateSsdpMessage_IP_V6_ONLY() {
             val cp = ControlPointFactory.create(
                 protocol = Protocol.IP_V6_ONLY,
-                interfaces = NetworkUtils.networkInterfaceList
+                interfaces = NetworkUtils.getAvailableInterfaces()
             ) as ControlPointImpl
             assertThat(
                 cp.needToUpdateSsdpMessage(
@@ -355,7 +355,7 @@ class ControlPointTest {
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
-                    NetworkUtils.availableInet4Interfaces, false,
+                    NetworkUtils.getAvailableInet4Interfaces(), false,
                     factory
                 )
             )
@@ -520,7 +520,7 @@ class ControlPointTest {
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
-                    NetworkUtils.availableInet4Interfaces,
+                    NetworkUtils.getAvailableInet4Interfaces(),
                     false,
                     factory
                 )
@@ -661,7 +661,7 @@ class ControlPointTest {
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
-                    NetworkUtils.availableInet4Interfaces,
+                    NetworkUtils.getAvailableInet4Interfaces(),
                     false,
                     DiFactory(Protocol.DEFAULT)
                 )
@@ -799,7 +799,7 @@ class ControlPointTest {
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
-                    NetworkUtils.availableInet4Interfaces,
+                    NetworkUtils.getAvailableInet4Interfaces(),
                     false,
                     factory
                 )
@@ -860,7 +860,7 @@ class ControlPointTest {
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
-                    NetworkUtils.availableInet4Interfaces,
+                    NetworkUtils.getAvailableInet4Interfaces(),
                     false,
                     factory
                 )
@@ -952,7 +952,7 @@ class ControlPointTest {
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
-                    NetworkUtils.availableInet4Interfaces,
+                    NetworkUtils.getAvailableInet4Interfaces(),
                     false,
                     DiFactory(Protocol.DEFAULT)
                 )

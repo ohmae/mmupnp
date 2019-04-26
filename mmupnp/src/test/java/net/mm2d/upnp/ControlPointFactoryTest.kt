@@ -26,7 +26,7 @@ class ControlPointFactoryTest {
     @Throws(Exception::class)
     fun create_インターフェース指定() {
         ControlPointFactory.create(
-            interfaces = NetworkUtils.availableInet4Interfaces
+            interfaces = NetworkUtils.getAvailableInet4Interfaces()
         )
         ControlPointFactory.create(
             interfaces = emptyList()
@@ -37,15 +37,15 @@ class ControlPointFactoryTest {
     fun create_インターフェース選別() {
         ControlPointFactory.create(
             protocol = Protocol.IP_V4_ONLY,
-            interfaces = NetworkUtils.networkInterfaceList
+            interfaces = NetworkUtils.getNetworkInterfaceList()
         )
         ControlPointFactory.create(
             protocol = Protocol.IP_V6_ONLY,
-            interfaces = NetworkUtils.networkInterfaceList
+            interfaces = NetworkUtils.getNetworkInterfaceList()
         )
         ControlPointFactory.create(
             protocol = Protocol.DUAL_STACK,
-            interfaces = NetworkUtils.networkInterfaceList
+            interfaces = NetworkUtils.getNetworkInterfaceList()
         )
     }
 
@@ -66,7 +66,7 @@ class ControlPointFactoryTest {
     fun builder() {
         ControlPointFactory.builder()
             .setProtocol(Protocol.DEFAULT)
-            .setInterfaces(NetworkUtils.networkInterfaceList)
+            .setInterfaces(NetworkUtils.getNetworkInterfaceList())
             .setNotifySegmentCheckEnabled(true)
             .setCallbackExecutor(mockk())
             .setCallbackHandler { true }
