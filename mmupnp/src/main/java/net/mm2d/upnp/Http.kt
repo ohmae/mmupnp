@@ -227,6 +227,7 @@ object Http {
              * @param code status code
              * @return Status
              */
+            @JvmStatic
             fun valueOf(code: Int): Status {
                 return values().find { it.code == code } ?: HTTP_INVALID
             }

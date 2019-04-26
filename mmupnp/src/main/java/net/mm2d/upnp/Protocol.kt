@@ -56,6 +56,7 @@ enum class Protocol {
         /**
          * Default protocol stack.
          */
+        @JvmField
         val DEFAULT = DUAL_STACK
     }
 }
