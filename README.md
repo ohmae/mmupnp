@@ -36,7 +36,7 @@ Android App
 
 Sample App
 
-|![](docs/img/1.png)|![](docs/img/2.png)|
+|![](readme/1.png)|![](readme/2.png)|
 |-|-|
 
 ## How to use
