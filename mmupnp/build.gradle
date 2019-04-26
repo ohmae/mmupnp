@@ -29,8 +29,7 @@ dependencies {
 }
 
 dokka {
-    outputFormat = 'javadoc'
-    // outputDirectory = "../docs/dokka"
+    outputFormat = 'html'
 }
 
 bintray {
