@@ -1,0 +1,207 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>SsdpMessage - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="./index.html">SsdpMessage</a><br/>
+<br/>
+<h1>SsdpMessage</h1>
+<code><span class="keyword">interface </span><span class="identifier">SsdpMessage</span></code>
+<p>Interface of SSDP(Simple Service Discovery Protocol) message.</p>
+<p><strong>Author</strong><br/>
+<a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a></p>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="expire-time.html">expireTime</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">expireTime</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a></code>
+<p>Returns the time when the expiration limit will expire.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="is-pinned.html">isPinned</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">isPinned</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Returns whether this is a message for pinned.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="local-address.html">localAddress</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">localAddress</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/InetAddress.html"><span class="identifier">InetAddress</span></a><span class="symbol">?</span></code>
+<p>Returns the address of the interface that received this packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="location.html">location</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">location</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Return the value of Location.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="max-age.html">maxAge</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">maxAge</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>Return the value of max-age.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="nts.html">nts</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">nts</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Return the value of NTS field.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="scope-id.html">scopeId</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">scopeId</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>Returns the ScopeID of the interface that received this packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="type.html">type</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">type</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Return Type described in USN.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="uuid.html">uuid</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">uuid</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Return UUID described in USN.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="get-header.html">getHeader</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">getHeader</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.SsdpMessage$getHeader(kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Returns the value of header</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-header.html">setHeader</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setHeader</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.SsdpMessage$setHeader(kotlin.String, kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.SsdpMessage$setHeader(kotlin.String, kotlin.String)/value">value</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the value of header</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-data.html">writeData</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">writeData</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.SsdpMessage$writeData(java.io.OutputStream)/os">os</span><span class="symbol">:</span>&nbsp;<a href="https://docs.oracle.com/javase/6/docs/api/java/io/OutputStream.html"><span class="identifier">OutputStream</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Write the message to the OutputStream.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Companion Object Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-m_-s-e-a-r-c-h.html">M_SEARCH</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">M_SEARCH</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Request method of M-SEARCH</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-n-o-t-i-f-y.html">NOTIFY</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">NOTIFY</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Request method of NOTIFY</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-s-d-p_-a-l-i-v-e.html">SSDP_ALIVE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SSDP_ALIVE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>NTS: ssdp:alive</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-s-d-p_-b-y-e-b-y-e.html">SSDP_BYEBYE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SSDP_BYEBYE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>NTS: ssdp:byebye</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-s-d-p_-d-i-s-c-o-v-e-r.html">SSDP_DISCOVER</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SSDP_DISCOVER</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>MAN: ssdp:discover</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-s-d-p_-u-p-d-a-t-e.html">SSDP_UPDATE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SSDP_UPDATE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>NTS: ssdp:update</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../net.mm2d.upnp.empty/-empty-ssdp-message/index.html">EmptySsdpMessage</a></p>
+</td>
+<td>
+<code><span class="keyword">object </span><span class="identifier">EmptySsdpMessage</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">SsdpMessage</span></a></code>
+<p>Empty implementation of <a href="./index.html">SsdpMessage</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Http.makeAbsoluteUrl - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="index.html">Http</a>&nbsp;/&nbsp;<a href="./make-absolute-url.html">makeAbsoluteUrl</a><br/>
+<br/>
+<h1>makeAbsoluteUrl</h1>
+<a name="net.mm2d.upnp.Http$makeAbsoluteUrl(kotlin.String, kotlin.String, kotlin.Int)"></a>
+<code><span class="keyword">fun </span><span class="identifier">makeAbsoluteUrl</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Http$makeAbsoluteUrl(kotlin.String, kotlin.String, kotlin.Int)/baseUrl">baseUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Http$makeAbsoluteUrl(kotlin.String, kotlin.String, kotlin.Int)/url">url</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Http$makeAbsoluteUrl(kotlin.String, kotlin.String, kotlin.Int)/scopeId">scopeId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/URL.html"><span class="identifier">URL</span></a></code>
+<p>Normalize URL information.</p>
+<p>URL has the following variations</p>
+<ul><li>Complete URL starting with "http: //"</li>
+<li>Absolute path starting with "/"</li>
+<li>Relative path starting from other than "/"</li>
+</ul>
+<p>On the other hand, consider the following variations as baseUrl</p>
+<ul><li>"http://10.0.0.1:1000/" Host name only</li>
+<li>"http://10.0.0.1:1000" Host name only but without "/" at the end</li>
+<li>"http://10.0.0.1:1000/hoge/fuga" Ends with a file name</li>
+<li>"http://10.0.0.1:1000/hoge/fuga/" Ends with a directory name</li>
+<li>"http://10.0.0.1:1000/hoge/fuga?a=foo&amp;amp;b=bar" With query above</li>
+</ul>
+<p>If the URL starts with "http: //", it will be used as it is.
+If it starts with "/",
+it will be combined with the first "/" after "://" of baseUrl as an absolute path of baseUrl host.
+Otherwise, it is a relative path from Location,
+and is combined with the directory name extracted from baseUrl.</p>
+<p>And this also gives scopeId.</p>
+<h3>Parameters</h3>
+<p><a name="baseUrl"></a>
+<code>baseUrl</code> - baseUrl</p>
+<p><a name="url"></a>
+<code>url</code> - URL</p>
+<p><a name="scopeId"></a>
+<code>scopeId</code> - ScopeID</p>
+<h3>Exceptions</h3>
+<p><a name="MalformedURLException"></a>
+<code>MalformedURLException</code> - Bad URL</p>
+<p><strong>Return</strong><br/>
+Normalized URL</p>
+</BODY>
+</HTML>

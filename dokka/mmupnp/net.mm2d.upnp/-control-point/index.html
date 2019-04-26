@@ -1,0 +1,225 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>ControlPoint - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="./index.html">ControlPoint</a><br/>
+<br/>
+<h1>ControlPoint</h1>
+<code><span class="keyword">interface </span><span class="identifier">ControlPoint</span></code>
+<p>Interface of UPnP ControlPoint.</p>
+<p><strong>Author</strong><br/>
+<a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a></p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-discovery-listener/index.html">DiscoveryListener</a></p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">DiscoveryListener</span></code>
+<p>Listener to notify discovery event.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-notify-event-listener/index.html">NotifyEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">NotifyEventListener</span></code>
+<p>Listener to notify event of "NotifyEvent".</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="device-list.html">deviceList</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">deviceList</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../-device/index.html"><span class="identifier">Device</span></a><span class="symbol">&gt;</span></code>
+<p>List of discovered devices.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="device-list-size.html">deviceListSize</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">deviceListSize</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>Number of discovered devices</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="add-discovery-listener.html">addDiscoveryListener</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">addDiscoveryListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$addDiscoveryListener(net.mm2d.upnp.ControlPoint.DiscoveryListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-discovery-listener/index.html"><span class="identifier">ControlPoint.DiscoveryListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Add a listener for device discovery.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="add-notify-event-listener.html">addNotifyEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">addNotifyEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$addNotifyEventListener(net.mm2d.upnp.ControlPoint.NotifyEventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-notify-event-listener/index.html"><span class="identifier">ControlPoint.NotifyEventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Add a NotifyEvent listener.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="clear-device-list.html">clearDeviceList</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">clearDeviceList</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Clear the discovered device list.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-device.html">getDevice</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">getDevice</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$getDevice(kotlin.String)/udn">udn</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-device/index.html"><span class="identifier">Device</span></a><span class="symbol">?</span></code>
+<p>Find Device by UDN.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="initialize.html">initialize</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">initialize</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Do initialize.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="remove-discovery-listener.html">removeDiscoveryListener</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">removeDiscoveryListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$removeDiscoveryListener(net.mm2d.upnp.ControlPoint.DiscoveryListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-discovery-listener/index.html"><span class="identifier">ControlPoint.DiscoveryListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Remove a listener for device discovery.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="remove-notify-event-listener.html">removeNotifyEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">removeNotifyEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$removeNotifyEventListener(net.mm2d.upnp.ControlPoint.NotifyEventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-notify-event-listener/index.html"><span class="identifier">ControlPoint.NotifyEventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Remove a NotifyEvent listener.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="remove-pinned-device.html">removePinnedDevice</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">removePinnedDevice</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$removePinnedDevice(kotlin.String)/location">location</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Remove the pinned device</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="search.html">search</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">search</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$search(kotlin.String)/st">st</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Send Search packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-icon-filter.html">setIconFilter</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setIconFilter</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$setIconFilter(net.mm2d.upnp.IconFilter)/filter">filter</span><span class="symbol">:</span>&nbsp;<a href="../-icon-filter/index.html"><span class="identifier">IconFilter</span></a><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set a filter to select Icon to download.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-ssdp-message-filter.html">setSsdpMessageFilter</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setSsdpMessageFilter</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$setSsdpMessageFilter(kotlin.Function1((net.mm2d.upnp.SsdpMessage, kotlin.Boolean)))/filter">filter</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="../-ssdp-message/index.html"><span class="identifier">SsdpMessage</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the method to judge whether to accept SsdpMessage.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="start.html">start</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">start</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>start.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="stop.html">stop</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">stop</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>stop.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="terminate.html">terminate</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">terminate</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Do terminate.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="try-add-device.html">tryAddDevice</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">tryAddDevice</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$tryAddDevice(kotlin.String, kotlin.String)/uuid">uuid</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.ControlPoint$tryAddDevice(kotlin.String, kotlin.String)/location">location</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Try to add a device.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="try-add-pinned-device.html">tryAddPinnedDevice</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">tryAddPinnedDevice</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$tryAddPinnedDevice(kotlin.String)/location">location</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Try to add the pinned device</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../net.mm2d.upnp.empty/-empty-control-point/index.html">EmptyControlPoint</a></p>
+</td>
+<td>
+<code><span class="keyword">object </span><span class="identifier">EmptyControlPoint</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">ControlPoint</span></a></code>
+<p>Empty implementation of <a href="./index.html">ControlPoint</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

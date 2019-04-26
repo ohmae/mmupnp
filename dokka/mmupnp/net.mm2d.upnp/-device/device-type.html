@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Device.deviceType - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="index.html">Device</a>&nbsp;/&nbsp;<a href="./device-type.html">deviceType</a><br/>
+<br/>
+<h1>deviceType</h1>
+<a name="net.mm2d.upnp.Device$deviceType"></a>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">deviceType</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Value of deviceType tag.</p>
+<p>Required. UPnP device type. Single URI.</p>
+<ul><li>For standard devices defined by a UPnP Forum working committee, shall begin with "urn:schemas-upnp-org:device:"
+followed by the standardized device type suffix, a colon, and an integer device version i.e.
+urn:schemas-upnp-org:device:deviceType:ver.
+The highest supported version of the device type shall be specified.</li>
+<li>For non-standard devices specified by UPnP vendors, shall begin with "urn:", followed by a Vendor Domain Name,
+followed by ":device:", followed by a device type suffix, colon, and an integer version, i.e.,
+"urn:domain-name:device:deviceType:ver".
+Period characters in the Vendor Domain Name shall be replaced with hyphens in accordance with RFC 2141.
+The highest supported version of the device type shall be specified.</li>
+</ul>
+<p>The device type suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be &amp;lt;= 64
+chars, not counting the version suffix and separating colon.</p>
+</BODY>
+</HTML>

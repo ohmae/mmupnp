@@ -1,0 +1,355 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Device - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="./index.html">Device</a><br/>
+<br/>
+<h1>Device</h1>
+<code><span class="keyword">interface </span><span class="identifier">Device</span></code>
+<p>Interface of UPnP Device.</p>
+<p><strong>Author</strong><br/>
+<a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a></p>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="base-url.html">baseUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">baseUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Base URL.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="control-point.html">controlPoint</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">controlPoint</span><span class="symbol">: </span><a href="../-control-point/index.html"><span class="identifier">ControlPoint</span></a></code>
+<p>ControlPoint that is owner of this Device.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="description.html">description</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">description</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>XML string of DeviceDescription.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="device-list.html">deviceList</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">deviceList</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="./index.html"><span class="identifier">Device</span></a><span class="symbol">&gt;</span></code>
+<p>Embedded Device list.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="device-type.html">deviceType</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">deviceType</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Value of deviceType tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="expire-time.html">expireTime</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">expireTime</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a></code>
+<p>The invalid time (ms) if there is no update.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="friendly-name.html">friendlyName</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">friendlyName</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Value of friendlyName tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="icon-list.html">iconList</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">iconList</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../-icon/index.html"><span class="identifier">Icon</span></a><span class="symbol">&gt;</span></code>
+<p>Icon list.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="ip-address.html">ipAddress</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">ipAddress</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>IP address described in Location</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="is-embedded-device.html">isEmbeddedDevice</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">isEmbeddedDevice</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Whether this is Embedded Device.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="is-pinned.html">isPinned</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">isPinned</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Whether this is Pinned device.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="location.html">location</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">location</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Location described in SSDP packet</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="manufacture.html">manufacture</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">manufacture</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Value of manufacturer tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="manufacture-url.html">manufactureUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">manufactureUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Value of manufacturerURL tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="model-description.html">modelDescription</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">modelDescription</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Value of modelDescription tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="model-name.html">modelName</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">modelName</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Value of modelName tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="model-number.html">modelNumber</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">modelNumber</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Value of modelNumber tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="model-url.html">modelUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">modelUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Value of modelURL tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="parent.html">parent</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">parent</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Device</span></a><span class="symbol">?</span></code>
+<p>The parent Device if this is Embedded Device. null if this is root device</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="presentation-url.html">presentationUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">presentationUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Value of presentationURL tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="scope-id.html">scopeId</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">scopeId</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>ScopeID of the received interface. 0 if not set (including IPv4).</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="serial-number.html">serialNumber</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">serialNumber</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Value of serialNumber tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="service-list.html">serviceList</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">serviceList</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../-service/index.html"><span class="identifier">Service</span></a><span class="symbol">&gt;</span></code>
+<p>Service list.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="ssdp-message.html">ssdpMessage</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">ssdpMessage</span><span class="symbol">: </span><a href="../-ssdp-message/index.html"><span class="identifier">SsdpMessage</span></a></code>
+<p>The latest SSDP packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="udn.html">udn</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">udn</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Value of UDN tag.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="upc.html">upc</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">upc</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Value of UPC tag.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="find-action.html">findAction</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">findAction</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$findAction(kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-action/index.html"><span class="identifier">Action</span></a><span class="symbol">?</span></code>
+<p>Find Action by Action name.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="find-device-by-type.html">findDeviceByType</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">findDeviceByType</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$findDeviceByType(kotlin.String)/deviceType">deviceType</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Device</span></a><span class="symbol">?</span></code>
+<p>Find Embedded Device by DeviceType.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="find-device-by-type-recursively.html">findDeviceByTypeRecursively</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">findDeviceByTypeRecursively</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$findDeviceByTypeRecursively(kotlin.String)/deviceType">deviceType</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Device</span></a><span class="symbol">?</span></code>
+<p>Find Embedded Device by DeviceType recursively.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="find-service-by-id.html">findServiceById</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">findServiceById</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$findServiceById(kotlin.String)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-service/index.html"><span class="identifier">Service</span></a><span class="symbol">?</span></code>
+<p>Find Service by ServiceID.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="find-service-by-type.html">findServiceByType</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">findServiceByType</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$findServiceByType(kotlin.String)/type">type</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-service/index.html"><span class="identifier">Service</span></a><span class="symbol">?</span></code>
+<p>Find Service by ServiceType.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-value.html">getValue</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">getValue</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$getValue(kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Get the value of the tag described in the Description.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-value-with-namespace.html">getValueWithNamespace</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">getValueWithNamespace</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$getValueWithNamespace(kotlin.String, kotlin.String)/namespace">namespace</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Device$getValueWithNamespace(kotlin.String, kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Get the value of the tag described in the Description.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="load-icon-binary.html">loadIconBinary</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">loadIconBinary</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$loadIconBinary(net.mm2d.upnp.HttpClient, net.mm2d.upnp.IconFilter)/client">client</span><span class="symbol">:</span>&nbsp;<a href="../-http-client/index.html"><span class="identifier">HttpClient</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Device$loadIconBinary(net.mm2d.upnp.HttpClient, net.mm2d.upnp.IconFilter)/filter">filter</span><span class="symbol">:</span>&nbsp;<a href="../-icon-filter/index.html"><span class="identifier">IconFilter</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Load the binary data of Icon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="update-ssdp-message.html">updateSsdpMessage</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">updateSsdpMessage</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Device$updateSsdpMessage(net.mm2d.upnp.SsdpMessage)/message">message</span><span class="symbol">:</span>&nbsp;<a href="../-ssdp-message/index.html"><span class="identifier">SsdpMessage</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>update SSDP packet</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../net.mm2d.upnp.empty/-empty-device/index.html">EmptyDevice</a></p>
+</td>
+<td>
+<code><span class="keyword">object </span><span class="identifier">EmptyDevice</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">Device</span></a></code>
+<p>Empty implementation of <a href="./index.html">Device</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

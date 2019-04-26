@@ -1,0 +1,139 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>HttpRequest - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="./index.html">HttpRequest</a><br/>
+<br/>
+<h1>HttpRequest</h1>
+<code><span class="keyword">class </span><span class="identifier">HttpRequest</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../-http-message/index.html"><span class="identifier">HttpMessage</span></a></code>
+<p>HTTP request message.</p>
+<p><strong>Author</strong><br/>
+<a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a></p>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="address.html">address</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">address</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/InetAddress.html"><span class="identifier">InetAddress</span></a><span class="symbol">?</span></code>
+<p>Destination address.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="port.html">port</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">port</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>Destination port number.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="get-address-string.html">getAddressString</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getAddressString</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Return address and port number combination string</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-method.html">getMethod</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getMethod</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Returns the request method.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-socket-address.html">getSocketAddress</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getSocketAddress</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/SocketAddress.html"><span class="identifier">SocketAddress</span></a></code>
+<p>Return destination SocketAddress</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-uri.html">getUri</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getUri</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Return the URI (request path)</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-method.html">setMethod</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">setMethod</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpRequest$setMethod(kotlin.String)/method">method</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the request method.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-uri.html">setUri</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">setUri</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpRequest$setUri(kotlin.String)/uri">uri</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the URI (request path)</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-url.html">setUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">setUrl</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpRequest$setUrl(java.net.URL, kotlin.Boolean)/url">url</span><span class="symbol">:</span>&nbsp;<a href="https://docs.oracle.com/javase/6/docs/api/java/net/URL.html"><span class="identifier">URL</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.HttpRequest$setUrl(java.net.URL, kotlin.Boolean)/withHostHeader">withHostHeader</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the destination URL.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="to-string.html">toString</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">toString</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Message as String</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Companion Object Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="copy.html">copy</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">copy</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpRequest.Companion$copy(net.mm2d.upnp.HttpRequest)/original">original</span><span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">HttpRequest</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">HttpRequest</span></a></code>
+<p>Create a new instance with the same contents as the argument.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="create.html">create</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">create</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">HttpRequest</span></a></code>
+<p>Create a new instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

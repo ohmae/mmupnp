@@ -1,0 +1,213 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>EmptyService - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp.empty</a>&nbsp;/&nbsp;<a href="./index.html">EmptyService</a><br/>
+<br/>
+<h1>EmptyService</h1>
+<code><span class="keyword">object </span><span class="identifier">EmptyService</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../../net.mm2d.upnp/-service/index.html"><span class="identifier">Service</span></a></code>
+<p>Empty implementation of <a href="../../net.mm2d.upnp/-service/index.html">Service</a>.</p>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="action-list.html">actionList</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">actionList</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../net.mm2d.upnp/-action/index.html"><span class="identifier">Action</span></a><span class="symbol">&gt;</span></code>
+<p>List of all Actions held by this service.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="control-url.html">controlUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">controlUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>The value of controlURL.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="description.html">description</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">description</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>XML String of ServiceDescription</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="device.html">device</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">device</span><span class="symbol">: </span><a href="../../net.mm2d.upnp/-device/index.html"><span class="identifier">Device</span></a></code>
+<p>Device that is owner of this Service.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="event-sub-url.html">eventSubUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">eventSubUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>The value of eventSubURL.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="scpd-url.html">scpdUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">scpdUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>The value of SCPDURL.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="service-id.html">serviceId</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">serviceId</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>The value of serviceId.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="service-type.html">serviceType</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">serviceType</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>The value of serviceType.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="state-variable-list.html">stateVariableList</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">stateVariableList</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../net.mm2d.upnp/-state-variable/index.html"><span class="identifier">StateVariable</span></a><span class="symbol">&gt;</span></code>
+<p>List of all StateVariable held by this service.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="subscription-id.html">subscriptionId</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">subscriptionId</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>SID (SubscriptionID)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="find-action.html">findAction</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">findAction</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$findAction(kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../../net.mm2d.upnp/-action/index.html"><span class="identifier">Action</span></a><span class="symbol">?</span></code>
+<p>Find the Action by name.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="find-state-variable.html">findStateVariable</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">findStateVariable</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$findStateVariable(kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="../../net.mm2d.upnp/-state-variable/index.html"><span class="identifier">StateVariable</span></a><span class="symbol">?</span></code>
+<p>Find the StateVariable by name.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="renew-subscribe.html">renewSubscribe</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">renewSubscribe</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$renewSubscribe(kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/callback">callback</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Invoke renew subscribe asynchronously.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="renew-subscribe-async.html">renewSubscribeAsync</a></p>
+</td>
+<td>
+<code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">renewSubscribeAsync</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Invoke renew subscribe asynchronously.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="renew-subscribe-sync.html">renewSubscribeSync</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">renewSubscribeSync</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Invoke renew subscribe synchronously.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="subscribe.html">subscribe</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">subscribe</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$subscribe(kotlin.Boolean, kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/keepRenew">keepRenew</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$subscribe(kotlin.Boolean, kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/callback">callback</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Invoke subscribe asynchronously.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="subscribe-async.html">subscribeAsync</a></p>
+</td>
+<td>
+<code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">subscribeAsync</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$subscribeAsync(kotlin.Boolean)/keepRenew">keepRenew</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Invoke subscribe asynchronously.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="subscribe-sync.html">subscribeSync</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">subscribeSync</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$subscribeSync(kotlin.Boolean)/keepRenew">keepRenew</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Invoke subscribe synchronously.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="unsubscribe.html">unsubscribe</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">unsubscribe</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$unsubscribe(kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/callback">callback</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Invoke unsubscribe asynchronously.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="unsubscribe-async.html">unsubscribeAsync</a></p>
+</td>
+<td>
+<code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">unsubscribeAsync</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Invoke unsubscribe asynchronously.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="unsubscribe-sync.html">unsubscribeSync</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">unsubscribeSync</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Invoke unsubscribe synchronously.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,55 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Adapter - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="./index.html">Adapter</a><br/>
+<br/>
+<h1>Adapter</h1>
+<code><span class="keyword">object </span><span class="identifier">Adapter</span></code>
+<p>Adapter to convert lambda to interface.</p>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="discovery-listener.html">discoveryListener</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">discoveryListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Adapter$discoveryListener(kotlin.Function1((net.mm2d.upnp.Device, kotlin.Unit)), kotlin.Function1((net.mm2d.upnp.Device, kotlin.Unit)))/discover">discover</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><a href="../-device/index.html"><span class="identifier">Device</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Adapter$discoveryListener(kotlin.Function1((net.mm2d.upnp.Device, kotlin.Unit)), kotlin.Function1((net.mm2d.upnp.Device, kotlin.Unit)))/lost">lost</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><a href="../-device/index.html"><span class="identifier">Device</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-control-point/-discovery-listener/index.html"><span class="identifier">ControlPoint.DiscoveryListener</span></a></code>
+<p>Adapter for <a href="../-control-point/-discovery-listener/index.html">DiscoveryListener</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="icon-filter.html">iconFilter</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">iconFilter</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Adapter$iconFilter(kotlin.Function1((kotlin.collections.List((net.mm2d.upnp.Icon)), )))/filter">filter</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../-icon/index.html"><span class="identifier">Icon</span></a><span class="symbol">&gt;</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../-icon/index.html"><span class="identifier">Icon</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="../-icon-filter/index.html"><span class="identifier">IconFilter</span></a></code>
+<p>Adapter for <a href="../-icon-filter/index.html">IconFilter</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="notify-event-listener.html">notifyEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">notifyEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Adapter$notifyEventListener(kotlin.Function4((net.mm2d.upnp.Service, kotlin.Long, kotlin.String, , kotlin.Unit)))/notifyEvent">notifyEvent</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="identifier">service</span><span class="symbol">:</span>&nbsp;<a href="../-service/index.html"><span class="identifier">Service</span></a><span class="symbol">,</span>&nbsp;<span class="identifier">seq</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a><span class="symbol">,</span>&nbsp;<span class="identifier">variable</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">,</span>&nbsp;<span class="identifier">value</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-control-point/-notify-event-listener/index.html"><span class="identifier">ControlPoint.NotifyEventListener</span></a></code>
+<p>Adapter for <a href="../-control-point/-notify-event-listener/index.html">NotifyEventListener</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="task-executor.html">taskExecutor</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">taskExecutor</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Adapter$taskExecutor(kotlin.Function1((java.lang.Runnable, kotlin.Boolean)))/handler">handler</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><a href="https://docs.oracle.com/javase/6/docs/api/java/lang/Runnable.html"><span class="identifier">Runnable</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-task-executor/index.html"><span class="identifier">TaskExecutor</span></a></code>
+<p>Adapter for <a href="../-task-executor/index.html">TaskExecutor</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

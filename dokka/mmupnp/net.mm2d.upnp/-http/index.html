@@ -1,0 +1,491 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Http - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="./index.html">Http</a><br/>
+<br/>
+<h1>Http</h1>
+<code><span class="keyword">object </span><span class="identifier">Http</span></code>
+<p>Provides various definitions and utilities required for HTTP.</p>
+<p><strong>Author</strong><br/>
+<a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a></p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-status/index.html">Status</a></p>
+</td>
+<td>
+<code><span class="keyword">enum</span> <span class="keyword">class </span><span class="identifier">Status</span></code>
+<p>Enum for HTTP status</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-a-c-c-e-p-t-e-d_-s-t-a-t-e-v-a-r.html">ACCEPTED_STATEVAR</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">ACCEPTED_STATEVAR</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Used in SUBSCRIBE response. CSV of StateVariables</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-b-o-o-t-i-d_-u-p-n-p_-o-r-g.html">BOOTID_UPNP_ORG</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">BOOTID_UPNP_ORG</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>number increased each time device sends an initial announce or update message</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-a-c-h-e_-c-o-n-t-r-o-l.html">CACHE_CONTROL</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CACHE_CONTROL</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Cache-Control</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-a-l-l-b-a-c-k.html">CALLBACK</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CALLBACK</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>CALLBACK</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-h-u-n-k-e-d.html">CHUNKED</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CHUNKED</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>chunked</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-l-o-s-e.html">CLOSE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CLOSE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>close</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-o-n-f-i-g-i-d_-u-p-n-p_-o-r-g.html">CONFIGID_UPNP_ORG</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CONFIGID_UPNP_ORG</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>number used for caching description information</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-o-n-n-e-c-t-i-o-n.html">CONNECTION</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CONNECTION</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Connection</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-o-n-t-e-n-t_-l-e-n-g-t-h.html">CONTENT_LENGTH</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CONTENT_LENGTH</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Content-Length</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-o-n-t-e-n-t_-t-y-p-e.html">CONTENT_TYPE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CONTENT_TYPE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Content-Type</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-c-o-n-t-e-n-t_-t-y-p-e_-d-e-f-a-u-l-t.html">CONTENT_TYPE_DEFAULT</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">CONTENT_TYPE_DEFAULT</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>default Content-Type</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-d-a-t-e.html">DATE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">DATE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Date</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-d-e-f-a-u-l-t_-h-t-t-p_-v-e-r-s-i-o-n.html">DEFAULT_HTTP_VERSION</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">DEFAULT_HTTP_VERSION</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>default Http version</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-d-e-f-a-u-l-t_-p-o-r-t.html">DEFAULT_PORT</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">DEFAULT_PORT</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>Default Http port</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-e-x-t.html">EXT</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">EXT</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Required for backwards compatibility with UPnP 1.0. (Header field name only; no field value.)</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-g-e-t.html">GET</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">GET</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Method name of GET</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-h-o-s-t.html">HOST</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">HOST</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>HOST</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-h-t-t-p_1_0.html">HTTP_1_0</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">HTTP_1_0</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>HTTP/1.0</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-h-t-t-p_1_1.html">HTTP_1_1</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">HTTP_1_1</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>HTTP/1.1</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-h-t-t-p_-s-c-h-e-m-e.html">HTTP_SCHEME</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">HTTP_SCHEME</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>http scheme</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-k-e-e-p_-a-l-i-v-e.html">KEEP_ALIVE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">KEEP_ALIVE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>keep-alive</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-l-o-c-a-t-i-o-n.html">LOCATION</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">LOCATION</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>URL to the UPnP description</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-m-a-n.html">MAN</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">MAN</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Mandatory request</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-m-x.html">MX</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">MX</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Maximum wait time in seconds 1-5</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-n-o-t-i-f-y.html">NOTIFY</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">NOTIFY</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Method name of NOTIFY</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-n-t.html">NT</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">NT</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Notification Type</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-n-t-s.html">NTS</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">NTS</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Notification Sub Type</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-p-o-s-t.html">POST</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">POST</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Method name of POST</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-e-a-r-c-h-p-o-r-t_-u-p-n-p_-o-r-g.html">SEARCHPORT_UPNP_ORG</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SEARCHPORT_UPNP_ORG</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>number identifies port on which device responds to unicast M-SEARCH</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-e-c-u-r-e-l-o-c-a-t-i-o-n_-u-p-n-p_-o-r-g.html">SECURELOCATION_UPNP_ORG</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SECURELOCATION_UPNP_ORG</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>a base URL with "https:"</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-e-q.html">SEQ</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SEQ</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Sequence number 32-bit unsigned</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-e-r-v-e-r.html">SERVER</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SERVER</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>SERVER</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-i-d.html">SID</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SID</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Subscription Identifier</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-o-a-p-a-c-t-i-o-n.html">SOAPACTION</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SOAPACTION</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>SOAPACTION</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-t.html">ST</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">ST</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Search Target</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-t-a-t-e-v-a-r.html">STATEVAR</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">STATEVAR</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Used in SUBSCRIBE. CSV of StateVariables</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-s-u-b-s-c-r-i-b-e.html">SUBSCRIBE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">SUBSCRIBE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Method name of SUBSCRIBE</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-t-i-m-e-o-u-t.html">TIMEOUT</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">TIMEOUT</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Used in SUBSCRIBE/response. duration until subscription expires.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-t-r-a-n-s-f-e-r_-e-n-c-o-d-i-n-g.html">TRANSFER_ENCODING</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">TRANSFER_ENCODING</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Transfer-Encoding</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-u-n-s-u-b-s-c-r-i-b-e.html">UNSUBSCRIBE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">UNSUBSCRIBE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Method name of UNSUBSCRIBE</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-u-p-n-p_-e-v-e-n-t.html">UPNP_EVENT</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">UPNP_EVENT</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Notification Type: upnp:event</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-u-p-n-p_-p-r-o-p-c-h-a-n-g-e.html">UPNP_PROPCHANGE</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">UPNP_PROPCHANGE</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Notification Sub Type: upnp:propchange</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-u-s-e-r_-a-g-e-n-t.html">USER_AGENT</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">USER_AGENT</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>User-Agent</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-u-s-n.html">USN</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">USN</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Unique Service Name</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="format-date.html">formatDate</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">formatDate</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Http$formatDate(kotlin.Long)/date">date</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code><br/>
+<code><span class="keyword">fun </span><span class="identifier">formatDate</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Http$formatDate(java.util.Date)/date">date</span><span class="symbol">:</span>&nbsp;<a href="https://docs.oracle.com/javase/6/docs/api/java/util/Date.html"><span class="identifier">Date</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Creates a date string.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-current-date.html">getCurrentDate</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getCurrentDate</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Creates a date string for the current time.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="is-http-url.html">isHttpUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">isHttpUrl</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Http$isHttpUrl(kotlin.String)/url">url</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Determine HTTP URL or not.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="make-absolute-url.html">makeAbsoluteUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">makeAbsoluteUrl</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Http$makeAbsoluteUrl(kotlin.String, kotlin.String, kotlin.Int)/baseUrl">baseUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Http$makeAbsoluteUrl(kotlin.String, kotlin.String, kotlin.Int)/url">url</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Http$makeAbsoluteUrl(kotlin.String, kotlin.String, kotlin.Int)/scopeId">scopeId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/URL.html"><span class="identifier">URL</span></a></code>
+<p>Normalize URL information.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="make-url-with-scope-id.html">makeUrlWithScopeId</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">makeUrlWithScopeId</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Http$makeUrlWithScopeId(kotlin.String, kotlin.Int)/urlString">urlString</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Http$makeUrlWithScopeId(kotlin.String, kotlin.Int)/scopeId">scopeId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/URL.html"><span class="identifier">URL</span></a></code>
+<p>Add ScopeID to URL.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="parse-date.html">parseDate</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">parseDate</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Http$parseDate(kotlin.String)/string">string</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/util/Date.html"><span class="identifier">Date</span></a><span class="symbol">?</span></code>
+<p>Parse the Date header.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

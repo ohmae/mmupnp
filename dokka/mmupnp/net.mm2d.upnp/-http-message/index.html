@@ -1,0 +1,209 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>HttpMessage - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="./index.html">HttpMessage</a><br/>
+<br/>
+<h1>HttpMessage</h1>
+<code><span class="keyword">interface </span><span class="identifier">HttpMessage</span></code>
+<p>Interface of HTTP message.</p>
+<p>Since the format of Start Line differs between Response and Request, separately implement that part.</p>
+<p>This specializes in the exchange of small data often used in UPnP communication,
+and does not assume the exchange of large data.</p>
+<p><strong>Author</strong><br/>
+<a href="mailto:ryo@mm2d.net">大前良介 (OHMAE Ryosuke)</a></p>
+<p><strong>See Also</strong><br/>
+<p><a href="../-http-response/index.html">HttpResponse</a></p>
+<p><a href="../-http-request/index.html">HttpRequest</a></p>
+</p>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="content-length.html">contentLength</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">contentLength</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>Content-Length. 0 if unknown</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="is-chunked.html">isChunked</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">isChunked</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Whether this is chunked transmission from the header value.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="start-line.html">startLine</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">startLine</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Start Line.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="version.html">version</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">version</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>HTTP Version.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="get-body.html">getBody</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">getBody</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Return message body as String.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-body-binary.html">getBodyBinary</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">getBodyBinary</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a><span class="symbol">?</span></code>
+<p>Return message body as binary.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-header.html">getHeader</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">getHeader</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$getHeader(kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Return the header value</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-message-string.html">getMessageString</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">getMessageString</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Convert this message to a string</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="is-keep-alive.html">isKeepAlive</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">isKeepAlive</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Returns whether this is Keep-Alive from the header value</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="read-data.html">readData</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">readData</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$readData(java.io.InputStream)/inputStream">inputStream</span><span class="symbol">:</span>&nbsp;<a href="https://docs.oracle.com/javase/6/docs/api/java/io/InputStream.html"><span class="identifier">InputStream</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Read data from InputStream.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-body.html">setBody</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setBody</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setBody(kotlin.String, kotlin.Boolean)/body">body</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setBody(kotlin.String, kotlin.Boolean)/withContentLength">withContentLength</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set message body by String.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-body-binary.html">setBodyBinary</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setBodyBinary</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setBodyBinary(kotlin.ByteArray, kotlin.Boolean)/body">body</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a><span class="symbol">?</span><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setBodyBinary(kotlin.ByteArray, kotlin.Boolean)/withContentLength">withContentLength</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set message body by binary.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-header.html">setHeader</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setHeader</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setHeader(kotlin.String, kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setHeader(kotlin.String, kotlin.String)/value">value</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the header value</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-header-line.html">setHeaderLine</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setHeaderLine</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setHeaderLine(kotlin.String)/line">line</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the header value for line</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-start-line.html">setStartLine</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setStartLine</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setStartLine(kotlin.String)/line">line</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the Start Line.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-version.html">setVersion</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">setVersion</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$setVersion(kotlin.String)/version">version</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set HTTP version</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-data.html">writeData</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">writeData</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.HttpMessage$writeData(java.io.OutputStream)/outputStream">outputStream</span><span class="symbol">:</span>&nbsp;<a href="https://docs.oracle.com/javase/6/docs/api/java/io/OutputStream.html"><span class="identifier">OutputStream</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Write data to OutputStream</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-http-request/index.html">HttpRequest</a></p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">HttpRequest</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">HttpMessage</span></a></code>
+<p>HTTP request message.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../-http-response/index.html">HttpResponse</a></p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">HttpResponse</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">HttpMessage</span></a></code>
+<p>HTTP response message.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>HttpClient.isKeepAlive - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp</a>&nbsp;/&nbsp;<a href="index.html">HttpClient</a>&nbsp;/&nbsp;<a href="./is-keep-alive.html">isKeepAlive</a><br/>
+<br/>
+<h1>isKeepAlive</h1>
+<a name="net.mm2d.upnp.HttpClient$isKeepAlive"></a>
+<code><span class="keyword">var </span><span class="identifier">isKeepAlive</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>keep-alive</p>
+<p>Default is true.
+If true, the connection is continued if the response can be keep-alive.
+Even if true, the connection is disconnected if the response is not capable of keep-alive.
+If false, the connection is disconnected regardless of the response.</p>
+<p>Also, even if true or false,
+the contents of <a href="../-http-request/index.html">HttpRequest</a> passed in the post argument will not be changed.</p>
+<p>If you need to describe keep-alive in the header,
+you need to set it in <a href="../-http-request/index.html">HttpRequest</a> before calling post.</p>
+</BODY>
+</HTML>

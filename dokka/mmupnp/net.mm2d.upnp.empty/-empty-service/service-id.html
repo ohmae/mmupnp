@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>EmptyService.serviceId - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp.empty</a>&nbsp;/&nbsp;<a href="index.html">EmptyService</a>&nbsp;/&nbsp;<a href="./service-id.html">serviceId</a><br/>
+<br/>
+<h1>serviceId</h1>
+<a name="net.mm2d.upnp.empty.EmptyService$serviceId"></a>
+<code><span class="keyword">val </span><span class="identifier">serviceId</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Overrides <a href="../../net.mm2d.upnp/-service/service-id.html">Service.serviceId</a></p>
+<p>The value of serviceId.</p>
+<p>Required. Service identifier. Shall be unique within this device description. Single URI.</p>
+<ul><li>For standard services defined by a UPnP Forum working committee, shall begin with "urn:upnp-org:serviceId:"
+followed by a service ID suffix i.e. urn:upnp-org:serviceId:serviceID.
+If this instance of the specified service type (i.e. the &amp;lt;serviceType&amp;gt; element above) corresponds to one of
+the services defined by the specified device type (i.e. the &amp;lt;deviceType&amp;gt; element above), then the value of
+the service ID suffix shall be the service ID defined by the device type for this instance of the service.
+Otherwise, the value of the service ID suffix is vendor defined. (Note that upnp-org is used instead of
+schemas-upnp- org in this case because an XML schema is not defined for each service ID.)</li>
+<li>For non-standard services specified by UPnP vendors, shall begin with “urn:”, followed by a Vendor Domain
+Name, followed by ":serviceId:", followed by a service ID suffix, i.e., "urn:domain- name:serviceId:serviceID".
+If this instance of the specified service type (i.e. the &amp;lt;serviceType&amp;gt; element above) corresponds to one of
+the services defined by the specified device type (i.e. the &amp;lt;deviceType&amp;gt; element above), then the value of
+the service ID suffix shall be the service ID defined by the device type for this instance of the service.
+Period characters in the Vendor Domain Name shall be replaced with hyphens in accordance with RFC 2141.</li>
+</ul>
+<p>The service ID suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be &amp;lt;= 64
+characters.</p>
+</BODY>
+</HTML>

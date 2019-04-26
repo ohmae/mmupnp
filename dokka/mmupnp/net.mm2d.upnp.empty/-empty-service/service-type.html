@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>EmptyService.serviceType - mmupnp</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp.empty</a>&nbsp;/&nbsp;<a href="index.html">EmptyService</a>&nbsp;/&nbsp;<a href="./service-type.html">serviceType</a><br/>
+<br/>
+<h1>serviceType</h1>
+<a name="net.mm2d.upnp.empty.EmptyService$serviceType"></a>
+<code><span class="keyword">val </span><span class="identifier">serviceType</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Overrides <a href="../../net.mm2d.upnp/-service/service-type.html">Service.serviceType</a></p>
+<p>The value of serviceType.</p>
+<p>Required. UPnP service type. Shall not contain a hash character (#, 23 Hex in UTF-8). Single URI.</p>
+<ul><li>For standard service types defined by a UPnP Forum working committee, shall begin with
+"urn:schemas-upnp-org:service:" followed by the standardized service type suffix, colon, and an integer service
+version i.e. urn:schemas-upnp-org:device:serviceType:ver.
+The highest supported version of the service type shall be specified.</li>
+<li>For non-standard service types specified by UPnP vendors, shall begin with "urn:", followed by a
+Vendor Domain Name, followed by ":service:", followed by a service type suffix, colon,
+and an integer service version, i.e., "urn:domain-name:service:serviceType:ver".
+Period characters in the Vendor Domain Name shall be replaced with hyphens in accordance with RFC 2141.
+The highest supported version of the service type shall be specified.</li>
+</ul>
+<p>The service type suffix defined by a UPnP Forum working committee or specified by a UPnP vendor shall be
+&amp;lt;= 64 characters, not counting the version suffix and separating colon.</p>
+</BODY>
+</HTML>
