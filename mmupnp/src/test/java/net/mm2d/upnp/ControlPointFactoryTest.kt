@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp
 
+import io.mockk.mockk
 import net.mm2d.upnp.util.NetworkUtils
 
 import org.junit.Test
@@ -62,11 +63,13 @@ class ControlPointFactoryTest {
     }
 
     @Test
-    fun create_Params() {
-        ControlPointFactory.create(
-            protocol = Protocol.DEFAULT,
-            interfaces = NetworkUtils.networkInterfaceList,
-            notifySegmentCheckEnabled = true
-        )
+    fun builder() {
+        ControlPointFactory.builder()
+            .setProtocol(Protocol.DEFAULT)
+            .setInterfaces(NetworkUtils.networkInterfaceList)
+            .setNotifySegmentCheckEnabled(true)
+            .setCallbackExecutor(mockk())
+            .setCallbackHandler { true }
+            .build()
     }
 }
