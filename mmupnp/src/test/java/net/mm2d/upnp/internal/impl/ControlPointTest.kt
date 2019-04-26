@@ -641,6 +641,14 @@ class ControlPointTest {
             cp.onAcceptSsdpMessage(message2)
             verify(exactly = 1) { deviceBuilder.updateSsdpMessage(message2) }
         }
+
+        @Test
+        fun tryAddDevice() {
+            val uuid = "uuid"
+            every { cp.loadDevice(any(), any()) } answers { nothing }
+            cp.tryAddDevice(uuid, "http://10.0.0.1/")
+            verify(exactly = 1) { cp.loadDevice(uuid, any()) }
+        }
     }
 
     @RunWith(JUnit4::class)

@@ -142,7 +142,8 @@ internal class ControlPointImpl(
         loadDevice(uuid, Builder(this, subscribeManager, message))
     }
 
-    private fun loadDevice(uuid: String, builder: Builder) {
+    // VisibleForTesting
+    internal fun loadDevice(uuid: String, builder: Builder) {
         loadingDeviceMap[uuid] = builder
         if (!taskExecutors.io { loadDevice(builder) }) {
             loadingDeviceMap.remove(uuid)
