@@ -80,7 +80,7 @@ repositories {
     }
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:3.0.0-alpha1'
+    implementation 'net.mm2d:mmupnp:3.0.0-alpha3'
 }
 ```
 
