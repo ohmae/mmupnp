@@ -39,19 +39,22 @@ Sample App
 |![](readme/1.png)|![](readme/2.png)|
 |-|-|
 
+## API Documents
+
+I described Javadoc/KDoc comments. Please refer to it for more information.
+
+- [Javadoc for 2.0.0](https://ohmae.github.io/mmupnp/javadoc/)
+- [KDoc for 3.0.0](https://ohmae.github.io/mmupnp/dokka/mmupnp/)
+
 ## How to use
 
 Download from jCenter.
+Add dependencies, such as the following.
 
 ```gradle
 repositories {
     jcenter()
 }
-```
-
-Add dependencies, such as the following.
-
-```gradle
 dependencies {
     implementation 'net.mm2d:mmupnp:2.0.0'
 }
@@ -241,12 +244,6 @@ Logger.setSender { level, message, throwable ->
 ```
 
 Please see [log library](https://github.com/ohmae/log) for more details
-
-### Documents
-
-I described Javadoc/KDoc comments. Please refer to it for more information.
-- [Javadoc for 2.0.0](https://ohmae.github.io/mmupnp/javadoc/)
-- [KDoc for 3.0.0](https://ohmae.github.io/mmupnp/dokka/mmupnp/)
 
 ## Author
 大前 良介 (OHMAE Ryosuke)
