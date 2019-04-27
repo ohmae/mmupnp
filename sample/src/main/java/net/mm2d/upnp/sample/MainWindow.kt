@@ -99,7 +99,7 @@ class MainWindow private constructor() : JFrame() {
             }
         })
         tree.addTreeSelectionListener {
-            val node = tree.lastSelectedPathComponent as UpnpNode
+            val node = tree.lastSelectedPathComponent as? UpnpNode ?: return@addTreeSelectionListener
             detail1.text = node.formatDescription()
             detail2.text = node.getDetailXml()
         }
