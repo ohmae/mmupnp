@@ -1,15 +1,15 @@
 <HTML>
 <HEAD>
 <meta charset="UTF-8">
-<title>NetworkUtils.networkInterfaceList - mmupnp</title>
+<title>NetworkUtils.getNetworkInterfaceList - mmupnp</title>
 <link rel="stylesheet" href="../../../style.css">
 </HEAD>
 <BODY>
-<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp.util</a>&nbsp;/&nbsp;<a href="index.html">NetworkUtils</a>&nbsp;/&nbsp;<a href="./network-interface-list.html">networkInterfaceList</a><br/>
+<a href="../../index.html">mmupnp</a>&nbsp;/&nbsp;<a href="../index.html">net.mm2d.upnp.util</a>&nbsp;/&nbsp;<a href="index.html">NetworkUtils</a>&nbsp;/&nbsp;<a href="./get-network-interface-list.html">getNetworkInterfaceList</a><br/>
 <br/>
-<h1>networkInterfaceList</h1>
-<a name="net.mm2d.upnp.util.NetworkUtils$networkInterfaceList"></a>
-<code><span class="keyword">val </span><span class="identifier">networkInterfaceList</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/NetworkInterface.html"><span class="identifier">NetworkInterface</span></a><span class="symbol">&gt;</span></code>
+<h1>getNetworkInterfaceList</h1>
+<a name="net.mm2d.upnp.util.NetworkUtils$getNetworkInterfaceList()"></a>
+<code><span class="identifier">@JvmStatic</span> <span class="keyword">fun </span><span class="identifier">getNetworkInterfaceList</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/NetworkInterface.html"><span class="identifier">NetworkInterface</span></a><span class="symbol">&gt;</span></code>
 <p>Return a list of all network interfaces in the system.</p>
 <p>The return value of <a href="https://docs.oracle.com/javase/6/docs/api/java/net/NetworkInterface.html#getNetworkInterfaces()">java.net.NetworkInterface.getNetworkInterfaces</a>
 is changed to <a href="https://docs.oracle.com/javase/6/docs/api/java/util/List.html">java.util.List</a> instead of <a href="https://docs.oracle.com/javase/6/docs/api/java/util/Enumeration.html">java.util.Enumeration</a>.
