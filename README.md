@@ -53,7 +53,7 @@ Add dependencies, such as the following.
 
 ```gradle
 dependencies {
-    implementation 'net.mm2d:mmupnp:2.0.0'
+    implementation 'net.mm2d:mmupnp:2.1.0'
 }
 ```
 
