@@ -28,7 +28,10 @@ import javax.annotation.Nullable;
 public final class ControlPointFactory {
     /**
      * ControlPointの初期化パラメータ
+     *
+     * @deprecated use {@link #builder()}
      */
+    @Deprecated
     public static class Params {
         @Nonnull
         private Protocol mProtocol = Protocol.DEFAULT;
@@ -153,6 +156,123 @@ public final class ControlPointFactory {
         }
     }
 
+    /**
+     * ControlPointのBuilder
+     */
+    public static class Builder {
+        @Nonnull
+        private Protocol mProtocol = Protocol.DEFAULT;
+        @Nullable
+        private Collection<NetworkInterface> mInterfaces;
+        @Nullable
+        private TaskExecutor mCallbackExecutor;
+
+        private boolean mNotifySegmentCheckEnabled;
+
+        /**
+         * 使用するプロトコルスタックを指定する。
+         *
+         * <p>未指定の場合デフォルトのプロトコルスタックが使用される。
+         *
+         * @param protocol 使用するプロトコルスタック
+         * @return このインスタンス
+         * @see Protocol
+         */
+        public Builder setProtocol(@Nonnull final Protocol protocol) {
+            mProtocol = protocol;
+            return this;
+        }
+
+        /**
+         * 使用するインターフェースを指定する。
+         *
+         * <p>未指定の場合、プロトコルスタックから自動選択される。
+         *
+         * @param interfaces 使用するインターフェース
+         * @return このインスタンス
+         */
+        public Builder setInterfaces(@Nullable final Collection<NetworkInterface> interfaces) {
+            mInterfaces = interfaces;
+            return this;
+        }
+
+        /**
+         * 使用するインターフェースを指定する。
+         *
+         * <p>未指定の場合、プロトコルスタックから自動選択される。
+         *
+         * @param nif 使用するインターフェース
+         * @return このインスタンス
+         */
+        @Nonnull
+        public Builder setInterface(@Nullable final NetworkInterface nif) {
+            mInterfaces = Collections.singletonList(nif);
+            return this;
+        }
+
+        /**
+         * コールバックを実行する{@link TaskExecutor}を指定する。
+         *
+         * コールバックのスレッドを指定したい場合に指定する。
+         * 未指定の場合singleThreadのExecutorが使用される。
+         *
+         * @param executor コールバックを実行するTaskExecutor
+         * @return このインスタンス
+         */
+        public Builder setCallbackExecutor(@Nonnull final TaskExecutor executor) {
+            mCallbackExecutor = executor;
+            return this;
+        }
+
+        /**
+         * コールバックを実行する{@link CallbackHandler}を指定する。
+         *
+         * コールバックのスレッドを指定したい場合に指定する。
+         * 未指定の場合singleThreadのExecutorが使用される。
+         *
+         * {@link #setCallbackExecutor(TaskExecutor)}と排他利用であり、後で設定したものが優先される。
+         * {@link ControlPoint#terminate()}を実行しても何ら終了処理は行われないため、必要であれば利用側で後始末を実行する。
+         *
+         * Androidプラットホームであれば、android.os.Handlerを使うことで簡単にUIスレッドでコールバックが実行できる。
+         * <pre>
+         * param.setCallbackHandler(handler::post)
+         * </pre>
+         *
+         * @param handler コールバックを実行するCallbackHandler
+         * @return このインスタンス
+         * @see #setCallbackExecutor(TaskExecutor)
+         */
+        public Builder setCallbackHandler(@Nonnull final CallbackHandler handler) {
+            mCallbackExecutor = new TaskExecutorWrapper(handler);
+            return this;
+        }
+
+        /**
+         * SSDP Notifyパケットを受け取った時にセグメントチェックを行う設定を行う
+         *
+         * @param enabled セグメントチェックを有効にするときtrue
+         * @return このインスタンス
+         */
+        public Builder setNotifySegmentCheckEnabled(final boolean enabled) {
+            mNotifySegmentCheckEnabled = enabled;
+            return this;
+        }
+
+        /**
+         * ControlPointのインスタンスを作成する。
+         *
+         * @return ControlPointのインスタンス
+         * @throws IllegalStateException 使用可能なインターフェースがない。
+         */
+        public ControlPoint build() throws IllegalStateException {
+            return new ControlPointImpl(
+                    mProtocol,
+                    getDefaultInterfacesIfEmpty(mProtocol, mInterfaces),
+                    mNotifySegmentCheckEnabled,
+                    new DiFactory(mProtocol, mCallbackExecutor));
+        }
+    }
+
     private static class TaskExecutorWrapper implements TaskExecutor {
         private final CallbackHandler mHandler;
 
@@ -171,6 +291,15 @@ public final class ControlPointFactory {
     }
 
     /**
+     * ControlPointのBuilderを返す。
+     *
+     * @return Builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
      * ControlPointのインスタンスを作成する。
      *
      * <p>引数のインターフェースを利用するように初期化される。
@@ -180,9 +309,8 @@ public final class ControlPointFactory {
      * @throws IllegalStateException 使用可能なインターフェースがない。
      */
     @Nonnull
-    public static ControlPoint create()
-            throws IllegalStateException {
-        return create(new Params());
+    public static ControlPoint create() throws IllegalStateException {
+        return builder().build();
     }
 
     /**
@@ -191,9 +319,11 @@ public final class ControlPointFactory {
      * @param params 初期化パラメータ
      * @return ControlPointのインスタンス
      * @throws IllegalStateException 使用可能なインターフェースがない。
+     * @deprecated use {@link #builder()}
      */
+    @Deprecated
     @Nonnull
-    public static ControlPoint create(@Nonnull final Params params) {
+    public static ControlPoint create(@Nonnull final Params params) throws IllegalStateException {
         final Protocol protocol = params.getProtocol();
         return new ControlPointImpl(
                 protocol,
@@ -210,9 +340,5 @@ public final class ControlPointFactory {
             return protocol.getAvailableInterfaces();
         }
         return interfaces;
-    }
-
-    // インスタンス化禁止
-    private ControlPointFactory() {
     }
 }
