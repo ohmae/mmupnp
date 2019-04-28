@@ -56,7 +56,7 @@ internal class ActionImpl(
 
     @Throws(IOException::class)
     override fun invokeSync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
         val soap = makeSoap(emptyMap(), makeArguments(argumentValues))
@@ -65,7 +65,7 @@ internal class ActionImpl(
 
     @Throws(IOException::class)
     override fun invokeCustomSync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
@@ -77,7 +77,7 @@ internal class ActionImpl(
     }
 
     override fun invoke(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean,
         onResult: ((Map<String, String>) -> Unit)?,
         onError: ((IOException) -> Unit)?
@@ -94,7 +94,7 @@ internal class ActionImpl(
     }
 
     override fun invokeCustom(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean,
@@ -113,7 +113,7 @@ internal class ActionImpl(
     }
 
     override suspend fun invokeAsync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
         return suspendCoroutine { continuation ->
@@ -129,7 +129,7 @@ internal class ActionImpl(
     }
 
     override suspend fun invokeCustomAsync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
@@ -152,7 +152,7 @@ internal class ActionImpl(
      * @param argumentValues Argument values
      * @return Argument list
      */
-    private fun makeArguments(argumentValues: Map<String, String>): MutableList<Pair<String, String?>> {
+    private fun makeArguments(argumentValues: Map<String, String?>): MutableList<Pair<String, String?>> {
         return argumentMap.values
             .filter { it.isInputDirection }
             .map { it.name to selectArgumentValue(it, argumentValues) }
@@ -169,7 +169,7 @@ internal class ActionImpl(
      * @param argumentValues Argument values
      * @return Selected argument value
      */
-    private fun selectArgumentValue(argument: Argument, argumentValues: Map<String, String>): String? {
+    private fun selectArgumentValue(argument: Argument, argumentValues: Map<String, String?>): String? {
         return argumentValues[argument.name] ?: argument.relatedStateVariable.defaultValue
     }
 

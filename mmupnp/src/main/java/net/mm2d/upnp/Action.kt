@@ -82,7 +82,7 @@ interface Action {
      */
     @Throws(IOException::class)
     fun invokeSync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean = false
     ): Map<String, String>
 
@@ -130,7 +130,7 @@ interface Action {
      */
     @Throws(IOException::class)
     fun invokeCustomSync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String> = emptyMap(),
         customArguments: Map<String, String> = emptyMap(),
         returnErrorResponse: Boolean = false
@@ -171,7 +171,7 @@ interface Action {
      * @see ERROR_DESCRIPTION_KEY
      */
     fun invoke(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean = false,
         onResult: ((Map<String, String>) -> Unit)? = null,
         onError: ((IOException) -> Unit)? = null
@@ -221,7 +221,7 @@ interface Action {
      * @see ERROR_DESCRIPTION_KEY
      */
     fun invokeCustom(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String> = emptyMap(),
         customArguments: Map<String, String> = emptyMap(),
         returnErrorResponse: Boolean = false,
@@ -262,7 +262,7 @@ interface Action {
      * @see ERROR_DESCRIPTION_KEY
      */
     suspend fun invokeAsync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean = false
     ): Map<String, String>
 
@@ -309,7 +309,7 @@ interface Action {
      * @see ERROR_DESCRIPTION_KEY
      */
     suspend fun invokeCustomAsync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String> = emptyMap(),
         customArguments: Map<String, String> = emptyMap(),
         returnErrorResponse: Boolean = false

@@ -24,7 +24,7 @@ object EmptyAction : Action {
 
     @Throws(IOException::class)
     override fun invokeSync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
         throw IOException("empty object")
@@ -32,7 +32,7 @@ object EmptyAction : Action {
 
     @Throws(IOException::class)
     override fun invokeCustomSync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
@@ -41,7 +41,7 @@ object EmptyAction : Action {
     }
 
     override fun invoke(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean,
         onResult: ((Map<String, String>) -> Unit)?,
         onError: ((IOException) -> Unit)?
@@ -50,7 +50,7 @@ object EmptyAction : Action {
     }
 
     override fun invokeCustom(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean,
@@ -61,14 +61,14 @@ object EmptyAction : Action {
     }
 
     override suspend fun invokeAsync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
         throw IOException("empty object")
     }
 
     override suspend fun invokeCustomAsync(
-        argumentValues: Map<String, String>,
+        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
