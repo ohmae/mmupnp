@@ -42,7 +42,7 @@ internal class DeviceImpl private constructor(
     private val tagMap: Map<String, Map<String, String>>,
     override val iconList: List<Icon>,
     private val serviceBuilderList: List<ServiceImpl.Builder>,
-    private val deviceBuilderList: List<DeviceImpl.Builder>
+    private val deviceBuilderList: List<Builder>
 ) : Device {
     override val ssdpMessage: SsdpMessage
         get() = _ssdpMessage
@@ -177,7 +177,7 @@ internal class DeviceImpl private constructor(
         private val iconList = mutableListOf<Icon>()
         private val serviceBuilderList = mutableListOf<ServiceImpl.Builder>()
         @Volatile
-        private var deviceBuilderList: List<DeviceImpl.Builder> = emptyList()
+        private var deviceBuilderList: List<Builder> = emptyList()
         private val tagMap: MutableMap<String, MutableMap<String, String>>
 
         init {
@@ -354,7 +354,7 @@ internal class DeviceImpl private constructor(
             return this
         }
 
-        fun getEmbeddedDeviceBuilderList(): List<DeviceImpl.Builder> {
+        fun getEmbeddedDeviceBuilderList(): List<Builder> {
             return deviceBuilderList
         }
 

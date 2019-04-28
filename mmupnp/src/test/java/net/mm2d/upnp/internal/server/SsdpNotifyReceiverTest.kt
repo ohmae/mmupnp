@@ -41,7 +41,8 @@ class SsdpNotifyReceiverTest {
 
     @Test
     fun setNotifyListener_受信メッセージが通知されること() {
-        val delegate = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val delegate =
+            spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         delegate.setReceiver(mockk(relaxed = true))
         val interfaceAddress = createInterfaceAddress("192.0.2.2", "255.255.255.0", 16)
         every { delegate.interfaceAddress } returns interfaceAddress
@@ -61,7 +62,8 @@ class SsdpNotifyReceiverTest {
 
     @Test
     fun onReceive_同一セグメントからのメッセージは通知する() {
-        val receiver = spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val receiver =
+            spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         val address = createInterfaceAddress("192.0.2.1", "255.255.0.0", 24)
         every { receiver.interfaceAddress } returns address
         val listener: (SsdpMessage) -> Unit = spyk { }
@@ -75,7 +77,8 @@ class SsdpNotifyReceiverTest {
 
     @Test
     fun onReceive_Listenerがnullでもクラッシュしない() {
-        val receiver = spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val receiver =
+            spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         val address = createInterfaceAddress("192.0.2.1", "255.255.0.0", 24)
         every { receiver.interfaceAddress } returns address
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
@@ -85,7 +88,8 @@ class SsdpNotifyReceiverTest {
 
     @Test
     fun onReceive_異なるセグメントからのメッセージは無視する() {
-        val receiver = spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val receiver =
+            spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         val address = createInterfaceAddress("192.0.2.1", "255.255.0.0", 24)
         every { receiver.interfaceAddress } returns address
         val listener: (SsdpMessage) -> Unit = spyk { }
@@ -100,7 +104,8 @@ class SsdpNotifyReceiverTest {
 
     @Test
     fun onReceive_M_SEARCHパケットは無視する() {
-        val receiver = spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val receiver =
+            spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         val address = createInterfaceAddress("192.0.2.1", "255.255.0.0", 24)
         every { receiver.interfaceAddress } returns address
         val listener: (SsdpMessage) -> Unit = spyk { }
@@ -122,7 +127,8 @@ class SsdpNotifyReceiverTest {
 
     @Test
     fun onReceive_ByeByeパケットは通知する() {
-        val receiver = spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val receiver =
+            spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         val address = createInterfaceAddress("192.0.2.1", "255.255.0.0", 24)
         every { receiver.interfaceAddress } returns address
         val listener: (SsdpMessage) -> Unit = spyk { }
@@ -137,7 +143,8 @@ class SsdpNotifyReceiverTest {
 
     @Test
     fun onReceive_LocationとSourceが不一致のメッセージは無視する() {
-        val receiver = spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val receiver =
+            spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         val address = createInterfaceAddress("192.0.2.1", "255.255.0.0", 24)
         every { receiver.interfaceAddress } returns address
         val listener: (SsdpMessage) -> Unit = spyk { }
@@ -151,7 +158,8 @@ class SsdpNotifyReceiverTest {
 
     @Test
     fun onReceive_IOExceptionが発生してもクラッシュしない() {
-        val receiver = spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val receiver =
+            spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         val address = createInterfaceAddress("192.0.2.1", "255.255.0.0", 24)
         every { receiver.interfaceAddress } returns address
         every { receiver.createSsdpRequestMessage(any(), any()) } throws IOException()

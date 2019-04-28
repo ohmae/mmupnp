@@ -22,22 +22,22 @@ object NetworkUtils {
      * Return interfaces with an address that can communicate with the network.
      */
     @JvmStatic
-    fun getAvailableInterfaces(): List<NetworkInterface>
-            = getNetworkInterfaceList().filter { it.isConnectedToNetwork() }
+    fun getAvailableInterfaces(): List<NetworkInterface> =
+        getNetworkInterfaceList().filter { it.isConnectedToNetwork() }
 
     /**
      * Return interfaces with an IPv4 address that can communicate with the network.
      */
     @JvmStatic
-    fun getAvailableInet4Interfaces(): List<NetworkInterface>
-            = getNetworkInterfaceList().filter { it.isAvailableInet4Interface() }
+    fun getAvailableInet4Interfaces(): List<NetworkInterface> =
+        getNetworkInterfaceList().filter { it.isAvailableInet4Interface() }
 
     /**
      * Return interfaces with an IPv6 address that can communicate with the network.
      */
     @JvmStatic
-    fun getAvailableInet6Interfaces(): List<NetworkInterface>
-            = getNetworkInterfaceList().filter { it.isAvailableInet6Interface() }
+    fun getAvailableInet6Interfaces(): List<NetworkInterface> =
+        getNetworkInterfaceList().filter { it.isAvailableInet6Interface() }
 
     /**
      * Return a list of all network interfaces in the system.
