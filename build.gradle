@@ -2,7 +2,7 @@ buildscript {
     def versionMajor = 3
     def versionMinor = 0
     def versionPatch = 0
-    def versionSuffix = "-alpha3"
+    def versionSuffix = "-beta1"
     ext {
         kotlin_version = '1.3.31'
         pj = [
