@@ -90,7 +90,7 @@ internal class ServiceImpl(
             }
             return subscribeInner(keepRenew)
         } catch (e: IOException) {
-            Logger.e("fail to subscribe", e)
+            Logger.e(e, "fail to subscribe")
         }
         return false
     }
@@ -134,7 +134,7 @@ internal class ServiceImpl(
                 subscribeInner(false)
             } else renewSubscribeInner()
         } catch (e: IOException) {
-            Logger.e("fail to renewSubscribe", e)
+            Logger.e(e, "fail to renewSubscribe")
         }
         return false
     }
@@ -186,7 +186,7 @@ internal class ServiceImpl(
             Logger.v { "unsubscribe request:\n$request\nresponse:\n$response" }
             return true
         } catch (e: IOException) {
-            Logger.e("fail to subscribe", e)
+            Logger.e(e, "fail to subscribe")
         }
         return false
     }

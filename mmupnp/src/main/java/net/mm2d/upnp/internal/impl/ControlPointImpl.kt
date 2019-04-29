@@ -330,7 +330,7 @@ internal class ControlPointImpl(
                 discoverDevice(device)
             }
         } catch (e: Exception) {
-            Logger.w({ "fail to load:\n${builder.getLocation()}" }, e)
+            Logger.w(e) { "fail to load:\n${builder.getLocation()}" }
         } finally {
             client.close()
         }
