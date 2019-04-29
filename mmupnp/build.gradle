@@ -24,7 +24,7 @@ dependencies {
 
     testImplementation "io.mockk:mockk:1.9.3"
     testImplementation "com.google.truth:truth:0.44"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.0"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1"
     testRuntimeOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
