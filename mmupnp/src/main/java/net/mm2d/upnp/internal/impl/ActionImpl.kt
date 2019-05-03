@@ -187,9 +187,8 @@ internal class ActionImpl(
 
     @Throws(IOException::class)
     private fun invoke(soap: String, returnErrorResponse: Boolean): Map<String, String> {
-        Logger.d { "action invoke:\n$soap" }
         val result = invoke(soap)
-        Logger.d { "action result:\n$result" }
+        Logger.v { "action result:\n$result" }
         if (!returnErrorResponse && result.containsKey(Action.ERROR_CODE_KEY)) {
             throw IOException("error response: $result")
         }
@@ -206,8 +205,10 @@ internal class ActionImpl(
     @Throws(IOException::class)
     private fun invoke(soap: String): Map<String, String> {
         val request = makeHttpRequest(makeAbsoluteControlUrl(), soap)
+        Logger.d { "action invoke:\n$request" }
         val response = createHttpClient().post(request)
         val body = response.getBody()
+        Logger.d { "action receive:\n$body" }
         if (response.getStatus() == Status.HTTP_INTERNAL_ERROR && !body.isNullOrEmpty()) {
             try {
                 return parseErrorResponse(body)
