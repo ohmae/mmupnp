@@ -163,7 +163,10 @@ internal fun Inet6Address.toNormalizedString(): String {
     return sb.toString()
 }
 
-private class Range(var start: Int = -1, var length: Int = 0) {
+private class Range(
+    var start: Int = -1,
+    var length: Int = 0
+) {
     fun reset() = set(-1, 0)
     fun set(range: Range) = set(range.start, range.length)
     fun set(s: Int, l: Int) {
