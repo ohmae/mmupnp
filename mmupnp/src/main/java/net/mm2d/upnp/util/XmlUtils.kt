@@ -83,12 +83,7 @@ object XmlUtils {
      */
     @JvmStatic
     fun findChildElementByLocalName(parent: Node, localName: String): Element? {
-        parent.firstChild?.forEachElement {
-            if (localName == it.localName) {
-                return it
-            }
-        }
-        return null
+        return parent.findChildElementByLocalName(localName)
     }
 }
 
@@ -99,13 +94,70 @@ object XmlUtils {
  * @param action Action to be performed on each element
  */
 inline fun Node.forEachElement(action: (Element) -> Unit) {
-    var node: Node? = this
-    while (node != null) {
-        if (node is Element) {
-            action(node)
-        }
-        node = node.nextSibling
+    siblingElements().asSequence().forEach(action)
+}
+
+/**
+ * Returns the Iterable of Element
+ *
+ * @receiver Node performing iteration
+ */
+fun Node.siblingElements(): Iterable<Element> {
+    return object : Iterable<Element> {
+        override fun iterator(): Iterator<Element> =
+            ElementIterator(this@siblingElements)
     }
+}
+
+private class ElementIterator(
+    node: Node
+) : Iterator<Element> {
+    private var node: Node? = node
+    override fun next(): Element {
+        skipUntilElement()
+        return (node as? Element)
+            ?.also { node = it.nextSibling }
+            ?: throw NoSuchElementException()
+    }
+
+    override fun hasNext(): Boolean {
+        skipUntilElement()
+        return node is Element
+    }
+
+    private fun skipUntilElement() {
+        var n: Node? = node
+        while (n != null) {
+            if (n is Element) {
+                node = n
+                return
+            }
+            n = n.nextSibling
+        }
+    }
+}
+
+/**
+ * Returns the Iterable of Node
+ *
+ * @receiver Node performing iteration
+ */
+fun Node.siblings(): Iterable<Node> {
+    return object : Iterable<Node> {
+        override fun iterator(): Iterator<Node> =
+            NodeIterator(this@siblings)
+    }
+}
+
+private class NodeIterator(
+    node: Node
+) : Iterator<Node> {
+    private var node: Node? = node
+    override fun next(): Node = node
+        ?.also { node = it.nextSibling }
+        ?: throw NoSuchElementException()
+
+    override fun hasNext(): Boolean = node != null
 }
 
 /**
@@ -115,12 +167,7 @@ inline fun Node.forEachElement(action: (Element) -> Unit) {
  * @param localName local name
  */
 fun Node.findChildElementByLocalName(localName: String): Element? {
-    firstChild?.forEachElement {
-        if (localName == it.localName) {
-            return it
-        }
-    }
-    return null
+    return firstChild?.siblingElements()?.firstOrNull { it.localName == localName }
 }
 
 /**
@@ -130,5 +177,30 @@ fun Node.findChildElementByLocalName(localName: String): Element? {
  * @param action Action to be performed on each node
  */
 inline fun NodeList.forEach(action: (Node) -> Unit) {
-    for (i in 0 until length) action(item(i))
+    asIterable().forEach(action)
+}
+
+/**
+ * Returns the Iterable of Node
+ *
+ * @receiver Node performing iteration
+ */
+fun NodeList.asIterable(): Iterable<Node> {
+    return object : Iterable<Node> {
+        override fun iterator(): Iterator<Node> =
+            NodeListIterator(this@asIterable)
+    }
+}
+
+private class NodeListIterator(
+    private val nodeList: NodeList
+) : Iterator<Node> {
+    private var index = 0
+    override fun next(): Node {
+        return nodeList.item(index++)
+    }
+
+    override fun hasNext(): Boolean {
+        return index < nodeList.length
+    }
 }

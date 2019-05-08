@@ -15,7 +15,7 @@ import net.mm2d.upnp.Property
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.util.closeQuietly
 import net.mm2d.upnp.util.XmlUtils
-import net.mm2d.upnp.util.forEachElement
+import net.mm2d.upnp.util.siblingElements
 import org.xml.sax.SAXException
 import java.io.IOException
 import java.io.InputStream
@@ -237,16 +237,16 @@ internal class EventReceiver(
                     return emptyList()
                 }
                 val list = mutableListOf<Pair<String, String>>()
-                propertySetNode.firstChild.forEachElement {
-                    if (it.localName == "property") {
-                        it.firstChild.forEachElement {
-                            val name = it.localName
-                            if (!name.isNullOrEmpty()) {
-                                list.add(name to it.textContent)
-                            }
+                propertySetNode.firstChild
+                    .siblingElements()
+                    .filter { it.localName == "property" }
+                    .flatMap { it.firstChild.siblingElements() }
+                    .forEach {
+                        val name = it.localName
+                        if (!name.isNullOrEmpty()) {
+                            list.add(name to it.textContent)
                         }
                     }
-                }
                 return list
             } catch (ignored: IOException) {
             } catch (ignored: SAXException) {
