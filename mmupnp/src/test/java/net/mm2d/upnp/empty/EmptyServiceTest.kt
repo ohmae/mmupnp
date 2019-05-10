@@ -8,6 +8,10 @@
 package net.mm2d.upnp.empty
 
 import com.google.common.truth.Truth.assertThat
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -81,32 +85,104 @@ class EmptyServiceTest {
     }
 
     @Test
-    fun subscribe() {
+    fun getSubscriptionId() {
+        val service = EmptyService
+        assertThat(service.subscriptionId).isNull()
+    }
+
+    @Test
+    fun subscribeSync() {
         val service = EmptyService
         assertThat(service.subscribeSync()).isFalse()
     }
 
     @Test
-    fun subscribe1() {
+    fun subscribeSync1() {
         val service = EmptyService
         assertThat(service.subscribeSync(true)).isFalse()
     }
 
     @Test
-    fun renewSubscribe() {
+    fun renewSubscribeSync() {
         val service = EmptyService
         assertThat(service.renewSubscribeSync()).isFalse()
     }
 
     @Test
-    fun unsubscribe() {
+    fun unsubscribeSync() {
         val service = EmptyService
         assertThat(service.unsubscribeSync()).isFalse()
     }
 
     @Test
-    fun getSubscriptionId() {
+    fun subscribe() {
         val service = EmptyService
-        assertThat(service.subscriptionId).isNull()
+        val callback: (Boolean) -> Unit = mockk()
+        val slot = slot<Boolean>()
+        every { callback.invoke(capture(slot)) } answers { nothing }
+        service.subscribe(callback = callback)
+        assertThat(slot.captured).isFalse()
+    }
+
+    @Test
+    fun subscribe1() {
+        val service = EmptyService
+        val callback: (Boolean) -> Unit = mockk()
+        val slot = slot<Boolean>()
+        every { callback.invoke(capture(slot)) } answers { nothing }
+        service.subscribe(true, callback)
+        assertThat(slot.captured).isFalse()
+    }
+
+    @Test
+    fun renewSubscribe() {
+        val service = EmptyService
+        val callback: (Boolean) -> Unit = mockk()
+        val slot = slot<Boolean>()
+        every { callback.invoke(capture(slot)) } answers { nothing }
+        service.renewSubscribe(callback)
+        assertThat(slot.captured).isFalse()
+    }
+
+    @Test
+    fun unsubscribe() {
+        val service = EmptyService
+        val callback: (Boolean) -> Unit = mockk()
+        val slot = slot<Boolean>()
+        every { callback.invoke(capture(slot)) } answers { nothing }
+        service.unsubscribe(callback)
+        assertThat(slot.captured).isFalse()
+    }
+
+    @Test
+    fun subscribeAsync() {
+        val service = EmptyService
+        runBlocking {
+            assertThat(service.subscribeAsync()).isFalse()
+        }
+    }
+
+    @Test
+    fun subscribeAsync1() {
+        val service = EmptyService
+        runBlocking {
+            assertThat(service.subscribeAsync(true)).isFalse()
+        }
+    }
+
+    @Test
+    fun renewSubscribeAsync() {
+        val service = EmptyService
+        runBlocking {
+            assertThat(service.renewSubscribeAsync()).isFalse()
+        }
+    }
+
+    @Test
+    fun unsubscribeAsync() {
+        val service = EmptyService
+        runBlocking {
+            assertThat(service.unsubscribeAsync()).isFalse()
+        }
     }
 }
