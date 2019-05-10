@@ -11,6 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.w3c.dom.Element
 
 @RunWith(JUnit4::class)
 class XmlUtilsTest {
@@ -48,5 +49,14 @@ class XmlUtilsTest {
         val root = document.documentElement
         val element = XmlUtils.findChildElementByLocalName(root, "properties")
         assertThat(element).isNull()
+    }
+
+    @Test
+    fun iterator() {
+        val xml = TestUtils.getResourceAsString("propchange.xml")
+        val document = XmlUtils.newDocument(true, xml)
+        val root = document.documentElement
+        assertThat(root.firstChild.siblings().filter { it is Element })
+            .isEqualTo(root.firstChild.siblingElements().toList())
     }
 }
