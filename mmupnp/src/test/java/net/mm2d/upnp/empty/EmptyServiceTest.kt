@@ -135,6 +135,18 @@ class EmptyServiceTest {
     }
 
     @Test
+    fun subscribe2() {
+        val service = EmptyService
+        service.subscribe(callback = null)
+    }
+
+    @Test
+    fun subscribe3() {
+        val service = EmptyService
+        service.subscribe(true, null)
+    }
+
+    @Test
     fun renewSubscribe() {
         val service = EmptyService
         val callback: (Boolean) -> Unit = mockk()
@@ -145,6 +157,12 @@ class EmptyServiceTest {
     }
 
     @Test
+    fun renewSubscribe1() {
+        val service = EmptyService
+        service.renewSubscribe(null)
+    }
+
+    @Test
     fun unsubscribe() {
         val service = EmptyService
         val callback: (Boolean) -> Unit = mockk()
@@ -152,6 +170,12 @@ class EmptyServiceTest {
         every { callback.invoke(capture(slot)) } answers { nothing }
         service.unsubscribe(callback)
         assertThat(slot.captured).isFalse()
+    }
+
+    @Test
+    fun unsubscribe1() {
+        val service = EmptyService
+        service.unsubscribe(null)
     }
 
     @Test
