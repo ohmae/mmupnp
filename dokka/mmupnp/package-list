@@ -1,11 +1,14 @@
 $dokka.format:html
 $dokka.linkExtension:html
 $dokka.location:net.mm2d.upnp$isHttpUrl(kotlin.String)net.mm2d.upnp/kotlin.-string/is-http-url.html
+$dokka.location:net.mm2d.upnp.util$asIterable(org.w3c.dom.NodeList)net.mm2d.upnp.util/org.w3c.dom.-node-list/as-iterable.html
 $dokka.location:net.mm2d.upnp.util$findChildElementByLocalName(org.w3c.dom.Node, kotlin.String)net.mm2d.upnp.util/org.w3c.dom.-node/find-child-element-by-local-name.html
 $dokka.location:net.mm2d.upnp.util$forEach(org.w3c.dom.NodeList, kotlin.Function1((org.w3c.dom.Node, kotlin.Unit)))net.mm2d.upnp.util/org.w3c.dom.-node-list/for-each.html
 $dokka.location:net.mm2d.upnp.util$forEachElement(org.w3c.dom.Node, kotlin.Function1((org.w3c.dom.Element, kotlin.Unit)))net.mm2d.upnp.util/org.w3c.dom.-node/for-each-element.html
 $dokka.location:net.mm2d.upnp.util$isAvailableInet4Interface(java.net.NetworkInterface)net.mm2d.upnp.util/java.net.-network-interface/is-available-inet4-interface.html
 $dokka.location:net.mm2d.upnp.util$isAvailableInet6Interface(java.net.NetworkInterface)net.mm2d.upnp.util/java.net.-network-interface/is-available-inet6-interface.html
+$dokka.location:net.mm2d.upnp.util$siblingElements(org.w3c.dom.Node)net.mm2d.upnp.util/org.w3c.dom.-node/sibling-elements.html
+$dokka.location:net.mm2d.upnp.util$siblings(org.w3c.dom.Node)net.mm2d.upnp.util/org.w3c.dom.-node/siblings.html
 $dokka.location:net.mm2d.upnp.util$toAddressString(java.net.InetAddress, kotlin.Int)net.mm2d.upnp.util/java.net.-inet-address/to-address-string.html
 $dokka.location:net.mm2d.upnp.util$toAddressString(java.net.InetSocketAddress)net.mm2d.upnp.util/java.net.-inet-socket-address/to-address-string.html
 net.mm2d.upnp
