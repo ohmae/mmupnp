@@ -940,6 +940,16 @@ class ControlPointTest {
 
             verify(inverse = true) { l.onNotifyEvent(service, 0, variableName, value) }
         }
+
+        @Test
+        fun notifyEvent_対応するサービスがない() {
+            val sid = "sid"
+            val variableName = "variable"
+            val l: NotifyEventListener = mockk(relaxed = true)
+            cp.addNotifyEventListener(l)
+            val value = "value"
+            assertThat(subscribeManager.onEventReceived(sid, 0, listOf(variableName + 1 to value))).isFalse()
+        }
     }
 
     @RunWith(JUnit4::class)
