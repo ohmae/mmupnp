@@ -7,10 +7,7 @@
 
 package net.mm2d.upnp.util
 
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
+import org.w3c.dom.*
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
 import java.io.IOException
@@ -171,7 +168,7 @@ fun Node.findChildElementByLocalName(localName: String): Element? {
 }
 
 /**
- * Iterate the node list.
+ * Iterate NodeList.
  *
  * @receiver node list
  * @param action Action to be performed on each node
@@ -183,7 +180,7 @@ inline fun NodeList.forEach(action: (Node) -> Unit) {
 /**
  * Returns the Iterable of Node
  *
- * @receiver Node performing iteration
+ * @receiver NodeList performing iteration
  */
 fun NodeList.asIterable(): Iterable<Node> {
     return object : Iterable<Node> {
@@ -202,5 +199,40 @@ private class NodeListIterator(
 
     override fun hasNext(): Boolean {
         return index < nodeList.length
+    }
+}
+
+/**
+ * Iterate NamedNodeMap.
+ *
+ * @receiver node list
+ * @param action Action to be performed on each node
+ */
+inline fun NamedNodeMap.forEach(action: (Node) -> Unit) {
+    asIterable().forEach(action)
+}
+
+/**
+ * Returns the Iterable of Node
+ *
+ * @receiver NamedNodeMap performing iteration
+ */
+fun NamedNodeMap.asIterable(): Iterable<Node> {
+    return object : Iterable<Node> {
+        override fun iterator(): Iterator<Node> =
+            NamedNodeMapIterator(this@asIterable)
+    }
+}
+
+private class NamedNodeMapIterator(
+    private val map: NamedNodeMap
+) : Iterator<Node> {
+    private var index = 0
+    override fun next(): Node {
+        return map.item(index++)
+    }
+
+    override fun hasNext(): Boolean {
+        return index < map.length
     }
 }

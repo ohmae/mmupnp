@@ -52,11 +52,28 @@ class XmlUtilsTest {
     }
 
     @Test
-    fun iterator() {
+    fun iterate_elements() {
         val xml = TestUtils.getResourceAsString("propchange.xml")
         val document = XmlUtils.newDocument(true, xml)
         val root = document.documentElement
         assertThat(root.firstChild.siblings().filter { it is Element })
             .isEqualTo(root.firstChild.siblingElements().toList())
+    }
+
+    @Test
+    fun iterate_attributes() {
+        val xml = """<item a="a" b="b" c="c" />"""
+        val document = XmlUtils.newDocument(true, xml)
+        val root = document.documentElement
+        val map = root.attributes.asIterable()
+            .map { it.nodeName to it.nodeValue }
+            .toMap()
+        assertThat(map).hasSize(3)
+        assertThat(map["a"]).isEqualTo("a")
+        assertThat(map["b"]).isEqualTo("b")
+        assertThat(map["c"]).isEqualTo("c")
+        root.attributes.forEach {
+            assertThat(it.nodeName).isEqualTo(it.nodeValue)
+        }
     }
 }
