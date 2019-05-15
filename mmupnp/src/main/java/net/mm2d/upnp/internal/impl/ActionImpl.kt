@@ -354,7 +354,7 @@ internal class ActionImpl(
     @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
     private fun parseResponse(xml: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
-        findResponseElement(xml).firstChild.forEachElement {
+        findResponseElement(xml).firstChild?.forEachElement {
             val tag = it.localName
             val text = it.textContent
             if (findArgument(tag) == null) {
