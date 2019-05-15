@@ -20,7 +20,7 @@ This can also be used from kotlin.
 
 ## Requirements
 - kotlin 1.3 or later
-- Java 6 or later
+- Java 7 or later
 
 ## Restrictions
 - This library support only ControlPoint functions.
@@ -83,7 +83,7 @@ repositories {
     }
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:3.0.0-rc1'
+    implementation 'net.mm2d:mmupnp:3.0.0-rc2'
 }
 ```
 
