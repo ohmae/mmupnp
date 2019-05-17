@@ -8,11 +8,11 @@
 [![Maven Repository](https://img.shields.io/badge/maven-jcenter-brightgreen.svg)](https://bintray.com/ohmae/maven/net.mm2d.mmupnp)
 [![Maven metadata URI](https://img.shields.io/maven-metadata/v/https/jcenter.bintray.com/net/mm2d/mmupnp/maven-metadata.xml.svg)](https://bintray.com/ohmae/maven/net.mm2d.mmupnp)
 
-Universal Plug and Play (UPnP) ControlPoint library for Java.
+Universal Plug and Play (UPnP) ControlPoint library for Java / Kotlin.
 
 ## Feature
-- Pure Java implementation.
-- Available in both Java application and Android apps.
+- Pure Kotlin implementation.
+- Available in both Java/Kotlin application and Android apps.
 - Easy to use
 - High response
 
@@ -43,8 +43,8 @@ Sample App
 
 I described Javadoc/KDoc comments. Please refer to it for more information.
 
-- [Javadoc for 2.0.0](https://ohmae.github.io/mmupnp/javadoc/)
-- [KDoc for 3.0.0](https://ohmae.github.io/mmupnp/dokka/mmupnp/)
+- [KDoc for 3.x.x](https://ohmae.github.io/mmupnp/dokka/mmupnp/) (English)
+- [Javadoc for 2.x.x](https://ohmae.github.io/mmupnp/javadoc/) (Japanese)
 
 ## How to use
 
@@ -56,36 +56,15 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:2.0.0'
+    implementation 'net.mm2d:mmupnp:3.0.0'
 }
 ```
-
-Some API are not compatible with 1.x.x
 
 1.x.x support has been discontinued.
 To access 1.x.x see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
 
 This branch is developing 3.0.0.
 To access 2.x.x see [2.x.x branch](https://github.com/ohmae/mmupnp/tree/support/2.x.x)
-
-### Test release
-
-This library is under development of 3.0.0.
-There are no plans to make major changes to the specification, but it will be rewritten with Kotlin.
-And undergoing destructive change.
-
-Distributed in the following maven repository.
-
-```gradle
-repositories {
-    maven {
-        url 'https://ohmae.github.com/mmupnp/maven'
-    }
-}
-dependencies {
-    implementation 'net.mm2d:mmupnp:3.0.0-rc2'
-}
-```
 
 ### Initialize and Start
 
@@ -142,6 +121,16 @@ val cp = ControlPointFactory.create(
         }
     }
 )
+```
+
+Builder type initialization is also provided.
+It is convenient when using from Java.
+
+```kotlin
+val cp = ControlPointFactory.builder()
+    .setInterfaces(interfaces)
+    .setCallbackHandler { handler.post(it) }
+    .build()
 ```
 
 ### M-SEARCH
@@ -213,7 +202,7 @@ When you want to reset, try again from the constructor call.
 
 This library use [log library](https://github.com/ohmae/log),
 
-If you want to enable debug log.
+To enable debug log.
 
 ```kotlin
 Logger.setLogLevel(Logger.VERBOSE)
