@@ -20,7 +20,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "net.mm2d:log:0.8.1"
+    implementation "net.mm2d:log:0.8.2"
 
     testImplementation "io.mockk:mockk:1.9.3"
     testImplementation "com.google.truth:truth:0.44"

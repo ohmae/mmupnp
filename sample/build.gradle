@@ -14,7 +14,7 @@ tasks.withType(JavaCompile) {
 dependencies {
     implementation project(':mmupnp')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "net.mm2d:log:0.8.1"
+    implementation "net.mm2d:log:0.8.2"
     implementation 'com.google.code.gson:gson:2.8.5'
     testImplementation 'junit:junit:4.12'
 }
