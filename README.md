@@ -60,12 +60,6 @@ dependencies {
 }
 ```
 
-1.x.x support has been discontinued.
-To access 1.x.x see [1.x.x branch](https://github.com/ohmae/mmupnp/tree/support/1.x.x)
-
-This branch is developing 3.0.0.
-To access 2.x.x see [2.x.x branch](https://github.com/ohmae/mmupnp/tree/support/2.x.x)
-
 ### Initialize and Start
 
 ```kotlin
