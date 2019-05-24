@@ -97,7 +97,7 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
     }
 
     private fun updateResult(result: Map<String, String>) {
-        result.forEach { key, value ->
+        result.forEach { (key, value) ->
             setResult(key, value)
         }
     }
@@ -124,12 +124,10 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
 
     private fun makeComponent(argument: Argument): JComponent {
         val variable = argument.relatedStateVariable
-        return if (!variable.allowedValueList.isEmpty()) {
-            makeComboBox(argument)
-        } else if (DataType.of(variable.dataType).isMultiLine) {
-            makeTextArea(argument)
-        } else {
-            makeTextField(argument)
+        return when {
+            variable.allowedValueList.isNotEmpty() -> makeComboBox(argument)
+            DataType.of(variable.dataType).isMultiLine -> makeTextArea(argument)
+            else -> makeTextField(argument)
         }
     }
 

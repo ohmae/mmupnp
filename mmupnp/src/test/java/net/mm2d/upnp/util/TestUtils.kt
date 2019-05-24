@@ -19,7 +19,7 @@ object TestUtils {
     private val classLoader: ClassLoader
         get() = TestUtils::class.java.classLoader
 
-    fun getResourceAsFile(name: String): File {
+    private fun getResourceAsFile(name: String): File {
         return File(classLoader.getResource(name)!!.file)
     }
 

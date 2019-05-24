@@ -28,30 +28,30 @@ class NetworkUtilsTest {
     class NetworkInterfaceをデバイスから取得 {
         @Test
         fun availableInterfaces() {
-            NetworkUtils.getAvailableInterfaces().forEach {
-                assertThat(it.isLoopback).isFalse()
-                assertThat(it.isUp).isTrue()
-                assertThat(it.supportsMulticast()).isTrue()
+            NetworkUtils.getAvailableInterfaces().forEach { nif ->
+                assertThat(nif.isLoopback).isFalse()
+                assertThat(nif.isUp).isTrue()
+                assertThat(nif.supportsMulticast()).isTrue()
             }
         }
 
         @Test
         fun availableInet4Interfaces() {
-            NetworkUtils.getAvailableInet4Interfaces().forEach {
-                assertThat(it.isLoopback).isFalse()
-                assertThat(it.isUp).isTrue()
-                assertThat(it.supportsMulticast()).isTrue()
-                assertThat(it.interfaceAddresses.any { it.address is Inet4Address }).isTrue()
+            NetworkUtils.getAvailableInet4Interfaces().forEach { nif ->
+                assertThat(nif.isLoopback).isFalse()
+                assertThat(nif.isUp).isTrue()
+                assertThat(nif.supportsMulticast()).isTrue()
+                assertThat(nif.interfaceAddresses.any { it.address is Inet4Address }).isTrue()
             }
         }
 
         @Test
         fun availableInet6Interfaces() {
-            NetworkUtils.getAvailableInet6Interfaces().forEach {
-                assertThat(it.isLoopback).isFalse()
-                assertThat(it.isUp).isTrue()
-                assertThat(it.supportsMulticast()).isTrue()
-                assertThat(it.interfaceAddresses.any { it.address is Inet6Address }).isTrue()
+            NetworkUtils.getAvailableInet6Interfaces().forEach { nif ->
+                assertThat(nif.isLoopback).isFalse()
+                assertThat(nif.isUp).isTrue()
+                assertThat(nif.supportsMulticast()).isTrue()
+                assertThat(nif.interfaceAddresses.any { it.address is Inet6Address }).isTrue()
             }
         }
     }
