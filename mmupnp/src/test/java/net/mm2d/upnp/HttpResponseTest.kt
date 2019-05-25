@@ -117,7 +117,7 @@ class HttpResponseTest {
         val response = HttpResponse.create().apply {
             setStatus(Http.Status.HTTP_OK)
             setHeader(Http.SERVER, Property.SERVER_VALUE)
-            setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
+            setHeader(Http.DATE, Http.formatDate(Date()))
             setHeader(Http.CONNECTION, Http.CLOSE)
             setBody(data, true)
         }

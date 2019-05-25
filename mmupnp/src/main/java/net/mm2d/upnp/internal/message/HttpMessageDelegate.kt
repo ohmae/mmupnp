@@ -247,24 +247,24 @@ internal class HttpMessageDelegate(
 
     @Throws(IOException::class)
     private fun readBody(inputStream: InputStream) {
-        val baos = ByteArrayOutputStream()
-        readInputStream(inputStream, baos, contentLength)
-        bodyBinary = baos.toByteArray()
+        bodyBinary = ByteArrayOutputStream().also {
+            readInputStream(inputStream, it, contentLength)
+        }.toByteArray()
     }
 
     @Throws(IOException::class)
     private fun readChunkedBody(inputStream: InputStream) {
-        val baos = ByteArrayOutputStream()
-        while (true) {
-            val length = readChunkSize(inputStream)
-            if (length == 0) {
+        bodyBinary = ByteArrayOutputStream().also {
+            while (true) {
+                val length = readChunkSize(inputStream)
+                if (length == 0) {
+                    readLine(inputStream)
+                    break
+                }
+                readInputStream(inputStream, it, length)
                 readLine(inputStream)
-                break
             }
-            readInputStream(inputStream, baos, length)
-            readLine(inputStream)
-        }
-        bodyBinary = baos.toByteArray()
+        }.toByteArray()
     }
 
     @Throws(IOException::class)
@@ -299,27 +299,26 @@ internal class HttpMessageDelegate(
     companion object {
         private const val BUFFER_SIZE = 1500
         private const val DEFAULT_CHUNK_SIZE = 1024
-        private const val CR = 0x0d
-        private const val LF = 0x0a
-        private const val EOL = "\r\n"
+        private const val CR: Int = '\r'.toInt()
+        private const val LF: Int = '\n'.toInt()
+        private const val EOL: String = "\r\n"
         private val CRLF = byteArrayOf(CR.toByte(), LF.toByte())
         private val CHARSET = Charsets.UTF_8
 
         @Throws(IOException::class)
         private fun readLine(inputStream: InputStream): String {
-            val baos = ByteArrayOutputStream()
-            while (true) {
-                val b = inputStream.read()
-                if (b < 0) {
-                    if (baos.size() == 0)
-                        throw IOException("can't read from InputStream")
-                    break
+            return ByteArrayOutputStream().also {
+                while (true) {
+                    val b = inputStream.read()
+                    if (b < 0) {
+                        if (it.size() == 0) throw IOException("can't read from InputStream")
+                        break
+                    }
+                    if (b == LF) break
+                    if (b == CR) continue
+                    it.write(b)
                 }
-                if (b == LF) break
-                if (b == CR) continue
-                baos.write(b)
-            }
-            return baos.toString(CHARSET.name())
+            }.toString(CHARSET.name())
         }
     }
 }
