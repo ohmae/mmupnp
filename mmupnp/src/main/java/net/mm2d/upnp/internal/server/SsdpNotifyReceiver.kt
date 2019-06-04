@@ -87,9 +87,9 @@ internal class SsdpNotifyReceiver(
         // Even if the address setting is incorrect, multicast packets can be sent.
         // Since the segment information is incorrect and packets from parties
         // that can not be exchanged except for multicast are useless even if received, they are discarded.
-        if (segmentCheckEnabled
-            && delegate.address == Address.IP_V4
-            && invalidSegment(interfaceAddress, sourceAddress)
+        if (segmentCheckEnabled &&
+            delegate.address == Address.IP_V4 &&
+            invalidSegment(interfaceAddress, sourceAddress)
         ) {
             Logger.w { "Invalid segment:$sourceAddress $interfaceAddress" }
             return true

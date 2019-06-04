@@ -70,7 +70,7 @@ interface Action {
      * and 'UPnPError/errorDescription' may also be included.
      * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
      *
-     * @param argumentValues      Input value to argument
+     * @param argumentValues Input value to argument
      * @param returnErrorResponse When an error response is received, if true,
      * the error is also parsed and returned as a return value. If false, throws IOException.
      * @return Invocation result
@@ -116,9 +116,9 @@ interface Action {
      * Designate with `Map<String, String>`, specify prefix as key and URI as value.
      * The Namespace given by this argument is added to the Action Element.
      *
-     * @param argumentValues      Input value to argument
-     * @param customNamespace     Namespace of custom argument
-     * @param customArguments     Custom argument
+     * @param argumentValues Input value to argument
+     * @param customNamespace Namespace of custom argument
+     * @param customArguments Custom argument
      * @param returnErrorResponse When an error response is received, if true,
      * the error is also parsed and returned as a return value. If false, throws IOException.
      * @return Invocation result
@@ -158,11 +158,11 @@ interface Action {
      * and 'UPnPError/errorDescription' may also be included.
      * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
      *
-     * @param argumentValues      Input value to argument
+     * @param argumentValues Input value to argument
      * @param returnErrorResponse When an error response is received, if true,
      * the error is also parsed and returned as a return value. If false, throws IOException.
-     * @param onResult            Callback to notify the result. It will be Executed in callback thread.
-     * @param onError             Callback to notify error. It will be Executed in callback thread.
+     * @param onResult Callback to notify the result. It will be Executed in callback thread.
+     * @param onError Callback to notify error. It will be Executed in callback thread.
      * @throws IOException If any exception occurs while communication or there is an error response
      * @see ControlPointFactory.create
      * @see FAULT_CODE_KEY
@@ -207,13 +207,13 @@ interface Action {
      * Designate with `Map<String, String>`, specify prefix as key and URI as value.
      * The Namespace given by this argument is added to the Action Element.
      *
-     * @param argumentValues      Input value to argument
-     * @param customNamespace     Namespace of custom argument
-     * @param customArguments     Custom argument
+     * @param argumentValues Input value to argument
+     * @param customNamespace Namespace of custom argument
+     * @param customArguments Custom argument
      * @param returnErrorResponse When an error response is received, if true,
      * the error is also parsed and returned as a return value. If false, throws IOException.
-     * @param onResult            Callback to notify the result. It will be Executed in callback thread.
-     * @param onError             Callback to notify error. It will be Executed in callback thread.
+     * @param onResult Callback to notify the result. It will be Executed in callback thread.
+     * @param onError Callback to notify error. It will be Executed in callback thread.
      * @see ControlPointFactory.create
      * @see FAULT_CODE_KEY
      * @see FAULT_STRING_KEY
@@ -251,7 +251,7 @@ interface Action {
      * and 'UPnPError/errorDescription' may also be included.
      * In this method, if 'UPnPError/errorCode' is not included, It is treated as an error and IOException is thrown.
      *
-     * @param argumentValues      Input value to argument
+     * @param argumentValues Input value to argument
      * @param returnErrorResponse When an error response is received, if true,
      * the error is also parsed and returned as a return value. If false, throws IOException.
      * @return Invocation result
@@ -296,9 +296,9 @@ interface Action {
      * Designate with `Map<String, String>`, specify prefix as key and URI as value.
      * The Namespace given by this argument is added to the Action Element.
      *
-     * @param argumentValues      Input value to argument
-     * @param customNamespace     Namespace of custom argument
-     * @param customArguments     Custom argument
+     * @param argumentValues Input value to argument
+     * @param customNamespace Namespace of custom argument
+     * @param customArguments Custom argument
      * @param returnErrorResponse When an error response is received, if true,
      * the error is also parsed and returned as a return value. If false, throws IOException.
      * @return Invocation result

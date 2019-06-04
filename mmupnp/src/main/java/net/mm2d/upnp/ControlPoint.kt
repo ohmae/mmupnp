@@ -53,10 +53,10 @@ interface ControlPoint {
         /**
          * Called on receive NotifyEvent
          *
-         * @param service  Target Service
-         * @param seq      Sequence number
+         * @param service Target Service
+         * @param seq Sequence number
          * @param variable variable name
-         * @param value    value
+         * @param value value
          * @see Service
          */
         fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String)
@@ -203,7 +203,7 @@ interface ControlPoint {
      *
      * This is used to read the cached information based on it.
      *
-     * @param uuid     UDN
+     * @param uuid UDN
      * @param location location
      */
     fun tryAddDevice(uuid: String, location: String)

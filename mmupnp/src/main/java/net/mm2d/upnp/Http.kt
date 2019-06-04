@@ -291,8 +291,8 @@ object Http {
      * @return true: HTTP URL, false otherwise
      */
     fun isHttpUrl(url: String?): Boolean {
-        return (url != null && url.length > HTTP_SCHEME.length
-                && url.substring(0, HTTP_SCHEME.length).equals(HTTP_SCHEME, ignoreCase = true))
+        return (url != null && url.length > HTTP_SCHEME.length &&
+                url.substring(0, HTTP_SCHEME.length).equals(HTTP_SCHEME, ignoreCase = true))
     }
 
     /**
@@ -310,7 +310,7 @@ object Http {
      * Create URL from BaseURL and absolute path.
      *
      * @param baseUrl BaseURL
-     * @param path    Absolute path
+     * @param path Absolute path
      * @return Combined URL
      */
     private fun makeUrlWithAbsolutePath(baseUrl: String, path: String): String {
@@ -322,7 +322,7 @@ object Http {
      * Create URL from BaseURL and relative path.
      *
      * @param baseUrl BaseURL
-     * @param path    Relative path
+     * @param path Relative path
      * @return Combined URL
      */
     private fun makeUrlWithRelativePath(baseUrl: String, path: String): String {
@@ -337,7 +337,7 @@ object Http {
      * Add ScopeID to URL.
      *
      * @param urlString String URL
-     * @param scopeId   ScopeID
+     * @param scopeId ScopeID
      * @return URL with ScopeID added
      * @throws MalformedURLException Bad URL
      */
@@ -413,7 +413,7 @@ object Http {
      * And this also gives scopeId.
      *
      * @param baseUrl baseUrl
-     * @param url     URL
+     * @param url URL
      * @param scopeId ScopeID
      * @return Normalized URL
      * @throws MalformedURLException Bad URL

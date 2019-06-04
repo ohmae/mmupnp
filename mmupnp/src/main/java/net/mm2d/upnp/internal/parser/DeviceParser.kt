@@ -36,10 +36,10 @@ internal object DeviceParser {
      * In addition, download Icon / description of Service described internally, parses it,
      * and creates each Builder.
      *
-     * @param client  HttpClient
+     * @param client HttpClient
      * @param builder DeviceのBuilder
-     * @throws SAXException                 if an parse error occurs.
-     * @throws IOException                  if an I/O error occurs.
+     * @throws SAXException if an parse error occurs.
+     * @throws IOException if an I/O error occurs.
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)

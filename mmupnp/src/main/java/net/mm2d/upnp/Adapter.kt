@@ -32,7 +32,7 @@ object Adapter {
      * Adapter for [DiscoveryListener].
      *
      * @param discover onDiscover callback
-     * @param lost     onLost callback
+     * @param lost onLost callback
      * @return DiscoveryListener
      */
     @JvmStatic

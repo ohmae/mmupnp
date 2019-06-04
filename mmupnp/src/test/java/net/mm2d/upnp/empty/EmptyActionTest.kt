@@ -99,5 +99,4 @@ class EmptyActionTest {
             EmptyAction.invokeCustomAsync(emptyMap())
         }
     }
-
 }

@@ -93,7 +93,7 @@ interface SsdpMessage {
     /**
      * Set the value of header
      *
-     * @param name  header name
+     * @param name header name
      * @param value value
      */
     fun setHeader(name: String, value: String)

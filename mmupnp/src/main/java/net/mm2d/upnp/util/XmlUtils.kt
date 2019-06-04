@@ -58,10 +58,10 @@ object XmlUtils {
      * Create new Document that contains the argument string.
      *
      * @param awareness if true, XML namespace aware
-     * @param xml       XML string
+     * @param xml XML string
      * @return Document
-     * @throws SAXException                 if an parse error occurs.
-     * @throws IOException                  if an I/O error occurs.
+     * @throws SAXException if an parse error occurs.
+     * @throws IOException if an I/O error occurs.
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(SAXException::class, IOException::class, ParserConfigurationException::class)
@@ -74,7 +74,7 @@ object XmlUtils {
     /**
      * Returns the first element node with a specific name below the parent node.
      *
-     * @param parent    parent node
+     * @param parent parent node
      * @param localName local name to search
      * @return Element node found, null if not found
      */

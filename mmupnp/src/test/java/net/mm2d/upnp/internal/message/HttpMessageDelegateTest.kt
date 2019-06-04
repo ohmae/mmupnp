@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.internal.message
 
-
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
@@ -41,7 +40,6 @@ class HttpMessageDelegateTest {
         }
         assertThat(message.getBody()).isNull()
     }
-
 
     @Test
     fun getHeaderBytes_エンコード不可でもnullが返らない() {

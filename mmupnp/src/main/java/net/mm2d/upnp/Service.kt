@@ -164,7 +164,7 @@ interface Service {
      * Invoke subscribe asynchronously.
      *
      * @param keepRenew true: renew will be performed periodically before Expire.
-     * @param callback  Callback to notify the result. Executed in callback thread.
+     * @param callback Callback to notify the result. Executed in callback thread.
      * @see ControlPointFactory.create
      */
     fun subscribe(keepRenew: Boolean = false, callback: ((Boolean) -> Unit)? = null)

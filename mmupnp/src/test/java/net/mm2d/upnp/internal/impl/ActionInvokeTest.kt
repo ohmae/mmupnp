@@ -87,14 +87,14 @@ class ActionInvokeTest {
         httpResponse = HttpResponse.create()
         httpResponse.setStatus(Http.Status.HTTP_OK)
         httpResponse.setBody(
-            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
-                    + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                    + "<s:Body>\n"
-                    + "<u:" + ACTION_NAME + "Response xmlns:u=\"" + SERVICE_TYPE + "\">\n"
-                    + "<" + OUT_ARG_NAME1 + ">" + OUT_ARG_VALUE1 + "</" + OUT_ARG_NAME1 + ">\n"
-                    + "</u:" + ACTION_NAME + "Response>\n"
-                    + "</s:Body>\n"
-                    + "</s:Envelope>"
+            """
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <s:Body>
+            <u:${ACTION_NAME}Response xmlns:u="$SERVICE_TYPE">
+            <$OUT_ARG_NAME1>$OUT_ARG_VALUE1</$OUT_ARG_NAME1>
+            </u:${ACTION_NAME}Response>
+            </s:Body>
+            </s:Envelope>""".trimIndent()
         )
         every { action.createHttpClient() } returns mockHttpClient
     }
@@ -294,7 +294,6 @@ class ActionInvokeTest {
             } catch (ignored: IOException) {
                 exceptionCount++
             }
-
         }
         assertThat(statusCount).isEqualTo(exceptionCount)
     }
@@ -302,9 +301,10 @@ class ActionInvokeTest {
     @Test(expected = IOException::class)
     fun invokeSync_BodyタグがないとIOExceptionが発生() {
         httpResponse.setBody(
-            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
-                    + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                    + "</s:Envelope>"
+            """
+            |<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            |</s:Envelope>
+            """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
 
@@ -314,11 +314,12 @@ class ActionInvokeTest {
     @Test(expected = IOException::class)
     fun invokeSync_ActionタグがないとIOExceptionが発生() {
         httpResponse.setBody(
-            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
-                    + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                    + "<s:Body>\n"
-                    + "</s:Body>\n"
-                    + "</s:Envelope>"
+            """
+                <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                <s:Body>
+                </s:Body>
+                </s:Envelope>
+                """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
 
@@ -335,15 +336,16 @@ class ActionInvokeTest {
     @Test
     fun invokeSync_argumentListにない結果が含まれていても結果に含まれる() {
         httpResponse.setBody(
-            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
-                    + " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
-                    + "<s:Body>\n"
-                    + "<u:" + ACTION_NAME + "Response xmlns:u=\"" + SERVICE_TYPE + "\">\n"
-                    + "<" + OUT_ARG_NAME1 + ">" + OUT_ARG_VALUE1 + "</" + OUT_ARG_NAME1 + ">\n"
-                    + "<" + OUT_ARG_NAME2 + ">" + OUT_ARG_VALUE2 + "</" + OUT_ARG_NAME2 + ">\n"
-                    + "</u:" + ACTION_NAME + "Response>\n"
-                    + "</s:Body>\n"
-                    + "</s:Envelope>"
+            """
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <s:Body>
+            <u:${ACTION_NAME}Response xmlns:u="$SERVICE_TYPE">
+            <$OUT_ARG_NAME1>$OUT_ARG_VALUE1</$OUT_ARG_NAME1>
+            <$OUT_ARG_NAME2>$OUT_ARG_VALUE2</$OUT_ARG_NAME2>
+            </u:${ACTION_NAME}Response>
+            </s:Body>
+            </s:Envelope>
+            """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
         val result = action.invokeSync(emptyMap())
@@ -363,20 +365,21 @@ class ActionInvokeTest {
     fun invokeSync_エラーレスポンスにerrorCodeがないとIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(
-            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-                    + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                    + "<s:Body>\n"
-                    + "<s:Fault>\n"
-                    + "<faultcode>s:Client</faultcode>\n"
-                    + "<faultstring>UPnPError</faultstring>\n"
-                    + "<detail>\n"
-                    + "<UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\">\n"
-                    + "<errorDescription>Restricted object</errorDescription>\n"
-                    + "</UPnPError>\n"
-                    + "</detail>\n"
-                    + "</s:Fault>\n"
-                    + "</s:Body>\n"
-                    + "</s:Envelope>"
+            """
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <s:Body>
+            <s:Fault>
+            <faultcode>s:Client</faultcode>
+            <faultstring>UPnPError</faultstring>
+            <detail>
+            <UPnPError xmlns="urn:schemas-upnp-org:control-1-0">
+            <errorDescription>Restricted object</errorDescription>
+            </UPnPError>
+            </detail>
+            </s:Fault>
+            </s:Body>
+            </s:Envelope>
+            """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
         action.invokeSync(emptyMap(), true)
@@ -386,17 +389,18 @@ class ActionInvokeTest {
     fun invokeSync_エラーレスポンスにUPnPErrorがないとIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(
-            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-                    + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                    + "<s:Body>\n"
-                    + "<s:Fault>\n"
-                    + "<faultcode>s:Client</faultcode>\n"
-                    + "<faultstring>UPnPError</faultstring>\n"
-                    + "<detail>\n"
-                    + "</detail>\n"
-                    + "</s:Fault>\n"
-                    + "</s:Body>\n"
-                    + "</s:Envelope>"
+            """
+                <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                <s:Body>
+                <s:Fault>
+                <faultcode>s:Client</faultcode>
+                <faultstring>UPnPError</faultstring>
+                <detail>
+                </detail>
+                </s:Fault>
+                </s:Body>
+                </s:Envelope>
+                """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
         action.invokeSync(emptyMap(), true)
@@ -406,9 +410,10 @@ class ActionInvokeTest {
     fun invokeSync_エラーレスポンスにBodyがないとIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(
-            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-                    + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                    + "</s:Envelope>"
+            """
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            </s:Envelope>
+            """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
         action.invokeSync(emptyMap(), true)
@@ -418,11 +423,12 @@ class ActionInvokeTest {
     fun invokeSync_エラーレスポンスにFaultがないとIOExceptionが発生() {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(
-            "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-                    + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                    + "<s:Body>\n"
-                    + "</s:Body>\n"
-                    + "</s:Envelope>"
+            """
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <s:Body>
+            </s:Body>
+            </s:Envelope>
+            """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
         action.invokeSync(emptyMap(), true)
@@ -623,21 +629,21 @@ class ActionInvokeTest {
         private const val ACTION_NAME = "TestAction"
         private const val SERVICE_TYPE = "urn:schemas-upnp-org:service:TestServiceType:1"
 
-        private const val ERROR_RESPONSE = (
-                "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-                        + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                        + "<s:Body>\n"
-                        + "<s:Fault>\n"
-                        + "<faultcode>s:Client</faultcode>\n"
-                        + "<faultstring>UPnPError</faultstring>\n"
-                        + "<detail>\n"
-                        + "<UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\">\n"
-                        + "<errorCode>711</errorCode>\n"
-                        + "<errorDescription>Restricted object</errorDescription>\n"
-                        + "</UPnPError>\n"
-                        + "</detail>\n"
-                        + "</s:Fault>\n"
-                        + "</s:Body>\n"
-                        + "</s:Envelope>")
+        private val ERROR_RESPONSE = """
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <s:Body>
+            <s:Fault>
+            <faultcode>s:Client</faultcode>
+            <faultstring>UPnPError</faultstring>
+            <detail>
+            <UPnPError xmlns="urn:schemas-upnp-org:control-1-0">
+            <errorCode>711</errorCode>
+            <errorDescription>Restricted object</errorDescription>
+            </UPnPError>
+            </detail>
+            </s:Fault>
+            </s:Body>
+            </s:Envelope>
+            """.trimIndent()
     }
 }

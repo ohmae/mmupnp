@@ -33,11 +33,11 @@ internal object ServiceParser {
      *
      * KeepAlive, if possible.
      *
-     * @param client        HttpClient
+     * @param client HttpClient
      * @param deviceBuilder DeviceのBuilder
-     * @param builder       ServiceのBuilder
-     * @throws SAXException                 if an parse error occurs.
-     * @throws IOException                  if an I/O error occurs.
+     * @param builder ServiceのBuilder
+     * @throws SAXException if an parse error occurs.
+     * @throws IOException if an I/O error occurs.
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)

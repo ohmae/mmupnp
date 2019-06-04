@@ -16,7 +16,6 @@ import org.junit.Test
 
 import java.net.InetAddress
 
-
 class FakeSsdpMessageTest {
     private lateinit var fakeSsdpMessage: FakeSsdpMessage
 

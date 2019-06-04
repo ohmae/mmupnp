@@ -16,9 +16,9 @@ import java.util.concurrent.TimeUnit
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  *
  * @constructor initialize
- * @param service             [Service]
+ * @param service [Service]
  * @param subscriptionTimeout Time to time out
- * @param keepRenew           true: periodically execute renew
+ * @param keepRenew true: periodically execute renew
  */
 internal class SubscribeService(
     private val service: Service,

@@ -260,7 +260,7 @@ interface Device {
      * If the value does not exist, null is returned.
      *
      * @param namespace tag namespace (URI)
-     * @param name      tag name
+     * @param name tag name
      * @return tag value
      */
     fun getValueWithNamespace(

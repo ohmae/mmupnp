@@ -165,7 +165,7 @@ internal class ActionImpl(
      * If there is a value in the input, adopt it, otherwise adopt the default value.
      * If there is neither, it will be null.
      *
-     * @param argument       Argument
+     * @param argument Argument
      * @param argumentValues Argument values
      * @return Selected argument value
      */
@@ -176,7 +176,7 @@ internal class ActionImpl(
     /**
      * Append custom arguments.
      *
-     * @param base      append target
+     * @param base append target
      * @param arguments custom arguments to append.
      */
     private fun appendArgument(base: MutableList<Pair<String, String?>>, arguments: Map<String, String>) {
@@ -240,7 +240,7 @@ internal class ActionImpl(
     /**
      * SOAP送信のためのHttpRequestを作成する。
      *
-     * @param url  接続先URL
+     * @param url 接続先URL
      * @param soap SOAPの文字列
      * @return SOAP送信用HttpRequest
      * @throws IOException if an I/O error occurs.
@@ -288,8 +288,8 @@ internal class ActionImpl(
     /**
      * Include Action's arguments in XML
      *
-     * @param document  XML Document
-     * @param action    Element of action
+     * @param document XML Document
+     * @param action Element of action
      * @param arguments Arguments
      */
     private fun setArgument(document: Document, action: Element, arguments: List<Pair<String, String?>>) {
@@ -347,8 +347,8 @@ internal class ActionImpl(
      *
      * @param xml XML string that is the response of Action
      * @return the response of this Action. Map with argument name as key and value as value
-     * @throws SAXException                 if an parse error occurs.
-     * @throws IOException                  if an I/O error occurs.
+     * @throws SAXException if an parse error occurs.
+     * @throws IOException if an I/O error occurs.
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
@@ -374,8 +374,8 @@ internal class ActionImpl(
      *
      * @param xml XML string that is the response of Action
      * @return Element of the Response tag
-     * @throws SAXException                 if an parse error occurs.
-     * @throws IOException                  if an I/O error occurs.
+     * @throws SAXException if an parse error occurs.
+     * @throws IOException if an I/O error occurs.
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
@@ -388,8 +388,8 @@ internal class ActionImpl(
      *
      * @param xml XML string that is the response of Action
      * @return error response such as 'faultcode','faultstring','UPnPError/errorCode','UPnPError/errorDescription'
-     * @throws SAXException                 if an parse error occurs.
-     * @throws IOException                  if an I/O error occurs.
+     * @throws SAXException if an parse error occurs.
+     * @throws IOException if an I/O error occurs.
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
@@ -430,8 +430,8 @@ internal class ActionImpl(
      *
      * @param xml XML string that is the response of Action
      * @return Element of the Fault tag
-     * @throws SAXException                 if an parse error occurs.
-     * @throws IOException                  if an I/O error occurs.
+     * @throws SAXException if an parse error occurs.
+     * @throws IOException if an I/O error occurs.
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)

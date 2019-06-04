@@ -103,7 +103,7 @@ class HttpRequest internal constructor(
     /**
      * Set the destination URL.
      *
-     * @param url            destination URL
+     * @param url destination URL
      * @param withHostHeader true: also set the HOST header based on the URL. default is false
      * @throws IOException specify something other than http, or error occurs while the URL parse
      */
@@ -173,4 +173,3 @@ class HttpRequest internal constructor(
         }
     }
 }
-

@@ -832,7 +832,6 @@ class ControlPointTest {
             verify(exactly = 1) { deviceHolder[udn] }
         }
 
-
         @Test
         fun onReceiveSsdp_NotifyListenerから伝搬() {
             val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"

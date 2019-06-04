@@ -82,7 +82,6 @@ internal object SsdpRequestTest {
         fun getType() {
             val message = makeFromResource("ssdp-notify-alive2.bin")
             assertThat(message.type).isEqualTo("urn:schemas-upnp-org:service:ContentDirectory:1")
-
         }
 
         @Test

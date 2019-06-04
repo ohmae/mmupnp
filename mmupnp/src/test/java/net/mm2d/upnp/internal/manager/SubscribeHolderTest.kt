@@ -182,7 +182,6 @@ class SubscribeHolderTest {
         subscribeHolder.stop()
     }
 
-
     @Test(timeout = 10000L)
     fun renew_失敗したら削除される() {
         val id = "id"

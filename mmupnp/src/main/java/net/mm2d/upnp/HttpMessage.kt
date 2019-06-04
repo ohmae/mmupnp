@@ -70,7 +70,7 @@ interface HttpMessage {
     /**
      * Set the header value
      *
-     * @param name  header name
+     * @param name header name
      * @param value value
      */
     fun setHeader(name: String, value: String)
@@ -100,7 +100,7 @@ interface HttpMessage {
     /**
      * Set message body by String.
      *
-     * @param body              message body
+     * @param body message body
      * @param withContentLength If true, Content-Length will be registered from the registered body value and registered.
      */
     fun setBody(body: String?, withContentLength: Boolean = false)
@@ -117,7 +117,7 @@ interface HttpMessage {
     /**
      * Set message body by binary.
      *
-     * @param body              message body
+     * @param body message body
      * @param withContentLength If true, Content-Length will be registered from the registered body value and registered.
      */
     fun setBodyBinary(body: ByteArray?, withContentLength: Boolean = false)

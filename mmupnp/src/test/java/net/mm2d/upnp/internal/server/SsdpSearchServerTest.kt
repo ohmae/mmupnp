@@ -157,5 +157,4 @@ class SsdpSearchServerTest {
 
         server.onReceive(address, data, data.size)
     }
-
 }

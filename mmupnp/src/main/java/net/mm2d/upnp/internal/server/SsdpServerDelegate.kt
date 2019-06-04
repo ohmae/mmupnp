@@ -26,10 +26,10 @@ import kotlin.concurrent.withLock
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  *
- * @param taskExecutors    taskExecutors
- * @param address          Multicast address
+ * @param taskExecutors taskExecutors
+ * @param address Multicast address
  * @param networkInterface network interface
- * @param bindPort         port number
+ * @param bindPort port number
  */
 internal class SsdpServerDelegate
 @JvmOverloads constructor(
@@ -201,7 +201,7 @@ internal class SsdpServerDelegate
          * A normal URL is described in the Location of SsdpMessage,
          * and it is checked whether there is a mismatch between the description address and the packet source address.
          *
-         * @param message       SsdpMessage to check
+         * @param message SsdpMessage to check
          * @param sourceAddress source address
          * @return true: if there is an invalid Location, such as a mismatch with the sender. false: otherwise
          */

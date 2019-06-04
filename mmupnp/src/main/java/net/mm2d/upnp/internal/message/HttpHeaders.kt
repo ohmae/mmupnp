@@ -27,7 +27,7 @@ internal class HttpHeaders {
         constructor(original: Entry) : this(original._name, original._value)
 
         var value: String
-            get() : String = _value
+            get(): String = _value
             internal set(value) {
                 _value = value
             }
@@ -124,7 +124,7 @@ internal class HttpHeaders {
      * Header duplication is not case sensitive.
      * If replaced, the header name is also replaced with that of the argument.
      *
-     * @param name  header name
+     * @param name header name
      * @param value header value
      * @return If there is a duplicate, the value already registered
      */
@@ -143,7 +143,7 @@ internal class HttpHeaders {
     /**
      * Determines whether the specified header contains the specified value regardless of case.
      *
-     * @param name  header name
+     * @param name header name
      * @param value header value
      * @return true: contains specified header value
      */
