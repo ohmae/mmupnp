@@ -121,19 +121,16 @@ class HttpServerMock {
         }
 
         override fun run() {
-            var inputStream: InputStream? = null
-            var outputStream: OutputStream? = null
             try {
-                inputStream = socket.getInputStream()
-                outputStream = socket.getOutputStream()
-                while (server.receiveAndReply(socket, inputStream!!, outputStream!!));
-            } catch (e: IOException) {
-            } finally {
-                inputStream.closeQuietly()
-                outputStream.closeQuietly()
-                socket.closeQuietly()
-                server.notifyClientFinished(this)
+                socket.use {
+                    val input = socket.getInputStream()
+                    val output = socket.getOutputStream()
+                    while (server.receiveAndReply(socket, input, output)) {
+                    }
+                }
+            } catch (ignored: IOException) {
             }
+            server.notifyClientFinished(this)
         }
     }
 }
