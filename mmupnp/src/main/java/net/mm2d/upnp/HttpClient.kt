@@ -17,8 +17,8 @@ import java.net.URL
 /**
  * Client that performs HTTP communication.
  *
- * Specialized in the exchange of small data often used in UPnP communication.
- * It does not assume the exchange of huge data.
+ * Specialized in sending and receiving small data often used in UPnP communication.
+ * It does not assume sending or receiving of huge data.
  * Priority is given to being easy to use, and efficiency is not considered much.
  * In principle, it is assumed that an instance is created for each series of communication to the same server.
  *
@@ -131,8 +131,8 @@ class HttpClient(keepAlive: Boolean = true) {
         }
     }
 
-    @Throws(IOException::class)
     // open状態でのみコールする
+    @Throws(IOException::class)
     private fun writeAndRead(request: HttpRequest): HttpResponse {
         request.writeData(outputStream!!)
         return HttpResponse.create().also { it.readData(inputStream!!) }
@@ -188,8 +188,6 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     private fun closeSocket() {
-        inputStream.closeQuietly()
-        outputStream.closeQuietly()
         socket.closeQuietly()
         inputStream = null
         outputStream = null
