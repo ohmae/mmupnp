@@ -352,12 +352,9 @@ class HttpClientTest {
         every { socket.isConnected } returns true
         every { socket.inetAddress } returns InetAddress.getByName("192.168.0.1")
         every { socket.port } returns 80
-        val fieldSocket = HttpClient::class.java.getDeclaredField("socket")
-        fieldSocket.isAccessible = true
-        fieldSocket.set(client, socket)
         val request = HttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
-        assertThat(client.canReuse(request)).isTrue()
+        assertThat(client.canReuse(socket, request)).isTrue()
     }
 
     @Test
@@ -367,12 +364,9 @@ class HttpClientTest {
         every { socket.isConnected } returns true
         every { socket.inetAddress } returns InetAddress.getByName("192.168.0.1")
         every { socket.port } returns 80
-        val fieldSocket = HttpClient::class.java.getDeclaredField("socket")
-        fieldSocket.isAccessible = true
-        fieldSocket.set(client, socket)
         val request = HttpRequest.create()
         request.setUrl(URL("http://192.168.0.1:8080/index.html"))
-        assertThat(client.canReuse(request)).isFalse()
+        assertThat(client.canReuse(socket, request)).isFalse()
     }
 
     @Test
@@ -382,12 +376,9 @@ class HttpClientTest {
         every { socket.isConnected } returns true
         every { socket.inetAddress } returns InetAddress.getByName("192.168.0.2")
         every { socket.port } returns 80
-        val fieldSocket = HttpClient::class.java.getDeclaredField("socket")
-        fieldSocket.isAccessible = true
-        fieldSocket.set(client, socket)
         val request = HttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
-        assertThat(client.canReuse(request)).isFalse()
+        assertThat(client.canReuse(socket, request)).isFalse()
     }
 
     @Test
@@ -397,11 +388,8 @@ class HttpClientTest {
         every { socket.isConnected } returns false
         every { socket.inetAddress } returns InetAddress.getByName("192.168.0.1")
         every { socket.port } returns 80
-        val fieldSocket = HttpClient::class.java.getDeclaredField("socket")
-        fieldSocket.isAccessible = true
-        fieldSocket.set(client, socket)
         val request = HttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
-        assertThat(client.canReuse(request)).isFalse()
+        assertThat(client.canReuse(socket, request)).isFalse()
     }
 }

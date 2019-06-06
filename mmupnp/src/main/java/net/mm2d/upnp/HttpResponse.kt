@@ -10,6 +10,7 @@ package net.mm2d.upnp
 import net.mm2d.upnp.Http.Status
 import net.mm2d.upnp.internal.message.HttpMessageDelegate
 import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate
+import java.io.InputStream
 
 /**
  * HTTP response message.
@@ -129,6 +130,14 @@ internal constructor(
             return StartLine().let {
                 HttpResponse(it, HttpMessageDelegate(it))
             }
+        }
+
+        /**
+         * Create a new instance from InputStream
+         */
+        @JvmStatic
+        fun create(input: InputStream): HttpResponse {
+            return create().also { it.readData(input) }
         }
 
         /**

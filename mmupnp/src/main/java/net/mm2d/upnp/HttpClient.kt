@@ -33,9 +33,18 @@ import java.net.URL
  * @param keepAlive true: keep-alive
  */
 class HttpClient(keepAlive: Boolean = true) {
-    private var socket: Socket? = null
-    private var inputStream: InputStream? = null
-    private var outputStream: OutputStream? = null
+    private class SocketHolder(
+        val socket: Socket
+    ) {
+        val input: InputStream = BufferedInputStream(socket.getInputStream())
+        val output: OutputStream = BufferedOutputStream(socket.getOutputStream())
+
+        fun close() {
+            socket.closeQuietly()
+        }
+    }
+
+    private var socketHolder: SocketHolder? = null
     /**
      * Returns the local address used by the socket.
      *
@@ -64,7 +73,7 @@ class HttpClient(keepAlive: Boolean = true) {
      * true if the socket is closed
      */
     val isClosed: Boolean
-        get() = socket == null
+        get() = socketHolder == null
 
     /**
      * Send a request and receive a response.
@@ -113,29 +122,28 @@ class HttpClient(keepAlive: Boolean = true) {
 
     @Throws(IOException::class)
     private fun doRequest(request: HttpRequest): HttpResponse {
-        return if (isClosed) {
-            openSocket(request)
-            writeAndRead(request)
+        val socketHolder = socketHolder
+        return if (socketHolder == null) {
+            writeAndRead(openSocket(request), request)
         } else {
             try {
-                writeAndRead(request)
+                writeAndRead(socketHolder, request)
             } catch (e: IOException) {
                 // コネクションを再利用した場合はpeerから既に切断されていた可能性がある。
                 // KeepAliveできないサーバである可能性があるのでKeepAliveを無効にしてリトライ
                 Logger.w { "retry:\n" + e.message }
                 isKeepAlive = false
                 closeSocket()
-                openSocket(request)
-                writeAndRead(request)
+                writeAndRead(openSocket(request), request)
             }
         }
     }
 
     // open状態でのみコールする
     @Throws(IOException::class)
-    private fun writeAndRead(request: HttpRequest): HttpResponse {
-        request.writeData(outputStream!!)
-        return HttpResponse.create().also { it.readData(inputStream!!) }
+    private fun writeAndRead(socketHolder: SocketHolder, request: HttpRequest): HttpResponse {
+        request.writeData(socketHolder.output)
+        return HttpResponse.create(socketHolder.input)
     }
 
     @Throws(IOException::class)
@@ -171,27 +179,32 @@ class HttpClient(keepAlive: Boolean = true) {
 
     // VisibleForTesting
     internal fun canReuse(request: HttpRequest): Boolean {
-        val socket = socket ?: return false
+        val socket = socketHolder?.socket ?: return false
+        return canReuse(socket, request)
+    }
+
+    // VisibleForTesting
+    internal fun canReuse(socket: Socket, request: HttpRequest): Boolean {
         return socket.isConnected &&
                 socket.inetAddress == request.address &&
                 socket.port == request.port
     }
 
     @Throws(IOException::class)
-    private fun openSocket(request: HttpRequest) {
-        val socket = Socket().also { socket = it }
-        socket.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT)
-        socket.soTimeout = Property.DEFAULT_TIMEOUT
-        inputStream = BufferedInputStream(socket.getInputStream())
-        outputStream = BufferedOutputStream(socket.getOutputStream())
-        localAddress = socket.localAddress
+    private fun openSocket(request: HttpRequest): SocketHolder {
+        val socket = Socket().also {
+            it.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT)
+            it.soTimeout = Property.DEFAULT_TIMEOUT
+            localAddress = it.localAddress
+        }
+        return SocketHolder(socket).also {
+            socketHolder = it
+        }
     }
 
     private fun closeSocket() {
-        socket.closeQuietly()
-        inputStream = null
-        outputStream = null
-        socket = null
+        socketHolder?.close()
+        socketHolder = null
     }
 
     /**
