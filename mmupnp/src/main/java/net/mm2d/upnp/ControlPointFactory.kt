@@ -90,9 +90,8 @@ object ControlPointFactory {
          * @param proto Protocol stack
          * @return builder
          */
-        fun setProtocol(proto: Protocol): ControlPointBuilder {
+        fun setProtocol(proto: Protocol): ControlPointBuilder = apply {
             protocol = proto
-            return this
         }
 
         /**
@@ -103,9 +102,8 @@ object ControlPointFactory {
          * @param ifs Network interface
          * @return builder
          */
-        fun setInterfaces(ifs: Iterable<NetworkInterface>?): ControlPointBuilder {
+        fun setInterfaces(ifs: Iterable<NetworkInterface>?): ControlPointBuilder = apply {
             interfaces = ifs
-            return this
         }
 
         /**
@@ -118,9 +116,8 @@ object ControlPointFactory {
          * @param executor callback executor
          * @return builder
          */
-        fun setCallbackExecutor(executor: TaskExecutor): ControlPointBuilder {
+        fun setCallbackExecutor(executor: TaskExecutor): ControlPointBuilder = apply {
             callbackExecutor = executor
-            return this
         }
 
         /**
@@ -134,9 +131,8 @@ object ControlPointFactory {
          * @param handler callback executor
          * @return builder
          */
-        fun setCallbackHandler(handler: (Runnable) -> Boolean): ControlPointBuilder {
+        fun setCallbackHandler(handler: (Runnable) -> Boolean): ControlPointBuilder = apply {
             callbackExecutor = taskExecutor(handler)
-            return this
         }
 
         /**
@@ -145,9 +141,8 @@ object ControlPointFactory {
          * @param enabled true, check the segment. false, otherwise
          * @return builder
          */
-        fun setNotifySegmentCheckEnabled(enabled: Boolean): ControlPointBuilder {
+        fun setNotifySegmentCheckEnabled(enabled: Boolean): ControlPointBuilder = apply {
             notifySegmentCheckEnabled = enabled
-            return this
         }
 
         /**

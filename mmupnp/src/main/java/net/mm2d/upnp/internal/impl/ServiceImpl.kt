@@ -369,58 +369,48 @@ internal class ServiceImpl(
             )
         }
 
-        fun setDevice(device: DeviceImpl): Builder {
+        fun setDevice(device: DeviceImpl): Builder = apply {
             this.device = device
-            return this
         }
 
-        fun setSubscribeManager(manager: SubscribeManager): Builder {
+        fun setSubscribeManager(manager: SubscribeManager): Builder = apply {
             subscribeManager = manager
-            return this
         }
 
-        fun setServiceType(serviceType: String): Builder {
+        fun setServiceType(serviceType: String): Builder = apply {
             this.serviceType = serviceType
-            return this
         }
 
-        fun setServiceId(serviceId: String): Builder {
+        fun setServiceId(serviceId: String): Builder = apply {
             this.serviceId = serviceId
-            return this
         }
 
-        fun setScpdUrl(scpdUrl: String): Builder {
+        fun setScpdUrl(scpdUrl: String): Builder = apply {
             this.scpdUrl = scpdUrl
-            return this
         }
 
         fun getScpdUrl(): String? {
             return scpdUrl
         }
 
-        fun setControlUrl(controlUrl: String): Builder {
+        fun setControlUrl(controlUrl: String): Builder = apply {
             this.controlUrl = controlUrl
-            return this
         }
 
-        fun setEventSubUrl(eventSubUrl: String): Builder {
+        fun setEventSubUrl(eventSubUrl: String): Builder = apply {
             this.eventSubUrl = eventSubUrl
-            return this
         }
 
-        fun setDescription(description: String): Builder {
+        fun setDescription(description: String): Builder = apply {
             this.description = description
-            return this
         }
 
-        fun addActionBuilder(builder: ActionImpl.Builder): Builder {
+        fun addActionBuilder(builder: ActionImpl.Builder): Builder = apply {
             actionBuilderList.add(builder)
-            return this
         }
 
-        fun addStateVariable(builder: StateVariable): Builder {
+        fun addStateVariable(builder: StateVariable): Builder = apply {
             stateVariables.add(builder)
-            return this
         }
 
         fun toDumpString(): String {

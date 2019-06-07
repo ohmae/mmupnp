@@ -307,9 +307,7 @@ internal class ControlPointImpl(
             Logger.i { "already added: $location" }
             return
         }
-        val builder = Builder(
-            this, subscribeManager, FakeSsdpMessage(location)
-        )
+        val builder = Builder(this, subscribeManager, FakeSsdpMessage(location))
         loadingPinnedDevices.add(builder)
         taskExecutors.io { loadPinnedDevice(builder) }
     }

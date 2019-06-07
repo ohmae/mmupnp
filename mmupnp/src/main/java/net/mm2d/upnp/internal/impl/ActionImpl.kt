@@ -471,20 +471,17 @@ internal class ActionImpl(
             return argumentList
         }
 
-        fun setService(service: ServiceImpl): Builder {
+        fun setService(service: ServiceImpl): Builder = apply {
             this.service = service
-            return this
         }
 
-        fun setName(name: String): Builder {
+        fun setName(name: String): Builder = apply {
             this.name = name
-            return this
         }
 
         // Actionのインスタンス作成後にArgumentを登録することはできない
-        fun addArgumentBuilder(argument: ArgumentImpl.Builder): Builder {
+        fun addArgumentBuilder(argument: ArgumentImpl.Builder): Builder = apply {
             argumentList.add(argument)
-            return this
         }
     }
 

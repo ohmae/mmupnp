@@ -93,12 +93,7 @@ internal class DeviceImpl private constructor(
     }
 
     override fun getValue(name: String): String? {
-        tagMap.values.forEach {
-            it[name]?.let { value ->
-                return value
-            }
-        }
-        return null
+        return tagMap.values.mapNotNull { it[name] }.firstOrNull()
     }
 
     override fun getValueWithNamespace(namespace: String, name: String): String? {
@@ -176,7 +171,6 @@ internal class DeviceImpl private constructor(
         private var urlBase: String? = null
         private val iconList = mutableListOf<Icon>()
         private val serviceBuilderList = mutableListOf<ServiceImpl.Builder>()
-        @Volatile
         private var deviceBuilderList: List<Builder> = emptyList()
         private val tagMap: MutableMap<String, MutableMap<String, String>>
 
@@ -268,90 +262,73 @@ internal class DeviceImpl private constructor(
             }
         }
 
-        fun setDescription(description: String): Builder {
+        fun setDescription(description: String): Builder = apply {
             this.description = description
-            return this
         }
 
-        fun setUdn(udn: String): Builder {
+        fun setUdn(udn: String): Builder = apply {
             this.udn = udn
-            return this
         }
 
-        fun setUpc(upc: String): Builder {
+        fun setUpc(upc: String): Builder = apply {
             this.upc = upc
-            return this
         }
 
-        fun setDeviceType(deviceType: String): Builder {
+        fun setDeviceType(deviceType: String): Builder = apply {
             this.deviceType = deviceType
-            return this
         }
 
-        fun setFriendlyName(friendlyName: String): Builder {
+        fun setFriendlyName(friendlyName: String): Builder = apply {
             this.friendlyName = friendlyName
-            return this
         }
 
-        fun setManufacture(manufacture: String): Builder {
+        fun setManufacture(manufacture: String): Builder = apply {
             this.manufacture = manufacture
-            return this
         }
 
-        fun setManufactureUrl(manufactureUrl: String): Builder {
+        fun setManufactureUrl(manufactureUrl: String): Builder = apply {
             this.manufactureUrl = manufactureUrl
-            return this
         }
 
-        fun setModelName(modelName: String): Builder {
+        fun setModelName(modelName: String): Builder = apply {
             this.modelName = modelName
-            return this
         }
 
-        fun setModelUrl(modelUrl: String): Builder {
+        fun setModelUrl(modelUrl: String): Builder = apply {
             this.modelUrl = modelUrl
-            return this
         }
 
-        fun setModelDescription(modelDescription: String): Builder {
+        fun setModelDescription(modelDescription: String): Builder = apply {
             this.modelDescription = modelDescription
-            return this
         }
 
-        fun setModelNumber(modelNumber: String): Builder {
+        fun setModelNumber(modelNumber: String): Builder = apply {
             this.modelNumber = modelNumber
-            return this
         }
 
-        fun setSerialNumber(serialNumber: String): Builder {
+        fun setSerialNumber(serialNumber: String): Builder = apply {
             this.serialNumber = serialNumber
-            return this
         }
 
-        fun setPresentationUrl(presentationUrl: String): Builder {
+        fun setPresentationUrl(presentationUrl: String): Builder = apply {
             this.presentationUrl = presentationUrl
-            return this
         }
 
         // URLBaseは1.1以降Deprecated
-        fun setUrlBase(urlBase: String?): Builder {
+        fun setUrlBase(urlBase: String?): Builder = apply {
             this.urlBase = urlBase
-            return this
         }
 
-        fun addIcon(icon: Icon): Builder {
+        fun addIcon(icon: Icon): Builder /**/ = apply {
             iconList.add(icon)
-            return this
         }
 
-        fun addServiceBuilder(builder: ServiceImpl.Builder): Builder {
+        fun addServiceBuilder(builder: ServiceImpl.Builder): Builder = apply {
             serviceBuilderList.add(builder)
-            return this
         }
 
-        fun setEmbeddedDeviceBuilderList(builderList: List<Builder>): Builder {
+        fun setEmbeddedDeviceBuilderList(builderList: List<Builder>): Builder = apply {
             deviceBuilderList = builderList
-            return this
         }
 
         fun getEmbeddedDeviceBuilderList(): List<Builder> {
@@ -359,13 +336,12 @@ internal class DeviceImpl private constructor(
         }
 
         // DeviceDescriptionにはAttributeは使用されていないためAttributeには非対応
-        fun putTag(namespace: String?, tag: String, value: String): Builder {
+        fun putTag(namespace: String?, tag: String, value: String): Builder = apply {
             val namespaceUri = namespace ?: ""
             val map = tagMap[namespaceUri] ?: mutableMapOf<String, String>().also {
                 tagMap[namespaceUri] = it
             }
             map[tag] = value
-            return this
         }
 
         fun toDumpString(): String {

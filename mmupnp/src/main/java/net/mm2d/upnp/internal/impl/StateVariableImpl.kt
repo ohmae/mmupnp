@@ -56,50 +56,41 @@ internal class StateVariableImpl(
         }
 
         // 値が"no"でなければyesであると判定する。
-        fun setSendEvents(sendEvents: String): Builder {
+        fun setSendEvents(sendEvents: String): Builder = apply {
             this.sendEvents = !sendEvents.equals("no", ignoreCase = true)
-            return this
         }
 
         // 値が"yes"でなければnoであると判定する。Multicastの受信には非対応。
-        fun setMulticast(multicast: String): Builder {
+        fun setMulticast(multicast: String): Builder = apply {
             this.multicast = multicast.equals("yes", ignoreCase = true)
-            return this
         }
 
-        fun setName(name: String): Builder {
+        fun setName(name: String): Builder = apply {
             this.name = name
-            return this
         }
 
-        fun setDataType(dataType: String): Builder {
+        fun setDataType(dataType: String): Builder = apply {
             this.dataType = dataType
-            return this
         }
 
-        fun addAllowedValue(value: String): Builder {
+        fun addAllowedValue(value: String): Builder = apply {
             allowedValueList.add(value)
-            return this
         }
 
-        fun setDefaultValue(defaultValue: String): Builder {
+        fun setDefaultValue(defaultValue: String): Builder = apply {
             this.defaultValue = defaultValue
-            return this
         }
 
-        fun setMinimum(minimum: String): Builder {
+        fun setMinimum(minimum: String): Builder = apply {
             this.minimum = minimum
-            return this
         }
 
-        fun setMaximum(maximum: String): Builder {
+        fun setMaximum(maximum: String): Builder = apply {
             this.maximum = maximum
-            return this
         }
 
-        fun setStep(step: String): Builder {
+        fun setStep(step: String): Builder = apply {
             this.step = step
-            return this
         }
     }
 }

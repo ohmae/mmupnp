@@ -39,28 +39,24 @@ internal class ArgumentImpl(
             )
         }
 
-        fun setName(name: String): Builder {
+        fun setName(name: String): Builder = apply {
             this.name = name
-            return this
         }
 
-        fun setDirection(direction: String): Builder {
+        fun setDirection(direction: String): Builder = apply {
             inputDirection = "in".equals(direction, ignoreCase = true)
-            return this
         }
 
-        fun setRelatedStateVariableName(name: String): Builder {
+        fun setRelatedStateVariableName(name: String): Builder = apply {
             relatedStateVariableName = name
-            return this
         }
 
         fun getRelatedStateVariableName(): String? {
             return relatedStateVariableName
         }
 
-        fun setRelatedStateVariable(variable: StateVariable): Builder {
+        fun setRelatedStateVariable(variable: StateVariable): Builder = apply {
             relatedStateVariable = variable
-            return this
         }
     }
 }

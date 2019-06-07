@@ -62,29 +62,24 @@ internal class IconImpl(
             )
         }
 
-        fun setMimeType(mimeType: String): Builder {
+        fun setMimeType(mimeType: String): Builder = apply {
             this.mimeType = mimeType
-            return this
         }
 
-        fun setHeight(height: String): Builder {
+        fun setHeight(height: String): Builder = apply {
             this.height = height.toIntOrNull() ?: 0
-            return this
         }
 
-        fun setWidth(width: String): Builder {
+        fun setWidth(width: String): Builder = apply {
             this.width = width.toIntOrNull() ?: 0
-            return this
         }
 
-        fun setDepth(depth: String): Builder {
+        fun setDepth(depth: String): Builder = apply {
             this.depth = depth.toIntOrNull() ?: 0
-            return this
         }
 
-        fun setUrl(url: String): Builder {
+        fun setUrl(url: String): Builder = apply {
             this.url = url
-            return this
         }
     }
 }
