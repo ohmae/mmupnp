@@ -275,7 +275,7 @@ internal class ServiceImpl(
             builderList.forEach { builder ->
                 builder.setService(service)
                 builder.getArgumentBuilderList().forEach {
-                    it.setRelatedStateVariable(service, variableMap)
+                    it.setRelatedStateVariable(variableMap)
                 }
             }
             return builderList
@@ -285,21 +285,27 @@ internal class ServiceImpl(
         }
 
         private fun ArgumentImpl.Builder.setRelatedStateVariable(
-            service: Service,
             variableMap: Map<String, StateVariable>
         ) {
             val name = getRelatedStateVariableName()
                 ?: throw IllegalStateException("relatedStateVariable name is null")
-            val variable = variableMap[name] ?: {
-                // for AN-WLTU1
-                val trimmedName = name.trim { it <= ' ' }
-                val trimmedVariable = variableMap[trimmedName]
-                    ?: throw IllegalStateException("There is no StateVariable $name")
-                setRelatedStateVariableName(trimmedName)
-                Logger.w { "Invalid description. relatedStateVariable name has unnecessary blanks [$name] on ${service.serviceId}" }
-                trimmedVariable
-            }.invoke()
+            val variable = variableMap[name] ?: collectInvalidFormat(name, variableMap)
             setRelatedStateVariable(variable)
+        }
+
+        // Implement the remedies because there is a device that has the wrong format of XML
+        // That indented in the text content.
+        // e.g. AN-WLTU1
+        private fun ArgumentImpl.Builder.collectInvalidFormat(
+            name: String,
+            variableMap: Map<String, StateVariable>
+        ): StateVariable {
+            val trimmedName = name.trim()
+            val trimmedVariable = variableMap[trimmedName]
+                ?: throw IllegalStateException("There is no StateVariable [$name]")
+            setRelatedStateVariableName(trimmedName)
+            Logger.w { "Invalid description. relatedStateVariable name has unnecessary blanks [$name]" }
+            return trimmedVariable
         }
 
         // VisibleForTesting
