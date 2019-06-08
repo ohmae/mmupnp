@@ -354,7 +354,7 @@ class HttpClientTest {
         every { socket.port } returns 80
         val request = HttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
-        assertThat(client.canReuse(socket, request)).isTrue()
+        assertThat(with(client) { socket.canReuse(request) }).isTrue()
     }
 
     @Test
@@ -366,7 +366,7 @@ class HttpClientTest {
         every { socket.port } returns 80
         val request = HttpRequest.create()
         request.setUrl(URL("http://192.168.0.1:8080/index.html"))
-        assertThat(client.canReuse(socket, request)).isFalse()
+        assertThat(with(client) { socket.canReuse(request) }).isFalse()
     }
 
     @Test
@@ -378,7 +378,7 @@ class HttpClientTest {
         every { socket.port } returns 80
         val request = HttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
-        assertThat(client.canReuse(socket, request)).isFalse()
+        assertThat(with(client) { socket.canReuse(request) }).isFalse()
     }
 
     @Test
@@ -390,6 +390,6 @@ class HttpClientTest {
         every { socket.port } returns 80
         val request = HttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
-        assertThat(client.canReuse(socket, request)).isFalse()
+        assertThat(with(client) { socket.canReuse(request) }).isFalse()
     }
 }

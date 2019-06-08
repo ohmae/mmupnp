@@ -270,9 +270,7 @@ object Http {
      * @param date date in Long
      * @return Date string in RFC1123 format
      */
-    fun formatDate(date: Long): String {
-        return formatDate(Date(date))
-    }
+    fun formatDate(date: Long): String = formatDate(Date(date))
 
     /**
      * Creates a date string.
@@ -291,8 +289,7 @@ object Http {
      * @return true: HTTP URL, false otherwise
      */
     fun isHttpUrl(url: String?): Boolean {
-        return (url != null && url.length > HTTP_SCHEME.length &&
-                url.substring(0, HTTP_SCHEME.length).equals(HTTP_SCHEME, ignoreCase = true))
+        return url?.startsWith(HTTP_SCHEME, true) == true
     }
 
     /**
@@ -302,8 +299,7 @@ object Http {
      * @return URL without query
      */
     private fun removeQuery(url: String): String {
-        val pos = url.indexOf('?')
-        return if (pos > 0) url.substring(0, pos) else url
+        return url.substringBefore('?')
     }
 
     /**
@@ -431,5 +427,5 @@ object Http {
  * @return true: HTTP URL, false otherwise
  */
 fun String?.isHttpUrl(): Boolean {
-    return (this != null && this.startsWith(Http.HTTP_SCHEME, ignoreCase = true))
+    return Http.isHttpUrl(this)
 }

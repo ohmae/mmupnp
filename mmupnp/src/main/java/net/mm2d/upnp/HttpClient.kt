@@ -179,15 +179,12 @@ class HttpClient(keepAlive: Boolean = true) {
 
     // VisibleForTesting
     internal fun canReuse(request: HttpRequest): Boolean {
-        val socket = socketHolder?.socket ?: return false
-        return canReuse(socket, request)
+        return socketHolder?.socket?.canReuse(request) ?: false
     }
 
     // VisibleForTesting
-    internal fun canReuse(socket: Socket, request: HttpRequest): Boolean {
-        return socket.isConnected &&
-                socket.inetAddress == request.address &&
-                socket.port == request.port
+    internal fun Socket.canReuse(request: HttpRequest): Boolean {
+        return isConnected && inetAddress == request.address && port == request.port
     }
 
     @Throws(IOException::class)
