@@ -106,12 +106,12 @@ internal class SsdpNotifyReceiver(
         val b = sourceAddress.address
         val pref = interfaceAddress.networkPrefixLength.toInt()
         val bytes = pref / 8
-        val bits = pref % 8
         for (i in 0 until bytes) {
             if (a[i] != b[i]) {
                 return true
             }
         }
+        val bits = pref % 8
         if (bits != 0) {
             val mask = (0xff shl 8 - bits) and 0xff
             return (a[bytes].toInt() and mask) != (b[bytes].toInt() and mask)

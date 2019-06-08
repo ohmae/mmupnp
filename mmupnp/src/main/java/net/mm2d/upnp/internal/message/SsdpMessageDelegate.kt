@@ -83,14 +83,10 @@ internal class SsdpMessageDelegate(
         // VisibleForTesting
         fun parseCacheControl(message: HttpMessage): Int {
             val age = message.getHeader(Http.CACHE_CONTROL)?.toLowerCase(Locale.US)
-            if (age.isNullOrEmpty() || !age.startsWith("max-age")) {
+            if (age == null || !age.startsWith("max-age")) {
                 return DEFAULT_MAX_AGE
             }
-            val pos = age.indexOf('=')
-            if (pos < 0 || pos + 1 == age.length) {
-                return DEFAULT_MAX_AGE
-            }
-            return age.substring(pos + 1).toIntOrNull() ?: DEFAULT_MAX_AGE
+            return age.substringAfter('=', "").toIntOrNull() ?: DEFAULT_MAX_AGE
         }
 
         // VisibleForTesting
