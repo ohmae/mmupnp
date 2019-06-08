@@ -45,14 +45,12 @@ internal class SsdpRequest(
     }
 
     companion object {
-        @JvmStatic
         fun create(): SsdpRequest {
             return HttpRequest.create().let {
                 SsdpRequest(it, SsdpMessageDelegate(it))
             }
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun create(address: InetAddress, data: ByteArray, length: Int): SsdpRequest {
             return HttpRequest.create().apply {

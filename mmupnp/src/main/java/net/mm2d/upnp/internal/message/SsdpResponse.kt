@@ -47,7 +47,6 @@ internal class SsdpResponse(
     }
 
     companion object {
-        @JvmStatic
         @Throws(IOException::class)
         fun create(address: InetAddress, data: ByteArray, length: Int): SsdpResponse {
             return HttpResponse.create().apply {
