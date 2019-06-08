@@ -53,7 +53,7 @@ object NetworkUtils {
     fun getNetworkInterfaceList(): List<NetworkInterface> {
         return try {
             NetworkInterface.getNetworkInterfaces()
-        } catch (ignored: SocketException) {
+        } catch (ignored: Throwable) {
             null
         }?.let { Collections.list(it) } ?: emptyList()
     }
