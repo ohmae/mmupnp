@@ -503,11 +503,14 @@ class ControlPointTest {
         private lateinit var cp: ControlPointImpl
         private lateinit var loadingDeviceMap: MutableMap<String, DeviceImpl.Builder>
         private lateinit var deviceHolder: DeviceHolder
+        private lateinit var taskExecutors: TaskExecutors
 
         @Before
         fun setUp() {
             loadingDeviceMap = spyk(HashMap())
             val factory = spyk(DiFactory())
+            taskExecutors = spyk(TaskExecutors())
+            every { factory.createTaskExecutors() } returns taskExecutors
             every { factory.createLoadingDeviceMap() } returns loadingDeviceMap
             every { factory.createDeviceHolder(any(), any()) } answers {
                 spyk(
@@ -645,9 +648,39 @@ class ControlPointTest {
         @Test
         fun tryAddDevice() {
             val uuid = "uuid"
-            every { cp.loadDevice(any(), any()) } answers { nothing }
+            every { taskExecutors.io(any<() -> Unit>()) } returns true
             cp.tryAddDevice(uuid, "http://10.0.0.1/")
             verify(exactly = 1) { cp.loadDevice(uuid, any()) }
+        }
+
+        @Test
+        fun tryAddDevice_already_added() {
+            val uuid = "uuid"
+            every { taskExecutors.io(any<() -> Unit>()) } returns true
+            cp.tryAddDevice(uuid, "http://10.0.0.1/")
+            cp.tryAddDevice(uuid, "http://10.0.0.1/")
+            verify(exactly = 1) { cp.loadDevice(uuid, any()) }
+        }
+
+        @Test
+        fun tryAddDevice_already_added_fail_first() {
+            val uuid = "uuid"
+            every { taskExecutors.io(any<() -> Unit>()) } returns false
+            cp.tryAddDevice(uuid, "http://10.0.0.1/")
+            cp.tryAddDevice(uuid, "http://10.0.0.1/")
+            verify(exactly = 2) { cp.loadDevice(uuid, any()) }
+        }
+
+        @Test
+        fun tryAddDevice_already_loaded() {
+            val location = "http://10.0.0.1/"
+            val device: Device = mockk()
+            every { device.location } returns location
+            every { cp.deviceList } returns listOf(device)
+            val uuid = "uuid"
+            every { taskExecutors.io(any<() -> Unit>()) } returns true
+            cp.tryAddDevice(uuid, location)
+            verify(inverse = true) { cp.loadDevice(uuid, any()) }
         }
     }
 
