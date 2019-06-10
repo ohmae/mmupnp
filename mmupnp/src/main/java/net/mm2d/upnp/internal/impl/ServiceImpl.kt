@@ -264,6 +264,7 @@ internal class ServiceImpl(
         private val DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300)
         private const val SECOND_PREFIX = "second-"
 
+        @Throws(IllegalStateException::class)
         private fun buildActionMap(
             service: ServiceImpl,
             variableMap: Map<String, StateVariable>,
@@ -284,19 +285,21 @@ internal class ServiceImpl(
                 .toMap()
         }
 
+        @Throws(IllegalStateException::class)
         private fun ArgumentImpl.Builder.setRelatedStateVariable(
             variableMap: Map<String, StateVariable>
         ) {
             val name = getRelatedStateVariableName()
                 ?: throw IllegalStateException("relatedStateVariable name is null")
-            val variable = variableMap[name] ?: collectInvalidFormat(name, variableMap)
+            val variable = variableMap[name] ?: repairInvalidFormatAndGet(name, variableMap)
             setRelatedStateVariable(variable)
         }
 
         // Implement the remedies because there is a device that has the wrong format of XML
         // That indented in the text content.
         // e.g. AN-WLTU1
-        private fun ArgumentImpl.Builder.collectInvalidFormat(
+        @Throws(IllegalStateException::class)
+        private fun ArgumentImpl.Builder.repairInvalidFormatAndGet(
             name: String,
             variableMap: Map<String, StateVariable>
         ): StateVariable {
