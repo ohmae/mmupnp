@@ -10,7 +10,9 @@ package net.mm2d.upnp.internal.impl
 import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import net.mm2d.upnp.*
+import net.mm2d.upnp.Adapter.discoveryListener
 import net.mm2d.upnp.Adapter.iconFilter
+import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.ControlPoint.DiscoveryListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.internal.manager.DeviceHolder
@@ -474,6 +476,25 @@ class ControlPointTest {
             Thread.sleep(100)
 
             verify(inverse = true) { l.onDiscover(device) }
+        }
+
+        @Test
+        fun addDiscoveryListener_by_adapter() {
+            val discover: (Device) -> Unit = mockk(relaxed = true)
+            val lost: (Device) -> Unit = mockk(relaxed = true)
+            cp.addDiscoveryListener(discoveryListener(discover, lost))
+            val uuid = "uuid"
+            val device: Device = mockk(relaxed = true)
+            every { device.udn } returns uuid
+            cp.discoverDevice(device)
+            Thread.sleep(100)
+
+            verify(exactly = 1) { discover(device) }
+
+            cp.lostDevice(device)
+            Thread.sleep(100)
+
+            verify(exactly = 1) { lost(device) }
         }
 
         @Test
@@ -982,6 +1003,32 @@ class ControlPointTest {
             val value = "value"
             assertThat(subscribeManager.onEventReceived(sid, 0, listOf(variableName + 1 to value))).isFalse()
         }
+
+        @Test
+        fun notifyEvent_by_adapter() {
+            val sid = "sid"
+            val service: Service = mockk(relaxed = true)
+            every { service.subscriptionId } returns sid
+
+            val variableName = "variable"
+            val variable: StateVariable = mockk(relaxed = true)
+            every { variable.isSendEvents } returns true
+            every { variable.name } returns variableName
+            every { service.findStateVariable(variableName) } returns variable
+
+            subscribeManager.register(service, 1000L, false)
+
+            val notifyEvent: (service: Service, seq: Long, variable: String, value: String) -> Unit = mockk(relaxed = true)
+            cp.addNotifyEventListener(notifyEventListener(notifyEvent))
+
+            val value = "value"
+            subscribeManager.onEventReceived(sid, 0, listOf(variableName to value))
+
+            Thread.sleep(2000)
+
+            verify(exactly = 1) { notifyEvent(service, 0, variableName, value) }
+        }
+
     }
 
     @RunWith(JUnit4::class)
