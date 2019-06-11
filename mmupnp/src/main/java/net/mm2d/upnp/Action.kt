@@ -87,7 +87,9 @@ interface Action {
     ): Map<String, String>
 
     /**
-     * Invoke this Action synchronously. (Experimental function)
+     * Invoke this Action synchronously.
+     *
+     * (Experimental function)
      *
      * Execution arguments and execution results are represented by Map with argument name as key and value as value.
      * All values ​​are treat as String.
@@ -137,7 +139,7 @@ interface Action {
     ): Map<String, String>
 
     /**
-     * Invoke this Action asynchronously.
+     * Invoke this Action asynchronously. The result is received by callback.
      *
      * Execution arguments and execution results are represented by Map with argument name as key and value as value.
      * All values ​​are treat as String.
@@ -178,7 +180,9 @@ interface Action {
     )
 
     /**
-     * Invoke this Action asynchronously. (Experimental function)
+     * Invoke this Action asynchronously. The result is received by callback.
+     *
+     * (Experimental function)
      *
      * Execution arguments and execution results are represented by Map with argument name as key and value as value.
      * All values ​​are treat as String.
@@ -230,7 +234,7 @@ interface Action {
     )
 
     /**
-     * Invoke this Action asynchronously.
+     * Invoke this Action asynchronously. Suspends the invoking coroutine until the result is received.
      *
      * Execution arguments and execution results are represented by Map with argument name as key and value as value.
      * All values ​​are treat as String.
@@ -267,7 +271,9 @@ interface Action {
     ): Map<String, String>
 
     /**
-     * Invoke this Action asynchronously. (Experimental function)
+     * Invoke this Action asynchronously. Suspends the invoking coroutine until the result is received.
+     *
+     * (Experimental function)
      *
      * Execution arguments and execution results are represented by Map with argument name as key and value as value.
      * All values ​​are treat as String.

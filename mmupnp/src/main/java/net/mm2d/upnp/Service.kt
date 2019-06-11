@@ -161,7 +161,7 @@ interface Service {
     fun unsubscribeSync(): Boolean
 
     /**
-     * Invoke subscribe asynchronously.
+     * Invoke subscribe asynchronously. The result is received by callback.
      *
      * @param keepRenew true: renew will be performed periodically before Expire.
      * @param callback Callback to notify the result. Executed in callback thread.
@@ -170,7 +170,7 @@ interface Service {
     fun subscribe(keepRenew: Boolean = false, callback: ((Boolean) -> Unit)? = null)
 
     /**
-     * Invoke renew subscribe asynchronously.
+     * Invoke renew subscribe asynchronously. The result is received by callback.
      *
      * @param callback Callback to notify the result. Executed in callback thread.
      * @see ControlPointFactory.create
@@ -178,7 +178,7 @@ interface Service {
     fun renewSubscribe(callback: ((Boolean) -> Unit)? = null)
 
     /**
-     * Invoke unsubscribe asynchronously.
+     * Invoke unsubscribe asynchronously. The result is received by callback.
      *
      * @param callback Callback to notify the result. Executed in callback thread.
      * @see ControlPointFactory.create
@@ -186,7 +186,7 @@ interface Service {
     fun unsubscribe(callback: ((Boolean) -> Unit)? = null)
 
     /**
-     * Invoke subscribe asynchronously.
+     * Invoke subscribe asynchronously. Suspends the invoking coroutine until the result is received.
      *
      * @param keepRenew true: renew will be performed periodically before Expire.
      * @see ControlPointFactory.create
@@ -194,14 +194,14 @@ interface Service {
     suspend fun subscribeAsync(keepRenew: Boolean = false): Boolean
 
     /**
-     * Invoke renew subscribe asynchronously.
+     * Invoke renew subscribe asynchronously. Suspends the invoking coroutine until the result is received.
      *
      * @see ControlPointFactory.create
      */
     suspend fun renewSubscribeAsync(): Boolean
 
     /**
-     * Invoke unsubscribe asynchronously.
+     * Invoke unsubscribe asynchronously. Suspends the invoking coroutine until the result is received.
      *
      * @see ControlPointFactory.create
      */
