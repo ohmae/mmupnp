@@ -361,4 +361,10 @@ class SsdpServerDelegateTest {
         val message = makeFromResource("ssdp-search-response-invalid-location1.bin")
         assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2"))).isTrue()
     }
+
+    @Test
+    fun isInvalidLocation_locationなし() {
+        val message = makeFromResource("ssdp-search-response-no-location.bin")
+        assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2"))).isTrue()
+    }
 }

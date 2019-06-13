@@ -216,8 +216,7 @@ internal class SsdpServerDelegate
             }
             try {
                 return sourceAddress == InetAddress.getByName(URL(location).host)
-            } catch (ignored: MalformedURLException) {
-            } catch (ignored: UnknownHostException) {
+            } catch (ignored: IOException) {
             }
             return false
         }
