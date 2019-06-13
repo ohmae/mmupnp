@@ -1,7 +1,6 @@
 HTTP/1.1 200 OK
 CACHE-CONTROL: max-age=300
-EXT: 
-LOCATION: https://192.0.2.2:12345/device.xml
+EXT:
 SERVER: Linux/2.6 UPnP/1.0 mmupnp/1.0
 ST: uuid:01234567-89ab-cdef-0123-456789abcdef
 USN: uuid:01234567-89ab-cdef-0123-456789abcdef
