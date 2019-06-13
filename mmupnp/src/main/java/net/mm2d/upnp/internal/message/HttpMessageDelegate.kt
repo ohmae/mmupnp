@@ -78,7 +78,7 @@ internal class HttpMessageDelegate(
     }
 
     // VisibleForTesting
-    fun getHeaderBytes(): ByteArray {
+    internal fun getHeaderBytes(): ByteArray {
         try {
             return getBytes(getHeaderString())
         } catch (e: UnsupportedEncodingException) {
@@ -164,7 +164,7 @@ internal class HttpMessageDelegate(
 
     // VisibleForTesting
     @Throws(UnsupportedEncodingException::class)
-    fun getBytes(string: String): ByteArray {
+    internal fun getBytes(string: String): ByteArray {
         return string.toByteArray(CHARSET)
     }
 

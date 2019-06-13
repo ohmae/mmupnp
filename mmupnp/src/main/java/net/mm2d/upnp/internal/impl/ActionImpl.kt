@@ -229,7 +229,7 @@ internal class ActionImpl(
 
     // VisibleForTesting
     @Throws(MalformedURLException::class)
-    fun makeAbsoluteControlUrl(): URL {
+    internal fun makeAbsoluteControlUrl(): URL {
         val device = service.device
         return Http.makeAbsoluteUrl(device.baseUrl, service.controlUrl, device.scopeId)
     }

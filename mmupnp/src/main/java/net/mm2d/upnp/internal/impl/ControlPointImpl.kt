@@ -351,7 +351,7 @@ internal class ControlPointImpl(
     companion object {
         private val EMPTY_FILTER = iconFilter { emptyList() }
         // VisibleForTesting
-        fun collectEmbeddedUdn(device: Device): Set<String> {
+        internal fun collectEmbeddedUdn(device: Device): Set<String> {
             if (device.deviceList.isEmpty()) {
                 return emptySet()
             }

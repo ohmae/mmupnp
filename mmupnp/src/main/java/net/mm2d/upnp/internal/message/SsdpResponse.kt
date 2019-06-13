@@ -21,7 +21,7 @@ import java.net.InetAddress
  */
 internal class SsdpResponse(
 // VisibleForTesting
-    val message: HttpResponse,
+    internal val message: HttpResponse,
     private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
     fun getStatusCode(): Int = message.getStatusCode()

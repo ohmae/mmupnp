@@ -16,7 +16,6 @@ import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.util.closeQuietly
 import net.mm2d.upnp.util.XmlUtils
 import net.mm2d.upnp.util.siblingElements
-import org.xml.sax.SAXException
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -26,7 +25,6 @@ import java.util.*
 import java.util.concurrent.FutureTask
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
-import javax.xml.parsers.ParserConfigurationException
 import kotlin.concurrent.withLock
 
 /**
@@ -133,7 +131,7 @@ internal class EventReceiver(
     }
 
     // VisibleForTesting
-    fun notifyEvent(sid: String, request: HttpRequest): Boolean {
+    internal fun notifyEvent(sid: String, request: HttpRequest): Boolean {
         val listener = listener ?: return false
         val list = parsePropertyPairs(request)
         if (list.isEmpty()) {
@@ -248,9 +246,7 @@ internal class EventReceiver(
                         }
                     }
                 return list
-            } catch (ignored: IOException) {
-            } catch (ignored: SAXException) {
-            } catch (ignored: ParserConfigurationException) {
+            } catch (ignored: Exception) {
             }
             return emptyList()
         }

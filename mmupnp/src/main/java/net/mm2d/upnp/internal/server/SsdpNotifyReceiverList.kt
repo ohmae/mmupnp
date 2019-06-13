@@ -57,7 +57,7 @@ internal class SsdpNotifyReceiverList(
 
     companion object {
         // VisibleForTesting
-        fun newReceiver(
+        internal fun newReceiver(
             taskExecutors: TaskExecutors,
             address: Address,
             nif: NetworkInterface,

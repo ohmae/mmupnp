@@ -81,7 +81,7 @@ internal class SsdpMessageDelegate(
         private const val DEFAULT_MAX_AGE = 1800
 
         // VisibleForTesting
-        fun parseCacheControl(message: HttpMessage): Int {
+        internal fun parseCacheControl(message: HttpMessage): Int {
             val age = message.getHeader(Http.CACHE_CONTROL)?.toLowerCase(Locale.US)
             if (age == null || !age.startsWith("max-age")) {
                 return DEFAULT_MAX_AGE
@@ -90,7 +90,7 @@ internal class SsdpMessageDelegate(
         }
 
         // VisibleForTesting
-        fun parseUsn(message: HttpMessage): Pair<String, String> {
+        internal fun parseUsn(message: HttpMessage): Pair<String, String> {
             val usn = message.getHeader(Http.USN)
             if (usn.isNullOrEmpty() || !usn.startsWith("uuid")) {
                 return "" to ""
