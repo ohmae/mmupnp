@@ -36,11 +36,10 @@ internal class ThreadWorkQueue(
 ) : BlockingQueue<Runnable> by delegate, RejectedExecutionHandler {
     private val idleThreads = AtomicInteger(0)
 
-    override fun offer(runnable: Runnable): Boolean {
-        return if (idleThreads.get() == 0) {
+    override fun offer(runnable: Runnable): Boolean =
+        if (idleThreads.get() == 0) {
             false
         } else delegate.offer(runnable)
-    }
 
     @Throws(InterruptedException::class)
     override fun take(): Runnable {
@@ -65,9 +64,7 @@ internal class ThreadWorkQueue(
     override fun rejectedExecution(r: Runnable, executor: ThreadPoolExecutor) {
         if (executor.isShutdown) {
             Logger.e("already shutdown: task $r is rejected from $executor")
-            return
-        }
-        if (!delegate.offer(r)) {
+        } else if (!delegate.offer(r)) {
             Logger.e("Unexpected problem: task $r is rejected from $executor")
         }
     }

@@ -37,11 +37,11 @@ internal class DeviceHolder(
 
     val deviceList: List<Device>
         get() = lock.withLock {
-            return deviceMap.values.toList()
+            deviceMap.values.toList()
         }
     val size: Int
         get() = lock.withLock {
-            return deviceMap.size
+            deviceMap.size
         }
 
     fun start() {
@@ -60,9 +60,7 @@ internal class DeviceHolder(
         }
     }
 
-    private fun isCanceled(): Boolean {
-        return futureTask?.isCancelled ?: true
-    }
+    private fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
 
     fun add(device: Device) {
         lock.withLock {
@@ -71,28 +69,20 @@ internal class DeviceHolder(
         }
     }
 
-    operator fun get(udn: String): Device? {
-        lock.withLock {
-            return deviceMap[udn]
-        }
+    operator fun get(udn: String): Device? = lock.withLock {
+        deviceMap[udn]
     }
 
-    fun remove(device: Device): Device? {
-        lock.withLock {
-            return deviceMap.remove(device.udn)
-        }
+    fun remove(device: Device): Device? = lock.withLock {
+        deviceMap.remove(device.udn)
     }
 
-    fun remove(udn: String): Device? {
-        lock.withLock {
-            return deviceMap.remove(udn)
-        }
+    fun remove(udn: String): Device? = lock.withLock {
+        deviceMap.remove(udn)
     }
 
-    fun clear() {
-        lock.withLock {
-            deviceMap.clear()
-        }
+    fun clear(): Unit = lock.withLock {
+        deviceMap.clear()
     }
 
     override fun run() {

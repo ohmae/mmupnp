@@ -18,26 +18,12 @@ internal class TaskExecutors(
     private val managerExecutor = ExecutorFactory.createManager()
     private val serverExecutor = ExecutorFactory.createServer()
 
-    fun callback(task: Runnable): Boolean {
-        return callbackExecutor.execute(task)
-    }
-
+    fun callback(task: Runnable): Boolean = callbackExecutor.execute(task)
     fun callback(task: () -> Unit): Boolean = callback(Runnable { task() })
-
-    fun io(task: Runnable): Boolean {
-        return ioExecutor.execute(task)
-    }
-
+    fun io(task: Runnable): Boolean = ioExecutor.execute(task)
     fun io(task: () -> Unit): Boolean = io(Runnable { task() })
-
-    fun manager(task: Runnable): Boolean {
-        return managerExecutor.execute(task)
-    }
-
-    fun server(task: Runnable): Boolean {
-        return serverExecutor.execute(task)
-    }
-
+    fun manager(task: Runnable): Boolean = managerExecutor.execute(task)
+    fun server(task: Runnable): Boolean = serverExecutor.execute(task)
     fun terminate() {
         callbackExecutor.terminate()
         ioExecutor.terminate()

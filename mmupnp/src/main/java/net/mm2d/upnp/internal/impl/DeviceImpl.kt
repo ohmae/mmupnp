@@ -92,22 +92,17 @@ internal class DeviceImpl private constructor(
         }
     }
 
-    override fun getValue(name: String): String? {
-        return tagMap.values.mapNotNull { it[name] }.firstOrNull()
-    }
+    override fun getValue(name: String): String? =
+        tagMap.values.mapNotNull { it[name] }.firstOrNull()
 
-    override fun getValueWithNamespace(namespace: String, name: String): String? {
-        val map = tagMap[namespace] ?: return null
-        return map[name]
-    }
+    override fun getValueWithNamespace(namespace: String, name: String): String? =
+        tagMap[namespace]?.get(name)
 
-    override fun findServiceById(id: String): Service? {
-        return serviceList.find { it.serviceId == id }
-    }
+    override fun findServiceById(id: String): Service? =
+        serviceList.find { it.serviceId == id }
 
-    override fun findServiceByType(type: String): Service? {
-        return serviceList.find { it.serviceType == type }
-    }
+    override fun findServiceByType(type: String): Service? =
+        serviceList.find { it.serviceType == type }
 
     override fun findAction(name: String): Action? {
         serviceList.forEach {
@@ -118,9 +113,8 @@ internal class DeviceImpl private constructor(
         return null
     }
 
-    override fun findDeviceByType(deviceType: String): Device? {
-        return deviceList.find { it.deviceType == deviceType }
-    }
+    override fun findDeviceByType(deviceType: String): Device? =
+        deviceList.find { it.deviceType == deviceType }
 
     override fun findDeviceByTypeRecursively(deviceType: String): Device? {
         deviceList.forEach {
@@ -134,9 +128,7 @@ internal class DeviceImpl private constructor(
         return null
     }
 
-    override fun hashCode(): Int {
-        return udn.hashCode()
-    }
+    override fun hashCode(): Int = udn.hashCode()
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -145,9 +137,7 @@ internal class DeviceImpl private constructor(
         return udn == other.udn
     }
 
-    override fun toString(): String {
-        return friendlyName
-    }
+    override fun toString(): String = friendlyName
 
     internal class Builder(
         private val controlPoint: ControlPointImpl,
@@ -319,7 +309,7 @@ internal class DeviceImpl private constructor(
             this.urlBase = urlBase
         }
 
-        fun addIcon(icon: Icon): Builder /**/ = apply {
+        fun addIcon(icon: Icon): Builder = apply {
             iconList.add(icon)
         }
 
@@ -331,9 +321,7 @@ internal class DeviceImpl private constructor(
             deviceBuilderList = builderList
         }
 
-        fun getEmbeddedDeviceBuilderList(): List<Builder> {
-            return deviceBuilderList
-        }
+        fun getEmbeddedDeviceBuilderList(): List<Builder> = deviceBuilderList
 
         // DeviceDescriptionにはAttributeは使用されていないためAttributeには非対応
         fun putTag(namespace: String?, tag: String, value: String): Builder = apply {

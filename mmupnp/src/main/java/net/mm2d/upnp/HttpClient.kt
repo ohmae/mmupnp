@@ -85,9 +85,7 @@ class HttpClient(keepAlive: Boolean = true) {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun post(request: HttpRequest): HttpResponse {
-        return post(request, 0)
-    }
+    fun post(request: HttpRequest): HttpResponse = post(request, 0)
 
     /**
      * Send a request and receive a response.
@@ -157,15 +155,14 @@ class HttpClient(keepAlive: Boolean = true) {
         return response
     }
 
-    private fun needToRedirect(response: HttpResponse): Boolean {
-        return when (response.getStatus()) {
+    private fun needToRedirect(response: HttpResponse): Boolean =
+        when (response.getStatus()) {
             Http.Status.HTTP_MOVED_PERM,
             Http.Status.HTTP_FOUND,
             Http.Status.HTTP_SEE_OTHER,
             Http.Status.HTTP_TEMP_REDIRECT -> true
             else -> false
         }
-    }
 
     @Throws(IOException::class)
     private fun redirect(request: HttpRequest, location: String, redirectDepth: Int): HttpResponse {
@@ -178,14 +175,12 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     // VisibleForTesting
-    internal fun canReuse(request: HttpRequest): Boolean {
-        return socketHolder?.socket?.canReuse(request) ?: false
-    }
+    internal fun canReuse(request: HttpRequest): Boolean =
+        socketHolder?.socket?.canReuse(request) ?: false
 
     // VisibleForTesting
-    internal fun Socket.canReuse(request: HttpRequest): Boolean {
-        return isConnected && inetAddress == request.address && port == request.port
-    }
+    internal fun Socket.canReuse(request: HttpRequest): Boolean =
+        isConnected && inetAddress == request.address && port == request.port
 
     @Throws(IOException::class)
     private fun openSocket(request: HttpRequest): SocketHolder {
@@ -207,9 +202,7 @@ class HttpClient(keepAlive: Boolean = true) {
     /**
      * close socket.
      */
-    fun close() {
-        closeSocket()
-    }
+    fun close(): Unit = closeSocket()
 
     /**
      * Get a string by simple HTTP GET.
@@ -219,10 +212,7 @@ class HttpClient(keepAlive: Boolean = true) {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun downloadString(url: URL): String {
-        // download()の中でgetBody()がnullで無いことはチェック済み
-        return download(url).getBody()!!
-    }
+    fun downloadString(url: URL): String = download(url).getBody()!!
 
     /**
      * Get a binary by simple HTTP GET.
@@ -232,10 +222,7 @@ class HttpClient(keepAlive: Boolean = true) {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun downloadBinary(url: URL): ByteArray {
-        // download()の中でgetBody()がnullで無いことはチェック済み
-        return download(url).getBodyBinary()!!
-    }
+    fun downloadBinary(url: URL): ByteArray = download(url).getBodyBinary()!!
 
     /**
      * Invoke simple HTTP GET.
@@ -257,14 +244,13 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     @Throws(IOException::class)
-    private fun makeHttpRequest(url: URL): HttpRequest {
-        return HttpRequest.create().apply {
+    private fun makeHttpRequest(url: URL): HttpRequest =
+        HttpRequest.create().apply {
             setMethod(Http.GET)
             setUrl(url, true)
             setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
             setHeader(Http.CONNECTION, if (isKeepAlive) Http.KEEP_ALIVE else Http.CLOSE)
         }
-    }
 
     companion object {
         private const val REDIRECT_MAX = 2

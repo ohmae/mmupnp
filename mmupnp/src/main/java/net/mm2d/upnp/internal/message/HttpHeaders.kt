@@ -41,9 +41,7 @@ internal class HttpHeaders {
                 _name = name
             }
 
-        override fun hashCode(): Int {
-            return _name.hashCode() + _value.hashCode()
-        }
+        override fun hashCode(): Int = _name.hashCode() + _value.hashCode()
 
         override fun equals(other: Any?): Boolean {
             if (other == null) return false
@@ -52,9 +50,7 @@ internal class HttpHeaders {
             return _name == other._name && _value == other._value
         }
 
-        override fun toString(): String {
-            return "$_name: $_value"
-        }
+        override fun toString(): String = "$_name: $_value"
     }
 
     private val map: MutableMap<String, Entry>
@@ -100,9 +96,7 @@ internal class HttpHeaders {
      * @param name header name
      * @return header value
      */
-    operator fun get(name: String): String? {
-        return map[name.toKey()]?.value
-    }
+    operator fun get(name: String): String? = map[name.toKey()]?.value
 
     /**
      * remove header.
@@ -112,9 +106,7 @@ internal class HttpHeaders {
      * @param name header name
      * @return If deleted, header value, if not null
      */
-    fun remove(name: String): String? {
-        return map.remove(name.toKey())?.value
-    }
+    fun remove(name: String): String? = map.remove(name.toKey())?.value
 
     /**
      * Add header entry.
@@ -154,18 +146,14 @@ internal class HttpHeaders {
     /**
      * clear all header
      */
-    fun clear() {
-        map.clear()
-    }
+    fun clear(): Unit = map.clear()
 
     /**
      * Returns a Collection view for registered header information.
      *
      * @return Collection view for registered header information.
      */
-    fun values(): Collection<Entry> {
-        return map.values
-    }
+    fun values(): Collection<Entry> = map.values
 
     override fun toString(): String {
         return StringBuilder().let { sb ->
@@ -180,8 +168,6 @@ internal class HttpHeaders {
     }
 
     companion object {
-        private fun String.toKey(): String {
-            return toLowerCase(Locale.US)
-        }
+        private fun String.toKey(): String = toLowerCase(Locale.US)
     }
 }

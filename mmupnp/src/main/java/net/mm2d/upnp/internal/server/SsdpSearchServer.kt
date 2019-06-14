@@ -40,12 +40,11 @@ internal class SsdpSearchServer(
         this.listener = listener
     }
 
-    fun search(st: String? = null) {
+    fun search(st: String? = null): Unit =
         send { makeSearchMessage(if (st.isNullOrEmpty()) ST_ALL else st) }
-    }
 
-    private fun makeSearchMessage(st: String): SsdpRequest {
-        return SsdpRequest.create().also {
+    private fun makeSearchMessage(st: String): SsdpRequest =
+        SsdpRequest.create().also {
             it.setMethod(SsdpMessage.M_SEARCH)
             it.setUri("*")
             it.setHeader(Http.HOST, delegate.getSsdpAddressString())
@@ -53,7 +52,6 @@ internal class SsdpSearchServer(
             it.setHeader(Http.MX, "1")
             it.setHeader(Http.ST, st)
         }
-    }
 
     // VisibleForTesting
     internal fun onReceive(sourceAddress: InetAddress, data: ByteArray, length: Int) {

@@ -25,33 +25,18 @@ internal class SsdpResponse(
     private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
     fun getStatusCode(): Int = message.getStatusCode()
-
-    fun setStatusCode(code: Int) {
-        message.setStatusCode(code)
-    }
-
+    fun setStatusCode(code: Int): Unit = message.setStatusCode(code)
     fun getReasonPhrase(): String = message.getReasonPhrase()
-
-    fun setReasonPhrase(reasonPhrase: String) {
-        message.setReasonPhrase(reasonPhrase)
-    }
-
+    fun setReasonPhrase(reasonPhrase: String): Unit = message.setReasonPhrase(reasonPhrase)
     fun getStatus(): Status = message.getStatus()
-
-    fun setStatus(status: Status) {
-        message.setStatus(status)
-    }
-
-    override fun toString(): String {
-        return delegate.toString()
-    }
+    fun setStatus(status: Status): Unit = message.setStatus(status)
+    override fun toString(): String = delegate.toString()
 
     companion object {
         @Throws(IOException::class)
-        fun create(address: InetAddress, data: ByteArray, length: Int): SsdpResponse {
-            return HttpResponse.create().apply {
+        fun create(address: InetAddress, data: ByteArray, length: Int): SsdpResponse =
+            HttpResponse.create().apply {
                 readData(ByteArrayInputStream(data, 0, length))
             }.let { SsdpResponse(it, SsdpMessageDelegate(it, address)) }
-        }
     }
 }

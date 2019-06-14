@@ -32,10 +32,8 @@ internal class SubscribeHolder(
     private val condition = lock.newCondition()
     private val subscriptionMap = mutableMapOf<String, SubscribeService>()
 
-    fun getServiceList(): List<Service> {
-        lock.withLock {
-            return subscriptionMap.values.map { it.getService() }
-        }
+    fun getServiceList(): List<Service> = lock.withLock {
+        subscriptionMap.values.map { it.getService() }
     }
 
     fun start() {

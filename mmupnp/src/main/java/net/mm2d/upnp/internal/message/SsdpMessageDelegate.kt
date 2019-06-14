@@ -60,22 +60,13 @@ internal class SsdpMessageDelegate(
         location = message.getHeader(Http.LOCATION)
     }
 
-    override fun getHeader(name: String): String? {
-        return message.getHeader(name)
-    }
-
-    override fun setHeader(name: String, value: String) {
-        message.setHeader(name, value)
-    }
+    override fun getHeader(name: String): String? = message.getHeader(name)
+    override fun setHeader(name: String, value: String): Unit = message.setHeader(name, value)
 
     @Throws(IOException::class)
-    override fun writeData(os: OutputStream) {
-        message.writeData(os)
-    }
+    override fun writeData(os: OutputStream): Unit = message.writeData(os)
 
-    override fun toString(): String {
-        return message.toString()
-    }
+    override fun toString(): String = message.toString()
 
     companion object {
         private const val DEFAULT_MAX_AGE = 1800

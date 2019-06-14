@@ -43,17 +43,9 @@ internal class SsdpNotifyReceiverList(
         }
     }
 
-    fun setSegmentCheckEnabled(enabled: Boolean) {
-        list.forEach { it.setSegmentCheckEnabled(enabled) }
-    }
-
-    fun start() {
-        list.forEach { it.start() }
-    }
-
-    fun stop() {
-        list.forEach { it.stop() }
-    }
+    fun setSegmentCheckEnabled(enabled: Boolean): Unit = list.forEach { it.setSegmentCheckEnabled(enabled) }
+    fun start(): Unit = list.forEach { it.start() }
+    fun stop(): Unit = list.forEach { it.stop() }
 
     companion object {
         // VisibleForTesting
@@ -62,10 +54,8 @@ internal class SsdpNotifyReceiverList(
             address: Address,
             nif: NetworkInterface,
             listener: (SsdpMessage) -> Unit
-        ): SsdpNotifyReceiver {
-            return SsdpNotifyReceiver(taskExecutors, address, nif).also {
-                it.setNotifyListener(listener)
-            }
+        ): SsdpNotifyReceiver = SsdpNotifyReceiver(taskExecutors, address, nif).also {
+            it.setNotifyListener(listener)
         }
     }
 }

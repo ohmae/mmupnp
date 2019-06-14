@@ -65,9 +65,8 @@ object NetworkUtils {
  * @receiver NetworkInterface to inspect
  * @return true: receiver has an IPv4 address that can communicate with the network. false: otherwise
  */
-fun NetworkInterface.isAvailableInet4Interface(): Boolean {
-    return isConnectedToNetwork() && hasInet4Address()
-}
+fun NetworkInterface.isAvailableInet4Interface(): Boolean =
+    isConnectedToNetwork() && hasInet4Address()
 
 /**
  * Returns whether receiver has an IPv6 address that can communicate with the network.
@@ -75,9 +74,8 @@ fun NetworkInterface.isAvailableInet4Interface(): Boolean {
  * @receiver NetworkInterface to inspect
  * @return true: receiver has an IPv6 address that can communicate with the network. false: otherwise
  */
-fun NetworkInterface.isAvailableInet6Interface(): Boolean {
-    return isConnectedToNetwork() && hasInet6Address()
-}
+fun NetworkInterface.isAvailableInet6Interface(): Boolean =
+    isConnectedToNetwork() && hasInet6Address()
 
 /**
  * Returns whether receiver has an address that can communicate with the network.
@@ -85,13 +83,12 @@ fun NetworkInterface.isAvailableInet6Interface(): Boolean {
  * @receiver NetworkInterface to inspect
  * @return true: receiver has an address that can communicate with the network. false: otherwise
  */
-private fun NetworkInterface.isConnectedToNetwork(): Boolean {
-    return try {
+private fun NetworkInterface.isConnectedToNetwork(): Boolean =
+    try {
         !isLoopback && isUp && supportsMulticast()
     } catch (ignored: SocketException) {
         false
     }
-}
 
 /**
  * Returns whether receiver has an IPv4 address.
@@ -99,9 +96,8 @@ private fun NetworkInterface.isConnectedToNetwork(): Boolean {
  * @receiver NetworkInterface to inspect
  * @return true: receiver has an IPv4 address false: otherwise
  */
-private fun NetworkInterface.hasInet4Address(): Boolean {
-    return interfaceAddresses.any { it.address is Inet4Address }
-}
+private fun NetworkInterface.hasInet4Address(): Boolean =
+    interfaceAddresses.any { it.address is Inet4Address }
 
 /**
  * Returns whether receiver has an IPv6 address.
@@ -109,9 +105,8 @@ private fun NetworkInterface.hasInet4Address(): Boolean {
  * @receiver NetworkInterface to inspect
  * @return true: receiver has an IPv6 address false: otherwise
  */
-private fun NetworkInterface.hasInet6Address(): Boolean {
-    return interfaceAddresses.any { it.address is Inet6Address }
-}
+private fun NetworkInterface.hasInet6Address(): Boolean =
+    interfaceAddresses.any { it.address is Inet6Address }
 
 /**
  * Returns a combined string of address and port number.
@@ -120,9 +115,8 @@ private fun NetworkInterface.hasInet6Address(): Boolean {
  * @return a combined string of address and port number
  */
 @Throws(IllegalStateException::class)
-fun InetSocketAddress.toAddressString(): String {
-    return address.toAddressString(port)
-}
+fun InetSocketAddress.toAddressString(): String =
+    address.toAddressString(port)
 
 /**
  * Returns a combined string of address and port number.
@@ -132,19 +126,16 @@ fun InetSocketAddress.toAddressString(): String {
  * @return a combined string of address and port number
  */
 @Throws(IllegalStateException::class)
-fun InetAddress.toAddressString(port: Int): String {
-    return toAddressString().let {
+fun InetAddress.toAddressString(port: Int): String =
+    toAddressString().let {
         if (port == Http.DEFAULT_PORT || port <= 0) it else "$it:$port"
     }
-}
 
-private fun InetAddress.toAddressString(): String {
-    return if (this is Inet6Address) "[${toNormalizedString()}]" else hostAddress
-}
+private fun InetAddress.toAddressString(): String =
+    if (this is Inet6Address) "[${toNormalizedString()}]" else hostAddress
 
-internal fun InetAddress.toSimpleString(): String {
-    return if (this is Inet6Address) toNormalizedString() else hostAddress
-}
+internal fun InetAddress.toSimpleString(): String =
+    if (this is Inet6Address) toNormalizedString() else hostAddress
 
 // VisibleForTesting
 internal fun Inet6Address.toNormalizedString(): String {
@@ -187,8 +178,6 @@ private fun IntArray.findSectionToOmission(): Pair<Int, Int> {
             work.reset()
         }
     }
-    if (work.length > best.length)
-        best.set(work)
-    return if (best.length < 2) -1 to -1
-    else best.start to best.start + best.length
+    if (work.length > best.length) best.set(work)
+    return if (best.length < 2) -1 to -1 else best.start to best.start + best.length
 }

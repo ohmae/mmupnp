@@ -126,19 +126,15 @@ internal constructor(
          * Create a new instance.
          */
         @JvmStatic
-        fun create(): HttpResponse {
-            return StartLine().let {
-                HttpResponse(it, HttpMessageDelegate(it))
-            }
+        fun create(): HttpResponse = StartLine().let {
+            HttpResponse(it, HttpMessageDelegate(it))
         }
 
         /**
          * Create a new instance from InputStream
          */
         @JvmStatic
-        fun create(input: InputStream): HttpResponse {
-            return create().also { it.readData(input) }
-        }
+        fun create(input: InputStream): HttpResponse = create().also { it.readData(input) }
 
         /**
          * Create a new instance with the same contents as the argument.
@@ -146,10 +142,9 @@ internal constructor(
          * @params original original message
          */
         @JvmStatic
-        fun copy(original: HttpResponse): HttpResponse {
-            return original.startLineDelegate.copy().let {
+        fun copy(original: HttpResponse): HttpResponse =
+            original.startLineDelegate.copy().let {
                 HttpResponse(it, HttpMessageDelegate(it, original.delegate))
             }
-        }
     }
 }

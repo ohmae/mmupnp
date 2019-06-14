@@ -72,9 +72,8 @@ internal class SsdpNotifyReceiver(
     }
 
     @Throws(IOException::class)
-    fun createSsdpRequestMessage(data: ByteArray, length: Int): SsdpRequest {
-        return SsdpRequest.create(delegate.getLocalAddress(), data, length)
-    }
+    fun createSsdpRequestMessage(data: ByteArray, length: Int): SsdpRequest =
+        SsdpRequest.create(delegate.getLocalAddress(), data, length)
 
     // VisibleForTesting
     internal fun invalidAddress(sourceAddress: InetAddress): Boolean {

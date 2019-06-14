@@ -114,18 +114,16 @@ internal class SsdpServerDelegate
         }
     }
 
-    private fun waitReady(): Boolean {
-        lock.withLock {
-            val task = futureTask ?: return false
-            if (task.isDone) return false
-            if (!ready) {
-                try {
-                    condition.awaitNanos(PREPARE_TIMEOUT_NANOS)
-                } catch (ignored: InterruptedException) {
-                }
+    private fun waitReady(): Boolean = lock.withLock {
+        val task = futureTask ?: return false
+        if (task.isDone) return false
+        if (!ready) {
+            try {
+                condition.awaitNanos(PREPARE_TIMEOUT_NANOS)
+            } catch (ignored: InterruptedException) {
             }
-            return ready
         }
+        ready
     }
 
     private fun notifyReady() {
@@ -136,9 +134,7 @@ internal class SsdpServerDelegate
     }
 
     // VisibleForTesting
-    internal fun isCanceled(): Boolean {
-        return futureTask?.isCancelled ?: true
-    }
+    internal fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
 
     override fun run() {
         val suffix = (if (bindPort == 0) "-ssdp-notify-" else "-ssdp-search-") +
@@ -187,15 +183,13 @@ internal class SsdpServerDelegate
     companion object {
         private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(3)
 
-        fun findInet4Address(addressList: List<InterfaceAddress>): InterfaceAddress {
-            return addressList.find { it.address is Inet4Address }
+        fun findInet4Address(addressList: List<InterfaceAddress>): InterfaceAddress =
+            addressList.find { it.address is Inet4Address }
                 ?: throw IllegalArgumentException("ni does not have IPv4 address.")
-        }
 
-        fun findInet6Address(addressList: List<InterfaceAddress>): InterfaceAddress {
-            return addressList.find { it.address is Inet6Address && it.address.isLinkLocalAddress }
+        fun findInet6Address(addressList: List<InterfaceAddress>): InterfaceAddress =
+            addressList.find { it.address is Inet6Address && it.address.isLinkLocalAddress }
                 ?: throw IllegalArgumentException("ni does not have IPv6 address.")
-        }
 
         /**
          * A normal URL is described in the Location of SsdpMessage,
@@ -205,9 +199,8 @@ internal class SsdpServerDelegate
          * @param sourceAddress source address
          * @return true: if there is an invalid Location, such as a mismatch with the sender. false: otherwise
          */
-        fun isInvalidLocation(message: SsdpMessage, sourceAddress: InetAddress): Boolean {
-            return !isValidLocation(message, sourceAddress)
-        }
+        fun isInvalidLocation(message: SsdpMessage, sourceAddress: InetAddress): Boolean =
+            !isValidLocation(message, sourceAddress)
 
         private fun isValidLocation(message: SsdpMessage, sourceAddress: InetAddress): Boolean {
             val location = message.location ?: return false

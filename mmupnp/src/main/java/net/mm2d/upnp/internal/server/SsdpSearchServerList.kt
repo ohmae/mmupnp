@@ -43,17 +43,9 @@ internal class SsdpSearchServerList(
         }
     }
 
-    fun start() {
-        list.forEach { it.start() }
-    }
-
-    fun stop() {
-        list.forEach { it.stop() }
-    }
-
-    fun search(st: String?) {
-        list.forEach { it.search(st) }
-    }
+    fun start(): Unit = list.forEach { it.start() }
+    fun stop(): Unit = list.forEach { it.stop() }
+    fun search(st: String?): Unit = list.forEach { it.search(st) }
 
     companion object {
         // VisibleForTesting
@@ -62,10 +54,8 @@ internal class SsdpSearchServerList(
             address: Address,
             nif: NetworkInterface,
             listener: (SsdpMessage) -> Unit
-        ): SsdpSearchServer {
-            return SsdpSearchServer(taskExecutors, address, nif).also {
-                it.setResponseListener(listener)
-            }
+        ): SsdpSearchServer = SsdpSearchServer(taskExecutors, address, nif).also {
+            it.setResponseListener(listener)
         }
     }
 }

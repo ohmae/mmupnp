@@ -45,14 +45,10 @@ internal class ActionImpl(
         argumentMap.values.toList()
     }
 
-    override fun findArgument(name: String): Argument? {
-        return argumentMap[name]
-    }
+    override fun findArgument(name: String): Argument? = argumentMap[name]
 
     // VisibleForTesting
-    internal fun createHttpClient(): HttpClient {
-        return HttpClient(false)
-    }
+    internal fun createHttpClient(): HttpClient = HttpClient(false)
 
     @Throws(IOException::class)
     override fun invokeSync(
@@ -115,8 +111,8 @@ internal class ActionImpl(
     override suspend fun invokeAsync(
         argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
-    ): Map<String, String> {
-        return suspendCoroutine { continuation ->
+    ): Map<String, String> =
+        suspendCoroutine { continuation ->
             service.device.controlPoint.taskExecutors.io {
                 try {
                     val result = invokeSync(argumentValues, returnErrorResponse)
@@ -126,15 +122,14 @@ internal class ActionImpl(
                 }
             }
         }
-    }
 
     override suspend fun invokeCustomAsync(
         argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
-    ): Map<String, String> {
-        return suspendCoroutine { continuation ->
+    ): Map<String, String> =
+        suspendCoroutine { continuation ->
             service.device.controlPoint.taskExecutors.io {
                 try {
                     val result = invokeCustomSync(argumentValues, customNamespace, customArguments, returnErrorResponse)
@@ -144,7 +139,6 @@ internal class ActionImpl(
                 }
             }
         }
-    }
 
     /**
      * Create an argument list.
@@ -152,12 +146,11 @@ internal class ActionImpl(
      * @param argumentValues Argument values
      * @return Argument list
      */
-    private fun makeArguments(argumentValues: Map<String, String?>): MutableList<Pair<String, String?>> {
-        return argumentMap.values
+    private fun makeArguments(argumentValues: Map<String, String?>): MutableList<Pair<String, String?>> =
+        argumentMap.values
             .filter { it.isInputDirection }
             .map { it.name to selectArgumentValue(it, argumentValues) }
             .toMutableList()
-    }
 
     /**
      * Select the value of Argument.
@@ -169,9 +162,8 @@ internal class ActionImpl(
      * @param argumentValues Argument values
      * @return Selected argument value
      */
-    private fun selectArgumentValue(argument: Argument, argumentValues: Map<String, String?>): String? {
-        return argumentValues[argument.name] ?: argument.relatedStateVariable.defaultValue
-    }
+    private fun selectArgumentValue(argument: Argument, argumentValues: Map<String, String?>): String? =
+        argumentValues[argument.name] ?: argument.relatedStateVariable.defaultValue
 
     /**
      * Append custom arguments.
@@ -246,8 +238,8 @@ internal class ActionImpl(
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    private fun makeHttpRequest(url: URL, soap: String): HttpRequest {
-        return HttpRequest.create().apply {
+    private fun makeHttpRequest(url: URL, soap: String): HttpRequest =
+        HttpRequest.create().apply {
             setMethod(Http.POST)
             setUrl(url, true)
             setHeader(Http.SOAPACTION, soapActionName)
@@ -256,7 +248,6 @@ internal class ActionImpl(
             setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT)
             setBody(soap, true)
         }
-    }
 
     /**
      * Create a SOAP Action XML string.
@@ -379,9 +370,7 @@ internal class ActionImpl(
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
-    private fun findResponseElement(xml: String): Element {
-        return findElement(xml, responseTagName)
-    }
+    private fun findResponseElement(xml: String): Element = findElement(xml, responseTagName)
 
     /**
      * Parses the error response of this Action.
@@ -435,16 +424,13 @@ internal class ActionImpl(
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
-    private fun findFaultElement(xml: String): Element {
-        return findElement(xml, "Fault")
-    }
+    private fun findFaultElement(xml: String): Element = findElement(xml, "Fault")
 
     @Throws(IOException::class, ParserConfigurationException::class, SAXException::class)
-    private fun findElement(xml: String, tag: String): Element {
-        return XmlUtils.newDocument(true, xml).documentElement
+    private fun findElement(xml: String, tag: String): Element =
+        XmlUtils.newDocument(true, xml).documentElement
             .findChildElementByLocalName("Body")
             ?.findChildElementByLocalName(tag) ?: throw IOException("no response tag")
-    }
 
     class Builder {
         private var service: ServiceImpl? = null
@@ -467,9 +453,7 @@ internal class ActionImpl(
             )
         }
 
-        fun getArgumentBuilderList(): List<ArgumentImpl.Builder> {
-            return argumentList
-        }
+        fun getArgumentBuilderList(): List<ArgumentImpl.Builder> = argumentList
 
         fun setService(service: ServiceImpl): Builder = apply {
             this.service = service

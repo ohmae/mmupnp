@@ -29,26 +29,19 @@ internal object ExecutorFactory {
         return DefaultTaskExecutor(executor, true)
     }
 
-    private fun calculateMaximumPoolSize(): Int {
-        return Math.max(2, Runtime.getRuntime().availableProcessors()) * 2
-    }
+    private fun calculateMaximumPoolSize(): Int = Math.max(2, Runtime.getRuntime().availableProcessors()) * 2
 
-    fun createManager(): TaskExecutor {
-        val executor = createServiceExecutor("mg-", PRIORITY_MANAGER)
-        return DefaultTaskExecutor(executor)
-    }
+    fun createManager(): TaskExecutor =
+        DefaultTaskExecutor(createServiceExecutor("mg-", PRIORITY_MANAGER))
 
-    fun createServer(): TaskExecutor {
-        val executor = createServiceExecutor("sv-", PRIORITY_SERVER)
-        return DefaultTaskExecutor(executor, true)
-    }
+    fun createServer(): TaskExecutor =
+        DefaultTaskExecutor(createServiceExecutor("sv-", PRIORITY_SERVER), true)
 
-    private fun createServiceExecutor(prefix: String, priority: Int): ExecutorService {
-        val factory = ExecutorThreadFactory(prefix, priority)
-        return ThreadPoolExecutor(
+    private fun createServiceExecutor(prefix: String, priority: Int): ExecutorService =
+        ThreadPoolExecutor(
             0, Integer.MAX_VALUE,
             0L, TimeUnit.NANOSECONDS,
-            SynchronousQueue(), factory
+            SynchronousQueue(),
+            ExecutorThreadFactory(prefix, priority)
         )
-    }
 }

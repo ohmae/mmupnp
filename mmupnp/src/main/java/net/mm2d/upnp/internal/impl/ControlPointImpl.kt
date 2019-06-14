@@ -75,9 +75,7 @@ internal class ControlPointImpl(
     }
 
     // VisibleForTesting
-    internal fun createHttpClient(): HttpClient {
-        return HttpClient(true)
-    }
+    internal fun createHttpClient(): HttpClient = HttpClient(true)
 
     // VisibleForTesting
     internal fun needToUpdateSsdpMessage(oldMessage: SsdpMessage, newMessage: SsdpMessage): Boolean {
@@ -285,9 +283,7 @@ internal class ControlPointImpl(
         }
     }
 
-    override fun getDevice(udn: String): Device? {
-        return deviceHolder[udn]
-    }
+    override fun getDevice(udn: String): Device? = deviceHolder[udn]
 
     override fun tryAddDevice(uuid: String, location: String) {
         if (deviceList.any { it.location == location }) {

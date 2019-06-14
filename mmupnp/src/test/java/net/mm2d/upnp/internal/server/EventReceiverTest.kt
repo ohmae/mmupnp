@@ -130,7 +130,7 @@ class EventReceiverTest {
         receiver.start()
         Thread.sleep(100)
         receiver.stop()
-        Thread.sleep(10)
+        Thread.sleep(100)
 
         assertThat(firstSlot.captured).isEqualTo(SID)
         assertThat(secondSlot.captured).isEqualTo(0L)

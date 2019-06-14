@@ -55,13 +55,9 @@ internal class HttpMessageDelegate(
 
     // VisibleForTesting
     @Throws(UnsupportedEncodingException::class)
-    fun ByteArray.newString(): String {
-        return String(this, CHARSET)
-    }
+    fun ByteArray.newString(): String = String(this, CHARSET)
 
-    private fun getHeaderString(): String {
-        return getHeaderStringBuilder().toString()
-    }
+    private fun getHeaderString(): String = getHeaderStringBuilder().toString()
 
     private fun getHeaderStringBuilder(): StringBuilder {
         return StringBuilder().also { sb ->
@@ -93,9 +89,7 @@ internal class HttpMessageDelegate(
         !headers.containsValue(Http.CONNECTION, Http.CLOSE)
     }
 
-    override fun setStartLine(line: String) {
-        startLineDelegate.setStartLine(line)
-    }
+    override fun setStartLine(line: String): Unit = startLineDelegate.setStartLine(line)
 
     override fun setVersion(version: String) {
         startLineDelegate.version = version
@@ -136,9 +130,7 @@ internal class HttpMessageDelegate(
         setBodyInner(body, null, withContentLength)
     }
 
-    override fun getBodyBinary(): ByteArray? {
-        return bodyBinary
-    }
+    override fun getBodyBinary(): ByteArray? = bodyBinary
 
     override fun setBodyBinary(body: ByteArray?, withContentLength: Boolean) {
         setBodyInner(null, body, withContentLength)
@@ -164,9 +156,7 @@ internal class HttpMessageDelegate(
 
     // VisibleForTesting
     @Throws(UnsupportedEncodingException::class)
-    internal fun getBytes(string: String): ByteArray {
-        return string.toByteArray(CHARSET)
-    }
+    internal fun getBytes(string: String): ByteArray = string.toByteArray(CHARSET)
 
     override fun getMessageString(): String {
         val body = body
@@ -292,9 +282,7 @@ internal class HttpMessageDelegate(
         return chunkSize.toIntOrNull(16) ?: throw IOException("Chunk format error! $chunkSize")
     }
 
-    override fun toString(): String {
-        return getMessageString()
-    }
+    override fun toString(): String = getMessageString()
 
     companion object {
         private const val BUFFER_SIZE = 1500

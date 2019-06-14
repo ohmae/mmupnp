@@ -51,13 +51,9 @@ internal class SubscribeManager(
         }
     }
 
-    fun initialize() {
-        subscribeHolder.start()
-    }
+    fun initialize(): Unit = subscribeHolder.start()
 
-    fun start() {
-        eventReceiver.start()
-    }
+    fun start(): Unit = eventReceiver.start()
 
     fun stop() {
         subscribeHolder.getServiceList().forEach {
@@ -67,27 +63,15 @@ internal class SubscribeManager(
         eventReceiver.stop()
     }
 
-    fun terminate() {
-        subscribeHolder.stop()
-    }
+    fun terminate(): Unit = subscribeHolder.stop()
 
-    fun getSubscribeService(subscriptionId: String): Service? {
-        return subscribeHolder.getService(subscriptionId)
-    }
+    fun getSubscribeService(subscriptionId: String): Service? = subscribeHolder.getService(subscriptionId)
 
-    fun register(service: Service, timeout: Long, keep: Boolean) {
-        subscribeHolder.add(service, timeout, keep)
-    }
+    fun register(service: Service, timeout: Long, keep: Boolean): Unit = subscribeHolder.add(service, timeout, keep)
 
-    fun renew(service: Service, timeout: Long) {
-        subscribeHolder.renew(service, timeout)
-    }
+    fun renew(service: Service, timeout: Long): Unit = subscribeHolder.renew(service, timeout)
 
-    fun setKeepRenew(service: Service, keep: Boolean) {
-        subscribeHolder.setKeepRenew(service, keep)
-    }
+    fun setKeepRenew(service: Service, keep: Boolean): Unit = subscribeHolder.setKeepRenew(service, keep)
 
-    fun unregister(service: Service) {
-        subscribeHolder.remove(service)
-    }
+    fun unregister(service: Service): Unit = subscribeHolder.remove(service)
 }

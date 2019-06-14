@@ -30,16 +30,14 @@ object XmlUtils {
     }
 
     @Throws(ParserConfigurationException::class)
-    private fun newDocumentBuilder(awareness: Boolean): DocumentBuilder {
-        return DocumentBuilderFactory.newInstance().also {
+    private fun newDocumentBuilder(awareness: Boolean): DocumentBuilder =
+        DocumentBuilderFactory.newInstance().also {
             it.isNamespaceAware = awareness
         }.newDocumentBuilder()
-    }
 
     @Throws(ParserConfigurationException::class)
-    private fun getDocumentBuilder(awareness: Boolean): DocumentBuilder {
-        return if (awareness) documentBuilderNs else documentBuilder
-    }
+    private fun getDocumentBuilder(awareness: Boolean): DocumentBuilder =
+        if (awareness) documentBuilderNs else documentBuilder
 
     /**
      * Create an empty Document.
@@ -50,9 +48,7 @@ object XmlUtils {
      */
     @Throws(ParserConfigurationException::class)
     @JvmStatic
-    fun newDocument(awareness: Boolean): Document {
-        return getDocumentBuilder(awareness).newDocument()
-    }
+    fun newDocument(awareness: Boolean): Document = getDocumentBuilder(awareness).newDocument()
 
     /**
      * Create new Document that contains the argument string.
@@ -79,9 +75,8 @@ object XmlUtils {
      * @return Element node found, null if not found
      */
     @JvmStatic
-    fun findChildElementByLocalName(parent: Node, localName: String): Element? {
-        return parent.findChildElementByLocalName(localName)
-    }
+    fun findChildElementByLocalName(parent: Node, localName: String): Element? =
+        parent.findChildElementByLocalName(localName)
 }
 
 /**
@@ -90,21 +85,17 @@ object XmlUtils {
  * @receiver Node performing iteration
  * @param action Action to be performed on each element
  */
-inline fun Node.forEachElement(action: (Element) -> Unit) {
-    siblingElements().asSequence().forEach(action)
-}
+inline fun Node.forEachElement(action: (Element) -> Unit): Unit = siblingElements().asSequence().forEach(action)
 
 /**
  * Returns the Iterable of Element
  *
  * @receiver Node performing iteration
  */
-fun Node.siblingElements(): Iterable<Element> {
-    return object : Iterable<Element> {
-        override fun iterator(): Iterator<Element> =
-            ElementIterator(this@siblingElements)
+fun Node.siblingElements(): Iterable<Element> =
+    object : Iterable<Element> {
+        override fun iterator(): Iterator<Element> = ElementIterator(this@siblingElements)
     }
-}
 
 private class ElementIterator(
     node: Node
@@ -141,8 +132,7 @@ private class ElementIterator(
  */
 fun Node.siblings(): Iterable<Node> {
     return object : Iterable<Node> {
-        override fun iterator(): Iterator<Node> =
-            NodeIterator(this@siblings)
+        override fun iterator(): Iterator<Node> = NodeIterator(this@siblings)
     }
 }
 
@@ -150,10 +140,7 @@ private class NodeIterator(
     node: Node
 ) : Iterator<Node> {
     private var node: Node? = node
-    override fun next(): Node = node
-        ?.also { node = it.nextSibling }
-        ?: throw NoSuchElementException()
-
+    override fun next(): Node = node?.also { node = it.nextSibling } ?: throw NoSuchElementException()
     override fun hasNext(): Boolean = node != null
 }
 
@@ -163,9 +150,8 @@ private class NodeIterator(
  * @receiver Search target node
  * @param localName local name
  */
-fun Node.findChildElementByLocalName(localName: String): Element? {
-    return firstChild?.siblingElements()?.firstOrNull { it.localName == localName }
-}
+fun Node.findChildElementByLocalName(localName: String): Element? =
+    firstChild?.siblingElements()?.firstOrNull { it.localName == localName }
 
 /**
  * Iterate NodeList.
@@ -173,33 +159,24 @@ fun Node.findChildElementByLocalName(localName: String): Element? {
  * @receiver node list
  * @param action Action to be performed on each node
  */
-inline fun NodeList.forEach(action: (Node) -> Unit) {
-    asIterable().forEach(action)
-}
+inline fun NodeList.forEach(action: (Node) -> Unit): Unit = asIterable().forEach(action)
 
 /**
  * Returns the Iterable of Node
  *
  * @receiver NodeList performing iteration
  */
-fun NodeList.asIterable(): Iterable<Node> {
-    return object : Iterable<Node> {
-        override fun iterator(): Iterator<Node> =
-            NodeListIterator(this@asIterable)
+fun NodeList.asIterable(): Iterable<Node> =
+    object : Iterable<Node> {
+        override fun iterator(): Iterator<Node> = NodeListIterator(this@asIterable)
     }
-}
 
 private class NodeListIterator(
     private val nodeList: NodeList
 ) : Iterator<Node> {
     private var index = 0
-    override fun next(): Node {
-        return nodeList.item(index++)
-    }
-
-    override fun hasNext(): Boolean {
-        return index < nodeList.length
-    }
+    override fun next(): Node = nodeList.item(index++)
+    override fun hasNext(): Boolean = index < nodeList.length
 }
 
 /**
@@ -208,31 +185,22 @@ private class NodeListIterator(
  * @receiver node list
  * @param action Action to be performed on each node
  */
-inline fun NamedNodeMap.forEach(action: (Node) -> Unit) {
-    asIterable().forEach(action)
-}
+inline fun NamedNodeMap.forEach(action: (Node) -> Unit): Unit = asIterable().forEach(action)
 
 /**
  * Returns the Iterable of Node
  *
  * @receiver NamedNodeMap performing iteration
  */
-fun NamedNodeMap.asIterable(): Iterable<Node> {
-    return object : Iterable<Node> {
-        override fun iterator(): Iterator<Node> =
-            NamedNodeMapIterator(this@asIterable)
+fun NamedNodeMap.asIterable(): Iterable<Node> =
+    object : Iterable<Node> {
+        override fun iterator(): Iterator<Node> = NamedNodeMapIterator(this@asIterable)
     }
-}
 
 private class NamedNodeMapIterator(
     private val map: NamedNodeMap
 ) : Iterator<Node> {
     private var index = 0
-    override fun next(): Node {
-        return map.item(index++)
-    }
-
-    override fun hasNext(): Boolean {
-        return index < map.length
-    }
+    override fun next(): Node = map.item(index++)
+    override fun hasNext(): Boolean = index < map.length
 }

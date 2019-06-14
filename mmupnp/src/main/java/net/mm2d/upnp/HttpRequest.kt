@@ -94,11 +94,8 @@ class HttpRequest internal constructor(
      * @return address and port string
      */
     @Throws(IllegalStateException::class)
-    fun getAddressString(): String {
-        address?.let {
-            return it.toAddressString(port)
-        } ?: throw IllegalStateException("address must be set")
-    }
+    fun getAddressString(): String =
+        address?.toAddressString(port) ?: throw IllegalStateException("address must be set")
 
     /**
      * Set the destination URL.
@@ -133,18 +130,13 @@ class HttpRequest internal constructor(
      * @return destination SocketAddress
      */
     @Throws(IllegalStateException::class)
-    fun getSocketAddress(): SocketAddress {
-        address?.let {
-            return InetSocketAddress(it, port)
-        } ?: throw IllegalStateException("address must be set")
-    }
+    fun getSocketAddress(): SocketAddress =
+        address?.let { InetSocketAddress(it, port) } ?: throw IllegalStateException("address must be set")
 
     /**
      * Message as String
      */
-    override fun toString(): String {
-        return delegate.toString()
-    }
+    override fun toString(): String = delegate.toString()
 
     companion object {
         /**

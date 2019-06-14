@@ -123,9 +123,7 @@ internal class SubscribeService(
         failCount++
     }
 
-    override fun hashCode(): Int {
-        return service.hashCode()
-    }
+    override fun hashCode(): Int = service.hashCode()
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false

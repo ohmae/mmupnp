@@ -68,27 +68,23 @@ internal class EventReceiver(
 
     // VisibleForTesting
     @Throws(IOException::class)
-    internal fun createServerSocket(): ServerSocket {
-        return ServerSocket(0)
-    }
+    internal fun createServerSocket(): ServerSocket = ServerSocket(0)
 
     fun getLocalPort(): Int {
         if (!waitReady()) return 0
         return serverSocket?.localPort ?: 0
     }
 
-    private fun waitReady(): Boolean {
-        lock.withLock {
-            val task = futureTask ?: return false
-            if (task.isDone) return false
-            if (!ready) {
-                try {
-                    condition.awaitNanos(PREPARE_TIMEOUT_NANOS)
-                } catch (ignored: InterruptedException) {
-                }
+    private fun waitReady(): Boolean = lock.withLock {
+        val task = futureTask ?: return false
+        if (task.isDone) return false
+        if (!ready) {
+            try {
+                condition.awaitNanos(PREPARE_TIMEOUT_NANOS)
+            } catch (ignored: InterruptedException) {
             }
-            return ready
         }
+        ready
     }
 
     private fun notifyReady() {
@@ -98,9 +94,7 @@ internal class EventReceiver(
         }
     }
 
-    private fun isCanceled(): Boolean {
-        return futureTask?.isCancelled ?: true
-    }
+    private fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
 
     override fun run() {
         Thread.currentThread().let {
@@ -138,7 +132,7 @@ internal class EventReceiver(
             return false
         }
         val seq = request.getHeader(Http.SEQ)?.toLongOrNull() ?: 0
-        return listener.invoke(sid, seq, list)
+        return listener(sid, seq, list)
     }
 
     // VisibleForTesting

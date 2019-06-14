@@ -326,7 +326,7 @@ class SsdpServerDelegateTest {
         verify(inverse = true) { receiver.invoke(any(), any(), any()) }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 10000)
     fun ReceiveTask_run_exceptionが発生したらループを抜ける() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))

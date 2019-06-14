@@ -228,9 +228,8 @@ object Http {
              * @return Status
              */
             @JvmStatic
-            fun valueOf(code: Int): Status {
-                return values().find { it.code == code } ?: HTTP_INVALID
-            }
+            fun valueOf(code: Int): Status =
+                values().find { it.code == code } ?: HTTP_INVALID
         }
     }
 
@@ -249,12 +248,10 @@ object Http {
         }
     }
 
-    private fun DateFormat.parseOrNull(source: String): Date? {
-        try {
-            return parse(source)
-        } catch (ignored: ParseException) {
-        }
-        return null
+    private fun DateFormat.parseOrNull(source: String): Date? = try {
+        parse(source)
+    } catch (ignored: ParseException) {
+        null
     }
 
     /**
@@ -288,9 +285,7 @@ object Http {
      * @param url URL
      * @return true: HTTP URL, false otherwise
      */
-    fun isHttpUrl(url: String?): Boolean {
-        return url?.startsWith(HTTP_SCHEME, true) == true
-    }
+    fun isHttpUrl(url: String?): Boolean = url?.startsWith(HTTP_SCHEME, true) == true
 
     /**
      * Delete the query attached to the URL.
@@ -298,9 +293,7 @@ object Http {
      * @param url URL
      * @return URL without query
      */
-    private fun removeQuery(url: String): String {
-        return url.substringBefore('?')
-    }
+    private fun removeQuery(url: String): String = url.substringBefore('?')
 
     /**
      * Create URL from BaseURL and absolute path.
@@ -365,12 +358,10 @@ object Http {
         } else "${host.substring(0, index)}%$scopeId]"
     }
 
-    private fun String.isInet6Host(): Boolean {
-        return try {
-            InetAddress.getByName(this) is Inet6Address
-        } catch (ignored: UnknownHostException) {
-            false
-        }
+    private fun String.isInet6Host(): Boolean = try {
+        InetAddress.getByName(this) is Inet6Address
+    } catch (ignored: UnknownHostException) {
+        false
     }
 
     private fun makeAbsoluteUrl(baseUrl: String, url: String): String {
@@ -415,9 +406,8 @@ object Http {
      * @throws MalformedURLException Bad URL
      */
     @Throws(MalformedURLException::class)
-    fun makeAbsoluteUrl(baseUrl: String, url: String, scopeId: Int): URL {
-        return makeUrlWithScopeId(makeAbsoluteUrl(baseUrl, url), scopeId)
-    }
+    fun makeAbsoluteUrl(baseUrl: String, url: String, scopeId: Int): URL =
+        makeUrlWithScopeId(makeAbsoluteUrl(baseUrl, url), scopeId)
 }
 
 /**
@@ -426,6 +416,4 @@ object Http {
  * @receiver target string
  * @return true: HTTP URL, false otherwise
  */
-fun String?.isHttpUrl(): Boolean {
-    return Http.isHttpUrl(this)
-}
+fun String?.isHttpUrl(): Boolean = Http.isHttpUrl(this)

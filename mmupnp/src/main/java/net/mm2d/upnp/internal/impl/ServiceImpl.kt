@@ -62,22 +62,14 @@ internal class ServiceImpl(
 
     // VisibleForTesting
     @Throws(MalformedURLException::class)
-    internal fun makeAbsoluteUrl(url: String): URL {
-        return Http.makeAbsoluteUrl(device.baseUrl, url, device.scopeId)
-    }
+    internal fun makeAbsoluteUrl(url: String): URL = Http.makeAbsoluteUrl(device.baseUrl, url, device.scopeId)
 
-    override fun findAction(name: String): Action? {
-        return actionMap[name]
-    }
+    override fun findAction(name: String): Action? = actionMap[name]
 
-    override fun findStateVariable(name: String?): StateVariable? {
-        return stateVariableMap[name]
-    }
+    override fun findStateVariable(name: String?): StateVariable? = stateVariableMap[name]
 
     // VisibleForTesting
-    internal fun createHttpClient(): HttpClient {
-        return HttpClient(false)
-    }
+    internal fun createHttpClient(): HttpClient = HttpClient(false)
 
     override fun subscribeSync(keepRenew: Boolean): Boolean {
         try {
@@ -117,8 +109,8 @@ internal class ServiceImpl(
     }
 
     @Throws(IOException::class)
-    private fun makeSubscribeRequest(): HttpRequest {
-        return HttpRequest.create().apply {
+    private fun makeSubscribeRequest(): HttpRequest =
+        HttpRequest.create().apply {
             setMethod(Http.SUBSCRIBE)
             setUrl(makeAbsoluteUrl(eventSubUrl), true)
             setHeader(Http.NT, Http.UPNP_EVENT)
@@ -126,7 +118,6 @@ internal class ServiceImpl(
             setHeader(Http.TIMEOUT, "Second-300")
             setHeader(Http.CONTENT_LENGTH, "0")
         }
-    }
 
     override fun renewSubscribeSync(): Boolean {
         try {
@@ -160,15 +151,14 @@ internal class ServiceImpl(
     }
 
     @Throws(IOException::class)
-    private fun makeRenewSubscribeRequest(subscriptionId: String): HttpRequest {
-        return HttpRequest.create().apply {
+    private fun makeRenewSubscribeRequest(subscriptionId: String): HttpRequest =
+        HttpRequest.create().apply {
             setMethod(Http.SUBSCRIBE)
             setUrl(makeAbsoluteUrl(eventSubUrl), true)
             setHeader(Http.SID, subscriptionId)
             setHeader(Http.TIMEOUT, "Second-300")
             setHeader(Http.CONTENT_LENGTH, "0")
         }
-    }
 
     override fun unsubscribeSync(): Boolean {
         if (subscriptionId.isNullOrEmpty()) {
@@ -192,14 +182,13 @@ internal class ServiceImpl(
     }
 
     @Throws(IOException::class)
-    private fun makeUnsubscribeRequest(subscriptionId: String): HttpRequest {
-        return HttpRequest.create().apply {
+    private fun makeUnsubscribeRequest(subscriptionId: String): HttpRequest =
+        HttpRequest.create().apply {
             setMethod(Http.UNSUBSCRIBE)
             setUrl(makeAbsoluteUrl(eventSubUrl), true)
             setHeader(Http.SID, subscriptionId)
             setHeader(Http.CONTENT_LENGTH, "0")
         }
-    }
 
     override fun subscribe(keepRenew: Boolean, callback: ((Boolean) -> Unit)?) {
         val executors = device.controlPoint.taskExecutors
@@ -225,33 +214,28 @@ internal class ServiceImpl(
         }
     }
 
-    override suspend fun subscribeAsync(keepRenew: Boolean): Boolean {
-        return suspendCoroutine { continuation ->
+    override suspend fun subscribeAsync(keepRenew: Boolean): Boolean =
+        suspendCoroutine { continuation ->
             device.controlPoint.taskExecutors.io {
                 continuation.resume(subscribeSync(keepRenew))
             }
         }
-    }
 
-    override suspend fun renewSubscribeAsync(): Boolean {
-        return suspendCoroutine { continuation ->
+    override suspend fun renewSubscribeAsync(): Boolean =
+        suspendCoroutine { continuation ->
             device.controlPoint.taskExecutors.io {
                 continuation.resume(renewSubscribeSync())
             }
         }
-    }
 
-    override suspend fun unsubscribeAsync(): Boolean {
-        return suspendCoroutine { continuation ->
+    override suspend fun unsubscribeAsync(): Boolean =
+        suspendCoroutine { continuation ->
             device.controlPoint.taskExecutors.io {
                 continuation.resume(unsubscribeSync())
             }
         }
-    }
 
-    override fun hashCode(): Int {
-        return device.hashCode() + serviceId.hashCode()
-    }
+    override fun hashCode(): Int = device.hashCode() + serviceId.hashCode()
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -416,14 +400,12 @@ internal class ServiceImpl(
             stateVariables.add(builder)
         }
 
-        fun toDumpString(): String {
-            return "ServiceBuilder:\n" +
-                    "serviceType:$serviceType\n" +
-                    "serviceId:$serviceId\n" +
-                    "SCPDURL:$scpdUrl\n" +
-                    "eventSubURL:$eventSubUrl\n" +
-                    "controlURL:$controlUrl\n" +
-                    "DESCRIPTION:$description"
-        }
+        fun toDumpString(): String = "ServiceBuilder:\n" +
+                "serviceType:$serviceType\n" +
+                "serviceId:$serviceId\n" +
+                "SCPDURL:$scpdUrl\n" +
+                "eventSubURL:$eventSubUrl\n" +
+                "controlURL:$controlUrl\n" +
+                "DESCRIPTION:$description"
     }
 }
