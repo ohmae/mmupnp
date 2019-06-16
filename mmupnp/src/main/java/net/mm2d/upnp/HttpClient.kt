@@ -234,13 +234,13 @@ class HttpClient(keepAlive: Boolean = true) {
     @Throws(IOException::class)
     fun download(url: URL): HttpResponse {
         val request = makeHttpRequest(url)
-        val response = post(request)
-        // response bodyがemptyであることは正常
-        if (response.getStatus() !== Http.Status.HTTP_OK || response.getBody() == null) {
-            Logger.i { "request:\n$request\nresponse:\n$response" }
-            throw IOException(response.startLine)
+        return post(request).also {
+            // response bodyがemptyであることは正常
+            if (it.getStatus() !== Http.Status.HTTP_OK || it.getBody() == null) {
+                Logger.i { "request:\n$request\nresponse:\n$it" }
+                throw IOException(it.startLine)
+            }
         }
-        return response
     }
 
     @Throws(IOException::class)
