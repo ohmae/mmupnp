@@ -77,7 +77,8 @@ interface ControlPoint {
     /**
      * Do initialize.
      *
-     * Always run before using.
+     * Must be call before use.
+     *
      * Once initialized, reinitialization is impossible.
      * If reinitialization is required, such as changing the interface, start over from creating an instance.
      * Also, be sure to call [terminate] when ending.
@@ -98,22 +99,22 @@ interface ControlPoint {
     fun terminate()
 
     /**
-     * start.
+     * Start the control point.
      *
      * It is not possible to execute network related processing before calling this method.
      * Nothing is done if it is already started.
-     * Even after it has been started once, it can be started again if it is after stop processing.
+     * Even after it has been started once, it can be started again if it is after stop.
      *
      * @see initialize
      */
     fun start()
 
     /**
-     * stop.
+     * Stop the control point.
      *
      * Nothing happens if it is not started or already stopped.
      * The discovered Device is treated as Lost.
-     * After stopping, even if it holds an instance of discovered Device, it does not operate normally.
+     * After stopping, even if you holds an instance of discovered Device, it does not operate normally.
      *
      * @see start
      */
