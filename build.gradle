@@ -3,7 +3,7 @@ buildscript {
     def versionMinor = 0
     def versionPatch = 0
     ext {
-        kotlin_version = '1.3.31'
+        kotlin_version = '1.3.40'
         pj = [
                 versions : [
                         name: "${versionMajor}.${versionMinor}.${versionPatch}",
