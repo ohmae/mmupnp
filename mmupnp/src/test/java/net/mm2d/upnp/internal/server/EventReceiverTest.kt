@@ -235,7 +235,7 @@ class EventReceiverTest {
         receiver.start()
         Thread.sleep(100)
         receiver.stop()
-        Thread.sleep(10)
+        Thread.sleep(100)
 
         val response = HttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))

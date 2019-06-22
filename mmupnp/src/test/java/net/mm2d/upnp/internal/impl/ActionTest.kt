@@ -51,7 +51,7 @@ class ActionTest {
             .setService(service)
             .setName(name)
             .build()
-        assertThat(action.service).isSameAs(service)
+        assertThat(action.service).isSameInstanceAs(service)
     }
 
     @Test

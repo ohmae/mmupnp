@@ -51,7 +51,7 @@ class DeviceHolderTest {
         every { device.udn } returns UDN
         holder.add(device)
 
-        assertThat(holder[UDN]).isSameAs(device)
+        assertThat(holder[UDN]).isSameInstanceAs(device)
     }
 
     @Test
@@ -61,7 +61,7 @@ class DeviceHolderTest {
         every { device.udn } returns UDN
         holder.add(device)
 
-        assertThat(holder[UDN]).isSameAs(device)
+        assertThat(holder[UDN]).isSameInstanceAs(device)
 
         holder.remove(device)
         assertThat(holder[UDN]).isNull()
@@ -74,7 +74,7 @@ class DeviceHolderTest {
         every { device.udn } returns UDN
         holder.add(device)
 
-        assertThat(holder[UDN]).isSameAs(device)
+        assertThat(holder[UDN]).isSameInstanceAs(device)
 
         holder.remove(UDN)
         assertThat(holder[UDN]).isNull()
@@ -87,7 +87,7 @@ class DeviceHolderTest {
         every { device.udn } returns UDN
         holder.add(device)
 
-        assertThat(holder[UDN]).isSameAs(device)
+        assertThat(holder[UDN]).isSameInstanceAs(device)
 
         holder.clear()
         assertThat(holder.deviceList).hasSize(0)
