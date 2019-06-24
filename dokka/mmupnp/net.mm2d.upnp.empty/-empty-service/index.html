@@ -132,7 +132,7 @@
 </td>
 <td>
 <code><span class="keyword">fun </span><span class="identifier">renewSubscribe</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$renewSubscribe(kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/callback">callback</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Invoke renew subscribe asynchronously.</p>
+<p>Invoke renew subscribe asynchronously. The result is received by callback.</p>
 </td>
 </tr>
 <tr>
@@ -141,7 +141,7 @@
 </td>
 <td>
 <code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">renewSubscribeAsync</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
-<p>Invoke renew subscribe asynchronously.</p>
+<p>Invoke renew subscribe asynchronously. Suspends the invoking coroutine until the result is received.</p>
 </td>
 </tr>
 <tr>
@@ -159,7 +159,7 @@
 </td>
 <td>
 <code><span class="keyword">fun </span><span class="identifier">subscribe</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$subscribe(kotlin.Boolean, kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/keepRenew">keepRenew</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$subscribe(kotlin.Boolean, kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/callback">callback</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Invoke subscribe asynchronously.</p>
+<p>Invoke subscribe asynchronously. The result is received by callback.</p>
 </td>
 </tr>
 <tr>
@@ -168,7 +168,7 @@
 </td>
 <td>
 <code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">subscribeAsync</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$subscribeAsync(kotlin.Boolean)/keepRenew">keepRenew</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
-<p>Invoke subscribe asynchronously.</p>
+<p>Invoke subscribe asynchronously. Suspends the invoking coroutine until the result is received.</p>
 </td>
 </tr>
 <tr>
@@ -186,7 +186,7 @@
 </td>
 <td>
 <code><span class="keyword">fun </span><span class="identifier">unsubscribe</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyService$unsubscribe(kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/callback">callback</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Invoke unsubscribe asynchronously.</p>
+<p>Invoke unsubscribe asynchronously. The result is received by callback.</p>
 </td>
 </tr>
 <tr>
@@ -195,7 +195,7 @@
 </td>
 <td>
 <code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">unsubscribeAsync</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
-<p>Invoke unsubscribe asynchronously.</p>
+<p>Invoke unsubscribe asynchronously. Suspends the invoking coroutine until the result is received.</p>
 </td>
 </tr>
 <tr>

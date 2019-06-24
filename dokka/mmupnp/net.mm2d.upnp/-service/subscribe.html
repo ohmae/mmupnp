@@ -10,7 +10,7 @@
 <h1>subscribe</h1>
 <a name="net.mm2d.upnp.Service$subscribe(kotlin.Boolean, kotlin.Function1((kotlin.Boolean, kotlin.Unit)))"></a>
 <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">subscribe</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Service$subscribe(kotlin.Boolean, kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/keepRenew">keepRenew</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">, </span><span class="identifier" id="net.mm2d.upnp.Service$subscribe(kotlin.Boolean, kotlin.Function1((kotlin.Boolean, kotlin.Unit)))/callback">callback</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Invoke subscribe asynchronously.</p>
+<p>Invoke subscribe asynchronously. The result is received by callback.</p>
 <h3>Parameters</h3>
 <p><a name="keepRenew"></a>
 <code>keepRenew</code> - true: renew will be performed periodically before Expire.</p>

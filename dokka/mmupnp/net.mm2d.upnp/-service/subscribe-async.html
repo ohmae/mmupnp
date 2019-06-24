@@ -10,7 +10,7 @@
 <h1>subscribeAsync</h1>
 <a name="net.mm2d.upnp.Service$subscribeAsync(kotlin.Boolean)"></a>
 <code><span class="keyword">abstract</span> <span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">subscribeAsync</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.Service$subscribeAsync(kotlin.Boolean)/keepRenew">keepRenew</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
-<p>Invoke subscribe asynchronously.</p>
+<p>Invoke subscribe asynchronously. Suspends the invoking coroutine until the result is received.</p>
 <h3>Parameters</h3>
 <p><a name="keepRenew"></a>
 <code>keepRenew</code> - true: renew will be performed periodically before Expire.</p>
