@@ -228,6 +228,12 @@ Logger.setSender { level, message, throwable ->
 
 Please see [log library](https://github.com/ohmae/log) for more details
 
+## Special thanks
+
+This project is approved to Jetbrains Free Open Source Licenses.
+
+[![](readme/jetbrains/jetbrains.svg)](https://www.jetbrains.com/?from=mmupnp)
+
 ## Author
 大前 良介 (OHMAE Ryosuke)
 http://www.mm2d.net/
