@@ -71,11 +71,11 @@ internal object ServiceParser {
 
     private fun parseAction(element: Element): ActionImpl.Builder {
         val builder = ActionImpl.Builder()
-        element.firstChild.forEachElement {
+        element.firstChild?.forEachElement {
             when (it.localName) {
                 "name" -> builder.setName(it.textContent)
                 "argumentList" -> {
-                    it.firstChild.forEachElement { child ->
+                    it.firstChild?.forEachElement { child ->
                         if (child.localName == "argument") {
                             builder.addArgumentBuilder(parseArgument(child))
                         }
@@ -88,7 +88,7 @@ internal object ServiceParser {
 
     private fun parseArgument(element: Element): ArgumentImpl.Builder {
         val builder = ArgumentImpl.Builder()
-        element.firstChild.forEachElement {
+        element.firstChild?.forEachElement {
             builder.setField(it.localName, it.textContent)
         }
         return builder
@@ -109,7 +109,7 @@ internal object ServiceParser {
         val builder = StateVariableImpl.Builder()
         builder.setSendEvents(element.getAttribute("sendEvents"))
         builder.setMulticast(element.getAttribute("multicast"))
-        element.firstChild.forEachElement {
+        element.firstChild?.forEachElement {
             when (it.localName) {
                 "name" ->
                     builder.setName(it.textContent)
@@ -127,7 +127,7 @@ internal object ServiceParser {
     }
 
     private fun parseAllowedValueList(builder: StateVariableImpl.Builder, element: Element) {
-        element.firstChild.forEachElement {
+        element.firstChild?.forEachElement {
             if ("allowedValue" == it.localName) {
                 builder.addAllowedValue(it.textContent)
             }
@@ -135,7 +135,7 @@ internal object ServiceParser {
     }
 
     private fun parseAllowedValueRange(builder: StateVariableImpl.Builder, element: Element) {
-        element.firstChild.forEachElement {
+        element.firstChild?.forEachElement {
             val tag = it.localName
             if (!tag.isNullOrEmpty()) {
                 builder.setField(tag, it.textContent)

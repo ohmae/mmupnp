@@ -229,10 +229,10 @@ internal class EventReceiver(
                     return emptyList()
                 }
                 val list = mutableListOf<Pair<String, String>>()
-                propertySetNode.firstChild
-                    .siblingElements()
+                val firstChild = propertySetNode.firstChild ?: return list
+                firstChild.siblingElements()
                     .filter { it.localName == "property" }
-                    .flatMap { it.firstChild.siblingElements() }
+                    .flatMap { it.firstChild?.siblingElements() ?: emptyList() }
                     .forEach {
                         val name = it.localName
                         if (!name.isNullOrEmpty()) {

@@ -56,7 +56,7 @@ class XmlUtilsTest {
         val xml = TestUtils.getResourceAsString("propchange.xml")
         val document = XmlUtils.newDocument(true, xml)
         val root = document.documentElement
-        assertThat(root.firstChild.siblings().filter { it is Element })
+        assertThat(root.firstChild.siblings().filterIsInstance<Element>())
             .isEqualTo(root.firstChild.siblingElements().toList())
     }
 

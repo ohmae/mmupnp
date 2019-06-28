@@ -112,6 +112,22 @@ class DeviceParserTest {
         }
 
         @Test
+        fun loadDescription_特殊パターン() {
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
+            } returns TestUtils.getResourceAsString("device.xml")
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
+            } returns TestUtils.getResourceAsString("mmupnp-special.xml")
+
+            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            DeviceParser.loadDescription(httpClient, builder)
+            val device = builder.build()
+            assertThat(device.iconList).hasSize(4)
+            assertThat(device.serviceList).hasSize(3)
+        }
+
+        @Test
         fun loadDescription_no_icon_device() {
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))

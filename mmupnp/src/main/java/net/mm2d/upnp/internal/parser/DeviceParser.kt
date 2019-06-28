@@ -73,7 +73,7 @@ internal object DeviceParser {
     }
 
     private fun parseDevice(builder: DeviceImpl.Builder, deviceNode: Node) {
-        deviceNode.firstChild.forEachElement {
+        deviceNode.firstChild?.forEachElement {
             when (val tag = it.localName) {
                 "iconList" ->
                     parseIconList(builder, it)
@@ -125,7 +125,7 @@ internal object DeviceParser {
     }
 
     private fun parseIconList(builder: DeviceImpl.Builder, listNode: Node) {
-        listNode.firstChild.forEachElement {
+        listNode.firstChild?.forEachElement {
             if (it.localName == "icon") {
                 builder.addIcon(parseIcon(it))
             }
@@ -134,7 +134,7 @@ internal object DeviceParser {
 
     private fun parseIcon(iconNode: Node): Icon {
         val builder = IconImpl.Builder()
-        iconNode.firstChild.forEachElement {
+        iconNode.firstChild?.forEachElement {
             builder.setField(it.localName, it.textContent)
         }
         return builder.build()
@@ -156,7 +156,7 @@ internal object DeviceParser {
     }
 
     private fun parseServiceList(builder: DeviceImpl.Builder, listNode: Node) {
-        listNode.firstChild.forEachElement {
+        listNode.firstChild?.forEachElement {
             if (it.localName == "service") {
                 builder.addServiceBuilder(parseService(it))
             }
@@ -165,7 +165,7 @@ internal object DeviceParser {
 
     private fun parseService(serviceNode: Node): ServiceImpl.Builder {
         val serviceBuilder = ServiceImpl.Builder()
-        serviceNode.firstChild.forEachElement {
+        serviceNode.firstChild?.forEachElement {
             serviceBuilder.setField(it.localName, it.textContent)
         }
         return serviceBuilder
@@ -188,7 +188,7 @@ internal object DeviceParser {
 
     private fun parseDeviceList(builder: DeviceImpl.Builder, listNode: Node) {
         val builderList = ArrayList<DeviceImpl.Builder>()
-        listNode.firstChild.forEachElement {
+        listNode.firstChild?.forEachElement {
             if (it.localName == "device") {
                 val embeddedBuilder = builder.createEmbeddedDeviceBuilder()
                 parseDevice(embeddedBuilder, it)
