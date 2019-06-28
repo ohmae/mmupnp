@@ -56,7 +56,7 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:3.0.1'
+    implementation 'net.mm2d:mmupnp:3.0.2'
 }
 ```
 
@@ -230,7 +230,8 @@ Please see [log library](https://github.com/ohmae/log) for more details
 
 ## Special thanks
 
-This project is approved to Jetbrains Free Open Source Licenses.
+This project is being developed with IntelliJ IDEA Ultimate,
+thanks to be approved to Jetbrains Free Open Source Licenses.
 
 [![](readme/jetbrains/jetbrains.svg)](https://www.jetbrains.com/?from=mmupnp)
 
