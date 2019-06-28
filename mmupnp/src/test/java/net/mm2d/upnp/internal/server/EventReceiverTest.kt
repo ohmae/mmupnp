@@ -72,7 +72,7 @@ class EventReceiverTest {
         receiver.stop()
     }
 
-    @Test(timeout = 1000L)
+    @Test(timeout = 10000L)
     fun close_open前なら即終了() {
         val receiver = EventReceiver(mockk(), null)
         receiver.stop()
@@ -202,7 +202,7 @@ class EventReceiverTest {
         receiver.start()
         Thread.sleep(100)
         receiver.stop()
-        Thread.sleep(10)
+        Thread.sleep(100)
 
         val response = HttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))
@@ -275,7 +275,7 @@ class EventReceiverTest {
         receiver.start()
         Thread.sleep(100)
         receiver.stop()
-        Thread.sleep(10)
+        Thread.sleep(100)
     }
 
     @Test

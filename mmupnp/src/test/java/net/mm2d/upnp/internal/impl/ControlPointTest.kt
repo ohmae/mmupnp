@@ -44,14 +44,14 @@ class ControlPointTest {
             ControlPointImpl(Protocol.DEFAULT, emptyList(), false, mockk(relaxed = true))
         }
 
-        @Test(timeout = 2000L)
+        @Test(timeout = 10000L)
         fun initialize_terminate() {
             val cp = ControlPointFactory.create()
             cp.initialize()
             cp.terminate()
         }
 
-        @Test(timeout = 2000L)
+        @Test(timeout = 10000L)
         fun initialize_initialize_terminate() {
             val cp = ControlPointFactory.create()
             cp.initialize()
@@ -59,7 +59,7 @@ class ControlPointTest {
             cp.terminate()
         }
 
-        @Test(timeout = 2000L)
+        @Test(timeout = 10000L)
         fun initialize_terminate_intercept() {
             val thread = Thread {
                 val cp = ControlPointFactory.create()
@@ -72,7 +72,7 @@ class ControlPointTest {
             thread.join()
         }
 
-        @Test(timeout = 1000L)
+        @Test(timeout = 10000L)
         fun terminate() {
             val cp = ControlPointFactory.create()
             cp.terminate()

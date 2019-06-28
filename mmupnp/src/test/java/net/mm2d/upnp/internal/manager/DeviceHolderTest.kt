@@ -35,7 +35,7 @@ class DeviceHolderTest {
         taskExecutors.terminate()
     }
 
-    @Test(timeout = 1000L)
+    @Test(timeout = 10000L)
     fun start_shutdown_デッドロックしない() {
         val holder = DeviceHolder(taskExecutors, mockk(relaxed = true))
         holder.start()
@@ -114,7 +114,7 @@ class DeviceHolderTest {
         assertThat(holder.size).isEqualTo(1)
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 10000L)
     fun stop() {
         val holder = DeviceHolder(taskExecutors, mockk(relaxed = true))
 

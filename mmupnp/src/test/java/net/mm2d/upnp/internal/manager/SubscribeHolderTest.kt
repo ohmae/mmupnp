@@ -35,7 +35,7 @@ class SubscribeHolderTest {
         taskExecutors.terminate()
     }
 
-    @Test(timeout = 100L)
+    @Test(timeout = 10000L)
     fun start_stop_でロックしない() {
         val subscribeHolder = SubscribeHolder(taskExecutors)
         subscribeHolder.start()

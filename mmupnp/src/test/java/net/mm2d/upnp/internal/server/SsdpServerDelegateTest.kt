@@ -47,7 +47,7 @@ class SsdpServerDelegateTest {
         taskExecutors.terminate()
     }
 
-    @Test(timeout = 1000L)
+    @Test(timeout = 10000L)
     fun start_stop_デッドロックしない() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface)
@@ -56,7 +56,7 @@ class SsdpServerDelegateTest {
         server.stop()
     }
 
-    @Test(timeout = 1000L)
+    @Test(timeout = 10000L)
     fun stop_デッドロックしない() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface)
@@ -226,7 +226,7 @@ class SsdpServerDelegateTest {
         verify(exactly = 1) { receiver.invoke(address, packetData, data.size) }
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 10000L)
     fun ReceiveTask_スレッド内の処理_port0() {
         val socket = spyk(object : MulticastSocket() {
             @Throws(IOException::class)
@@ -241,7 +241,7 @@ class SsdpServerDelegateTest {
             @Throws(IOException::class)
             override fun receive(p: DatagramPacket) {
                 try { // avoid busy loop
-                    Thread.sleep(10)
+                    Thread.sleep(100)
                 } catch (ignored: InterruptedException) {
                 }
                 p.address = InetAddress.getByName("192.168.0.1")
@@ -263,7 +263,7 @@ class SsdpServerDelegateTest {
         verify(inverse = true) { socket.leaveGroup(any()) }
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 10000L)
     fun ReceiveTask_スレッド内の処理_port_non0() {
         val socket = spyk(object : MulticastSocket() {
             @Throws(IOException::class)
@@ -278,7 +278,7 @@ class SsdpServerDelegateTest {
             @Throws(IOException::class)
             override fun receive(p: DatagramPacket) {
                 try { // avoid busy loop
-                    Thread.sleep(10)
+                    Thread.sleep(100)
                 } catch (ignored: InterruptedException) {
                 }
                 p.address = InetAddress.getByName("192.168.0.1")
@@ -300,7 +300,7 @@ class SsdpServerDelegateTest {
         verify(exactly = 1) { socket.leaveGroup(any()) }
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 10000L)
     fun ReceiveTask_receiveLoop_exceptionが発生してもループを続ける() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
@@ -326,7 +326,7 @@ class SsdpServerDelegateTest {
         verify(inverse = true) { receiver.invoke(any(), any(), any()) }
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 10000L)
     fun ReceiveTask_run_exceptionが発生したらループを抜ける() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
