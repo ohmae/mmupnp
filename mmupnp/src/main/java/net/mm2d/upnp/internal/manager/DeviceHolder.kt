@@ -13,7 +13,6 @@ import java.util.concurrent.FutureTask
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-import kotlin.math.max
 
 /**
  * A class holding [Device] found in [net.mm2d.upnp.ControlPoint].
@@ -119,7 +118,7 @@ internal class DeviceHolder(
         if (deviceMap.isEmpty()) {
             return
         }
-        val sleep = max(
+        val sleep = maxOf(
             findMostRecentExpireTime() - System.currentTimeMillis() + MARGIN_TIME,
             MARGIN_TIME
         ) // avoid negative value

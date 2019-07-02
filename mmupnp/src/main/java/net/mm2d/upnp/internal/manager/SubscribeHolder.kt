@@ -13,7 +13,6 @@ import java.util.concurrent.FutureTask
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-import kotlin.math.max
 
 /**
  * Class to manage the Service that became subscribed state.
@@ -181,7 +180,7 @@ internal class SubscribeHolder(
             if (subscriptionMap.isEmpty()) {
                 return
             }
-            val sleep = max(findMostRecentTime() - System.currentTimeMillis(), MIN_INTERVAL)
+            val sleep = maxOf(findMostRecentTime() - System.currentTimeMillis(), MIN_INTERVAL)
             // ビジーループを回避するため最小値を設ける
             condition.await(sleep, TimeUnit.MILLISECONDS)
         }

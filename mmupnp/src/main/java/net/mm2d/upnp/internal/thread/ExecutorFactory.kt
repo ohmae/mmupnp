@@ -15,6 +15,7 @@ internal object ExecutorFactory {
     private const val PRIORITY_IO = Thread.MIN_PRIORITY
     private const val PRIORITY_MANAGER = Thread.MIN_PRIORITY
     private const val PRIORITY_SERVER = Thread.MIN_PRIORITY + 1
+    private const val KEEP_ALIVE_SECOND = 15L
 
     fun createCallback(): TaskExecutor {
         val factory = ExecutorThreadFactory("callback-", PRIORITY_CALLBACK)
@@ -25,11 +26,11 @@ internal object ExecutorFactory {
     fun createIo(maxThread: Int = calculateMaximumPoolSize()): TaskExecutor {
         val factory = ExecutorThreadFactory("io-", PRIORITY_IO)
         val queue = ThreadWorkQueue()
-        val executor = ThreadPoolExecutor(0, maxThread, 15L, TimeUnit.SECONDS, queue, factory, queue)
+        val executor = ThreadPoolExecutor(0, maxThread, KEEP_ALIVE_SECOND, TimeUnit.SECONDS, queue, factory, queue)
         return DefaultTaskExecutor(executor, true)
     }
 
-    private fun calculateMaximumPoolSize(): Int = Math.max(2, Runtime.getRuntime().availableProcessors()) * 2
+    private fun calculateMaximumPoolSize(): Int = maxOf(2, Runtime.getRuntime().availableProcessors()) * 2
 
     fun createManager(): TaskExecutor =
         DefaultTaskExecutor(createServiceExecutor("mg-", PRIORITY_MANAGER))

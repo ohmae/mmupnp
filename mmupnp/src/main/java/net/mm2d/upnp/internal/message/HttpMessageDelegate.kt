@@ -11,7 +11,6 @@ import net.mm2d.log.Logger
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpMessage
 import java.io.*
-import kotlin.math.min
 
 /**
  * Common implementation of [HttpMessage].
@@ -184,7 +183,7 @@ internal class HttpMessageDelegate(
     private fun writeChunkedBody(outputStream: OutputStream, binary: ByteArray) {
         var offset = 0
         while (offset < binary.size) {
-            val size = min(DEFAULT_CHUNK_SIZE, binary.size - offset)
+            val size = minOf(DEFAULT_CHUNK_SIZE, binary.size - offset)
             writeChunkSize(outputStream, size)
             outputStream.write(binary, offset, size)
             outputStream.write(CRLF)
