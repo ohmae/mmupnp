@@ -8,11 +8,14 @@
 package net.mm2d.upnp.sample
 
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import net.mm2d.log.DefaultSender
 import net.mm2d.log.Logger
-import net.mm2d.log.Senders
-import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.Adapter.discoveryListener
 import net.mm2d.upnp.Adapter.iconFilter
+import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPointFactory
 import java.awt.*
@@ -20,6 +23,8 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
@@ -211,8 +216,7 @@ class MainWindow private constructor() : JFrame() {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            Logger.setLogLevel(Logger.VERBOSE)
-            Logger.setSender(Senders.create())
+            setUpLogger()
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
             } catch (e: ClassNotFoundException) {
@@ -225,6 +229,30 @@ class MainWindow private constructor() : JFrame() {
                 e.printStackTrace()
             }
             MainWindow()
+        }
+
+        private fun setUpLogger() {
+            Logger.setLogLevel(Logger.VERBOSE)
+            Logger.setSender(DefaultSender.create { level, tag, message ->
+                GlobalScope.launch(Dispatchers.Main) {
+                    val prefix = "$dateString ${level.toLogLevelString()} [$tag] "
+                    message.split("\n").forEach { println(prefix + it) }
+                }
+            })
+        }
+
+        private val FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
+
+        private val dateString: String
+            get() = FORMAT.format(Date(System.currentTimeMillis()))
+
+        private fun Int.toLogLevelString(): String = when (this) {
+            Logger.VERBOSE -> "V"
+            Logger.DEBUG -> "D"
+            Logger.INFO -> "I"
+            Logger.WARN -> "W"
+            Logger.ERROR -> "E"
+            else -> " "
         }
     }
 }
