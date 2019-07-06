@@ -23,8 +23,8 @@ internal class DeviceImpl private constructor(
     override val controlPoint: ControlPointImpl,
     private val subscribeManager: SubscribeManager,
     override val parent: Device?,
-    private var _ssdpMessage: SsdpMessage,
-    private var _location: String,
+    ssdpMessage: SsdpMessage,
+    location: String,
     override val description: String,
     override val udn: String,
     override val upc: String?,
@@ -44,12 +44,12 @@ internal class DeviceImpl private constructor(
     private val serviceBuilderList: List<ServiceImpl.Builder>,
     private val deviceBuilderList: List<Builder>
 ) : Device {
-    override val ssdpMessage: SsdpMessage
-        get() = _ssdpMessage
+    override var ssdpMessage: SsdpMessage = ssdpMessage
+        private set
     override val expireTime: Long = ssdpMessage.expireTime
     override val scopeId: Int = ssdpMessage.scopeId
-    override val location: String
-        get() = _location
+    override var location: String = location
+        private set
     override val baseUrl: String
         get() = urlBase ?: location
     override val ipAddress: String
@@ -85,8 +85,8 @@ internal class DeviceImpl private constructor(
         if (!isEmbeddedDevice && udn != message.uuid) {
             throw IllegalArgumentException("uuid and udn does not match! uuid=${message.uuid} udn=$udn")
         }
-        _location = message.location ?: throw IllegalArgumentException()
-        _ssdpMessage = message
+        location = message.location ?: throw IllegalArgumentException()
+        ssdpMessage = message
         deviceList.forEach {
             it.updateSsdpMessage(message)
         }
@@ -191,8 +191,8 @@ internal class DeviceImpl private constructor(
                 controlPoint = controlPoint,
                 subscribeManager = subscribeManager,
                 parent = parent,
-                _ssdpMessage = ssdpMessage,
-                _location = location,
+                ssdpMessage = ssdpMessage,
+                location = location,
                 description = description,
                 udn = udn,
                 upc = upc,
