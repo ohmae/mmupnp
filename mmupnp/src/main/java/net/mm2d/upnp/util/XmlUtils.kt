@@ -22,22 +22,11 @@ import javax.xml.parsers.ParserConfigurationException
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 object XmlUtils {
-    private val documentBuilder: DocumentBuilder by lazy {
-        newDocumentBuilder(false)
-    }
-    private val documentBuilderNs: DocumentBuilder by lazy {
-        newDocumentBuilder(true)
-    }
-
     @Throws(ParserConfigurationException::class)
     private fun newDocumentBuilder(awareness: Boolean): DocumentBuilder =
         DocumentBuilderFactory.newInstance().also {
             it.isNamespaceAware = awareness
         }.newDocumentBuilder()
-
-    @Throws(ParserConfigurationException::class)
-    private fun getDocumentBuilder(awareness: Boolean): DocumentBuilder =
-        if (awareness) documentBuilderNs else documentBuilder
 
     /**
      * Create an empty Document.
@@ -48,7 +37,7 @@ object XmlUtils {
      */
     @Throws(ParserConfigurationException::class)
     @JvmStatic
-    fun newDocument(awareness: Boolean): Document = getDocumentBuilder(awareness).newDocument()
+    fun newDocument(awareness: Boolean): Document = newDocumentBuilder(awareness).newDocument()
 
     /**
      * Create new Document that contains the argument string.
@@ -64,7 +53,7 @@ object XmlUtils {
     @JvmStatic
     fun newDocument(awareness: Boolean, xml: String): Document {
         val reader = StringReader(xml)
-        return getDocumentBuilder(awareness).parse(InputSource(reader))
+        return newDocumentBuilder(awareness).parse(InputSource(reader))
     }
 
     /**
