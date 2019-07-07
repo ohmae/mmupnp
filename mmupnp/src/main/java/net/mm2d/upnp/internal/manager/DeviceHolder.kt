@@ -125,10 +125,7 @@ internal class DeviceHolder(
         condition.await(sleep, TimeUnit.MILLISECONDS)
     }
 
-    private fun findMostRecentExpireTime(): Long {
-        return deviceMap.values.minBy { it.expireTime }
-            ?.expireTime ?: 0L
-    }
+    private fun findMostRecentExpireTime(): Long = deviceMap.values.map { it.expireTime }.min() ?: 0L
 
     companion object {
         private val MARGIN_TIME = TimeUnit.SECONDS.toMillis(10)
