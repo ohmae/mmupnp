@@ -43,6 +43,9 @@ internal object ServiceParser {
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
     fun loadDescription(client: HttpClient, deviceBuilder: DeviceImpl.Builder, builder: ServiceImpl.Builder) {
         val scpdUrl = builder.getScpdUrl() ?: throw IOException("scpdUrl is null")
+        // Treat as empty if "/ssdp/notfound". If try to download, "404 Not found" will be returned.
+        // This may be Google's DIAL device.
+        if (scpdUrl == "/ssdp/notfound") return
         val baseUrl = deviceBuilder.getBaseUrl()
         val scopeId = deviceBuilder.getSsdpMessage().scopeId
         val url = Http.makeAbsoluteUrl(baseUrl, scpdUrl, scopeId)
