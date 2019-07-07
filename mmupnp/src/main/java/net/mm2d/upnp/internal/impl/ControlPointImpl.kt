@@ -44,8 +44,8 @@ internal class ControlPointImpl(
     private val notifyEventListenerList: MutableSet<NotifyEventListener>
     private val searchServerList: SsdpSearchServerList
     private val notifyReceiverList: SsdpNotifyReceiverList
+    private val deviceMap: MutableMap<String, Device>
     private val loadingDeviceMap: MutableMap<String, Builder>
-    private val embeddedUdnSet: MutableSet<String>
     private val initialized = AtomicBoolean()
     private val started = AtomicBoolean()
     private val deviceHolder: DeviceHolder
@@ -59,8 +59,8 @@ internal class ControlPointImpl(
         }
         discoveryListenerList = CopyOnWriteArraySet()
         notifyEventListenerList = CopyOnWriteArraySet()
-        embeddedUdnSet = mutableSetOf()
-        loadingPinnedDevices = Collections.synchronizedList<Builder>(mutableListOf())
+        deviceMap = mutableMapOf()
+        loadingPinnedDevices = Collections.synchronizedList(mutableListOf())
         taskExecutors = factory.createTaskExecutors()
         loadingDeviceMap = factory.createLoadingDeviceMap()
         searchServerList = factory.createSsdpSearchServerList(taskExecutors, interfaces) { message ->
@@ -105,11 +105,8 @@ internal class ControlPointImpl(
     internal fun onAcceptSsdpMessage(message: SsdpMessage) {
         synchronized(deviceHolder) {
             val uuid = message.uuid
-            val device = deviceHolder[uuid]
+            val device = deviceMap[uuid]
             if (device == null) {
-                if (embeddedUdnSet.contains(uuid)) {
-                    return
-                }
                 onReceiveNewSsdp(message)
                 return
             }
@@ -263,8 +260,8 @@ internal class ControlPointImpl(
         if (isPinnedDevice(deviceHolder[device.udn])) {
             return
         }
-        embeddedUdnSet.addAll(collectEmbeddedUdn(device))
         deviceHolder.add(device)
+        collectUdn(device).forEach { deviceMap[it] = device }
         taskExecutors.callback {
             discoveryListenerList.forEach { it.onDiscover(device) }
         }
@@ -273,9 +270,9 @@ internal class ControlPointImpl(
     // VisibleForTesting
     internal fun lostDevice(device: Device) {
         Logger.d { "lostDevice:[${device.friendlyName}](${device.ipAddress})" }
-        embeddedUdnSet.removeAll(collectEmbeddedUdn(device))
         synchronized(deviceHolder) {
             device.serviceList.forEach { subscribeManager.unregister(it) }
+            collectUdn(device).forEach { deviceMap.remove(it) }
             deviceHolder.remove(device)
         }
         taskExecutors.callback {
@@ -283,7 +280,7 @@ internal class ControlPointImpl(
         }
     }
 
-    override fun getDevice(udn: String): Device? = deviceHolder[udn]
+    override fun getDevice(udn: String): Device? = deviceMap[udn]
 
     override fun tryAddDevice(uuid: String, location: String) {
         if (deviceList.any { it.location == location }) {
@@ -346,19 +343,15 @@ internal class ControlPointImpl(
 
     companion object {
         private val EMPTY_FILTER = iconFilter { emptyList() }
+
         // VisibleForTesting
-        internal fun collectEmbeddedUdn(device: Device): Set<String> {
-            if (device.deviceList.isEmpty()) {
-                return emptySet()
-            }
-            val outSet = mutableSetOf<String>()
-            device.deviceList.forEach { collectEmbeddedUdn(it, outSet) }
-            return outSet
+        internal fun collectUdn(device: Device): Set<String> = mutableSetOf<String>().also {
+            collectUdn(device, it)
         }
 
-        private fun collectEmbeddedUdn(device: Device, outSet: MutableSet<String>) {
+        private fun collectUdn(device: Device, outSet: MutableSet<String>) {
             outSet.add(device.udn)
-            device.deviceList.forEach { collectEmbeddedUdn(it, outSet) }
+            device.deviceList.forEach { collectUdn(it, outSet) }
         }
 
         private fun isPinnedDevice(device: Device?): Boolean {

@@ -79,7 +79,7 @@ class DeviceParserTest {
             assertThat(device.iconList).hasSize(4)
             assertThat(device.serviceList).hasSize(3)
 
-            assertThat(ControlPointImpl.collectEmbeddedUdn(device)).isEmpty()
+            assertThat(ControlPointImpl.collectUdn(device)).hasSize(1)
         }
 
         @Test
@@ -188,18 +188,18 @@ class DeviceParserTest {
             assertThat(device1.parent).isEqualTo(device)
             assertThat(device1.isEmbeddedDevice).isEqualTo(true)
 
-            val device2 = device.findDeviceByTypeRecursively("urn:schemas-upnp-org:device:WANConnectionDevice:1")
+            val embeddedDevice = device.findDeviceByTypeRecursively("urn:schemas-upnp-org:device:WANConnectionDevice:1")
                 ?: return fail()
-            assertThat(device2.findServiceById("urn:upnp-org:serviceId:WANIPConn1")).isNotNull()
+            assertThat(embeddedDevice.findServiceById("urn:upnp-org:serviceId:WANIPConn1")).isNotNull()
 
-            assertThat(device2.upc).isEqualTo("000000000000")
-            assertThat(device2.parent).isEqualTo(device1)
-            assertThat(device2.isEmbeddedDevice).isEqualTo(true)
+            assertThat(embeddedDevice.upc).isEqualTo("000000000000")
+            assertThat(embeddedDevice.parent).isEqualTo(device1)
+            assertThat(embeddedDevice.isEmbeddedDevice).isEqualTo(true)
 
-            val udns = ControlPointImpl.collectEmbeddedUdn(device)
-            assertThat(udns).contains("uuid:01234567-89ab-cdef-0123-456789abcdee")
-            assertThat(udns).contains("uuid:01234567-89ab-cdef-0123-456789abcded")
-            assertThat(udns).doesNotContain("uuid:01234567-89ab-cdef-0123-456789abcdef")
+            val udnSet = ControlPointImpl.collectUdn(device)
+            assertThat(udnSet).contains("uuid:01234567-89ab-cdef-0123-456789abcdee")
+            assertThat(udnSet).contains("uuid:01234567-89ab-cdef-0123-456789abcded")
+            assertThat(udnSet).contains("uuid:01234567-89ab-cdef-0123-456789abcdef")
         }
 
         @Test

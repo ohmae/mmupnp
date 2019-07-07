@@ -23,6 +23,7 @@ internal class DeviceImpl private constructor(
     override val controlPoint: ControlPointImpl,
     private val subscribeManager: SubscribeManager,
     override val parent: Device?,
+    private val udnSet: Set<String>,
     ssdpMessage: SsdpMessage,
     location: String,
     override val description: String,
@@ -41,8 +42,8 @@ internal class DeviceImpl private constructor(
     private val urlBase: String?,
     private val tagMap: Map<String, Map<String, String>>,
     override val iconList: List<Icon>,
-    private val serviceBuilderList: List<ServiceImpl.Builder>,
-    private val deviceBuilderList: List<Builder>
+    serviceBuilderList: List<ServiceImpl.Builder>,
+    deviceBuilderList: List<Builder>
 ) : Device {
     override var ssdpMessage: SsdpMessage = ssdpMessage
         private set
@@ -82,8 +83,8 @@ internal class DeviceImpl private constructor(
 
     override fun updateSsdpMessage(message: SsdpMessage) {
         if (ssdpMessage.isPinned) return
-        if (!isEmbeddedDevice && udn != message.uuid) {
-            throw IllegalArgumentException("uuid and udn does not match! uuid=${message.uuid} udn=$udn")
+        if (!isEmbeddedDevice && !udnSet.contains(message.uuid)) {
+            throw IllegalArgumentException("uuid and udn does not match! uuid=${message.uuid} udn=$udnSet")
         }
         location = message.location ?: throw IllegalArgumentException()
         ssdpMessage = message
@@ -176,6 +177,7 @@ internal class DeviceImpl private constructor(
             val manufacture = manufacture ?: throw IllegalStateException("manufacturer must be set.")
             val modelName = modelName ?: throw IllegalStateException("modelName must be set.")
             val udn = udn ?: throw IllegalStateException("UDN must be set.")
+            val udnSet = collectUdn()
 
             if (parent == null) {
                 // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
@@ -183,14 +185,15 @@ internal class DeviceImpl private constructor(
                 val uuid = getUuid()
                 if (uuid.isEmpty() && ssdpMessage is FakeSsdpMessage) {
                     ssdpMessage.uuid = udn
-                } else if (udn != uuid) {
-                    throw IllegalStateException("uuid and udn does not match! uuid=$uuid udn=$udn")
+                } else if (!udnSet.contains(uuid)) {
+                    throw IllegalStateException("uuid and udn does not match! uuid=$uuid udn=$udnSet")
                 }
             }
             return DeviceImpl(
                 controlPoint = controlPoint,
                 subscribeManager = subscribeManager,
                 parent = parent,
+                udnSet = udnSet,
                 ssdpMessage = ssdpMessage,
                 location = location,
                 description = description,
@@ -212,6 +215,15 @@ internal class DeviceImpl private constructor(
                 serviceBuilderList = serviceBuilderList,
                 deviceBuilderList = deviceBuilderList
             )
+        }
+
+        private fun collectUdn(): Set<String> = mutableSetOf<String>().also {
+            collectUdn(this, it)
+        }
+
+        private fun collectUdn(builder: Builder, outSet: MutableSet<String>) {
+            builder.udn?.let { outSet.add(it) }
+            builder.deviceBuilderList.forEach { collectUdn(it, outSet) }
         }
 
         fun getSsdpMessage(): SsdpMessage = ssdpMessage

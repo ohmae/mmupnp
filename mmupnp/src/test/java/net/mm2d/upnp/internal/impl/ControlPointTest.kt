@@ -19,6 +19,7 @@ import net.mm2d.upnp.internal.manager.DeviceHolder
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.message.SsdpResponse
+import net.mm2d.upnp.internal.parser.DeviceParser
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
 import net.mm2d.upnp.internal.thread.TaskExecutors
@@ -568,7 +569,7 @@ class ControlPointTest {
             val device: Device = mockk(relaxed = true)
             val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"
             every { device.udn } returns udn
-            deviceHolder.add(device)
+            cp.discoverDevice(device)
             assertThat(deviceHolder[udn]).isEqualTo(device)
             cp.onAcceptSsdpMessage(message)
             assertThat(deviceHolder[udn]).isNull()
@@ -850,13 +851,11 @@ class ControlPointTest {
             every { factory.createSubscribeManager(any(), any()) } answers {
                 spyk(SubscribeManager(arg(0), arg(1), factory)).also { subscribeManager = it }
             }
-            cp = spyk(
-                ControlPointImpl(
-                    Protocol.DEFAULT,
-                    NetworkUtils.getAvailableInet4Interfaces(),
-                    false,
-                    factory
-                )
+            cp = ControlPointImpl(
+                Protocol.DEFAULT,
+                NetworkUtils.getAvailableInet4Interfaces(),
+                false,
+                factory
             )
         }
 
@@ -878,22 +877,28 @@ class ControlPointTest {
 
         @Test
         fun onReceiveSsdp_ResponseListenerから伝搬() {
-            val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"
             val data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin")
             val message = SsdpResponse.create(mockk(relaxed = true), data, data.size)
+            val filter: (SsdpMessage) -> Boolean = spyk({ _ -> false })
+            cp.setSsdpMessageFilter(filter)
+
             responseListener.invoke(message)
+
             Thread.sleep(100)
-            verify(exactly = 1) { deviceHolder[udn] }
+            verify(exactly = 1) { filter(any()) }
         }
 
         @Test
         fun onReceiveSsdp_NotifyListenerから伝搬() {
-            val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin")
             val message = SsdpRequest.create(mockk(relaxed = true), data, data.size)
+            val filter: (SsdpMessage) -> Boolean = spyk({ _ -> false })
+            cp.setSsdpMessageFilter(filter)
+
             notifyListener.invoke(message)
+
             Thread.sleep(100)
-            verify(exactly = 1) { deviceHolder[udn] }
+            verify(exactly = 1) { filter(any()) }
         }
     }
 
@@ -1018,7 +1023,8 @@ class ControlPointTest {
 
             subscribeManager.register(service, 1000L, false)
 
-            val notifyEvent: (service: Service, seq: Long, variable: String, value: String) -> Unit = mockk(relaxed = true)
+            val notifyEvent: (service: Service, seq: Long, variable: String, value: String) -> Unit =
+                mockk(relaxed = true)
             cp.addNotifyEventListener(notifyEventListener(notifyEvent))
 
             val value = "value"
@@ -1076,6 +1082,51 @@ class ControlPointTest {
             cp.setSsdpMessageFilter(null)
             cp.onReceiveSsdpMessage(ssdpMessage)
             verify(exactly = 1) { cp.onAcceptSsdpMessage(ssdpMessage) }
+        }
+    }
+
+    @RunWith(JUnit4::class)
+    class EmbeddedDevice {
+        @Test
+        fun embeddedDeviceごとにuuidが異なる場合どのuuidでも取り出せる() {
+            val cp: ControlPointImpl = spyk(
+                ControlPointImpl(
+                    Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(),
+                    false,
+                    DiFactory(Protocol.DEFAULT)
+                )
+            )
+            val httpClient: HttpClient = mockk(relaxed = true)
+            val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
+            val ssdpMessage: SsdpMessage = SsdpRequest.create(mockk(relaxed = true), data, data.size)
+            val subscribeManager: SubscribeManager = mockk(relaxed = true)
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
+            } returns TestUtils.getResourceAsString("device-with-embedded-device.xml")
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/cds.xml"))
+            } returns TestUtils.getResourceAsString("cds.xml")
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/cms.xml"))
+            } returns TestUtils.getResourceAsString("cms.xml")
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
+            } returns TestUtils.getResourceAsString("mmupnp.xml")
+            every { cp.createHttpClient() } returns httpClient
+            every { httpClient.localAddress } returns InetAddress.getByName("192.0.2.3")
+            val builder = DeviceImpl.Builder(cp, subscribeManager, ssdpMessage)
+            DeviceParser.loadDescription(httpClient, builder)
+            val device = builder.build()
+            cp.discoverDevice(device)
+            assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdee")).isEqualTo(device)
+            assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcded")).isEqualTo(device)
+            assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef")).isEqualTo(device)
+
+            cp.lostDevice(device)
+            assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdee")).isNull()
+            assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcded")).isNull()
+            assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef")).isNull()
         }
     }
 }
