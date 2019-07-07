@@ -38,6 +38,7 @@ class MainWindow private constructor() : JFrame() {
         it.setIconFilter(iconFilter { list -> list })
         it.initialize()
     }
+    private val enabledLogLevel = Array(7) { true }
     private val rootNode: UpnpNode = UpnpNode("Device").also {
         it.allowsChildren = true
     }
@@ -50,8 +51,10 @@ class MainWindow private constructor() : JFrame() {
     private val eventArea: JTextArea = makeTextArea()
 
     init {
+        setUpLogger()
         title = "UPnP"
         setSize(800, 800)
+        setLocationRelativeTo(null)
         defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
         contentPane.add(makeControlPanel(), BorderLayout.NORTH)
 
@@ -133,6 +136,35 @@ class MainWindow private constructor() : JFrame() {
         it.addActionListener { dump() }
     }
 
+    private fun makeLogLevelDialog(): JButton = JButton("Log").also {
+        it.addActionListener {
+            val dialog = JDialog()
+            val panel = JPanel()
+            panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
+            for (i in Logger.VERBOSE..Logger.ERROR) {
+                val label = when (i) {
+                    Logger.VERBOSE -> "VERBOSE"
+                    Logger.DEBUG -> "DEBUG"
+                    Logger.INFO -> "INFO"
+                    Logger.WARN -> "WARN"
+                    Logger.ERROR -> "ERROR"
+                    else -> ""
+                }
+                panel.add(JCheckBox(label).also { checkBox ->
+                    checkBox.isSelected = enabledLogLevel[i]
+                    checkBox.addChangeListener {
+                        enabledLogLevel[i] = checkBox.isSelected
+                    }
+                })
+            }
+            dialog.add(panel)
+            dialog.pack()
+            dialog.setLocationRelativeTo(null)
+            dialog.isModal = true
+            dialog.isVisible = true
+        }
+    }
+
     private fun selectSaveDirectory(): File? {
         val chooser = JFileChooser().also {
             it.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
@@ -167,6 +199,7 @@ class MainWindow private constructor() : JFrame() {
         it.add(makeClearButton())
         it.add(makeSearchButton())
         it.add(makeDumpButton())
+        it.add(makeLogLevelDialog())
     }
 
     private fun makeTextArea(): JTextArea = JTextArea().also {
@@ -210,13 +243,23 @@ class MainWindow private constructor() : JFrame() {
         }
     }
 
+    private fun setUpLogger() {
+        Logger.setLogLevel(Logger.VERBOSE)
+        Logger.setSender(DefaultSender.create { level, tag, message ->
+            if (!enabledLogLevel[level]) return@create
+            GlobalScope.launch(Dispatchers.Main) {
+                val prefix = "$dateString ${level.toLogLevelString()} [$tag] "
+                message.split("\n").forEach { println(prefix + it) }
+            }
+        })
+    }
+
     companion object {
         private const val DMS_PREFIX = "urn:schemas-upnp-org:device:MediaServer"
         private const val DMR_PREFIX = "urn:schemas-upnp-org:device:MediaRenderer"
 
         @JvmStatic
         fun main(args: Array<String>) {
-            setUpLogger()
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
             } catch (e: ClassNotFoundException) {
@@ -229,16 +272,6 @@ class MainWindow private constructor() : JFrame() {
                 e.printStackTrace()
             }
             MainWindow()
-        }
-
-        private fun setUpLogger() {
-            Logger.setLogLevel(Logger.VERBOSE)
-            Logger.setSender(DefaultSender.create { level, tag, message ->
-                GlobalScope.launch(Dispatchers.Main) {
-                    val prefix = "$dateString ${level.toLogLevelString()} [$tag] "
-                    message.split("\n").forEach { println(prefix + it) }
-                }
-            })
         }
 
         private val FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
