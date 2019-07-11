@@ -350,7 +350,7 @@ internal class ActionImpl(
             val text = it.textContent
             if (findArgument(tag) == null) {
                 // Optionalな情報としてArgumentに記述されていないタグが含まれる可能性があるためログ出力に留める
-                Logger.d { "invalid argument:$tag->$text" }
+                Logger.i { "invalid argument:$tag->$text" }
             }
             result[tag] = text
         }

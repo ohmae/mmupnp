@@ -57,9 +57,7 @@ internal class SsdpNotifyReceiver(
             if (message.getMethod() == SsdpMessage.M_SEARCH) {
                 return
             }
-            Logger.v {
-                "receive ssdp notify from $sourceAddress in ${delegate.getLocalAddress()}:\n$message"
-            }
+            Logger.v { "receive ssdp notify from $sourceAddress in ${delegate.getLocalAddress()}:\n$message" }
             // ByeBye accepts it regardless of address problems because it does not communicate
             if (message.nts != SsdpMessage.SSDP_BYEBYE &&
                 SsdpServerDelegate.isInvalidLocation(message, sourceAddress)

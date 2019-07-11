@@ -30,7 +30,7 @@ internal class SubscribeManager(
         Logger.d { "$sid $seq $properties" }
         val service = subscribeHolder.getService(sid)
         if (service == null) {
-            Logger.e("service is null")
+            Logger.w { "no service to receive: $sid" }
             return false
         }
         return taskExecutors.callback {

@@ -228,6 +228,19 @@ Logger.setSender { level, message, throwable ->
 
 Please see [log library](https://github.com/ohmae/log) for more details
 
+#### Log leveling
+
+- ERROR
+  - Log indicating the possibility of a problem occurring.
+- WARN
+  - Log indicating the possibility of a problem occurring, but also often output in normal operation.
+- INFO
+  - Logs that may help analyze the problem, but may be output in large amounts.
+- DEBUG
+  - Logs that output in normal operation for debugging.
+- VERBOSE
+  - More detail logs that output in normal operation for debugging.
+
 ## Special thanks
 
 This project is being developed with IntelliJ IDEA Ultimate,

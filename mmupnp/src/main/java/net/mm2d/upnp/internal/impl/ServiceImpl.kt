@@ -176,7 +176,7 @@ internal class ServiceImpl(
             Logger.v { "unsubscribe request:\n$request\nresponse:\n$response" }
             return true
         } catch (e: IOException) {
-            Logger.e(e, "fail to subscribe")
+            Logger.w(e, "fail to subscribe")
         }
         return false
     }
@@ -291,7 +291,7 @@ internal class ServiceImpl(
             val trimmedVariable = variableMap[trimmedName]
                 ?: throw IllegalStateException("There is no StateVariable [$name]")
             setRelatedStateVariableName(trimmedName)
-            Logger.w { "Invalid description. relatedStateVariable name has unnecessary blanks [$name]" }
+            Logger.i { "Invalid description. relatedStateVariable name has unnecessary blanks [$name]" }
             return trimmedVariable
         }
 
