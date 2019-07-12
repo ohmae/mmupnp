@@ -23,9 +23,7 @@ internal class HttpMessageDelegate(
 ) : HttpMessage {
     internal interface StartLineDelegate {
         var version: String
-
         fun getStartLine(): String
-
         fun setStartLine(startLine: String)
     }
 
@@ -54,7 +52,7 @@ internal class HttpMessageDelegate(
 
     // VisibleForTesting
     @Throws(UnsupportedEncodingException::class)
-    fun ByteArray.newString(): String = String(this, CHARSET)
+    fun ByteArray.newString(): String = toString(Charsets.UTF_8)
 
     private fun getHeaderString(): String = getHeaderStringBuilder().toString()
 
@@ -155,7 +153,7 @@ internal class HttpMessageDelegate(
 
     // VisibleForTesting
     @Throws(UnsupportedEncodingException::class)
-    internal fun getBytes(string: String): ByteArray = string.toByteArray(CHARSET)
+    internal fun getBytes(string: String): ByteArray = string.toByteArray()
 
     override fun getMessageString(): String {
         val body = body
@@ -171,7 +169,7 @@ internal class HttpMessageDelegate(
         outputStream.write(getHeaderBytes())
         bodyBinary?.let {
             if (isChunked) {
-                writeChunkedBody(outputStream, it)
+                outputStream.writeChunkedBody(it)
             } else {
                 outputStream.write(it)
             }
@@ -180,39 +178,41 @@ internal class HttpMessageDelegate(
     }
 
     @Throws(IOException::class)
-    private fun writeChunkedBody(outputStream: OutputStream, binary: ByteArray) {
+    private fun OutputStream.writeChunkedBody(binary: ByteArray) {
         var offset = 0
         while (offset < binary.size) {
             val size = minOf(DEFAULT_CHUNK_SIZE, binary.size - offset)
-            writeChunkSize(outputStream, size)
-            outputStream.write(binary, offset, size)
-            outputStream.write(CRLF)
+            writeChunkSize(size)
+            write(binary, offset, size)
+            write(CRLF)
             offset += size
         }
-        writeChunkSize(outputStream, 0)
-        outputStream.write(CRLF)
+        writeChunkSize(0)
+        write(CRLF)
     }
 
     @Throws(IOException::class)
-    private fun writeChunkSize(outputStream: OutputStream, size: Int) {
-        outputStream.write(getBytes(Integer.toHexString(size)))
-        outputStream.write(CRLF)
+    private fun OutputStream.writeChunkSize(size: Int) {
+        write(getBytes(Integer.toHexString(size)))
+        write(CRLF)
     }
 
     @Throws(IOException::class)
     override fun readData(inputStream: InputStream) {
-        readStartLine(inputStream)
-        readHeaders(inputStream)
-        if (isChunked) {
-            readChunkedBody(inputStream)
-        } else {
-            readBody(inputStream)
+        inputStream.run {
+            readStartLine()
+            readHeaders()
+            if (isChunked) {
+                readChunkedBody()
+            } else {
+                readBody()
+            }
         }
     }
 
     @Throws(IOException::class)
-    private fun readStartLine(inputStream: InputStream) {
-        val startLine = readLine(inputStream)
+    private fun InputStream.readStartLine() {
+        val startLine = readLine()
         if (startLine.isEmpty()) {
             throw IOException("Illegal start line:$startLine")
         }
@@ -224,9 +224,9 @@ internal class HttpMessageDelegate(
     }
 
     @Throws(IOException::class)
-    private fun readHeaders(inputStream: InputStream) {
+    private fun InputStream.readHeaders() {
         while (true) {
-            val line = readLine(inputStream)
+            val line = readLine()
             if (line.isEmpty()) {
                 break
             }
@@ -235,68 +235,60 @@ internal class HttpMessageDelegate(
     }
 
     @Throws(IOException::class)
-    private fun readBody(inputStream: InputStream) {
-        bodyBinary = ByteArrayOutputStream().also {
-            readInputStream(inputStream, it, contentLength)
-        }.toByteArray()
+    private fun InputStream.readBody() {
+        bodyBinary = readBytes(contentLength)
     }
 
     @Throws(IOException::class)
-    private fun readChunkedBody(inputStream: InputStream) {
-        bodyBinary = ByteArrayOutputStream().also {
+    private fun InputStream.readChunkedBody() {
+        bodyBinary = toOutputStream {
             while (true) {
-                val length = readChunkSize(inputStream)
+                val length = readChunkSize()
                 if (length == 0) {
-                    readLine(inputStream)
+                    readLine()
                     break
                 }
-                readInputStream(inputStream, it, length)
-                readLine(inputStream)
+                copyTo(it, length)
+                readLine()
             }
         }.toByteArray()
-    }
-
-    @Throws(IOException::class)
-    private fun readInputStream(inputStream: InputStream, outputStream: OutputStream, length: Int) {
-        val buffer = ByteArray(BUFFER_SIZE)
-        var remain = length
-        while (remain > 0) {
-            val stroke = if (remain > buffer.size) buffer.size else remain
-            val size = inputStream.read(buffer, 0, stroke)
-            if (size < 0) {
-                throw IOException("can't read from InputStream")
-            }
-            outputStream.write(buffer, 0, size)
-            remain -= size
-        }
-    }
-
-    @Throws(IOException::class)
-    private fun readChunkSize(inputStream: InputStream): Int {
-        val line = readLine(inputStream)
-        if (line.isEmpty()) {
-            throw IOException("Can not read chunk size!")
-        }
-        val chunkSize = line.split(";", limit = 2)[0]
-        return chunkSize.toIntOrNull(16) ?: throw IOException("Chunk format error! $chunkSize")
     }
 
     override fun toString(): String = getMessageString()
 
     companion object {
-        private const val BUFFER_SIZE = 1500
         private const val DEFAULT_CHUNK_SIZE = 1024
+        private const val BUFFER_SIZE = 1500
         private const val CR: Int = '\r'.toInt()
         private const val LF: Int = '\n'.toInt()
         private const val EOL: String = "\r\n"
-        private val CRLF = byteArrayOf(CR.toByte(), LF.toByte())
-        private val CHARSET = Charsets.UTF_8
+        private val CRLF = EOL.toByteArray()
 
         @Throws(IOException::class)
-        private fun readLine(inputStream: InputStream): String {
-            return ByteArrayOutputStream().also {
+        private inline fun InputStream.toOutputStream(
+            block: InputStream.(ByteArrayOutputStream) -> Unit
+        ): ByteArrayOutputStream = ByteArrayOutputStream(maxOf(available(), BUFFER_SIZE)).also { block(it) }
+
+        @Throws(IOException::class)
+        private fun InputStream.copyTo(out: OutputStream, requestBytes: Int) {
+            val buffer = ByteArray(BUFFER_SIZE)
+            var remain = requestBytes
+            while (remain > 0) {
+                val stroke = if (remain > buffer.size) buffer.size else remain
+                val size = read(buffer, 0, stroke)
+                if (size < 0) {
+                    throw IOException("can't read from InputStream: ${requestBytes - remain} / $requestBytes")
+                }
+                out.write(buffer, 0, size)
+                remain -= size
+            }
+        }
+
+        @Throws(IOException::class)
+        private fun InputStream.readLine(): String {
+            return toOutputStream {
                 while (true) {
-                    val b = inputStream.read()
+                    val b = read()
                     if (b < 0) {
                         if (it.size() == 0) throw IOException("can't read from InputStream")
                         break
@@ -305,7 +297,20 @@ internal class HttpMessageDelegate(
                     if (b == CR) continue
                     it.write(b)
                 }
-            }.toString(CHARSET.name())
+            }.toString(Charsets.UTF_8.name())
+        }
+
+        @Throws(IOException::class)
+        private fun InputStream.readBytes(length: Int): ByteArray = toOutputStream { copyTo(it, length) }.toByteArray()
+
+        @Throws(IOException::class)
+        private fun InputStream.readChunkSize(): Int {
+            val line = readLine()
+            if (line.isEmpty()) {
+                throw IOException("Can not read chunk size!")
+            }
+            val chunkSize = line.split(";", limit = 2)[0]
+            return chunkSize.toIntOrNull(16) ?: throw IOException("Chunk format error! $chunkSize")
         }
     }
 }
