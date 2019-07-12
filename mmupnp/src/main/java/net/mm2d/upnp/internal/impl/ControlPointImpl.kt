@@ -164,7 +164,7 @@ internal class ControlPointImpl(
             }
         } catch (e: Exception) {
             Logger.w(e)
-            Logger.i { "${e.javaClass.simpleName} occurred on loadDevice\n${builder.toDumpString()}" }
+            Logger.i(e) { "${e.javaClass.simpleName} occurred on loadDevice\n${builder.toDumpString()}" }
             synchronized(deviceHolder) {
                 loadingDeviceMap.remove(uuid)
             }
