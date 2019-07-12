@@ -163,6 +163,110 @@ class HttpClientTest {
         }
     }
 
+    @Test
+    fun download_no_content_length() {
+        val responseBody = "responseBody"
+
+        val server = HttpServerMock()
+        server.setServerCore { _, inputStream, outputStream ->
+            HttpRequest.create().readData(inputStream)
+            val response = HttpResponse.create()
+            response.setStartLine("HTTP/1.1 200 OK")
+            response.setBody(responseBody, false)
+            response.setHeader(Http.CONNECTION, Http.CLOSE)
+            response.writeData(outputStream)
+            false
+        }
+        server.open()
+        val port = server.localPort
+        try {
+            val client = HttpClient(true)
+            val response = client.download(URL("http://127.0.0.1:$port/"))
+            assertThat(response.getBody()).isEqualTo(responseBody)
+            assertThat(client.isKeepAlive).isTrue()
+            assertThat(client.isClosed).isTrue()
+            client.close()
+        } finally {
+            server.close()
+        }
+    }
+
+    @Test
+    fun download_no_content_length_in_keep_alive() {
+        val responseBody = "responseBody"
+
+        val server = HttpServerMock()
+        server.setServerCore { _, inputStream, outputStream ->
+            HttpRequest.create().readData(inputStream)
+            val response = HttpResponse.create()
+            response.setStartLine("HTTP/1.1 200 OK")
+            response.setBody(responseBody, false)
+            response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE)
+            response.writeData(outputStream)
+            false
+        }
+        server.open()
+        val port = server.localPort
+        try {
+            val client = HttpClient(true)
+            val response = client.download(URL("http://127.0.0.1:$port/"))
+            assertThat(response.getBody()).isEmpty()
+            client.close()
+        } finally {
+            server.close()
+        }
+    }
+
+    @Test
+    fun download_content_length_0() {
+        val responseBody = "responseBody"
+
+        val server = HttpServerMock()
+        server.setServerCore { _, inputStream, outputStream ->
+            HttpRequest.create().readData(inputStream)
+            val response = HttpResponse.create()
+            response.setStartLine("HTTP/1.1 200 OK")
+            response.setBody(responseBody, false)
+            response.setHeader(Http.CONTENT_LENGTH, "0")
+            response.setHeader(Http.CONNECTION, Http.CLOSE)
+            response.writeData(outputStream)
+            false
+        }
+        server.open()
+        val port = server.localPort
+        try {
+            val client = HttpClient(true)
+            val response = client.download(URL("http://127.0.0.1:$port/"))
+            assertThat(response.getBody()).isEmpty()
+            client.close()
+        } finally {
+            server.close()
+        }
+    }
+
+    @Test(expected = IOException::class)
+    fun download_no_content_length_204() {
+        val responseBody = "responseBody"
+
+        val server = HttpServerMock()
+        server.setServerCore { _, inputStream, outputStream ->
+            HttpRequest.create().readData(inputStream)
+            val response = HttpResponse.create()
+            response.setStartLine("HTTP/1.1 204 No Content")
+            response.setBody(responseBody, false)
+            response.setHeader(Http.CONNECTION, Http.CLOSE)
+            response.writeData(outputStream)
+            false
+        }
+        server.open()
+        val port = server.localPort
+        try {
+            HttpClient(false).download(URL("http://127.0.0.1:$port/"))
+        } finally {
+            server.close()
+        }
+    }
+
     @Test(timeout = 10000L)
     fun post_Redirectが無限ループしない() {
         val server = HttpServerMock()

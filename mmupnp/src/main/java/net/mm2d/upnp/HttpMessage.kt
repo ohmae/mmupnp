@@ -37,7 +37,7 @@ interface HttpMessage {
      */
     val isChunked: Boolean
     /**
-     * Content-Length. 0 if unknown
+     * Content-Length. -1 if unknown
      */
     val contentLength: Int
 

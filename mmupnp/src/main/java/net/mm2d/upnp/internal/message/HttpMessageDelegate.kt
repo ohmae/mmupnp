@@ -23,6 +23,7 @@ internal class HttpMessageDelegate(
 ) : HttpMessage {
     internal interface StartLineDelegate {
         var version: String
+        val shouldStriveToReadBody: Boolean
         fun getStartLine(): String
         fun setStartLine(startLine: String)
     }
@@ -48,7 +49,7 @@ internal class HttpMessageDelegate(
     override val isChunked: Boolean
         get() = headers.containsValue(Http.TRANSFER_ENCODING, Http.CHUNKED)
     override val contentLength: Int
-        get() = headers[Http.CONTENT_LENGTH]?.toIntOrNull() ?: 0
+        get() = headers[Http.CONTENT_LENGTH]?.toIntOrNull() ?: -1
 
     // VisibleForTesting
     @Throws(UnsupportedEncodingException::class)
@@ -234,9 +235,18 @@ internal class HttpMessageDelegate(
         }
     }
 
+    private fun shouldStriveToReadBody() = !isKeepAlive() && startLineDelegate.shouldStriveToReadBody
+
     @Throws(IOException::class)
     private fun InputStream.readBody() {
-        bodyBinary = readBytes(contentLength)
+        val length = contentLength
+        bodyBinary = if (length < 0 && shouldStriveToReadBody()) {
+            readBytes()
+        } else if (length <= 0) {
+            byteArrayOf()
+        } else {
+            readBytes(length)
+        }
     }
 
     @Throws(IOException::class)

@@ -29,6 +29,9 @@ internal constructor(
         var reasonPhrase: String = "",
         override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
+        override val shouldStriveToReadBody: Boolean
+            get() = status == Http.Status.HTTP_OK
+
         fun getStatusCode(): Int = statusCode
 
         fun setStatusCode(code: Int) {

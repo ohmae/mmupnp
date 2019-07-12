@@ -277,7 +277,7 @@ class HttpRequestTest {
     fun getContentLength_異常系() {
         val request = HttpRequest.create()
         request.setHeader(Http.CONTENT_LENGTH, "length")
-        assertThat(request.contentLength).isEqualTo(0)
+        assertThat(request.contentLength).isEqualTo(-1)
     }
 
     @Test

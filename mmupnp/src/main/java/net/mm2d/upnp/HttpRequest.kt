@@ -31,6 +31,8 @@ class HttpRequest internal constructor(
         var uri: String = "",
         override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
+        override val shouldStriveToReadBody: Boolean = false
+
         override fun getStartLine(): String = "$method $uri $version"
 
         override fun setStartLine(startLine: String) {
