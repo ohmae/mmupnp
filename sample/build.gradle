@@ -16,7 +16,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.2.2"
-    implementation "net.mm2d:log:0.8.2"
+    implementation "net.mm2d:log:0.8.3"
     implementation "com.google.code.gson:gson:2.8.5"
     testImplementation "junit:junit:4.12"
 }
