@@ -20,6 +20,7 @@ import net.mm2d.upnp.internal.parser.DeviceParser
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
 import net.mm2d.upnp.internal.thread.TaskExecutors
+import net.mm2d.upnp.internal.util.toSimpleTrace
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.NetworkInterface
@@ -163,8 +164,8 @@ internal class ControlPointImpl(
                 }
             }
         } catch (e: Exception) {
-            Logger.w(e)
-            Logger.i(e) { "${e.javaClass.simpleName} occurred on loadDevice\n${builder.toDumpString()}" }
+            Logger.w { "loadDevice: " + e.toSimpleTrace() }
+            Logger.i(e) { builder.toDumpString() }
             synchronized(deviceHolder) {
                 loadingDeviceMap.remove(uuid)
             }

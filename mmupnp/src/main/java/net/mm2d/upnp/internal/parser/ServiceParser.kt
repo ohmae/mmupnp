@@ -77,11 +77,9 @@ internal object ServiceParser {
         element.firstChild?.forEachElement {
             when (it.localName) {
                 "name" -> builder.setName(it.textContent)
-                "argumentList" -> {
-                    it.firstChild?.forEachElement { child ->
-                        if (child.localName == "argument") {
-                            builder.addArgumentBuilder(parseArgument(child))
-                        }
+                "argumentList" -> it.firstChild?.forEachElement { child ->
+                    if (child.localName == "argument") {
+                        builder.addArgumentBuilder(parseArgument(child))
                     }
                 }
             }
