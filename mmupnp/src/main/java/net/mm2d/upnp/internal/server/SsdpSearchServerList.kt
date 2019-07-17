@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp.internal.server
 
+import net.mm2d.log.Logger
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.thread.TaskExecutors
@@ -28,17 +29,17 @@ internal class SsdpSearchServerList(
     private val list: List<SsdpSearchServer> = when (protocol) {
         Protocol.IP_V4_ONLY -> {
             interfaces.filter { it.isAvailableInet4Interface() }
-                .map { newServer(taskExecutors, Address.IP_V4, it, listener) }
+                .mapNotNull { newServer(taskExecutors, Address.IP_V4, it, listener) }
         }
         Protocol.IP_V6_ONLY -> {
             interfaces.filter { it.isAvailableInet6Interface() }
-                .map { newServer(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
+                .mapNotNull { newServer(taskExecutors, Address.IP_V6, it, listener) }
         }
         Protocol.DUAL_STACK -> {
             val v4 = interfaces.filter { it.isAvailableInet4Interface() }
-                .map { newServer(taskExecutors, Address.IP_V4, it, listener) }
+                .mapNotNull { newServer(taskExecutors, Address.IP_V4, it, listener) }
             val v6 = interfaces.filter { it.isAvailableInet6Interface() }
-                .map { newServer(taskExecutors, Address.IP_V6_LINK_LOCAL, it, listener) }
+                .mapNotNull { newServer(taskExecutors, Address.IP_V6, it, listener) }
             v4.toMutableList().also { it.addAll(v6) }
         }
     }
@@ -54,8 +55,13 @@ internal class SsdpSearchServerList(
             address: Address,
             nif: NetworkInterface,
             listener: (SsdpMessage) -> Unit
-        ): SsdpSearchServer = SsdpSearchServer(taskExecutors, address, nif).also {
-            it.setResponseListener(listener)
+        ): SsdpSearchServer? = try {
+            SsdpSearchServer(taskExecutors, address, nif).also {
+                it.setResponseListener(listener)
+            }
+        } catch (e: IllegalArgumentException) {
+            Logger.e(e)
+            null
         }
     }
 }

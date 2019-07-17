@@ -18,6 +18,7 @@ import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPointFactory
+import net.mm2d.upnp.Protocol
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -34,10 +35,7 @@ import javax.swing.tree.TreeSelectionModel
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 class MainWindow private constructor() : JFrame() {
-    private val controlPoint: ControlPoint = ControlPointFactory.create().also {
-        it.setIconFilter(iconFilter { list -> list })
-        it.initialize()
-    }
+    private val controlPoint: ControlPoint
     private val enabledLogLevel = Array(7) { true }
     private val rootNode: UpnpNode = UpnpNode("Device").also {
         it.allowsChildren = true
@@ -52,6 +50,10 @@ class MainWindow private constructor() : JFrame() {
 
     init {
         setUpLogger()
+        controlPoint = ControlPointFactory.create(protocol = Protocol.DUAL_STACK).also {
+            it.setIconFilter(iconFilter { list -> list })
+            it.initialize()
+        }
         title = "UPnP"
         setSize(800, 800)
         setLocationRelativeTo(null)

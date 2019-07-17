@@ -22,11 +22,7 @@ internal enum class Address(address: String) {
     /**
      * Multicast address for IPv6 (link local)
      */
-    IP_V6_LINK_LOCAL("FF02::C"),
-    /**
-     * Multicast address for IPv6 (cite local)
-     */
-    IP_V6_SITE_LOCAL("FF05::C");
+    IP_V6("FF02::C");
 
     val inetAddress: InetAddress = InetAddress.getByName(address)
     val socketAddress: InetSocketAddress = InetSocketAddress(inetAddress, SsdpServer.SSDP_PORT)

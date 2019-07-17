@@ -12,6 +12,8 @@ import net.mm2d.upnp.Http
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.util.closeQuietly
+import net.mm2d.upnp.util.isAvailableInet4Address
+import net.mm2d.upnp.util.isAvailableInet6Address
 import net.mm2d.upnp.util.toSimpleString
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -49,9 +51,9 @@ internal class SsdpServerDelegate
 
     init {
         interfaceAddress = if (address == Address.IP_V4)
-            findInet4Address(networkInterface.interfaceAddresses)
+            networkInterface.findInet4Address()
         else
-            findInet6Address(networkInterface.interfaceAddresses)
+            networkInterface.findInet6Address()
     }
 
     fun setReceiver(receiver: ((sourceAddress: InetAddress, data: ByteArray, length: Int) -> Unit)?) {
@@ -183,13 +185,13 @@ internal class SsdpServerDelegate
     companion object {
         private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(3)
 
-        fun findInet4Address(addressList: List<InterfaceAddress>): InterfaceAddress =
-            addressList.find { it.address is Inet4Address }
-                ?: throw IllegalArgumentException("ni does not have IPv4 address.")
+        fun NetworkInterface.findInet4Address(): InterfaceAddress =
+            interfaceAddresses.find { it.address.isAvailableInet4Address() }
+                ?: throw IllegalArgumentException("$this does not have IPv4 address.")
 
-        fun findInet6Address(addressList: List<InterfaceAddress>): InterfaceAddress =
-            addressList.find { it.address is Inet6Address && it.address.isLinkLocalAddress }
-                ?: throw IllegalArgumentException("ni does not have IPv6 address.")
+        fun NetworkInterface.findInet6Address(): InterfaceAddress =
+            interfaceAddresses.find { it.address.isAvailableInet6Address() }
+                ?: throw IllegalArgumentException("$this does not have IPv6 address.")
 
         /**
          * A normal URL is described in the Location of SsdpMessage,

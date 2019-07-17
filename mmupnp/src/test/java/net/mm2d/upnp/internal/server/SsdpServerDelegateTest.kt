@@ -26,10 +26,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.IOException
-import java.net.DatagramPacket
-import java.net.InetAddress
-import java.net.MulticastSocket
-import java.net.SocketTimeoutException
+import java.net.*
 import java.util.*
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
@@ -68,45 +65,77 @@ class SsdpServerDelegateTest {
     fun findInet4Address() {
         val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
         val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
-        assertThat(SsdpServerDelegate.findInet4Address(listOf(ipv4, ipv6))).isEqualTo(ipv4)
-        assertThat(SsdpServerDelegate.findInet4Address(listOf(ipv6, ipv4))).isEqualTo(ipv4)
+        val ni: NetworkInterface = mockk()
+        every { ni.interfaceAddresses } returns listOf(ipv4, ipv6)
+        with(SsdpServerDelegate) {
+            assertThat(ni.findInet4Address()).isEqualTo(ipv4)
+        }
+        every { ni.interfaceAddresses } returns listOf(ipv6, ipv4)
+        with(SsdpServerDelegate) {
+            assertThat(ni.findInet4Address()).isEqualTo(ipv4)
+        }
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun findInet4Address_見つからなければException1() {
         val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
-        SsdpServerDelegate.findInet4Address(Arrays.asList(ipv6, ipv6))
+        val ni: NetworkInterface = mockk()
+        every { ni.interfaceAddresses } returns listOf(ipv6, ipv6)
+        with(SsdpServerDelegate) {
+            ni.findInet4Address()
+        }
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun findInet4Address_見つからなければException2() {
-        SsdpServerDelegate.findInet4Address(emptyList())
+        val ni: NetworkInterface = mockk()
+        every { ni.interfaceAddresses } returns emptyList()
+        with(SsdpServerDelegate) {
+            ni.findInet4Address()
+        }
     }
 
     @Test
     fun findInet6Address() {
         val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
         val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
-        assertThat(SsdpServerDelegate.findInet6Address(listOf(ipv4, ipv6))).isEqualTo(ipv6)
-        assertThat(SsdpServerDelegate.findInet6Address(listOf(ipv6, ipv4))).isEqualTo(ipv6)
+        val ni: NetworkInterface = mockk()
+        every { ni.interfaceAddresses } returns listOf(ipv4, ipv6)
+        with(SsdpServerDelegate) {
+            assertThat(ni.findInet6Address()).isEqualTo(ipv6)
+        }
+        every { ni.interfaceAddresses } returns listOf(ipv6, ipv4)
+        with(SsdpServerDelegate) {
+            assertThat(ni.findInet6Address()).isEqualTo(ipv6)
+        }
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun findInet6Address_見つからなければException1() {
         val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
-        SsdpServerDelegate.findInet6Address(listOf(ipv4))
+        val ni: NetworkInterface = mockk()
+        every { ni.interfaceAddresses } returns listOf(ipv4)
+        with(SsdpServerDelegate) {
+            ni.findInet6Address()
+        }
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun findInet6Address_見つからなければException2() {
-        SsdpServerDelegate.findInet6Address(emptyList())
+        val ni: NetworkInterface = mockk()
+        every { ni.interfaceAddresses } returns emptyList()
+        with(SsdpServerDelegate) {
+            ni.findInet6Address()
+        }
     }
 
     @Test
     fun getInterfaceAddress() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
-        assertThat(server.interfaceAddress).isEqualTo(SsdpServerDelegate.findInet4Address(networkInterface.interfaceAddresses))
+        with(SsdpServerDelegate) {
+            assertThat(server.interfaceAddress).isEqualTo(networkInterface.findInet4Address())
+        }
     }
 
     @Test

@@ -227,7 +227,7 @@ class SsdpNotifyReceiverTest {
     @Test
     fun invalidAddress_IPv6() {
         val delegate: SsdpServerDelegate = mockk(relaxed = true)
-        every { delegate.address } returns Address.IP_V6_LINK_LOCAL
+        every { delegate.address } returns Address.IP_V6
         val receiver = spyk(SsdpNotifyReceiver(delegate))
         receiver.setSegmentCheckEnabled(true)
 

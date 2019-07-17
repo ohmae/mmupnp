@@ -94,10 +94,18 @@ private fun NetworkInterface.isConnectedToNetwork(): Boolean =
  * Returns whether receiver has an IPv4 address.
  *
  * @receiver NetworkInterface to inspect
- * @return true: receiver has an IPv4 address false: otherwise
+ * @return true: receiver has an IPv4 address, false: otherwise
  */
 private fun NetworkInterface.hasInet4Address(): Boolean =
-    interfaceAddresses.any { it.address is Inet4Address }
+    interfaceAddresses.any { it.address.isAvailableInet4Address() }
+
+/**
+ * Determine if receiver is available Inet4addresses.
+ *
+ * @receiver InetAddress
+ * @return true: receiver is available Inet4Address, false: otherwise
+ */
+internal fun InetAddress.isAvailableInet4Address() = this is Inet4Address
 
 /**
  * Returns whether receiver has an IPv6 address.
@@ -106,7 +114,15 @@ private fun NetworkInterface.hasInet4Address(): Boolean =
  * @return true: receiver has an IPv6 address false: otherwise
  */
 private fun NetworkInterface.hasInet6Address(): Boolean =
-    interfaceAddresses.any { it.address is Inet6Address }
+    interfaceAddresses.any { it.address.isAvailableInet6Address() }
+
+/**
+ * Determine if receiver is available Inet6addresses.
+ *
+ * @receiver InetAddress
+ * @return true: receiver is available Inet6Address, false: otherwise
+ */
+internal fun InetAddress.isAvailableInet6Address() = this is Inet6Address && this.isLinkLocalAddress
 
 /**
  * Returns a combined string of address and port number.
