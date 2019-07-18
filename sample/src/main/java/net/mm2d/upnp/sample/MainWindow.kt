@@ -210,13 +210,25 @@ class MainWindow private constructor() : JFrame() {
         it.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
     }
 
-    private class MyTreeCellRenderer internal constructor() : DefaultTreeCellRenderer() {
-        private val deviceIcon: Icon = UIManager.getIcon("FileView.computerIcon")
-        private val serviceIcon: Icon = UIManager.getIcon("FileView.directoryIcon")
-        private val variableListIcon: Icon = UIManager.getIcon("FileView.hardDriveIcon")
-        private val variableIcon: Icon = UIManager.getIcon("FileView.fileIcon")
-        private val argumentIcon: Icon = UIManager.getIcon("FileView.fileIcon")
-        private val actionIcon: Icon = UIManager.getIcon("FileView.floppyDriveIcon")
+    private class MyTreeCellRenderer : DefaultTreeCellRenderer() {
+        private val rootIcon: Icon
+        private val deviceIcon: Icon
+        private val serviceIcon: Icon
+        private val variableListIcon: Icon
+        private val variableIcon: Icon
+        private val argumentIcon: Icon
+        private val actionIcon: Icon
+
+        init {
+            val classLoader = MyTreeCellRenderer::class.java.classLoader
+            rootIcon = ImageIcon(classLoader.getResource("root.png"))
+            deviceIcon = ImageIcon(classLoader.getResource("device.png"))
+            serviceIcon = ImageIcon(classLoader.getResource("service.png"))
+            variableListIcon = ImageIcon(classLoader.getResource("folder.png"))
+            variableIcon = ImageIcon(classLoader.getResource("variable.png"))
+            argumentIcon = ImageIcon(classLoader.getResource("variable.png"))
+            actionIcon = ImageIcon(classLoader.getResource("action.png"))
+        }
 
         override fun getTreeCellRendererComponent(
             tree: JTree,
@@ -240,6 +252,7 @@ class MainWindow private constructor() : JFrame() {
                 is StateVariableNode -> icon = variableIcon
                 is ArgumentNode -> icon = argumentIcon
                 is ActionNode -> icon = actionIcon
+                else -> icon = rootIcon
             }
             return this
         }
