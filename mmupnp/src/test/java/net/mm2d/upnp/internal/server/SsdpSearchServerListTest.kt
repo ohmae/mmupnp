@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp.internal.server
 
+import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.SsdpMessage
@@ -71,5 +72,10 @@ class SsdpSearchServerListTest {
         list.search("")
 
         verify(exactly = 1) { server.search("") }
+    }
+
+    @Test
+    fun newReceiver_該当アドレスがなければnull() {
+        assertThat(SsdpSearchServerList.newServer(mockk(), Address.IP_V4, nif, mockk())).isNull()
     }
 }

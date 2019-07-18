@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp.internal.server
 
+import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.SsdpMessage
@@ -59,5 +60,10 @@ class SsdpNotifyReceiverListTest {
         list.stop()
 
         verify(exactly = 1) { receiver.stop() }
+    }
+
+    @Test
+    fun newReceiver_該当アドレスがなければnull() {
+        assertThat(SsdpNotifyReceiverList.newReceiver(mockk(), Address.IP_V4, nif, mockk())).isNull()
     }
 }
