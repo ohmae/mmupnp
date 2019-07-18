@@ -15,7 +15,6 @@ import net.mm2d.upnp.Device
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import org.junit.After
 import org.junit.Before
-
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

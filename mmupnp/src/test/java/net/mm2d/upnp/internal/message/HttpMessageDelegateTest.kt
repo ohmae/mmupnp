@@ -11,7 +11,6 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
-
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

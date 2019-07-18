@@ -13,7 +13,6 @@ import io.mockk.spyk
 import io.mockk.verify
 import net.mm2d.upnp.HttpResponse.StartLine
 import net.mm2d.upnp.internal.message.HttpMessageDelegate
-
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

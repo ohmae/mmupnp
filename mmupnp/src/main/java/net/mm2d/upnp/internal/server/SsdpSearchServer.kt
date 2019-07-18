@@ -13,7 +13,6 @@ import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.message.SsdpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
-
 import java.io.IOException
 import java.net.InetAddress
 import java.net.NetworkInterface

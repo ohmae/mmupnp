@@ -12,11 +12,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import net.mm2d.upnp.Http.Status
-
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
