@@ -30,13 +30,13 @@ import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeSelectionModel
+import javax.swing.UIManager
 
 /**
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 class MainWindow private constructor() : JFrame() {
     private val controlPoint: ControlPoint
-    private val enabledLogLevel = Array(7) { true }
     private val rootNode: UpnpNode = UpnpNode("Device").also {
         it.allowsChildren = true
     }
@@ -49,7 +49,6 @@ class MainWindow private constructor() : JFrame() {
     private val eventArea: JTextArea = makeTextArea()
 
     init {
-        setUpLogger()
         controlPoint = ControlPointFactory.create(protocol = Protocol.DUAL_STACK).also {
             it.setIconFilter(iconFilter { list -> list })
             it.initialize()
@@ -207,7 +206,6 @@ class MainWindow private constructor() : JFrame() {
     private fun makeTextArea(): JTextArea = JTextArea().also {
         it.tabSize = 2
         it.isEditable = false
-        it.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
     }
 
     private class MyTreeCellRenderer : DefaultTreeCellRenderer() {
@@ -258,38 +256,32 @@ class MainWindow private constructor() : JFrame() {
         }
     }
 
-    private fun setUpLogger() {
-        Logger.setLogLevel(Logger.VERBOSE)
-        Logger.setSender(DefaultSender.create { level, tag, message ->
-            if (!enabledLogLevel[level]) return@create
-            GlobalScope.launch(Dispatchers.Main) {
-                val prefix = "$dateString ${level.toLogLevelString()} [$tag] "
-                message.split("\n").dropLast(1).forEach { println(prefix + it) }
-            }
-        })
-    }
-
     companion object {
         private const val DMS_PREFIX = "urn:schemas-upnp-org:device:MediaServer"
         private const val DMR_PREFIX = "urn:schemas-upnp-org:device:MediaRenderer"
 
+        private val enabledLogLevel = Array(7) { true }
+        private val FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
+
         @JvmStatic
         fun main(args: Array<String>) {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-            } catch (e: ClassNotFoundException) {
-                e.printStackTrace()
-            } catch (e: InstantiationException) {
-                e.printStackTrace()
-            } catch (e: IllegalAccessException) {
-                e.printStackTrace()
-            } catch (e: UnsupportedLookAndFeelException) {
-                e.printStackTrace()
-            }
+            setUpLogger()
+            UIManager.getInstalledLookAndFeels()
+                .find { it.className.contains("Nimbus") }
+                ?.let { UIManager.setLookAndFeel(it.className) }
             MainWindow()
         }
 
-        private val FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
+        private fun setUpLogger() {
+            Logger.setLogLevel(Logger.VERBOSE)
+            Logger.setSender(DefaultSender.create { level, tag, message ->
+                if (!enabledLogLevel[level]) return@create
+                GlobalScope.launch(Dispatchers.Main) {
+                    val prefix = "$dateString ${level.toLogLevelString()} [$tag] "
+                    message.split("\n").dropLast(1).forEach { println(prefix + it) }
+                }
+            })
+        }
 
         private val dateString: String
             get() = FORMAT.format(Date(System.currentTimeMillis()))

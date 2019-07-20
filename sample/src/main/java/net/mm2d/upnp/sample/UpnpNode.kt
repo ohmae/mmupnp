@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp.sample
 
+import net.mm2d.upnp.util.asIterable
+import org.w3c.dom.Element
+import org.w3c.dom.Node
 import org.xml.sax.SAXException
 import java.awt.Component
 import java.io.ByteArrayInputStream
@@ -45,6 +48,7 @@ open class UpnpNode(
             }
             val doc = dbf.newDocumentBuilder()
                 .parse(ByteArrayInputStream(xml.toByteArray(charset("utf-8"))))
+            removeBlankText(doc.documentElement)
             val sw = StringWriter()
             TransformerFactory.newInstance().newTransformer().also {
                 it.setOutputProperty(OutputKeys.INDENT, "yes")
@@ -59,6 +63,18 @@ open class UpnpNode(
         } catch (e: TransformerException) {
         }
         return ""
+    }
+
+    private fun removeBlankText(element: Element) {
+        element.firstChild ?: return
+        val remove = element.childNodes
+            .asIterable()
+            .filter { it.nodeType == Node.TEXT_NODE && it.textContent.isNullOrBlank() }
+        remove.forEach { element.removeChild(it) }
+        element.childNodes
+            .asIterable()
+            .mapNotNull { it as? Element }
+            .forEach { removeBlankText(it) }
     }
 
     open fun showContextMenu(frame: JFrame, invoker: Component, x: Int, y: Int) {

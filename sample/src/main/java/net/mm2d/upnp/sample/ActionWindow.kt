@@ -143,7 +143,6 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
 
     private fun makeTextArea(argument: Argument): JComponent = JScrollPane(JTextArea().also {
         it.lineWrap = true
-        it.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
         if (!argument.isInputDirection) {
             it.background = Color(0xeeeeee)
         }
