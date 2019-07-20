@@ -375,24 +375,24 @@ class SsdpServerDelegateTest {
     @Test
     fun isInvalidLocation_アドレス一致() {
         val message = makeFromResource("ssdp-search-response0.bin")
-        assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2"))).isFalse()
+        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isFalse()
     }
 
     @Test
     fun isInvalidLocation_http以外() {
         val message = makeFromResource("ssdp-search-response-invalid-location0.bin")
-        assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2"))).isTrue()
+        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
     }
 
     @Test
     fun isInvalidLocation_表記に問題() {
         val message = makeFromResource("ssdp-search-response-invalid-location1.bin")
-        assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2"))).isTrue()
+        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
     }
 
     @Test
     fun isInvalidLocation_locationなし() {
         val message = makeFromResource("ssdp-search-response-no-location.bin")
-        assertThat(SsdpServerDelegate.isInvalidLocation(message, InetAddress.getByName("192.0.2.2"))).isTrue()
+        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
     }
 }

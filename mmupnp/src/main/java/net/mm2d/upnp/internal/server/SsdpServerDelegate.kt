@@ -185,35 +185,37 @@ internal class SsdpServerDelegate
     companion object {
         private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(3)
 
-        fun NetworkInterface.findInet4Address(): InterfaceAddress =
+        // VisibleForTesting
+        internal fun NetworkInterface.findInet4Address(): InterfaceAddress =
             interfaceAddresses.find { it.address.isAvailableInet4Address() }
                 ?: throw IllegalArgumentException("$this does not have IPv4 address.")
 
-        fun NetworkInterface.findInet6Address(): InterfaceAddress =
+        // VisibleForTesting
+        internal fun NetworkInterface.findInet6Address(): InterfaceAddress =
             interfaceAddresses.find { it.address.isAvailableInet6Address() }
                 ?: throw IllegalArgumentException("$this does not have IPv6 address.")
-
-        /**
-         * A normal URL is described in the Location of SsdpMessage,
-         * and it is checked whether there is a mismatch between the description address and the packet source address.
-         *
-         * @param message SsdpMessage to check
-         * @param sourceAddress source address
-         * @return true: if there is an invalid Location, such as a mismatch with the sender. false: otherwise
-         */
-        fun isInvalidLocation(message: SsdpMessage, sourceAddress: InetAddress): Boolean =
-            !isValidLocation(message, sourceAddress)
-
-        private fun isValidLocation(message: SsdpMessage, sourceAddress: InetAddress): Boolean {
-            val location = message.location ?: return false
-            if (!Http.isHttpUrl(location)) {
-                return false
-            }
-            try {
-                return sourceAddress == InetAddress.getByName(URL(location).host)
-            } catch (ignored: IOException) {
-            }
-            return false
-        }
     }
+}
+
+/**
+ * A normal URL is described in the Location of SsdpMessage,
+ * and it is checked whether there is a mismatch between the description address and the packet source address.
+ *
+ * @receiver SsdpMessage to check
+ * @param sourceAddress source address
+ * @return true: if there is an invalid Location, such as a mismatch with the sender. false: otherwise
+ */
+internal fun SsdpMessage.hasInvalidLocation(sourceAddress: InetAddress): Boolean =
+    !hasValidLocation(sourceAddress)
+
+private fun SsdpMessage.hasValidLocation(sourceAddress: InetAddress): Boolean {
+    val location = location ?: return false
+    if (!Http.isHttpUrl(location)) {
+        return false
+    }
+    try {
+        return sourceAddress == InetAddress.getByName(URL(location).host)
+    } catch (ignored: IOException) {
+    }
+    return false
 }
