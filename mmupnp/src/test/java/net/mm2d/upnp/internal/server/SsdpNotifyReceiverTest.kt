@@ -187,61 +187,60 @@ class SsdpNotifyReceiverTest {
     fun invalidAddress_IPv4() {
         val delegate: SsdpServerDelegate = mockk(relaxed = true)
         every { delegate.address } returns Address.IP_V4
+        every { delegate.interfaceAddress } returns
+                createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
         val receiver = spyk(SsdpNotifyReceiver(delegate))
-        receiver.setSegmentCheckEnabled(true)
 
-        every { delegate.interfaceAddress } returns
-                createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
+        with(receiver) {
+            setSegmentCheckEnabled(true)
+            assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isFalse()
+            setSegmentCheckEnabled(false)
+            assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isFalse()
 
-        receiver.setSegmentCheckEnabled(true)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255"))).isFalse()
-        receiver.setSegmentCheckEnabled(false)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255"))).isFalse()
+            every { delegate.interfaceAddress } returns
+                    createInterfaceAddress("192.168.0.1", "255.255.255.128", 25)
 
-        every { delegate.interfaceAddress } returns
-                createInterfaceAddress("192.168.0.1", "255.255.255.128", 25)
+            setSegmentCheckEnabled(true)
+            assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isTrue()
+            setSegmentCheckEnabled(false)
+            assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isFalse()
 
-        receiver.setSegmentCheckEnabled(true)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255"))).isTrue()
-        receiver.setSegmentCheckEnabled(false)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255"))).isFalse()
+            every { delegate.interfaceAddress } returns
+                    createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
 
-        every { delegate.interfaceAddress } returns
-                createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
+            setSegmentCheckEnabled(true)
+            assertThat(InetAddress.getByName("192.168.1.255").isInvalidAddress()).isTrue()
 
-        receiver.setSegmentCheckEnabled(true)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.1.255"))).isTrue()
+            every { delegate.interfaceAddress } returns
+                    createInterfaceAddress("192.168.0.1", "255.255.254.0", 23)
 
-        every { delegate.interfaceAddress } returns
-                createInterfaceAddress("192.168.0.1", "255.255.254.0", 23)
+            setSegmentCheckEnabled(true)
+            assertThat(InetAddress.getByName("192.168.1.255").isInvalidAddress()).isFalse()
 
-        receiver.setSegmentCheckEnabled(true)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.1.255"))).isFalse()
-
-        receiver.setSegmentCheckEnabled(true)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("fe80::a831:801b:8dc6:421f"))).isTrue()
-        receiver.setSegmentCheckEnabled(false)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("fe80::a831:801b:8dc6:421f"))).isTrue()
+            setSegmentCheckEnabled(true)
+            assertThat(InetAddress.getByName("fe80::a831:801b:8dc6:421f").isInvalidAddress()).isTrue()
+            setSegmentCheckEnabled(false)
+            assertThat(InetAddress.getByName("fe80::a831:801b:8dc6:421f").isInvalidAddress()).isTrue()
+        }
     }
 
     @Test
     fun invalidAddress_IPv6() {
         val delegate: SsdpServerDelegate = mockk(relaxed = true)
         every { delegate.address } returns Address.IP_V6
-        val receiver = spyk(SsdpNotifyReceiver(delegate))
-        receiver.setSegmentCheckEnabled(true)
-
         every { delegate.interfaceAddress } returns
                 createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
+        val receiver = spyk(SsdpNotifyReceiver(delegate))
+        with(receiver) {
+            setSegmentCheckEnabled(true)
+            assertThat(InetAddress.getByName("2001:db8::1").isInvalidAddress()).isFalse()
+            setSegmentCheckEnabled(false)
+            assertThat(InetAddress.getByName("2001:db8::1").isInvalidAddress()).isFalse()
 
-        receiver.setSegmentCheckEnabled(true)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("2001:db8::1"))).isFalse()
-        receiver.setSegmentCheckEnabled(false)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("2001:db8::1"))).isFalse()
-
-        receiver.setSegmentCheckEnabled(true)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255"))).isTrue()
-        receiver.setSegmentCheckEnabled(false)
-        assertThat(receiver.invalidAddress(InetAddress.getByName("192.168.0.255"))).isTrue()
+            setSegmentCheckEnabled(true)
+            assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isTrue()
+            setSegmentCheckEnabled(false)
+            assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isTrue()
+        }
     }
 }

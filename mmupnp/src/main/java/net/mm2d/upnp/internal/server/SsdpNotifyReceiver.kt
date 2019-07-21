@@ -48,7 +48,7 @@ internal class SsdpNotifyReceiver(
 
     // VisibleForTesting
     internal fun onReceive(sourceAddress: InetAddress, data: ByteArray, length: Int) {
-        if (invalidAddress(sourceAddress)) {
+        if (sourceAddress.isInvalidAddress()) {
             return
         }
         try {
@@ -75,9 +75,9 @@ internal class SsdpNotifyReceiver(
         SsdpRequest.create(delegate.getLocalAddress(), data, length)
 
     // VisibleForTesting
-    internal fun invalidAddress(sourceAddress: InetAddress): Boolean {
-        if (invalidVersion(sourceAddress)) {
-            Logger.w { "IP version mismatch:$sourceAddress $interfaceAddress" }
+    internal fun InetAddress.isInvalidAddress(): Boolean {
+        if (isInvalidVersion()) {
+            Logger.w { "IP version mismatch:$this $interfaceAddress" }
             return true
         }
         // Even if the address setting is incorrect, multicast packets can be sent.
@@ -85,23 +85,24 @@ internal class SsdpNotifyReceiver(
         // that can not be exchanged except for multicast are useless even if received, they are discarded.
         if (segmentCheckEnabled &&
             delegate.address == Address.IP_V4 &&
-            invalidSegment(interfaceAddress, sourceAddress)
+            isInvalidSegment(interfaceAddress)
         ) {
-            Logger.w { "Invalid segment:$sourceAddress $interfaceAddress" }
+            Logger.w { "Invalid segment:$this $interfaceAddress" }
             return true
         }
         return false
     }
 
-    private fun invalidVersion(sourceAddress: InetAddress): Boolean {
-        return if (delegate.address == Address.IP_V4) {
-            sourceAddress is Inet6Address
-        } else sourceAddress is Inet4Address
+    private fun InetAddress.isInvalidVersion(): Boolean {
+        return if (delegate.address == Address.IP_V4)
+            this is Inet6Address
+        else
+            this is Inet4Address
     }
 
-    private fun invalidSegment(interfaceAddress: InterfaceAddress, sourceAddress: InetAddress): Boolean {
+    private fun InetAddress.isInvalidSegment(interfaceAddress: InterfaceAddress): Boolean {
         val a = interfaceAddress.address.address
-        val b = sourceAddress.address
+        val b = address
         val pref = interfaceAddress.networkPrefixLength.toInt()
         val bytes = pref / 8
         for (i in 0 until bytes) {
