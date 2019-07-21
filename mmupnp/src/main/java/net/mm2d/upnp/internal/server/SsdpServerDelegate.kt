@@ -220,7 +220,7 @@ private fun SsdpMessage.hasValidLocation(sourceAddress: InetAddress): Boolean {
     return false
 }
 
-internal fun SsdpMessage.shouldIgnore(): Boolean {
+internal fun SsdpMessage.isNotUpnp(): Boolean {
     if (getHeader("X-TelepathyAddress.sony.com") != null) {
         // Sony telepathy service(urn:schemas-sony-com:service:X_Telepathy:1) send ssdp packet,
         // but it's location address refuses connection. Since this is not correct as UPnP, ignore it.

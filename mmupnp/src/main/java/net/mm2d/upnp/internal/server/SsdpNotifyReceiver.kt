@@ -57,7 +57,7 @@ internal class SsdpNotifyReceiver(
             if (message.getMethod() == SsdpMessage.M_SEARCH) {
                 return
             }
-            if (message.shouldIgnore()) {
+            if (message.isNotUpnp()) {
                 return
             }
             Logger.v { "receive ssdp notify from $sourceAddress in ${delegate.getLocalAddress()}:\n$message" }
