@@ -1064,13 +1064,6 @@ class ControlPointTest {
         }
 
         @Test
-        fun sony_telepathy_serviceは無視する() {
-            ssdpMessage.setHeader("X-TelepathyAddress.sony.com", "192.0.2.3:1234")
-            cp.onReceiveSsdpMessage(ssdpMessage)
-            verify(inverse = true) { cp.onAcceptSsdpMessage(ssdpMessage) }
-        }
-
-        @Test
         fun filterが機能する() {
             val slot = slot<SsdpMessage>()
             val filter: (SsdpMessage) -> Boolean = mockk()

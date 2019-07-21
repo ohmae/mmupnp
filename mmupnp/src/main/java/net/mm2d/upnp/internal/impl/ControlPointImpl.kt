@@ -97,11 +97,6 @@ internal class ControlPointImpl(
 
     // VisibleForTesting
     internal fun onReceiveSsdpMessage(message: SsdpMessage) {
-        // Sony telepathy service(urn:schemas-sony-com:service:X_Telepathy:1) send ssdp packet,
-        // but it's location address refuses connection. Since this is not correct as UPnP, ignore it.
-        if (message.getHeader("X-TelepathyAddress.sony.com") != null) {
-            return
-        }
         if (ssdpMessageFilter(message)) {
             onAcceptSsdpMessage(message)
         }

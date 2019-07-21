@@ -134,6 +134,20 @@ class SsdpSearchServerTest {
     }
 
     @Test
+    fun onReceive_sony_telepathy_serviceは無視する() {
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
+        val server = SsdpSearchServer(taskExecutors, Address.IP_V4, networkInterface)
+        val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
+        server.setResponseListener(listener)
+        val address = InetAddress.getByName("192.0.2.2")
+        val data = TestUtils.getResourceAsByteArray("ssdp-search-response-telepathy.bin")
+
+        server.onReceive(address, data, data.size)
+
+        verify(inverse = true) { listener.invoke(any()) }
+    }
+
+    @Test
     fun onReceive_データに問題がある場合listenerコールされない() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpSearchServer(taskExecutors, Address.IP_V4, networkInterface)

@@ -57,8 +57,11 @@ internal class SsdpSearchServer(
         try {
             val message = SsdpResponse.create(delegate.getLocalAddress(), data, length)
             Logger.v { "receive ssdp search response from $sourceAddress to ${delegate.getLocalAddress()}:\n$message" }
+            if (message.shouldIgnore()) {
+                return
+            }
             if (message.hasInvalidLocation(sourceAddress)) {
-                Logger.w { "Location:${message.location} is invalid from $sourceAddress" }
+                Logger.w { "Location: ${message.location} is invalid from $sourceAddress" }
                 return
             }
             listener?.invoke(message)
