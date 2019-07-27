@@ -518,7 +518,7 @@ class ActionInvokeTest {
         val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
         val onError: (IOException) -> Unit = mockk(relaxed = true)
         action.invoke(emptyMap(), true, onResult, onError)
-        Thread.sleep(100)
+        Thread.sleep(200)
         verify(exactly = 1) { onResult.invoke(any()) }
         verify(inverse = true) { onError.invoke(any()) }
     }
@@ -529,7 +529,7 @@ class ActionInvokeTest {
         val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
         val onError: (IOException) -> Unit = mockk(relaxed = true)
         action.invoke(emptyMap(), true, onResult, onError)
-        Thread.sleep(100)
+        Thread.sleep(200)
         verify(inverse = true) { onResult.invoke(any()) }
         verify(exactly = 1) { onError.invoke(any()) }
     }
@@ -538,7 +538,7 @@ class ActionInvokeTest {
     fun invoke_no_callback_success() {
         every { action.invokeSync(any(), any()) } returns emptyMap()
         action.invoke(emptyMap())
-        Thread.sleep(100)
+        Thread.sleep(200)
     }
 
     @Test
@@ -554,7 +554,7 @@ class ActionInvokeTest {
         val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
         val onError: (IOException) -> Unit = mockk(relaxed = true)
         action.invokeCustom(emptyMap(), emptyMap(), emptyMap(), true, onResult, onError)
-        Thread.sleep(100)
+        Thread.sleep(200)
         verify(exactly = 1) { onResult.invoke(any()) }
         verify(inverse = true) { onError.invoke(any()) }
     }
@@ -565,7 +565,7 @@ class ActionInvokeTest {
         val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
         val onError: (IOException) -> Unit = mockk(relaxed = true)
         action.invokeCustom(emptyMap(), emptyMap(), emptyMap(), true, onResult, onError)
-        Thread.sleep(100)
+        Thread.sleep(200)
         verify(inverse = true) { onResult.invoke(any()) }
         verify(exactly = 1) { onError.invoke(any()) }
     }
@@ -574,14 +574,14 @@ class ActionInvokeTest {
     fun invokeCustom_no_callback_success() {
         every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
         action.invokeCustom(emptyMap())
-        Thread.sleep(100)
+        Thread.sleep(200)
     }
 
     @Test
     fun invokeCustom_no_callback_exception() {
         every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
         action.invokeCustom(emptyMap())
-        Thread.sleep(100)
+        Thread.sleep(200)
     }
 
     @Test
