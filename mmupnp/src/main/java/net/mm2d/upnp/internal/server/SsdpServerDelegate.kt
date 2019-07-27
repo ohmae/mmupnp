@@ -197,6 +197,8 @@ internal class SsdpServerDelegate
     }
 }
 
+internal val DEFAULT_SSDP_MESSAGE_FILTER: (SsdpMessage) -> Boolean = { true }
+
 /**
  * A normal URL is described in the Location of SsdpMessage,
  * and it is checked whether there is a mismatch between the description address and the packet source address.
@@ -206,7 +208,9 @@ internal class SsdpServerDelegate
  * @return true: if there is an invalid Location, such as a mismatch with the sender. false: otherwise
  */
 internal fun SsdpMessage.hasInvalidLocation(sourceAddress: InetAddress): Boolean =
-    !hasValidLocation(sourceAddress)
+    (!hasValidLocation(sourceAddress)).also {
+        if (it) Logger.w { "Location: $location is invalid from $sourceAddress" }
+    }
 
 private fun SsdpMessage.hasValidLocation(sourceAddress: InetAddress): Boolean {
     val location = location ?: return false

@@ -22,8 +22,9 @@ import java.net.*
 internal class SsdpNotifyReceiver(
     private val delegate: SsdpServerDelegate
 ) : SsdpServer by delegate {
-    private var listener: ((SsdpMessage) -> Unit)? = null
+    private var notifyListener: ((SsdpMessage) -> Unit)? = null
     private var segmentCheckEnabled: Boolean = false
+    private var shouldNotAccept: SsdpMessage.() -> Boolean = { false }
     // VisibleForTesting
     internal val interfaceAddress: InterfaceAddress
         get() = delegate.interfaceAddress
@@ -43,7 +44,11 @@ internal class SsdpNotifyReceiver(
     }
 
     fun setNotifyListener(listener: ((SsdpMessage) -> Unit)?) {
-        this.listener = listener
+        notifyListener = listener
+    }
+
+    fun setFilter(predicate: (SsdpMessage) -> Boolean) {
+        shouldNotAccept = { !predicate(this) }
     }
 
     // VisibleForTesting
@@ -53,22 +58,18 @@ internal class SsdpNotifyReceiver(
         }
         try {
             val message = createSsdpRequestMessage(data, length)
-            // ignore M-SEARCH packet
-            if (message.getMethod() == SsdpMessage.M_SEARCH) {
-                return
-            }
-            if (message.isNotUpnp()) {
-                return
-            }
             Logger.v { "receive ssdp notify from $sourceAddress in ${delegate.getLocalAddress()}:\n$message" }
+
+            if (message.shouldNotAccept()) return
+            // ignore M-SEARCH packet
+            if (message.getMethod() == SsdpMessage.M_SEARCH) return
+            if (message.isNotUpnp()) return
             // ByeBye accepts it regardless of address problems because it does not communicate
             if (message.nts != SsdpMessage.SSDP_BYEBYE &&
                 message.hasInvalidLocation(sourceAddress)
-            ) {
-                Logger.w { "Location: ${message.location} is invalid from $sourceAddress" }
-                return
-            }
-            listener?.invoke(message)
+            ) return
+
+            notifyListener?.invoke(message)
         } catch (ignored: IOException) {
         }
     }

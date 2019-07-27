@@ -25,6 +25,7 @@ import java.net.NetworkInterface
 internal class SsdpSearchServer(
     private val delegate: SsdpServerDelegate
 ) : SsdpServer by delegate {
+    private var shouldNotAccept: SsdpMessage.() -> Boolean = { false }
     private var listener: ((SsdpMessage) -> Unit)? = null
 
     constructor(
@@ -42,6 +43,10 @@ internal class SsdpSearchServer(
     fun search(st: String? = null): Unit =
         send { makeSearchMessage(if (st.isNullOrEmpty()) ST_ALL else st) }
 
+    fun setFilter(predicate: (SsdpMessage) -> Boolean) {
+        shouldNotAccept = { !predicate(this) }
+    }
+
     private fun makeSearchMessage(st: String): SsdpRequest =
         SsdpRequest.create().also {
             it.setMethod(SsdpMessage.M_SEARCH)
@@ -57,13 +62,11 @@ internal class SsdpSearchServer(
         try {
             val message = SsdpResponse.create(delegate.getLocalAddress(), data, length)
             Logger.v { "receive ssdp search response from $sourceAddress to ${delegate.getLocalAddress()}:\n$message" }
-            if (message.isNotUpnp()) {
-                return
-            }
-            if (message.hasInvalidLocation(sourceAddress)) {
-                Logger.w { "Location: ${message.location} is invalid from $sourceAddress" }
-                return
-            }
+
+            if (message.shouldNotAccept()) return
+            if (message.isNotUpnp()) return
+            if (message.hasInvalidLocation(sourceAddress)) return
+
             listener?.invoke(message)
         } catch (ignored: IOException) {
         }

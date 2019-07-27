@@ -76,6 +76,22 @@ class SsdpNotifyReceiverTest {
     }
 
     @Test
+    fun onReceive_filterでfalseになるとlistenerコールされない() {
+        val receiver =
+            spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+        val address = createInterfaceAddress("192.0.2.1", "255.255.0.0", 24)
+        every { receiver.interfaceAddress } returns address
+        val listener: (SsdpMessage) -> Unit = spyk { }
+        receiver.setNotifyListener(listener)
+        val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
+        receiver.setFilter { false }
+
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
+
+        verify(inverse = true) { listener.invoke(any()) }
+    }
+
+    @Test
     fun onReceive_Listenerがnullでもクラッシュしない() {
         val receiver =
             spyk(SsdpNotifyReceiver(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))

@@ -137,16 +137,17 @@ interface ControlPoint {
     fun search(st: String? = null)
 
     /**
-     * Set the method to judge whether to accept SsdpMessage.
+     * Set a filter to judge whether to accept or ignore SsdpMessage.
      *
-     * @param filter Judgment method, if null, accept all.
+     * @param predicate filter: return true to accept, false to ignore. if null, accept all.
      */
-    fun setSsdpMessageFilter(filter: ((SsdpMessage) -> Boolean)?)
+    fun setSsdpMessageFilter(predicate: ((SsdpMessage) -> Boolean)?)
 
     /**
      * Set a filter to select Icon to download.
      *
      * @param filter the filter to be set, null will not download anything.
+     * @see IconFilter
      */
     fun setIconFilter(filter: IconFilter?)
 

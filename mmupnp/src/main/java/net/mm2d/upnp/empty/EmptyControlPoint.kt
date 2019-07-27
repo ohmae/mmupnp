@@ -24,7 +24,7 @@ object EmptyControlPoint : ControlPoint {
     override fun stop() = Unit
     override fun clearDeviceList() = Unit
     override fun search(st: String?) = Unit
-    override fun setSsdpMessageFilter(filter: ((SsdpMessage) -> Boolean)?) = Unit
+    override fun setSsdpMessageFilter(predicate: ((SsdpMessage) -> Boolean)?) = Unit
     override fun setIconFilter(filter: IconFilter?) = Unit
     override fun addDiscoveryListener(listener: ControlPoint.DiscoveryListener) = Unit
     override fun removeDiscoveryListener(listener: ControlPoint.DiscoveryListener) = Unit

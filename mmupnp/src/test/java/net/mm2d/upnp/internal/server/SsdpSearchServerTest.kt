@@ -120,6 +120,21 @@ class SsdpSearchServerTest {
     }
 
     @Test
+    fun onReceive_filterでfalseになるとlistenerコールされない() {
+        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
+        val server = SsdpSearchServer(taskExecutors, Address.IP_V4, networkInterface)
+        val listener: (SsdpMessage) -> Unit = spyk({ _ -> })
+        server.setResponseListener(listener)
+        val address = InetAddress.getByName("192.0.2.2")
+        val data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin")
+        server.setFilter { false }
+
+        server.onReceive(address, data, data.size)
+
+        verify(inverse = true) { listener.invoke(any()) }
+    }
+
+    @Test
     fun onReceive_アドレス不一致ならlistenerコールされない() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpSearchServer(taskExecutors, Address.IP_V4, networkInterface)

@@ -17,6 +17,7 @@ import net.mm2d.upnp.internal.manager.DeviceHolder
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import net.mm2d.upnp.internal.parser.DeviceParser
+import net.mm2d.upnp.internal.server.DEFAULT_SSDP_MESSAGE_FILTER
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
 import net.mm2d.upnp.internal.thread.TaskExecutors
@@ -39,7 +40,6 @@ internal class ControlPointImpl(
     notifySegmentCheckEnabled: Boolean,
     factory: DiFactory
 ) : ControlPoint {
-    private var ssdpMessageFilter: (SsdpMessage) -> Boolean = { true }
     private var iconFilter: IconFilter = EMPTY_FILTER
     private val discoveryListenerList: MutableSet<DiscoveryListener>
     private val notifyEventListenerList: MutableSet<NotifyEventListener>
@@ -97,13 +97,6 @@ internal class ControlPointImpl(
 
     // VisibleForTesting
     internal fun onReceiveSsdpMessage(message: SsdpMessage) {
-        if (ssdpMessageFilter(message)) {
-            onAcceptSsdpMessage(message)
-        }
-    }
-
-    // VisibleForTesting
-    internal fun onAcceptSsdpMessage(message: SsdpMessage) {
         synchronized(deviceHolder) {
             val uuid = message.uuid
             val device = deviceMap[uuid]
@@ -231,8 +224,10 @@ internal class ControlPointImpl(
         searchServerList.search(st)
     }
 
-    override fun setSsdpMessageFilter(filter: ((SsdpMessage) -> Boolean)?) {
-        ssdpMessageFilter = filter ?: { true }
+    override fun setSsdpMessageFilter(predicate: ((SsdpMessage) -> Boolean)?) {
+        val predicateNonNull = predicate ?: DEFAULT_SSDP_MESSAGE_FILTER
+        searchServerList.setFilter(predicateNonNull)
+        notifyReceiverList.setFilter(predicateNonNull)
     }
 
     override fun setIconFilter(filter: IconFilter?) {

@@ -44,9 +44,17 @@ internal class SsdpSearchServerList(
         }
     }
 
-    fun start(): Unit = list.forEach { it.start() }
-    fun stop(): Unit = list.forEach { it.stop() }
-    fun search(st: String?): Unit = list.forEach { it.search(st) }
+    fun setFilter(predicate: (SsdpMessage) -> Boolean): Unit =
+        list.forEach { it.setFilter(predicate) }
+
+    fun start(): Unit =
+        list.forEach { it.start() }
+
+    fun stop(): Unit =
+        list.forEach { it.stop() }
+
+    fun search(st: String?): Unit =
+        list.forEach { it.search(st) }
 
     companion object {
         // VisibleForTesting

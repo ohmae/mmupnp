@@ -20,11 +20,11 @@ import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.message.SsdpResponse
 import net.mm2d.upnp.internal.parser.DeviceParser
-import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList
-import net.mm2d.upnp.internal.server.SsdpSearchServerList
+import net.mm2d.upnp.internal.server.*
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.NetworkUtils
 import net.mm2d.upnp.util.TestUtils
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.experimental.runners.Enclosed
@@ -557,7 +557,7 @@ class ControlPointTest {
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin")
             val addr = InetAddress.getByName("192.0.2.3")
             val message = SsdpRequest.create(addr, data, data.size)
-            cp.onAcceptSsdpMessage(message)
+            cp.onReceiveSsdpMessage(message)
             verify(exactly = 1) { loadingDeviceMap.remove(any()) }
         }
 
@@ -571,7 +571,7 @@ class ControlPointTest {
             every { device.udn } returns udn
             cp.discoverDevice(device)
             assertThat(deviceHolder[udn]).isEqualTo(device)
-            cp.onAcceptSsdpMessage(message)
+            cp.onReceiveSsdpMessage(message)
             assertThat(deviceHolder[udn]).isNull()
         }
 
@@ -587,7 +587,7 @@ class ControlPointTest {
                 throw IOException()
             }
             every { cp.createHttpClient() } returns client
-            cp.onAcceptSsdpMessage(message)
+            cp.onReceiveSsdpMessage(message)
             assertThat(loadingDeviceMap).containsKey(udn)
             Thread.sleep(1000L) // Exception発生を待つ
             assertThat(loadingDeviceMap).doesNotContainKey(udn)
@@ -629,7 +629,7 @@ class ControlPointTest {
             every { cp.createHttpClient() } returns httpClient
             val iconFilter = spyk(iconFilter { listOf(it[0]) })
             cp.setIconFilter(iconFilter)
-            cp.onAcceptSsdpMessage(message)
+            cp.onReceiveSsdpMessage(message)
             Thread.sleep(1000) // 読み込みを待つ
             val device = cp.getDevice(udn)
             verify(exactly = 1) { iconFilter.invoke(any()) }
@@ -651,7 +651,7 @@ class ControlPointTest {
             every { device.udn } returns udn
 
             deviceHolder.add(device)
-            cp.onAcceptSsdpMessage(message)
+            cp.onReceiveSsdpMessage(message)
         }
 
         @Test
@@ -663,7 +663,7 @@ class ControlPointTest {
             loadingDeviceMap[deviceBuilder.getUuid()] = deviceBuilder
             val data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             val message2 = SsdpRequest.create(addr, data2, data2.size)
-            cp.onAcceptSsdpMessage(message2)
+            cp.onReceiveSsdpMessage(message2)
             verify(exactly = 1) { deviceBuilder.updateSsdpMessage(message2) }
         }
 
@@ -763,7 +763,7 @@ class ControlPointTest {
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             val address = InetAddress.getByName("192.0.2.3")
             val message = SsdpRequest.create(address, data, data.size)
-            cp.onAcceptSsdpMessage(message)
+            cp.onReceiveSsdpMessage(message)
             Thread.sleep(1000) // 読み込みを待つ
             cp.tryAddPinnedDevice("http://192.0.2.2:12345/device.xml")
             Thread.sleep(1000) // 読み込みを待つ
@@ -777,7 +777,7 @@ class ControlPointTest {
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             val address = InetAddress.getByName("192.0.2.3")
             val message = SsdpRequest.create(address, data, data.size)
-            cp.onAcceptSsdpMessage(message)
+            cp.onReceiveSsdpMessage(message)
             Thread.sleep(1000) // 読み込みを待つ
             val device = cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef")
             assertThat(device!!.isPinned).isFalse()
@@ -878,27 +878,23 @@ class ControlPointTest {
         @Test
         fun onReceiveSsdp_ResponseListenerから伝搬() {
             val data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin")
-            val message = SsdpResponse.create(mockk(relaxed = true), data, data.size)
-            val filter: (SsdpMessage) -> Boolean = spyk({ _ -> false })
-            cp.setSsdpMessageFilter(filter)
+            val message = spyk(SsdpResponse.create(mockk(relaxed = true), data, data.size))
 
             responseListener.invoke(message)
 
             Thread.sleep(100)
-            verify(exactly = 1) { filter(any()) }
+            verify { message.uuid }
         }
 
         @Test
         fun onReceiveSsdp_NotifyListenerから伝搬() {
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin")
-            val message = SsdpRequest.create(mockk(relaxed = true), data, data.size)
-            val filter: (SsdpMessage) -> Boolean = spyk({ _ -> false })
-            cp.setSsdpMessageFilter(filter)
+            val message = spyk(SsdpRequest.create(mockk(relaxed = true), data, data.size))
 
             notifyListener.invoke(message)
 
             Thread.sleep(100)
-            verify(exactly = 1) { filter(any()) }
+            verify { message.uuid }
         }
     }
 
@@ -1041,9 +1037,19 @@ class ControlPointTest {
     class SsdpMessageFilterのテスト {
         private lateinit var cp: ControlPointImpl
         private lateinit var ssdpMessage: SsdpMessage
+        private val receiverList: MutableList<SsdpNotifyReceiver> = mutableListOf()
+        private val serverList: MutableList<SsdpSearchServer> = mutableListOf()
 
         @Before
         fun setUp() {
+            mockkObject(SsdpNotifyReceiverList.Companion)
+            mockkObject(SsdpSearchServerList.Companion)
+            every { SsdpNotifyReceiverList.newReceiver(any(), any(), any(), any()) } answers {
+                mockk<SsdpNotifyReceiver>(relaxed = true).also { receiverList += it }
+            }
+            every { SsdpSearchServerList.newServer(any(), any(), any(), any()) } answers {
+                mockk<SsdpSearchServer>(relaxed = true).also { serverList += it }
+            }
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
@@ -1057,31 +1063,33 @@ class ControlPointTest {
             ssdpMessage = SsdpRequest.create(addr, data, data.size)
         }
 
-        @Test
-        fun デフォルトでは受け付ける() {
-            cp.onReceiveSsdpMessage(ssdpMessage)
-            verify(exactly = 1) { cp.onAcceptSsdpMessage(ssdpMessage) }
+        @After
+        fun teardown() {
+            unmockkObject(SsdpNotifyReceiverList.Companion)
+            unmockkObject(SsdpSearchServerList.Companion)
         }
 
         @Test
-        fun filterが機能する() {
-            val slot = slot<SsdpMessage>()
+        fun filterが全serverに設定される() {
             val filter: (SsdpMessage) -> Boolean = mockk()
-            every { filter.invoke(capture(slot)) } returns false
             cp.setSsdpMessageFilter(filter)
-            cp.onReceiveSsdpMessage(ssdpMessage)
-            assertThat(slot.captured).isEqualTo(ssdpMessage)
-            verify(inverse = true) { cp.onAcceptSsdpMessage(any()) }
+            receiverList.forEach {
+                verify { it.setFilter(filter) }
+            }
+            serverList.forEach {
+                verify { it.setFilter(filter) }
+            }
         }
 
         @Test
-        fun filterにnullを指定すると受け付ける() {
-            cp.setSsdpMessageFilter { false }
-            cp.onReceiveSsdpMessage(ssdpMessage)
-            verify(inverse = true) { cp.onAcceptSsdpMessage(any()) }
+        fun filterにnullを指定すると全serverに設定される() {
             cp.setSsdpMessageFilter(null)
-            cp.onReceiveSsdpMessage(ssdpMessage)
-            verify(exactly = 1) { cp.onAcceptSsdpMessage(ssdpMessage) }
+            receiverList.forEach {
+                verify { it.setFilter(DEFAULT_SSDP_MESSAGE_FILTER) }
+            }
+            serverList.forEach {
+                verify { it.setFilter(DEFAULT_SSDP_MESSAGE_FILTER) }
+            }
         }
     }
 

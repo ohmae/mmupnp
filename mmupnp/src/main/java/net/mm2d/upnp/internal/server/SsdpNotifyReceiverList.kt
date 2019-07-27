@@ -44,7 +44,12 @@ internal class SsdpNotifyReceiverList(
         }
     }
 
-    fun setSegmentCheckEnabled(enabled: Boolean): Unit = list.forEach { it.setSegmentCheckEnabled(enabled) }
+    fun setSegmentCheckEnabled(enabled: Boolean): Unit =
+        list.forEach { it.setSegmentCheckEnabled(enabled) }
+
+    fun setFilter(predicate: (SsdpMessage) -> Boolean): Unit =
+        list.forEach { it.setFilter(predicate) }
+
     fun start(): Unit = list.forEach { it.start() }
     fun stop(): Unit = list.forEach { it.stop() }
 
