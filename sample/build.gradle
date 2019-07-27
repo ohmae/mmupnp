@@ -1,11 +1,8 @@
 apply plugin: "java"
 apply plugin: "kotlin"
 
-group "net.mm2d"
-version 1.0
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+group pj.groupId
+version pj.versions.name
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
