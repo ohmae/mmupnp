@@ -6,8 +6,8 @@ before_install:
   - chmod +x gradlew
 
 script:
-  - ./gradlew mmupnp:check
-  - ./gradlew jacocoTestReport
+  - ./gradlew :mmupnp:check
+  - ./gradlew :mmupnp:jacocoTestReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
