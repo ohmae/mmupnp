@@ -376,9 +376,7 @@ internal class ServiceImpl(
             this.scpdUrl = scpdUrl
         }
 
-        fun getScpdUrl(): String? {
-            return scpdUrl
-        }
+        fun getScpdUrl(): String? = scpdUrl
 
         fun setControlUrl(controlUrl: String): Builder = apply {
             this.controlUrl = controlUrl
