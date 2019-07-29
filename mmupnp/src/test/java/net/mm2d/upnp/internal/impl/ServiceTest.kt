@@ -937,7 +937,7 @@ class ServiceTest {
             every { service.subscribeSync(any()) } returns true
             val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
             service.subscribe(false, callback)
-            Thread.sleep(100)
+            Thread.sleep(200)
             verify { callback(true) }
         }
 
@@ -946,7 +946,7 @@ class ServiceTest {
             every { service.renewSubscribeSync() } returns true
             val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
             service.renewSubscribe(callback)
-            Thread.sleep(100)
+            Thread.sleep(200)
             verify { callback(true) }
         }
 
@@ -955,7 +955,7 @@ class ServiceTest {
             every { service.unsubscribeSync() } returns true
             val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
             service.unsubscribe(callback)
-            Thread.sleep(100)
+            Thread.sleep(200)
             verify { callback(true) }
         }
 
@@ -963,21 +963,21 @@ class ServiceTest {
         fun subscribe_no_callback() {
             every { service.subscribeSync(any()) } returns true
             service.subscribe()
-            Thread.sleep(100)
+            Thread.sleep(200)
         }
 
         @Test
         fun renewSubscribe_no_callback() {
             every { service.renewSubscribeSync() } returns true
             service.renewSubscribe()
-            Thread.sleep(100)
+            Thread.sleep(200)
         }
 
         @Test
         fun unsubscribe_no_callback() {
             every { service.unsubscribeSync() } returns true
             service.unsubscribe()
-            Thread.sleep(100)
+            Thread.sleep(200)
         }
 
         @Test

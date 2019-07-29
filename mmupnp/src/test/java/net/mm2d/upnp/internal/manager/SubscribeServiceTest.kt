@@ -25,7 +25,7 @@ class SubscribeServiceTest {
         val service: Service = mockk(relaxed = true)
         val subscribeService = SubscribeService(service, 1000, false)
 
-        assertThat(subscribeService.getService()).isEqualTo(service)
+        assertThat(subscribeService.service).isEqualTo(service)
     }
 
     @Test

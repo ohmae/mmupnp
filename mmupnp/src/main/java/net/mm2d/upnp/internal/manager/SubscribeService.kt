@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
  * @param keepRenew true: periodically execute renew
  */
 internal class SubscribeService(
-    private val service: Service,
+    val service: Service,
     private var subscriptionTimeout: Long,
     private var keepRenew: Boolean
 ) {
@@ -29,18 +29,12 @@ internal class SubscribeService(
     private var subscriptionStart: Long = System.currentTimeMillis()
     private var subscriptionExpiryTime: Long = subscriptionStart + subscriptionTimeout
 
-    fun getService(): Service {
-        return service
-    }
-
     /**
      * Returns whether the status has exceeded the upper limit of the number of retries.
      *
      * @return true: failed, false: otherwise
      */
-    fun isFailed(): Boolean {
-        return failCount >= RETRY_COUNT
-    }
+    fun isFailed(): Boolean = failCount >= RETRY_COUNT
 
     /**
      * Returns the next scan time.
@@ -50,9 +44,7 @@ internal class SubscribeService(
      *
      * @return The next scan time
      */
-    fun getNextScanTime(): Long {
-        return if (!keepRenew) subscriptionExpiryTime else calculateRenewTime()
-    }
+    fun getNextScanTime(): Long = if (!keepRenew) subscriptionExpiryTime else calculateRenewTime()
 
     fun renew(timeout: Long) {
         subscriptionStart = System.currentTimeMillis()
@@ -92,9 +84,7 @@ internal class SubscribeService(
      * @param now Current time
      * @return true: expired, false: otherwise
      */
-    fun isExpired(now: Long): Boolean {
-        return subscriptionExpiryTime < now
-    }
+    fun isExpired(now: Long): Boolean = subscriptionExpiryTime < now
 
     /**
      * Execute renewSubscribe if there is a condition.

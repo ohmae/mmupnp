@@ -32,7 +32,7 @@ internal class SubscribeHolder(
     private val subscriptionMap = mutableMapOf<String, SubscribeService>()
 
     fun getServiceList(): List<Service> = lock.withLock {
-        subscriptionMap.values.map { it.getService() }
+        subscriptionMap.values.map { it.service }
     }
 
     fun start(): Unit = threadLock.withLock {
@@ -73,7 +73,7 @@ internal class SubscribeHolder(
     }
 
     fun getService(subscriptionId: String): Service? = lock.withLock {
-        subscriptionMap[subscriptionId]?.getService()
+        subscriptionMap[subscriptionId]?.service
     }
 
     fun clear(): Unit = lock.withLock {
@@ -126,7 +126,7 @@ internal class SubscribeHolder(
     private fun renewSubscribe(serviceList: Collection<SubscribeService>) {
         serviceList.forEach {
             if (!it.renewSubscribe(System.currentTimeMillis()) && it.isFailed()) {
-                remove(it.getService())
+                remove(it.service)
             }
         }
     }
@@ -139,7 +139,7 @@ internal class SubscribeHolder(
         subscriptionMap.values
             .toList()
             .filter { it.isExpired(now) }
-            .map { it.getService() }
+            .map { it.service }
             .forEach {
                 remove(it)
                 it.unsubscribeSync()
