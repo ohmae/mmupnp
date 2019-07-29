@@ -58,7 +58,7 @@ class EmptyActionTest {
     @Test
     fun invoke2() {
         val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
-        val onError: (IOException) -> Unit = spyk({ _ -> })
+        val onError: (IOException) -> Unit = spyk()
         EmptyAction.invoke(
             emptyMap(),
             onResult = onResult,
@@ -76,7 +76,7 @@ class EmptyActionTest {
     @Test
     fun invokeCustom2() {
         val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
-        val onError: (IOException) -> Unit = spyk({ _ -> })
+        val onError: (IOException) -> Unit = spyk()
         EmptyAction.invokeCustom(
             emptyMap(),
             onResult = onResult,
