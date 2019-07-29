@@ -8,7 +8,6 @@
 package net.mm2d.upnp.internal.impl
 
 import net.mm2d.upnp.*
-import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import java.io.IOException
 import java.net.MalformedURLException
@@ -21,7 +20,6 @@ import java.net.URL
  */
 internal class DeviceImpl private constructor(
     override val controlPoint: ControlPointImpl,
-    private val subscribeManager: SubscribeManager,
     override val parent: Device?,
     private val udnSet: Set<String>,
     ssdpMessage: SsdpMessage,
@@ -61,7 +59,6 @@ internal class DeviceImpl private constructor(
         }
     override val serviceList: List<Service> = serviceBuilderList.map {
         it.setDevice(this)
-        it.setSubscribeManager(subscribeManager)
         it.build()
     }
     override val isEmbeddedDevice: Boolean = parent != null
@@ -142,7 +139,6 @@ internal class DeviceImpl private constructor(
 
     internal class Builder(
         private val controlPoint: ControlPointImpl,
-        private val subscribeManager: SubscribeManager,
         private var ssdpMessage: SsdpMessage
     ) {
         private var location: String
@@ -191,7 +187,6 @@ internal class DeviceImpl private constructor(
             }
             return DeviceImpl(
                 controlPoint = controlPoint,
-                subscribeManager = subscribeManager,
                 parent = parent,
                 udnSet = udnSet,
                 ssdpMessage = ssdpMessage,
@@ -237,7 +232,7 @@ internal class DeviceImpl private constructor(
         fun getServiceBuilderList(): List<ServiceImpl.Builder> = serviceBuilderList
 
         fun createEmbeddedDeviceBuilder(): Builder {
-            val builder = Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = Builder(controlPoint, ssdpMessage)
             builder.setDescription(description!!)
             builder.setUrlBase(urlBase)
             return builder

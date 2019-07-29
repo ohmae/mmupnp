@@ -15,7 +15,6 @@ import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.SsdpMessage
-import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.parser.DeviceParser
@@ -36,7 +35,6 @@ class DeviceTest {
         private lateinit var httpClient: HttpClient
         private lateinit var ssdpMessage: SsdpMessage
         private lateinit var controlPoint: ControlPointImpl
-        private lateinit var subscribeManager: SubscribeManager
         private lateinit var builder: DeviceImpl.Builder
 
         @Before
@@ -69,8 +67,7 @@ class DeviceTest {
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             ssdpMessage = SsdpRequest.create(mockk(relaxed = true), data, data.size)
             controlPoint = mockk(relaxed = true)
-            subscribeManager = mockk(relaxed = true)
-            builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
         }
 
@@ -402,7 +399,7 @@ class DeviceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "http://192.168.0.1/"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")
@@ -419,7 +416,7 @@ class DeviceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")
@@ -437,7 +434,7 @@ class DeviceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "http://192.168.0.1/"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")

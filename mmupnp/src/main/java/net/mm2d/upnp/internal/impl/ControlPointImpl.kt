@@ -50,8 +50,8 @@ internal class ControlPointImpl(
     private val initialized = AtomicBoolean()
     private val started = AtomicBoolean()
     private val deviceHolder: DeviceHolder
-    private val subscribeManager: SubscribeManager
     private val loadingPinnedDevices: MutableList<Builder>
+    internal val subscribeManager: SubscribeManager
     internal val taskExecutors: TaskExecutors
 
     init {
@@ -128,7 +128,7 @@ internal class ControlPointImpl(
             }
             return
         }
-        loadDevice(uuid, Builder(this, subscribeManager, message))
+        loadDevice(uuid, Builder(this, message))
     }
 
     // VisibleForTesting
@@ -288,7 +288,7 @@ internal class ControlPointImpl(
             return
         }
         val message = FakeSsdpMessage(location, uuid, false)
-        loadDevice(uuid, Builder(this, subscribeManager, message))
+        loadDevice(uuid, Builder(this, message))
     }
 
     override fun tryAddPinnedDevice(location: String) {
@@ -296,7 +296,7 @@ internal class ControlPointImpl(
             Logger.i { "already added: $location" }
             return
         }
-        val builder = Builder(this, subscribeManager, FakeSsdpMessage(location))
+        val builder = Builder(this, FakeSsdpMessage(location))
         loadingPinnedDevices.add(builder)
         taskExecutors.io { loadPinnedDevice(builder) }
     }

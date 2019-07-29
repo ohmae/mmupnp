@@ -26,7 +26,6 @@ import kotlin.coroutines.suspendCoroutine
  */
 internal class ServiceImpl(
     override val device: DeviceImpl,
-    private val subscribeManager: SubscribeManager,
     override val description: String,
     override val serviceType: String,
     override val serviceId: String,
@@ -36,6 +35,7 @@ internal class ServiceImpl(
     actionBuilderList: List<ActionImpl.Builder>,
     stateVariables: List<StateVariable>
 ) : Service {
+    private val subscribeManager: SubscribeManager = device.controlPoint.subscribeManager
     private val actionMap: Map<String, Action>
     private val stateVariableMap = stateVariables.map { it.name to it }.toMap()
     override var subscriptionId: String? = null
@@ -314,7 +314,6 @@ internal class ServiceImpl(
     }
 
     internal class Builder {
-        private var subscribeManager: SubscribeManager? = null
         private var device: DeviceImpl? = null
         private var serviceType: String? = null
         private var serviceId: String? = null
@@ -329,8 +328,6 @@ internal class ServiceImpl(
         fun build(): ServiceImpl {
             val device = device
                 ?: throw IllegalStateException("device must be set.")
-            val subscribeManager = subscribeManager
-                ?: throw IllegalStateException("subscribeManager must be set.")
             val serviceType = serviceType
                 ?: throw IllegalStateException("serviceType must be set.")
             val serviceId = serviceId
@@ -344,7 +341,6 @@ internal class ServiceImpl(
             val description = description ?: ""
             return ServiceImpl(
                 device = device,
-                subscribeManager = subscribeManager,
                 serviceType = serviceType,
                 serviceId = serviceId,
                 scpdUrl = scpdUrl,
@@ -358,10 +354,6 @@ internal class ServiceImpl(
 
         fun setDevice(device: DeviceImpl): Builder = apply {
             this.device = device
-        }
-
-        fun setSubscribeManager(manager: SubscribeManager): Builder = apply {
-            subscribeManager = manager
         }
 
         fun setServiceType(serviceType: String): Builder = apply {

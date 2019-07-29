@@ -14,7 +14,6 @@ import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.impl.ControlPointImpl
 import net.mm2d.upnp.internal.impl.DeviceImpl
-import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.util.TestUtils
 import org.junit.Assert.fail
@@ -34,7 +33,6 @@ class DeviceParserTest {
         private lateinit var httpClient: HttpClient
         private lateinit var ssdpMessage: SsdpMessage
         private lateinit var controlPoint: ControlPointImpl
-        private lateinit var subscribeManager: SubscribeManager
 
         @Before
         fun setUp() {
@@ -64,7 +62,6 @@ class DeviceParserTest {
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             ssdpMessage = SsdpRequest.create(mockk(relaxed = true), data, data.size)
             controlPoint = mockk(relaxed = true)
-            subscribeManager = mockk(relaxed = true)
         }
 
         @Test
@@ -73,7 +70,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
@@ -88,7 +85,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device-with-garbage.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
@@ -104,7 +101,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
             } returns TestUtils.getResourceAsString("mmupnp-with-mistake.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
@@ -120,7 +117,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
             } returns TestUtils.getResourceAsString("mmupnp-special.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
@@ -133,7 +130,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device-no-icon.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(0)
@@ -146,7 +143,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device-no-service.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
@@ -161,7 +158,7 @@ class DeviceParserTest {
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0-for-url-base.bin")
             ssdpMessage = SsdpRequest.create(mockk(relaxed = true), data, data.size)
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             assertThat(device.baseUrl).isEqualTo("http://192.0.2.2:12345/")
@@ -173,7 +170,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device-with-embedded-device.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
 
@@ -208,7 +205,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device-with-embedded-device.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
 
@@ -222,7 +219,7 @@ class DeviceParserTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device-with-embedded-device.xml")
 
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
 

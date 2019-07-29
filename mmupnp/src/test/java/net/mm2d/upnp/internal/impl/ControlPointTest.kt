@@ -42,7 +42,11 @@ class ControlPointTest {
     class mock未使用 {
         @Test(expected = IllegalStateException::class)
         fun constructor_インターフェース空で指定() {
-            ControlPointImpl(Protocol.DEFAULT, emptyList(), false, mockk(relaxed = true))
+            ControlPointImpl(
+                Protocol.DEFAULT, emptyList(),
+                notifySegmentCheckEnabled = false,
+                factory = mockk(relaxed = true)
+            )
         }
 
         @Test(timeout = 10000L)
@@ -121,8 +125,8 @@ class ControlPointTest {
             val cp = ControlPointImpl(
                 Protocol.DEFAULT,
                 NetworkUtils.getAvailableInet4Interfaces(),
-                false,
-                factory
+                notifySegmentCheckEnabled = false,
+                factory = factory
             )
             cp.initialize()
             cp.start()
@@ -358,8 +362,9 @@ class ControlPointTest {
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
-                    NetworkUtils.getAvailableInet4Interfaces(), false,
-                    factory
+                    NetworkUtils.getAvailableInet4Interfaces(),
+                    notifySegmentCheckEnabled = false,
+                    factory = factory
                 )
             )
         }
@@ -546,8 +551,8 @@ class ControlPointTest {
                 ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
-                    false,
-                    factory
+                    notifySegmentCheckEnabled = false,
+                    factory = factory
                 )
             )
         }
@@ -659,7 +664,7 @@ class ControlPointTest {
             val data1 = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin")
             val addr = InetAddress.getByName("192.0.2.3")
             val message1 = SsdpRequest.create(addr, data1, data1.size)
-            val deviceBuilder = spyk(DeviceImpl.Builder(cp, mockk(relaxed = true), message1))
+            val deviceBuilder = spyk(DeviceImpl.Builder(cp, message1))
             loadingDeviceMap[deviceBuilder.getUuid()] = deviceBuilder
             val data2 = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             val message2 = SsdpRequest.create(addr, data2, data2.size)
@@ -717,8 +722,8 @@ class ControlPointTest {
                 ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
-                    false,
-                    DiFactory(Protocol.DEFAULT)
+                    notifySegmentCheckEnabled = false,
+                    factory = DiFactory(Protocol.DEFAULT)
                 )
             )
             httpClient = mockk(relaxed = true)
@@ -854,8 +859,8 @@ class ControlPointTest {
             cp = ControlPointImpl(
                 Protocol.DEFAULT,
                 NetworkUtils.getAvailableInet4Interfaces(),
-                false,
-                factory
+                notifySegmentCheckEnabled = false,
+                factory = factory
             )
         }
 
@@ -915,8 +920,8 @@ class ControlPointTest {
                 ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
-                    false,
-                    factory
+                    notifySegmentCheckEnabled = false,
+                    factory = factory
                 )
             )
         }
@@ -1054,8 +1059,8 @@ class ControlPointTest {
                 ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
-                    false,
-                    DiFactory(Protocol.DEFAULT)
+                    notifySegmentCheckEnabled = false,
+                    factory = DiFactory(Protocol.DEFAULT)
                 )
             )
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
@@ -1101,14 +1106,13 @@ class ControlPointTest {
                 ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
-                    false,
-                    DiFactory(Protocol.DEFAULT)
+                    notifySegmentCheckEnabled = false,
+                    factory = DiFactory(Protocol.DEFAULT)
                 )
             )
             val httpClient: HttpClient = mockk(relaxed = true)
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             val ssdpMessage: SsdpMessage = SsdpRequest.create(mockk(relaxed = true), data, data.size)
-            val subscribeManager: SubscribeManager = mockk(relaxed = true)
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device-with-embedded-device.xml")
@@ -1123,7 +1127,7 @@ class ControlPointTest {
             } returns TestUtils.getResourceAsString("mmupnp.xml")
             every { cp.createHttpClient() } returns httpClient
             every { httpClient.localAddress } returns InetAddress.getByName("192.0.2.3")
-            val builder = DeviceImpl.Builder(cp, subscribeManager, ssdpMessage)
+            val builder = DeviceImpl.Builder(cp, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             cp.discoverDevice(device)

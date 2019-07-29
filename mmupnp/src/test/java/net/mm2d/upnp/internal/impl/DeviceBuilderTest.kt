@@ -14,7 +14,6 @@ import io.mockk.verify
 import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
 import net.mm2d.upnp.SsdpMessage
-import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +26,6 @@ class DeviceBuilderTest {
     @Test
     fun build() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -50,10 +48,9 @@ class DeviceBuilderTest {
         val service: ServiceImpl = mockk(relaxed = true)
         val serviceBuilder: ServiceImpl.Builder = mockk(relaxed = true)
         every { serviceBuilder.setDevice(any()) } returns serviceBuilder
-        every { serviceBuilder.setSubscribeManager(any()) } returns serviceBuilder
         every { serviceBuilder.build() } returns service
 
-        val device = DeviceImpl.Builder(cp, manager, message)
+        val device = DeviceImpl.Builder(cp, message)
             .setDescription(description)
             .setUdn(uuid)
             .setUpc(upc)
@@ -93,7 +90,6 @@ class DeviceBuilderTest {
     @Test
     fun build_最低限のパラメータ() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -106,7 +102,7 @@ class DeviceBuilderTest {
         val manufacture = "manufacture"
         val modelName = "modelName"
 
-        val device = DeviceImpl.Builder(cp, manager, message)
+        val device = DeviceImpl.Builder(cp, message)
             .setDescription(description)
             .setUdn(uuid)
             .setUpc(upc)
@@ -128,7 +124,6 @@ class DeviceBuilderTest {
     @Test(expected = IllegalStateException::class)
     fun build_Description不足() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -139,7 +134,7 @@ class DeviceBuilderTest {
         val manufacture = "manufacture"
         val modelName = "modelName"
 
-        DeviceImpl.Builder(cp, manager, message)
+        DeviceImpl.Builder(cp, message)
             .setUdn(uuid)
             .setDeviceType(deviceType)
             .setFriendlyName(friendlyName)
@@ -151,7 +146,6 @@ class DeviceBuilderTest {
     @Test(expected = IllegalStateException::class)
     fun build_DeviceType不足() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -162,7 +156,7 @@ class DeviceBuilderTest {
         val manufacture = "manufacture"
         val modelName = "modelName"
 
-        DeviceImpl.Builder(cp, manager, message)
+        DeviceImpl.Builder(cp, message)
             .setDescription(description)
             .setUdn(uuid)
             .setFriendlyName(friendlyName)
@@ -174,7 +168,6 @@ class DeviceBuilderTest {
     @Test(expected = IllegalStateException::class)
     fun build_FriendlyName不足() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -185,7 +178,7 @@ class DeviceBuilderTest {
         val manufacture = "manufacture"
         val modelName = "modelName"
 
-        DeviceImpl.Builder(cp, manager, message)
+        DeviceImpl.Builder(cp, message)
             .setDescription(description)
             .setUdn(uuid)
             .setDeviceType(deviceType)
@@ -197,7 +190,6 @@ class DeviceBuilderTest {
     @Test(expected = IllegalStateException::class)
     fun build_Manufacture不足() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -208,7 +200,7 @@ class DeviceBuilderTest {
         val friendlyName = "friendlyName"
         val modelName = "modelName"
 
-        DeviceImpl.Builder(cp, manager, message)
+        DeviceImpl.Builder(cp, message)
             .setDescription(description)
             .setUdn(uuid)
             .setDeviceType(deviceType)
@@ -220,7 +212,6 @@ class DeviceBuilderTest {
     @Test(expected = IllegalStateException::class)
     fun build_ModelName不足() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -231,7 +222,7 @@ class DeviceBuilderTest {
         val friendlyName = "friendlyName"
         val manufacture = "manufacture"
 
-        DeviceImpl.Builder(cp, manager, message)
+        DeviceImpl.Builder(cp, message)
             .setDescription(description)
             .setUdn(uuid)
             .setDeviceType(deviceType)
@@ -243,7 +234,6 @@ class DeviceBuilderTest {
     @Test(expected = IllegalStateException::class)
     fun build_Udn不足() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -255,7 +245,7 @@ class DeviceBuilderTest {
         val manufacture = "manufacture"
         val modelName = "modelName"
 
-        DeviceImpl.Builder(cp, manager, message)
+        DeviceImpl.Builder(cp, message)
             .setDescription(description)
             .setDeviceType(deviceType)
             .setFriendlyName(friendlyName)
@@ -267,7 +257,6 @@ class DeviceBuilderTest {
     @Test(expected = IllegalStateException::class)
     fun build_Udn不一致() {
         val cp: ControlPointImpl = mockk(relaxed = true)
-        val manager: SubscribeManager = mockk(relaxed = true)
         val message: SsdpMessage = mockk(relaxed = true)
         val location = "location"
         val uuid = "uuid"
@@ -281,7 +270,7 @@ class DeviceBuilderTest {
         val manufacture = "manufacture"
         val modelName = "modelName"
 
-        DeviceImpl.Builder(cp, manager, message)
+        DeviceImpl.Builder(cp, message)
             .setDescription(description)
             .setUdn(udn)
             .setUpc(upc)
@@ -298,7 +287,7 @@ class DeviceBuilderTest {
         every { message.location } returns "location"
         every { message.isPinned } returns true
         val newMessage: SsdpMessage = mockk(relaxed = true)
-        val builder = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+        val builder = DeviceImpl.Builder(mockk(relaxed = true), message)
         builder.updateSsdpMessage(newMessage)
         assertThat(builder.getSsdpMessage()).isEqualTo(message)
     }
@@ -307,7 +296,7 @@ class DeviceBuilderTest {
     fun build_不正なSsdpMessage1() {
         val illegalMessage: SsdpMessage = mockk(relaxed = true)
         every { illegalMessage.location } returns null
-        DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), illegalMessage)
+        DeviceImpl.Builder(mockk(relaxed = true), illegalMessage)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -319,7 +308,7 @@ class DeviceBuilderTest {
         every { message.uuid } returns uuid
         val illegalMessage: SsdpMessage = mockk(relaxed = true)
         every { illegalMessage.location } returns null
-        DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+        DeviceImpl.Builder(mockk(relaxed = true), message)
             .updateSsdpMessage(illegalMessage)
     }
 
@@ -331,7 +320,7 @@ class DeviceBuilderTest {
         every { message.location } returns location
         every { message.uuid } returns uuid
         val embeddedDeviceBuilder: DeviceImpl.Builder = mockk(relaxed = true)
-        DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+        DeviceImpl.Builder(mockk(relaxed = true), message)
             .setEmbeddedDeviceBuilderList(listOf(embeddedDeviceBuilder))
             .updateSsdpMessage(message)
 
@@ -348,7 +337,7 @@ class DeviceBuilderTest {
         val tag2 = "tag2"
         val value2 = "value2"
 
-        val device = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+        val device = DeviceImpl.Builder(mockk(relaxed = true), message)
             .setDescription("description")
             .setUdn("uuid")
             .setUpc("upc")
@@ -367,7 +356,7 @@ class DeviceBuilderTest {
     fun onDownloadDescription() {
         val message: FakeSsdpMessage = mockk(relaxed = true)
         every { message.location } returns "location"
-        val builder = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+        val builder = DeviceImpl.Builder(mockk(relaxed = true), message)
         val client: HttpClient = mockk(relaxed = true)
         val address = InetAddress.getByName("127.0.0.1")
         every { client.localAddress } returns address
@@ -381,7 +370,7 @@ class DeviceBuilderTest {
     fun onDownloadDescription_before_download() {
         val message: FakeSsdpMessage = mockk(relaxed = true)
         every { message.location } returns "location"
-        val builder = DeviceImpl.Builder(mockk(relaxed = true), mockk(relaxed = true), message)
+        val builder = DeviceImpl.Builder(mockk(relaxed = true), message)
         val client = HttpClient()
         builder.setDownloadInfo(client)
     }

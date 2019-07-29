@@ -35,7 +35,6 @@ class ServiceTest {
         fun build_成功() {
             val service = ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -50,20 +49,6 @@ class ServiceTest {
         @Test(expected = IllegalStateException::class)
         fun build_Device不足() {
             ServiceImpl.Builder()
-                .setSubscribeManager(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_SubscribeManager不足() {
-            ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -77,7 +62,6 @@ class ServiceTest {
         fun build_ServiceType不足() {
             ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
                 .setControlUrl("controlUrl")
@@ -90,7 +74,6 @@ class ServiceTest {
         fun build_ServiceId不足() {
             ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setScpdUrl("scpdUrl")
                 .setControlUrl("controlUrl")
@@ -103,7 +86,6 @@ class ServiceTest {
         fun build_ScpdUrl不足() {
             ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setControlUrl("controlUrl")
@@ -116,7 +98,6 @@ class ServiceTest {
         fun build_ControlUrl不足() {
             ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -129,7 +110,6 @@ class ServiceTest {
         fun build_EventSubUrl不足() {
             ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -149,7 +129,6 @@ class ServiceTest {
                 )
             val service = ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -174,7 +153,6 @@ class ServiceTest {
                 )
             val service = ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -191,10 +169,11 @@ class ServiceTest {
         fun getCallback() {
             val cp: ControlPointImpl = mockk(relaxed = true)
             val manager: SubscribeManager = mockk(relaxed = true)
+            every { cp.subscribeManager } returns manager
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(cp, manager, message)
+            val device = DeviceImpl.Builder(cp, message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")
@@ -205,7 +184,6 @@ class ServiceTest {
                 .build()
             val service = ServiceImpl.Builder()
                 .setDevice(device)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -227,7 +205,6 @@ class ServiceTest {
         fun hashCode_Exceptionが発生しない() {
             val service = ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -242,7 +219,6 @@ class ServiceTest {
         fun equals_比較可能() {
             val service = ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -256,11 +232,10 @@ class ServiceTest {
 
         @Test
         fun equals_同一の情報() {
-            val manager: SubscribeManager = mockk(relaxed = true)
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), manager, message)
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")
@@ -271,7 +246,6 @@ class ServiceTest {
                 .build()
             val service1 = ServiceImpl.Builder()
                 .setDevice(device)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -281,7 +255,6 @@ class ServiceTest {
                 .build()
             val service2 = ServiceImpl.Builder()
                 .setDevice(device)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -295,11 +268,10 @@ class ServiceTest {
         @Test
         @Throws(Exception::class)
         fun equals_不一致を無視() {
-            val manager: SubscribeManager = mockk(relaxed = true)
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), manager, message)
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")
@@ -310,7 +282,6 @@ class ServiceTest {
                 .build()
             val service1 = ServiceImpl.Builder()
                 .setDevice(device)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType1")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl1")
@@ -320,7 +291,6 @@ class ServiceTest {
                 .build()
             val service2 = ServiceImpl.Builder()
                 .setDevice(device)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType2")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl2")
@@ -333,11 +303,10 @@ class ServiceTest {
 
         @Test
         fun equals_ServiceId不一致() {
-            val manager: SubscribeManager = mockk(relaxed = true)
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), manager, message)
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
                 .setDescription("description")
                 .setUdn("uuid")
                 .setUpc("upc")
@@ -348,7 +317,6 @@ class ServiceTest {
                 .build()
             val service1 = ServiceImpl.Builder()
                 .setDevice(device)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType")
                 .setServiceId("serviceId1")
                 .setScpdUrl("scpdUrl")
@@ -358,7 +326,6 @@ class ServiceTest {
                 .build()
             val service2 = ServiceImpl.Builder()
                 .setDevice(device)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType")
                 .setServiceId("serviceId2")
                 .setScpdUrl("scpdUrl")
@@ -371,11 +338,10 @@ class ServiceTest {
 
         @Test
         fun equals_device不一致() {
-            val manager: SubscribeManager = mockk(relaxed = true)
             val message1: SsdpMessage = mockk(relaxed = true)
             every { message1.location } returns "location"
             every { message1.uuid } returns "uuid1"
-            val device1 = DeviceImpl.Builder(mockk(relaxed = true), manager, message1)
+            val device1 = DeviceImpl.Builder(mockk(relaxed = true), message1)
                 .setDescription("description")
                 .setUdn("uuid1")
                 .setUpc("upc")
@@ -387,7 +353,7 @@ class ServiceTest {
             val message2: SsdpMessage = mockk(relaxed = true)
             every { message2.location } returns "location"
             every { message2.uuid } returns "uuid2"
-            val device2 = DeviceImpl.Builder(mockk(relaxed = true), manager, message2)
+            val device2 = DeviceImpl.Builder(mockk(relaxed = true), message2)
                 .setDescription("description")
                 .setUdn("uuid2")
                 .setUpc("upc")
@@ -398,7 +364,6 @@ class ServiceTest {
                 .build()
             val service1 = ServiceImpl.Builder()
                 .setDevice(device1)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -408,7 +373,6 @@ class ServiceTest {
                 .build()
             val service2 = ServiceImpl.Builder()
                 .setDevice(device2)
-                .setSubscribeManager(manager)
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -423,7 +387,6 @@ class ServiceTest {
         fun createHttpClient() {
             val service = ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -440,7 +403,6 @@ class ServiceTest {
         fun toDumpString() {
             ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
-                .setSubscribeManager(mockk(relaxed = true))
                 .setServiceType("serviceType")
                 .setServiceId("serviceId")
                 .setScpdUrl("scpdUrl")
@@ -493,7 +455,8 @@ class ServiceTest {
             controlPoint = mockk(relaxed = true)
             subscribeManager = mockk(relaxed = true)
             every { subscribeManager.getEventPort() } returns EVENT_PORT
-            val builder = DeviceImpl.Builder(controlPoint, subscribeManager, ssdpMessage)
+            every { controlPoint.subscribeManager } returns subscribeManager
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
             device = builder.build()
             cms = device.findServiceById("urn:upnp-org:serviceId:ConnectionManager") as ServiceImpl
@@ -744,7 +707,6 @@ class ServiceTest {
     class subscribe_機能のテスト {
         private lateinit var controlPoint: ControlPointImpl
         private lateinit var device: DeviceImpl
-        private lateinit var subscribeManager: SubscribeManager
         private lateinit var service: ServiceImpl
         private lateinit var httpClient: HttpClient
 
@@ -753,12 +715,10 @@ class ServiceTest {
             controlPoint = mockk(relaxed = true)
             every { controlPoint.taskExecutors } returns TaskExecutors()
             device = mockk(relaxed = true)
-            subscribeManager = mockk(relaxed = true)
             every { device.controlPoint } returns controlPoint
             service = spyk(
                 ServiceImpl.Builder()
                     .setDevice(device)
-                    .setSubscribeManager(subscribeManager)
                     .setServiceType("serviceType")
                     .setServiceId("serviceId")
                     .setScpdUrl("scpdUrl")
