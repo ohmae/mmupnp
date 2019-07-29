@@ -35,70 +35,49 @@ internal class SubscribeHolder(
         subscriptionMap.values.map { it.getService() }
     }
 
-    fun start() {
-        threadLock.withLock {
-            FutureTask(this, null).also {
-                futureTask = it
-                taskExecutors.manager(it)
-            }
+    fun start(): Unit = threadLock.withLock {
+        FutureTask(this, null).also {
+            futureTask = it
+            taskExecutors.manager(it)
         }
     }
 
-    fun stop() {
-        threadLock.withLock {
-            futureTask?.cancel(false)
-            futureTask = null
+    fun stop(): Unit = threadLock.withLock {
+        futureTask?.cancel(false)
+        futureTask = null
+    }
+
+
+    fun add(service: Service, timeout: Long, keepRenew: Boolean): Unit = lock.withLock {
+        val id = service.subscriptionId
+        if (id.isNullOrEmpty()) {
+            return
         }
+        subscriptionMap[id] = SubscribeService(service, timeout, keepRenew)
+        condition.signalAll()
     }
 
-    private fun isCanceled(): Boolean {
-        return futureTask?.isCancelled ?: true
+    fun renew(service: Service, timeout: Long): Unit = lock.withLock {
+        subscriptionMap[service.subscriptionId]?.renew(timeout)
     }
 
-    fun add(service: Service, timeout: Long, keepRenew: Boolean) {
-        lock.withLock {
-            val id = service.subscriptionId
-            if (id.isNullOrEmpty()) {
-                return
-            }
-            subscriptionMap[id] = SubscribeService(service, timeout, keepRenew)
+    fun setKeepRenew(service: Service, keep: Boolean): Unit = lock.withLock {
+        subscriptionMap[service.subscriptionId]?.setKeepRenew(keep)
+        condition.signalAll()
+    }
+
+    fun remove(service: Service): Unit = lock.withLock {
+        subscriptionMap.remove(service.subscriptionId)?.let {
             condition.signalAll()
         }
     }
 
-    fun renew(service: Service, timeout: Long) {
-        lock.withLock {
-            subscriptionMap[service.subscriptionId]
-                ?.renew(timeout)
-        }
+    fun getService(subscriptionId: String): Service? = lock.withLock {
+        subscriptionMap[subscriptionId]?.getService()
     }
 
-    fun setKeepRenew(service: Service, keep: Boolean) {
-        lock.withLock {
-            subscriptionMap[service.subscriptionId]
-                ?.setKeepRenew(keep)
-            condition.signalAll()
-        }
-    }
-
-    fun remove(service: Service) {
-        lock.withLock {
-            subscriptionMap.remove(service.subscriptionId)?.let {
-                condition.signalAll()
-            }
-        }
-    }
-
-    fun getService(subscriptionId: String): Service? {
-        lock.withLock {
-            return subscriptionMap[subscriptionId]?.getService()
-        }
-    }
-
-    fun clear() {
-        lock.withLock {
-            subscriptionMap.clear()
-        }
+    fun clear(): Unit = lock.withLock {
+        subscriptionMap.clear()
     }
 
     override fun run() {
@@ -115,6 +94,8 @@ internal class SubscribeHolder(
         }
     }
 
+    private fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
+
     /**
      * Wait until some entry is added to ServiceList.
      *
@@ -126,14 +107,12 @@ internal class SubscribeHolder(
      * @throws InterruptedException An interrupt occurred
      */
     @Throws(InterruptedException::class)
-    private fun waitEntry(): Collection<SubscribeService> {
-        lock.withLock {
-            while (subscriptionMap.isEmpty()) {
-                condition.await()
-            }
-            // 操作をロックしないようにコピーに対して処理を行う。
-            return ArrayList(subscriptionMap.values)
+    private fun waitEntry(): Collection<SubscribeService> = lock.withLock {
+        while (subscriptionMap.isEmpty()) {
+            condition.await()
         }
+        // 操作をロックしないようにコピーに対して処理を行う。
+        ArrayList(subscriptionMap.values)
     }
 
     /**
@@ -155,18 +134,16 @@ internal class SubscribeHolder(
     /**
      * Remove expired [Service].
      */
-    private fun removeExpiredService() {
-        lock.withLock {
-            val now = System.currentTimeMillis()
-            subscriptionMap.values
-                .toList()
-                .filter { it.isExpired(now) }
-                .map { it.getService() }
-                .forEach {
-                    remove(it)
-                    it.unsubscribeSync()
-                }
-        }
+    private fun removeExpiredService(): Unit = lock.withLock {
+        val now = System.currentTimeMillis()
+        subscriptionMap.values
+            .toList()
+            .filter { it.isExpired(now) }
+            .map { it.getService() }
+            .forEach {
+                remove(it)
+                it.unsubscribeSync()
+            }
     }
 
     /**
@@ -175,15 +152,13 @@ internal class SubscribeHolder(
      * @throws InterruptedException An interrupt occurred
      */
     @Throws(InterruptedException::class)
-    private fun waitNextRenewTime() {
-        lock.withLock {
-            if (subscriptionMap.isEmpty()) {
-                return
-            }
-            val sleep = maxOf(findMostRecentTime() - System.currentTimeMillis(), MIN_INTERVAL)
-            // ビジーループを回避するため最小値を設ける
-            condition.await(sleep, TimeUnit.MILLISECONDS)
+    private fun waitNextRenewTime(): Unit = lock.withLock {
+        if (subscriptionMap.isEmpty()) {
+            return
         }
+        val sleep = maxOf(findMostRecentTime() - System.currentTimeMillis(), MIN_INTERVAL)
+        // ビジーループを回避するため最小値を設ける
+        condition.await(sleep, TimeUnit.MILLISECONDS)
     }
 
     /**
@@ -191,10 +166,8 @@ internal class SubscribeHolder(
      *
      * @return Next time to scan
      */
-    private fun findMostRecentTime(): Long {
-        return subscriptionMap.values.minBy { it.getNextScanTime() }
-            ?.getNextScanTime() ?: 0L
-    }
+    private fun findMostRecentTime(): Long =
+        subscriptionMap.values.minBy { it.getNextScanTime() }?.getNextScanTime() ?: 0L
 
     companion object {
         private val MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1)
