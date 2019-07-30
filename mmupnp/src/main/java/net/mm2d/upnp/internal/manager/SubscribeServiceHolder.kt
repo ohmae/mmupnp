@@ -22,7 +22,7 @@ import kotlin.concurrent.withLock
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal class SubscribeHolder(
+internal class SubscribeServiceHolder(
     private val taskExecutors: TaskExecutors
 ) : Runnable {
     private var futureTask: FutureTask<*>? = null

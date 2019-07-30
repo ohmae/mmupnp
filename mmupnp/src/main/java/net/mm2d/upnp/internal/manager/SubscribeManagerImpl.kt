@@ -19,7 +19,7 @@ internal class SubscribeManagerImpl(
     private val listeners: Set<NotifyEventListener>,
     factory: DiFactory
 ) : SubscribeManager {
-    private val subscribeHolder: SubscribeHolder = factory.createSubscribeHolder(taskExecutors)
+    private val serviceHolder: SubscribeServiceHolder = factory.createSubscribeServiceHolder(taskExecutors)
     private val eventReceiver: EventReceiver = factory.createEventReceiver(
         taskExecutors, this::onEventReceived
     )
@@ -27,8 +27,7 @@ internal class SubscribeManagerImpl(
     // VisibleForTesting
     internal fun onEventReceived(sid: String, seq: Long, properties: List<Pair<String, String>>): Boolean {
         Logger.d { "$sid $seq $properties" }
-        val service = subscribeHolder.getService(sid)
-        if (service == null) {
+        val service = serviceHolder.getService(sid) ?: run {
             Logger.w { "no service to receive: $sid" }
             return false
         }
@@ -54,31 +53,31 @@ internal class SubscribeManagerImpl(
         eventReceiver.getLocalPort()
 
     override fun initialize(): Unit =
-        subscribeHolder.start()
+        serviceHolder.start()
 
     override fun start(): Unit =
         eventReceiver.start()
 
     override fun stop() {
-        subscribeHolder.clear()
+        serviceHolder.clear()
         eventReceiver.stop()
     }
 
     override fun terminate(): Unit =
-        subscribeHolder.stop()
+        serviceHolder.stop()
 
     override fun getSubscribeService(subscriptionId: String): Service? =
-        subscribeHolder.getService(subscriptionId)
+        serviceHolder.getService(subscriptionId)
 
     override fun register(service: Service, timeout: Long, keep: Boolean): Unit =
-        subscribeHolder.add(service, timeout, keep)
+        serviceHolder.add(service, timeout, keep)
 
     override fun renew(service: Service, timeout: Long): Unit =
-        subscribeHolder.renew(service, timeout)
+        serviceHolder.renew(service, timeout)
 
     override fun setKeepRenew(service: Service, keep: Boolean): Unit =
-        subscribeHolder.setKeepRenew(service, keep)
+        serviceHolder.setKeepRenew(service, keep)
 
     override fun unregister(service: Service): Unit =
-        subscribeHolder.remove(service)
+        serviceHolder.remove(service)
 }

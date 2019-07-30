@@ -57,9 +57,9 @@ internal class DiFactory(
         EmptySubscribeManager()
     }
 
-    fun createSubscribeHolder(
+    fun createSubscribeServiceHolder(
         taskExecutors: TaskExecutors
-    ): SubscribeHolder = SubscribeHolder(taskExecutors)
+    ): SubscribeServiceHolder = SubscribeServiceHolder(taskExecutors)
 
     fun createEventReceiver(
         taskExecutors: TaskExecutors,

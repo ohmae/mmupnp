@@ -21,7 +21,7 @@ import org.junit.runners.JUnit4
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class SubscribeHolderTest {
+class SubscribeServiceHolderTest {
     private lateinit var taskExecutors: TaskExecutors
 
     @Before
@@ -36,7 +36,7 @@ class SubscribeHolderTest {
 
     @Test(timeout = 10000L)
     fun start_stop_でロックしない() {
-        val subscribeHolder = SubscribeHolder(taskExecutors)
+        val subscribeHolder = SubscribeServiceHolder(taskExecutors)
         subscribeHolder.start()
         subscribeHolder.stop()
     }
@@ -46,7 +46,7 @@ class SubscribeHolderTest {
         val id = "id"
         val service: Service = mockk(relaxed = true)
         every { service.subscriptionId } returns id
-        val subscribeHolder = SubscribeHolder(taskExecutors)
+        val subscribeHolder = SubscribeServiceHolder(taskExecutors)
 
         subscribeHolder.add(service, 1000L, false)
 
@@ -61,7 +61,7 @@ class SubscribeHolderTest {
         val id2 = "id2"
         val service2: Service = mockk(relaxed = true)
         every { service2.subscriptionId } returns id2
-        val subscribeHolder = SubscribeHolder(taskExecutors)
+        val subscribeHolder = SubscribeServiceHolder(taskExecutors)
 
         subscribeHolder.add(service1, 1000L, false)
         subscribeHolder.add(service2, 1000L, false)
@@ -78,7 +78,7 @@ class SubscribeHolderTest {
     @Test
     fun getServiceList_subscriptionIdがnullだとaddできない() {
         val service1: Service = mockk(relaxed = true)
-        val subscribeHolder = SubscribeHolder(taskExecutors)
+        val subscribeHolder = SubscribeServiceHolder(taskExecutors)
         subscribeHolder.add(service1, 1000L, false)
 
         assertThat(subscribeHolder.getService(service1.serviceId)).isNull()
@@ -92,7 +92,7 @@ class SubscribeHolderTest {
         val id2 = "id2"
         val service2: Service = mockk(relaxed = true)
         every { service2.subscriptionId } returns id2
-        val subscribeHolder = SubscribeHolder(taskExecutors)
+        val subscribeHolder = SubscribeServiceHolder(taskExecutors)
 
         subscribeHolder.add(service1, 1000L, false)
         subscribeHolder.add(service2, 1000L, false)
@@ -114,7 +114,7 @@ class SubscribeHolderTest {
         val id2 = "id2"
         val service2: Service = mockk(relaxed = true)
         every { service2.subscriptionId } returns id2
-        val subscribeHolder = SubscribeHolder(taskExecutors)
+        val subscribeHolder = SubscribeServiceHolder(taskExecutors)
         subscribeHolder.start()
 
         subscribeHolder.add(service1, 1000L, false)
@@ -146,7 +146,7 @@ class SubscribeHolderTest {
         every { service2.renewSubscribeSync() } returns true
         every { service2.subscriptionId } returns "id2"
 
-        val subscribeHolder = SubscribeHolder(taskExecutors)
+        val subscribeHolder = SubscribeServiceHolder(taskExecutors)
         subscribeHolder.start()
 
         subscribeHolder.add(service1, 1000L, true)
@@ -165,7 +165,7 @@ class SubscribeHolderTest {
         val service: Service = mockk(relaxed = true)
         every { service.renewSubscribeSync() } returns false
         every { service.subscriptionId } returns id
-        val subscribeHolder = SubscribeHolder(taskExecutors)
+        val subscribeHolder = SubscribeServiceHolder(taskExecutors)
         subscribeHolder.start()
 
         subscribeHolder.add(service, 1000L, true)
