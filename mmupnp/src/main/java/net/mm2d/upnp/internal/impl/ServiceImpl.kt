@@ -10,6 +10,7 @@ package net.mm2d.upnp.internal.impl
 import net.mm2d.log.Logger
 import net.mm2d.upnp.*
 import net.mm2d.upnp.internal.manager.SubscribeManager
+import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.toAddressString
 import java.io.IOException
 import java.net.MalformedURLException
@@ -36,6 +37,7 @@ internal class ServiceImpl(
     stateVariables: List<StateVariable>
 ) : Service {
     private val subscribeManager: SubscribeManager = device.controlPoint.subscribeManager
+    private val taskExecutors: TaskExecutors = device.controlPoint.taskExecutors
     private val actionMap: Map<String, Action>
     private val stateVariableMap = stateVariables.map { it.name to it }.toMap()
     override var subscriptionId: String? = null
@@ -74,13 +76,13 @@ internal class ServiceImpl(
     override fun subscribeSync(keepRenew: Boolean): Boolean {
         try {
             if (!subscriptionId.isNullOrEmpty()) {
-                if (renewSubscribeInner()) {
+                if (renewSubscribeActual()) {
                     subscribeManager.setKeepRenew(this, keepRenew)
                     return true
                 }
                 return false
             }
-            return subscribeInner(keepRenew)
+            return subscribeActual(keepRenew)
         } catch (e: IOException) {
             Logger.e(e, "fail to subscribe")
         }
@@ -89,7 +91,7 @@ internal class ServiceImpl(
 
     // VisibleForTesting
     @Throws(IOException::class)
-    internal fun subscribeInner(keepRenew: Boolean): Boolean {
+    internal fun subscribeActual(keepRenew: Boolean): Boolean {
         val request = makeSubscribeRequest()
         val response = createHttpClient().post(request)
         if (response.getStatus() != Http.Status.HTTP_OK) {
@@ -120,19 +122,18 @@ internal class ServiceImpl(
         }
 
     override fun renewSubscribeSync(): Boolean {
-        try {
-            return if (subscriptionId.isNullOrEmpty()) {
-                subscribeInner(false)
-            } else renewSubscribeInner()
+        return try {
+            if (subscriptionId.isNullOrEmpty()) subscribeActual(false)
+            else renewSubscribeActual()
         } catch (e: IOException) {
             Logger.e(e, "fail to renewSubscribe")
+            false
         }
-        return false
     }
 
     // VisibleForTesting
     @Throws(IOException::class)
-    internal fun renewSubscribeInner(): Boolean {
+    internal fun renewSubscribeActual(): Boolean {
         val request = makeRenewSubscribeRequest(subscriptionId!!)
         val response = createHttpClient().post(request)
         if (response.getStatus() != Http.Status.HTTP_OK) {
@@ -190,49 +191,52 @@ internal class ServiceImpl(
             setHeader(Http.CONTENT_LENGTH, "0")
         }
 
+    private fun subscribeInner(keepRenew: Boolean, callback: (Boolean) -> Unit) {
+        taskExecutors.io { callback(subscribeSync(keepRenew)) }
+    }
+
+    private fun renewSubscribeInner(callback: (Boolean) -> Unit) {
+        taskExecutors.io { callback(renewSubscribeSync()) }
+    }
+
+    private fun unsubscribeInner(callback: (Boolean) -> Unit) {
+        taskExecutors.io { callback(unsubscribeSync()) }
+    }
+
     override fun subscribe(keepRenew: Boolean, callback: ((Boolean) -> Unit)?) {
-        val executors = device.controlPoint.taskExecutors
-        executors.io {
-            val result = subscribeSync(keepRenew)
-            callback?.let { executors.callback { it(result) } }
+        subscribeInner(keepRenew) {
+            callback ?: return@subscribeInner
+            taskExecutors.callback { callback(it) }
         }
     }
 
     override fun renewSubscribe(callback: ((Boolean) -> Unit)?) {
-        val executors = device.controlPoint.taskExecutors
-        executors.io {
-            val result = renewSubscribeSync()
-            callback?.let { executors.callback { it(result) } }
+        renewSubscribeInner {
+            callback ?: return@renewSubscribeInner
+            taskExecutors.callback { callback(it) }
         }
     }
 
     override fun unsubscribe(callback: ((Boolean) -> Unit)?) {
-        val executors = device.controlPoint.taskExecutors
-        executors.io {
-            val result = unsubscribeSync()
-            callback?.let { executors.callback { it(result) } }
+        unsubscribeInner {
+            callback ?: return@unsubscribeInner
+            taskExecutors.callback { callback(it) }
         }
     }
 
     override suspend fun subscribeAsync(keepRenew: Boolean): Boolean =
         suspendCoroutine { continuation ->
-            device.controlPoint.taskExecutors.io {
-                continuation.resume(subscribeSync(keepRenew))
-            }
+            subscribeInner(keepRenew) { continuation.resume(it) }
         }
 
     override suspend fun renewSubscribeAsync(): Boolean =
         suspendCoroutine { continuation ->
-            device.controlPoint.taskExecutors.io {
-                continuation.resume(renewSubscribeSync())
-            }
+            renewSubscribeInner { continuation.resume(it) }
         }
 
     override suspend fun unsubscribeAsync(): Boolean =
         suspendCoroutine { continuation ->
-            device.controlPoint.taskExecutors.io {
-                continuation.resume(unsubscribeSync())
-            }
+            unsubscribeInner { continuation.resume(it) }
         }
 
     override fun hashCode(): Int = device.hashCode() + serviceId.hashCode()

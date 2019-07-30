@@ -41,6 +41,8 @@ internal class ActionImpl(
     override val name: String,
     private val argumentMap: Map<String, Argument>
 ) : Action {
+    private val taskExecutors = service.device.controlPoint.taskExecutors
+
     override val argumentList: List<Argument> by lazy {
         argumentMap.values.toList()
     }
@@ -72,21 +74,51 @@ internal class ActionImpl(
         return invoke(soap, returnErrorResponse)
     }
 
+    private fun invokeInner(
+        argumentValues: Map<String, String?>,
+        returnErrorResponse: Boolean,
+        onResult: (Map<String, String>) -> Unit,
+        onError: (IOException) -> Unit
+    ) {
+        taskExecutors.io {
+            try {
+                onResult(invokeSync(argumentValues, returnErrorResponse))
+            } catch (e: IOException) {
+                onError(e)
+            }
+        }
+    }
+
+    private fun invokeCustomInner(
+        argumentValues: Map<String, String?>,
+        customNamespace: Map<String, String>,
+        customArguments: Map<String, String>,
+        returnErrorResponse: Boolean,
+        onResult: (Map<String, String>) -> Unit,
+        onError: (IOException) -> Unit
+    ) {
+        taskExecutors.io {
+            try {
+                onResult(invokeCustomSync(argumentValues, customNamespace, customArguments, returnErrorResponse))
+            } catch (e: IOException) {
+                onError(e)
+            }
+        }
+    }
+
     override fun invoke(
         argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean,
         onResult: ((Map<String, String>) -> Unit)?,
         onError: ((IOException) -> Unit)?
     ) {
-        val executors = service.device.controlPoint.taskExecutors
-        executors.io {
-            try {
-                val result = invokeSync(argumentValues, returnErrorResponse)
-                onResult?.let { executors.callback { it(result) } }
-            } catch (e: IOException) {
-                onError?.let { executors.callback { it(e) } }
-            }
-        }
+        invokeInner(argumentValues, returnErrorResponse, {
+            onResult ?: return@invokeInner
+            taskExecutors.callback { onResult(it) }
+        }, {
+            onError ?: return@invokeInner
+            taskExecutors.callback { onError(it) }
+        })
     }
 
     override fun invokeCustom(
@@ -97,15 +129,13 @@ internal class ActionImpl(
         onResult: ((Map<String, String>) -> Unit)?,
         onError: ((IOException) -> Unit)?
     ) {
-        val executors = service.device.controlPoint.taskExecutors
-        executors.io {
-            try {
-                val result = invokeCustomSync(argumentValues, customNamespace, customArguments, returnErrorResponse)
-                onResult?.let { executors.callback { it(result) } }
-            } catch (e: IOException) {
-                onError?.let { executors.callback { it(e) } }
-            }
-        }
+        invokeCustomInner(argumentValues, customNamespace, customArguments, returnErrorResponse, {
+            onResult ?: return@invokeCustomInner
+            taskExecutors.callback { onResult(it) }
+        }, {
+            onError ?: return@invokeCustomInner
+            taskExecutors.callback { onError(it) }
+        })
     }
 
     override suspend fun invokeAsync(
@@ -113,14 +143,10 @@ internal class ActionImpl(
         returnErrorResponse: Boolean
     ): Map<String, String> =
         suspendCoroutine { continuation ->
-            service.device.controlPoint.taskExecutors.io {
-                try {
-                    val result = invokeSync(argumentValues, returnErrorResponse)
-                    continuation.resume(result)
-                } catch (e: IOException) {
-                    continuation.resumeWithException(e)
-                }
-            }
+            invokeInner(argumentValues, returnErrorResponse,
+                { continuation.resume(it) },
+                { continuation.resumeWithException(it) }
+            )
         }
 
     override suspend fun invokeCustomAsync(
@@ -130,14 +156,10 @@ internal class ActionImpl(
         returnErrorResponse: Boolean
     ): Map<String, String> =
         suspendCoroutine { continuation ->
-            service.device.controlPoint.taskExecutors.io {
-                try {
-                    val result = invokeCustomSync(argumentValues, customNamespace, customArguments, returnErrorResponse)
-                    continuation.resume(result)
-                } catch (e: IOException) {
-                    continuation.resumeWithException(e)
-                }
-            }
+            invokeCustomInner(argumentValues, customNamespace, customArguments, returnErrorResponse,
+                { continuation.resume(it) },
+                { continuation.resumeWithException(it) }
+            )
         }
 
     /**

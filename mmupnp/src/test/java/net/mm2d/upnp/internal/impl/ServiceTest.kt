@@ -794,11 +794,11 @@ class ServiceTest {
 
             assertThat(service.subscribeSync()).isTrue()
 
-            every { service.renewSubscribeInner() } returns false
+            every { service.renewSubscribeActual() } returns false
 
             assertThat(service.subscribeSync()).isFalse()
 
-            verify(exactly = 1) { service.renewSubscribeInner() }
+            verify(exactly = 1) { service.renewSubscribeActual() }
         }
 
         @Test
@@ -811,7 +811,7 @@ class ServiceTest {
 
             assertThat(service.renewSubscribeSync()).isTrue()
 
-            verify(exactly = 1) { service.subscribeInner(any()) }
+            verify(exactly = 1) { service.subscribeActual(any()) }
         }
 
         @Test
@@ -823,10 +823,10 @@ class ServiceTest {
             every { httpClient.post(any()) } returns response
 
             assertThat(service.renewSubscribeSync()).isTrue()
-            verify(exactly = 1) { service.subscribeInner(any()) }
+            verify(exactly = 1) { service.subscribeActual(any()) }
 
             assertThat(service.renewSubscribeSync()).isTrue()
-            verify(exactly = 1) { service.renewSubscribeInner() }
+            verify(exactly = 1) { service.renewSubscribeActual() }
         }
 
         @Test
