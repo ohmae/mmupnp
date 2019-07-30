@@ -86,10 +86,8 @@ class SubscribeManagerImplTest {
         every { factory.createSubscribeHolder(any()) } returns holder
         every { factory.createEventReceiver(any(), any()) } returns receiver
         val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
-        every { holder.getServiceList() } returns listOf(mockk())
         manager.stop()
 
-        verify(exactly = 1) { executors.io(any<() -> Unit>()) }
         verify(exactly = 1) { holder.clear() }
         verify(exactly = 1) { receiver.stop() }
     }

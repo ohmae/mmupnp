@@ -76,34 +76,12 @@ class SubscribeHolderTest {
     }
 
     @Test
-    fun getServiceList_addしたServiceが取得できる() {
-        val id1 = "id1"
-        val service1: Service = mockk(relaxed = true)
-        every { service1.subscriptionId } returns id1
-        val id2 = "id2"
-        val service2: Service = mockk(relaxed = true)
-        every { service2.subscriptionId } returns id2
-        val subscribeHolder = SubscribeHolder(taskExecutors)
-
-        subscribeHolder.add(service1, 1000L, false)
-        subscribeHolder.add(service2, 1000L, false)
-
-        assertThat(subscribeHolder.getServiceList()).contains(service1)
-        assertThat(subscribeHolder.getServiceList()).contains(service2)
-
-        subscribeHolder.remove(service1)
-
-        assertThat(subscribeHolder.getServiceList()).doesNotContain(service1)
-        assertThat(subscribeHolder.getServiceList()).contains(service2)
-    }
-
-    @Test
     fun getServiceList_subscriptionIdがnullだとaddできない() {
         val service1: Service = mockk(relaxed = true)
         val subscribeHolder = SubscribeHolder(taskExecutors)
         subscribeHolder.add(service1, 1000L, false)
 
-        assertThat(subscribeHolder.getServiceList()).doesNotContain(service1)
+        assertThat(subscribeHolder.getService(service1.serviceId)).isNull()
     }
 
     @Test

@@ -31,10 +31,6 @@ internal class SubscribeHolder(
     private val condition = lock.newCondition()
     private val subscriptionMap = mutableMapOf<String, SubscribeService>()
 
-    fun getServiceList(): List<Service> = lock.withLock {
-        subscriptionMap.values.map { it.service }
-    }
-
     fun start(): Unit = threadLock.withLock {
         FutureTask(this, null).also {
             futureTask = it
@@ -77,6 +73,9 @@ internal class SubscribeHolder(
     }
 
     fun clear(): Unit = lock.withLock {
+        subscriptionMap.values.forEach {
+            it.service.unsubscribe()
+        }
         subscriptionMap.clear()
     }
 

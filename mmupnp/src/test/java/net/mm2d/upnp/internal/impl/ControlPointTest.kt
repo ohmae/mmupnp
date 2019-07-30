@@ -882,7 +882,7 @@ class ControlPointTest {
             cp.stop()
             cp.terminate()
             Thread.sleep(100)
-            verify(exactly = 1) { service.unsubscribeSync() }
+            verify(exactly = 1) { service.unsubscribe() }
             verify(exactly = 1) { deviceHolder.remove(device) }
         }
 

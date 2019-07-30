@@ -60,9 +60,6 @@ internal class SubscribeManagerImpl(
         eventReceiver.start()
 
     override fun stop() {
-        subscribeHolder.getServiceList().forEach {
-            taskExecutors.io { it.unsubscribeSync() }
-        }
         subscribeHolder.clear()
         eventReceiver.stop()
     }
