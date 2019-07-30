@@ -35,6 +35,10 @@ object ControlPointFactory {
      * This argument is used to specify the callback thread.
      * If not specified, single Thread Executor is used.
      * @param notifySegmentCheckEnabled Set whether to check the segment of SSDP Notify packet or not.
+     * @param subscriptionEnabled Set whether to use event subscription.
+     * Default is true.
+     * If false, reduce memory and number of threads at the expense of disabling the feature of event subscription.
+     * In that state, when the method for subscription are called, IllegalStateException will be thrown.
      * @return Instance of ControlPoint.
      * @throws IllegalStateException There is no interface available.
      */
@@ -44,7 +48,8 @@ object ControlPointFactory {
         interfaces: Iterable<NetworkInterface>? = null,
         callbackExecutor: TaskExecutor? = null,
         callbackHandler: ((Runnable) -> Boolean)? = null,
-        notifySegmentCheckEnabled: Boolean = false
+        notifySegmentCheckEnabled: Boolean = false,
+        subscriptionEnabled: Boolean = true
     ): ControlPoint {
         val executor = callbackExecutor
             ?: callbackHandler?.let { taskExecutor(it) }
@@ -52,6 +57,7 @@ object ControlPointFactory {
             protocol,
             getDefaultInterfacesIfEmpty(protocol, interfaces),
             notifySegmentCheckEnabled,
+            subscriptionEnabled,
             DiFactory(protocol, executor)
         )
     }
@@ -81,6 +87,7 @@ object ControlPointFactory {
         private var interfaces: Iterable<NetworkInterface>? = null
         private var callbackExecutor: TaskExecutor? = null
         private var notifySegmentCheckEnabled: Boolean = false
+        private var subscriptionEnabled: Boolean = true
 
         /**
          * Set protocol stack.
@@ -146,6 +153,20 @@ object ControlPointFactory {
         }
 
         /**
+         * Set whether to use event subscription.
+         *
+         * Default is true.
+         * If false, reduce memory and number of threads at the expense of disabling the feature of event subscription.
+         * In that state, when the method for subscription are called, IllegalStateException will be thrown.
+         *
+         * @param enabled true, enable event subscription. false, otherwise
+         * @return builder
+         */
+        fun setSubscriptionEnabled(enabled: Boolean): ControlPointBuilder = apply {
+            subscriptionEnabled = enabled
+        }
+
+        /**
          * Build an instance of ControlPoint.
          *
          * @return instance of ControlPoint
@@ -154,6 +175,7 @@ object ControlPointFactory {
             protocol,
             getDefaultInterfacesIfEmpty(protocol, interfaces),
             notifySegmentCheckEnabled,
+            subscriptionEnabled,
             DiFactory(protocol, callbackExecutor)
         )
     }

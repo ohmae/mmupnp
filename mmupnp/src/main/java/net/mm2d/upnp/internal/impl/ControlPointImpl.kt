@@ -38,6 +38,7 @@ internal class ControlPointImpl(
     private val protocol: Protocol,
     interfaces: Iterable<NetworkInterface>,
     notifySegmentCheckEnabled: Boolean,
+    subscriptionEnabled: Boolean,
     factory: DiFactory
 ) : ControlPoint {
     private var iconFilter: IconFilter = EMPTY_FILTER
@@ -72,7 +73,7 @@ internal class ControlPointImpl(
         }
         notifyReceiverList.setSegmentCheckEnabled(notifySegmentCheckEnabled)
         deviceHolder = factory.createDeviceHolder(taskExecutors) { lostDevice(it) }
-        subscribeManager = factory.createSubscribeManager(taskExecutors, notifyEventListenerList)
+        subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, notifyEventListenerList)
     }
 
     // VisibleForTesting

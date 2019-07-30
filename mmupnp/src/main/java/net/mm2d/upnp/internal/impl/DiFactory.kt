@@ -12,9 +12,7 @@ import net.mm2d.upnp.Device
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.TaskExecutor
-import net.mm2d.upnp.internal.manager.DeviceHolder
-import net.mm2d.upnp.internal.manager.SubscribeHolder
-import net.mm2d.upnp.internal.manager.SubscribeManager
+import net.mm2d.upnp.internal.manager.*
 import net.mm2d.upnp.internal.server.EventReceiver
 import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
@@ -50,9 +48,14 @@ internal class DiFactory(
     ): SsdpNotifyReceiverList = SsdpNotifyReceiverList(taskExecutors, protocol, interfaces, listener)
 
     fun createSubscribeManager(
+        subscriptionEnabled: Boolean,
         taskExecutors: TaskExecutors,
         listeners: Set<NotifyEventListener>
-    ): SubscribeManager = SubscribeManager(taskExecutors, listeners, this)
+    ): SubscribeManager = if (subscriptionEnabled) {
+        SubscribeManagerImpl(taskExecutors, listeners, this)
+    } else {
+        EmptySubscribeManager()
+    }
 
     fun createSubscribeHolder(
         taskExecutors: TaskExecutors

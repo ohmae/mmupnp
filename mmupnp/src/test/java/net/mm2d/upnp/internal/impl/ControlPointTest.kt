@@ -16,7 +16,7 @@ import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.ControlPoint.DiscoveryListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.internal.manager.DeviceHolder
-import net.mm2d.upnp.internal.manager.SubscribeManager
+import net.mm2d.upnp.internal.manager.SubscribeManagerImpl
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.message.SsdpResponse
 import net.mm2d.upnp.internal.parser.DeviceParser
@@ -45,6 +45,7 @@ class ControlPointTest {
             ControlPointImpl(
                 Protocol.DEFAULT, emptyList(),
                 notifySegmentCheckEnabled = false,
+                subscriptionEnabled = true,
                 factory = mockk(relaxed = true)
             )
         }
@@ -126,6 +127,7 @@ class ControlPointTest {
                 Protocol.DEFAULT,
                 NetworkUtils.getAvailableInet4Interfaces(),
                 notifySegmentCheckEnabled = false,
+                subscriptionEnabled = true,
                 factory = factory
             )
             cp.initialize()
@@ -351,19 +353,20 @@ class ControlPointTest {
         private val taskExecutors: TaskExecutors = mockk(relaxed = true)
         private val notifyEventListener: NotifyEventListener = mockk(relaxed = true)
         private val diFactory = spyk(DiFactory())
-        private val subscribeManager = spyk(SubscribeManager(taskExecutors, setOf(notifyEventListener), diFactory))
+        private val subscribeManager = spyk(SubscribeManagerImpl(taskExecutors, setOf(notifyEventListener), diFactory))
 
         @Before
         fun setUp() {
             val factory = spyk(DiFactory())
             every { factory.createSsdpSearchServerList(any(), any(), any()) } returns ssdpSearchServerList
             every { factory.createSsdpNotifyReceiverList(any(), any(), any()) } returns ssdpNotifyReceiverList
-            every { factory.createSubscribeManager(any(), any()) } returns subscribeManager
+            every { factory.createSubscribeManager(any(), any(), any()) } returns subscribeManager
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
+                    subscriptionEnabled = true,
                     factory = factory
                 )
             )
@@ -552,6 +555,7 @@ class ControlPointTest {
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
+                    subscriptionEnabled = true,
                     factory = factory
                 )
             )
@@ -723,6 +727,7 @@ class ControlPointTest {
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
+                    subscriptionEnabled = true,
                     factory = DiFactory(Protocol.DEFAULT)
                 )
             )
@@ -825,7 +830,7 @@ class ControlPointTest {
     @RunWith(JUnit4::class)
     class イベント伝搬テスト {
         private lateinit var cp: ControlPointImpl
-        private lateinit var subscribeManager: SubscribeManager
+        private lateinit var subscribeManager: SubscribeManagerImpl
         private val loadingDeviceMap = spyk(HashMap<String, DeviceImpl.Builder>())
         private lateinit var deviceHolder: DeviceHolder
         private val ssdpSearchServerList: SsdpSearchServerList = mockk(relaxed = true)
@@ -853,13 +858,14 @@ class ControlPointTest {
                 notifyListener = arg(2)
                 ssdpNotifyReceiverList
             }
-            every { factory.createSubscribeManager(any(), any()) } answers {
-                spyk(SubscribeManager(arg(0), arg(1), factory)).also { subscribeManager = it }
+            every { factory.createSubscribeManager(any(), any(), any()) } answers {
+                spyk(SubscribeManagerImpl(arg(1), arg(2), factory)).also { subscribeManager = it }
             }
             cp = ControlPointImpl(
                 Protocol.DEFAULT,
                 NetworkUtils.getAvailableInet4Interfaces(),
                 notifySegmentCheckEnabled = false,
+                subscriptionEnabled = true,
                 factory = factory
             )
         }
@@ -906,21 +912,22 @@ class ControlPointTest {
     @RunWith(JUnit4::class)
     class EventReceiverに起因するテスト {
         private lateinit var cp: ControlPointImpl
-        private lateinit var subscribeManager: SubscribeManager
+        private lateinit var subscribeManager: SubscribeManagerImpl
 
         @Before
         fun setUp() {
             val factory = spyk(DiFactory())
             every { factory.createSsdpSearchServerList(any(), any(), any()) } returns mockk(relaxed = true)
             every { factory.createSsdpNotifyReceiverList(any(), any(), any()) } returns mockk(relaxed = true)
-            every { factory.createSubscribeManager(any(), any()) } answers {
-                spyk(SubscribeManager(arg(0), arg(1), factory)).also { subscribeManager = it }
+            every { factory.createSubscribeManager(any(), any(), any()) } answers {
+                spyk(SubscribeManagerImpl(arg(1), arg(2), factory)).also { subscribeManager = it }
             }
             cp = spyk(
                 ControlPointImpl(
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
+                    subscriptionEnabled = true,
                     factory = factory
                 )
             )
@@ -1060,6 +1067,7 @@ class ControlPointTest {
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
+                    subscriptionEnabled = true,
                     factory = DiFactory(Protocol.DEFAULT)
                 )
             )
@@ -1107,6 +1115,7 @@ class ControlPointTest {
                     Protocol.DEFAULT,
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
+                    subscriptionEnabled = true,
                     factory = DiFactory(Protocol.DEFAULT)
                 )
             )

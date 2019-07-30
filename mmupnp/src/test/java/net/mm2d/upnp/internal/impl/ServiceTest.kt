@@ -11,7 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.*
-import net.mm2d.upnp.internal.manager.SubscribeManager
+import net.mm2d.upnp.internal.manager.SubscribeManagerImpl
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.parser.DeviceParser
 import net.mm2d.upnp.internal.thread.TaskExecutors
@@ -168,7 +168,7 @@ class ServiceTest {
         @Test
         fun getCallback() {
             val cp: ControlPointImpl = mockk(relaxed = true)
-            val manager: SubscribeManager = mockk(relaxed = true)
+            val manager: SubscribeManagerImpl = mockk(relaxed = true)
             every { cp.subscribeManager } returns manager
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
@@ -416,7 +416,7 @@ class ServiceTest {
     @RunWith(JUnit4::class)
     class DeviceParserによる生成からのテスト {
         private lateinit var controlPoint: ControlPointImpl
-        private lateinit var subscribeManager: SubscribeManager
+        private lateinit var subscribeManager: SubscribeManagerImpl
         private lateinit var device: Device
         private lateinit var cms: ServiceImpl
         private lateinit var cds: ServiceImpl
