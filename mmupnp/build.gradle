@@ -58,7 +58,6 @@ install {
             name = libraryName
             url = pj.siteUrl
 
-            packaging = "aar"
             groupId = pj.groupId
             artifactId = libraryName
             version = pj.versions.name
@@ -79,20 +78,25 @@ install {
 }
 
 uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "file:build/maven")
-            pom.project {
-                groupId = pj.groupId
-                artifactId = libraryName
-                version = pj.versions.name
-                licenses {
-                    license {
-                        name = "The MIT License"
-                        url = "https://opensource.org/licenses/MIT"
-                        distribution = "repo"
-                    }
+    repositories.mavenDeployer {
+        repository(url: "file:build/maven")
+        pom.project {
+            name = libraryName
+            url = pj.siteUrl
+
+            groupId = pj.groupId
+            artifactId = libraryName
+            version = pj.versions.name
+            licenses {
+                license {
+                    name = "The MIT License"
+                    url = "https://opensource.org/licenses/MIT"
+                    distribution = "repo"
                 }
+            }
+            scm {
+                connection pj.githubUrl + ".git"
+                url pj.githubUrl
             }
         }
     }

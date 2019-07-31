@@ -24,13 +24,3 @@ jar {
     from configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}
     from "$buildDir/classes/main"
 }
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.6"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.6"
-    }
-}
