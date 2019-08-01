@@ -70,8 +70,30 @@ install {
                 }
             }
             scm {
-                connection pj.githubUrl + ".git"
-                url pj.githubUrl
+                connection = pj.githubUrl + ".git"
+                url = pj.githubUrl
+            }
+        }
+        pom.withXml {
+            asElement().removeChild(asElement().getElementsByTagName('dependencies').item(0))
+            def dependenciesNode = asNode().appendNode('dependencies')
+            configurations.api.allDependencies.each {
+                if (it.name != 'unspecified') {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                    dependencyNode.appendNode('scope', 'compile')
+                }
+            }
+            configurations.implementation.allDependencies.each {
+                if (it.name != 'unspecified') {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                    dependencyNode.appendNode('scope', 'runtime')
+                }
             }
         }
     }
@@ -79,7 +101,7 @@ install {
 
 uploadArchives {
     repositories.mavenDeployer {
-        repository(url: "file:build/maven")
+        repository(url: "file:$projectDir/build/maven")
         pom.project {
             name = libraryName
             url = pj.siteUrl
@@ -95,8 +117,8 @@ uploadArchives {
                 }
             }
             scm {
-                connection pj.githubUrl + ".git"
-                url pj.githubUrl
+                connection = pj.githubUrl + ".git"
+                url = pj.githubUrl
             }
         }
     }
@@ -117,8 +139,8 @@ jacoco {
 
 jacocoTestReport {
     reports {
-        xml.enabled true
-        html.enabled true
+        xml.enabled = true
+        html.enabled = true
     }
 }
 compileKotlin {
