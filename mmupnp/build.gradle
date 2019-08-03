@@ -1,6 +1,7 @@
 apply plugin: "java"
 apply plugin: "kotlin"
 apply plugin: "maven"
+apply plugin: 'maven-publish'
 apply plugin: "org.jetbrains.dokka"
 apply plugin: "com.jfrog.bintray"
 apply plugin: "jacoco"
@@ -28,71 +29,29 @@ dependencies {
     testRuntimeOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.6"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.6"
+    }
+}
+
 dokka {
     outputFormat = "html"
 }
 
-bintray {
-    user = project.hasProperty("bintray_user") ? bintray_user : ""
-    key = project.hasProperty("bintray_key") ? bintray_key : ""
-    configurations = ["archives"]
-
-    pkg {
-        repo = "maven"
-        name = pj.groupId + "." + libraryName
-        licenses = ["MIT"]
-        websiteUrl = pj.siteUrl
-        issueTrackerUrl = pj.githubUrl + "/blob/master/LICENSE"
-        vcsUrl = pj.githubUrl + ".git"
-        issueTrackerUrl = pj.githubUrl + "/issues"
-        publicDownloadNumbers = true
-        version {
-            name = project.version
-        }
-    }
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier = "sources"
+    from sourceSets.main.allSource
 }
 
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            name = libraryName
-            url = pj.siteUrl
-
-            groupId = pj.groupId
-            artifactId = libraryName
-            version = pj.versions.name
-
-            licenses {
-                license {
-                    name = "The MIT License"
-                    url = "https://opensource.org/licenses/MIT"
-                    distribution = "repo"
-                }
-            }
-            scm {
-                connection = pj.githubUrl + ".git"
-                url = pj.githubUrl
-            }
-        }
-        pom.withXml {
-            asElement().removeChild(asElement().getElementsByTagName('dependencies').item(0))
-            def dependencies = asNode().appendNode('dependencies')
-            configurations.api.dependencies.each {
-                appendDependency(dependencies, it.group, it.name, it.version, 'compile')
-            }
-            configurations.implementation.dependencies.each {
-                appendDependency(dependencies, it.group, it.name, it.version, 'runtime')
-            }
-        }
-    }
-}
-
-static def appendDependency(parent, groupId, artifactId, version, scope) {
-    def node = parent.appendNode('dependency')
-    node.appendNode('groupId', groupId)
-    node.appendNode('artifactId', artifactId)
-    node.appendNode('version', version)
-    node.appendNode('scope', scope)
+artifacts {
+    archives sourcesJar
 }
 
 uploadArchives {
@@ -113,20 +72,82 @@ uploadArchives {
                 }
             }
             scm {
-                connection = pj.githubUrl + ".git"
+                connection = pj.scmConnection
                 url = pj.githubUrl
             }
         }
     }
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = "sources"
-    from sourceSets.main.allSource
+publishing {
+    publications {
+        bintray(MavenPublication) {
+            artifact("$buildDir/libs/${libraryName}-${version}.jar")
+            groupId = pj.groupId
+            artifactId = libraryName
+            version = pj.versions.name
+
+            artifact sourcesJar
+
+            pom.withXml {
+                def node = asNode()
+
+                def licenses = node.appendNode("licenses")
+                appendLicense(licenses, "The MIT License", "https://opensource.org/licenses/MIT", "repo")
+
+                appendScm(node, pj.scmConnection, pj.githubUrl)
+
+                def dependencies = node.appendNode("dependencies")
+                configurations.api.dependencies.each {
+                    appendDependency(dependencies, it.group, it.name, it.version, "compile")
+                }
+                configurations.implementation.dependencies.each {
+                    appendDependency(dependencies, it.group, it.name, it.version, "runtime")
+                }
+            }
+        }
+    }
 }
 
-artifacts {
-    archives sourcesJar
+def appendLicense(parentNode, name, url, distribution) {
+    def node = parentNode.appendNode("license")
+    node.appendNode("name", name)
+    node.appendNode("url", url)
+    node.appendNode("distribution", distribution)
+}
+
+def appendScm(parentNode, connection, url) {
+    def node = parentNode.appendNode("scm")
+    node.appendNode("connection", connection)
+    node.appendNode("url", url)
+}
+
+def appendDependency(parentNode, groupId, artifactId, version, scope) {
+    def node = parentNode.appendNode("dependency")
+    node.appendNode("groupId", groupId)
+    node.appendNode("artifactId", artifactId)
+    node.appendNode("version", version)
+    node.appendNode("scope", scope)
+}
+
+bintray {
+    user = project.hasProperty("bintray_user") ? bintray_user : ""
+    key = project.hasProperty("bintray_key") ? bintray_key : ""
+    publications = ["bintray"]
+
+    pkg {
+        repo = "maven"
+        name = pj.groupId + "." + libraryName
+        licenses = ["MIT"]
+        websiteUrl = pj.siteUrl
+        issueTrackerUrl = pj.githubUrl + "/blob/master/LICENSE"
+        vcsUrl = pj.githubUrl + ".git"
+        issueTrackerUrl = pj.githubUrl + "/issues"
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+        }
+    }
 }
 
 jacoco {
@@ -137,16 +158,6 @@ jacocoTestReport {
     reports {
         xml.enabled = true
         html.enabled = true
-    }
-}
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.6"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.6"
     }
 }
 
