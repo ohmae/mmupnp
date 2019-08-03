@@ -150,6 +150,8 @@ bintray {
     }
 }
 
+bintrayUpload.dependsOn assemble
+
 jacoco {
     toolVersion = "0.8.3"
 }
