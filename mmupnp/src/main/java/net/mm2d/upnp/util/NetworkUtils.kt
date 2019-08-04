@@ -19,21 +19,21 @@ import java.util.*
  */
 object NetworkUtils {
     /**
-     * Return interfaces with an address that can communicate with the network.
+     * Return interfaces with address that can communicate with the network.
      */
     @JvmStatic
     fun getAvailableInterfaces(): List<NetworkInterface> =
-        getNetworkInterfaceList().filter { it.isConnectedToNetwork() }
+        getNetworkInterfaceList().filter { it.isAvailableInterface() }
 
     /**
-     * Return interfaces with an IPv4 address that can communicate with the network.
+     * Return interfaces with IPv4 address that can communicate with the network.
      */
     @JvmStatic
     fun getAvailableInet4Interfaces(): List<NetworkInterface> =
         getNetworkInterfaceList().filter { it.isAvailableInet4Interface() }
 
     /**
-     * Return interfaces with an IPv6 address that can communicate with the network.
+     * Return interfaces with IPv6 address that can communicate with the network.
      */
     @JvmStatic
     fun getAvailableInet6Interfaces(): List<NetworkInterface> =
@@ -60,28 +60,37 @@ object NetworkUtils {
 }
 
 /**
- * Returns whether receiver has an IPv4 address that can communicate with the network.
+ * Returns whether receiver has IPv4/IPv6 address that can communicate with the network.
  *
  * @receiver NetworkInterface to inspect
- * @return true: receiver has an IPv4 address that can communicate with the network. false: otherwise
+ * @return true: receiver has IPv4/IPv6 address that can communicate with the network. false: otherwise
+ */
+fun NetworkInterface.isAvailableInterface(): Boolean =
+    isConnectedToNetwork() && (hasInet4Address() || hasInet6Address())
+
+/**
+ * Returns whether receiver has IPv4 address that can communicate with the network.
+ *
+ * @receiver NetworkInterface to inspect
+ * @return true: receiver has IPv4 address that can communicate with the network. false: otherwise
  */
 fun NetworkInterface.isAvailableInet4Interface(): Boolean =
     isConnectedToNetwork() && hasInet4Address()
 
 /**
- * Returns whether receiver has an IPv6 address that can communicate with the network.
+ * Returns whether receiver has IPv6 address that can communicate with the network.
  *
  * @receiver NetworkInterface to inspect
- * @return true: receiver has an IPv6 address that can communicate with the network. false: otherwise
+ * @return true: receiver has IPv6 address that can communicate with the network. false: otherwise
  */
 fun NetworkInterface.isAvailableInet6Interface(): Boolean =
     isConnectedToNetwork() && hasInet6Address()
 
 /**
- * Returns whether receiver has an address that can communicate with the network.
+ * Returns whether receiver has address that can communicate with the network.
  *
  * @receiver NetworkInterface to inspect
- * @return true: receiver has an address that can communicate with the network. false: otherwise
+ * @return true: receiver has address that can communicate with the network. false: otherwise
  */
 private fun NetworkInterface.isConnectedToNetwork(): Boolean =
     try {
@@ -91,10 +100,10 @@ private fun NetworkInterface.isConnectedToNetwork(): Boolean =
     }
 
 /**
- * Returns whether receiver has an IPv4 address.
+ * Returns whether receiver has IPv4 address.
  *
  * @receiver NetworkInterface to inspect
- * @return true: receiver has an IPv4 address, false: otherwise
+ * @return true: receiver has IPv4 address, false: otherwise
  */
 private fun NetworkInterface.hasInet4Address(): Boolean =
     interfaceAddresses.any { it.address.isAvailableInet4Address() }
@@ -108,10 +117,10 @@ private fun NetworkInterface.hasInet4Address(): Boolean =
 internal fun InetAddress.isAvailableInet4Address() = this is Inet4Address
 
 /**
- * Returns whether receiver has an IPv6 address.
+ * Returns whether receiver has IPv6 address.
  *
  * @receiver NetworkInterface to inspect
- * @return true: receiver has an IPv6 address false: otherwise
+ * @return true: receiver has IPv6 address false: otherwise
  */
 private fun NetworkInterface.hasInet6Address(): Boolean =
     interfaceAddresses.any { it.address.isAvailableInet6Address() }

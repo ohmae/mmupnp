@@ -170,6 +170,7 @@ object ControlPointFactory {
          * Build an instance of ControlPoint.
          *
          * @return instance of ControlPoint
+         * @throws IllegalStateException There is no interface available.
          */
         fun build(): ControlPoint = ControlPointImpl(
             protocol,
