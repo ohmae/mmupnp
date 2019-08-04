@@ -16,6 +16,7 @@ import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.parser.DeviceParser
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.TestUtils
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.experimental.runners.Enclosed
@@ -384,22 +385,6 @@ class ServiceTest {
         }
 
         @Test
-        fun createHttpClient() {
-            val service = ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-
-            val client = service.createHttpClient()
-            assertThat(client.isKeepAlive).isFalse()
-        }
-
-        @Test
         fun toDumpString() {
             ServiceImpl.Builder()
                 .setDevice(mockk(relaxed = true))
@@ -573,7 +558,8 @@ class ServiceTest {
             val client = spyk(HttpClient())
             val slot = slot<HttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            every { cds.createHttpClient() } returns client
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns client
             cds.subscribeSync()
 
             val request = slot.captured
@@ -586,6 +572,7 @@ class ServiceTest {
             val url = URL(callback.substring(1, callback.length - 2))
             assertThat(url.host).isEqualTo(INTERFACE_ADDRESS)
             assertThat(url.port).isEqualTo(EVENT_PORT)
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test
@@ -593,12 +580,14 @@ class ServiceTest {
             val client = spyk(HttpClient())
             val slot = slot<HttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            every { cds.createHttpClient() } returns client
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns client
             cds.subscribeSync(true)
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
             verify(exactly = 1) { subscribeManager.register(cds, TimeUnit.SECONDS.toMillis(300), true) }
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test
@@ -606,12 +595,14 @@ class ServiceTest {
             val client = spyk(HttpClient())
             val slot = slot<HttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            every { cds.createHttpClient() } returns client
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns client
             cds.subscribeSync()
             cds.renewSubscribeSync()
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test
@@ -619,12 +610,14 @@ class ServiceTest {
             val client = spyk(HttpClient())
             val slot = slot<HttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            every { cds.createHttpClient() } returns client
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns client
             cds.subscribeSync()
             cds.subscribeSync()
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test
@@ -632,23 +625,27 @@ class ServiceTest {
             val client = spyk(HttpClient())
             val slot = slot<HttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            every { cds.createHttpClient() } returns client
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns client
             cds.subscribeSync()
             cds.unsubscribeSync()
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
             verify(exactly = 1) { subscribeManager.unregister(cds) }
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test
         fun getSubscriptionId() {
             val client = spyk(HttpClient())
             every { client.post(any()) } returns createSubscribeResponse()
-            every { cds.createHttpClient() } returns client
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns client
             cds.subscribeSync()
 
             assertThat(cds.subscriptionId).isEqualTo(SID)
+            unmockkObject(HttpClient.Companion)
         }
 
         companion object {
@@ -730,7 +727,14 @@ class ServiceTest {
             every { service.makeAbsoluteUrl(any()) } returns URL("http://192.0.2.2/")
             every { service.callback } returns ""
             httpClient = mockk(relaxed = true)
-            every { service.createHttpClient() } returns httpClient
+
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns httpClient
+        }
+
+        @After
+        fun teardown() {
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test

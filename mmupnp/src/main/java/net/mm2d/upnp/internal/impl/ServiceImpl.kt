@@ -70,8 +70,7 @@ internal class ServiceImpl(
 
     override fun findStateVariable(name: String?): StateVariable? = stateVariableMap[name]
 
-    // VisibleForTesting
-    internal fun createHttpClient(): HttpClient = HttpClient(false)
+    private fun createHttpClient(): HttpClient = HttpClient.create(false)
 
     override fun subscribeSync(keepRenew: Boolean): Boolean {
         try {

@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.*
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.XmlUtils
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -96,14 +97,20 @@ class ActionInvokeTest {
             </s:Body>
             </s:Envelope>""".trimIndent()
         )
-        every { action.createHttpClient() } returns mockHttpClient
+        mockkObject(HttpClient.Companion)
+        every { HttpClient.create(false) } returns mockHttpClient
+    }
+
+    @After
+    fun teardown() {
+        unmockkObject(HttpClient.Companion)
     }
 
     @Test(expected = IOException::class)
     fun invokeSync_postでIOExceptionが発生() {
         val client: HttpClient = mockk(relaxed = true)
         every { client.post(any()) } throws IOException()
-        every { action.createHttpClient() } returns client
+        every { HttpClient.create(any()) } returns client
         action.invokeSync(emptyMap())
     }
 

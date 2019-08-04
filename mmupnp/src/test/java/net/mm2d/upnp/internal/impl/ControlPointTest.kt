@@ -139,13 +139,6 @@ class ControlPointTest {
         }
 
         @Test
-        fun createHttpClient() {
-            val cp = ControlPointFactory.create() as ControlPointImpl
-            val client = cp.createHttpClient()
-            assertThat(client.isKeepAlive).isTrue()
-        }
-
-        @Test
         fun needToUpdateSsdpMessage_DUAL_STACK() {
             val cp = ControlPointFactory.create(
                 protocol = Protocol.DUAL_STACK,
@@ -595,12 +588,14 @@ class ControlPointTest {
                 Thread.sleep(500L)
                 throw IOException()
             }
-            every { cp.createHttpClient() } returns client
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns client
             cp.onReceiveSsdpMessage(message)
             assertThat(loadingDeviceMap).containsKey(udn)
             Thread.sleep(1000L) // Exception発生を待つ
             assertThat(loadingDeviceMap).doesNotContainKey(udn)
             assertThat(deviceHolder.size).isEqualTo(0)
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test
@@ -635,7 +630,8 @@ class ControlPointTest {
             val address = InetAddress.getByName("192.0.2.3")
             val message = SsdpRequest.create(address, data, data.size)
             val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"
-            every { cp.createHttpClient() } returns httpClient
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns httpClient
             val iconFilter = spyk(iconFilter { listOf(it[0]) })
             cp.setIconFilter(iconFilter)
             cp.onReceiveSsdpMessage(message)
@@ -647,6 +643,7 @@ class ControlPointTest {
             assertThat(device.iconList[1].binary).isNull()
             assertThat(device.iconList[2].binary).isNull()
             assertThat(device.iconList[3].binary).isNull()
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test
@@ -744,8 +741,14 @@ class ControlPointTest {
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
             } returns TestUtils.getResourceAsString("mmupnp.xml")
-            every { cp.createHttpClient() } returns httpClient
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns httpClient
             every { httpClient.localAddress } returns InetAddress.getByName("192.0.2.3")
+        }
+
+        @After
+        fun teardown() {
+            unmockkObject(HttpClient.Companion)
         }
 
         @Test
@@ -1134,7 +1137,9 @@ class ControlPointTest {
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
             } returns TestUtils.getResourceAsString("mmupnp.xml")
-            every { cp.createHttpClient() } returns httpClient
+
+            mockkObject(HttpClient.Companion)
+            every { HttpClient.create(any()) } returns httpClient
             every { httpClient.localAddress } returns InetAddress.getByName("192.0.2.3")
             val builder = DeviceImpl.Builder(cp, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
@@ -1148,6 +1153,8 @@ class ControlPointTest {
             assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdee")).isNull()
             assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcded")).isNull()
             assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef")).isNull()
+
+            unmockkObject(HttpClient.Companion)
         }
     }
 }

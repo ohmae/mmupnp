@@ -49,8 +49,7 @@ internal class ActionImpl(
 
     override fun findArgument(name: String): Argument? = argumentMap[name]
 
-    // VisibleForTesting
-    internal fun createHttpClient(): HttpClient = HttpClient(false)
+    private fun createHttpClient(): HttpClient = HttpClient.create(false)
 
     @Throws(IOException::class)
     override fun invokeSync(

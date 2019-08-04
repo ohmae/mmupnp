@@ -254,5 +254,7 @@ class HttpClient(keepAlive: Boolean = true) {
 
     companion object {
         private const val REDIRECT_MAX = 2
+
+        internal fun create(keepAlive: Boolean = true) = HttpClient(keepAlive)
     }
 }

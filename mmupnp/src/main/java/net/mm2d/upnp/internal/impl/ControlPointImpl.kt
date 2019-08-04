@@ -76,8 +76,7 @@ internal class ControlPointImpl(
         subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, notifyEventListenerList)
     }
 
-    // VisibleForTesting
-    internal fun createHttpClient(): HttpClient = HttpClient(true)
+    private fun createHttpClient(): HttpClient = HttpClient.create(true)
 
     // VisibleForTesting
     internal fun needToUpdateSsdpMessage(oldMessage: SsdpMessage, newMessage: SsdpMessage): Boolean {

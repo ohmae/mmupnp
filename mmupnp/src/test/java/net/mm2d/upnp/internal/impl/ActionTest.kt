@@ -124,18 +124,6 @@ class ActionTest {
     }
 
     @Test
-    fun createHttpClient() {
-        val service: ServiceImpl = mockk(relaxed = true)
-        val name = "name"
-        val action = ActionImpl.Builder()
-            .setService(service)
-            .setName(name)
-            .build()
-        val client = action.createHttpClient()
-        assertThat(client.isKeepAlive).isEqualTo(false)
-    }
-
-    @Test
     fun makeAbsoluteControlUrl() {
         val device: DeviceImpl = mockk(relaxed = true)
         val service: ServiceImpl = mockk(relaxed = true)
