@@ -10,6 +10,7 @@ package net.mm2d.upnp.internal.manager
 import net.mm2d.upnp.Service
 
 class EmptySubscribeManager : SubscribeManager {
+    override fun checkEnabled() = throw IllegalStateException()
     override fun getEventPort(): Int = 0
     override fun initialize() = Unit
     override fun start() = Unit

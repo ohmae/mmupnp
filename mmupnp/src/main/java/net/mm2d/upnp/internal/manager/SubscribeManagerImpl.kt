@@ -49,6 +49,8 @@ internal class SubscribeManagerImpl(
         }
     }
 
+    override fun checkEnabled() = Unit
+
     override fun getEventPort(): Int =
         eventReceiver.getLocalPort()
 
