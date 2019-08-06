@@ -37,7 +37,7 @@ internal class ServiceImpl(
     private val actionMap: Map<String, Action>
     private val stateVariableMap = stateVariables.map { it.name to it }.toMap()
     // VisibleForTesting
-    internal val subscribeDelegate = createSubscribeDelegate(this)
+    internal val subscribeDelegate: SubscribeDelegate by lazy { createSubscribeDelegate(this) }
     override val subscriptionId: String?
         get() = subscribeDelegate.subscriptionId
 

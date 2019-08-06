@@ -706,6 +706,7 @@ class ServiceTest {
         private lateinit var device: DeviceImpl
         private lateinit var service: ServiceImpl
         private lateinit var httpClient: HttpClient
+        private lateinit var subscribeDelegate: SubscribeDelegate
 
         @Before
         fun setUp() {
@@ -726,8 +727,9 @@ class ServiceTest {
                 .setEventSubUrl("eventSubUrl")
                 .setDescription("description")
                 .build()
-            every { service.subscribeDelegate.makeAbsoluteUrl(any()) } returns URL("http://192.0.2.2/")
-            every { service.subscribeDelegate.callback } returns ""
+            subscribeDelegate = service.subscribeDelegate
+            every { subscribeDelegate.makeAbsoluteUrl(any()) } returns URL("http://192.0.2.2/")
+            every { subscribeDelegate.callback } returns ""
 
             httpClient = mockk(relaxed = true)
             mockkObject(HttpClient.Companion)
@@ -801,11 +803,11 @@ class ServiceTest {
 
             assertThat(service.subscribeSync()).isTrue()
 
-            every { service.subscribeDelegate["renewSubscribeActual"]() } returns false
+            every { subscribeDelegate["renewSubscribeActual"]() } returns false
 
             assertThat(service.subscribeSync()).isFalse()
 
-            verify(exactly = 1) { service.subscribeDelegate.renewSubscribeActual() }
+            verify(exactly = 1) { subscribeDelegate.renewSubscribeActual() }
         }
 
         @Test
@@ -818,7 +820,7 @@ class ServiceTest {
 
             assertThat(service.renewSubscribeSync()).isTrue()
 
-            verify(exactly = 1) { service.subscribeDelegate.subscribeActual(any()) }
+            verify(exactly = 1) { subscribeDelegate.subscribeActual(any()) }
         }
 
         @Test
@@ -830,10 +832,10 @@ class ServiceTest {
             every { httpClient.post(any()) } returns response
 
             assertThat(service.renewSubscribeSync()).isTrue()
-            verify(exactly = 1) { service.subscribeDelegate.subscribeActual(any()) }
+            verify(exactly = 1) { subscribeDelegate.subscribeActual(any()) }
 
             assertThat(service.renewSubscribeSync()).isTrue()
-            verify(exactly = 1) { service.subscribeDelegate.renewSubscribeActual() }
+            verify(exactly = 1) { subscribeDelegate.renewSubscribeActual() }
         }
 
         @Test
@@ -941,7 +943,7 @@ class ServiceTest {
 
         @Test
         fun subscribe() {
-            every { service.subscribeDelegate.subscribe(any()) } returns true
+            every { subscribeDelegate.subscribe(any()) } returns true
             val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
             service.subscribe(false, callback)
             Thread.sleep(200)
@@ -950,7 +952,7 @@ class ServiceTest {
 
         @Test
         fun renewSubscribe() {
-            every { service.subscribeDelegate.renewSubscribe() } returns true
+            every { subscribeDelegate.renewSubscribe() } returns true
             val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
             service.renewSubscribe(callback)
             Thread.sleep(200)
@@ -959,7 +961,7 @@ class ServiceTest {
 
         @Test
         fun unsubscribe() {
-            every { service.subscribeDelegate.unsubscribe() } returns true
+            every { subscribeDelegate.unsubscribe() } returns true
             val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
             service.unsubscribe(callback)
             Thread.sleep(200)
@@ -968,28 +970,28 @@ class ServiceTest {
 
         @Test
         fun subscribe_no_callback() {
-            every { service.subscribeDelegate.subscribe(any()) } returns true
+            every { subscribeDelegate.subscribe(any()) } returns true
             service.subscribe()
             Thread.sleep(200)
         }
 
         @Test
         fun renewSubscribe_no_callback() {
-            every { service.subscribeDelegate.renewSubscribe() } returns true
+            every { subscribeDelegate.renewSubscribe() } returns true
             service.renewSubscribe()
             Thread.sleep(200)
         }
 
         @Test
         fun unsubscribe_no_callback() {
-            every { service.subscribeDelegate.unsubscribe() } returns true
+            every { subscribeDelegate.unsubscribe() } returns true
             service.unsubscribe()
             Thread.sleep(200)
         }
 
         @Test
         fun subscribeAsync() {
-            every { service.subscribeDelegate.subscribe(any()) } returns true
+            every { subscribeDelegate.subscribe(any()) } returns true
             runBlocking {
                 assertThat(service.subscribeAsync()).isTrue()
             }
@@ -997,7 +999,7 @@ class ServiceTest {
 
         @Test
         fun renewSubscribeAsync() {
-            every { service.subscribeDelegate.renewSubscribe() } returns true
+            every { subscribeDelegate.renewSubscribe() } returns true
             runBlocking {
                 assertThat(service.renewSubscribeAsync()).isTrue()
             }
@@ -1005,7 +1007,7 @@ class ServiceTest {
 
         @Test
         fun unsubscribeAsync() {
-            every { service.subscribeDelegate.unsubscribe() } returns true
+            every { subscribeDelegate.unsubscribe() } returns true
             runBlocking {
                 assertThat(service.unsubscribeAsync()).isTrue()
             }
