@@ -8,9 +8,7 @@
 package net.mm2d.upnp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.spyk
+import io.mockk.*
 import net.mm2d.upnp.StateVariable
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -125,22 +123,24 @@ class ActionTest {
 
     @Test
     fun makeAbsoluteControlUrl() {
+        mockkObject(ActionImpl)
+        every { ActionImpl.createInvokeDelegate(any()) } answers { spyk(ActionInvokeDelegate(arg(0))) }
         val device: DeviceImpl = mockk(relaxed = true)
         val service: ServiceImpl = mockk(relaxed = true)
         every { service.device } returns device
-        val action = spyk(
-            ActionImpl.Builder()
-                .setService(service)
-                .setName("name")
-                .build()
-        )
+        val action = ActionImpl.Builder()
+            .setService(service)
+            .setName("name")
+            .build()
         every { device.baseUrl } returns "http://10.0.0.1:1000/"
         every { device.scopeId } returns 0
         every { service.controlUrl } returns "/control"
+        val invokeDelegate = action.invokeDelegate
         assertThat(
-            action.makeAbsoluteControlUrl().toString()
+            invokeDelegate.makeAbsoluteControlUrl().toString()
         ).isEqualTo(
             "http://10.0.0.1:1000/control"
         )
+        unmockkObject(ActionImpl)
     }
 }

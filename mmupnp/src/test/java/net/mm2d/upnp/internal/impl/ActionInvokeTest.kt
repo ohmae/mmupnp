@@ -31,59 +31,61 @@ class ActionInvokeTest {
     private lateinit var httpResponse: HttpResponse
     private lateinit var url: URL
     private lateinit var action: ActionImpl
+    private lateinit var invokeDelegate: ActionInvokeDelegate
     private lateinit var mockHttpClient: HttpClient
 
     @Before
     fun setUp() {
+        mockkObject(ActionImpl.Companion)
+        every { ActionImpl.createInvokeDelegate(any()) } answers { spyk(ActionInvokeDelegate(arg(0))) }
         url = URL("http://127.0.0.1:8888/test")
         val service: ServiceImpl = mockk(relaxed = true)
         every { service.serviceType } returns SERVICE_TYPE
         every { service.controlUrl } returns ""
         every { service.device.controlPoint.taskExecutors } returns TaskExecutors()
-        action = spyk(
-            ActionImpl.Builder()
-                .setService(service)
-                .setName(ACTION_NAME)
-                .addArgumentBuilder(
-                    ArgumentImpl.Builder()
-                        .setName(IN_ARG_NAME_1)
-                        .setDirection("in")
-                        .setRelatedStateVariableName("1")
-                        .setRelatedStateVariable(
-                            StateVariableImpl.Builder()
-                                .setDataType("string")
-                                .setName("1")
-                                .build()
-                        )
-                )
-                .addArgumentBuilder(
-                    ArgumentImpl.Builder()
-                        .setName(IN_ARG_NAME_2)
-                        .setDirection("in")
-                        .setRelatedStateVariableName("2")
-                        .setRelatedStateVariable(
-                            StateVariableImpl.Builder()
-                                .setDataType("string")
-                                .setName("2")
-                                .setDefaultValue(IN_ARG_DEFAULT_VALUE)
-                                .build()
-                        )
-                )
-                .addArgumentBuilder(
-                    ArgumentImpl.Builder()
-                        .setName(OUT_ARG_NAME1)
-                        .setDirection("out")
-                        .setRelatedStateVariableName("3")
-                        .setRelatedStateVariable(
-                            StateVariableImpl.Builder()
-                                .setDataType("string")
-                                .setName("3")
-                                .build()
-                        )
-                )
-                .build()
-        )
-        every { action.makeAbsoluteControlUrl() } returns url
+        action = ActionImpl.Builder()
+            .setService(service)
+            .setName(ACTION_NAME)
+            .addArgumentBuilder(
+                ArgumentImpl.Builder()
+                    .setName(IN_ARG_NAME_1)
+                    .setDirection("in")
+                    .setRelatedStateVariableName("1")
+                    .setRelatedStateVariable(
+                        StateVariableImpl.Builder()
+                            .setDataType("string")
+                            .setName("1")
+                            .build()
+                    )
+            )
+            .addArgumentBuilder(
+                ArgumentImpl.Builder()
+                    .setName(IN_ARG_NAME_2)
+                    .setDirection("in")
+                    .setRelatedStateVariableName("2")
+                    .setRelatedStateVariable(
+                        StateVariableImpl.Builder()
+                            .setDataType("string")
+                            .setName("2")
+                            .setDefaultValue(IN_ARG_DEFAULT_VALUE)
+                            .build()
+                    )
+            )
+            .addArgumentBuilder(
+                ArgumentImpl.Builder()
+                    .setName(OUT_ARG_NAME1)
+                    .setDirection("out")
+                    .setRelatedStateVariableName("3")
+                    .setRelatedStateVariable(
+                        StateVariableImpl.Builder()
+                            .setDataType("string")
+                            .setName("3")
+                            .build()
+                    )
+            )
+            .build()
+        invokeDelegate = action.invokeDelegate
+        every { invokeDelegate.makeAbsoluteControlUrl() } returns url
         mockHttpClient = spyk(HttpClient())
         httpResponse = HttpResponse.create()
         httpResponse.setStatus(Http.Status.HTTP_OK)
@@ -104,6 +106,7 @@ class ActionInvokeTest {
     @After
     fun teardown() {
         unmockkObject(HttpClient.Companion)
+        unmockkObject(ActionImpl.Companion)
     }
 
     @Test(expected = IOException::class)
@@ -515,8 +518,8 @@ class ActionInvokeTest {
 
     @Test(expected = IOException::class)
     fun makeSoap_xml作成でExceptionが発生したらIOException() {
-        every { action.formatXmlString(any()) } throws TransformerException("")
-        action.makeSoap(emptyMap(), emptyList())
+        every { invokeDelegate.formatXmlString(any()) } throws TransformerException("")
+        invokeDelegate.makeSoap(emptyMap(), emptyList())
     }
 
     @Test
