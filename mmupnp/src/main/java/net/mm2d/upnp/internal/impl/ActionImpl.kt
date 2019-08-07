@@ -38,7 +38,7 @@ internal class ActionImpl(
     override fun invokeSync(
         argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
-    ): Map<String, String> = invokeDelegate.invokeSync(argumentValues, returnErrorResponse)
+    ): Map<String, String> = invokeDelegate.invoke(argumentValues, returnErrorResponse)
 
     @Throws(IOException::class)
     override fun invokeCustomSync(
@@ -46,7 +46,7 @@ internal class ActionImpl(
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
-    ): Map<String, String> = invokeDelegate.invokeCustomSync(
+    ): Map<String, String> = invokeDelegate.invokeCustom(
         argumentValues, customNamespace, customArguments, returnErrorResponse
     )
 

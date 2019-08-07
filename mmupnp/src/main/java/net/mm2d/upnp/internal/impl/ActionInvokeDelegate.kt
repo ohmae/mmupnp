@@ -36,7 +36,7 @@ internal class ActionInvokeDelegate(
     private fun createHttpClient(): HttpClient = HttpClient.create(false)
 
     @Throws(IOException::class)
-    fun invokeSync(
+    fun invoke(
         argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
@@ -45,7 +45,7 @@ internal class ActionInvokeDelegate(
     }
 
     @Throws(IOException::class)
-    fun invokeCustomSync(
+    fun invokeCustom(
         argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
