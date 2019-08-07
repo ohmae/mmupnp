@@ -38,22 +38,14 @@ internal class ActionInvokeDelegate(
     @Throws(IOException::class)
     fun invoke(
         argumentValues: Map<String, String?>,
-        returnErrorResponse: Boolean
-    ): Map<String, String> {
-        val soap = makeSoap(emptyMap(), makeArguments(argumentValues))
-        return invoke(soap, returnErrorResponse)
-    }
-
-    @Throws(IOException::class)
-    fun invokeCustom(
-        argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
-        val arguments = makeArguments(argumentValues)
-        appendArgument(arguments, customArguments)
-        val soap = makeSoap(customNamespace, arguments)
+        val soap = makeArguments(argumentValues).let {
+            it.appendArgument(customArguments)
+            it.makeSoap(customNamespace)
+        }
         return invoke(soap, returnErrorResponse)
     }
 
@@ -85,12 +77,13 @@ internal class ActionInvokeDelegate(
     /**
      * Append custom arguments.
      *
-     * @param base append target
+     * @receiver append target
      * @param arguments custom arguments to append.
      */
-    private fun appendArgument(base: MutableList<Pair<String, String?>>, arguments: Map<String, String>) {
+    private fun MutableList<Pair<String, String?>>.appendArgument(arguments: Map<String, String>) {
+        if (arguments.isEmpty()) return
         arguments.entries.forEach {
-            base.add(it.key to it.value)
+            add(it.key to it.value)
         }
     }
 
@@ -169,44 +162,46 @@ internal class ActionInvokeDelegate(
     /**
      * Create a SOAP Action XML string.
      *
-     * @param arguments Arguments
+     * @receiver Arguments
+     * @param namespaces custom namespaces
      * @return SOAP Action XML string
      * @throws IOException if an I/O error occurs.
      */
     // VisibleForTesting
     @Throws(IOException::class)
-    internal fun makeSoap(namespaces: Map<String, String>, arguments: List<Pair<String, String?>>): String {
+    internal fun List<Pair<String, String?>>.makeSoap(namespaces: Map<String, String>): String {
         try {
             val document = XmlUtils.newDocument(true)
-            val action = makeUpToActionElement(document)
-            setNamespace(action, namespaces)
-            setArgument(document, action, arguments)
+            makeUpToActionElement(document).also {
+                it.setNamespace(namespaces)
+                it.setArgument(this)
+            }
             return formatXmlString(document)
         } catch (e: Exception) {
             throw IOException(e)
         }
     }
 
-    private fun setNamespace(action: Element, namespace: Map<String, String>) {
+    private fun Element.setNamespace(namespace: Map<String, String>) {
+        if (namespace.isEmpty()) return
         namespace.entries.forEach {
-            action.setAttributeNS(XMLNS_URI, XMLNS_PREFIX + it.key, it.value)
+            setAttributeNS(XMLNS_URI, XMLNS_PREFIX + it.key, it.value)
         }
     }
 
     /**
      * Include Action's arguments in XML
      *
-     * @param document XML Document
-     * @param action Element of action
+     * @receiver Element of action
      * @param arguments Arguments
      */
-    private fun setArgument(document: Document, action: Element, arguments: List<Pair<String, String?>>) {
+    private fun Element.setArgument(arguments: List<Pair<String, String?>>) {
         arguments.forEach { pair ->
-            document.createElement(pair.first)?.let { param ->
+            ownerDocument.createElement(pair.first)?.let { param ->
                 pair.second?.let {
                     param.textContent = it
                 }
-                action.appendChild(param)
+                appendChild(param)
             }
         }
     }

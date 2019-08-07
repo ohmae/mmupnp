@@ -519,7 +519,7 @@ class ActionInvokeTest {
     @Test(expected = IOException::class)
     fun makeSoap_xml作成でExceptionが発生したらIOException() {
         every { invokeDelegate.formatXmlString(any()) } throws TransformerException("")
-        invokeDelegate.makeSoap(emptyMap(), emptyList())
+        with(invokeDelegate){ emptyList<Pair<String, String?>>().makeSoap(emptyMap()) }
     }
 
     @Test

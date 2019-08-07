@@ -38,7 +38,7 @@ internal class ActionImpl(
     override fun invokeSync(
         argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
-    ): Map<String, String> = invokeDelegate.invoke(argumentValues, returnErrorResponse)
+    ): Map<String, String> = invokeCustomSync(argumentValues, emptyMap(), emptyMap(), returnErrorResponse)
 
     @Throws(IOException::class)
     override fun invokeCustomSync(
@@ -46,26 +46,11 @@ internal class ActionImpl(
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
-    ): Map<String, String> = invokeDelegate.invokeCustom(
+    ): Map<String, String> = invokeDelegate.invoke(
         argumentValues, customNamespace, customArguments, returnErrorResponse
     )
 
     private fun invokeInner(
-        argumentValues: Map<String, String?>,
-        returnErrorResponse: Boolean,
-        onResult: (Map<String, String>) -> Unit,
-        onError: (IOException) -> Unit
-    ) {
-        taskExecutors.io {
-            try {
-                onResult(invokeSync(argumentValues, returnErrorResponse))
-            } catch (e: IOException) {
-                onError(e)
-            }
-        }
-    }
-
-    private fun invokeCustomInner(
         argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
@@ -87,15 +72,7 @@ internal class ActionImpl(
         returnErrorResponse: Boolean,
         onResult: ((Map<String, String>) -> Unit)?,
         onError: ((IOException) -> Unit)?
-    ) {
-        invokeInner(argumentValues, returnErrorResponse, {
-            onResult ?: return@invokeInner
-            taskExecutors.callback { onResult(it) }
-        }, {
-            onError ?: return@invokeInner
-            taskExecutors.callback { onError(it) }
-        })
-    }
+    ) = invokeCustom(argumentValues, emptyMap(), emptyMap(), returnErrorResponse, onResult, onError)
 
     override fun invokeCustom(
         argumentValues: Map<String, String?>,
@@ -104,39 +81,30 @@ internal class ActionImpl(
         returnErrorResponse: Boolean,
         onResult: ((Map<String, String>) -> Unit)?,
         onError: ((IOException) -> Unit)?
-    ) {
-        invokeCustomInner(argumentValues, customNamespace, customArguments, returnErrorResponse, {
-            onResult ?: return@invokeCustomInner
-            taskExecutors.callback { onResult(it) }
-        }, {
-            onError ?: return@invokeCustomInner
-            taskExecutors.callback { onError(it) }
-        })
-    }
+    ) = invokeInner(argumentValues, customNamespace, customArguments, returnErrorResponse, {
+        onResult ?: return@invokeInner
+        taskExecutors.callback { onResult(it) }
+    }, {
+        onError ?: return@invokeInner
+        taskExecutors.callback { onError(it) }
+    })
 
     override suspend fun invokeAsync(
         argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
-    ): Map<String, String> =
-        suspendCoroutine { continuation ->
-            invokeInner(argumentValues, returnErrorResponse,
-                { continuation.resume(it) },
-                { continuation.resumeWithException(it) }
-            )
-        }
+    ): Map<String, String> = invokeCustomAsync(argumentValues, emptyMap(), emptyMap(), returnErrorResponse)
 
     override suspend fun invokeCustomAsync(
         argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
-    ): Map<String, String> =
-        suspendCoroutine { continuation ->
-            invokeCustomInner(argumentValues, customNamespace, customArguments, returnErrorResponse,
-                { continuation.resume(it) },
-                { continuation.resumeWithException(it) }
-            )
-        }
+    ): Map<String, String> = suspendCoroutine { continuation ->
+        invokeInner(argumentValues, customNamespace, customArguments, returnErrorResponse,
+            { continuation.resume(it) },
+            { continuation.resumeWithException(it) }
+        )
+    }
 
     class Builder {
         private var service: ServiceImpl? = null
