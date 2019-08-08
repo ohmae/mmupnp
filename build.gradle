@@ -1,7 +1,7 @@
 buildscript {
     def versionMajor = 3
     def versionMinor = 0
-    def versionPatch = 4
+    def versionPatch = 5
     ext {
         kotlin_version = "1.3.41"
         pj = [
