@@ -9,11 +9,11 @@
 <br/>
 <h1>setSsdpMessageFilter</h1>
 <a name="net.mm2d.upnp.empty.EmptyControlPoint$setSsdpMessageFilter(kotlin.Function1((net.mm2d.upnp.SsdpMessage, kotlin.Boolean)))"></a>
-<code><span class="keyword">fun </span><span class="identifier">setSsdpMessageFilter</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyControlPoint$setSsdpMessageFilter(kotlin.Function1((net.mm2d.upnp.SsdpMessage, kotlin.Boolean)))/filter">filter</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="../../net.mm2d.upnp/-ssdp-message/index.html"><span class="identifier">SsdpMessage</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<code><span class="keyword">fun </span><span class="identifier">setSsdpMessageFilter</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.empty.EmptyControlPoint$setSsdpMessageFilter(kotlin.Function1((net.mm2d.upnp.SsdpMessage, kotlin.Boolean)))/predicate">predicate</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="../../net.mm2d.upnp/-ssdp-message/index.html"><span class="identifier">SsdpMessage</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Overrides <a href="../../net.mm2d.upnp/-control-point/set-ssdp-message-filter.html">ControlPoint.setSsdpMessageFilter</a></p>
-<p>Set the method to judge whether to accept SsdpMessage.</p>
+<p>Set a filter to judge whether to accept or ignore SsdpMessage.</p>
 <h3>Parameters</h3>
-<p><a name="filter"></a>
-<code>filter</code> - Judgment method, if null, accept all.</p>
+<p><a name="predicate"></a>
+<code>predicate</code> - filter: return true to accept, false to ignore. if null, accept all.</p>
 </BODY>
 </HTML>
