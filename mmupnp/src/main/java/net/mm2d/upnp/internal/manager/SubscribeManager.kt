@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.manager
 
 import net.mm2d.upnp.Service
 
-interface SubscribeManager {
+internal interface SubscribeManager {
     fun checkEnabled()
     fun getEventPort(): Int
     fun initialize()
