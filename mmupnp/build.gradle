@@ -109,20 +109,20 @@ publishing {
     }
 }
 
-def appendLicense(parentNode, name, url, distribution) {
+static def appendLicense(parentNode, name, url, distribution) {
     def node = parentNode.appendNode("license")
     node.appendNode("name", name)
     node.appendNode("url", url)
     node.appendNode("distribution", distribution)
 }
 
-def appendScm(parentNode, connection, url) {
+static def appendScm(parentNode, connection, url) {
     def node = parentNode.appendNode("scm")
     node.appendNode("connection", connection)
     node.appendNode("url", url)
 }
 
-def appendDependency(parentNode, groupId, artifactId, version, scope) {
+static def appendDependency(parentNode, groupId, artifactId, version, scope) {
     def node = parentNode.appendNode("dependency")
     node.appendNode("groupId", groupId)
     node.appendNode("artifactId", artifactId)
