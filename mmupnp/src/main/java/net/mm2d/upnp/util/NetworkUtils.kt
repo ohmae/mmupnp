@@ -134,6 +134,30 @@ private fun NetworkInterface.hasInet6Address(): Boolean =
 internal fun InetAddress.isAvailableInet6Address() = this is Inet6Address && this.isLinkLocalAddress
 
 /**
+ * Extract IPv4 address from assigned to the interface.
+ *
+ * @receiver NetworkInterface
+ * @return InterfaceAddress
+ * @throws IllegalArgumentException receiver does not have IPv4 address
+ */
+// VisibleForTesting
+internal fun NetworkInterface.findInet4Address(): InterfaceAddress =
+    interfaceAddresses.find { it.address.isAvailableInet4Address() }
+        ?: throw IllegalArgumentException("$this does not have IPv4 address.")
+
+/**
+ * Extract IPv6 address from assigned to the interface
+ *
+ * @receiver NetworkInterface
+ * @return InterfaceAddress
+ * @throws IllegalArgumentException receiver does not have IPv6 address
+ */
+// VisibleForTesting
+internal fun NetworkInterface.findInet6Address(): InterfaceAddress =
+    interfaceAddresses.find { it.address.isAvailableInet6Address() }
+        ?: throw IllegalArgumentException("$this does not have IPv6 address.")
+
+/**
  * Returns a combined string of address and port number.
  *
  * @receiver Address to convert

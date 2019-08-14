@@ -19,14 +19,17 @@ import net.mm2d.upnp.internal.message.SsdpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.NetworkUtils
 import net.mm2d.upnp.util.TestUtils
-import net.mm2d.upnp.util.createInterfaceAddress
+import net.mm2d.upnp.util.findInet4Address
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.IOException
-import java.net.*
+import java.net.DatagramPacket
+import java.net.InetAddress
+import java.net.MulticastSocket
+import java.net.SocketTimeoutException
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
@@ -60,81 +63,12 @@ class SsdpServerDelegateTest {
         server.stop()
     }
 
-    @Test
-    fun findInet4Address() {
-        val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
-        val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
-        val ni: NetworkInterface = mockk()
-        every { ni.interfaceAddresses } returns listOf(ipv4, ipv6)
-        with(SsdpServerDelegate) {
-            assertThat(ni.findInet4Address()).isEqualTo(ipv4)
-        }
-        every { ni.interfaceAddresses } returns listOf(ipv6, ipv4)
-        with(SsdpServerDelegate) {
-            assertThat(ni.findInet4Address()).isEqualTo(ipv4)
-        }
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun findInet4Address_見つからなければException1() {
-        val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
-        val ni: NetworkInterface = mockk()
-        every { ni.interfaceAddresses } returns listOf(ipv6, ipv6)
-        with(SsdpServerDelegate) {
-            ni.findInet4Address()
-        }
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun findInet4Address_見つからなければException2() {
-        val ni: NetworkInterface = mockk()
-        every { ni.interfaceAddresses } returns emptyList()
-        with(SsdpServerDelegate) {
-            ni.findInet4Address()
-        }
-    }
-
-    @Test
-    fun findInet6Address() {
-        val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
-        val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
-        val ni: NetworkInterface = mockk()
-        every { ni.interfaceAddresses } returns listOf(ipv4, ipv6)
-        with(SsdpServerDelegate) {
-            assertThat(ni.findInet6Address()).isEqualTo(ipv6)
-        }
-        every { ni.interfaceAddresses } returns listOf(ipv6, ipv4)
-        with(SsdpServerDelegate) {
-            assertThat(ni.findInet6Address()).isEqualTo(ipv6)
-        }
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun findInet6Address_見つからなければException1() {
-        val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
-        val ni: NetworkInterface = mockk()
-        every { ni.interfaceAddresses } returns listOf(ipv4)
-        with(SsdpServerDelegate) {
-            ni.findInet6Address()
-        }
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun findInet6Address_見つからなければException2() {
-        val ni: NetworkInterface = mockk()
-        every { ni.interfaceAddresses } returns emptyList()
-        with(SsdpServerDelegate) {
-            ni.findInet6Address()
-        }
-    }
 
     @Test
     fun getInterfaceAddress() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
-        with(SsdpServerDelegate) {
-            assertThat(server.interfaceAddress).isEqualTo(networkInterface.findInet4Address())
-        }
+        assertThat(server.interfaceAddress).isEqualTo(networkInterface.findInet4Address())
     }
 
     @Test
@@ -203,8 +137,8 @@ class SsdpServerDelegateTest {
 
         verify(exactly = 1) { socket.send(any()) }
 
-        val packet = socket.sendPacket
-        assertThat(packet!!.address).isEqualTo(server.getSsdpInetAddress())
+        val packet = socket.sendPacket!!
+        assertThat(packet.address).isEqualTo(server.getSsdpInetAddress())
         assertThat(packet.port).isEqualTo(SsdpServer.SSDP_PORT)
         assertThat(String(packet.data)).isEqualTo(message.message.getMessageString())
     }

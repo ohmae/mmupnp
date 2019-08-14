@@ -12,8 +12,8 @@ import net.mm2d.upnp.Http
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.util.closeQuietly
-import net.mm2d.upnp.util.isAvailableInet4Address
-import net.mm2d.upnp.util.isAvailableInet6Address
+import net.mm2d.upnp.util.findInet4Address
+import net.mm2d.upnp.util.findInet6Address
 import net.mm2d.upnp.util.toSimpleString
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -33,14 +33,17 @@ import kotlin.concurrent.withLock
  * @param networkInterface network interface
  * @param bindPort port number
  */
-internal class SsdpServerDelegate
-@JvmOverloads constructor(
+internal class SsdpServerDelegate(
     private val taskExecutors: TaskExecutors,
     val address: Address,
     private val networkInterface: NetworkInterface,
     private val bindPort: Int = 0
 ) : SsdpServer, Runnable {
-    val interfaceAddress: InterfaceAddress
+    val interfaceAddress: InterfaceAddress =
+        if (address == Address.IP_V4)
+            networkInterface.findInet4Address()
+        else
+            networkInterface.findInet6Address()
     private var socket: MulticastSocket? = null
     private var receiver: ((sourceAddress: InetAddress, data: ByteArray, length: Int) -> Unit)? = null
 
@@ -48,13 +51,6 @@ internal class SsdpServerDelegate
     private val lock = ReentrantLock()
     private val condition = lock.newCondition()
     private var ready = false
-
-    init {
-        interfaceAddress = if (address == Address.IP_V4)
-            networkInterface.findInet4Address()
-        else
-            networkInterface.findInet6Address()
-    }
 
     fun setReceiver(receiver: ((sourceAddress: InetAddress, data: ByteArray, length: Int) -> Unit)?) {
         this.receiver = receiver
@@ -140,7 +136,7 @@ internal class SsdpServerDelegate
 
     override fun run() {
         val suffix = (if (bindPort == 0) "-ssdp-notify-" else "-ssdp-search-") +
-                networkInterface.name + "-" + interfaceAddress.address.toSimpleString()
+            networkInterface.name + "-" + interfaceAddress.address.toSimpleString()
         Thread.currentThread().let {
             it.name = it.name + suffix
         }
@@ -184,16 +180,6 @@ internal class SsdpServerDelegate
 
     companion object {
         private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(3)
-
-        // VisibleForTesting
-        internal fun NetworkInterface.findInet4Address(): InterfaceAddress =
-            interfaceAddresses.find { it.address.isAvailableInet4Address() }
-                ?: throw IllegalArgumentException("$this does not have IPv4 address.")
-
-        // VisibleForTesting
-        internal fun NetworkInterface.findInet6Address(): InterfaceAddress =
-            interfaceAddresses.find { it.address.isAvailableInet6Address() }
-                ?: throw IllegalArgumentException("$this does not have IPv6 address.")
     }
 }
 

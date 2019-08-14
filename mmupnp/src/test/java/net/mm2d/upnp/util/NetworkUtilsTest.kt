@@ -54,6 +54,58 @@ class NetworkUtilsTest {
                 assertThat(nif.interfaceAddresses.any { it.address is Inet6Address }).isTrue()
             }
         }
+
+        @Test
+        fun findInet4Address() {
+            val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
+            val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
+            val ni: NetworkInterface = mockk()
+            every { ni.interfaceAddresses } returns listOf(ipv4, ipv6)
+            assertThat(ni.findInet4Address()).isEqualTo(ipv4)
+            every { ni.interfaceAddresses } returns listOf(ipv6, ipv4)
+            assertThat(ni.findInet4Address()).isEqualTo(ipv4)
+        }
+
+        @Test(expected = IllegalArgumentException::class)
+        fun findInet4Address_見つからなければException1() {
+            val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
+            val ni: NetworkInterface = mockk()
+            every { ni.interfaceAddresses } returns listOf(ipv6, ipv6)
+            ni.findInet4Address()
+        }
+
+        @Test(expected = IllegalArgumentException::class)
+        fun findInet4Address_見つからなければException2() {
+            val ni: NetworkInterface = mockk()
+            every { ni.interfaceAddresses } returns emptyList()
+            ni.findInet4Address()
+        }
+
+        @Test
+        fun findInet6Address() {
+            val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
+            val ipv6 = createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
+            val ni: NetworkInterface = mockk()
+            every { ni.interfaceAddresses } returns listOf(ipv4, ipv6)
+            assertThat(ni.findInet6Address()).isEqualTo(ipv6)
+            every { ni.interfaceAddresses } returns listOf(ipv6, ipv4)
+            assertThat(ni.findInet6Address()).isEqualTo(ipv6)
+        }
+
+        @Test(expected = IllegalArgumentException::class)
+        fun findInet6Address_見つからなければException1() {
+            val ipv4 = createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
+            val ni: NetworkInterface = mockk()
+            every { ni.interfaceAddresses } returns listOf(ipv4)
+            ni.findInet6Address()
+        }
+
+        @Test(expected = IllegalArgumentException::class)
+        fun findInet6Address_見つからなければException2() {
+            val ni: NetworkInterface = mockk()
+            every { ni.interfaceAddresses } returns emptyList()
+            ni.findInet6Address()
+        }
     }
 
     @RunWith(JUnit4::class)
