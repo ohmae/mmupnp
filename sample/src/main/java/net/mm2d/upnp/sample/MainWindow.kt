@@ -133,7 +133,7 @@ class MainWindow private constructor() : JFrame() {
         it.addActionListener { controlPoint.search() }
     }
 
-    private fun makeDumpButton(): JButton = JButton("DMS/DMR Dump").also {
+    private fun makeDumpButton(): JButton = JButton("Device Dump").also {
         it.addActionListener { dump() }
     }
 
@@ -180,7 +180,6 @@ class MainWindow private constructor() : JFrame() {
     private fun dump() {
         val dir = selectSaveDirectory() ?: return
         val json = controlPoint.deviceList
-            .filter { it.deviceType.startsWith(DMS_PREFIX) || it.deviceType.startsWith(DMR_PREFIX) }
             .map { Server(it.location, it.friendlyName) }
             .let { Gson().toJson(it) }
         FileOutputStream(File(dir, "locations.json")).use {
