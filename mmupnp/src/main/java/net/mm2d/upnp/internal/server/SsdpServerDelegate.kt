@@ -56,9 +56,9 @@ internal class SsdpServerDelegate(
         this.receiver = receiver
     }
 
-    fun getSsdpInetAddress(): InetAddress = address.inetAddress
+    fun getSsdpInetAddress(): InetAddress = address.ssdpInetAddress
 
-    fun getSsdpAddressString(): String = address.addressString
+    fun getSsdpAddressString(): String = address.ssdpAddressString
 
     fun getLocalAddress(): InetAddress = interfaceAddress.address
 
@@ -106,7 +106,7 @@ internal class SsdpServerDelegate(
             val data = ByteArrayOutputStream().also {
                 message.writeData(it)
             }.toByteArray()
-            socket.send(DatagramPacket(data, data.size, address.socketAddress))
+            socket.send(DatagramPacket(data, data.size, address.ssdpSocketAddress))
         } catch (e: IOException) {
             Logger.w(e)
         }

@@ -33,7 +33,7 @@ internal class SsdpNotifyReceiver(
         taskExecutors: TaskExecutors,
         address: Address,
         ni: NetworkInterface
-    ) : this(SsdpServerDelegate(taskExecutors, address, ni, SsdpServer.SSDP_PORT)) {
+    ) : this(SsdpServerDelegate(taskExecutors, address, ni, ServerConst.SSDP_PORT)) {
         delegate.setReceiver { sourceAddress, data, length ->
             onReceive(sourceAddress, data, length)
         }

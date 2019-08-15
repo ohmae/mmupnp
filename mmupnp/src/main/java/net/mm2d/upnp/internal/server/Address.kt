@@ -14,17 +14,20 @@ import java.net.InetSocketAddress
 /**
  * Multicast address
  */
-internal enum class Address(address: String) {
+internal enum class Address(
+    ssdpAddress: String
+) {
     /**
      * Multicast address for IPv4
      */
-    IP_V4("239.255.255.250"),
+    IP_V4(ServerConst.SSDP_ADDRESS_V4),
     /**
      * Multicast address for IPv6 (link local)
      */
-    IP_V6("FF02::C");
+    IP_V6(ServerConst.SSDP_ADDRESS_V6),
+    ;
 
-    val inetAddress: InetAddress = InetAddress.getByName(address)
-    val socketAddress: InetSocketAddress = InetSocketAddress(inetAddress, SsdpServer.SSDP_PORT)
-    val addressString: String = socketAddress.toAddressString()
+    val ssdpInetAddress: InetAddress = InetAddress.getByName(ssdpAddress)
+    val ssdpSocketAddress: InetSocketAddress = InetSocketAddress(ssdpInetAddress, ServerConst.SSDP_PORT)
+    val ssdpAddressString: String = ssdpSocketAddress.toAddressString()
 }

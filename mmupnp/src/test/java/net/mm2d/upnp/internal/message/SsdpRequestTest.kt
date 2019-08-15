@@ -40,7 +40,7 @@ internal object SsdpRequestTest {
             val message = SsdpRequest.create()
             message.setMethod(SsdpMessage.M_SEARCH)
             message.setUri("*")
-            message.setHeader(Http.HOST, Address.IP_V4.addressString)
+            message.setHeader(Http.HOST, Address.IP_V4.ssdpAddressString)
             message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER)
             message.setHeader(Http.MX, "1")
             message.setHeader(Http.ST, SsdpSearchServer.ST_ROOTDEVICE)
@@ -114,7 +114,7 @@ internal object SsdpRequestTest {
 
         @Theory
         fun getHeader_HOST_SSDPのアドレスであること(message: SsdpRequest) {
-            assertThat(message.getHeader(Http.HOST)).isEqualTo(Address.IP_V4.addressString)
+            assertThat(message.getHeader(Http.HOST)).isEqualTo(Address.IP_V4.ssdpAddressString)
         }
 
         companion object {

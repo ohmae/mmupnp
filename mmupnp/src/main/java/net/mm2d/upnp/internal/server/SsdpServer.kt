@@ -33,11 +33,4 @@ internal interface SsdpServer {
      * @param messageSupplier Lambda to create a message to send
      */
     fun send(messageSupplier: () -> SsdpMessage)
-
-    companion object {
-        /**
-         * Port number used for SSDP.
-         */
-        const val SSDP_PORT = 1900
-    }
 }

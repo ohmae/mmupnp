@@ -139,7 +139,7 @@ class SsdpServerDelegateTest {
 
         val packet = socket.sendPacket!!
         assertThat(packet.address).isEqualTo(server.getSsdpInetAddress())
-        assertThat(packet.port).isEqualTo(SsdpServer.SSDP_PORT)
+        assertThat(packet.port).isEqualTo(ServerConst.SSDP_PORT)
         assertThat(String(packet.data)).isEqualTo(message.message.getMessageString())
     }
 
