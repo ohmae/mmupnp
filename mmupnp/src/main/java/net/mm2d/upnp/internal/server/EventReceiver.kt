@@ -12,10 +12,9 @@ import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpRequest
 import net.mm2d.upnp.HttpResponse
 import net.mm2d.upnp.Property
+import net.mm2d.upnp.internal.parser.parseEventXml
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.util.closeQuietly
-import net.mm2d.upnp.util.XmlUtils
-import net.mm2d.upnp.util.siblingElements
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -127,11 +126,11 @@ internal class EventReceiver(
     // VisibleForTesting
     internal fun notifyEvent(sid: String, request: HttpRequest): Boolean {
         val listener = listener ?: return false
-        val list = parsePropertyPairs(request)
+        val list = request.getBody().parseEventXml()
         if (list.isEmpty()) {
             return false
         }
-        val seq = request.getHeader(Http.SEQ)?.toLongOrNull() ?: 0
+        val seq = request.getHeader(Http.SEQ)?.toLongOrNull() ?: return false
         return listener(sid, seq, list)
     }
 
@@ -217,32 +216,5 @@ internal class EventReceiver(
 
     companion object {
         private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(1)
-
-        internal fun parsePropertyPairs(request: HttpRequest): List<Pair<String, String>> {
-            val xml = request.getBody()
-            if (xml.isNullOrEmpty()) {
-                return emptyList()
-            }
-            try {
-                val propertySetNode = XmlUtils.newDocument(true, xml).documentElement
-                if (propertySetNode.localName != "propertyset") {
-                    return emptyList()
-                }
-                val list = mutableListOf<Pair<String, String>>()
-                val firstChild = propertySetNode.firstChild ?: return list
-                firstChild.siblingElements()
-                    .filter { it.localName == "property" }
-                    .flatMap { it.firstChild?.siblingElements() ?: emptyList() }
-                    .forEach {
-                        val name = it.localName
-                        if (!name.isNullOrEmpty()) {
-                            list.add(name to it.textContent)
-                        }
-                    }
-                return list
-            } catch (ignored: Exception) {
-            }
-            return emptyList()
-        }
     }
 }
