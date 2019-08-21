@@ -94,7 +94,7 @@ class EventReceiverTest {
 
     @Test
     fun getLocalPort_開始前は0() {
-        val receiver = EventReceiver(mockk(), null)
+        val receiver = EventReceiver(mockk(relaxed = true), null)
         assertThat(receiver.getLocalPort()).isEqualTo(0)
     }
 

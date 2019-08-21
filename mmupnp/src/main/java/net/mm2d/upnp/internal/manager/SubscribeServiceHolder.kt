@@ -136,7 +136,6 @@ internal class SubscribeServiceHolder(
     private fun removeExpiredService(): Unit = lock.withLock {
         val now = System.currentTimeMillis()
         subscriptionMap.values
-            .toList()
             .filter { it.isExpired(now) }
             .map { it.service }
             .forEach {

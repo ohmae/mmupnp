@@ -73,6 +73,10 @@ object Http {
     const val ACCEPTED_STATEVAR = "ACCEPTED-STATEVAR"
     /** Used in SUBSCRIBE/response. duration until subscription expires. */
     const val TIMEOUT = "TIMEOUT"
+    /** ServiceID from the SCPD */
+    const val SVCID = "SVCID"
+    /** event importance */
+    const val LVL = "LVL"
     /** Date */
     const val DATE = "DATE"
     /** Required for backwards compatibility with UPnP 1.0. (Header field name only; no field value.) */

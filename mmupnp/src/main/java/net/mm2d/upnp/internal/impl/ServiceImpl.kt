@@ -267,11 +267,11 @@ internal class ServiceImpl(
         }
 
         fun toDumpString(): String = "ServiceBuilder:\n" +
-                "serviceType:$serviceType\n" +
-                "serviceId:$serviceId\n" +
-                "SCPDURL:$scpdUrl\n" +
-                "eventSubURL:$eventSubUrl\n" +
-                "controlURL:$controlUrl\n" +
-                "DESCRIPTION:$description"
+            "serviceType:$serviceType\n" +
+            "serviceId:$serviceId\n" +
+            "SCPDURL:$scpdUrl\n" +
+            "eventSubURL:$eventSubUrl\n" +
+            "controlURL:$controlUrl\n" +
+            "DESCRIPTION:$description"
     }
 }

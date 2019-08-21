@@ -38,6 +38,7 @@ internal class DeviceHolder(
         get() = lock.withLock {
             deviceMap.values.toList()
         }
+
     val size: Int
         get() = lock.withLock {
             deviceMap.size
@@ -118,14 +119,11 @@ internal class DeviceHolder(
         if (deviceMap.isEmpty()) {
             return
         }
-        val sleep = maxOf(
-            findMostRecentExpireTime() - System.currentTimeMillis() + MARGIN_TIME,
-            MARGIN_TIME
-        ) // avoid negative value
+        val mostRecentExpireTime = deviceMap.values.map { it.expireTime }.min() ?: 0L
+        val duration = mostRecentExpireTime - System.currentTimeMillis() + MARGIN_TIME
+        val sleep = maxOf(duration, MARGIN_TIME) // avoid negative value
         condition.await(sleep, TimeUnit.MILLISECONDS)
     }
-
-    private fun findMostRecentExpireTime(): Long = deviceMap.values.map { it.expireTime }.min() ?: 0L
 
     companion object {
         private val MARGIN_TIME = TimeUnit.SECONDS.toMillis(10)
