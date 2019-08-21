@@ -1,4 +1,6 @@
 apipa
+bais
+baos
 bootid
 byebye
 configid
@@ -10,7 +12,10 @@ evented
 faultcode
 faultstring
 ffff
+fuga
 hdlnk
+hoge
+hogehoge
 ietf
 inet
 jlabs
@@ -30,6 +35,7 @@ skyperfectv
 soapaction
 ssdp
 statevar
+svcid
 tada
 upnp
 mmupnp

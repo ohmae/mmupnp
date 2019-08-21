@@ -25,7 +25,7 @@ import kotlin.concurrent.withLock
  * @param expireListener Listener to receive expired notifications
  */
 internal class DeviceHolder(
-    private val taskExecutors: TaskExecutors,
+    taskExecutors: TaskExecutors,
     private val expireListener: (Device) -> Unit
 ) : Runnable {
     private val threadCondition = ThreadCondition(taskExecutors.manager)
