@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.manager
 
 import net.mm2d.upnp.Device
 import net.mm2d.upnp.internal.thread.TaskExecutors
-import java.util.concurrent.FutureTask
+import net.mm2d.upnp.internal.thread.ThreadCondition
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -28,8 +28,7 @@ internal class DeviceHolder(
     private val taskExecutors: TaskExecutors,
     private val expireListener: (Device) -> Unit
 ) : Runnable {
-    private var futureTask: FutureTask<*>? = null
-    private val threadLock = ReentrantLock()
+    private val threadCondition = ThreadCondition(taskExecutors.manager)
     private val lock = ReentrantLock()
     private val condition = lock.newCondition()
     private val deviceMap = mutableMapOf<String, Device>()
@@ -45,22 +44,12 @@ internal class DeviceHolder(
         }
 
     fun start() {
-        threadLock.withLock {
-            FutureTask(this, null).also {
-                futureTask = it
-                taskExecutors.manager(it)
-            }
-        }
+        threadCondition.start(this)
     }
 
     fun stop() {
-        threadLock.withLock {
-            futureTask?.cancel(false)
-            futureTask = null
-        }
+        threadCondition.stop()
     }
-
-    private fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
 
     fun add(device: Device) {
         lock.withLock {
@@ -91,7 +80,7 @@ internal class DeviceHolder(
         }
         lock.withLock {
             try {
-                while (!isCanceled()) {
+                while (!threadCondition.isCanceled()) {
                     while (deviceMap.isEmpty()) {
                         condition.await()
                     }
@@ -106,7 +95,6 @@ internal class DeviceHolder(
     private fun expireDevice() {
         val now = System.currentTimeMillis()
         deviceMap.values
-            .toList()
             .filter { it.expireTime < now }
             .forEach {
                 deviceMap.remove(it.udn)

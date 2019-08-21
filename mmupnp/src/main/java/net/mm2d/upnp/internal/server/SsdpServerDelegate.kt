@@ -11,6 +11,7 @@ import net.mm2d.log.Logger
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.thread.TaskExecutors
+import net.mm2d.upnp.internal.thread.ThreadCondition
 import net.mm2d.upnp.internal.util.closeQuietly
 import net.mm2d.upnp.util.findInet4Address
 import net.mm2d.upnp.util.findInet6Address
@@ -18,10 +19,6 @@ import net.mm2d.upnp.util.toSimpleString
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.*
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 /**
  * A class that implements the common part of [SsdpServer].
@@ -46,11 +43,7 @@ internal class SsdpServerDelegate(
             networkInterface.findInet6Address()
     private var socket: MulticastSocket? = null
     private var receiver: ((sourceAddress: InetAddress, data: ByteArray, length: Int) -> Unit)? = null
-
-    private var futureTask: FutureTask<*>? = null
-    private val lock = ReentrantLock()
-    private val condition = lock.newCondition()
-    private var ready = false
+    private val threadCondition = ThreadCondition(taskExecutors.server)
 
     fun setReceiver(receiver: ((sourceAddress: InetAddress, data: ByteArray, length: Int) -> Unit)?) {
         this.receiver = receiver
@@ -73,22 +66,12 @@ internal class SsdpServerDelegate(
 
     override fun start() {
         receiver ?: throw IllegalStateException("receiver must be set")
-        futureTask ?: stop()
-        lock.withLock {
-            ready = false
-            FutureTask(this, null).also {
-                futureTask = it
-                taskExecutors.server(it)
-            }
-        }
+        threadCondition.start(this)
     }
 
     override fun stop() {
-        lock.withLock {
-            futureTask?.cancel(false)
-            futureTask = null
-            socket.closeQuietly()
-        }
+        threadCondition.stop()
+        socket.closeQuietly()
     }
 
     override fun send(messageSupplier: () -> SsdpMessage) {
@@ -96,7 +79,7 @@ internal class SsdpServerDelegate(
     }
 
     private fun sendInner(message: SsdpMessage) {
-        if (!waitReady()) {
+        if (!threadCondition.waitReady()) {
             Logger.w("socket is not ready")
             return
         }
@@ -112,35 +95,13 @@ internal class SsdpServerDelegate(
         }
     }
 
-    private fun waitReady(): Boolean = lock.withLock {
-        val task = futureTask ?: return false
-        if (task.isDone) return false
-        if (!ready) {
-            try {
-                condition.awaitNanos(PREPARE_TIMEOUT_NANOS)
-            } catch (ignored: InterruptedException) {
-            }
-        }
-        ready
-    }
-
-    private fun notifyReady() {
-        lock.withLock {
-            ready = true
-            condition.signalAll()
-        }
-    }
-
-    // VisibleForTesting
-    internal fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
-
     override fun run() {
         val suffix = (if (bindPort == 0) "-ssdp-notify-" else "-ssdp-search-") +
             networkInterface.name + "-" + interfaceAddress.address.toSimpleString()
         Thread.currentThread().let {
             it.name = it.name + suffix
         }
-        if (isCanceled()) {
+        if (threadCondition.isCanceled()) {
             return
         }
         try {
@@ -149,7 +110,7 @@ internal class SsdpServerDelegate(
             if (bindPort != 0) {
                 socket.joinGroup(getSsdpInetAddress())
             }
-            notifyReady()
+            threadCondition.notifyReady()
             receiveLoop(socket)
         } catch (ignored: IOException) {
         } finally {
@@ -165,21 +126,17 @@ internal class SsdpServerDelegate(
     @Throws(IOException::class)
     internal fun receiveLoop(socket: MulticastSocket) {
         val buf = ByteArray(1500)
-        while (!isCanceled()) {
+        while (!threadCondition.isCanceled()) {
             try {
                 val dp = DatagramPacket(buf, buf.size)
                 socket.receive(dp)
-                if (isCanceled()) {
+                if (threadCondition.isCanceled()) {
                     break
                 }
                 receiver?.invoke(dp.address, dp.data, dp.length)
             } catch (ignored: SocketTimeoutException) {
             }
         }
-    }
-
-    companion object {
-        private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(3)
     }
 }
 

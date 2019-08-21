@@ -74,7 +74,7 @@ class EventReceiverTest {
 
     @Test(timeout = 10000L)
     fun close_open前なら即終了() {
-        val receiver = EventReceiver(mockk(), null)
+        val receiver = EventReceiver(mockk(relaxed = true), null)
         receiver.stop()
     }
 
@@ -332,7 +332,7 @@ class EventReceiverTest {
         every { socket.getInputStream() } returns mockk(relaxed = true)
         every { socket.getOutputStream() } returns mockk(relaxed = true)
         val receiver = spyk(EventReceiver(taskExecutors, null))
-        val clientTask = spyk(ClientTask(receiver, socket))
+        val clientTask = spyk(ClientTask(taskExecutors, receiver, socket))
         every { clientTask.receiveAndReply(any(), any()) } throws IOException()
 
         clientTask.run()

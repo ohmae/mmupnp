@@ -14,6 +14,7 @@ import net.mm2d.upnp.HttpResponse
 import net.mm2d.upnp.Property
 import net.mm2d.upnp.internal.parser.parseEventXml
 import net.mm2d.upnp.internal.thread.TaskExecutors
+import net.mm2d.upnp.internal.thread.ThreadCondition
 import net.mm2d.upnp.internal.util.closeQuietly
 import java.io.IOException
 import java.io.InputStream
@@ -21,10 +22,6 @@ import java.io.OutputStream
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 /**
  * Class to receive Event notified by event subscription.
@@ -40,24 +37,12 @@ internal class EventReceiver(
 ) : Runnable {
     private var serverSocket: ServerSocket? = null
     private val clientList: MutableList<ClientTask> = Collections.synchronizedList(LinkedList())
-    private var futureTask: FutureTask<*>? = null
-    private val lock = ReentrantLock()
-    private val condition = lock.newCondition()
-    private var ready = false
+    private val threadCondition = ThreadCondition(taskExecutors.server)
 
-    fun start() {
-        lock.withLock {
-            ready = false
-        }
-        FutureTask(this, null).also {
-            futureTask = it
-            taskExecutors.server(it)
-        }
-    }
+    fun start(): Unit = threadCondition.start(this)
 
     fun stop() {
-        futureTask?.cancel(false)
-        futureTask = null
+        threadCondition.stop()
         serverSocket.closeQuietly()
         synchronized(clientList) {
             clientList.forEach { it.stop() }
@@ -70,30 +55,9 @@ internal class EventReceiver(
     internal fun createServerSocket(): ServerSocket = ServerSocket(0)
 
     fun getLocalPort(): Int {
-        if (!waitReady()) return 0
+        if (!threadCondition.waitReady()) return 0
         return serverSocket?.localPort ?: 0
     }
-
-    private fun waitReady(): Boolean = lock.withLock {
-        val task = futureTask ?: return false
-        if (task.isDone) return false
-        if (!ready) {
-            try {
-                condition.awaitNanos(PREPARE_TIMEOUT_NANOS)
-            } catch (ignored: InterruptedException) {
-            }
-        }
-        ready
-    }
-
-    private fun notifyReady() {
-        lock.withLock {
-            ready = true
-            condition.signalAll()
-        }
-    }
-
-    private fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
 
     override fun run() {
         Thread.currentThread().let {
@@ -102,14 +66,14 @@ internal class EventReceiver(
         try {
             val socket = createServerSocket()
             serverSocket = socket
-            notifyReady()
-            while (!isCanceled()) {
+            threadCondition.notifyReady()
+            while (!threadCondition.isCanceled()) {
                 val clientSocket = socket.accept().also {
                     it.soTimeout = Property.DEFAULT_TIMEOUT
                 }
-                ClientTask(this, clientSocket).let {
+                ClientTask(taskExecutors, this, clientSocket).let {
                     clientList.add(it)
-                    it.start(taskExecutors)
+                    it.start()
                 }
             }
         } catch (ignored: IOException) {
@@ -136,21 +100,16 @@ internal class EventReceiver(
 
     // VisibleForTesting
     internal class ClientTask(
+        taskExecutors: TaskExecutors,
         private val eventReceiver: EventReceiver,
         private val socket: Socket
     ) : Runnable {
-        private var futureTask: FutureTask<Nothing?>? = null
+        private val condition = ThreadCondition(taskExecutors.io)
 
-        fun start(taskExecutors: TaskExecutors) {
-            FutureTask(this, null).also {
-                futureTask = it
-                taskExecutors.io(it)
-            }
-        }
+        fun start(): Unit = condition.start(this)
 
         fun stop() {
-            futureTask?.cancel(false)
-            futureTask = null
+            condition.stop()
             socket.closeQuietly()
         }
 
@@ -212,9 +171,5 @@ internal class EventReceiver(
                 setHeader(Http.CONTENT_LENGTH, "0")
             }
         }
-    }
-
-    companion object {
-        private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(1)
     }
 }

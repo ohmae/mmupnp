@@ -63,25 +63,11 @@ class SsdpServerDelegateTest {
         server.stop()
     }
 
-
     @Test
     fun getInterfaceAddress() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
         assertThat(server.interfaceAddress).isEqualTo(networkInterface.findInet4Address())
-    }
-
-    @Test
-    fun start_stop() {
-        val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
-        val server = spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, networkInterface))
-        server.setReceiver(mockk(relaxed = true))
-        val socket: MulticastSocket = mockk(relaxed = true)
-        every { server.createMulticastSocket(any()) } returns socket
-        server.start()
-        server.start()
-        verify(exactly = 1) { server.stop() }
-        server.stop()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -295,7 +281,6 @@ class SsdpServerDelegateTest {
         val socket: MulticastSocket = mockk(relaxed = true)
         every { socket.receive(any()) } throws IOException()
         every { server.createMulticastSocket(any()) } returns socket
-        every { server.isCanceled() } returns false
 
         server.run()
     }

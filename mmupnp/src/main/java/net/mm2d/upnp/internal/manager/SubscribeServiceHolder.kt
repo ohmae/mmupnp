@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.manager
 
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.internal.thread.TaskExecutors
-import java.util.concurrent.FutureTask
+import net.mm2d.upnp.internal.thread.ThreadCondition
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -23,26 +23,15 @@ import kotlin.concurrent.withLock
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SubscribeServiceHolder(
-    private val taskExecutors: TaskExecutors
+    taskExecutors: TaskExecutors
 ) : Runnable {
-    private var futureTask: FutureTask<*>? = null
-    private val threadLock = ReentrantLock()
+    private val threadCondition = ThreadCondition(taskExecutors.manager)
     private val lock = ReentrantLock()
     private val condition = lock.newCondition()
     private val subscriptionMap = mutableMapOf<String, SubscribeService>()
 
-    fun start(): Unit = threadLock.withLock {
-        FutureTask(this, null).also {
-            futureTask = it
-            taskExecutors.manager(it)
-        }
-    }
-
-    fun stop(): Unit = threadLock.withLock {
-        futureTask?.cancel(false)
-        futureTask = null
-    }
-
+    fun start(): Unit = threadCondition.start(this)
+    fun stop(): Unit = threadCondition.stop()
 
     fun add(service: Service, timeout: Long, keepRenew: Boolean): Unit = lock.withLock {
         val id = service.subscriptionId
@@ -84,7 +73,7 @@ internal class SubscribeServiceHolder(
             it.name = it.name + "-subscribe-holder"
         }
         try {
-            while (!isCanceled()) {
+            while (!threadCondition.isCanceled()) {
                 renewSubscribe(waitEntry())
                 removeExpiredService()
                 waitNextRenewTime()
@@ -92,8 +81,6 @@ internal class SubscribeServiceHolder(
         } catch (ignored: InterruptedException) {
         }
     }
-
-    private fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
 
     /**
      * Wait until some entry is added to ServiceList.
