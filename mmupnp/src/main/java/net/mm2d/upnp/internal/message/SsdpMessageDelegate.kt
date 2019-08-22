@@ -10,11 +10,12 @@ package net.mm2d.upnp.internal.message
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpMessage
 import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.internal.parser.parseCacheControl
+import net.mm2d.upnp.internal.parser.parseUsn
 import java.io.IOException
 import java.io.OutputStream
 import java.net.Inet6Address
 import java.net.InetAddress
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -46,9 +47,9 @@ internal class SsdpMessageDelegate(
             nts = ""
             location = null
         } else {
-            maxAge = parseCacheControl(message)
+            maxAge = message.parseCacheControl()
             expireTime = TimeUnit.SECONDS.toMillis(maxAge.toLong()) + System.currentTimeMillis()
-            val (uuid, type) = parseUsn(message)
+            val (uuid, type) = message.parseUsn()
             this.uuid = uuid
             this.type = type
             nts = message.getHeader(Http.NTS)
@@ -67,28 +68,4 @@ internal class SsdpMessageDelegate(
     override fun writeData(os: OutputStream): Unit = message.writeData(os)
 
     override fun toString(): String = message.toString()
-
-    companion object {
-        private const val DEFAULT_MAX_AGE = 1800
-
-        // VisibleForTesting
-        internal fun parseCacheControl(message: HttpMessage): Int {
-            val age = message.getHeader(Http.CACHE_CONTROL)?.toLowerCase(Locale.US)
-            if (age == null || !age.startsWith("max-age")) {
-                return DEFAULT_MAX_AGE
-            }
-            return age.substringAfter('=', "").toIntOrNull() ?: DEFAULT_MAX_AGE
-        }
-
-        // VisibleForTesting
-        internal fun parseUsn(message: HttpMessage): Pair<String, String> {
-            val usn = message.getHeader(Http.USN)
-            if (usn.isNullOrEmpty() || !usn.startsWith("uuid")) {
-                return "" to ""
-            }
-            val pos = usn.indexOf("::")
-            return if (pos < 0) usn to ""
-            else usn.substring(0, pos) to usn.substring(pos + 2)
-        }
-    }
 }

@@ -295,20 +295,18 @@ internal class HttpMessageDelegate(
         }
 
         @Throws(IOException::class)
-        private fun InputStream.readLine(): String {
-            return toOutputStream {
-                while (true) {
-                    val b = read()
-                    if (b < 0) {
-                        if (it.size() == 0) throw IOException("can't read from InputStream")
-                        break
-                    }
-                    if (b == LF) break
-                    if (b == CR) continue
-                    it.write(b)
+        private fun InputStream.readLine(): String = toOutputStream {
+            while (true) {
+                val b = read()
+                if (b < 0) {
+                    if (it.size() == 0) throw IOException("can't read from InputStream")
+                    break
                 }
-            }.toString(Charsets.UTF_8.name())
-        }
+                if (b == LF) break
+                if (b == CR) continue
+                it.write(b)
+            }
+        }.toString(Charsets.UTF_8.name())
 
         @Throws(IOException::class)
         private fun InputStream.readBytes(length: Int): ByteArray = toOutputStream { copyTo(it, length) }.toByteArray()
