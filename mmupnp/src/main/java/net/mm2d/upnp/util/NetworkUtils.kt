@@ -206,27 +206,20 @@ internal fun Inet6Address.toNormalizedString(): String {
 private class Range(
     var start: Int = -1,
     var length: Int = 0
-) {
-    fun reset() = set(-1, 0)
-    fun set(range: Range) = set(range.start, range.length)
-    fun set(s: Int, l: Int) {
-        start = s
-        length = l
-    }
-}
+)
 
 private fun IntArray.findSectionToOmission(): Pair<Int, Int> {
-    val work = Range()
-    val best = Range()
+    var work = Range()
+    var best = Range()
     for (i in indices) {
         if (this[i] == 0) {
             if (work.start < 0) work.start = i
             work.length++
         } else if (work.start >= 0) {
-            if (work.length > best.length) best.set(work)
-            work.reset()
+            if (work.length > best.length) best = work
+            work = Range()
         }
     }
-    if (work.length > best.length) best.set(work)
+    if (work.length > best.length) best = work
     return if (best.length < 2) -1 to -1 else best.start to best.start + best.length
 }
