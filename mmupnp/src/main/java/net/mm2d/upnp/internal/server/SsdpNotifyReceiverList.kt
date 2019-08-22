@@ -11,8 +11,6 @@ import net.mm2d.log.Logger
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.thread.TaskExecutors
-import net.mm2d.upnp.util.isAvailableInet4Interface
-import net.mm2d.upnp.util.isAvailableInet6Interface
 import java.net.NetworkInterface
 
 /**
@@ -26,23 +24,10 @@ internal class SsdpNotifyReceiverList(
     interfaces: Iterable<NetworkInterface>,
     listener: (SsdpMessage) -> Unit
 ) {
-    private val list: List<SsdpNotifyReceiver> = when (protocol) {
-        Protocol.IP_V4_ONLY -> {
-            interfaces.filter { it.isAvailableInet4Interface() }
-                .mapNotNull { newReceiver(taskExecutors, Address.IP_V4, it, listener) }
-        }
-        Protocol.IP_V6_ONLY -> {
-            interfaces.filter { it.isAvailableInet6Interface() }
-                .mapNotNull { newReceiver(taskExecutors, Address.IP_V6, it, listener) }
-        }
-        Protocol.DUAL_STACK -> {
-            val v4 = interfaces.filter { it.isAvailableInet4Interface() }
-                .mapNotNull { newReceiver(taskExecutors, Address.IP_V4, it, listener) }
-            val v6 = interfaces.filter { it.isAvailableInet6Interface() }
-                .mapNotNull { newReceiver(taskExecutors, Address.IP_V6, it, listener) }
-            v4.toMutableList().also { it.addAll(v6) }
-        }
-    }
+    private val list: List<SsdpNotifyReceiver> = interfaces.createServerList(protocol,
+        { newReceiver(taskExecutors, Address.IP_V4, it, listener) },
+        { newReceiver(taskExecutors, Address.IP_V6, it, listener) }
+    )
 
     fun setSegmentCheckEnabled(enabled: Boolean): Unit =
         list.forEach { it.setSegmentCheckEnabled(enabled) }
