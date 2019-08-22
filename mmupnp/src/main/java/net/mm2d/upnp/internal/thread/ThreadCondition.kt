@@ -7,14 +7,13 @@
 
 package net.mm2d.upnp.internal.thread
 
-import net.mm2d.upnp.TaskExecutor
 import java.util.concurrent.FutureTask
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 internal class ThreadCondition(
-    private val executor: TaskExecutor
+    private val execute: ExecuteFunction
 ) {
     private var futureTask: FutureTask<*>? = null
     private val lock = ReentrantLock()
@@ -25,7 +24,7 @@ internal class ThreadCondition(
         ready = false
         FutureTask(runnable, null).also {
             futureTask = it
-            executor.execute(it)
+            execute(it)
         }
     }
 
