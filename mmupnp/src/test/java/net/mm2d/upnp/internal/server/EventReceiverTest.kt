@@ -67,14 +67,14 @@ class EventReceiverTest {
 
     @Test(timeout = 10000L)
     fun open_close_デッドロックしない() {
-        val receiver = EventReceiver(mockk(relaxed = true), null)
+        val receiver = EventReceiver(mockk(relaxed = true), mockk())
         receiver.start()
         receiver.stop()
     }
 
     @Test(timeout = 10000L)
     fun close_open前なら即終了() {
-        val receiver = EventReceiver(mockk(relaxed = true), null)
+        val receiver = EventReceiver(mockk(relaxed = true), mockk())
         receiver.stop()
     }
 
@@ -84,7 +84,7 @@ class EventReceiverTest {
         val serverSocket: ServerSocket = mockk(relaxed = true)
         every { serverSocket.localPort } returns port
         every { serverSocket.accept() } throws IOException()
-        val receiver = spyk(EventReceiver(taskExecutors, null))
+        val receiver = spyk(EventReceiver(taskExecutors, mockk()))
         every { receiver.createServerSocket() } returns serverSocket
 
         receiver.start()
@@ -94,7 +94,7 @@ class EventReceiverTest {
 
     @Test
     fun getLocalPort_開始前は0() {
-        val receiver = EventReceiver(mockk(relaxed = true), null)
+        val receiver = EventReceiver(mockk(relaxed = true), mockk())
         assertThat(receiver.getLocalPort()).isEqualTo(0)
     }
 
@@ -177,39 +177,6 @@ class EventReceiverTest {
     }
 
     @Test(timeout = 10000L)
-    fun onEventReceived_Failedが返る2() {
-        val baos = ByteArrayOutputStream()
-        val bais = ByteArrayInputStream(notifyRequest)
-        val socket: Socket = mockk(relaxed = true)
-        every { socket.getOutputStream() } returns baos
-        every { socket.getInputStream() } returns bais
-        val serverSocket: ServerSocket = mockk(relaxed = true)
-        var latch = false
-        every { serverSocket.accept() } answers {
-            if (!latch) {
-                latch = true
-                socket
-            } else {
-                try {
-                    Thread.sleep(1000)
-                } catch (e: InterruptedException) {
-                }
-                throw IOException()
-            }
-        }
-        val receiver = spyk(EventReceiver(taskExecutors, null))
-        every { receiver.createServerSocket() } returns serverSocket
-        receiver.start()
-        Thread.sleep(100)
-        receiver.stop()
-        Thread.sleep(100)
-
-        val response = HttpResponse.create()
-        response.readData(ByteArrayInputStream(baos.toByteArray()))
-        assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_PRECON_FAILED)
-    }
-
-    @Test(timeout = 10000L)
     fun onEventReceived_BadRequestが返る() {
         val baos = ByteArrayOutputStream()
         val bais = ByteArrayInputStream(badRequest)
@@ -230,7 +197,7 @@ class EventReceiverTest {
                 throw IOException()
             }
         }
-        val receiver = spyk(EventReceiver(taskExecutors, null))
+        val receiver = spyk(EventReceiver(taskExecutors, mockk()))
         every { receiver.createServerSocket() } returns serverSocket
         receiver.start()
         Thread.sleep(100)
@@ -315,23 +282,11 @@ class EventReceiverTest {
     }
 
     @Test
-    fun ServerTask_notifyEvent_listenerがなければfalse() {
-        val sid = "sid"
-        val receiver = spyk(EventReceiver(taskExecutors, null))
-        val request = HttpRequest.create().apply {
-            setHeader(Http.SEQ, "0")
-            setBody(TestUtils.getResourceAsString("propchange.xml"), true)
-        }
-
-        assertThat(receiver.notifyEvent(sid, request)).isFalse()
-    }
-
-    @Test
     fun ClientTask_run() {
         val socket: Socket = mockk(relaxed = true)
         every { socket.getInputStream() } returns mockk(relaxed = true)
         every { socket.getOutputStream() } returns mockk(relaxed = true)
-        val receiver = spyk(EventReceiver(taskExecutors, null))
+        val receiver = spyk(EventReceiver(taskExecutors, mockk()))
         val clientTask = spyk(ClientTask(taskExecutors, receiver, socket))
         every { clientTask.receiveAndReply(any(), any()) } throws IOException()
 

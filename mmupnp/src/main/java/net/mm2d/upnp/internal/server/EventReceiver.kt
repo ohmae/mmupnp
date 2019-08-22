@@ -33,7 +33,7 @@ import java.util.*
  */
 internal class EventReceiver(
     private val taskExecutors: TaskExecutors,
-    private val listener: ((sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean)?
+    private val listener: (sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean
 ) : Runnable {
     private var serverSocket: ServerSocket? = null
     private val clientList: MutableList<ClientTask> = Collections.synchronizedList(LinkedList())
@@ -89,13 +89,10 @@ internal class EventReceiver(
 
     // VisibleForTesting
     internal fun notifyEvent(sid: String, request: HttpRequest): Boolean {
-        val listener = listener ?: return false
-        val list = request.getBody().parseEventXml()
-        if (list.isEmpty()) {
-            return false
-        }
         val seq = request.getHeader(Http.SEQ)?.toLongOrNull() ?: return false
-        return listener(sid, seq, list)
+        val properties = request.getBody().parseEventXml()
+        if (properties.isEmpty()) return false
+        return listener(sid, seq, properties)
     }
 
     // VisibleForTesting
