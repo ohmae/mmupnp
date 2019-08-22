@@ -15,7 +15,6 @@ import io.mockk.verify
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.message.SsdpRequest
-import net.mm2d.upnp.internal.message.SsdpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.NetworkUtils
 import net.mm2d.upnp.util.TestUtils
@@ -283,35 +282,5 @@ class SsdpServerDelegateTest {
         every { server.createMulticastSocket(any()) } returns socket
 
         server.run()
-    }
-
-    @Throws(IOException::class)
-    private fun makeFromResource(name: String): SsdpResponse {
-        val data = TestUtils.getResourceAsByteArray(name)
-        return SsdpResponse.create(mockk(relaxed = true), data, data.size)
-    }
-
-    @Test
-    fun isInvalidLocation_アドレス一致() {
-        val message = makeFromResource("ssdp-search-response0.bin")
-        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isFalse()
-    }
-
-    @Test
-    fun isInvalidLocation_http以外() {
-        val message = makeFromResource("ssdp-search-response-invalid-location0.bin")
-        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
-    }
-
-    @Test
-    fun isInvalidLocation_表記に問題() {
-        val message = makeFromResource("ssdp-search-response-invalid-location1.bin")
-        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
-    }
-
-    @Test
-    fun isInvalidLocation_locationなし() {
-        val message = makeFromResource("ssdp-search-response-no-location.bin")
-        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
     }
 }
