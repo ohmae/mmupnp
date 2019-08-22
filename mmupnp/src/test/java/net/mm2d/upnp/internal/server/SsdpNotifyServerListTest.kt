@@ -21,7 +21,7 @@ import java.net.NetworkInterface
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class SsdpNotifyReceiverListTest {
+class SsdpNotifyServerListTest {
     private lateinit var nif: NetworkInterface
 
     @Before
@@ -38,32 +38,32 @@ class SsdpNotifyReceiverListTest {
 
     @Test
     fun start() {
-        val receiver: SsdpNotifyReceiver = mockk(relaxed = true)
+        val server: SsdpNotifyServer = mockk(relaxed = true)
         val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
-        mockkObject(SsdpNotifyReceiverList.Companion)
-        every { SsdpNotifyReceiverList.newReceiver(any(), Address.IP_V4, nif, listener) } returns receiver
-        val list = spyk(SsdpNotifyReceiverList(mockk(), Protocol.DEFAULT, listOf(nif), listener))
+        mockkObject(SsdpNotifyServerList.Companion)
+        every { SsdpNotifyServerList.newServer(any(), Address.IP_V4, nif, listener) } returns server
+        val list = spyk(SsdpNotifyServerList(mockk(), Protocol.DEFAULT, listOf(nif), listener))
 
         list.start()
 
-        verify(exactly = 1) { receiver.start() }
+        verify(exactly = 1) { server.start() }
     }
 
     @Test
     fun stop() {
-        val receiver: SsdpNotifyReceiver = mockk(relaxed = true)
+        val server: SsdpNotifyServer = mockk(relaxed = true)
         val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
-        mockkObject(SsdpNotifyReceiverList.Companion)
-        every { SsdpNotifyReceiverList.newReceiver(any(), Address.IP_V4, nif, listener) } returns receiver
-        val list = spyk(SsdpNotifyReceiverList(mockk(), Protocol.DEFAULT, listOf(nif), listener))
+        mockkObject(SsdpNotifyServerList.Companion)
+        every { SsdpNotifyServerList.newServer(any(), Address.IP_V4, nif, listener) } returns server
+        val list = spyk(SsdpNotifyServerList(mockk(), Protocol.DEFAULT, listOf(nif), listener))
 
         list.stop()
 
-        verify(exactly = 1) { receiver.stop() }
+        verify(exactly = 1) { server.stop() }
     }
 
     @Test
     fun newReceiver_該当アドレスがなければnull() {
-        assertThat(SsdpNotifyReceiverList.newReceiver(mockk(), Address.IP_V4, nif, mockk())).isNull()
+        assertThat(SsdpNotifyServerList.newServer(mockk(), Address.IP_V4, nif, mockk())).isNull()
     }
 }

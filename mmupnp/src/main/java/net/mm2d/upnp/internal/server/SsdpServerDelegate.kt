@@ -100,9 +100,7 @@ internal class SsdpServerDelegate(
         Thread.currentThread().let {
             it.name = it.name + suffix
         }
-        if (threadCondition.isCanceled()) {
-            return
-        }
+        if (threadCondition.isCanceled()) return
         try {
             val socket = createMulticastSocket(bindPort)
             this.socket = socket
@@ -129,9 +127,7 @@ internal class SsdpServerDelegate(
             try {
                 val dp = DatagramPacket(buf, buf.size)
                 socket.receive(dp)
-                if (threadCondition.isCanceled()) {
-                    break
-                }
+                if (threadCondition.isCanceled()) break
                 receiver?.invoke(dp.address, dp.data, dp.length)
             } catch (ignored: SocketTimeoutException) {
             }

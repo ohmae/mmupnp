@@ -19,7 +19,7 @@ import java.net.*
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal class SsdpNotifyReceiver(
+internal class SsdpNotifyServer(
     private val delegate: SsdpServerDelegate
 ) : SsdpServer by delegate {
     private var notifyListener: ((SsdpMessage) -> Unit)? = null

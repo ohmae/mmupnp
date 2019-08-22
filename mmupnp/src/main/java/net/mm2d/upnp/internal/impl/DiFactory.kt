@@ -14,7 +14,7 @@ import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.TaskExecutor
 import net.mm2d.upnp.internal.manager.*
 import net.mm2d.upnp.internal.server.EventReceiver
-import net.mm2d.upnp.internal.server.SsdpNotifyReceiverList
+import net.mm2d.upnp.internal.server.SsdpNotifyServerList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import java.net.NetworkInterface
@@ -41,11 +41,11 @@ internal class DiFactory(
         listener: (SsdpMessage) -> Unit
     ): SsdpSearchServerList = SsdpSearchServerList(taskExecutors, protocol, interfaces, listener)
 
-    fun createSsdpNotifyReceiverList(
+    fun createSsdpNotifyServerList(
         taskExecutors: TaskExecutors,
         interfaces: Iterable<NetworkInterface>,
         listener: (SsdpMessage) -> Unit
-    ): SsdpNotifyReceiverList = SsdpNotifyReceiverList(taskExecutors, protocol, interfaces, listener)
+    ): SsdpNotifyServerList = SsdpNotifyServerList(taskExecutors, protocol, interfaces, listener)
 
     fun createSubscribeManager(
         subscriptionEnabled: Boolean,

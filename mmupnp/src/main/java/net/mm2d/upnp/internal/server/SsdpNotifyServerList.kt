@@ -14,19 +14,19 @@ import net.mm2d.upnp.internal.thread.TaskExecutors
 import java.net.NetworkInterface
 
 /**
- * Class for putting together [SsdpNotifyReceiver] for all interfaces.
+ * Class for putting together [SsdpNotifyServer] for all interfaces.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal class SsdpNotifyReceiverList(
+internal class SsdpNotifyServerList(
     taskExecutors: TaskExecutors,
     protocol: Protocol,
     interfaces: Iterable<NetworkInterface>,
     listener: (SsdpMessage) -> Unit
 ) {
-    private val list: List<SsdpNotifyReceiver> = interfaces.createServerList(protocol,
-        { newReceiver(taskExecutors, Address.IP_V4, it, listener) },
-        { newReceiver(taskExecutors, Address.IP_V6, it, listener) }
+    private val list: List<SsdpNotifyServer> = interfaces.createServerList(protocol,
+        { newServer(taskExecutors, Address.IP_V4, it, listener) },
+        { newServer(taskExecutors, Address.IP_V6, it, listener) }
     )
 
     fun setSegmentCheckEnabled(enabled: Boolean): Unit =
@@ -40,13 +40,13 @@ internal class SsdpNotifyReceiverList(
 
     companion object {
         // VisibleForTesting
-        internal fun newReceiver(
+        internal fun newServer(
             taskExecutors: TaskExecutors,
             address: Address,
             nif: NetworkInterface,
             listener: (SsdpMessage) -> Unit
-        ): SsdpNotifyReceiver? = try {
-            SsdpNotifyReceiver(taskExecutors, address, nif).also {
+        ): SsdpNotifyServer? = try {
+            SsdpNotifyServer(taskExecutors, address, nif).also {
                 it.setNotifyListener(listener)
             }
         } catch (e: IllegalArgumentException) {
