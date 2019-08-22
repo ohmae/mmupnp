@@ -113,10 +113,6 @@ internal class EventReceiver(
             socket.closeQuietly()
         }
 
-        private fun notifyEvent(sid: String, request: HttpRequest): Boolean {
-            return eventReceiver.notifyEvent(sid, request)
-        }
-
         override fun run() {
             try {
                 receiveAndReply(socket.getInputStream(), socket.getOutputStream())
@@ -143,7 +139,7 @@ internal class EventReceiver(
             } else if (sid.isNullOrEmpty() || nt != Http.UPNP_EVENT || nts != Http.UPNP_PROPCHANGE) {
                 RESPONSE_FAIL.writeData(outputStream)
             } else {
-                if (notifyEvent(sid, request)) {
+                if (eventReceiver.notifyEvent(sid, request)) {
                     RESPONSE_OK.writeData(outputStream)
                 } else {
                     RESPONSE_FAIL.writeData(outputStream)
