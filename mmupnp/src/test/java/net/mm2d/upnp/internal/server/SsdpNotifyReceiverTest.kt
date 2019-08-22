@@ -219,7 +219,7 @@ class SsdpNotifyReceiverTest {
         val delegate: SsdpServerDelegate = mockk(relaxed = true)
         every { delegate.address } returns Address.IP_V4
         every { delegate.interfaceAddress } returns
-                createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
+            createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
         val receiver = spyk(SsdpNotifyReceiver(delegate))
 
         with(receiver) {
@@ -229,7 +229,7 @@ class SsdpNotifyReceiverTest {
             assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isFalse()
 
             every { delegate.interfaceAddress } returns
-                    createInterfaceAddress("192.168.0.1", "255.255.255.128", 25)
+                createInterfaceAddress("192.168.0.1", "255.255.255.128", 25)
 
             setSegmentCheckEnabled(true)
             assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isTrue()
@@ -237,13 +237,13 @@ class SsdpNotifyReceiverTest {
             assertThat(InetAddress.getByName("192.168.0.255").isInvalidAddress()).isFalse()
 
             every { delegate.interfaceAddress } returns
-                    createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
+                createInterfaceAddress("192.168.0.1", "255.255.255.0", 24)
 
             setSegmentCheckEnabled(true)
             assertThat(InetAddress.getByName("192.168.1.255").isInvalidAddress()).isTrue()
 
             every { delegate.interfaceAddress } returns
-                    createInterfaceAddress("192.168.0.1", "255.255.254.0", 23)
+                createInterfaceAddress("192.168.0.1", "255.255.254.0", 23)
 
             setSegmentCheckEnabled(true)
             assertThat(InetAddress.getByName("192.168.1.255").isInvalidAddress()).isFalse()
@@ -260,7 +260,7 @@ class SsdpNotifyReceiverTest {
         val delegate: SsdpServerDelegate = mockk(relaxed = true)
         every { delegate.address } returns Address.IP_V6
         every { delegate.interfaceAddress } returns
-                createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
+            createInterfaceAddress("fe80::a831:801b:8dc6:421f", "255.255.0.0", 16)
         val receiver = spyk(SsdpNotifyReceiver(delegate))
         with(receiver) {
             setSegmentCheckEnabled(true)
