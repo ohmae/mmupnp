@@ -42,10 +42,11 @@ class SsdpSearchServerListTest {
         val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
         mockkObject(SsdpSearchServerList.Companion)
         every { SsdpSearchServerList.newServer(any(), Address.IP_V4, any(), listener) } returns server
-        val list = spyk(SsdpSearchServerList(mockk(), Protocol.DEFAULT, listOf(nif), listener))
+        val list = SsdpSearchServerList(mockk(), Protocol.DEFAULT, listOf(nif), listener)
 
         list.start()
         verify(exactly = 1) { server.start() }
+        unmockkObject(SsdpSearchServerList.Companion)
     }
 
     @Test
@@ -54,11 +55,12 @@ class SsdpSearchServerListTest {
         val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
         mockkObject(SsdpSearchServerList.Companion)
         every { SsdpSearchServerList.newServer(any(), Address.IP_V4, any(), listener) } returns server
-        val list = spyk(SsdpSearchServerList(mockk(), Protocol.DEFAULT, listOf(nif), listener))
+        val list = SsdpSearchServerList(mockk(), Protocol.DEFAULT, listOf(nif), listener)
 
         list.stop()
 
         verify(exactly = 1) { server.stop() }
+        unmockkObject(SsdpSearchServerList.Companion)
     }
 
     @Test
@@ -67,11 +69,12 @@ class SsdpSearchServerListTest {
         val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
         mockkObject(SsdpSearchServerList.Companion)
         every { SsdpSearchServerList.newServer(any(), Address.IP_V4, any(), listener) } returns server
-        val list = spyk(SsdpSearchServerList(mockk(), Protocol.DEFAULT, listOf(nif), listener))
+        val list = SsdpSearchServerList(mockk(), Protocol.DEFAULT, listOf(nif), listener)
 
         list.search("")
 
         verify(exactly = 1) { server.search("") }
+        unmockkObject(SsdpSearchServerList.Companion)
     }
 
     @Test

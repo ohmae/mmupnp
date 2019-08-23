@@ -14,6 +14,7 @@ import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.TaskExecutor
 import net.mm2d.upnp.internal.manager.*
 import net.mm2d.upnp.internal.server.EventReceiver
+import net.mm2d.upnp.internal.server.MulticastEventReceiverList
 import net.mm2d.upnp.internal.server.SsdpNotifyServerList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
 import net.mm2d.upnp.internal.thread.TaskExecutors
@@ -65,6 +66,12 @@ internal class DiFactory(
         taskExecutors: TaskExecutors,
         listener: (sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean
     ): EventReceiver = EventReceiver(taskExecutors, listener)
+
+    fun createMulticastEventReceiverList(
+        taskExecutors: TaskExecutors,
+        interfaces: Iterable<NetworkInterface>,
+        listener: (uuid: String, svcid: String, lvl: String, seq: Long, properties: List<Pair<String, String>>) -> Unit
+    ): MulticastEventReceiverList = MulticastEventReceiverList(taskExecutors, protocol, interfaces, listener)
 
     fun createTaskExecutors(): TaskExecutors = TaskExecutors(callbackExecutor)
 }

@@ -10,14 +10,14 @@ package net.mm2d.upnp.internal.impl
 import net.mm2d.log.Logger
 import net.mm2d.upnp.*
 import net.mm2d.upnp.Adapter.iconFilter
-import net.mm2d.upnp.ControlPoint.DiscoveryListener
-import net.mm2d.upnp.ControlPoint.NotifyEventListener
+import net.mm2d.upnp.ControlPoint.*
 import net.mm2d.upnp.internal.impl.DeviceImpl.Builder
 import net.mm2d.upnp.internal.manager.DeviceHolder
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import net.mm2d.upnp.internal.parser.DeviceParser
 import net.mm2d.upnp.internal.server.DEFAULT_SSDP_MESSAGE_FILTER
+import net.mm2d.upnp.internal.server.MulticastEventReceiverList
 import net.mm2d.upnp.internal.server.SsdpNotifyServerList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
 import net.mm2d.upnp.internal.thread.TaskExecutors
@@ -39,11 +39,13 @@ internal class ControlPointImpl(
     interfaces: Iterable<NetworkInterface>,
     notifySegmentCheckEnabled: Boolean,
     subscriptionEnabled: Boolean,
+    multicastEventingEnabled: Boolean,
     factory: DiFactory
 ) : ControlPoint {
     private var iconFilter: IconFilter = EMPTY_FILTER
     private val discoveryListenerList: MutableSet<DiscoveryListener>
     private val notifyEventListenerList: MutableSet<NotifyEventListener>
+    private val multicastEventListenerSet: MutableSet<MulticastEventListener>
     private val searchServerList: SsdpSearchServerList
     private val notifyServerList: SsdpNotifyServerList
     private val deviceMap: MutableMap<String, Device>
@@ -52,6 +54,7 @@ internal class ControlPointImpl(
     private val started = AtomicBoolean()
     private val deviceHolder: DeviceHolder
     private val loadingPinnedDevices: MutableList<Builder>
+    private val multicastEventReceiverList: MulticastEventReceiverList?
     internal val subscribeManager: SubscribeManager
     internal val taskExecutors: TaskExecutors
 
@@ -61,6 +64,7 @@ internal class ControlPointImpl(
         }
         discoveryListenerList = CopyOnWriteArraySet()
         notifyEventListenerList = CopyOnWriteArraySet()
+        multicastEventListenerSet = CopyOnWriteArraySet()
         deviceMap = mutableMapOf()
         loadingPinnedDevices = Collections.synchronizedList(mutableListOf())
         taskExecutors = factory.createTaskExecutors()
@@ -74,6 +78,9 @@ internal class ControlPointImpl(
         notifyServerList.setSegmentCheckEnabled(notifySegmentCheckEnabled)
         deviceHolder = factory.createDeviceHolder(taskExecutors) { lostDevice(it) }
         subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, notifyEventListenerList)
+        multicastEventReceiverList = if (multicastEventingEnabled) {
+            factory.createMulticastEventReceiverList(taskExecutors, interfaces, this::onReceiveMulticastEvent)
+        } else null
     }
 
     private fun createHttpClient(): HttpClient = HttpClient.create(true)
@@ -162,6 +169,22 @@ internal class ControlPointImpl(
         }
     }
 
+    // VisibleForTesting
+    internal fun onReceiveMulticastEvent(
+        uuid: String,
+        svcid: String,
+        lvl: String,
+        seq: Long,
+        properties: List<Pair<String, String>>
+    ) {
+        val service = synchronized(deviceHolder) {
+            deviceMap[uuid]?.findServiceById(svcid)
+        } ?: return
+        multicastEventListenerSet.forEach {
+            it.onEvent(service, lvl, seq, properties)
+        }
+    }
+
     override val deviceListSize: Int
         get() = deviceHolder.size
 
@@ -195,6 +218,7 @@ internal class ControlPointImpl(
         if (started.getAndSet(true)) {
             return
         }
+        multicastEventReceiverList?.start()
         subscribeManager.start()
         searchServerList.start()
         notifyServerList.start()
@@ -204,6 +228,7 @@ internal class ControlPointImpl(
         if (!started.getAndSet(false)) {
             return
         }
+        multicastEventReceiverList?.stop()
         subscribeManager.stop()
         searchServerList.stop()
         notifyServerList.stop()
@@ -248,6 +273,14 @@ internal class ControlPointImpl(
 
     override fun removeNotifyEventListener(listener: NotifyEventListener) {
         notifyEventListenerList.remove(listener)
+    }
+
+    override fun addMulticastEventListener(listener: MulticastEventListener) {
+        multicastEventListenerSet.add(listener)
+    }
+
+    override fun removeMulticastEventListener(listener: MulticastEventListener) {
+        multicastEventListenerSet.remove(listener)
     }
 
     // VisibleForTesting

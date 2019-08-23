@@ -30,7 +30,7 @@ class SubscribeServiceHolderTest {
     }
 
     @After
-    fun terminate() {
+    fun tearDown() {
         taskExecutors.terminate()
     }
 

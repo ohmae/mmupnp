@@ -68,6 +68,7 @@ class ControlPointFactoryTest {
             .setInterfaces(NetworkUtils.getNetworkInterfaceList())
             .setNotifySegmentCheckEnabled(true)
             .setSubscriptionEnabled(true)
+            .setMulticastEventingEnabled(true)
             .setCallbackExecutor(mockk())
             .setCallbackHandler { true }
             .build()

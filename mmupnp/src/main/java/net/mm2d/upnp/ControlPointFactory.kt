@@ -39,6 +39,8 @@ object ControlPointFactory {
      * Default is true.
      * If false, reduce memory and number of threads at the expense of disabling the feature of event subscription.
      * In that state, when the method for subscription are called, IllegalStateException will be thrown.
+     * @param multicastEventingEnabled set whether to use multicast eventing.
+     * Default is false.
      * @return Instance of ControlPoint.
      * @throws IllegalStateException There is no interface available.
      */
@@ -49,7 +51,8 @@ object ControlPointFactory {
         callbackExecutor: TaskExecutor? = null,
         callbackHandler: ((Runnable) -> Boolean)? = null,
         notifySegmentCheckEnabled: Boolean = false,
-        subscriptionEnabled: Boolean = true
+        subscriptionEnabled: Boolean = true,
+        multicastEventingEnabled: Boolean = false
     ): ControlPoint {
         val executor = callbackExecutor
             ?: callbackHandler?.let { taskExecutor(it) }
@@ -58,6 +61,7 @@ object ControlPointFactory {
             getDefaultInterfacesIfEmpty(protocol, interfaces),
             notifySegmentCheckEnabled,
             subscriptionEnabled,
+            multicastEventingEnabled,
             DiFactory(protocol, executor)
         )
     }
@@ -88,6 +92,7 @@ object ControlPointFactory {
         private var callbackExecutor: TaskExecutor? = null
         private var notifySegmentCheckEnabled: Boolean = false
         private var subscriptionEnabled: Boolean = true
+        private var multicastEventingEnabled: Boolean = false
 
         /**
          * Set protocol stack.
@@ -156,7 +161,7 @@ object ControlPointFactory {
          * Set whether to use event subscription.
          *
          * Default is true.
-         * If false, reduce memory and number of threads at the expense of disabling the feature of event subscription.
+         * If set to false, reduce memory and number of threads at the expense of disabling the feature of event subscription.
          * In that state, when the method for subscription are called, IllegalStateException will be thrown.
          *
          * @param enabled true, enable event subscription. false, otherwise
@@ -164,6 +169,22 @@ object ControlPointFactory {
          */
         fun setSubscriptionEnabled(enabled: Boolean): ControlPointBuilder = apply {
             subscriptionEnabled = enabled
+        }
+
+        /**
+         * Set whether to use multicast eventing.
+         *
+         * **Multicast eventing is an experimental feature.**
+         * Because no other implementation has been found and compatibility has not been verified at all.
+         *
+         * Default is false.
+         * If set to true, multicast events can be received.
+         *
+         * @param enabled true, enable multicast eventing. false, otherwise
+         * @return builder
+         */
+        fun setMulticastEventingEnabled(enabled: Boolean): ControlPointBuilder = apply {
+            multicastEventingEnabled = enabled
         }
 
         /**
@@ -177,6 +198,7 @@ object ControlPointFactory {
             getDefaultInterfacesIfEmpty(protocol, interfaces),
             notifySegmentCheckEnabled,
             subscriptionEnabled,
+            multicastEventingEnabled,
             DiFactory(protocol, callbackExecutor)
         )
     }

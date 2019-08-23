@@ -30,7 +30,7 @@ class DeviceHolderTest {
     }
 
     @After
-    fun terminate() {
+    fun tearDown() {
         taskExecutors.terminate()
     }
 

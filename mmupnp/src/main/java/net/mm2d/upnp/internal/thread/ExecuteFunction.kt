@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.thread
 
 import net.mm2d.upnp.TaskExecutor
 
-class ExecuteFunction(
+internal class ExecuteFunction(
     private val executor: TaskExecutor
 ) : TaskExecutor by executor {
     operator fun invoke(task: Runnable) = executor.execute(task)

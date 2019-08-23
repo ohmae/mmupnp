@@ -23,7 +23,7 @@ class EmptyControlPointTest {
     }
 
     @Test
-    fun terminate() {
+    fun tearDown() {
         val controlPoint = EmptyControlPoint
         controlPoint.terminate()
     }
@@ -92,6 +92,18 @@ class EmptyControlPointTest {
     fun removeNotifyEventListener() {
         val controlPoint = EmptyControlPoint
         controlPoint.removeNotifyEventListener(mockk())
+    }
+
+    @Test
+    fun addMulticastEventListener() {
+        val controlPoint = EmptyControlPoint
+        controlPoint.addMulticastEventListener(mockk())
+    }
+
+    @Test
+    fun removeMulticastEventListener() {
+        val controlPoint = EmptyControlPoint
+        controlPoint.removeMulticastEventListener(mockk())
     }
 
     @Test

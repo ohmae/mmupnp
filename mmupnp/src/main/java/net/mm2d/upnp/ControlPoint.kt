@@ -17,9 +17,6 @@ interface ControlPoint {
      * Listener to notify discovery event.
      *
      * Notified in callback thread
-     *
-     * @see ControlPointFactory.create
-     * @see NotifyEventListener
      */
     interface DiscoveryListener {
         /**
@@ -45,9 +42,6 @@ interface ControlPoint {
      * Listener to notify event of "NotifyEvent".
      *
      * Notified in callback thread
-     *
-     * @see ControlPointFactory.create
-     * @see DiscoveryListener
      */
     interface NotifyEventListener {
         /**
@@ -60,6 +54,26 @@ interface ControlPoint {
          * @see Service
          */
         fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String)
+    }
+
+    /**
+     * Listener to notify on receive multicast event.
+     *
+     * Notified in callback thread
+     */
+    interface MulticastEventListener {
+        /**
+         * Called on receive Multicast Events
+         *
+         * @param service Target Service
+         * @param lvl Multicast event levels.
+         * Format is `<domain>:/<level>`
+         * `upnp:/emergency`, `upnp:/fault`, `upnp:/warning`, `upnp:/info`, `upnp:/debug`, `upnp:/general`
+         * @param seq Sequence number
+         * @param properties property name / value pair list
+         * @see Service
+         */
+        fun onEvent(service: Service, lvl: String, seq: Long, properties: List<Pair<String, String>>)
     }
 
     /**
@@ -188,6 +202,24 @@ interface ControlPoint {
      * @see NotifyEventListener
      */
     fun removeNotifyEventListener(listener: NotifyEventListener)
+
+    /**
+     * Add a EventListener.
+     *
+     * Listener notification is performed in the callback thread.
+     *
+     * @param listener Listener to add
+     * @see MulticastEventListener
+     */
+    fun addMulticastEventListener(listener: MulticastEventListener)
+
+    /**
+     * Remove a EventListener.
+     *
+     * @param listener Listener to remove
+     * @see MulticastEventListener
+     */
+    fun removeMulticastEventListener(listener: MulticastEventListener)
 
     /**
      * Find Device by UDN.

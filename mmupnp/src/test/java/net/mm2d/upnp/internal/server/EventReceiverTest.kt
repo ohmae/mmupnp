@@ -61,7 +61,7 @@ class EventReceiverTest {
     }
 
     @After
-    fun terminate() {
+    fun tearDown() {
         taskExecutors.terminate()
     }
 

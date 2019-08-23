@@ -35,7 +35,7 @@ class SsdpNotifyServerTest {
     }
 
     @After
-    fun terminate() {
+    fun tearDown() {
         taskExecutors.terminate()
     }
 

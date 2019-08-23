@@ -7,8 +7,7 @@
 
 package net.mm2d.upnp
 
-import net.mm2d.upnp.ControlPoint.DiscoveryListener
-import net.mm2d.upnp.ControlPoint.NotifyEventListener
+import net.mm2d.upnp.ControlPoint.*
 
 /**
  * Adapter to convert lambda to interface.
@@ -61,6 +60,21 @@ object Adapter {
     ): NotifyEventListener = object : NotifyEventListener {
         override fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String) {
             notifyEvent(service, seq, variable, value)
+        }
+    }
+
+    /**
+     * Adapter for [MulticastEventListener].
+     *
+     * @param onEvent callback
+     * @return MulticastEventListener
+     */
+    @JvmStatic
+    fun multicastEventListener(
+        onEvent: (service: Service, lvl: String, seq: Long, properties: List<Pair<String, String>>) -> Unit
+    ): MulticastEventListener = object : MulticastEventListener {
+        override fun onEvent(service: Service, lvl: String, seq: Long, properties: List<Pair<String, String>>) {
+            onEvent(service, lvl, seq, properties)
         }
     }
 

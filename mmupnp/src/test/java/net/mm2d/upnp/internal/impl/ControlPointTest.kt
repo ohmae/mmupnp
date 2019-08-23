@@ -46,6 +46,7 @@ class ControlPointTest {
                 Protocol.DEFAULT, emptyList(),
                 notifySegmentCheckEnabled = false,
                 subscriptionEnabled = true,
+                multicastEventingEnabled = false,
                 factory = mockk(relaxed = true)
             )
         }
@@ -104,6 +105,24 @@ class ControlPointTest {
         }
 
         @Test(timeout = 10000L)
+        fun start_stop_with_multicast_eventing() {
+            val multicastEventReceiverList: MulticastEventReceiverList = mockk(relaxed = true)
+            val factory: DiFactory = mockk(relaxed = true)
+            every { factory.createMulticastEventReceiverList(any(), any(), any()) } returns multicastEventReceiverList
+            val cp = ControlPointImpl(
+                Protocol.DEFAULT, Protocol.DEFAULT.getAvailableInterfaces(),
+                notifySegmentCheckEnabled = false,
+                subscriptionEnabled = true,
+                multicastEventingEnabled = true,
+                factory = factory
+            )
+            cp.start()
+            verify(exactly = 1) { multicastEventReceiverList.start() }
+            cp.stop()
+            verify(exactly = 1) { multicastEventReceiverList.stop() }
+        }
+
+        @Test(timeout = 10000L)
         fun start_stop_illegal() {
             val cp = ControlPointFactory.create()
             cp.start()
@@ -128,6 +147,7 @@ class ControlPointTest {
                 NetworkUtils.getAvailableInet4Interfaces(),
                 notifySegmentCheckEnabled = false,
                 subscriptionEnabled = true,
+                multicastEventingEnabled = false,
                 factory = factory
             )
             cp.initialize()
@@ -360,6 +380,7 @@ class ControlPointTest {
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
                     subscriptionEnabled = true,
+                    multicastEventingEnabled = false,
                     factory = factory
                 )
             )
@@ -549,6 +570,7 @@ class ControlPointTest {
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
                     subscriptionEnabled = true,
+                    multicastEventingEnabled = false,
                     factory = factory
                 )
             )
@@ -725,6 +747,7 @@ class ControlPointTest {
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
                     subscriptionEnabled = true,
+                    multicastEventingEnabled = false,
                     factory = DiFactory(Protocol.DEFAULT)
                 )
             )
@@ -869,6 +892,7 @@ class ControlPointTest {
                 NetworkUtils.getAvailableInet4Interfaces(),
                 notifySegmentCheckEnabled = false,
                 subscriptionEnabled = true,
+                multicastEventingEnabled = false,
                 factory = factory
             )
         }
@@ -931,6 +955,7 @@ class ControlPointTest {
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
                     subscriptionEnabled = true,
+                    multicastEventingEnabled = false,
                     factory = factory
                 )
             )
@@ -1071,6 +1096,7 @@ class ControlPointTest {
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
                     subscriptionEnabled = true,
+                    multicastEventingEnabled = false,
                     factory = DiFactory(Protocol.DEFAULT)
                 )
             )
@@ -1110,6 +1136,91 @@ class ControlPointTest {
     }
 
     @RunWith(JUnit4::class)
+    class MulticastEventingのテスト {
+        private lateinit var cp: ControlPointImpl
+        @Before
+        fun setUp() {
+            cp = spyk(
+                ControlPointImpl(
+                    Protocol.DEFAULT,
+                    NetworkUtils.getAvailableInet4Interfaces(),
+                    notifySegmentCheckEnabled = false,
+                    subscriptionEnabled = true,
+                    multicastEventingEnabled = false,
+                    factory = DiFactory(Protocol.DEFAULT)
+                )
+            )
+        }
+
+        @Test
+        fun `onReceiveMulticastEvent listenerに通知される`() {
+            val uuid = "uuid"
+            val svcid = "svcid"
+            val device: Device = mockk(relaxed = true)
+            every { device.udn } returns uuid
+            val service: Service = mockk(relaxed = true)
+            every { device.findServiceById(svcid) } returns service
+            cp.discoverDevice(device)
+
+            val listener = spyk(Adapter.multicastEventListener { _, _, _, _ -> })
+            cp.addMulticastEventListener(listener)
+
+            val lvl = "upnp:/info"
+            val seq = 0L
+            val properties = listOf<Pair<String, String>>()
+
+            cp.onReceiveMulticastEvent(uuid, svcid, lvl, seq, properties)
+            verify(exactly = 1) { listener.onEvent(service, lvl, seq, properties) }
+        }
+
+        @Test
+        fun `onReceiveMulticastEvent removeしたlistenerには通知されない`() {
+            val uuid = "uuid"
+            val svcid = "svcid"
+            val device: Device = mockk(relaxed = true)
+            every { device.udn } returns uuid
+            val service: Service = mockk(relaxed = true)
+            every { device.findServiceById(svcid) } returns service
+            cp.discoverDevice(device)
+
+            val listener = spyk(Adapter.multicastEventListener { _, _, _, _ -> })
+            cp.addMulticastEventListener(listener)
+            cp.removeMulticastEventListener(listener)
+
+            val lvl = "upnp:/info"
+            val seq = 0L
+            val properties = listOf<Pair<String, String>>()
+
+            cp.onReceiveMulticastEvent(uuid, svcid, lvl, seq, properties)
+            verify(inverse = true) { listener.onEvent(any(), any(), any(), any()) }
+        }
+
+        @Test
+        fun `onReceiveMulticastEvent uuidやsvcidが違っていると何も起こらない`() {
+            val uuid = "uuid"
+            val svcid = "svcid"
+            val device: Device = mockk(relaxed = true)
+            every { device.udn } returns uuid
+            val service: Service = mockk(relaxed = true)
+            every { device.findServiceById(any()) } returns null
+            every { device.findServiceById(svcid) } returns service
+            cp.discoverDevice(device)
+
+            val listener = spyk(Adapter.multicastEventListener { _, _, _, _ -> })
+            cp.addMulticastEventListener(listener)
+
+            val lvl = "upnp:/info"
+            val seq = 0L
+            val properties = listOf<Pair<String, String>>()
+
+            cp.onReceiveMulticastEvent("hoge", svcid, lvl, seq, properties)
+            verify(inverse = true) { listener.onEvent(any(), any(), any(), any()) }
+            cp.onReceiveMulticastEvent(uuid, "hoge", lvl, seq, properties)
+            verify(inverse = true) { listener.onEvent(any(), any(), any(), any()) }
+        }
+    }
+
+    @RunWith(JUnit4::class)
     class EmbeddedDevice {
         @Test
         fun embeddedDeviceごとにuuidが異なる場合どのuuidでも取り出せる() {
@@ -1119,6 +1230,7 @@ class ControlPointTest {
                     NetworkUtils.getAvailableInet4Interfaces(),
                     notifySegmentCheckEnabled = false,
                     subscriptionEnabled = true,
+                    multicastEventingEnabled = false,
                     factory = DiFactory(Protocol.DEFAULT)
                 )
             )

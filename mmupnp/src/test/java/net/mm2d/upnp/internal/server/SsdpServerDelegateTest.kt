@@ -41,7 +41,7 @@ class SsdpServerDelegateTest {
     }
 
     @After
-    fun terminate() {
+    fun tearDown() {
         taskExecutors.terminate()
     }
 

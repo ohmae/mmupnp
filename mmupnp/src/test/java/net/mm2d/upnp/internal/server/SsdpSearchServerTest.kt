@@ -35,7 +35,7 @@ class SsdpSearchServerTest {
     }
 
     @After
-    fun terminate() {
+    fun tearDown() {
         taskExecutors.terminate()
     }
 
