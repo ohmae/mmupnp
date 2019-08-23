@@ -53,6 +53,6 @@ internal class ThreadCondition(
     fun isCanceled(): Boolean = futureTask?.isCancelled ?: true
 
     companion object {
-        private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(1)
+        private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(5)
     }
 }
