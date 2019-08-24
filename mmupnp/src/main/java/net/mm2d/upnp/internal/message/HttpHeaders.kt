@@ -35,9 +35,7 @@ internal class HttpHeaders {
         var name: String
             get() = _name
             internal set(name) {
-                if (_name.toKey() != name.toKey()) {
-                    throw IllegalArgumentException()
-                }
+                require(_name.toKey() == name.toKey())
                 _name = name
             }
 

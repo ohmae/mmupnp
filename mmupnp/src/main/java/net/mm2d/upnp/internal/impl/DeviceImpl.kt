@@ -80,9 +80,7 @@ internal class DeviceImpl private constructor(
 
     override fun updateSsdpMessage(message: SsdpMessage) {
         if (ssdpMessage.isPinned) return
-        if (!isEmbeddedDevice && !udnSet.contains(message.uuid)) {
-            throw IllegalArgumentException("uuid and udn does not match! uuid=${message.uuid} udn=$udnSet")
-        }
+        require(isEmbeddedDevice || udnSet.contains(message.uuid)) { "uuid and udn does not match! uuid=${message.uuid} udn=$udnSet" }
         location = message.location ?: throw IllegalArgumentException()
         ssdpMessage = message
         deviceList.forEach {

@@ -37,9 +37,7 @@ class HttpRequest internal constructor(
 
         override fun setStartLine(startLine: String) {
             val params = startLine.split(" ", limit = 3)
-            if (params.size < 3) {
-                throw IllegalArgumentException()
-            }
+            require(params.size >= 3)
             method = params[0]
             uri = params[1]
             version = params[2]

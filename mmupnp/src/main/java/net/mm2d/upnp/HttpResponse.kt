@@ -30,15 +30,13 @@ internal constructor(
         override var version: String = Http.DEFAULT_HTTP_VERSION
     ) : StartLineDelegate {
         override val shouldStriveToReadBody: Boolean
-            get() = status == Http.Status.HTTP_OK
+            get() = status == Status.HTTP_OK
 
         fun getStatusCode(): Int = statusCode
 
         fun setStatusCode(code: Int) {
             val status = Status.valueOf(code)
-            if (status == Status.HTTP_INVALID) {
-                throw IllegalArgumentException("unexpected status code:$code")
-            }
+            require(status != Status.HTTP_INVALID) { "unexpected status code:$code" }
             setStatus(status)
         }
 
@@ -54,9 +52,7 @@ internal constructor(
 
         override fun setStartLine(startLine: String) {
             val params = startLine.split(" ", limit = 3)
-            if (params.size < 3) {
-                throw IllegalArgumentException()
-            }
+            require(params.size >= 3)
             version = params[0]
             val code = params[1].toIntOrNull() ?: throw IllegalArgumentException()
             setStatusCode(code)
