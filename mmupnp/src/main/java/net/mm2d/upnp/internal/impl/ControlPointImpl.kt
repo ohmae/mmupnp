@@ -181,7 +181,7 @@ internal class ControlPointImpl(
             deviceMap[uuid]?.findServiceById(svcid)
         } ?: return
         multicastEventListenerSet.forEach {
-            it.onEvent(service, lvl, seq, properties)
+            taskExecutors.callback { it.onEvent(service, lvl, seq, properties) }
         }
     }
 
