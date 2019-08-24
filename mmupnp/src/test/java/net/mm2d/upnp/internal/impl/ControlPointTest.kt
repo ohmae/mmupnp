@@ -12,7 +12,9 @@ import io.mockk.*
 import net.mm2d.upnp.*
 import net.mm2d.upnp.Adapter.discoveryListener
 import net.mm2d.upnp.Adapter.iconFilter
+import net.mm2d.upnp.Adapter.multicastEventListener
 import net.mm2d.upnp.Adapter.notifyEventListener
+import net.mm2d.upnp.Adapter.taskExecutor
 import net.mm2d.upnp.ControlPoint.DiscoveryListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.internal.manager.DeviceHolder
@@ -364,9 +366,8 @@ class ControlPointTest {
         private val ssdpSearchServerList: SsdpSearchServerList = mockk(relaxed = true)
         private val ssdpNotifyServerList: SsdpNotifyServerList = mockk(relaxed = true)
         private val taskExecutors: TaskExecutors = mockk(relaxed = true)
-        private val notifyEventListener: NotifyEventListener = mockk(relaxed = true)
         private val diFactory = spyk(DiFactory())
-        private val subscribeManager = spyk(SubscribeManagerImpl(taskExecutors, setOf(notifyEventListener), diFactory))
+        private val subscribeManager = spyk(SubscribeManagerImpl(taskExecutors, mockk(relaxed = true), diFactory))
 
         @Before
         fun setUp() {
@@ -1147,7 +1148,7 @@ class ControlPointTest {
                     notifySegmentCheckEnabled = false,
                     subscriptionEnabled = true,
                     multicastEventingEnabled = false,
-                    factory = DiFactory(Protocol.DEFAULT)
+                    factory = DiFactory(Protocol.DEFAULT, taskExecutor { it.run().let { true } })
                 )
             )
         }
@@ -1162,7 +1163,7 @@ class ControlPointTest {
             every { device.findServiceById(svcid) } returns service
             cp.discoverDevice(device)
 
-            val listener = spyk(Adapter.multicastEventListener { _, _, _, _ -> })
+            val listener = spyk(multicastEventListener { _, _, _, _ -> })
             cp.addMulticastEventListener(listener)
 
             val lvl = "upnp:/info"
@@ -1183,7 +1184,7 @@ class ControlPointTest {
             every { device.findServiceById(svcid) } returns service
             cp.discoverDevice(device)
 
-            val listener = spyk(Adapter.multicastEventListener { _, _, _, _ -> })
+            val listener = spyk(multicastEventListener { _, _, _, _ -> })
             cp.addMulticastEventListener(listener)
             cp.removeMulticastEventListener(listener)
 
@@ -1206,7 +1207,7 @@ class ControlPointTest {
             every { device.findServiceById(svcid) } returns service
             cp.discoverDevice(device)
 
-            val listener = spyk(Adapter.multicastEventListener { _, _, _, _ -> })
+            val listener = spyk(multicastEventListener { _, _, _, _ -> })
             cp.addMulticastEventListener(listener)
 
             val lvl = "upnp:/info"

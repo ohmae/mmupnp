@@ -8,21 +8,18 @@
 package net.mm2d.upnp.internal.manager
 
 import net.mm2d.log.Logger
-import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.internal.impl.DiFactory
 import net.mm2d.upnp.internal.server.EventReceiver
 import net.mm2d.upnp.internal.thread.TaskExecutors
 
 internal class SubscribeManagerImpl(
-    private val taskExecutors: TaskExecutors,
-    private val listeners: Set<NotifyEventListener>,
+    taskExecutors: TaskExecutors,
+    private val listener: (service: Service, seq: Long, properties: List<Pair<String, String>>) -> Unit,
     factory: DiFactory
 ) : SubscribeManager {
     private val serviceHolder: SubscribeServiceHolder = factory.createSubscribeServiceHolder(taskExecutors)
-    private val eventReceiver: EventReceiver = factory.createEventReceiver(
-        taskExecutors, this::onEventReceived
-    )
+    private val eventReceiver: EventReceiver = factory.createEventReceiver(taskExecutors, this::onEventReceived)
 
     // VisibleForTesting
     internal fun onEventReceived(sid: String, seq: Long, properties: List<Pair<String, String>>): Boolean {
@@ -31,22 +28,8 @@ internal class SubscribeManagerImpl(
             Logger.w { "no service to receive: $sid" }
             return false
         }
-        return taskExecutors.callback {
-            properties.forEach {
-                notifyEvent(service, seq, it.first, it.second)
-            }
-        }
-    }
-
-    private fun notifyEvent(service: Service, seq: Long, name: String?, value: String?) {
-        val variable = service.findStateVariable(name)
-        if (variable?.isSendEvents != true || value == null) {
-            Logger.w { "illegal notify argument: $name $value" }
-            return
-        }
-        listeners.forEach {
-            it.onNotifyEvent(service, seq, variable.name, value)
-        }
+        listener(service, seq, properties)
+        return true
     }
 
     override fun checkEnabled() = Unit

@@ -59,9 +59,7 @@ internal class ControlPointImpl(
     internal val taskExecutors: TaskExecutors
 
     init {
-        if (interfaces.none()) {
-            throw IllegalStateException("no valid network interface.")
-        }
+        check(!interfaces.none()) { "no valid network interface." }
         discoveryListenerSet = CopyOnWriteArraySet()
         notifyEventListenerSet = CopyOnWriteArraySet()
         multicastEventListenerSet = CopyOnWriteArraySet()
@@ -77,9 +75,9 @@ internal class ControlPointImpl(
         }
         notifyServerList.setSegmentCheckEnabled(notifySegmentCheckEnabled)
         deviceHolder = factory.createDeviceHolder(taskExecutors) { lostDevice(it) }
-        subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, notifyEventListenerSet)
+        subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, ::onReceiveEvent)
         multicastEventReceiverList = if (multicastEventingEnabled) {
-            factory.createMulticastEventReceiverList(taskExecutors, interfaces, this::onReceiveMulticastEvent)
+            factory.createMulticastEventReceiverList(taskExecutors, interfaces, ::onReceiveMulticastEvent)
         } else null
     }
 
@@ -166,6 +164,23 @@ internal class ControlPointImpl(
             }
         } finally {
             client.close()
+        }
+    }
+
+    private fun onReceiveEvent(service: Service, seq: Long, properties: List<Pair<String, String>>) {
+        properties.forEach {
+            notifyEvent(service, seq, it.first, it.second)
+        }
+    }
+
+    private fun notifyEvent(service: Service, seq: Long, name: String?, value: String?) {
+        val variable = service.findStateVariable(name)
+        if (variable?.isSendEvents != true || value == null) {
+            Logger.w { "illegal notify argument: $name $value" }
+            return
+        }
+        notifyEventListenerSet.forEach {
+            taskExecutors.callback { it.onNotifyEvent(service, seq, variable.name, value) }
         }
     }
 

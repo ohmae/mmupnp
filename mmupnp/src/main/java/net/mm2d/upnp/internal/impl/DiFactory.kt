@@ -7,11 +7,7 @@
 
 package net.mm2d.upnp.internal.impl
 
-import net.mm2d.upnp.ControlPoint.NotifyEventListener
-import net.mm2d.upnp.Device
-import net.mm2d.upnp.Protocol
-import net.mm2d.upnp.SsdpMessage
-import net.mm2d.upnp.TaskExecutor
+import net.mm2d.upnp.*
 import net.mm2d.upnp.internal.manager.*
 import net.mm2d.upnp.internal.server.EventReceiver
 import net.mm2d.upnp.internal.server.MulticastEventReceiverList
@@ -51,9 +47,9 @@ internal class DiFactory(
     fun createSubscribeManager(
         subscriptionEnabled: Boolean,
         taskExecutors: TaskExecutors,
-        listeners: Set<NotifyEventListener>
+        listener: (service: Service, seq: Long, properties: List<Pair<String, String>>) -> Unit
     ): SubscribeManager = if (subscriptionEnabled) {
-        SubscribeManagerImpl(taskExecutors, listeners, this)
+        SubscribeManagerImpl(taskExecutors, listener, this)
     } else {
         EmptySubscribeManager()
     }

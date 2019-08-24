@@ -12,7 +12,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
-import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.internal.impl.DiFactory
 import net.mm2d.upnp.internal.server.EventReceiver
@@ -26,12 +25,12 @@ class SubscribeManagerImplTest {
     @Test
     fun onEventReceived_has_no_service() {
         val holder: SubscribeServiceHolder = mockk(relaxed = true)
+        every { holder.getService(any()) } returns null
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createSubscribeServiceHolder(any()) } returns holder
 
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         assertThat(manager.onEventReceived("", 0, emptyList())).isFalse()
     }
 
@@ -39,10 +38,9 @@ class SubscribeManagerImplTest {
     fun onEventReceived() {
         val holder: SubscribeServiceHolder = mockk(relaxed = true)
         val taskExecutors = TaskExecutors()
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createSubscribeServiceHolder(any()) } returns holder
-        val manager = SubscribeManagerImpl(taskExecutors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(taskExecutors, mockk(relaxed = true), factory)
         val sid = "sid"
         val service: Service = mockk(relaxed = true)
         every { holder.getService(sid) } returns service
@@ -56,10 +54,9 @@ class SubscribeManagerImplTest {
     fun initialize() {
         val holder: SubscribeServiceHolder = mockk(relaxed = true)
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createSubscribeServiceHolder(any()) } returns holder
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         manager.initialize()
         verify(exactly = 1) { holder.start() }
     }
@@ -68,10 +65,9 @@ class SubscribeManagerImplTest {
     fun start() {
         val receiver: EventReceiver = mockk(relaxed = true)
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createEventReceiver(any(), any()) } returns receiver
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         manager.start()
         verify(exactly = 1) { receiver.start() }
     }
@@ -81,11 +77,10 @@ class SubscribeManagerImplTest {
         val holder: SubscribeServiceHolder = mockk(relaxed = true)
         val receiver: EventReceiver = mockk(relaxed = true)
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createSubscribeServiceHolder(any()) } returns holder
         every { factory.createEventReceiver(any(), any()) } returns receiver
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         manager.stop()
 
         verify(exactly = 1) { holder.clear() }
@@ -96,10 +91,9 @@ class SubscribeManagerImplTest {
     fun terminate() {
         val holder: SubscribeServiceHolder = mockk(relaxed = true)
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createSubscribeServiceHolder(any()) } returns holder
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         manager.terminate()
         verify(exactly = 1) { holder.stop() }
     }
@@ -108,10 +102,9 @@ class SubscribeManagerImplTest {
     fun getEventPort() {
         val receiver: EventReceiver = mockk(relaxed = true)
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createEventReceiver(any(), any()) } returns receiver
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         val port = 80
         every { receiver.getLocalPort() } returns port
 
@@ -124,10 +117,9 @@ class SubscribeManagerImplTest {
     fun getSubscribeService() {
         val holder: SubscribeServiceHolder = mockk(relaxed = true)
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createSubscribeServiceHolder(any()) } returns holder
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         val id = "id"
         val service: Service = mockk(relaxed = true)
         every { holder.getService(id) } returns service
@@ -141,10 +133,9 @@ class SubscribeManagerImplTest {
     fun register() {
         val holder: SubscribeServiceHolder = mockk(relaxed = true)
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createSubscribeServiceHolder(any()) } returns holder
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         val service: Service = mockk(relaxed = true)
         val timeout = 1000L
 
@@ -156,9 +147,8 @@ class SubscribeManagerImplTest {
     @Test
     fun renew() {
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = DiFactory()
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         val service: Service = mockk(relaxed = true)
         val id = "id"
         every { service.subscriptionId } returns id
@@ -175,10 +165,9 @@ class SubscribeManagerImplTest {
     fun unregister() {
         val holder: SubscribeServiceHolder = mockk(relaxed = true)
         val executors: TaskExecutors = mockk(relaxed = true)
-        val listener: NotifyEventListener = mockk(relaxed = true)
         val factory = spyk(DiFactory())
         every { factory.createSubscribeServiceHolder(any()) } returns holder
-        val manager = SubscribeManagerImpl(executors, setOf(listener), factory)
+        val manager = SubscribeManagerImpl(executors, mockk(relaxed = true), factory)
         val service: Service = mockk(relaxed = true)
 
         manager.unregister(service)
