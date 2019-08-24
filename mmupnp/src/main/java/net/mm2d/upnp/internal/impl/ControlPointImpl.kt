@@ -59,7 +59,7 @@ internal class ControlPointImpl(
     internal val taskExecutors: TaskExecutors
 
     init {
-        check(!interfaces.none()) { "no valid network interface." }
+        check(interfaces.any()) { "no valid network interface." }
         discoveryListenerSet = CopyOnWriteArraySet()
         notifyEventListenerSet = CopyOnWriteArraySet()
         multicastEventListenerSet = CopyOnWriteArraySet()
@@ -258,9 +258,7 @@ internal class ControlPointImpl(
     }
 
     override fun search(st: String?) {
-        if (!started.get()) {
-            throw IllegalStateException("ControlPoint is not started.")
-        }
+        check(started.get()) { "ControlPoint is not started." }
         searchServerList.search(st)
     }
 

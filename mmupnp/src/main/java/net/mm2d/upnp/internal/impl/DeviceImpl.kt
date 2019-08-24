@@ -167,12 +167,18 @@ internal class DeviceImpl private constructor(
         }
 
         fun build(parent: Device? = null): DeviceImpl {
-            val description = description ?: throw IllegalStateException("description must be set.")
-            val deviceType = deviceType ?: throw IllegalStateException("deviceType must be set.")
-            val friendlyName = friendlyName ?: throw IllegalStateException("friendlyName must be set.")
-            val manufacture = manufacture ?: throw IllegalStateException("manufacturer must be set.")
-            val modelName = modelName ?: throw IllegalStateException("modelName must be set.")
-            val udn = udn ?: throw IllegalStateException("UDN must be set.")
+            val description = description
+                ?: throw IllegalStateException("description must be set.")
+            val deviceType = deviceType
+                ?: throw IllegalStateException("deviceType must be set.")
+            val friendlyName = friendlyName
+                ?: throw IllegalStateException("friendlyName must be set.")
+            val manufacture = manufacture
+                ?: throw IllegalStateException("manufacturer must be set.")
+            val modelName = modelName
+                ?: throw IllegalStateException("modelName must be set.")
+            val udn = udn
+                ?: throw IllegalStateException("UDN must be set.")
             val udnSet = collectUdn()
 
             if (parent == null) {
@@ -181,8 +187,8 @@ internal class DeviceImpl private constructor(
                 val uuid = getUuid()
                 if (uuid.isEmpty() && ssdpMessage is FakeSsdpMessage) {
                     ssdpMessage.uuid = udn
-                } else if (!udnSet.contains(uuid)) {
-                    throw IllegalStateException("uuid and udn does not match! uuid=$uuid udn=$udnSet")
+                } else {
+                    check(udnSet.contains(uuid)) { "uuid and udn does not match! uuid=$uuid udn=$udnSet" }
                 }
             }
             return DeviceImpl(

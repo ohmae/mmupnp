@@ -44,12 +44,9 @@ internal class IconImpl(
         fun build(): IconImpl {
             val mimeType = mimeType
                 ?: throw IllegalStateException("mimetype must be set.")
-            if (width <= 0)
-                throw IllegalStateException("width must be > 0. actually $width")
-            if (height <= 0)
-                throw IllegalStateException("height must be > 0. actually $height")
-            if (depth <= 0)
-                throw IllegalStateException("depth must be > 0. actually $depth")
+            check(width > 0) { "width must be > 0. actually $width" }
+            check(height > 0) { "height must be > 0. actually $height" }
+            check(depth > 0) { "depth must be > 0. actually $depth" }
             val url = url
                 ?: throw IllegalStateException("url must be set.")
 
