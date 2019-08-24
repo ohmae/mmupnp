@@ -1,4 +1,5 @@
 # mmupnp
+
 [![license](https://img.shields.io/github/license/ohmae/mmupnp.svg)](./LICENSE)
 [![GitHub release](https://img.shields.io/github/release/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/releases)
 [![GitHub issues](https://img.shields.io/github/issues/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/issues)
@@ -11,31 +12,35 @@
 Universal Plug and Play (UPnP) ControlPoint library for Java / Kotlin.
 
 ## Feature
+
 - Pure Kotlin implementation.
 - Available in both Java/Kotlin application and Android apps.
 - Easy to use
 - High response
 
 ## Requirements
+
 - kotlin 1.3 or later
 - Java 7 or later
 
 ## Restrictions
-- This library support only ControlPoint functions.
+
+- This library only provides ControlPoint.
 There is no way to make Device. If you need it, please select another library.
-- Some functions that are not widely used are not implemented.
-  - Multicast eventing
 
 ## Example of use
+
 Android App
+
 - DMS Explorer --
 [[Google Play](https://play.google.com/store/apps/details?id=net.mm2d.dmsexplorer)]
 [[Source Code](https://github.com/ohmae/DmsExplorer)]
 
 Sample App
 
-|![](readme/1.png)|![](readme/2.png)|
+|![screenshot](readme/1.png)|![screenshot](readme/2.png)|
 |-|-|
+
 
 ## API Documents
 
@@ -58,20 +63,30 @@ dependencies {
 }
 ```
 
-### Initialize and Start
+### Create instance
+
+To create instance with default parameor.
 
 ```kotlin
-val cp = ControlPointFactory.create().also {
-    // adding listener if necessary.
-    it.addDiscoveryListener(...)
-    it.addNotifyEventListener(...)
-    it.initialize()
-    it.start()
-}
-...
+val cp = ControlPointFactory.create()
 ```
 
-To specify the network interface, describe the following.
+`ControlPointFactory.create()` has many initialization parameters.
+
+In addition, Builder is also provided.
+Please use them according to your preference. It is convenient when using from Java.
+
+```kotlin
+val cp = ControlPointFactory.builder()
+    .setInterfaces(interfaces)
+    .setCallbackHandler { handler.post(it) }
+    ....
+    .build()
+```
+
+#### Initialize parameter
+
+To specify the network interface,
 
 ```kotlin
 val cp = ControlPointFactory.create(
@@ -80,7 +95,7 @@ val cp = ControlPointFactory.create(
 ```
 
 By default ControlPoint will work with dual stack of IPv4 and IPv6.
-To operate with IPv4 only, specify the protocol as follows.
+To operate with IPv4 only, specify the protocol,
 
 ```kotlin
 val cp = ControlPointFactory.create(
@@ -90,7 +105,6 @@ val cp = ControlPointFactory.create(
 
 You can change the callback thread.
 For example in Android, you may want to run callbacks with MainThread.
-In that case write as follows.
 
 ```kotlin
 val cp = ControlPointFactory.create(
@@ -98,7 +112,7 @@ val cp = ControlPointFactory.create(
 )
 ```
 
-Or If use executor
+Or If use executor,
 
 ```kotlin
 val cp = ControlPointFactory.create(
@@ -115,17 +129,42 @@ val cp = ControlPointFactory.create(
 )
 ```
 
-Builder type initialization is also provided.
-It is convenient when using from Java.
+If EventSubscription is not required,
 
 ```kotlin
-val cp = ControlPointFactory.builder()
-    .setInterfaces(interfaces)
-    .setCallbackHandler { handler.post(it) }
-    .build()
+val cp = ControlPointFactory.create(
+    subscriptionEnabled = false
+)
+```
+
+The server thread for receiving events does not start and resources can be reduced.
+
+If you want to receive multicast events,
+
+```kotlin
+val cp = ControlPointFactory.create(
+    multicastEventingEnabled = true
+)
+```
+
+**This feature is experimental.**
+Compatibility cannot be confirmed because no other implementation has been found.
+
+### Initialize and Start
+
+```kotlin
+val cp = ControlPointFactory.create().also {
+    // adding listener if necessary.
+    it.addDiscoveryListener(...)
+    it.addNotifyEventListener(...)
+    it.initialize()
+    it.start()
+}
+...
 ```
 
 ### M-SEARCH
+
 Call ControlPoint#search() or ControlPoint#search(String).
 
 ```kotlin
@@ -139,6 +178,7 @@ cp.search("upnp:rootdevice") // To use specific ST. In this case "upnp:rootdevic
 These methods send one M-SEARCH packet to all interfaces.
 
 ### Invoke Action
+
 For example, to invoke "Browse" (ContentDirectory) action...
 
 ```kotlin
@@ -165,6 +205,7 @@ browse?.invoke(
 ```
 
 ### Event Subscription
+
 For example, to subscribe ContentDirectory's events...
 
 ```kotlin
@@ -179,6 +220,8 @@ cds.subscribe()                              // Start subscribe
 ...
 cds.unsubscribe()                            // End subscribe
 ```
+
+Of course, this will not work if disabled at initialization.
 
 ### Stop and Terminate
 
@@ -217,7 +260,7 @@ Logger.setSender(DefaultSender.create({ level, tag, message ->
 eg. To handle exception
 
 ```kotlin
-Logger.setSender { level, message, throwable -> 
+Logger.setSender { level, message, throwable ->
     if (level >= Log.DEBUG) {
         SomeLogger.send(...)
     }
@@ -239,16 +282,25 @@ Please see [log library](https://github.com/ohmae/log) for more details
 - VERBOSE
   - More detail logs that output in normal operation for debugging.
 
+## Dependent OSS
+
+- [Kotlin](https://kotlinlang.org/)
+  - org.jetbrains.kotlin:kotlin-stdlib-jdk7
+- [log](https://github.com/ohmae/log)
+  - net.mm2d:log
+
 ## Special thanks
 
 This project is being developed with IntelliJ IDEA Ultimate,
 thanks to be approved to Jetbrains Free Open Source Licenses.
 
-[![](readme/jetbrains/jetbrains.svg)](https://www.jetbrains.com/?from=mmupnp)
+[![jetbrans logo](readme/jetbrains/jetbrains.svg)](https://www.jetbrains.com/?from=mmupnp)
 
 ## Author
+
 大前 良介 (OHMAE Ryosuke)
 http://www.mm2d.net/
 
 ## License
+
 [MIT License](./LICENSE)
