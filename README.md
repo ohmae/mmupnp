@@ -41,7 +41,6 @@ Sample App
 |![screenshot](readme/1.png)|![screenshot](readme/2.png)|
 |-|-|
 
-
 ## API Documents
 
 I described Javadoc/KDoc comments. Please refer to it for more information.
@@ -65,7 +64,7 @@ dependencies {
 
 ### Create instance
 
-To create instance with default parameor.
+To create instance with default parameter.
 
 ```kotlin
 val cp = ControlPointFactory.create()
