@@ -210,8 +210,10 @@ For example, to subscribe ContentDirectory's events...
 
 ```kotlin
 // add listener to receive event
-controlPoint.addNotifyEventListener(adapter { service, seq, variable, value ->
-    eventArea.text = "${eventArea.text}${service.serviceType} : $seq : $variable : $value\n"
+addEventListener( eventListener { service, seq, properties ->
+    properties.forEach {
+        eventArea.text = "${eventArea.text}${service.serviceType} : $seq : ${it.first} : ${it.second}\n"
+    }
 })
 val mediaServer = cp.getDevice(UDN)          // get device by UDN
 val cds = mediaServer.findServiceById(

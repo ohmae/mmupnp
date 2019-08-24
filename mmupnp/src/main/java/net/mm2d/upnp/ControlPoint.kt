@@ -43,6 +43,7 @@ interface ControlPoint {
      *
      * Notified in callback thread
      */
+    @Deprecated("use EventListener instead")
     interface NotifyEventListener {
         /**
          * Called on receive NotifyEvent
@@ -54,6 +55,23 @@ interface ControlPoint {
          * @see Service
          */
         fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String)
+    }
+
+    /**
+     * Listener to notify on receive Event.
+     *
+     * Notified in callback thread
+     */
+    interface EventListener {
+        /**
+         * Called on receive NotifyEvent
+         *
+         * @param service Target Service
+         * @param seq Sequence number
+         * @param properties property name / value pair list
+         * @see Service
+         */
+        fun onEvent(service: Service, seq: Long, properties: List<Pair<String, String>>)
     }
 
     /**
@@ -193,6 +211,7 @@ interface ControlPoint {
      * @see NotifyEventListener
      * @see ControlPointFactory.create
      */
+    @Deprecated("use addEventListener instead")
     fun addNotifyEventListener(listener: NotifyEventListener)
 
     /**
@@ -201,7 +220,26 @@ interface ControlPoint {
      * @param listener Listener to remove
      * @see NotifyEventListener
      */
+    @Deprecated("use removeEventListener instead")
     fun removeNotifyEventListener(listener: NotifyEventListener)
+
+    /**
+     * Add a EventListener.
+     *
+     * Listener notification is performed in the callback thread.
+     *
+     * @param listener Listener to add
+     * @see EventListener
+     */
+    fun addEventListener(listener: EventListener)
+
+    /**
+     * Remove a EventListener.
+     *
+     * @param listener Listener to remove
+     * @see EventListener
+     */
+    fun removeEventListener(listener: EventListener)
 
     /**
      * Add a EventListener.

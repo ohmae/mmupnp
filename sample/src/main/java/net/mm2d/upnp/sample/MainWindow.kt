@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import net.mm2d.log.DefaultSender
 import net.mm2d.log.Logger
 import net.mm2d.upnp.Adapter.discoveryListener
+import net.mm2d.upnp.Adapter.eventListener
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.ControlPoint
@@ -76,8 +77,10 @@ class MainWindow private constructor() : JFrame() {
 
     private fun setUpControlPoint() {
         controlPoint.addDiscoveryListener(discoveryListener({ update() }, { update() }))
-        controlPoint.addNotifyEventListener(notifyEventListener { service, seq, variable, value ->
-            eventArea.text = "${eventArea.text}${service.serviceType} : $seq : $variable : $value\n"
+        controlPoint.addEventListener( eventListener { service, seq, properties ->
+            properties.forEach {
+                eventArea.text = "${eventArea.text}${service.serviceType} : $seq : ${it.first} : ${it.second}\n"
+            }
         })
     }
 

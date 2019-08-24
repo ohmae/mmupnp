@@ -29,8 +29,12 @@ object EmptyControlPoint : ControlPoint {
     override fun setIconFilter(filter: IconFilter?) = Unit
     override fun addDiscoveryListener(listener: DiscoveryListener) = Unit
     override fun removeDiscoveryListener(listener: DiscoveryListener) = Unit
+    @Suppress("DEPRECATION")
     override fun addNotifyEventListener(listener: NotifyEventListener) = Unit
+    @Suppress("DEPRECATION")
     override fun removeNotifyEventListener(listener: NotifyEventListener) = Unit
+    override fun addEventListener(listener: EventListener) = Unit
+    override fun removeEventListener(listener: EventListener) = Unit
     override fun addMulticastEventListener(listener: MulticastEventListener) = Unit
     override fun removeMulticastEventListener(listener: MulticastEventListener) = Unit
     override fun getDevice(udn: String): Device? = null

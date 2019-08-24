@@ -95,6 +95,18 @@ class EmptyControlPointTest {
     }
 
     @Test
+    fun addEventListener() {
+        val controlPoint = EmptyControlPoint
+        controlPoint.addEventListener(mockk())
+    }
+
+    @Test
+    fun removeEventListener() {
+        val controlPoint = EmptyControlPoint
+        controlPoint.removeEventListener(mockk())
+    }
+
+    @Test
     fun addMulticastEventListener() {
         val controlPoint = EmptyControlPoint
         controlPoint.addMulticastEventListener(mockk())

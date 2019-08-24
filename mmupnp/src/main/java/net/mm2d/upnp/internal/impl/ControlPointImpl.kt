@@ -11,6 +11,7 @@ import net.mm2d.log.Logger
 import net.mm2d.upnp.*
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint.*
+import net.mm2d.upnp.ControlPoint.EventListener
 import net.mm2d.upnp.internal.impl.DeviceImpl.Builder
 import net.mm2d.upnp.internal.manager.DeviceHolder
 import net.mm2d.upnp.internal.manager.SubscribeManager
@@ -44,7 +45,9 @@ internal class ControlPointImpl(
 ) : ControlPoint {
     private var iconFilter: IconFilter = EMPTY_FILTER
     private val discoveryListenerSet: MutableSet<DiscoveryListener>
+    @Suppress("DEPRECATION")
     private val notifyEventListenerSet: MutableSet<NotifyEventListener>
+    private val eventListenerSet: MutableSet<EventListener>
     private val multicastEventListenerSet: MutableSet<MulticastEventListener>
     private val searchServerList: SsdpSearchServerList
     private val notifyServerList: SsdpNotifyServerList
@@ -62,6 +65,7 @@ internal class ControlPointImpl(
         check(interfaces.any()) { "no valid network interface." }
         discoveryListenerSet = CopyOnWriteArraySet()
         notifyEventListenerSet = CopyOnWriteArraySet()
+        eventListenerSet = CopyOnWriteArraySet()
         multicastEventListenerSet = CopyOnWriteArraySet()
         deviceMap = mutableMapOf()
         loadingPinnedDevices = Collections.synchronizedList(mutableListOf())
@@ -168,6 +172,10 @@ internal class ControlPointImpl(
     }
 
     private fun onReceiveEvent(service: Service, seq: Long, properties: List<Pair<String, String>>) {
+        eventListenerSet.forEach {
+            taskExecutors.callback { it.onEvent(service, seq, properties) }
+        }
+        if (notifyEventListenerSet.isEmpty()) return
         properties.forEach {
             notifyEvent(service, seq, it.first, it.second)
         }
@@ -280,12 +288,22 @@ internal class ControlPointImpl(
         discoveryListenerSet.remove(listener)
     }
 
+    @Suppress("DEPRECATION")
     override fun addNotifyEventListener(listener: NotifyEventListener) {
         notifyEventListenerSet.add(listener)
     }
 
+    @Suppress("DEPRECATION")
     override fun removeNotifyEventListener(listener: NotifyEventListener) {
         notifyEventListenerSet.remove(listener)
+    }
+
+    override fun addEventListener(listener: EventListener) {
+        eventListenerSet.add(listener)
+    }
+
+    override fun removeEventListener(listener: EventListener) {
+        eventListenerSet.remove(listener)
     }
 
     override fun addMulticastEventListener(listener: MulticastEventListener) {

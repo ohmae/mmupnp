@@ -51,15 +51,32 @@ object Adapter {
     /**
      * Adapter for [NotifyEventListener].
      *
-     * @param notifyEvent onNotifyEvent callback.
+     * @param notifyEvent onNotifyEvent callback
      * @return NotifyEventListener
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("use eventListener instead")
     @JvmStatic
     fun notifyEventListener(
         notifyEvent: (service: Service, seq: Long, variable: String, value: String) -> Unit
     ): NotifyEventListener = object : NotifyEventListener {
         override fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String) {
             notifyEvent(service, seq, variable, value)
+        }
+    }
+
+    /**
+     * Adapter for [EventListener].
+     *
+     * @param onEvent callback
+     * @return EventListener
+     */
+    @JvmStatic
+    fun eventListener(
+        onEvent: (service: Service, seq: Long, properties: List<Pair<String, String>>) -> Unit
+    ): EventListener = object : EventListener {
+        override fun onEvent(service: Service, seq: Long, properties: List<Pair<String, String>>) {
+            onEvent(service, seq, properties)
         }
     }
 
