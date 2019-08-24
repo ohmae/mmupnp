@@ -26,10 +26,28 @@
 </tr>
 <tr>
 <td>
+<p><a href="-event-listener/index.html">EventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">EventListener</span></code>
+<p>Listener to notify on receive Event.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-multicast-event-listener/index.html">MulticastEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">MulticastEventListener</span></code>
+<p>Listener to notify on receive multicast event.</p>
+</td>
+</tr>
+<tr>
+<td>
 <p><a href="-notify-event-listener/index.html">NotifyEventListener</a></p>
 </td>
 <td>
-<code><span class="keyword">interface </span><span class="identifier">NotifyEventListener</span></code>
+<code><span class="keyword">interface </span><s><span class="identifier">NotifyEventListener</span></s></code>
 <p>Listener to notify event of "NotifyEvent".</p>
 </td>
 </tr>
@@ -72,10 +90,28 @@
 </tr>
 <tr>
 <td>
+<p><a href="add-event-listener.html">addEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">addEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$addEventListener(net.mm2d.upnp.ControlPoint.EventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-event-listener/index.html"><span class="identifier">ControlPoint.EventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Add a EventListener.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="add-multicast-event-listener.html">addMulticastEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">addMulticastEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$addMulticastEventListener(net.mm2d.upnp.ControlPoint.MulticastEventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-multicast-event-listener/index.html"><span class="identifier">ControlPoint.MulticastEventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Add a EventListener.</p>
+</td>
+</tr>
+<tr>
+<td>
 <p><a href="add-notify-event-listener.html">addNotifyEventListener</a></p>
 </td>
 <td>
-<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">addNotifyEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$addNotifyEventListener(net.mm2d.upnp.ControlPoint.NotifyEventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-notify-event-listener/index.html"><span class="identifier">ControlPoint.NotifyEventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><s><span class="identifier">addNotifyEventListener</span></s><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$addNotifyEventListener(net.mm2d.upnp.ControlPoint.NotifyEventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-notify-event-listener/index.html"><span class="identifier">ControlPoint.NotifyEventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Add a NotifyEvent listener.</p>
 </td>
 </tr>
@@ -117,10 +153,28 @@
 </tr>
 <tr>
 <td>
+<p><a href="remove-event-listener.html">removeEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">removeEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$removeEventListener(net.mm2d.upnp.ControlPoint.EventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-event-listener/index.html"><span class="identifier">ControlPoint.EventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Remove a EventListener.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="remove-multicast-event-listener.html">removeMulticastEventListener</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">removeMulticastEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$removeMulticastEventListener(net.mm2d.upnp.ControlPoint.MulticastEventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-multicast-event-listener/index.html"><span class="identifier">ControlPoint.MulticastEventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Remove a EventListener.</p>
+</td>
+</tr>
+<tr>
+<td>
 <p><a href="remove-notify-event-listener.html">removeNotifyEventListener</a></p>
 </td>
 <td>
-<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">removeNotifyEventListener</span><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$removeNotifyEventListener(net.mm2d.upnp.ControlPoint.NotifyEventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-notify-event-listener/index.html"><span class="identifier">ControlPoint.NotifyEventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><s><span class="identifier">removeNotifyEventListener</span></s><span class="symbol">(</span><span class="identifier" id="net.mm2d.upnp.ControlPoint$removeNotifyEventListener(net.mm2d.upnp.ControlPoint.NotifyEventListener)/listener">listener</span><span class="symbol">:</span>&nbsp;<a href="-notify-event-listener/index.html"><span class="identifier">ControlPoint.NotifyEventListener</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Remove a NotifyEvent listener.</p>
 </td>
 </tr>
