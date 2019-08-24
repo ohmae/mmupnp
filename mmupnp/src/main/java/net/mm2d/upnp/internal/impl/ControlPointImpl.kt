@@ -43,8 +43,8 @@ internal class ControlPointImpl(
     factory: DiFactory
 ) : ControlPoint {
     private var iconFilter: IconFilter = EMPTY_FILTER
-    private val discoveryListenerList: MutableSet<DiscoveryListener>
-    private val notifyEventListenerList: MutableSet<NotifyEventListener>
+    private val discoveryListenerSet: MutableSet<DiscoveryListener>
+    private val notifyEventListenerSet: MutableSet<NotifyEventListener>
     private val multicastEventListenerSet: MutableSet<MulticastEventListener>
     private val searchServerList: SsdpSearchServerList
     private val notifyServerList: SsdpNotifyServerList
@@ -62,8 +62,8 @@ internal class ControlPointImpl(
         if (interfaces.none()) {
             throw IllegalStateException("no valid network interface.")
         }
-        discoveryListenerList = CopyOnWriteArraySet()
-        notifyEventListenerList = CopyOnWriteArraySet()
+        discoveryListenerSet = CopyOnWriteArraySet()
+        notifyEventListenerSet = CopyOnWriteArraySet()
         multicastEventListenerSet = CopyOnWriteArraySet()
         deviceMap = mutableMapOf()
         loadingPinnedDevices = Collections.synchronizedList(mutableListOf())
@@ -77,7 +77,7 @@ internal class ControlPointImpl(
         }
         notifyServerList.setSegmentCheckEnabled(notifySegmentCheckEnabled)
         deviceHolder = factory.createDeviceHolder(taskExecutors) { lostDevice(it) }
-        subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, notifyEventListenerList)
+        subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, notifyEventListenerSet)
         multicastEventReceiverList = if (multicastEventingEnabled) {
             factory.createMulticastEventReceiverList(taskExecutors, interfaces, this::onReceiveMulticastEvent)
         } else null
@@ -260,19 +260,19 @@ internal class ControlPointImpl(
     }
 
     override fun addDiscoveryListener(listener: DiscoveryListener) {
-        discoveryListenerList.add(listener)
+        discoveryListenerSet.add(listener)
     }
 
     override fun removeDiscoveryListener(listener: DiscoveryListener) {
-        discoveryListenerList.remove(listener)
+        discoveryListenerSet.remove(listener)
     }
 
     override fun addNotifyEventListener(listener: NotifyEventListener) {
-        notifyEventListenerList.add(listener)
+        notifyEventListenerSet.add(listener)
     }
 
     override fun removeNotifyEventListener(listener: NotifyEventListener) {
-        notifyEventListenerList.remove(listener)
+        notifyEventListenerSet.remove(listener)
     }
 
     override fun addMulticastEventListener(listener: MulticastEventListener) {
@@ -292,7 +292,7 @@ internal class ControlPointImpl(
         deviceHolder.add(device)
         collectUdn(device).forEach { deviceMap[it] = device }
         taskExecutors.callback {
-            discoveryListenerList.forEach { it.onDiscover(device) }
+            discoveryListenerSet.forEach { it.onDiscover(device) }
         }
     }
 
@@ -305,7 +305,7 @@ internal class ControlPointImpl(
             deviceHolder.remove(device)
         }
         taskExecutors.callback {
-            discoveryListenerList.forEach { it.onLost(device) }
+            discoveryListenerSet.forEach { it.onLost(device) }
         }
     }
 
