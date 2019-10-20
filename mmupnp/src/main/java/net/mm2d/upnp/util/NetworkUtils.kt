@@ -55,7 +55,7 @@ object NetworkUtils {
             NetworkInterface.getNetworkInterfaces()
         } catch (ignored: Throwable) {
             null
-        }?.let { Collections.list(it) } ?: emptyList()
+        }.let { it?.toList() } ?: emptyList()
     }
 }
 

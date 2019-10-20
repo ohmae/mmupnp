@@ -216,7 +216,7 @@ class NetworkUtilsTest {
             every { nif.interfaceAddresses } returns listOf(ipv6Address)
             every { nif.isLoopback } returns false
             every { nif.isUp } returns true
-            every { nif.supportsMulticast() } returns false
+            every { nif.supportsMulticast() } returns true
             assertThat(nif.isAvailableInet4Interface()).isFalse()
         }
 
@@ -284,8 +284,32 @@ class NetworkUtilsTest {
             every { nif.interfaceAddresses } returns listOf(ipv4Address)
             every { nif.isLoopback } returns false
             every { nif.isUp } returns true
-            every { nif.supportsMulticast() } returns false
+            every { nif.supportsMulticast() } returns true
             assertThat(nif.isAvailableInet6Interface()).isFalse()
+        }
+
+        @Test
+        fun isAvailableInterface() {
+            val nif = mockk<NetworkInterface>()
+            every { nif.interfaceAddresses } returns listOf()
+            every { nif.isLoopback } returns false
+            every { nif.isUp } returns true
+            every { nif.supportsMulticast() } returns true
+            assertThat(nif.isAvailableInterface()).isFalse()
+            every { nif.interfaceAddresses } returns listOf(ipv4Address)
+            assertThat(nif.isAvailableInterface()).isTrue()
+            every { nif.interfaceAddresses } returns listOf(ipv6Address)
+            assertThat(nif.isAvailableInterface()).isTrue()
+        }
+
+        @Test
+        fun isAvailableInet6Address() {
+            val address: Inet6Address = mockk(relaxed = true)
+            every { address.isLinkLocalAddress } returns false
+            assertThat(address.isAvailableInet6Address()).isFalse()
+            every { address.isLinkLocalAddress } returns true
+            assertThat(address.isAvailableInet6Address()).isTrue()
+            assertThat(mockk<Inet4Address>().isAvailableInet6Address()).isFalse()
         }
     }
 
