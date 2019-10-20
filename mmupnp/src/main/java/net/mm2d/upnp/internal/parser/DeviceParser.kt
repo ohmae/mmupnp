@@ -81,8 +81,6 @@ internal object DeviceParser {
                     parseServiceList(builder, it)
                 "deviceList" ->
                     parseDeviceList(builder, it)
-                "", null -> {
-                }
                 else -> {
                     val namespace = it.namespaceURI
                     val value = it.textContent

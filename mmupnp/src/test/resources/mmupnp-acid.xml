@@ -6,6 +6,7 @@
     </specVersion>
     <actionList>
         <action>
+            <garbage/>
             <name>X_GetValue</name>
             <argumentList>
                 <argument>
@@ -46,9 +47,10 @@
             <defaultValue>10</defaultValue>
         </stateVariable>
         <stateVariable sendEvents="yes">
+            <garbage/>
             <name>A_ARG_TYPE_Value2</name>
             <dataType>i4</dataType>
-            <allowedValueRange></allowedValueRange>
+            <allowedValueRange/>
             <allowedValueList/>
             <allowedValueList>
                 <allowedValue>Input</allowedValue>
@@ -56,7 +58,6 @@
                 <garbage/>
             </allowedValueList>
             <defaultValue>10</defaultValue>
-            <garbage/>
         </stateVariable>
         <garbage/>
         <stateVariable/>
