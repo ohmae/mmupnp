@@ -23,6 +23,7 @@ import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.IOException
+import java.lang.IllegalStateException
 import java.net.URL
 
 @Suppress("TestFunctionName", "NonAsciiCharacters", "ClassName")
@@ -116,6 +117,22 @@ class DeviceParserTest {
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
             } returns TestUtils.getResourceAsString("mmupnp-special.xml")
+
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
+            DeviceParser.loadDescription(httpClient, builder)
+            val device = builder.build()
+            assertThat(device.iconList).hasSize(4)
+            assertThat(device.serviceList).hasSize(3)
+        }
+
+        @Test(expected = IllegalStateException::class)
+        fun loadDescription_acid() {
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
+            } returns TestUtils.getResourceAsString("device.xml")
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
+            } returns TestUtils.getResourceAsString("mmupnp-acid.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
