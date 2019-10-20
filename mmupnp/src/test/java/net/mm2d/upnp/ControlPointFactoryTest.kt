@@ -62,6 +62,26 @@ class ControlPointFactoryTest {
     }
 
     @Test
+    fun create_executorの指定() {
+        ControlPointFactory.create(
+            callbackExecutor = null,
+            callbackHandler = null
+        )
+        ControlPointFactory.create(
+            callbackExecutor = mockk(),
+            callbackHandler = null
+        )
+        ControlPointFactory.create(
+            callbackExecutor = null,
+            callbackHandler = mockk()
+        )
+        ControlPointFactory.create(
+            callbackExecutor = mockk(),
+            callbackHandler = mockk()
+        )
+    }
+
+    @Test
     fun builder() {
         ControlPointFactory.builder()
             .setProtocol(Protocol.DEFAULT)
