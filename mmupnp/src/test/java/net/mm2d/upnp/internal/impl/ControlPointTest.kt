@@ -680,7 +680,7 @@ class ControlPointTest {
             val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"
             every { device.udn } returns udn
 
-            deviceHolder.add(device)
+            cp.discoverDevice(device)
             cp.onReceiveSsdpMessage(message)
         }
 
@@ -904,7 +904,7 @@ class ControlPointTest {
             cp.start()
             val device: Device = mockk(relaxed = true)
             every { device.udn } returns "udn"
-            deviceHolder.add(device)
+            cp.discoverDevice(device)
             val service: Service = mockk(relaxed = true)
             every { service.subscriptionId } returns "SubscriptionId"
             subscribeManager.register(service, 1000L, false)
