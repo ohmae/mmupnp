@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp
+package net.mm2d.upnp.common
 
 import java.util.concurrent.TimeUnit
 

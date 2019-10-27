@@ -19,6 +19,7 @@ import net.mm2d.upnp.Adapter.taskExecutor
 import net.mm2d.upnp.ControlPoint.*
 import net.mm2d.upnp.ControlPoint.EventListener
 import net.mm2d.upnp.common.HttpClient
+import net.mm2d.upnp.common.Protocol
 import net.mm2d.upnp.common.util.NetworkUtils
 import net.mm2d.upnp.internal.manager.DeviceHolder
 import net.mm2d.upnp.internal.manager.SubscribeManagerImpl

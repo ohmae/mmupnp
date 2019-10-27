@@ -16,10 +16,9 @@ import net.mm2d.log.Logger
 import net.mm2d.upnp.Adapter.discoveryListener
 import net.mm2d.upnp.Adapter.eventListener
 import net.mm2d.upnp.Adapter.iconFilter
-import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPointFactory
-import net.mm2d.upnp.Protocol
+import net.mm2d.upnp.common.Protocol
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.sample
 
-import net.mm2d.upnp.util.asIterable
+import net.mm2d.upnp.common.util.asIterable
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.xml.sax.SAXException

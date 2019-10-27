@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.server
 
 import net.mm2d.log.Logger
-import net.mm2d.upnp.Property
+import net.mm2d.upnp.common.Property
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.HttpResponse

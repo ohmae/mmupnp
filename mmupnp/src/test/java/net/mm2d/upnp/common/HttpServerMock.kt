@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.common
 
-import net.mm2d.upnp.Property
 import net.mm2d.upnp.internal.util.closeQuietly
 import java.io.IOException
 import java.io.InputStream

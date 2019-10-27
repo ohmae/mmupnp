@@ -8,6 +8,7 @@
 package net.mm2d.upnp.internal.impl
 
 import net.mm2d.upnp.*
+import net.mm2d.upnp.common.Protocol
 import net.mm2d.upnp.internal.manager.*
 import net.mm2d.upnp.internal.server.EventReceiver
 import net.mm2d.upnp.internal.server.MulticastEventReceiverList

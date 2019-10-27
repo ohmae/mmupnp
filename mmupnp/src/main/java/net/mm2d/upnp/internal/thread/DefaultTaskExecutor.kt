@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.thread
 
 import net.mm2d.log.Logger
-import net.mm2d.upnp.Property
+import net.mm2d.upnp.common.Property
 import net.mm2d.upnp.TaskExecutor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException

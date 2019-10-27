@@ -10,7 +10,7 @@ package net.mm2d.upnp.internal.impl
 import net.mm2d.log.Logger
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Argument
-import net.mm2d.upnp.Property
+import net.mm2d.upnp.common.Property
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.HttpRequest

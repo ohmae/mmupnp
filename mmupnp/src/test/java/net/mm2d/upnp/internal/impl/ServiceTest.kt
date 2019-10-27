@@ -11,7 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Device
-import net.mm2d.upnp.Property
+import net.mm2d.upnp.common.Property
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient

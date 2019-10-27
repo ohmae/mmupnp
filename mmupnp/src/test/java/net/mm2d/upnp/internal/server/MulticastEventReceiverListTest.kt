@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.server
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.*
-import net.mm2d.upnp.Protocol
+import net.mm2d.upnp.common.Protocol
 import net.mm2d.upnp.common.util.isAvailableInet4Interface
 import org.junit.After
 import org.junit.Before

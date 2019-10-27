@@ -11,7 +11,6 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
-import net.mm2d.upnp.Property
 import net.mm2d.upnp.common.Http.Status
 import org.junit.Test
 import org.junit.runner.RunWith

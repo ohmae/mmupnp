@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.server
 
 import net.mm2d.log.Logger
-import net.mm2d.upnp.Protocol
+import net.mm2d.upnp.common.Protocol
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import java.net.NetworkInterface
 
