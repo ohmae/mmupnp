@@ -12,8 +12,7 @@ import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.util.findInet4Address
 import net.mm2d.upnp.common.util.findInet6Address
 import net.mm2d.upnp.common.util.toSimpleString
-import net.mm2d.upnp.internal.parser.parseEventXml
-import net.mm2d.upnp.internal.parser.parseUsn
+import net.mm2d.upnp.common.internal.message.parseUsn
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
 import net.mm2d.upnp.internal.util.closeQuietly

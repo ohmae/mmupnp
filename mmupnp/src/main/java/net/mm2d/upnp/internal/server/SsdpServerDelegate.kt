@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.server
 
 import net.mm2d.log.Logger
-import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.util.findInet4Address
 import net.mm2d.upnp.common.util.findInet6Address
 import net.mm2d.upnp.common.util.toSimpleString

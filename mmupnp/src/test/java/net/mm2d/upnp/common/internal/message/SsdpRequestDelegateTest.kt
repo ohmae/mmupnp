@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message
+package net.mm2d.upnp.common.internal.message
 
 import io.mockk.every
 import io.mockk.mockk
@@ -17,16 +17,16 @@ import org.junit.runners.JUnit4
 import java.io.ByteArrayOutputStream
 
 @RunWith(JUnit4::class)
-class SsdpResponseDelegateTest {
+class SsdpRequestDelegateTest {
     private lateinit var delegate: SsdpMessageDelegate
-    private lateinit var message: SsdpResponse
+    private lateinit var message: SsdpRequest
 
     @Before
     fun setUp() {
         delegate = mockk(relaxed = true)
         every { delegate.type } returns ""
         every { delegate.uuid } returns ""
-        message = SsdpResponse(mockk(relaxed = true), delegate)
+        message = SsdpRequest(mockk(relaxed = true), delegate)
     }
 
     @Test
@@ -39,7 +39,7 @@ class SsdpResponseDelegateTest {
     fun getHeader() {
         val name = "name"
         message.getHeader(name)
-        verify(exactly = 1) { delegate.getHeader(eq(name)) }
+        verify(exactly = 1) { delegate.getHeader(name) }
     }
 
     @Test
@@ -47,7 +47,7 @@ class SsdpResponseDelegateTest {
         val name = "name"
         val value = "value"
         message.setHeader(name, value)
-        verify(exactly = 1) { delegate.setHeader(eq(name), eq(value)) }
+        verify(exactly = 1) { delegate.setHeader(name, value) }
     }
 
     @Test
@@ -90,7 +90,7 @@ class SsdpResponseDelegateTest {
     fun writeData() {
         val os = ByteArrayOutputStream()
         message.writeData(os)
-        verify(exactly = 1) { delegate.writeData(eq(os)) }
+        verify(exactly = 1) { delegate.writeData(os) }
     }
 
     @Test

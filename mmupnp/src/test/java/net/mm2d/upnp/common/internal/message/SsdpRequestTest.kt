@@ -5,12 +5,12 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message
+package net.mm2d.upnp.common.internal.message
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
-import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.internal.server.Address
 import net.mm2d.upnp.internal.server.SsdpSearchServer
 import net.mm2d.upnp.util.TestUtils
@@ -54,7 +54,8 @@ internal object SsdpRequestTest {
 
         @Test
         fun buildUp_受信データから作成() {
-            val message = makeFromResource("ssdp-notify-alive0.bin")
+            val message =
+                makeFromResource("ssdp-notify-alive0.bin")
             val baos = ByteArrayOutputStream()
             message.message.writeData(baos)
             val actual = baos.toByteArray()
@@ -65,13 +66,15 @@ internal object SsdpRequestTest {
 
         @Test
         fun toString_messageのtoStringと等価() {
-            val message = makeFromResource("ssdp-notify-alive0.bin")
+            val message =
+                makeFromResource("ssdp-notify-alive0.bin")
             assertThat(message.toString()).isEqualTo(message.message.toString())
         }
 
         @Test
         fun isPinned() {
-            val message = makeFromResource("ssdp-notify-alive0.bin")
+            val message =
+                makeFromResource("ssdp-notify-alive0.bin")
             assertThat(message.isPinned).isFalse()
         }
     }
@@ -80,14 +83,16 @@ internal object SsdpRequestTest {
     class 個別パラメータ {
         @Test
         fun getType() {
-            val message = makeFromResource("ssdp-notify-alive2.bin")
+            val message =
+                makeFromResource("ssdp-notify-alive2.bin")
             assertThat(message.type).isEqualTo("urn:schemas-upnp-org:service:ContentDirectory:1")
         }
 
         @Test
         fun getExpireTime() {
             val beforeTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(300)
-            val message = makeFromResource("ssdp-notify-alive2.bin")
+            val message =
+                makeFromResource("ssdp-notify-alive2.bin")
             val afterTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(300)
 
             assertThat(message.expireTime).isAtLeast(beforeTime)

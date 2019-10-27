@@ -5,9 +5,9 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message
+package net.mm2d.upnp.common.internal.message
 
-import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.HttpRequest
 import java.io.ByteArrayInputStream
 import java.io.IOException

@@ -9,6 +9,7 @@ package net.mm2d.upnp.empty
 
 import net.mm2d.upnp.*
 import net.mm2d.upnp.common.HttpClient
+import net.mm2d.upnp.common.SsdpMessage
 
 /**
  * Empty implementation of [Device].

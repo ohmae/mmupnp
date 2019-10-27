@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message
+package net.mm2d.upnp.common.internal.message
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
@@ -33,7 +33,8 @@ internal object SsdpResponseTest {
     class 作成 {
         @Test
         fun buildUp_受信データから作成() {
-            val message = makeFromResource("ssdp-search-response0.bin")
+            val message =
+                makeFromResource("ssdp-search-response0.bin")
 
             val baos = ByteArrayOutputStream()
             message.message.writeData(baos)
@@ -46,28 +47,32 @@ internal object SsdpResponseTest {
 
         @Test
         fun setStatusCode() {
-            val message = makeFromResource("ssdp-search-response0.bin")
+            val message =
+                makeFromResource("ssdp-search-response0.bin")
             message.setStatusCode(404)
             assertThat(message.getStatusCode()).isEqualTo(404)
         }
 
         @Test
         fun setReasonPhrase() {
-            val message = makeFromResource("ssdp-search-response0.bin")
+            val message =
+                makeFromResource("ssdp-search-response0.bin")
             message.setReasonPhrase("Not Found")
             assertThat(message.getReasonPhrase()).isEqualTo("Not Found")
         }
 
         @Test
         fun setStatus() {
-            val message = makeFromResource("ssdp-search-response0.bin")
+            val message =
+                makeFromResource("ssdp-search-response0.bin")
             message.setStatus(Http.Status.HTTP_NOT_FOUND)
             assertThat(message.getStatus()).isEqualTo(Http.Status.HTTP_NOT_FOUND)
         }
 
         @Test
         fun isPinned() {
-            val message = makeFromResource("ssdp-search-response0.bin")
+            val message =
+                makeFromResource("ssdp-search-response0.bin")
             assertThat(message.isPinned).isEqualTo(false)
         }
     }

@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.empty
 
-import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.SsdpMessage
 import java.io.IOException
 import java.io.OutputStream
 import java.net.InetAddress

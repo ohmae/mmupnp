@@ -7,9 +7,9 @@
 
 package net.mm2d.upnp.internal.server
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
-import net.mm2d.upnp.internal.message.SsdpResponse
+import net.mm2d.upnp.common.internal.message.SsdpResponse
 import net.mm2d.upnp.util.TestUtils
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,24 +29,24 @@ class SsdpMessageValidatorTest {
     @Test
     fun isInvalidLocation_アドレス一致() {
         val message = makeFromResource("ssdp-search-response0.bin")
-        Truth.assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isFalse()
+        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isFalse()
     }
 
     @Test
     fun isInvalidLocation_http以外() {
         val message = makeFromResource("ssdp-search-response-invalid-location0.bin")
-        Truth.assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
+        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
     }
 
     @Test
     fun isInvalidLocation_表記に問題() {
         val message = makeFromResource("ssdp-search-response-invalid-location1.bin")
-        Truth.assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
+        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
     }
 
     @Test
     fun isInvalidLocation_locationなし() {
         val message = makeFromResource("ssdp-search-response-no-location.bin")
-        Truth.assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
+        assertThat(message.hasInvalidLocation(InetAddress.getByName("192.0.2.2"))).isTrue()
     }
 }

@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.server
 
-import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.SsdpMessage
 
 /**
  * Interface for receiving SSDP packets

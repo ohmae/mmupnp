@@ -9,7 +9,7 @@ package net.mm2d.upnp.internal.message
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
-import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.SsdpMessage
 import org.junit.Before
 import org.junit.Test
 

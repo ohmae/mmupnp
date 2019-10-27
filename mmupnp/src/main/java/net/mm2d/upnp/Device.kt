@@ -8,6 +8,7 @@
 package net.mm2d.upnp
 
 import net.mm2d.upnp.common.HttpClient
+import net.mm2d.upnp.common.SsdpMessage
 
 /**
  * Interface of UPnP Device.

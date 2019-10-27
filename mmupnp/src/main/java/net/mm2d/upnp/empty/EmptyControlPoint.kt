@@ -11,7 +11,7 @@ import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPoint.*
 import net.mm2d.upnp.Device
 import net.mm2d.upnp.IconFilter
-import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.SsdpMessage
 
 /**
  * Empty implementation of [ControlPoint].

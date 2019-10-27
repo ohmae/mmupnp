@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp
 
+import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.empty.*
 
 /**

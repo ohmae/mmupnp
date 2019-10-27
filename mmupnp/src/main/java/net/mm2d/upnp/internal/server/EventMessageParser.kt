@@ -5,13 +5,10 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.parser
+package net.mm2d.upnp.internal.server
 
-import net.mm2d.upnp.common.Http
-import net.mm2d.upnp.common.HttpMessage
 import net.mm2d.upnp.common.util.XmlUtils
 import net.mm2d.upnp.common.util.siblingElements
-import java.util.*
 
 internal fun String?.parseEventXml(): List<Pair<String, String>> {
     if (this.isNullOrEmpty()) {
@@ -39,22 +36,3 @@ internal fun String?.parseEventXml(): List<Pair<String, String>> {
     return emptyList()
 }
 
-internal const val DEFAULT_MAX_AGE = 1800
-
-internal fun HttpMessage.parseCacheControl(): Int {
-    val age = getHeader(Http.CACHE_CONTROL)?.toLowerCase(Locale.US)
-    if (age?.startsWith("max-age") != true) {
-        return DEFAULT_MAX_AGE
-    }
-    return age.substringAfter('=', "").toIntOrNull() ?: DEFAULT_MAX_AGE
-}
-
-internal fun HttpMessage.parseUsn(): Pair<String, String> {
-    val usn = getHeader(Http.USN)
-    if (usn.isNullOrEmpty() || !usn.startsWith("uuid")) {
-        return "" to ""
-    }
-    val pos = usn.indexOf("::")
-    return if (pos < 0) usn to ""
-    else usn.substring(0, pos) to usn.substring(pos + 2)
-}

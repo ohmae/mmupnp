@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message
+package net.mm2d.upnp.common.internal.message
 
 import com.google.common.truth.Truth.assertThat
 import net.mm2d.upnp.common.HttpRequest
@@ -35,7 +35,8 @@ class SsdpMessageDelegateTest {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
         val request = HttpRequest.create()
         request.readData(ByteArrayInputStream(data, 0, data.size))
-        val delegate = SsdpMessageDelegate(request, InetAddress.getByName("192.0.2.3"))
+        val delegate =
+            SsdpMessageDelegate(request, InetAddress.getByName("192.0.2.3"))
 
         assertThat(delegate.scopeId).isEqualTo(0)
     }
@@ -45,7 +46,10 @@ class SsdpMessageDelegateTest {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
         val request = HttpRequest.create()
         request.readData(ByteArrayInputStream(data, 0, data.size))
-        val delegate = SsdpMessageDelegate(request, InetAddress.getByName("fe80::a831:801b:8dc6:421f"))
+        val delegate = SsdpMessageDelegate(
+            request,
+            InetAddress.getByName("fe80::a831:801b:8dc6:421f")
+        )
 
         assertThat(delegate.scopeId).isEqualTo(0)
     }

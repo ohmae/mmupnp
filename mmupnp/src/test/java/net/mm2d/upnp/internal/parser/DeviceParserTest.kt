@@ -10,11 +10,11 @@ package net.mm2d.upnp.internal.parser
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
-import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.common.HttpClient
+import net.mm2d.upnp.common.SsdpMessage
+import net.mm2d.upnp.common.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.impl.ControlPointImpl
 import net.mm2d.upnp.internal.impl.DeviceImpl
-import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.util.TestUtils
 import org.junit.Assert.fail
 import org.junit.Before
