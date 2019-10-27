@@ -8,8 +8,8 @@
 package net.mm2d.upnp.internal.server
 
 import io.mockk.*
-import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpRequest
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
 import net.mm2d.upnp.internal.util.closeQuietly

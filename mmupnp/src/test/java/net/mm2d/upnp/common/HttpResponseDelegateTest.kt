@@ -5,14 +5,14 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp
+package net.mm2d.upnp.common
 
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
-import net.mm2d.upnp.HttpResponse.StartLine
-import net.mm2d.upnp.internal.message.HttpMessageDelegate
+import net.mm2d.upnp.common.HttpResponse.StartLine
+import net.mm2d.upnp.common.internal.message.HttpMessageDelegate
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.sample
 
-import net.mm2d.upnp.Http
+import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.Service
 import java.awt.Component
 import java.awt.Desktop

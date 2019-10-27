@@ -12,9 +12,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import net.mm2d.upnp.Adapter.iconFilter
-import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.parser.DeviceParser

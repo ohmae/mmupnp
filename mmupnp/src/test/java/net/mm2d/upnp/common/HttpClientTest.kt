@@ -5,13 +5,14 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp
+package net.mm2d.upnp.common
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
-import net.mm2d.upnp.Http.Status
+import net.mm2d.upnp.Property
+import net.mm2d.upnp.common.Http.Status
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

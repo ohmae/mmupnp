@@ -7,9 +7,9 @@
 
 package net.mm2d.upnp.internal.message
 
-import net.mm2d.upnp.Http.Status
-import net.mm2d.upnp.HttpResponse
 import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.Http.Status
+import net.mm2d.upnp.common.HttpResponse
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.net.InetAddress

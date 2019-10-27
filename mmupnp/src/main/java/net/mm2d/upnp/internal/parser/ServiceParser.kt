@@ -7,9 +7,9 @@
 
 package net.mm2d.upnp.internal.parser
 
-import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.StateVariable
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.internal.impl.*
 import net.mm2d.upnp.util.XmlUtils
 import net.mm2d.upnp.util.forEach

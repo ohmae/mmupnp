@@ -12,6 +12,7 @@ import net.mm2d.upnp.*
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint.*
 import net.mm2d.upnp.ControlPoint.EventListener
+import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.internal.impl.DeviceImpl.Builder
 import net.mm2d.upnp.internal.manager.DeviceHolder
 import net.mm2d.upnp.internal.manager.SubscribeManager

@@ -8,10 +8,10 @@
 package net.mm2d.upnp.internal.impl
 
 import net.mm2d.log.Logger
-import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
-import net.mm2d.upnp.HttpRequest
-import net.mm2d.upnp.HttpResponse
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpClient
+import net.mm2d.upnp.common.HttpRequest
+import net.mm2d.upnp.common.HttpResponse
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.util.toAddressString
 import java.io.IOException

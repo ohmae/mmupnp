@@ -8,8 +8,8 @@
 package net.mm2d.upnp.internal.parser
 
 import com.google.common.truth.Truth.assertThat
-import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpResponse
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

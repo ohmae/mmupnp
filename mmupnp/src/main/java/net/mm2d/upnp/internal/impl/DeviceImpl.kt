@@ -8,6 +8,7 @@
 package net.mm2d.upnp.internal.impl
 
 import net.mm2d.upnp.*
+import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import java.io.IOException
 import java.net.MalformedURLException

@@ -7,9 +7,9 @@
 
 package net.mm2d.upnp.internal.impl
 
-import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpClient
 import java.io.IOException
 
 /**

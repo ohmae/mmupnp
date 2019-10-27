@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp
 
+import net.mm2d.upnp.common.HttpClient
+
 /**
  * Interface of UPnP Device.
  *

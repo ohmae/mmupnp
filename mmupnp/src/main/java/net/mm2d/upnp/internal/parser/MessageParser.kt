@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp.internal.parser
 
-import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpMessage
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpMessage
 import net.mm2d.upnp.util.XmlUtils
 import net.mm2d.upnp.util.siblingElements
 import java.util.*

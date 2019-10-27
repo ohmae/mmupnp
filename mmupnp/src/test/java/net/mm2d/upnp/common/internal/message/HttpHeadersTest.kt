@@ -5,10 +5,10 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.message
+package net.mm2d.upnp.common.internal.message
 
 import com.google.common.truth.Truth.assertThat
-import net.mm2d.upnp.internal.message.HttpHeaders.Entry
+import net.mm2d.upnp.common.internal.message.HttpHeaders.Entry
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

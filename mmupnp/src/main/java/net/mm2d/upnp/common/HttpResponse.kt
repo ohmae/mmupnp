@@ -5,11 +5,11 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp
+package net.mm2d.upnp.common
 
-import net.mm2d.upnp.Http.Status
-import net.mm2d.upnp.internal.message.HttpMessageDelegate
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate
+import net.mm2d.upnp.common.Http.Status
+import net.mm2d.upnp.common.internal.message.HttpMessageDelegate
+import net.mm2d.upnp.common.internal.message.HttpMessageDelegate.StartLineDelegate
 import java.io.InputStream
 
 /**

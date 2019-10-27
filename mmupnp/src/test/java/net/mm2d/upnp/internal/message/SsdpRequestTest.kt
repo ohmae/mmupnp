@@ -9,8 +9,8 @@ package net.mm2d.upnp.internal.message
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
-import net.mm2d.upnp.Http
 import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.internal.server.Address
 import net.mm2d.upnp.internal.server.SsdpSearchServer
 import net.mm2d.upnp.util.TestUtils

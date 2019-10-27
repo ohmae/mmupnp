@@ -11,9 +11,9 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
 import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import org.junit.Test
 import org.junit.runner.RunWith

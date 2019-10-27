@@ -7,9 +7,9 @@
 
 package net.mm2d.upnp.internal.parser
 
-import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.internal.impl.DeviceImpl
 import net.mm2d.upnp.internal.impl.IconImpl
 import net.mm2d.upnp.internal.impl.ServiceImpl

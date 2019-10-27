@@ -5,10 +5,10 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp
+package net.mm2d.upnp.common
 
-import net.mm2d.upnp.internal.message.HttpMessageDelegate
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate
+import net.mm2d.upnp.common.internal.message.HttpMessageDelegate
+import net.mm2d.upnp.common.internal.message.HttpMessageDelegate.StartLineDelegate
 import net.mm2d.upnp.util.toAddressString
 import java.io.IOException
 import java.net.InetAddress

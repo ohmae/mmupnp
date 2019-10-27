@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.util
 
-import net.mm2d.upnp.Http
+import net.mm2d.upnp.common.Http
 import java.net.*
 import java.nio.ByteBuffer
 import java.util.*
