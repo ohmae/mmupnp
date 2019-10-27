@@ -14,9 +14,9 @@ import net.mm2d.upnp.Property
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.HttpRequest
-import net.mm2d.upnp.util.XmlUtils
-import net.mm2d.upnp.util.findChildElementByLocalName
-import net.mm2d.upnp.util.forEachElement
+import net.mm2d.upnp.common.util.XmlUtils
+import net.mm2d.upnp.common.util.findChildElementByLocalName
+import net.mm2d.upnp.common.util.forEachElement
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node

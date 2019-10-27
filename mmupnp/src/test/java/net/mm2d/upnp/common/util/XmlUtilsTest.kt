@@ -5,9 +5,10 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.util
+package net.mm2d.upnp.common.util
 
 import com.google.common.truth.Truth.assertThat
+import net.mm2d.upnp.util.TestUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

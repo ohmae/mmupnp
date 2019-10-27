@@ -5,13 +5,14 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.util
+package net.mm2d.upnp.common.util
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
+import net.mm2d.upnp.util.createInterfaceAddress
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

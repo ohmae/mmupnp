@@ -11,7 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.SsdpMessage
-import net.mm2d.upnp.util.isAvailableInet4Interface
+import net.mm2d.upnp.common.util.isAvailableInet4Interface
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -27,13 +27,13 @@ class SsdpNotifyServerListTest {
     @Before
     fun setUp() {
         nif = mockk(relaxed = true)
-        mockkStatic("net.mm2d.upnp.util.NetworkUtilsKt")
+        mockkStatic("net.mm2d.upnp.common.util.NetworkUtilsKt")
         every { nif.isAvailableInet4Interface() } returns true
     }
 
     @After
     fun teardown() {
-        unmockkStatic("net.mm2d.upnp.util.NetworkUtilsKt")
+        unmockkStatic("net.mm2d.upnp.common.util.NetworkUtilsKt")
     }
 
     @Test

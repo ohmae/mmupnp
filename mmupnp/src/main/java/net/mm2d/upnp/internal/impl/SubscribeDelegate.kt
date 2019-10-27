@@ -12,8 +12,8 @@ import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.HttpResponse
+import net.mm2d.upnp.common.util.toAddressString
 import net.mm2d.upnp.internal.manager.SubscribeManager
-import net.mm2d.upnp.util.toAddressString
 import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL

@@ -8,8 +8,8 @@
 package net.mm2d.upnp.internal.server
 
 import net.mm2d.upnp.Protocol
-import net.mm2d.upnp.util.isAvailableInet4Interface
-import net.mm2d.upnp.util.isAvailableInet6Interface
+import net.mm2d.upnp.common.util.isAvailableInet4Interface
+import net.mm2d.upnp.common.util.isAvailableInet6Interface
 import java.net.NetworkInterface
 
 internal inline fun <T : Any> Iterable<NetworkInterface>.createServerList(

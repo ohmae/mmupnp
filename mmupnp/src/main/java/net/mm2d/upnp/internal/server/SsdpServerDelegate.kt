@@ -9,12 +9,12 @@ package net.mm2d.upnp.internal.server
 
 import net.mm2d.log.Logger
 import net.mm2d.upnp.SsdpMessage
+import net.mm2d.upnp.common.util.findInet4Address
+import net.mm2d.upnp.common.util.findInet6Address
+import net.mm2d.upnp.common.util.toSimpleString
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
 import net.mm2d.upnp.internal.util.closeQuietly
-import net.mm2d.upnp.util.findInet4Address
-import net.mm2d.upnp.util.findInet6Address
-import net.mm2d.upnp.util.toSimpleString
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.*

@@ -11,10 +11,10 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.util.NetworkUtils
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.message.SsdpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
-import net.mm2d.upnp.util.NetworkUtils
 import net.mm2d.upnp.util.TestUtils
 import net.mm2d.upnp.util.createInterfaceAddress
 import org.junit.After

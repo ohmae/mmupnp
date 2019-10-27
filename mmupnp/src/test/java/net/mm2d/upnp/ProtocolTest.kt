@@ -5,8 +5,8 @@
 package net.mm2d.upnp
 
 import com.google.common.truth.Truth.assertThat
-import net.mm2d.upnp.util.isAvailableInet4Interface
-import net.mm2d.upnp.util.isAvailableInet6Interface
+import net.mm2d.upnp.common.util.isAvailableInet4Interface
+import net.mm2d.upnp.common.util.isAvailableInet6Interface
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

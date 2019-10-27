@@ -8,7 +8,7 @@
 package net.mm2d.upnp
 
 import io.mockk.mockk
-import net.mm2d.upnp.util.NetworkUtils
+import net.mm2d.upnp.common.util.NetworkUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

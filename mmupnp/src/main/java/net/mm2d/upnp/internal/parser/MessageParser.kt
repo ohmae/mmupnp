@@ -9,8 +9,8 @@ package net.mm2d.upnp.internal.parser
 
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpMessage
-import net.mm2d.upnp.util.XmlUtils
-import net.mm2d.upnp.util.siblingElements
+import net.mm2d.upnp.common.util.XmlUtils
+import net.mm2d.upnp.common.util.siblingElements
 import java.util.*
 
 internal fun String?.parseEventXml(): List<Pair<String, String>> {

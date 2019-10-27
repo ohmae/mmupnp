@@ -19,6 +19,7 @@ import net.mm2d.upnp.Adapter.taskExecutor
 import net.mm2d.upnp.ControlPoint.*
 import net.mm2d.upnp.ControlPoint.EventListener
 import net.mm2d.upnp.common.HttpClient
+import net.mm2d.upnp.common.util.NetworkUtils
 import net.mm2d.upnp.internal.manager.DeviceHolder
 import net.mm2d.upnp.internal.manager.SubscribeManagerImpl
 import net.mm2d.upnp.internal.message.SsdpRequest
@@ -26,7 +27,6 @@ import net.mm2d.upnp.internal.message.SsdpResponse
 import net.mm2d.upnp.internal.parser.DeviceParser
 import net.mm2d.upnp.internal.server.*
 import net.mm2d.upnp.internal.thread.TaskExecutors
-import net.mm2d.upnp.util.NetworkUtils
 import net.mm2d.upnp.util.TestUtils
 import org.junit.After
 import org.junit.Before

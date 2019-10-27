@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.util
+package net.mm2d.upnp.common.util
 
 import org.w3c.dom.*
 import org.xml.sax.InputSource
