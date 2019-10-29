@@ -51,8 +51,6 @@ internal class ControlPointImpl(
 ) : ControlPoint {
     private var iconFilter: IconFilter = EMPTY_FILTER
     private val discoveryListenerSet: MutableSet<DiscoveryListener>
-    @Suppress("DEPRECATION")
-    private val notifyEventListenerSet: MutableSet<NotifyEventListener>
     private val eventListenerSet: MutableSet<EventListener>
     private val multicastEventListenerSet: MutableSet<MulticastEventListener>
     private val searchServerList: SsdpSearchServerList
@@ -70,7 +68,6 @@ internal class ControlPointImpl(
     init {
         check(interfaces.any()) { "no valid network interface." }
         discoveryListenerSet = CopyOnWriteArraySet()
-        notifyEventListenerSet = CopyOnWriteArraySet()
         eventListenerSet = CopyOnWriteArraySet()
         multicastEventListenerSet = CopyOnWriteArraySet()
         deviceMap = mutableMapOf()
@@ -181,21 +178,6 @@ internal class ControlPointImpl(
         eventListenerSet.forEach {
             taskExecutors.callback { it.onEvent(service, seq, properties) }
         }
-        if (notifyEventListenerSet.isEmpty()) return
-        properties.forEach {
-            notifyEvent(service, seq, it.first, it.second)
-        }
-    }
-
-    private fun notifyEvent(service: Service, seq: Long, name: String?, value: String?) {
-        val variable = service.findStateVariable(name)
-        if (variable?.isSendEvents != true || value == null) {
-            Logger.w { "illegal notify argument: $name $value" }
-            return
-        }
-        notifyEventListenerSet.forEach {
-            taskExecutors.callback { it.onNotifyEvent(service, seq, variable.name, value) }
-        }
     }
 
     // VisibleForTesting
@@ -292,16 +274,6 @@ internal class ControlPointImpl(
 
     override fun removeDiscoveryListener(listener: DiscoveryListener) {
         discoveryListenerSet.remove(listener)
-    }
-
-    @Suppress("DEPRECATION")
-    override fun addNotifyEventListener(listener: NotifyEventListener) {
-        notifyEventListenerSet.add(listener)
-    }
-
-    @Suppress("DEPRECATION")
-    override fun removeNotifyEventListener(listener: NotifyEventListener) {
-        notifyEventListenerSet.remove(listener)
     }
 
     override fun addEventListener(listener: EventListener) {

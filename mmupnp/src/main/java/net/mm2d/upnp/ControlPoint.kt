@@ -41,25 +41,6 @@ interface ControlPoint {
     }
 
     /**
-     * Listener to notify event of "NotifyEvent".
-     *
-     * Notified in callback thread
-     */
-    @Deprecated("use EventListener instead")
-    interface NotifyEventListener {
-        /**
-         * Called on receive NotifyEvent
-         *
-         * @param service Target Service
-         * @param seq Sequence number
-         * @param variable variable name
-         * @param value value
-         * @see Service
-         */
-        fun onNotifyEvent(service: Service, seq: Long, variable: String, value: String)
-    }
-
-    /**
      * Listener to notify on receive Event.
      *
      * Notified in callback thread
@@ -203,27 +184,6 @@ interface ControlPoint {
      * @see DiscoveryListener
      */
     fun removeDiscoveryListener(listener: DiscoveryListener)
-
-    /**
-     * Add a NotifyEvent listener.
-     *
-     * Listener notification is performed in the callback thread.
-     *
-     * @param listener Listener to add
-     * @see NotifyEventListener
-     * @see ControlPointFactory.create
-     */
-    @Deprecated("use addEventListener instead")
-    fun addNotifyEventListener(listener: NotifyEventListener)
-
-    /**
-     * Remove a NotifyEvent listener.
-     *
-     * @param listener Listener to remove
-     * @see NotifyEventListener
-     */
-    @Deprecated("use removeEventListener instead")
-    fun removeNotifyEventListener(listener: NotifyEventListener)
 
     /**
      * Add a EventListener.

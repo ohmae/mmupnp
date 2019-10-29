@@ -83,18 +83,6 @@ class EmptyControlPointTest {
     }
 
     @Test
-    fun addNotifyEventListener() {
-        val controlPoint = EmptyControlPoint
-        controlPoint.addNotifyEventListener(mockk())
-    }
-
-    @Test
-    fun removeNotifyEventListener() {
-        val controlPoint = EmptyControlPoint
-        controlPoint.removeNotifyEventListener(mockk())
-    }
-
-    @Test
     fun addEventListener() {
         val controlPoint = EmptyControlPoint
         controlPoint.addEventListener(mockk())

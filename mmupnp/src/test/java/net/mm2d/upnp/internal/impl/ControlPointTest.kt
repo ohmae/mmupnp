@@ -13,7 +13,6 @@ import net.mm2d.upnp.Adapter.discoveryListener
 import net.mm2d.upnp.Adapter.eventListener
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.Adapter.multicastEventListener
-import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.Adapter.taskExecutor
 import net.mm2d.upnp.ControlPoint.*
 import net.mm2d.upnp.ControlPoint.EventListener
@@ -985,15 +984,12 @@ class ControlPointTest {
 
             val eventListener: EventListener = mockk(relaxed = true)
             cp.addEventListener(eventListener)
-            val notifyEventListener: NotifyEventListener = mockk(relaxed = true)
-            cp.addNotifyEventListener(notifyEventListener)
 
             val value = "value"
             subscribeManager.onEventReceived(sid, 0, listOf(variableName to value))
 
             Thread.sleep(2000)
 
-            verify(exactly = 1) { notifyEventListener.onNotifyEvent(service, 0, variableName, value) }
             verify(exactly = 1) { eventListener.onEvent(service, 0, listOf(variableName to value)) }
         }
 
@@ -1014,15 +1010,11 @@ class ControlPointTest {
             val eventListener: EventListener = mockk(relaxed = true)
             cp.addEventListener(eventListener)
             cp.removeEventListener(eventListener)
-            val notifyEventListener: NotifyEventListener = mockk(relaxed = true)
-            cp.addNotifyEventListener(notifyEventListener)
-            cp.removeNotifyEventListener(notifyEventListener)
 
             val value = "value"
             subscribeManager.onEventReceived(sid, 0, listOf(variableName to value))
             Thread.sleep(100)
 
-            verify(inverse = true) { notifyEventListener.onNotifyEvent(service, 0, variableName, value) }
             verify(inverse = true) { eventListener.onEvent(service, 0, listOf(variableName to value)) }
         }
 
@@ -1042,14 +1034,11 @@ class ControlPointTest {
 
             val eventListener: EventListener = mockk(relaxed = true)
             cp.addEventListener(eventListener)
-            val notifyEventListener: NotifyEventListener = mockk(relaxed = true)
-            cp.addNotifyEventListener(notifyEventListener)
 
             val value = "value"
             subscribeManager.onEventReceived(sid, 0, listOf(variableName + 1 to value))
             Thread.sleep(100)
 
-            verify(inverse = true) { notifyEventListener.onNotifyEvent(service, 0, variableName, value) }
             verify(exactly = 1) { eventListener.onEvent(service, 0, listOf(variableName + 1 to value)) }
         }
 
@@ -1078,16 +1067,12 @@ class ControlPointTest {
             val onEvent: (service: Service, seq: Long, properties: List<Pair<String, String>>) -> Unit =
                 mockk(relaxed = true)
             cp.addEventListener(eventListener(onEvent))
-            val notifyEvent: (service: Service, seq: Long, variable: String, value: String) -> Unit =
-                mockk(relaxed = true)
-            cp.addNotifyEventListener(notifyEventListener(notifyEvent))
 
             val value = "value"
             subscribeManager.onEventReceived(sid, 0, listOf(variableName to value))
 
             Thread.sleep(2000)
 
-            verify(exactly = 1) { notifyEvent(service, 0, variableName, value) }
             verify(exactly = 1) { onEvent(service, 0, listOf(variableName to value)) }
         }
 

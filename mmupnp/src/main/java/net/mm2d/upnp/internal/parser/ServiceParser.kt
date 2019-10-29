@@ -136,9 +136,9 @@ internal object ServiceParser {
     }
 
     private fun parseAllowedValueRange(builder: StateVariableImpl.Builder, element: Element) {
-        element.firstChild?.forEachElement { element ->
-            element.localName?.let {
-                builder.setField(it, element.textContent)
+        element.firstChild?.forEachElement { childElement ->
+            childElement.localName?.let {
+                builder.setField(it, childElement.textContent)
             }
         }
     }
