@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+    <specVersion>
+        <major>1</major>
+        <minor>0</minor>
+    </specVersion>
+    <device>
+        <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
+        <friendlyName>mmupnp</friendlyName>
+        <manufacturer>mm2d.net</manufacturer>
+        <manufacturerURL>http://www.mm2d.net/</manufacturerURL>
+        <modelName>mmupnp</modelName>
+        <modelDescription>mmupnp test server</modelDescription>
+        <modelURL>http://www.mm2d.net/</modelURL>
+        <modelNumber>ABCDEFG</modelNumber>
+        <serialNumber>0123456789ABC</serialNumber>
+        <UDN>uuid:01234567-89ab-cdef-0123-456789abcdef</UDN>
+        <presentationURL>http://192.0.2.2:12346/</presentationURL>
+        <serviceList/>
+        <serviceList>
+            <garbage/>
+            <service/>
+        </serviceList>
+        <deviceList/>
+        <deviceList>
+            <garbage/>
+        </deviceList>
+        <iconList/>
+        <iconList>
+            <garbage/>
+            <icon/>
+        </iconList>
+    </device>
+</root>

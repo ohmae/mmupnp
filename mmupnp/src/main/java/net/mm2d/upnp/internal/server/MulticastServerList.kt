@@ -12,7 +12,7 @@ import net.mm2d.upnp.common.util.isAvailableInet4Interface
 import net.mm2d.upnp.common.util.isAvailableInet6Interface
 import java.net.NetworkInterface
 
-internal inline fun <T : Any> Iterable<NetworkInterface>.createServerList(
+internal fun <T : Any> Iterable<NetworkInterface>.createServerList(
     protocol: Protocol,
     createV4: (NetworkInterface) -> T?,
     createV6: (NetworkInterface) -> T?

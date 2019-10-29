@@ -50,13 +50,11 @@ object NetworkUtils {
      * @see java.net.NetworkInterface.getNetworkInterfaces
      */
     @JvmStatic
-    fun getNetworkInterfaceList(): List<NetworkInterface> {
-        return try {
-            NetworkInterface.getNetworkInterfaces()
-        } catch (ignored: Throwable) {
-            null
-        }?.let { Collections.list(it) } ?: emptyList()
-    }
+    fun getNetworkInterfaceList(): List<NetworkInterface> = try {
+        NetworkInterface.getNetworkInterfaces()
+    } catch (ignored: Throwable) {
+        null
+    }.let { it?.toList() } ?: emptyList()
 }
 
 /**

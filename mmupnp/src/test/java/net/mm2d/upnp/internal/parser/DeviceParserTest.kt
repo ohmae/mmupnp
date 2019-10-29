@@ -125,7 +125,7 @@ class DeviceParserTest {
         }
 
         @Test(expected = IllegalStateException::class)
-        fun loadDescription_acid() {
+        fun loadDescription_acid_service() {
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device.xml")
@@ -135,9 +135,50 @@ class DeviceParserTest {
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
+        }
+
+        @Test(expected = IllegalStateException::class)
+        fun loadDescription_acid_device() {
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
+            } returns TestUtils.getResourceAsString("device-acid.xml")
+
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
+            DeviceParser.loadDescription(httpClient, builder)
+        }
+
+        @Test
+        fun loadDescription_acid2_device() {
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
+            } returns TestUtils.getResourceAsString("device-acid2.xml")
+
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
+            DeviceParser.loadDescription(httpClient, builder)
+        }
+
+
+        @Test(expected = IOException::class)
+        fun loadDescription_no_scpd_url() {
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
+            } returns TestUtils.getResourceAsString("device-no-scpd-url.xml")
+
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
+            DeviceParser.loadDescription(httpClient, builder)
+        }
+
+        @Test
+        fun loadDescription_google_dial() {
+            every {
+                httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
+            } returns TestUtils.getResourceAsString("device-google-dial.xml")
+
+            val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
+            DeviceParser.loadDescription(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
-            assertThat(device.serviceList).hasSize(3)
+            assertThat(device.serviceList).hasSize(1)
         }
 
         @Test
