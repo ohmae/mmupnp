@@ -14,7 +14,7 @@ import net.mm2d.upnp.common.util.findInet6Address
 import net.mm2d.upnp.common.util.toSimpleString
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
-import net.mm2d.upnp.internal.util.closeQuietly
+import net.mm2d.upnp.common.internal.util.closeQuietly
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.*

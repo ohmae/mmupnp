@@ -13,7 +13,7 @@ import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.util.NetworkUtils
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
-import net.mm2d.upnp.internal.util.closeQuietly
+import net.mm2d.upnp.common.internal.util.closeQuietly
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

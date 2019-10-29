@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.util
+package net.mm2d.upnp.common.internal.util
 
 import io.mockk.every
 import io.mockk.mockk

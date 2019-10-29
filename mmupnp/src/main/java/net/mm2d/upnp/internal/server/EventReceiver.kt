@@ -14,7 +14,7 @@ import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.HttpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
-import net.mm2d.upnp.internal.util.closeQuietly
+import net.mm2d.upnp.common.internal.util.closeQuietly
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream

@@ -25,7 +25,7 @@ import net.mm2d.upnp.internal.server.MulticastEventReceiverList
 import net.mm2d.upnp.internal.server.SsdpNotifyServerList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
 import net.mm2d.upnp.internal.thread.TaskExecutors
-import net.mm2d.upnp.internal.util.toSimpleTrace
+import net.mm2d.upnp.common.internal.util.toSimpleTrace
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.NetworkInterface
