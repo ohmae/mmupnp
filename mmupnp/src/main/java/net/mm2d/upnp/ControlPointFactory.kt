@@ -9,6 +9,7 @@ package net.mm2d.upnp
 
 import net.mm2d.upnp.Adapter.taskExecutor
 import net.mm2d.upnp.common.Protocol
+import net.mm2d.upnp.common.TaskExecutor
 import net.mm2d.upnp.internal.impl.ControlPointImpl
 import net.mm2d.upnp.internal.impl.DiFactory
 import java.net.NetworkInterface

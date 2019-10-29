@@ -5,11 +5,11 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.thread
+package net.mm2d.upnp.common.internal.thread
 
 import net.mm2d.log.Logger
 import net.mm2d.upnp.common.Property
-import net.mm2d.upnp.TaskExecutor
+import net.mm2d.upnp.common.TaskExecutor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.TimeUnit

@@ -15,8 +15,8 @@ import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.HttpResponse
+import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.common.util.XmlUtils
-import net.mm2d.upnp.internal.thread.TaskExecutors
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

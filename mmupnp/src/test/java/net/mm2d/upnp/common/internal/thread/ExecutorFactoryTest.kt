@@ -5,9 +5,10 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.thread
+package net.mm2d.upnp.common.internal.thread
 
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -19,7 +20,7 @@ import java.util.concurrent.RejectedExecutionException
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class DefaultTaskExecutorTest {
+class ExecutorFactoryTest {
     @Test
     fun execute_executeが実行される() {
         val executorService: ExecutorService = mockk(relaxed = true)
@@ -78,7 +79,7 @@ class DefaultTaskExecutorTest {
         val taskExecutor = DefaultTaskExecutor(executorService, true)
         val command: Runnable = mockk()
 
-        Truth.assertThat(taskExecutor.execute(command)).isTrue()
+        assertThat(taskExecutor.execute(command)).isTrue()
 
         verify(exactly = 1) { executorService.execute(any()) }
     }
@@ -90,7 +91,7 @@ class DefaultTaskExecutorTest {
         val command: Runnable = mockk()
         every { executorService.execute(any()) } throws RejectedExecutionException()
 
-        Truth.assertThat(taskExecutor.execute(command)).isFalse()
+        assertThat(taskExecutor.execute(command)).isFalse()
     }
 
     @Test
@@ -100,7 +101,7 @@ class DefaultTaskExecutorTest {
         val command: Runnable = mockk()
 
         taskExecutor.terminate()
-        Truth.assertThat(taskExecutor.execute(command)).isFalse()
+        assertThat(taskExecutor.execute(command)).isFalse()
     }
 
     @Test

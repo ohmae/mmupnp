@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.thread
+package net.mm2d.upnp.common.internal.thread
 
 import java.util.concurrent.FutureTask
 import java.util.concurrent.TimeUnit

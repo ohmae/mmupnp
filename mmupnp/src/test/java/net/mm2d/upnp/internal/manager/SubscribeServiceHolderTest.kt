@@ -12,7 +12,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.mm2d.upnp.Service
-import net.mm2d.upnp.internal.thread.TaskExecutors
+import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

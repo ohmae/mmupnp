@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp.common.internal.message
 
-import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.HttpRequest
+import net.mm2d.upnp.common.SsdpMessage
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.net.InetAddress

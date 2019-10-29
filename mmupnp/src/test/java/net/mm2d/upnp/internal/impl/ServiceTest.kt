@@ -13,9 +13,9 @@ import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Device
 import net.mm2d.upnp.common.*
 import net.mm2d.upnp.common.internal.message.SsdpRequest
+import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.manager.SubscribeManagerImpl
 import net.mm2d.upnp.internal.parser.DeviceParser
-import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.TestUtils
 import org.junit.After
 import org.junit.Before

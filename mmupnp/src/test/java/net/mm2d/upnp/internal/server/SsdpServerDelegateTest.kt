@@ -15,9 +15,9 @@ import io.mockk.verify
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.internal.message.SsdpRequest
+import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.common.util.NetworkUtils
 import net.mm2d.upnp.common.util.findInet4Address
-import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.TestUtils
 import org.junit.After
 import org.junit.Before

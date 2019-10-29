@@ -9,9 +9,9 @@ package net.mm2d.upnp.internal.manager
 
 import net.mm2d.log.Logger
 import net.mm2d.upnp.Service
+import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.impl.DiFactory
 import net.mm2d.upnp.internal.server.EventReceiver
-import net.mm2d.upnp.internal.thread.TaskExecutors
 
 internal class SubscribeManagerImpl(
     taskExecutors: TaskExecutors,

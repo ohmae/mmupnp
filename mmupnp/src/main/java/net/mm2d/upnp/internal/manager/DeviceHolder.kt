@@ -8,8 +8,8 @@
 package net.mm2d.upnp.internal.manager
 
 import net.mm2d.upnp.Device
-import net.mm2d.upnp.internal.thread.TaskExecutors
-import net.mm2d.upnp.internal.thread.ThreadCondition
+import net.mm2d.upnp.common.internal.thread.TaskExecutors
+import net.mm2d.upnp.common.internal.thread.ThreadCondition
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
