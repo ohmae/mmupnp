@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp.internal.server
 
+import net.mm2d.upnp.common.ServerConst
 import net.mm2d.upnp.common.util.toAddressString
 import java.net.InetAddress
 import java.net.InetSocketAddress

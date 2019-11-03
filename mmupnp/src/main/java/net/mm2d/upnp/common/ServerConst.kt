@@ -5,9 +5,9 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.internal.server
+package net.mm2d.upnp.common
 
-internal object ServerConst {
+object ServerConst {
     /**
      * IPv4 Address for SSDP
      */
