@@ -803,11 +803,11 @@ class ServiceTest {
 
             assertThat(service.subscribeSync()).isTrue()
 
-            every { subscribeDelegate["renewSubscribeActual"]() } returns false
+            every { subscribeDelegate["renewSubscribeActual"]("sid") } returns false
 
             assertThat(service.subscribeSync()).isFalse()
 
-            verify(exactly = 1) { subscribeDelegate.renewSubscribeActual() }
+            verify(exactly = 1) { subscribeDelegate.renewSubscribeActual("sid") }
         }
 
         @Test
@@ -835,7 +835,7 @@ class ServiceTest {
             verify(exactly = 1) { subscribeDelegate.subscribeActual(any()) }
 
             assertThat(service.renewSubscribeSync()).isTrue()
-            verify(exactly = 1) { subscribeDelegate.renewSubscribeActual() }
+            verify(exactly = 1) { subscribeDelegate.renewSubscribeActual("sid") }
         }
 
         @Test

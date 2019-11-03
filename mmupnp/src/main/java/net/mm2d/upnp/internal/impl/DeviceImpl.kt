@@ -343,18 +343,18 @@ internal class DeviceImpl private constructor(
             map[tag] = value
         }
 
-        fun toDumpString(): String {
-            val sb = StringBuilder()
-                .append("DeviceBuilder")
-                .append("\nSSDP:").append(ssdpMessage)
-                .append("\nDESCRIPTION:").append(description)
+        fun toDumpString(): String = buildString {
+            append("DeviceBuilder")
+            append("\nSSDP:")
+            append(ssdpMessage)
+            append("\nDESCRIPTION:")
+            append(description)
             if (serviceBuilderList.size != 0) {
-                sb.append("\n")
+                append("\n")
                 serviceBuilderList.forEach {
-                    sb.append(it.toDumpString())
+                    append(it.toDumpString())
                 }
             }
-            return sb.toString()
         }
     }
 }

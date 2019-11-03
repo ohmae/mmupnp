@@ -10,7 +10,6 @@ package net.mm2d.upnp.util
 import net.mm2d.upnp.Http
 import java.net.*
 import java.nio.ByteBuffer
-import java.util.*
 
 /**
  * Provide network related utility methods.
@@ -189,16 +188,16 @@ internal fun Inet6Address.toNormalizedString(): String {
     val buffer = ByteBuffer.wrap(address).asShortBuffer()
     val section = IntArray(8) { buffer.get().toInt() and 0xffff }
     val (start, end) = section.findSectionToOmission()
-    val sb = StringBuilder()
-    for (i in section.indices) {
-        if (i < start || i >= end) {
-            if (i != 0 && i != end) sb.append(':')
-            sb.append(section[i].toString(16))
-        } else if (i == start) {
-            sb.append("::")
+    return buildString {
+        for (i in section.indices) {
+            if (i < start || i >= end) {
+                if (i != 0 && i != end) append(':')
+                append(section[i].toString(16))
+            } else if (i == start) {
+                append("::")
+            }
         }
     }
-    return sb.toString()
 }
 
 private class Range(
