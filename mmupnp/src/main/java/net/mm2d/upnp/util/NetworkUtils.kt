@@ -52,7 +52,7 @@ object NetworkUtils {
     @JvmStatic
     fun getNetworkInterfaceList(): List<NetworkInterface> = try {
         NetworkInterface.getNetworkInterfaces()
-    } catch (ignored: Throwable) {
+    } catch (ignored: Throwable) { // Some devices have bugs and occasionally cause RuntimeException
         null
     }.let { it?.toList() } ?: emptyList()
 }

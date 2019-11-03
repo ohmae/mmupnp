@@ -24,7 +24,7 @@ interface Device {
     val ssdpMessage: SsdpMessage
 
     /**
-     * The invalid time (ms) if there is no update.
+     * The time to expire (ms) if there is no update.
      */
     val expireTime: Long
 
