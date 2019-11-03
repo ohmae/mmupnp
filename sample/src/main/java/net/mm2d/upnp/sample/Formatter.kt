@@ -7,30 +7,30 @@
 
 package net.mm2d.upnp.sample
 
-import net.mm2d.upnp.*
+import net.mm2d.upnp.cp.*
 
 object Formatter {
     fun format(device: Device): String {
         return "Location: ${device.location}\n" +
-                "UDN: ${device.udn}\n" +
-                "DeviceType: ${device.deviceType}\n" +
-                "FriendlyName: ${device.friendlyName}\n" +
-                "Manufacture: ${device.manufacture}\n" +
-                "ManufactureUrl: ${device.manufactureUrl}\n" +
-                "ModelName: ${device.modelName}\n" +
-                "ModelUrl: ${device.modelUrl}\n" +
-                "ModelDescription: ${device.modelDescription}\n" +
-                "ModelNumber: ${device.modelNumber}\n" +
-                "SerialNumber: ${device.serialNumber}\n" +
-                "PresentationUrl: ${device.presentationUrl}"
+            "UDN: ${device.udn}\n" +
+            "DeviceType: ${device.deviceType}\n" +
+            "FriendlyName: ${device.friendlyName}\n" +
+            "Manufacture: ${device.manufacture}\n" +
+            "ManufactureUrl: ${device.manufactureUrl}\n" +
+            "ModelName: ${device.modelName}\n" +
+            "ModelUrl: ${device.modelUrl}\n" +
+            "ModelDescription: ${device.modelDescription}\n" +
+            "ModelNumber: ${device.modelNumber}\n" +
+            "SerialNumber: ${device.serialNumber}\n" +
+            "PresentationUrl: ${device.presentationUrl}"
     }
 
     fun format(service: Service): String {
         return "ServiceType: ${service.serviceType}\n" +
-                "ServiceId: ${service.serviceId}\n" +
-                "ScpdUrl: ${service.scpdUrl}\n" +
-                "ControlUrl: ${service.controlUrl}\n" +
-                "EventSubUrl: ${service.eventSubUrl}"
+            "ServiceId: ${service.serviceId}\n" +
+            "ScpdUrl: ${service.scpdUrl}\n" +
+            "ControlUrl: ${service.controlUrl}\n" +
+            "EventSubUrl: ${service.eventSubUrl}"
     }
 
     fun format(action: Action): String {

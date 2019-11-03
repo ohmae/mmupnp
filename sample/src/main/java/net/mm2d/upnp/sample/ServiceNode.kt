@@ -8,7 +8,7 @@
 package net.mm2d.upnp.sample
 
 import net.mm2d.upnp.common.Http
-import net.mm2d.upnp.Service
+import net.mm2d.upnp.cp.Service
 import java.awt.Component
 import java.awt.Desktop
 import java.io.IOException

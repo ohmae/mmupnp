@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.sample
 
-import net.mm2d.upnp.Device
+import net.mm2d.upnp.cp.Device
 import java.awt.Component
 import java.awt.Desktop
 import java.io.IOException

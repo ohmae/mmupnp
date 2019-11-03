@@ -1,0 +1,183 @@
+/*
+ * Copyright (c) 2019 大前良介 (OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/MIT
+ */
+
+package net.mm2d.upnp.cp.internal.impl
+
+import net.mm2d.log.Logger
+import net.mm2d.upnp.common.Http
+import net.mm2d.upnp.common.HttpClient
+import net.mm2d.upnp.common.HttpRequest
+import net.mm2d.upnp.common.HttpResponse
+import net.mm2d.upnp.common.util.toAddressString
+import net.mm2d.upnp.cp.internal.manager.SubscribeManager
+import java.io.IOException
+import java.net.MalformedURLException
+import java.net.URL
+import java.util.*
+import java.util.concurrent.TimeUnit
+
+internal class SubscribeDelegate(
+    private val service: ServiceImpl
+) {
+    private val device: DeviceImpl = service.device
+    private val subscribeManager: SubscribeManager = device.controlPoint.subscribeManager
+    var subscriptionId: String? = null
+        private set
+
+    internal val callback: String
+        get() {
+            val address = device.ssdpMessage.localAddress ?: return ""
+            val port = subscribeManager.getEventPort()
+            return "<http://${address.toAddressString(port)}/>"
+        }
+
+    private fun createHttpClient(): HttpClient = HttpClient.create(false)
+
+    // VisibleForTesting
+    @Throws(MalformedURLException::class)
+    internal fun makeAbsoluteUrl(url: String): URL = Http.makeAbsoluteUrl(device.baseUrl, url, device.scopeId)
+
+    fun subscribe(keepRenew: Boolean): Boolean {
+        try {
+            if (!subscriptionId.isNullOrEmpty()) {
+                if (renewSubscribeActual()) {
+                    subscribeManager.setKeepRenew(service, keepRenew)
+                    return true
+                }
+                return false
+            }
+            return subscribeActual(keepRenew)
+        } catch (e: IOException) {
+            Logger.e(e, "fail to subscribe")
+        }
+        return false
+    }
+
+    // VisibleForTesting
+    @Throws(IOException::class)
+    internal fun subscribeActual(keepRenew: Boolean): Boolean {
+        val request = makeSubscribeRequest()
+        val response = createHttpClient().post(request)
+        if (response.getStatus() != Http.Status.HTTP_OK) {
+            Logger.w { "error subscribe request:\n$request\nresponse:\n$response" }
+            return false
+        }
+        val sid = response.getHeader(Http.SID)
+        val timeout = parseTimeout(response)
+        if (sid.isNullOrEmpty() || timeout <= 0) {
+            Logger.w { "error subscribe response:\n$response" }
+            return false
+        }
+        Logger.v { "subscribe request:\n$request\nresponse:\n$response" }
+        subscriptionId = sid
+        subscribeManager.register(service, timeout, keepRenew)
+        return true
+    }
+
+    @Throws(IOException::class)
+    private fun makeSubscribeRequest(): HttpRequest =
+        HttpRequest.create().apply {
+            setMethod(Http.SUBSCRIBE)
+            setUrl(makeAbsoluteUrl(service.eventSubUrl), true)
+            setHeader(Http.NT, Http.UPNP_EVENT)
+            setHeader(Http.CALLBACK, callback)
+            setHeader(Http.TIMEOUT, "Second-300")
+            setHeader(Http.CONTENT_LENGTH, "0")
+        }
+
+    fun renewSubscribe(): Boolean {
+        return try {
+            if (subscriptionId.isNullOrEmpty()) subscribeActual(false)
+            else renewSubscribeActual()
+        } catch (e: IOException) {
+            Logger.e(e, "fail to renewSubscribe")
+            false
+        }
+    }
+
+    // VisibleForTesting
+    @Throws(IOException::class)
+    internal fun renewSubscribeActual(): Boolean {
+        val request = makeRenewSubscribeRequest(subscriptionId!!)
+        val response = createHttpClient().post(request)
+        if (response.getStatus() != Http.Status.HTTP_OK) {
+            Logger.w { "renewSubscribe request:\n$request\nresponse:\n$response" }
+            return false
+        }
+        val sid = response.getHeader(Http.SID)
+        val timeout = parseTimeout(response)
+        if (sid != subscriptionId || timeout <= 0) {
+            Logger.w { "renewSubscribe response:\n$response" }
+            return false
+        }
+        Logger.v { "renew subscribe request:\n$request\nresponse:\n$response" }
+        subscribeManager.renew(service, timeout)
+        return true
+    }
+
+    @Throws(IOException::class)
+    private fun makeRenewSubscribeRequest(subscriptionId: String): HttpRequest =
+        HttpRequest.create().apply {
+            setMethod(Http.SUBSCRIBE)
+            setUrl(makeAbsoluteUrl(service.eventSubUrl), true)
+            setHeader(Http.SID, subscriptionId)
+            setHeader(Http.TIMEOUT, "Second-300")
+            setHeader(Http.CONTENT_LENGTH, "0")
+        }
+
+    fun unsubscribe(): Boolean {
+        if (subscriptionId.isNullOrEmpty()) {
+            return false
+        }
+        try {
+            val request = makeUnsubscribeRequest(subscriptionId!!)
+            val response = createHttpClient().post(request)
+            subscribeManager.unregister(service)
+            subscriptionId = null
+            if (response.getStatus() != Http.Status.HTTP_OK) {
+                Logger.w { "unsubscribe request:\n$request\nresponse:\n$response" }
+                return false
+            }
+            Logger.v { "unsubscribe request:\n$request\nresponse:\n$response" }
+            return true
+        } catch (e: IOException) {
+            Logger.w(e, "fail to unsubscribe")
+        }
+        return false
+    }
+
+    @Throws(IOException::class)
+    private fun makeUnsubscribeRequest(subscriptionId: String): HttpRequest =
+        HttpRequest.create().apply {
+            setMethod(Http.UNSUBSCRIBE)
+            setUrl(makeAbsoluteUrl(service.eventSubUrl), true)
+            setHeader(Http.SID, subscriptionId)
+            setHeader(Http.CONTENT_LENGTH, "0")
+        }
+
+    companion object {
+        private val DEFAULT_SUBSCRIPTION_TIMEOUT = TimeUnit.SECONDS.toMillis(300)
+        private const val SECOND_PREFIX = "second-"
+
+        // VisibleForTesting
+        internal fun parseTimeout(response: HttpResponse): Long {
+            val timeout = response.getHeader(Http.TIMEOUT)?.toLowerCase(Locale.ENGLISH)
+            if (timeout.isNullOrEmpty() || timeout.contains("infinite")) {
+                // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。
+                return DEFAULT_SUBSCRIPTION_TIMEOUT
+            }
+            val pos = timeout.indexOf(SECOND_PREFIX)
+            if (pos < 0) {
+                return DEFAULT_SUBSCRIPTION_TIMEOUT
+            }
+            val secondSection = timeout.substring(pos + SECOND_PREFIX.length)
+                .toLongOrNull()
+                ?: return DEFAULT_SUBSCRIPTION_TIMEOUT
+            return TimeUnit.SECONDS.toMillis(secondSection)
+        }
+    }
+}

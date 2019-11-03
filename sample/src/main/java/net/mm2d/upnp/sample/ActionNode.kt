@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.sample
 
-import net.mm2d.upnp.Action
+import net.mm2d.upnp.cp.Action
 import java.awt.Component
 import javax.swing.JFrame
 import javax.swing.JMenuItem

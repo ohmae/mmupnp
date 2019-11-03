@@ -13,13 +13,16 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.mm2d.log.DefaultSender
 import net.mm2d.log.Logger
-import net.mm2d.upnp.Adapter.discoveryListener
-import net.mm2d.upnp.Adapter.eventListener
-import net.mm2d.upnp.Adapter.iconFilter
-import net.mm2d.upnp.ControlPoint
-import net.mm2d.upnp.ControlPointFactory
 import net.mm2d.upnp.common.Protocol
-import java.awt.*
+import net.mm2d.upnp.cp.Adapter.discoveryListener
+import net.mm2d.upnp.cp.Adapter.eventListener
+import net.mm2d.upnp.cp.Adapter.iconFilter
+import net.mm2d.upnp.cp.ControlPoint
+import net.mm2d.upnp.cp.ControlPointFactory
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Component
+import java.awt.FlowLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
@@ -30,7 +33,6 @@ import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeSelectionModel
-import javax.swing.UIManager
 
 /**
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
@@ -76,7 +78,7 @@ class MainWindow private constructor() : JFrame() {
 
     private fun setUpControlPoint() {
         controlPoint.addDiscoveryListener(discoveryListener({ update() }, { update() }))
-        controlPoint.addEventListener( eventListener { service, seq, properties ->
+        controlPoint.addEventListener(eventListener { service, seq, properties ->
             properties.forEach {
                 eventArea.text = "${eventArea.text}${service.serviceType} : $seq : ${it.first} : ${it.second}\n"
             }

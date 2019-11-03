@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.sample
 
-import net.mm2d.upnp.Argument
+import net.mm2d.upnp.cp.Argument
 
 /**
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)

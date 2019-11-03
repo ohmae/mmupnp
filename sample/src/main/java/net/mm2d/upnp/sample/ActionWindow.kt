@@ -7,12 +7,11 @@
 
 package net.mm2d.upnp.sample
 
-import net.mm2d.upnp.Action
-import net.mm2d.upnp.Argument
+import net.mm2d.upnp.cp.Action
+import net.mm2d.upnp.cp.Argument
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.FlowLayout
-import java.awt.Font
 import java.io.IOException
 import javax.swing.*
 import javax.swing.text.JTextComponent
