@@ -58,7 +58,7 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation 'net.mm2d:mmupnp:3.1.0'
+    implementation 'net.mm2d:mmupnp:3.1.1'
 }
 ```
 

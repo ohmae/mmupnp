@@ -22,11 +22,11 @@ import javax.swing.JPopupMenu
  */
 class DeviceNode(device: Device) : UpnpNode(device) {
     init {
-        for (service in device.serviceList) {
-            add(ServiceNode(service))
+        device.serviceList.forEach {
+            add(ServiceNode(it))
         }
-        for (embeddedDevice in device.deviceList) {
-            add(DeviceNode(embeddedDevice))
+        device.deviceList.forEach {
+            add(DeviceNode(it))
         }
     }
 

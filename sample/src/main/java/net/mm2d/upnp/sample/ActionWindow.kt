@@ -53,7 +53,7 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
         contentPane.add(errorMessage, BorderLayout.SOUTH)
         val panel = JPanel().also {
             it.layout = BoxLayout(it, BoxLayout.Y_AXIS)
-            for (argument in action.argumentList) {
+            action.argumentList.forEach { argument ->
                 it.add(JSeparator(SwingConstants.HORIZONTAL))
                 it.add(makeArgumentPanel(argument))
             }

@@ -18,9 +18,8 @@ import javax.swing.JPopupMenu
  */
 class ActionNode(action: Action) : UpnpNode(action) {
     init {
-        val arguments = action.argumentList
-        for (argument in arguments) {
-            add(ArgumentNode(argument))
+        action.argumentList.forEach {
+            add(ArgumentNode(it))
         }
     }
 

@@ -153,15 +153,12 @@ internal class HttpHeaders {
      */
     fun values(): Collection<Entry> = map.values
 
-    override fun toString(): String {
-        return StringBuilder().let { sb ->
-            map.values.forEach {
-                sb.append(it.name)
-                sb.append(": ")
-                sb.append(it.value)
-                sb.append("\r\n")
-            }
-            sb.toString()
+    override fun toString(): String = buildString {
+        map.values.forEach {
+            append(it.name)
+            append(": ")
+            append(it.value)
+            append("\r\n")
         }
     }
 

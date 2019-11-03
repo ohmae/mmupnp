@@ -43,8 +43,9 @@ internal class SubscribeDelegate(
 
     fun subscribe(keepRenew: Boolean): Boolean {
         try {
-            if (!subscriptionId.isNullOrEmpty()) {
-                if (renewSubscribeActual()) {
+            val sId = subscriptionId
+            if (!sId.isNullOrEmpty()) {
+                if (renewSubscribeActual(sId)) {
                     subscribeManager.setKeepRenew(service, keepRenew)
                     return true
                 }
@@ -91,8 +92,9 @@ internal class SubscribeDelegate(
 
     fun renewSubscribe(): Boolean {
         return try {
-            if (subscriptionId.isNullOrEmpty()) subscribeActual(false)
-            else renewSubscribeActual()
+            val sId = subscriptionId
+            if (sId.isNullOrEmpty()) subscribeActual(false)
+            else renewSubscribeActual(sId)
         } catch (e: IOException) {
             Logger.e(e, "fail to renewSubscribe")
             false
@@ -101,8 +103,8 @@ internal class SubscribeDelegate(
 
     // VisibleForTesting
     @Throws(IOException::class)
-    internal fun renewSubscribeActual(): Boolean {
-        val request = makeRenewSubscribeRequest(subscriptionId!!)
+    internal fun renewSubscribeActual(subscriptionId: String): Boolean {
+        val request = makeRenewSubscribeRequest(subscriptionId)
         val response = createHttpClient().post(request)
         if (response.getStatus() != Http.Status.HTTP_OK) {
             Logger.w { "renewSubscribe request:\n$request\nresponse:\n$response" }
@@ -130,11 +132,12 @@ internal class SubscribeDelegate(
         }
 
     fun unsubscribe(): Boolean {
-        if (subscriptionId.isNullOrEmpty()) {
+        val sId = subscriptionId
+        if (sId.isNullOrEmpty()) {
             return false
         }
         try {
-            val request = makeUnsubscribeRequest(subscriptionId!!)
+            val request = makeUnsubscribeRequest(sId)
             val response = createHttpClient().post(request)
             subscribeManager.unregister(service)
             subscriptionId = null
