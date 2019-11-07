@@ -39,7 +39,7 @@ class XmlUtilsTest {
         val xml = TestUtils.getResourceAsString("propchange.xml")
         val document = XmlUtils.newDocument(true, xml)
         val root = document.documentElement
-        val element = XmlUtils.findChildElementByLocalName(root, "property")
+        val element = root.findChildElementByLocalName("property")
         assertThat(element!!.tagName).isEqualTo("e:property")
     }
 
@@ -48,7 +48,7 @@ class XmlUtilsTest {
         val xml = TestUtils.getResourceAsString("propchange.xml")
         val document = XmlUtils.newDocument(true, xml)
         val root = document.documentElement
-        val element = XmlUtils.findChildElementByLocalName(root, "properties")
+        val element = root.findChildElementByLocalName("properties")
         assertThat(element).isNull()
     }
 

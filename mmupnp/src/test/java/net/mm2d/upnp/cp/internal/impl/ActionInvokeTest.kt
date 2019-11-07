@@ -16,6 +16,7 @@ import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.HttpResponse
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.common.util.XmlUtils
+import net.mm2d.upnp.common.util.findChildElementByLocalName
 import net.mm2d.upnp.cp.Action
 import org.junit.After
 import org.junit.Before
@@ -161,12 +162,12 @@ class ActionInvokeTest {
         assertThat(envelope.namespaceURI).isEqualTo(SOAP_NS)
         assertThat(envelope.getAttributeNS(SOAP_NS, "encodingStyle")).isEqualTo(SOAP_STYLE)
 
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
+        val body = envelope.findChildElementByLocalName("Body")
 
         assertThat(body).isNotNull()
-        assertThat(body!!.namespaceURI).isEqualTo(SOAP_NS)
+        assertThat(body?.namespaceURI).isEqualTo(SOAP_NS)
 
-        val action = XmlUtils.findChildElementByLocalName(body, ACTION_NAME)
+        val action = body?.findChildElementByLocalName(ACTION_NAME)
 
         assertThat(action).isNotNull()
         assertThat(action!!.namespaceURI).isEqualTo(SERVICE_TYPE)
@@ -181,8 +182,8 @@ class ActionInvokeTest {
 
         val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
-        val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
+        val body = envelope.findChildElementByLocalName("Body")
+        val action = body?.findChildElementByLocalName(ACTION_NAME)
 
         val elements = createChildElementList(action!!)
         assertThat(elements).hasSize(2)
@@ -208,8 +209,8 @@ class ActionInvokeTest {
 
         val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
-        val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
+        val body = envelope.findChildElementByLocalName("Body")
+        val action = body?.findChildElementByLocalName(ACTION_NAME)
 
         val elements = createChildElementList(action!!)
         assertThat(elements).hasSize(2)
@@ -237,8 +238,8 @@ class ActionInvokeTest {
 
         val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
-        val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
+        val body = envelope.findChildElementByLocalName("Body")
+        val action = body?.findChildElementByLocalName(ACTION_NAME)
 
         val elements = createChildElementList(action!!)
         assertThat(elements.size).isEqualTo(3)
@@ -276,8 +277,8 @@ class ActionInvokeTest {
 
         val doc = XmlUtils.newDocument(true, request.getBody()!!)
         val envelope = doc.documentElement
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
-        val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
+        val body = envelope.findChildElementByLocalName("Body")
+        val action = body?.findChildElementByLocalName(ACTION_NAME)
 
         val elements = createChildElementList(action!!)
         assertThat(elements.size).isEqualTo(3)

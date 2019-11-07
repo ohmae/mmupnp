@@ -10,6 +10,7 @@ package net.mm2d.upnp.cp.internal.parser
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.util.XmlUtils
+import net.mm2d.upnp.common.util.findChildElementByLocalName
 import net.mm2d.upnp.common.util.forEachElement
 import net.mm2d.upnp.cp.Icon
 import net.mm2d.upnp.cp.internal.impl.DeviceImpl
@@ -68,7 +69,7 @@ internal object DeviceParser {
     internal fun parseDescription(builder: DeviceImpl.Builder, description: String) {
         builder.setDescription(description)
         val doc = XmlUtils.newDocument(true, description)
-        val deviceNode = XmlUtils.findChildElementByLocalName(doc.documentElement, "device") ?: throw IOException()
+        val deviceNode = doc.documentElement.findChildElementByLocalName("device") ?: throw IOException()
         parseDevice(builder, deviceNode)
     }
 

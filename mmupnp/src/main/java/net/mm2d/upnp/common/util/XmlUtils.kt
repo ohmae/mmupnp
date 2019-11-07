@@ -55,17 +55,6 @@ object XmlUtils {
         val reader = StringReader(xml)
         return newDocumentBuilder(awareness).parse(InputSource(reader))
     }
-
-    /**
-     * Returns the first element node with a specific name below the parent node.
-     *
-     * @param parent parent node
-     * @param localName local name to search
-     * @return Element node found, null if not found
-     */
-    @JvmStatic
-    fun findChildElementByLocalName(parent: Node, localName: String): Element? =
-        parent.findChildElementByLocalName(localName)
 }
 
 /**
