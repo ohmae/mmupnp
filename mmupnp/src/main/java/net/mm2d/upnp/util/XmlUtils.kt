@@ -193,3 +193,15 @@ private class NamedNodeMapIterator(
     override fun next(): Node = map.item(index++)
     override fun hasNext(): Boolean = index < map.length
 }
+
+fun Document.appendNewElementNs(namespaceUri: String, tagName: String): Element =
+    createElementNS(namespaceUri, tagName).also { appendChild(it) }
+
+fun Node.appendNewElementNs(namespaceUri: String, tagName: String): Element =
+    ownerDocument.createElementNS(namespaceUri, tagName).also { appendChild(it) }
+
+fun Node.appendNewElement(tagName: String): Element =
+    ownerDocument.createElement(tagName).also { appendChild(it) }
+
+fun Node.appendNewElement(tagName: String, textContent: String?): Element =
+    appendNewElement(tagName).also { it.textContent = textContent }
