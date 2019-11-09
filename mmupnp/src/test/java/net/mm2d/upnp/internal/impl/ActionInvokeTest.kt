@@ -18,6 +18,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.io.IOException
@@ -518,8 +519,10 @@ class ActionInvokeTest {
 
     @Test(expected = IOException::class)
     fun makeSoap_xml作成でExceptionが発生したらIOException() {
-        every { invokeDelegate.formatXmlString(any()) } throws TransformerException("")
-        with(invokeDelegate) { emptyList<Pair<String, String?>>().makeSoap(emptyMap()) }
+        with(invokeDelegate) {
+            every { any<Document>().formatXmlString() } throws TransformerException("")
+            emptyList<Pair<String, String?>>().makeSoap(emptyMap())
+        }
     }
 
     @Test

@@ -32,11 +32,11 @@
         <action/>
     </actionList>
     <serviceStateTable>
-        <stateVariable sendEvents="no">
+        <stateVariable sendEvents="no" multicast="yes">
             <name>A_ARG_TYPE_Type</name>
             <dataType>string</dataType>
         </stateVariable>
-        <stateVariable sendEvents="yes">
+        <stateVariable sendEvents="yes" multicast="yes">
             <name>A_ARG_TYPE_Value</name>
             <dataType>i4</dataType>
             <allowedValueRange>
@@ -46,7 +46,7 @@
             </allowedValueRange>
             <defaultValue>10</defaultValue>
         </stateVariable>
-        <stateVariable sendEvents="yes">
+        <stateVariable sendEvents="yes" multicast="no">
             <garbage/>
             <name>A_ARG_TYPE_Value2</name>
             <dataType>i4</dataType>
