@@ -194,14 +194,48 @@ private class NamedNodeMapIterator(
     override fun hasNext(): Boolean = index < map.length
 }
 
-fun Document.appendNewElementNs(namespaceUri: String, tagName: String): Element =
-    createElementNS(namespaceUri, tagName).also { appendChild(it) }
+/**
+ * Create new element and add to receiver document.
+ *
+ * @receiver Document
+ * @param namespaceUri The namespace URI of the element to create
+ * @param qualifiedName The qualified name of the element type to instantiate.
+ * @return New element
+ */
+@Throws(DOMException::class)
+fun Document.appendNewElementNs(namespaceUri: String, qualifiedName: String): Element =
+    createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
 
-fun Node.appendNewElementNs(namespaceUri: String, tagName: String): Element =
-    ownerDocument.createElementNS(namespaceUri, tagName).also { appendChild(it) }
+/**
+ * Create new element with namespace and add to receiver node.
+ *
+ * @receiver Parent node
+ * @param namespaceUri The namespace URI of the element to create
+ * @param qualifiedName The qualified name of the element type to instantiate.
+ * @return New element
+ */
+@Throws(DOMException::class)
+fun Node.appendNewElementNs(namespaceUri: String, qualifiedName: String): Element =
+    ownerDocument.createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
 
+/**
+ * Create new element and add to receiver node.
+ *
+ * @receiver Parent node
+ * @param tagName The name of the element type to instantiate.
+ * @return New element
+ */
+@Throws(DOMException::class)
 fun Node.appendNewElement(tagName: String): Element =
     ownerDocument.createElement(tagName).also { appendChild(it) }
 
+/**
+ * Create new element with text content and add to receiver node.
+ *
+ * @receiver Parent node
+ * @param tagName The name of the element type to instantiate.
+ * @return New element
+ */
+@Throws(DOMException::class)
 fun Node.appendNewElement(tagName: String, textContent: String?): Element =
     appendNewElement(tagName).also { it.textContent = textContent }

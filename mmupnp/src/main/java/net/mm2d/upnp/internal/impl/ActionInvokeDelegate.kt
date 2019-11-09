@@ -9,9 +9,7 @@ package net.mm2d.upnp.internal.impl
 
 import net.mm2d.log.Logger
 import net.mm2d.upnp.*
-import net.mm2d.upnp.util.XmlUtils
-import net.mm2d.upnp.util.findChildElementByLocalName
-import net.mm2d.upnp.util.forEachElement
+import net.mm2d.upnp.util.*
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -42,24 +40,12 @@ internal class ActionInvokeDelegate(
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
-        val soap = makeArguments(argumentValues).let {
-            it.appendArgument(customArguments)
-            it.makeSoap(customNamespace)
-        }
-        return invoke(soap, returnErrorResponse)
-    }
-
-    /**
-     * Create an argument list.
-     *
-     * @param argumentValues Argument values
-     * @return Argument list
-     */
-    private fun makeArguments(argumentValues: Map<String, String?>): MutableList<Pair<String, String?>> =
-        argumentMap.values
+        val arguments = argumentMap.values
             .filter { it.isInputDirection }
-            .map { it.name to selectArgumentValue(it, argumentValues) }
-            .toMutableList()
+            .map { it.name to selectArgumentValue(it, argumentValues) } +
+            customArguments.toList()
+        return invoke(arguments.makeSoap(customNamespace), returnErrorResponse)
+    }
 
     /**
      * Select the value of Argument.
@@ -74,28 +60,14 @@ internal class ActionInvokeDelegate(
     private fun selectArgumentValue(argument: Argument, argumentValues: Map<String, String?>): String? =
         argumentValues[argument.name] ?: argument.relatedStateVariable.defaultValue
 
-    /**
-     * Append custom arguments.
-     *
-     * @receiver append target
-     * @param arguments custom arguments to append.
-     */
-    private fun MutableList<Pair<String, String?>>.appendArgument(arguments: Map<String, String>) {
-        if (arguments.isEmpty()) return
-        arguments.entries.forEach {
-            add(it.key to it.value)
-        }
-    }
-
     @Throws(IOException::class)
-    private fun invoke(soap: String, returnErrorResponse: Boolean): Map<String, String> {
-        val result = invoke(soap)
-        Logger.v { "action result:\n$result" }
-        if (!returnErrorResponse && result.containsKey(Action.ERROR_CODE_KEY)) {
-            throw IOException("error response: $result")
+    private fun invoke(soap: String, returnErrorResponse: Boolean): Map<String, String> =
+        invoke(soap).also {
+            Logger.v { "action result:\n$it" }
+            if (!returnErrorResponse && it.containsKey(Action.ERROR_CODE_KEY)) {
+                throw IOException("error response: $it")
+            }
         }
-        return result
-    }
 
     /**
      * invoke this Action
@@ -172,19 +144,18 @@ internal class ActionInvokeDelegate(
     internal fun List<Pair<String, String?>>.makeSoap(namespaces: Map<String, String>): String {
         try {
             val document = XmlUtils.newDocument(true)
-            makeUpToActionElement(document).also {
+            document.makeUpToActionElement().also {
                 it.setNamespace(namespaces)
                 it.setArgument(this)
             }
-            return formatXmlString(document)
+            return document.formatXmlString()
         } catch (e: Exception) {
             throw IOException(e)
         }
     }
 
     private fun Element.setNamespace(namespace: Map<String, String>) {
-        if (namespace.isEmpty()) return
-        namespace.entries.forEach {
+        namespace.forEach {
             setAttributeNS(XMLNS_URI, XMLNS_PREFIX + it.key, it.value)
         }
     }
@@ -196,36 +167,23 @@ internal class ActionInvokeDelegate(
      * @param arguments Arguments
      */
     private fun Element.setArgument(arguments: List<Pair<String, String?>>) {
-        arguments.forEach { pair ->
-            ownerDocument.createElement(pair.first)?.let { param ->
-                pair.second?.let {
-                    param.textContent = it
-                }
-                appendChild(param)
-            }
+        arguments.forEach {
+            appendNewElement(it.first, it.second)
         }
     }
 
     /**
      * Create SOAP Action XML up to ActionElement.
      *
-     * @param document XML Document
+     * @receiver document XML Document
      * @return ActionElement
      */
-    private fun makeUpToActionElement(document: Document): Element {
-        val envelope = document.createElementNS(SOAP_NS, "s:Envelope")
-        document.appendChild(envelope)
-        document.createAttributeNS(SOAP_NS, "s:encodingStyle").also {
-            it.nodeValue = SOAP_STYLE
-            envelope.setAttributeNode(it)
+    private fun Document.makeUpToActionElement(): Element =
+        appendNewElementNs(SOAP_NS, "s:Envelope").let {
+            it.setAttributeNS(SOAP_NS, "s:encodingStyle", SOAP_STYLE)
+            it.appendNewElementNs(SOAP_NS, "s:Body")
+                .appendNewElementNs(service.serviceType, "u:$name")
         }
-        val body = document.createElementNS(SOAP_NS, "s:Body").also {
-            envelope.appendChild(it)
-        }
-        return document.createElementNS(service.serviceType, "u:$name").also {
-            body.appendChild(it)
-        }
-    }
 
     /**
      * Convert XML Document to String.
@@ -236,11 +194,11 @@ internal class ActionInvokeDelegate(
      */
     // VisibleForTesting
     @Throws(TransformerException::class)
-    internal fun formatXmlString(document: Document): String {
+    internal fun Document.formatXmlString(): String {
         val sw = StringWriter()
         TransformerFactory.newInstance().newTransformer().also {
             it.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-            it.transform(DOMSource(document), StreamResult(sw))
+            it.transform(DOMSource(this), StreamResult(sw))
         }
         return sw.toString()
     }
