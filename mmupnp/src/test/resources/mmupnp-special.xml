@@ -30,7 +30,7 @@
             <name>A_ARG_TYPE_Type</name>
             <dataType>string</dataType>
         </stateVariable>
-        <stateVariable sendEvents="yes">
+        <stateVariable sendEvents="yes" multicast="no">
             <name>A_ARG_TYPE_Value</name>
             <dataType>i4</dataType>
             <allowedValueRange>
