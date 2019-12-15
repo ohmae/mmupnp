@@ -10,8 +10,8 @@ package net.mm2d.upnp.cp.internal.parser
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.util.XmlUtils
+import net.mm2d.upnp.common.util.childElements
 import net.mm2d.upnp.common.util.forEach
-import net.mm2d.upnp.common.util.forEachElement
 import net.mm2d.upnp.cp.StateVariable
 import net.mm2d.upnp.cp.internal.impl.*
 import org.w3c.dom.Element
@@ -74,10 +74,10 @@ internal object ServiceParser {
 
     private fun parseAction(element: Element): ActionImpl.Builder {
         val builder = ActionImpl.Builder()
-        element.firstChild?.forEachElement {
+        element.childElements().forEach {
             when (it.localName) {
                 "name" -> builder.setName(it.textContent)
-                "argumentList" -> it.firstChild?.forEachElement { child ->
+                "argumentList" -> it.childElements().forEach { child ->
                     if (child.localName == "argument") {
                         builder.addArgumentBuilder(parseArgument(child))
                     }
@@ -89,7 +89,7 @@ internal object ServiceParser {
 
     private fun parseArgument(element: Element): ArgumentImpl.Builder {
         val builder = ArgumentImpl.Builder()
-        element.firstChild?.forEachElement {
+        element.childElements().forEach {
             builder.setField(it.localName, it.textContent)
         }
         return builder
@@ -110,7 +110,7 @@ internal object ServiceParser {
         val builder = StateVariableImpl.Builder()
         builder.setSendEvents(element.getAttribute("sendEvents"))
         builder.setMulticast(element.getAttribute("multicast"))
-        element.firstChild?.forEachElement {
+        element.childElements().forEach {
             when (it.localName) {
                 "name" ->
                     builder.setName(it.textContent)
@@ -128,7 +128,7 @@ internal object ServiceParser {
     }
 
     private fun parseAllowedValueList(builder: StateVariableImpl.Builder, element: Element) {
-        element.firstChild?.forEachElement {
+        element.childElements().forEach {
             if ("allowedValue" == it.localName) {
                 builder.addAllowedValue(it.textContent)
             }
@@ -136,7 +136,7 @@ internal object ServiceParser {
     }
 
     private fun parseAllowedValueRange(builder: StateVariableImpl.Builder, element: Element) {
-        element.firstChild?.forEachElement { childElement ->
+        element.childElements().forEach { childElement ->
             childElement.localName.let {
                 builder.setField(it, childElement.textContent)
             }

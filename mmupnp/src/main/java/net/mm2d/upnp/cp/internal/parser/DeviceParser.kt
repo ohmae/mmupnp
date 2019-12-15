@@ -10,8 +10,8 @@ package net.mm2d.upnp.cp.internal.parser
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.util.XmlUtils
+import net.mm2d.upnp.common.util.childElements
 import net.mm2d.upnp.common.util.findChildElementByLocalName
-import net.mm2d.upnp.common.util.forEachElement
 import net.mm2d.upnp.cp.Icon
 import net.mm2d.upnp.cp.internal.impl.DeviceImpl
 import net.mm2d.upnp.cp.internal.impl.IconImpl
@@ -74,7 +74,7 @@ internal object DeviceParser {
     }
 
     private fun parseDevice(builder: DeviceImpl.Builder, deviceNode: Node) {
-        deviceNode.firstChild?.forEachElement {
+        deviceNode.childElements().forEach {
             when (val tag = it.localName) {
                 "iconList" ->
                     parseIconList(builder, it)
@@ -124,7 +124,7 @@ internal object DeviceParser {
     }
 
     private fun parseIconList(builder: DeviceImpl.Builder, listNode: Node) {
-        listNode.firstChild?.forEachElement {
+        listNode.childElements().forEach {
             if (it.localName == "icon") {
                 builder.addIcon(parseIcon(it))
             }
@@ -133,7 +133,7 @@ internal object DeviceParser {
 
     private fun parseIcon(iconNode: Node): Icon {
         val builder = IconImpl.Builder()
-        iconNode.firstChild?.forEachElement {
+        iconNode.childElements().forEach {
             builder.setField(it.localName, it.textContent)
         }
         return builder.build()
@@ -155,7 +155,7 @@ internal object DeviceParser {
     }
 
     private fun parseServiceList(builder: DeviceImpl.Builder, listNode: Node) {
-        listNode.firstChild?.forEachElement {
+        listNode.childElements().forEach {
             if (it.localName == "service") {
                 builder.addServiceBuilder(parseService(it))
             }
@@ -164,7 +164,7 @@ internal object DeviceParser {
 
     private fun parseService(serviceNode: Node): ServiceImpl.Builder {
         val serviceBuilder = ServiceImpl.Builder()
-        serviceNode.firstChild?.forEachElement {
+        serviceNode.childElements().forEach {
             serviceBuilder.setField(it.localName, it.textContent)
         }
         return serviceBuilder
@@ -187,7 +187,7 @@ internal object DeviceParser {
 
     private fun parseDeviceList(builder: DeviceImpl.Builder, listNode: Node) {
         val builderList = ArrayList<DeviceImpl.Builder>()
-        listNode.firstChild?.forEachElement {
+        listNode.childElements().forEach {
             if (it.localName == "device") {
                 val embeddedBuilder = builder.createEmbeddedDeviceBuilder()
                 parseDevice(embeddedBuilder, it)

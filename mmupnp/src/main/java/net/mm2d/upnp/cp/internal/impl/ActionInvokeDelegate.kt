@@ -220,7 +220,7 @@ internal class ActionInvokeDelegate(
     @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
     private fun parseResponse(xml: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
-        findResponseElement(xml).firstChild?.forEachElement {
+        findResponseElement(xml).childElements().forEach {
             val tag = it.localName
             val text = it.textContent
             if (argumentMap[tag] == null) {
@@ -259,7 +259,7 @@ internal class ActionInvokeDelegate(
     @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
     private fun parseErrorResponse(xml: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
-        findFaultElement(xml).firstChild?.forEachElement {
+        findFaultElement(xml).childElements().forEach {
             val tag = it.localName
             if (tag == "detail") {
                 parseErrorDetail(result, it)
@@ -283,8 +283,8 @@ internal class ActionInvokeDelegate(
     @Throws(IOException::class)
     private fun parseErrorDetail(result: MutableMap<String, String>, detailNode: Node) {
         detailNode.findChildElementByLocalName("UPnPError")
-            ?.firstChild
-            ?.forEachElement {
+            ?.childElements()
+            ?.forEach {
                 result["UPnPError/${it.localName}"] = it.textContent
             } ?: throw IOException("no UPnPError tag")
     }
