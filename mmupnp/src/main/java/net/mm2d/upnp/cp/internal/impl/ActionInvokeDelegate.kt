@@ -193,7 +193,7 @@ internal class ActionInvokeDelegate(
     /**
      * Convert XML Document to String.
      *
-     * @param document XML Document to convert
+     * @receiver document XML Document to convert
      * @return Converted string
      * @throws TransformerException If a conversion error occurs
      */
