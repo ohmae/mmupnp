@@ -10,7 +10,7 @@ version pj.versions.name
 test.maxParallelForks = 4
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     api "net.mm2d:log:0.8.4"
 
     testImplementation "io.mockk:mockk:1.9.3"
