@@ -10,8 +10,8 @@ package net.mm2d.upnp.cp.internal.parser
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.util.XmlUtils
+import net.mm2d.upnp.common.util.asElementIterable
 import net.mm2d.upnp.common.util.childElements
-import net.mm2d.upnp.common.util.forEach
 import net.mm2d.upnp.cp.StateVariable
 import net.mm2d.upnp.cp.internal.impl.*
 import org.w3c.dom.Element
@@ -61,14 +61,14 @@ internal object ServiceParser {
     }
 
     private fun parseActionList(builder: ServiceImpl.Builder, nodeList: NodeList) {
-        nodeList.forEach {
-            builder.addActionBuilder(parseAction(it as Element))
+        nodeList.asElementIterable().forEach {
+            builder.addActionBuilder(parseAction(it))
         }
     }
 
     private fun parseStateVariableList(builder: ServiceImpl.Builder, nodeList: NodeList) {
-        nodeList.forEach {
-            builder.addStateVariable(parseStateVariable(it as Element))
+        nodeList.asElementIterable().forEach {
+            builder.addStateVariable(parseStateVariable(it))
         }
     }
 

@@ -119,14 +119,6 @@ operator fun NodeList.iterator(): Iterator<Node> = object : Iterator<Node> {
 }
 
 /**
- * Iterate NodeList.
- *
- * @receiver node list
- * @param action Action to be performed on each node
- */
-inline fun NodeList.forEach(action: (Node) -> Unit): Unit = iterator().forEach(action)
-
-/**
  * Returns the Iterable of Node
  *
  * @receiver NodeList performing iteration
