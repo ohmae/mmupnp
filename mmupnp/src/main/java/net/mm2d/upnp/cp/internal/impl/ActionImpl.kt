@@ -7,8 +7,10 @@
 
 package net.mm2d.upnp.cp.internal.impl
 
+import net.mm2d.upnp.common.internal.property.ActionProperty
 import net.mm2d.upnp.cp.Action
 import net.mm2d.upnp.cp.Argument
+import net.mm2d.upnp.cp.StateVariable
 import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -21,13 +23,18 @@ import kotlin.coroutines.suspendCoroutine
  */
 internal class ActionImpl(
     override val service: ServiceImpl,
-    override val name: String,
-    internal val argumentMap: Map<String, Argument>
+    property: ActionProperty,
+    stateVariableMap: Map<String, StateVariable>
 ) : Action {
     private val taskExecutors = service.device.controlPoint.taskExecutors
     // VisibleForTesting
     internal val invokeDelegate: ActionInvokeDelegate by lazy { createInvokeDelegate(this) }
 
+    override val name: String = property.name
+    internal val argumentMap: Map<String, Argument> = property.argumentList
+        .map { ArgumentImpl(it, stateVariableMap) }
+        .map { it.name to it }
+        .toMap()
     override val argumentList: List<Argument> by lazy {
         argumentMap.values.toList()
     }
@@ -104,43 +111,6 @@ internal class ActionImpl(
             { continuation.resume(it) },
             { continuation.resumeWithException(it) }
         )
-    }
-
-    class Builder {
-        private var service: ServiceImpl? = null
-        private var name: String? = null
-        private val argumentList: MutableList<ArgumentImpl.Builder> = mutableListOf()
-
-        @Throws(IllegalStateException::class)
-        fun build(): ActionImpl {
-            val service = service
-                ?: throw IllegalStateException("service must be set.")
-            val name = name
-                ?: throw IllegalStateException("name must be set.")
-            return ActionImpl(
-                service = service,
-                name = name,
-                argumentMap = argumentList
-                    .map { it.build() }
-                    .map { it.name to it }
-                    .toMap()
-            )
-        }
-
-        fun getArgumentBuilderList(): List<ArgumentImpl.Builder> = argumentList
-
-        fun setService(service: ServiceImpl): Builder = apply {
-            this.service = service
-        }
-
-        fun setName(name: String): Builder = apply {
-            this.name = name
-        }
-
-        // Actionのインスタンス作成後にArgumentを登録することはできない
-        fun addArgumentBuilder(argument: ArgumentImpl.Builder): Builder = apply {
-            argumentList.add(argument)
-        }
     }
 
     companion object {

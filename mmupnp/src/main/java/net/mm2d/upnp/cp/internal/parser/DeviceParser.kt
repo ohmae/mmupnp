@@ -9,17 +9,13 @@ package net.mm2d.upnp.cp.internal.parser
 
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
-import net.mm2d.upnp.common.util.XmlUtils
-import net.mm2d.upnp.common.util.childElements
-import net.mm2d.upnp.common.util.findChildElementByLocalName
-import net.mm2d.upnp.cp.Icon
+import net.mm2d.upnp.common.internal.parser.DevicePropertyParser
+import net.mm2d.upnp.common.internal.parser.ServicePropertyParser
+import net.mm2d.upnp.common.internal.property.DeviceProperty
+import net.mm2d.upnp.common.internal.property.ServiceProperty
 import net.mm2d.upnp.cp.internal.impl.DeviceImpl
-import net.mm2d.upnp.cp.internal.impl.IconImpl
-import net.mm2d.upnp.cp.internal.impl.ServiceImpl
-import org.w3c.dom.Node
 import org.xml.sax.SAXException
 import java.io.IOException
-import java.util.*
 import javax.xml.parsers.ParserConfigurationException
 
 /**
@@ -51,149 +47,42 @@ internal object DeviceParser {
             throw IOException("download error: $url")
         }
         builder.setDownloadInfo(client)
-        parseDescription(builder, description)
-        loadServices(client, builder)
+        DevicePropertyParser.parseDescription(builder.propertyBuilder, description)
+        loadServices(client, builder, builder.propertyBuilder)
     }
 
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
-    private fun loadServices(client: HttpClient, builder: DeviceImpl.Builder) {
-        builder.getServiceBuilderList().forEach {
-            ServiceParser.loadDescription(client, builder, it)
+    private fun loadServices(client: HttpClient, builder: DeviceImpl.Builder, propertyBuilder: DeviceProperty.Builder) {
+        propertyBuilder.serviceBuilderList.forEach {
+            loadDescription(client, builder, it)
         }
-        builder.getEmbeddedDeviceBuilderList().forEach {
-            loadServices(client, it)
+        propertyBuilder.deviceBuilderList.forEach {
+            loadServices(client, builder, it)
         }
     }
 
+    /**
+     * Download Description from SCPDURL and parse it.
+     *
+     * KeepAlive, if possible.
+     *
+     * @param client HttpClient
+     * @param deviceBuilder DeviceのBuilder
+     * @param builder ServiceのBuilder
+     * @throws SAXException if an parse error occurs.
+     * @throws IOException if an I/O error occurs.
+     * @throws ParserConfigurationException If there is a problem with instantiation
+     */
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
-    internal fun parseDescription(builder: DeviceImpl.Builder, description: String) {
-        builder.setDescription(description)
-        val doc = XmlUtils.newDocument(true, description)
-        val deviceNode = doc.documentElement.findChildElementByLocalName("device") ?: throw IOException()
-        parseDevice(builder, deviceNode)
-    }
-
-    private fun parseDevice(builder: DeviceImpl.Builder, deviceNode: Node) {
-        deviceNode.childElements().forEach {
-            when (val tag = it.localName) {
-                "iconList" ->
-                    parseIconList(builder, it)
-                "serviceList" ->
-                    parseServiceList(builder, it)
-                "deviceList" ->
-                    parseDeviceList(builder, it)
-                else -> {
-                    val namespace = it.namespaceURI
-                    val value = it.textContent
-                    builder.putTag(namespace, tag, value)
-                    builder.setField(tag, value)
-                }
-            }
-        }
-    }
-
-    private fun DeviceImpl.Builder.setField(tag: String, value: String) {
-        when (tag) {
-            "UDN" ->
-                setUdn(value)
-            "UPC" ->
-                setUpc(value)
-            "deviceType" ->
-                setDeviceType(value)
-            "friendlyName" ->
-                setFriendlyName(value)
-            "manufacturer" ->
-                setManufacture(value)
-            "manufacturerURL" ->
-                setManufactureUrl(value)
-            "modelName" ->
-                setModelName(value)
-            "modelURL" ->
-                setModelUrl(value)
-            "modelDescription" ->
-                setModelDescription(value)
-            "modelNumber" ->
-                setModelNumber(value)
-            "serialNumber" ->
-                setSerialNumber(value)
-            "presentationURL" ->
-                setPresentationUrl(value)
-            "URLBase" ->
-                setUrlBase(value)
-        }
-    }
-
-    private fun parseIconList(builder: DeviceImpl.Builder, listNode: Node) {
-        listNode.childElements().forEach {
-            if (it.localName == "icon") {
-                builder.addIcon(parseIcon(it))
-            }
-        }
-    }
-
-    private fun parseIcon(iconNode: Node): Icon {
-        val builder = IconImpl.Builder()
-        iconNode.childElements().forEach {
-            builder.setField(it.localName, it.textContent)
-        }
-        return builder.build()
-    }
-
-    private fun IconImpl.Builder.setField(tag: String, value: String) {
-        when (tag) {
-            "mimetype" ->
-                setMimeType(value)
-            "height" ->
-                setHeight(value)
-            "width" ->
-                setWidth(value)
-            "depth" ->
-                setDepth(value)
-            "url" ->
-                setUrl(value)
-        }
-    }
-
-    private fun parseServiceList(builder: DeviceImpl.Builder, listNode: Node) {
-        listNode.childElements().forEach {
-            if (it.localName == "service") {
-                builder.addServiceBuilder(parseService(it))
-            }
-        }
-    }
-
-    private fun parseService(serviceNode: Node): ServiceImpl.Builder {
-        val serviceBuilder = ServiceImpl.Builder()
-        serviceNode.childElements().forEach {
-            serviceBuilder.setField(it.localName, it.textContent)
-        }
-        return serviceBuilder
-    }
-
-    private fun ServiceImpl.Builder.setField(tag: String, value: String) {
-        when (tag) {
-            "serviceType" ->
-                setServiceType(value)
-            "serviceId" ->
-                setServiceId(value)
-            "SCPDURL" ->
-                setScpdUrl(value)
-            "eventSubURL" ->
-                setEventSubUrl(value)
-            "controlURL" ->
-                setControlUrl(value)
-        }
-    }
-
-    private fun parseDeviceList(builder: DeviceImpl.Builder, listNode: Node) {
-        val builderList = ArrayList<DeviceImpl.Builder>()
-        listNode.childElements().forEach {
-            if (it.localName == "device") {
-                val embeddedBuilder = builder.createEmbeddedDeviceBuilder()
-                parseDevice(embeddedBuilder, it)
-                builderList.add(embeddedBuilder)
-            }
-        }
-        builder.setEmbeddedDeviceBuilderList(builderList)
+    fun loadDescription(client: HttpClient, deviceBuilder: DeviceImpl.Builder, builder: ServiceProperty.Builder) {
+        val scpdUrl = builder.scpdUrl ?: throw IOException("scpdUrl is null")
+        // Treat as empty if "/ssdp/notfound". If try to download, "404 Not found" will be returned.
+        // This may be Google's DIAL device.
+        if (scpdUrl == "/ssdp/notfound") return
+        val baseUrl = deviceBuilder.getBaseUrl()
+        val scopeId = deviceBuilder.getSsdpMessage().scopeId
+        val url = Http.makeAbsoluteUrl(baseUrl, scpdUrl, scopeId)
+        val description = client.downloadString(url)
+        ServicePropertyParser.parseDescription(builder, description)
     }
 }
