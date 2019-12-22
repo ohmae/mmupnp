@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * A class holding [Device] found in [net.mm2d.upnp.ControlPoint].
+ * A class holding [Device] found in [net.mm2d.upnp.cp.ControlPoint].
  *
  * Check the expiration date of Device, and notify the expired Device as Lost.
  *

@@ -10,7 +10,10 @@ package net.mm2d.upnp.cp.internal.impl
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.internal.property.DeviceProperty
-import net.mm2d.upnp.cp.*
+import net.mm2d.upnp.cp.Action
+import net.mm2d.upnp.cp.Device
+import net.mm2d.upnp.cp.IconFilter
+import net.mm2d.upnp.cp.Service
 import net.mm2d.upnp.cp.internal.message.FakeSsdpMessage
 import java.io.IOException
 import java.net.MalformedURLException
@@ -23,12 +26,19 @@ import java.net.URL
  */
 internal class DeviceImpl private constructor(
     override val controlPoint: ControlPointImpl,
-    override val parent: Device?,
     private val property: DeviceProperty,
     private val udnSet: Set<String>,
     ssdpMessage: SsdpMessage,
-    location: String
+    location: String,
+    override val iconList: List<IconImpl>,
+    override val serviceList: List<ServiceImpl>,
+    override val deviceList: List<DeviceImpl>
 ) : Device {
+    init {
+        serviceList.forEach { it.device = this }
+        deviceList.forEach { it.parent = this }
+    }
+
     override var ssdpMessage: SsdpMessage = ssdpMessage
         private set
     override val expireTime: Long = ssdpMessage.expireTime
@@ -56,21 +66,9 @@ internal class DeviceImpl private constructor(
     override val modelNumber: String? = property.modelNumber
     override val serialNumber: String? = property.serialNumber
     override val presentationUrl: String? = property.presentationUrl
-    override val iconList: List<Icon> = property.iconList.map { IconImpl(it) }
-    override val serviceList: List<Service> = property.serviceList.map {
-        ServiceImpl(this, it)
-    }
+    override var parent: Device? = null
+        private set
     override val isEmbeddedDevice: Boolean = parent != null
-    override val deviceList: List<Device> = property.deviceList.map {
-        DeviceImpl(
-            controlPoint = controlPoint,
-            parent = this,
-            property = it,
-            udnSet = collectUdn(it),
-            ssdpMessage = ssdpMessage,
-            location = location
-        )
-    }
 
     override val isPinned: Boolean
         get() = ssdpMessage.isPinned
@@ -165,27 +163,37 @@ internal class DeviceImpl private constructor(
             location = ssdpMessage.location ?: throw IllegalArgumentException()
         }
 
-        fun build(parent: Device? = null): DeviceImpl {
+        fun build(): DeviceImpl {
             val property = propertyBuilder.build(null)
             val udnSet = collectUdn(property)
+            // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
+            val ssdpMessage = ssdpMessage
+            val uuid = getUuid()
+            if (uuid.isEmpty() && ssdpMessage is FakeSsdpMessage) {
+                ssdpMessage.uuid = property.udn
+            } else {
+                check(udnSet.contains(uuid)) { "uuid and udn does not match! uuid=$uuid udn=$udnSet" }
+            }
+            return build(property, udnSet)
+        }
 
-            if (parent == null) {
-                // Sometime Embedded devices have different UUIDs. So, do not check when embedded device
-                val ssdpMessage = ssdpMessage
-                val uuid = getUuid()
-                if (uuid.isEmpty() && ssdpMessage is FakeSsdpMessage) {
-                    ssdpMessage.uuid = property.udn
-                } else {
-                    check(udnSet.contains(uuid)) { "uuid and udn does not match! uuid=$uuid udn=$udnSet" }
-                }
+        private fun build(property: DeviceProperty, udnSet: Set<String>): DeviceImpl {
+            val iconList = property.iconList.map { IconImpl(it) }
+            val serviceList = property.serviceList.map {
+                ServiceImpl.create(controlPoint, it)
+            }
+            val deviceList: List<DeviceImpl> = property.deviceList.map {
+                build(it, collectUdn(it))
             }
             return DeviceImpl(
                 controlPoint = controlPoint,
-                parent = parent,
                 property = property,
                 udnSet = udnSet,
                 ssdpMessage = ssdpMessage,
-                location = location
+                location = location,
+                iconList = iconList,
+                serviceList = serviceList,
+                deviceList = deviceList
             )
         }
 

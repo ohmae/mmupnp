@@ -12,7 +12,7 @@ package net.mm2d.upnp.common.internal.property
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-class DeviceProperty (
+class DeviceProperty(
     /**
      * XML string of DeviceDescription.
      */
@@ -180,7 +180,6 @@ class DeviceProperty (
 
     deviceBuilderList: List<Builder>
 ) {
-
     /**
      * Whether this is Embedded Device.
      */

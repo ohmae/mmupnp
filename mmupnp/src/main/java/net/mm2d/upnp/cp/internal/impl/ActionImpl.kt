@@ -10,7 +10,6 @@ package net.mm2d.upnp.cp.internal.impl
 import net.mm2d.upnp.common.internal.property.ActionProperty
 import net.mm2d.upnp.cp.Action
 import net.mm2d.upnp.cp.Argument
-import net.mm2d.upnp.cp.StateVariable
 import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -22,21 +21,20 @@ import kotlin.coroutines.suspendCoroutine
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class ActionImpl(
-    override val service: ServiceImpl,
+    controlPoint: ControlPointImpl,
     property: ActionProperty,
-    stateVariableMap: Map<String, StateVariable>
+    override val argumentList: List<ArgumentImpl>
 ) : Action {
-    private val taskExecutors = service.device.controlPoint.taskExecutors
+    override lateinit var service: ServiceImpl
+        internal set
+    private val taskExecutors = controlPoint.taskExecutors
     // VisibleForTesting
-    internal val invokeDelegate: ActionInvokeDelegate by lazy { createInvokeDelegate(this) }
-
+    internal val invokeDelegate: ActionInvokeDelegate by lazy {
+        createInvokeDelegate(this)
+    }
     override val name: String = property.name
-    internal val argumentMap: Map<String, Argument> = property.argumentList
-        .map { ArgumentImpl(it, stateVariableMap) }
-        .map { it.name to it }
-        .toMap()
-    override val argumentList: List<Argument> by lazy {
-        argumentMap.values.toList()
+    internal val argumentMap: Map<String, Argument> by lazy {
+        argumentList.map { it.name to it }.toMap()
     }
 
     override fun findArgument(name: String): Argument? = argumentMap[name]
@@ -116,5 +114,14 @@ internal class ActionImpl(
     companion object {
         // VisibleForTesting
         internal fun createInvokeDelegate(action: ActionImpl) = ActionInvokeDelegate(action)
+
+        fun create(
+            controlPoint: ControlPointImpl,
+            property: ActionProperty,
+            stateVariableList: List<StateVariableImpl>
+        ): ActionImpl {
+            val argumentList = property.argumentList.map { ArgumentImpl.create(it, stateVariableList) }
+            return ActionImpl(controlPoint, property, argumentList)
+        }
     }
 }

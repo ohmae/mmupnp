@@ -14,7 +14,7 @@ import net.mm2d.log.Logger
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-class ArgumentProperty (
+class ArgumentProperty(
     /**
      * Return the Argument name
      *
@@ -59,7 +59,10 @@ class ArgumentProperty (
         // That indented in the text content.
         // e.g. AN-WLTU1
         @Throws(IllegalStateException::class)
-        private fun repairInvalidFormatAndGet(name: String, stateVariableList: List<StateVariableProperty>): StateVariableProperty {
+        private fun repairInvalidFormatAndGet(
+            name: String,
+            stateVariableList: List<StateVariableProperty>
+        ): StateVariableProperty {
             val trimmedName = name.trim()
             val trimmedVariable = stateVariableList.find { it.name == trimmedName }
                 ?: throw IllegalStateException("There is no StateVariable [$name]")

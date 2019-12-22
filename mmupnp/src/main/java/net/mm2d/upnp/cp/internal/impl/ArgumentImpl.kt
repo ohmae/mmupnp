@@ -18,10 +18,17 @@ import net.mm2d.upnp.cp.StateVariable
  */
 internal class ArgumentImpl(
     property: ArgumentProperty,
-    stateVariableMap: Map<String, StateVariable>
+    override val relatedStateVariable: StateVariableImpl
 ) : Argument {
     override val name: String = property.name
     override val isInputDirection: Boolean = property.isInputDirection
-    override val relatedStateVariable: StateVariable =
-        stateVariableMap[property.relatedStateVariable.name] ?: error("impossible")
+
+    companion object {
+        fun create(property: ArgumentProperty, stateVariableList: List<StateVariableImpl>): ArgumentImpl {
+            val relatedStateVariable = stateVariableList.find {
+                it.name == property.relatedStateVariable.name
+            } ?: error("impossible")
+            return ArgumentImpl(property, relatedStateVariable)
+        }
+    }
 }

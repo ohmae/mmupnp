@@ -22,36 +22,36 @@ import kotlin.coroutines.suspendCoroutine
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class ServiceImpl(
-    override val device: DeviceImpl,
-    private val property: ServiceProperty
+    controlPoint: ControlPointImpl,
+    property: ServiceProperty,
+    override val actionList: List<ActionImpl>,
+    override val stateVariableList: List<StateVariableImpl>
 ) : Service {
-    private val subscribeManager: SubscribeManager = device.controlPoint.subscribeManager
-    private val taskExecutors: TaskExecutors = device.controlPoint.taskExecutors
+    init {
+        actionList.forEach { it.service = this }
+    }
+
+    override lateinit var device: DeviceImpl
+        internal set
+    private val subscribeManager: SubscribeManager = controlPoint.subscribeManager
+    private val taskExecutors: TaskExecutors = controlPoint.taskExecutors
     override val description: String = property.description
     override val serviceType: String = property.serviceType
     override val serviceId: String = property.serviceId
     override val scpdUrl: String = property.scpdUrl
     override val controlUrl: String = property.controlUrl
     override val eventSubUrl: String = property.eventSubUrl
-    private val stateVariableMap: Map<String, StateVariable> = property.stateVariableList
-        .map { StateVariableImpl(it) }
-        .map { it.name to it }
-        .toMap()
-    private val actionMap: Map<String, Action> = property.actionList
-        .map { ActionImpl(this, it, stateVariableMap) }
-        .map { it.name to it }
-        .toMap()
+    private val actionMap: Map<String, Action> by lazy {
+        actionList.map { it.name to it }.toMap()
+    }
+    private val stateVariableMap: Map<String, StateVariable> by lazy {
+        stateVariableList.map { it.name to it }.toMap()
+    }
     // VisibleForTesting
     internal val subscribeDelegate: SubscribeDelegate by lazy { createSubscribeDelegate(this) }
+
     override val subscriptionId: String?
         get() = subscribeDelegate.subscriptionId
-
-    override val actionList: List<Action> by lazy {
-        actionMap.values.toList()
-    }
-    override val stateVariableList: List<StateVariable> by lazy {
-        stateVariableMap.values.toList()
-    }
 
     override fun findAction(name: String): Action? = actionMap[name]
 
@@ -141,5 +141,18 @@ internal class ServiceImpl(
     companion object {
         // VisibleForTesting
         internal fun createSubscribeDelegate(service: ServiceImpl) = SubscribeDelegate(service)
+
+        fun create(
+            controlPoint: ControlPointImpl,
+            property: ServiceProperty
+        ): ServiceImpl {
+            val stateVariableList = property.stateVariableList.map {
+                StateVariableImpl(it)
+            }
+            val actionList = property.actionList.map {
+                ActionImpl.create(controlPoint, it, stateVariableList)
+            }
+            return ServiceImpl(controlPoint, property, actionList, stateVariableList)
+        }
     }
 }
