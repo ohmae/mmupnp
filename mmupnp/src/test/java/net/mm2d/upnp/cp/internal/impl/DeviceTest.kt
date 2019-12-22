@@ -189,7 +189,7 @@ class DeviceTest {
         fun getBaseUrl_URLBaseがあればURLBaseの値() {
             val location = "http://10.0.0.1:1000/"
             val urlBase = "http://10.0.0.1:1001/"
-            builder.setUrlBase(urlBase)
+            builder.propertyBuilder.urlBase = urlBase
             val device = builder.build()
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive2.bin")
             val message = SsdpRequest.create(mockk(relaxed = true), data, data.size)
@@ -399,15 +399,17 @@ class DeviceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "http://192.168.0.1/"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
-                .setDescription("description")
-                .setUdn("uuid")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message).also { builder ->
+                builder.propertyBuilder.also {
+                    it.description = "description"
+                    it.udn = "uuid"
+                    it.upc = "upc"
+                    it.deviceType = "deviceType"
+                    it.friendlyName = "friendlyName"
+                    it.manufacture = "manufacture"
+                    it.modelName = "modelName"
+                }
+            }.build()
             assertThat(device.ipAddress).isEqualTo("192.168.0.1")
         }
 
@@ -416,16 +418,17 @@ class DeviceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
-                .setDescription("description")
-                .setUdn("uuid")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
-
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message).also { builder ->
+                builder.propertyBuilder.also {
+                    it.description = "description"
+                    it.udn = "uuid"
+                    it.upc = "upc"
+                    it.deviceType = "deviceType"
+                    it.friendlyName = "friendlyName"
+                    it.manufacture = "manufacture"
+                    it.modelName = "modelName"
+                }
+            }.build()
             assertThat(device.ipAddress).isEqualTo("")
         }
 
@@ -434,16 +437,17 @@ class DeviceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "http://192.168.0.1/"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
-                .setDescription("description")
-                .setUdn("uuid")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
-
+            val device = DeviceImpl.Builder(mockk(relaxed = true), message).also { builder ->
+                builder.propertyBuilder.also {
+                    it.description = "description"
+                    it.udn = "uuid"
+                    it.upc = "upc"
+                    it.deviceType = "deviceType"
+                    it.friendlyName = "friendlyName"
+                    it.manufacture = "manufacture"
+                    it.modelName = "modelName"
+                }
+            }.build()
             device.loadIconBinary(mockk(relaxed = true), iconFilter { it })
         }
     }

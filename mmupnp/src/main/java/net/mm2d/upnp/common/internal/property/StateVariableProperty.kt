@@ -18,14 +18,14 @@ class StateVariableProperty(
      *
      * @return true: SendEvents is "yes", false: "no"
      */
-    val isSendEvents: Boolean,
+    val isSendEvents: Boolean = false,
 
     /**
      * Return the status of Multicast.
      *
      * @return true: Multicast is "yes", false: "no"
      */
-    val isMulticast: Boolean,
+    val isMulticast: Boolean = false,
 
     /**
      * Return the name of StateVariable.
@@ -120,35 +120,35 @@ class StateVariableProperty(
      *
      * @return AllowedValueList
      */
-    val allowedValueList: List<String>,
+    val allowedValueList: List<String> = emptyList(),
 
     /**
      * Return the value of DefaultValue.
      *
      * @return DefaultValue
      */
-    val defaultValue: String?,
+    val defaultValue: String? = null,
 
     /**
      * Return the value of Minimum.
      *
      * @return Minimum
      */
-    val minimum: String?,
+    val minimum: String? = null,
 
     /**
      * Return the value of Maximum.
      *
      * @return Maximum
      */
-    val maximum: String?,
+    val maximum: String? = null,
 
     /**
      * Return the value of Step.
      *
      * @return Step
      */
-    val step: String?
+    val step: String? = null
 ) {
     class Builder {
         var isSendEvents: Boolean = false
@@ -162,10 +162,8 @@ class StateVariableProperty(
         var step: String? = null
 
         fun build(): StateVariableProperty {
-            val name = name
-                ?: throw IllegalStateException("name must be set.")
-            val dataType = dataType
-                ?: throw IllegalStateException("dataType must be set.")
+            val name = checkNotNull(name) { "name must be set." }
+            val dataType = checkNotNull(dataType) { "dataType must be set." }
 
             return StateVariableProperty(
                 isSendEvents = isSendEvents,

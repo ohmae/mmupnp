@@ -38,7 +38,7 @@ class DeviceProperty(
      * Allowed. Universal Product Code. 12-digit, all-numeric code that identifies the consumer package.
      * Managed by the Uniform Code Council. Specified by UPnP vendor. Single UPC.
      */
-    val upc: String?,
+    val upc: String? = null,
 
     /**
      * Value of deviceType tag.
@@ -76,7 +76,7 @@ class DeviceProperty(
      * Required. Manufacturer's name. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header
      * fields). Specified by UPnP vendor. String. Should be &lt; 64 characters.
      */
-    val manufacture: String?,
+    val manufacture: String? = null,
 
     /**
      * Value of manufacturerURL tag.
@@ -86,7 +86,7 @@ class DeviceProperty(
      * Allowed. Web site for Manufacturer. Is allowed to have a different value depending on language requested
      * (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields). Specified by UPnP vendor. Single URL.
      */
-    val manufactureUrl: String?,
+    val manufactureUrl: String? = null,
 
     /**
      * Value of modelName tag.
@@ -104,7 +104,7 @@ class DeviceProperty(
      * Allowed. Web site for model. Is allowed to have a different value depending on language requested (see
      * ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields). Specified by UPnP vendor. Single URL.
      */
-    val modelUrl: String?,
+    val modelUrl: String? = null,
 
     /**
      * Value of modelDescription tag.
@@ -114,7 +114,7 @@ class DeviceProperty(
      * Recommended. Long description for end user. Is allowed to be localized (see ACCEPT- LANGUAGE and
      * CONTENT-LANGUAGE header fields). Specified by UPnP vendor. String. Should be &lt; 128 characters.
      */
-    val modelDescription: String?,
+    val modelDescription: String? = null,
 
     /**
      * Value of modelNumber tag.
@@ -124,7 +124,7 @@ class DeviceProperty(
      * Recommended. Model number. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields).
      * Specified by UPnP vendor. String. Should be &lt; 32 characters.
      */
-    val modelNumber: String?,
+    val modelNumber: String? = null,
 
     /**
      * Value of serialNumber tag.
@@ -134,7 +134,7 @@ class DeviceProperty(
      * Recommended. Serial number. Is allowed to be localized (see ACCEPT-LANGUAGE and CONTENT-LANGUAGE header fields).
      * Specified by UPnP vendor. String. Should be &lt; 64 characters.
      */
-    val serialNumber: String?,
+    val serialNumber: String? = null,
 
     /**
      * Value of presentationURL tag.
@@ -145,21 +145,21 @@ class DeviceProperty(
      * which the device description is located in accordance with the rules specified in clause 5 of RFC 3986.
      * Specified by UPnP vendor. Single URL.
      */
-    val presentationUrl: String?,
+    val presentationUrl: String? = null,
 
     /**
      * Icon list.
      *
      * @see IconProperty
      */
-    val iconList: List<IconProperty>,
+    val iconList: List<IconProperty> = emptyList(),
 
     /**
      * Service list.
      *
      * @see ServiceProperty
      */
-    val serviceList: List<ServiceProperty>,
+    val serviceList: List<ServiceProperty> = emptyList(),
 
     /**
      * URLBase.
@@ -169,16 +169,16 @@ class DeviceProperty(
      * This field is only used in ControlPoint for backward compatibility.
      * Do not use in DeviceArchitecture.
      */
-    val urlBase: String?,
+    val urlBase: String? = null,
 
     /**
      * The parent Device if this is Embedded Device. null if this is root device
      */
-    val parent: DeviceProperty?,
+    val parent: DeviceProperty? = null,
 
     private val tagMap: Map<String, Map<String, String>>,
 
-    deviceBuilderList: List<Builder>
+    deviceBuilderList: List<Builder> = emptyList()
 ) {
     /**
      * Whether this is Embedded Device.
@@ -257,18 +257,12 @@ class DeviceProperty(
         }
 
         fun build(parent: DeviceProperty? = null): DeviceProperty {
-            val description = description
-                ?: throw IllegalStateException("description must be set.")
-            val deviceType = deviceType
-                ?: throw IllegalStateException("deviceType must be set.")
-            val friendlyName = friendlyName
-                ?: throw IllegalStateException("friendlyName must be set.")
-            val manufacture = manufacture
-                ?: throw IllegalStateException("manufacturer must be set.")
-            val modelName = modelName
-                ?: throw IllegalStateException("modelName must be set.")
-            val udn = udn
-                ?: throw IllegalStateException("UDN must be set.")
+            val description = checkNotNull(description) { "description must be set." }
+            val deviceType = checkNotNull(deviceType) { "deviceType must be set." }
+            val friendlyName = checkNotNull(friendlyName) { "friendlyName must be set." }
+            val manufacture = checkNotNull(manufacture) { "manufacturer must be set." }
+            val modelName = checkNotNull(modelName) { "modelName must be set." }
+            val udn = checkNotNull(udn) { "UDN must be set." }
 
             return DeviceProperty(
                 parent = parent,

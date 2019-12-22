@@ -28,15 +28,14 @@ class ActionProperty(
      *
      * @return Argument list
      */
-    val argumentList: List<ArgumentProperty>
+    val argumentList: List<ArgumentProperty> = emptyList()
 ) {
     class Builder {
         var name: String? = null
         val argumentBuilderList: MutableList<ArgumentProperty.Builder> = mutableListOf()
 
         fun build(stateVariableList: List<StateVariableProperty>): ActionProperty {
-            val name = name
-                ?: throw IllegalStateException("name must be set.")
+            val name = checkNotNull(name) { "name must be set." }
             return ActionProperty(
                 name = name,
                 argumentList = argumentBuilderList.map { it.build(stateVariableList) }.toList()

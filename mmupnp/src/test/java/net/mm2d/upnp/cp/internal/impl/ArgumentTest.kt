@@ -9,7 +9,7 @@ package net.mm2d.upnp.cp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
-import net.mm2d.upnp.cp.StateVariable
+import net.mm2d.upnp.common.internal.property.ArgumentProperty
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -17,50 +17,17 @@ import org.junit.runners.JUnit4
 @Suppress("NonAsciiCharacters", "TestFunctionName")
 @RunWith(JUnit4::class)
 class ArgumentTest {
-    @Test(expected = IllegalStateException::class)
-    fun build_Nameを設定していないとException() {
-        ArgumentImpl.Builder()
-            .build()
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun build_RelatedStateVariableを設定していないとException() {
-        ArgumentImpl.Builder()
-            .setName("")
-            .build()
-    }
-
     @Test
-    fun getRelatedStateVariableName_setした値が返る() {
-        val name = "name"
-        val builder = ArgumentImpl.Builder()
-            .setRelatedStateVariableName(name)
-        assertThat(builder.getRelatedStateVariableName()).isEqualTo(name)
-    }
-
-    @Test
-    fun build_Builderで指定した値が得られる() {
-        val name = "name"
-        val stateVariable: StateVariable = mockk(relaxed = true)
-        val argument = ArgumentImpl.Builder()
-            .setName(name)
-            .setDirection("in")
-            .setRelatedStateVariable(stateVariable)
-            .build()
+    fun `propertyの値が返ること`() {
+        val property = ArgumentProperty(
+            name = "name",
+            isInputDirection = true,
+            relatedStateVariable = mockk()
+        )
+        val stateVariable: StateVariableImpl = mockk(relaxed = true)
+        val argument = ArgumentImpl(property, stateVariable)
+        assertThat(argument.name).isEqualTo(property.name)
+        assertThat(argument.isInputDirection).isEqualTo(property.isInputDirection)
         assertThat(argument.relatedStateVariable).isEqualTo(stateVariable)
-        assertThat(argument.name).isEqualTo(name)
-        assertThat(argument.isInputDirection).isTrue()
-    }
-
-    @Test
-    fun isInputDirection_Builderでoutを指定した場合false() {
-        val name = "name"
-        val stateVariable: StateVariable = mockk(relaxed = true)
-        val argument = ArgumentImpl.Builder()
-            .setName(name)
-            .setDirection("out")
-            .setRelatedStateVariable(stateVariable)
-            .build()
-        assertThat(argument.isInputDirection).isFalse()
     }
 }

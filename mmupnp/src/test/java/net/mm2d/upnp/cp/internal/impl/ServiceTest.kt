@@ -12,6 +12,8 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.common.*
 import net.mm2d.upnp.common.internal.message.SsdpRequest
+import net.mm2d.upnp.common.internal.property.DeviceProperty
+import net.mm2d.upnp.common.internal.property.ServiceProperty
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.cp.Device
 import net.mm2d.upnp.cp.internal.manager.SubscribeManagerImpl
@@ -34,140 +36,6 @@ class ServiceTest {
     @RunWith(JUnit4::class)
     class Builderによる生成からのテスト {
         @Test
-        fun build_成功() {
-            val service = ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-
-            assertThat(service).isNotNull()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_Device不足() {
-            ServiceImpl.Builder()
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_ServiceType不足() {
-            ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_ServiceId不足() {
-            ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_ScpdUrl不足() {
-            ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_ControlUrl不足() {
-            ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_EventSubUrl不足() {
-            ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setDescription("description")
-                .build()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_argumentのRelatedStateVariableNameが指定されていない() {
-            val actionBuilder = ActionImpl.Builder()
-                .setName("action")
-                .addArgumentBuilder(
-                    ArgumentImpl.Builder()
-                        .setName("argumentName")
-                        .setDirection("in")
-                )
-            val service = ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .addActionBuilder(actionBuilder)
-                .build()
-
-            assertThat(service).isNotNull()
-        }
-
-        @Test(expected = IllegalStateException::class)
-        fun build_argumentのRelatedStateVariableNameがに対応するStateVariableがない() {
-            val actionBuilder = ActionImpl.Builder()
-                .setName("action")
-                .addArgumentBuilder(
-                    ArgumentImpl.Builder()
-                        .setName("argumentName")
-                        .setDirection("in")
-                        .setRelatedStateVariableName("StateVariableName")
-                )
-            val service = ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .addActionBuilder(actionBuilder)
-                .build()
-
-            assertThat(service).isNotNull()
-        }
-
-        @Test
         fun getCallback() {
             val cp: ControlPointImpl = mockk(relaxed = true)
             val manager: SubscribeManagerImpl = mockk(relaxed = true)
@@ -175,24 +43,39 @@ class ServiceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(cp, message)
-                .setDescription("description")
-                .setUdn("uuid")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
-            val service = ServiceImpl.Builder()
-                .setDevice(device)
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
+            val device = DeviceImpl(
+                controlPoint = cp,
+                property = DeviceProperty(
+                    description = "description",
+                    udn = "uuid",
+                    upc = "upc",
+                    deviceType = "deviceType",
+                    friendlyName = "friendlyName",
+                    manufacture = "manufacture",
+                    modelName = "modelName",
+                    serialNumber = "serial",
+                    tagMap = emptyMap()
+                ),
+                udnSet = setOf("uuid"),
+                ssdpMessage = message,
+                location = message.location!!,
+                iconList = emptyList(),
+                serviceList = emptyList(),
+                deviceList = emptyList()
+            )
+            val service = ServiceImpl(
+                controlPoint = cp,
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device }
             every { message.localAddress } returns InetAddress.getByName("192.168.0.1")
             every { manager.getEventPort() } returns 80
 
@@ -205,29 +88,37 @@ class ServiceTest {
 
         @Test
         fun hashCode_Exceptionが発生しない() {
-            val service = ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
+            val service = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = mockk(relaxed = true) }
             service.hashCode()
         }
 
         @Test
         fun equals_比較可能() {
-            val service = ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
+            val service: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = mockk(relaxed = true) }
             assertThat(service == null).isFalse()
             assertThat(service == service).isTrue()
         }
@@ -237,33 +128,52 @@ class ServiceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
-                .setDescription("description")
-                .setUdn("uuid")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
-            val service1 = ServiceImpl.Builder()
-                .setDevice(device)
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-            val service2 = ServiceImpl.Builder()
-                .setDevice(device)
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
+            val device = DeviceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = DeviceProperty(
+                    description = "description",
+                    udn = "uuid",
+                    upc = "upc",
+                    deviceType = "deviceType",
+                    friendlyName = "friendlyName",
+                    manufacture = "manufacture",
+                    modelName = "modelName",
+                    serialNumber = "serial",
+                    tagMap = emptyMap()
+                ),
+                udnSet = setOf("uuid"),
+                ssdpMessage = message,
+                location = message.location!!,
+                iconList = emptyList(),
+                serviceList = emptyList(),
+                deviceList = emptyList()
+            )
+            val service1: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device }
+            val service2: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device }
             assertThat(service1 == service2).isTrue()
         }
 
@@ -273,33 +183,52 @@ class ServiceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
-                .setDescription("description")
-                .setUdn("uuid")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
-            val service1 = ServiceImpl.Builder()
-                .setDevice(device)
-                .setServiceType("serviceType1")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl1")
-                .setControlUrl("controlUrl1")
-                .setEventSubUrl("eventSubUrl1")
-                .setDescription("description1")
-                .build()
-            val service2 = ServiceImpl.Builder()
-                .setDevice(device)
-                .setServiceType("serviceType2")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl2")
-                .setControlUrl("controlUrl2")
-                .setEventSubUrl("eventSubUrl2")
-                .setDescription("description2")
-                .build()
+            val device = DeviceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = DeviceProperty(
+                    description = "description",
+                    udn = "uuid",
+                    upc = "upc",
+                    deviceType = "deviceType",
+                    friendlyName = "friendlyName",
+                    manufacture = "manufacture",
+                    modelName = "modelName",
+                    serialNumber = "serial",
+                    tagMap = emptyMap()
+                ),
+                udnSet = setOf("uuid"),
+                ssdpMessage = message,
+                location = message.location!!,
+                iconList = emptyList(),
+                serviceList = emptyList(),
+                deviceList = emptyList()
+            )
+            val service1: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType1",
+                    serviceId = "serviceId",
+                    scpdUrl = "scpdUrl1",
+                    controlUrl = "controlUrl1",
+                    eventSubUrl = "eventSubUrl1",
+                    description = "description1"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device }
+            val service2: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType2",
+                    serviceId = "serviceId",
+                    scpdUrl = "scpdUrl2",
+                    controlUrl = "controlUrl2",
+                    eventSubUrl = "eventSubUrl2",
+                    description = "description2"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device }
             assertThat(service1 == service2).isTrue()
         }
 
@@ -308,33 +237,52 @@ class ServiceTest {
             val message: SsdpMessage = mockk(relaxed = true)
             every { message.location } returns "location"
             every { message.uuid } returns "uuid"
-            val device = DeviceImpl.Builder(mockk(relaxed = true), message)
-                .setDescription("description")
-                .setUdn("uuid")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
-            val service1 = ServiceImpl.Builder()
-                .setDevice(device)
-                .setServiceType("serviceType")
-                .setServiceId("serviceId1")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-            val service2 = ServiceImpl.Builder()
-                .setDevice(device)
-                .setServiceType("serviceType")
-                .setServiceId("serviceId2")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
+            val device = DeviceImpl(
+                controlPoint = mockk(),
+                property = DeviceProperty(
+                    description = "description",
+                    udn = "uuid",
+                    upc = "upc",
+                    deviceType = "deviceType",
+                    friendlyName = "friendlyName",
+                    manufacture = "manufacture",
+                    modelName = "modelName",
+                    serialNumber = "serial",
+                    tagMap = emptyMap()
+                ),
+                udnSet = setOf("uuid"),
+                ssdpMessage = message,
+                location = message.location!!,
+                iconList = emptyList(),
+                serviceList = emptyList(),
+                deviceList = emptyList()
+            )
+            val service1: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId1",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device }
+            val service2: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId2",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device }
             assertThat(service1 == service2).isFalse()
         }
 
@@ -343,59 +291,76 @@ class ServiceTest {
             val message1: SsdpMessage = mockk(relaxed = true)
             every { message1.location } returns "location"
             every { message1.uuid } returns "uuid1"
-            val device1 = DeviceImpl.Builder(mockk(relaxed = true), message1)
-                .setDescription("description")
-                .setUdn("uuid1")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
+            val device1 = DeviceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = DeviceProperty(
+                    description = "description",
+                    udn = "uuid",
+                    upc = "upc",
+                    deviceType = "deviceType",
+                    friendlyName = "friendlyName",
+                    manufacture = "manufacture",
+                    modelName = "modelName",
+                    serialNumber = "serial",
+                    tagMap = emptyMap()
+                ),
+                udnSet = setOf("uuid"),
+                ssdpMessage = message1,
+                location = message1.location!!,
+                iconList = emptyList(),
+                serviceList = emptyList(),
+                deviceList = emptyList()
+            )
             val message2: SsdpMessage = mockk(relaxed = true)
             every { message2.location } returns "location"
             every { message2.uuid } returns "uuid2"
-            val device2 = DeviceImpl.Builder(mockk(relaxed = true), message2)
-                .setDescription("description")
-                .setUdn("uuid2")
-                .setUpc("upc")
-                .setDeviceType("deviceType")
-                .setFriendlyName("friendlyName")
-                .setManufacture("manufacture")
-                .setModelName("modelName")
-                .build()
-            val service1 = ServiceImpl.Builder()
-                .setDevice(device1)
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
-            val service2 = ServiceImpl.Builder()
-                .setDevice(device2)
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
+            val device2 = DeviceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = DeviceProperty(
+                    description = "description",
+                    udn = "uuid",
+                    upc = "upc",
+                    deviceType = "deviceType",
+                    friendlyName = "friendlyName",
+                    manufacture = "manufacture",
+                    modelName = "modelName",
+                    serialNumber = "serial",
+                    tagMap = emptyMap()
+                ),
+                udnSet = setOf("uuid"),
+                ssdpMessage = message2,
+                location = message2.location!!,
+                iconList = emptyList(),
+                serviceList = emptyList(),
+                deviceList = emptyList()
+            )
+            val service1: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId1",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device1 }
+            val service2: ServiceImpl? = ServiceImpl(
+                controlPoint = mockk(relaxed = true),
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId2",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            ).also { it.device = device2 }
             assertThat(service1 == service2).isFalse()
-        }
-
-        @Test
-        fun toDumpString() {
-            ServiceImpl.Builder()
-                .setDevice(mockk(relaxed = true))
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .toDumpString()
         }
     }
 
@@ -715,19 +680,25 @@ class ServiceTest {
             every { controlPoint.taskExecutors } returns TaskExecutors()
             device = mockk(relaxed = true)
             every { device.controlPoint } returns controlPoint
+
+            service = ServiceImpl(
+                controlPoint = controlPoint,
+                property = ServiceProperty(
+                    serviceType = "serviceType",
+                    serviceId = "serviceId",
+                    scpdUrl = "scpdUrl",
+                    controlUrl = "controlUrl",
+                    eventSubUrl = "eventSubUrl",
+                    description = "description"
+                ),
+                actionList = emptyList(),
+                stateVariableList = emptyList()
+            )
+            service.device = device
             mockkObject(ServiceImpl.Companion)
-            every { ServiceImpl.createSubscribeDelegate(any()) } answers {
-                spyk(SubscribeDelegate(arg(0)), recordPrivateCalls = true)
+            every { ServiceImpl.createSubscribeDelegate(service) } answers {
+                spyk(SubscribeDelegate(service), recordPrivateCalls = true)
             }
-            service = ServiceImpl.Builder()
-                .setDevice(device)
-                .setServiceType("serviceType")
-                .setServiceId("serviceId")
-                .setScpdUrl("scpdUrl")
-                .setControlUrl("controlUrl")
-                .setEventSubUrl("eventSubUrl")
-                .setDescription("description")
-                .build()
             subscribeDelegate = service.subscribeDelegate
             every { subscribeDelegate.makeAbsoluteUrl(any()) } returns URL("http://192.0.2.2/")
             every { subscribeDelegate.callback } returns ""

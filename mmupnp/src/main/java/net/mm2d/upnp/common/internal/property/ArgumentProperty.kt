@@ -41,13 +41,15 @@ class ArgumentProperty(
         var isInputDirection: Boolean = false
         var relatedStateVariableName: String? = null
         fun build(stateVariableList: List<StateVariableProperty>): ArgumentProperty {
-            val name = name
-                ?: throw IllegalStateException("name must be set.")
-            val relatedStateVariableName = relatedStateVariableName
-                ?: throw  IllegalStateException("relatedStateVariableName must be set.")
+            val name = checkNotNull(name) {
+                "name must be set."
+            }
+            val relatedStateVariableName = checkNotNull(relatedStateVariableName) {
+                "relatedStateVariableName must be set."
+            }
             val relatedStateVariable = stateVariableList.find { it.name == relatedStateVariableName }
                 ?: repairInvalidFormatAndGet(relatedStateVariableName, stateVariableList)
-                ?: throw IllegalStateException("$relatedStateVariableName not found in serviceStateTable.")
+                ?: error("$relatedStateVariableName not found in serviceStateTable.")
             return ArgumentProperty(
                 name = name,
                 isInputDirection = isInputDirection,
@@ -65,7 +67,7 @@ class ArgumentProperty(
         ): StateVariableProperty {
             val trimmedName = name.trim()
             val trimmedVariable = stateVariableList.find { it.name == trimmedName }
-                ?: throw IllegalStateException("There is no StateVariable [$name]")
+                ?: error("There is no StateVariable [$name]")
             relatedStateVariableName = trimmedName
             Logger.i { "Invalid description. relatedStateVariable name has unnecessary blanks [$name]" }
             return trimmedVariable

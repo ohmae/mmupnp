@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.cp.internal.impl
+package net.mm2d.upnp.common.internal.property
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -14,7 +14,7 @@ import org.junit.runners.JUnit4
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class IconBuilderTest {
+class IconPropertyBuilderTest {
     @Test
     fun build() {
         val mimeType = "mimeType"
@@ -22,13 +22,13 @@ class IconBuilderTest {
         val width = 300
         val depth = 24
         val url = "http://192.168.0.1/"
-        val icon = IconImpl.Builder()
-            .setMimeType(mimeType)
-            .setWidth(width.toString())
-            .setHeight(height.toString())
-            .setDepth(depth.toString())
-            .setUrl(url)
-            .build()
+        val icon = IconProperty.Builder().also {
+            it.mimeType = mimeType
+            it.width = width
+            it.height = height
+            it.depth = depth
+            it.url = url
+        }.build()
 
         assertThat(icon.mimeType).isEqualTo(mimeType)
         assertThat(icon.width).isEqualTo(width)
@@ -43,12 +43,12 @@ class IconBuilderTest {
         val width = 300
         val depth = 24
         val url = "http://192.168.0.1/"
-        IconImpl.Builder()
-            .setWidth(width.toString())
-            .setHeight(height.toString())
-            .setDepth(depth.toString())
-            .setUrl(url)
-            .build()
+        IconProperty.Builder().also {
+            it.width = width
+            it.height = height
+            it.depth = depth
+            it.url = url
+        }.build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -57,13 +57,13 @@ class IconBuilderTest {
         val height = 200
         val depth = 24
         val url = "http://192.168.0.1/"
-        IconImpl.Builder()
-            .setMimeType(mimeType)
-            .setWidth("width")
-            .setHeight(height.toString())
-            .setDepth(depth.toString())
-            .setUrl(url)
-            .build()
+        IconProperty.Builder().also {
+            it.mimeType = mimeType
+            it.width = 0
+            it.height = height
+            it.depth = depth
+            it.url = url
+        }.build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -72,13 +72,13 @@ class IconBuilderTest {
         val width = 300
         val depth = 24
         val url = "http://192.168.0.1/"
-        IconImpl.Builder()
-            .setMimeType(mimeType)
-            .setWidth(width.toString())
-            .setHeight("height")
-            .setDepth(depth.toString())
-            .setUrl(url)
-            .build()
+        IconProperty.Builder().also {
+            it.mimeType = mimeType
+            it.width = width
+            it.height = 0
+            it.depth = depth
+            it.url = url
+        }.build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -87,13 +87,13 @@ class IconBuilderTest {
         val height = 200
         val width = 300
         val url = "http://192.168.0.1/"
-        IconImpl.Builder()
-            .setMimeType(mimeType)
-            .setWidth(width.toString())
-            .setHeight(height.toString())
-            .setDepth("depth")
-            .setUrl(url)
-            .build()
+        IconProperty.Builder().also {
+            it.mimeType = mimeType
+            it.width = width
+            it.height = height
+            it.depth = 0
+            it.url = url
+        }.build()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -102,11 +102,11 @@ class IconBuilderTest {
         val height = 200
         val width = 300
         val depth = 24
-        IconImpl.Builder()
-            .setMimeType(mimeType)
-            .setWidth(width.toString())
-            .setHeight(height.toString())
-            .setDepth(depth.toString())
-            .build()
+        IconProperty.Builder().also {
+            it.mimeType = mimeType
+            it.width = width
+            it.height = height
+            it.depth = depth
+        }.build()
     }
 }

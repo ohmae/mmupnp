@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.cp.internal.parser
+package net.mm2d.upnp.common.internal.parser
 
 import io.mockk.mockk
 import org.junit.Test
@@ -15,9 +15,15 @@ import java.io.IOException
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class ServiceParserTest {
+class DevicePropertyParserTest {
+
     @Test(expected = IOException::class)
-    fun loadDescription_パラメータがとれないとException() {
-        ServiceParser.loadDescription(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
+    fun parseDescription_deviceノードのないXMLを渡すとException() {
+        DevicePropertyParser.parseDescription(
+            mockk(relaxed = true),
+            "<?xml version=\"1.0\"?>\n" +
+                "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">\n" +
+                "</root>"
+        )
     }
 }

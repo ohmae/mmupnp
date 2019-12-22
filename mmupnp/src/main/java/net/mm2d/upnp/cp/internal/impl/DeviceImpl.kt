@@ -24,7 +24,7 @@ import java.net.URL
  *
  * @author [大前良介(OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal class DeviceImpl private constructor(
+internal class DeviceImpl(
     override val controlPoint: ControlPointImpl,
     private val property: DeviceProperty,
     private val udnSet: Set<String>,
@@ -68,7 +68,8 @@ internal class DeviceImpl private constructor(
     override val presentationUrl: String? = property.presentationUrl
     override var parent: Device? = null
         private set
-    override val isEmbeddedDevice: Boolean = parent != null
+    override val isEmbeddedDevice: Boolean
+        get() = parent != null
 
     override val isPinned: Boolean
         get() = ssdpMessage.isPinned
@@ -183,7 +184,7 @@ internal class DeviceImpl private constructor(
                 ServiceImpl.create(controlPoint, it)
             }
             val deviceList: List<DeviceImpl> = property.deviceList.map {
-                build(it, collectUdn(it))
+                build(it, udnSet)
             }
             return DeviceImpl(
                 controlPoint = controlPoint,
@@ -225,6 +226,16 @@ internal class DeviceImpl private constructor(
 
         fun toDumpString(): String = buildString {
             append("DeviceBuilder")
+            append("\nSSDP:")
+            append(ssdpMessage)
+            append("\nDESCRIPTION:")
+            append(propertyBuilder.description)
+            if (propertyBuilder.serviceBuilderList.isNotEmpty()) {
+                append("\n")
+                propertyBuilder.serviceBuilderList.forEach {
+                    append(it.description)
+                }
+            }
         }
     }
 }

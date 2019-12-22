@@ -97,7 +97,7 @@ class ServiceProperty(
      *
      * @return List of all Actions
      */
-    val actionList: List<ActionProperty>,
+    val actionList: List<ActionProperty> = emptyList(),
 
     /**
      * List of all StateVariable held by this service.
@@ -106,7 +106,7 @@ class ServiceProperty(
      *
      * @return List of all StateVariable
      */
-    val stateVariableList: List<StateVariableProperty>
+    val stateVariableList: List<StateVariableProperty> = emptyList()
 ) {
     class Builder {
         var serviceType: String? = null
@@ -120,16 +120,11 @@ class ServiceProperty(
 
         @Throws(IllegalStateException::class)
         fun build(): ServiceProperty {
-            val serviceType = serviceType
-                ?: throw IllegalStateException("serviceType must be set.")
-            val serviceId = serviceId
-                ?: throw IllegalStateException("serviceId must be set.")
-            val scpdUrl = scpdUrl
-                ?: throw IllegalStateException("SCPDURL must be set.")
-            val controlUrl = controlUrl
-                ?: throw IllegalStateException("controlURL must be set.")
-            val eventSubUrl = eventSubUrl
-                ?: throw IllegalStateException("eventSubURL must be set.")
+            val serviceType = checkNotNull(serviceType) { "serviceType must be set." }
+            val serviceId = checkNotNull(serviceId) { "serviceId must be set." }
+            val scpdUrl = checkNotNull(scpdUrl) { "SCPDURL must be set." }
+            val controlUrl = checkNotNull(controlUrl) { "controlURL must be set." }
+            val eventSubUrl = checkNotNull(eventSubUrl) { "eventSubURL must be set." }
             val description = description ?: ""
             return ServiceProperty(
                 serviceType = serviceType,

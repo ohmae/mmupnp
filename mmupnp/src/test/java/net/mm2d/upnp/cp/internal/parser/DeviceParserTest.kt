@@ -300,13 +300,8 @@ class DeviceParserTest {
         }
 
         @Test(expected = IOException::class)
-        fun parseDescription_deviceノードのないXMLを渡すとException() {
-            DeviceParser.parseDescription(
-                mockk(relaxed = true),
-                "<?xml version=\"1.0\"?>\n" +
-                    "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">\n" +
-                    "</root>"
-            )
+        fun loadDescription_パラメータがとれないとException() {
+            DeviceParser.loadDescription(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
         }
     }
 }

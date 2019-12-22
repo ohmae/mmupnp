@@ -14,6 +14,9 @@ import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.HttpResponse
+import net.mm2d.upnp.common.internal.property.ActionProperty
+import net.mm2d.upnp.common.internal.property.ArgumentProperty
+import net.mm2d.upnp.common.internal.property.StateVariableProperty
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.common.util.XmlUtils
 import net.mm2d.upnp.common.util.findChildElementByLocalName
@@ -45,51 +48,46 @@ class ActionInvokeTest {
         mockkObject(ActionImpl.Companion)
         every { ActionImpl.createInvokeDelegate(any()) } answers { spyk(ActionInvokeDelegate(arg(0))) }
         url = URL("http://127.0.0.1:8888/test")
+        val controlPoint: ControlPointImpl = mockk(relaxed = true)
+        every { controlPoint.taskExecutors } returns TaskExecutors()
         val service: ServiceImpl = mockk(relaxed = true)
         every { service.serviceType } returns SERVICE_TYPE
         every { service.controlUrl } returns ""
-        every { service.device.controlPoint.taskExecutors } returns TaskExecutors()
-        action = ActionImpl.Builder()
-            .setService(service)
-            .setName(ACTION_NAME)
-            .addArgumentBuilder(
-                ArgumentImpl.Builder()
-                    .setName(IN_ARG_NAME_1)
-                    .setDirection("in")
-                    .setRelatedStateVariableName("1")
-                    .setRelatedStateVariable(
-                        StateVariableImpl.Builder()
-                            .setDataType("string")
-                            .setName("1")
-                            .build()
+        action = ActionImpl(
+            controlPoint,
+            ActionProperty(ACTION_NAME, mockk()),
+            listOf(
+                ArgumentImpl(
+                    ArgumentProperty(IN_ARG_NAME_1, true, mockk()),
+                    StateVariableImpl(
+                        StateVariableProperty(
+                            name = "1",
+                            dataType = "string"
+                        )
                     )
-            )
-            .addArgumentBuilder(
-                ArgumentImpl.Builder()
-                    .setName(IN_ARG_NAME_2)
-                    .setDirection("in")
-                    .setRelatedStateVariableName("2")
-                    .setRelatedStateVariable(
-                        StateVariableImpl.Builder()
-                            .setDataType("string")
-                            .setName("2")
-                            .setDefaultValue(IN_ARG_DEFAULT_VALUE)
-                            .build()
+                ),
+                ArgumentImpl(
+                    ArgumentProperty(IN_ARG_NAME_2, true, mockk()),
+                    StateVariableImpl(
+                        StateVariableProperty(
+                            name = "2",
+                            dataType = "string",
+                            defaultValue = IN_ARG_DEFAULT_VALUE
+                        )
                     )
-            )
-            .addArgumentBuilder(
-                ArgumentImpl.Builder()
-                    .setName(OUT_ARG_NAME1)
-                    .setDirection("out")
-                    .setRelatedStateVariableName("3")
-                    .setRelatedStateVariable(
-                        StateVariableImpl.Builder()
-                            .setDataType("string")
-                            .setName("3")
-                            .build()
+                ),
+                ArgumentImpl(
+                    ArgumentProperty(OUT_ARG_NAME1, false, mockk()),
+                    StateVariableImpl(
+                        StateVariableProperty(
+                            name = "3",
+                            dataType = "string"
+                        )
                     )
+                )
             )
-            .build()
+        )
+        action.service = service
         invokeDelegate = action.invokeDelegate
         every { invokeDelegate.makeAbsoluteControlUrl() } returns url
         mockHttpClient = spyk(HttpClient())
@@ -532,7 +530,7 @@ class ActionInvokeTest {
 
     @Test
     fun invoke_success() {
-        every { action.invokeSync(any(), any()) } returns emptyMap()
+        every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
         val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
         val onError: (IOException) -> Unit = mockk(relaxed = true)
         action.invoke(emptyMap(), true, onResult, onError)
@@ -543,7 +541,7 @@ class ActionInvokeTest {
 
     @Test
     fun invoke_exception() {
-        every { action.invokeSync(any(), any()) } throws IOException()
+        every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
         val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
         val onError: (IOException) -> Unit = mockk(relaxed = true)
         action.invoke(emptyMap(), true, onResult, onError)
@@ -602,7 +600,7 @@ class ActionInvokeTest {
         Thread.sleep(200)
     }
 
-    @Test
+    @Test(timeout = 10000L)
     fun invokeAsync_success() {
         every { action.invokeSync(any(), any()) } returns emptyMap()
         runBlocking {
@@ -610,7 +608,7 @@ class ActionInvokeTest {
         }
     }
 
-    @Test(expected = IOException::class)
+    @Test(timeout = 10000L, expected = IOException::class)
     fun invokeAsync_exception() {
         every { action.invokeSync(any(), any()) } throws IOException()
         runBlocking {
@@ -618,7 +616,7 @@ class ActionInvokeTest {
         }
     }
 
-    @Test
+    @Test(timeout = 10000L)
     fun invokeCustomAsync_success() {
         every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
         runBlocking {
@@ -626,7 +624,7 @@ class ActionInvokeTest {
         }
     }
 
-    @Test(expected = IOException::class)
+    @Test(timeout = 10000L, expected = IOException::class)
     fun invokeCustomAsync_exception() {
         every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
         runBlocking {
