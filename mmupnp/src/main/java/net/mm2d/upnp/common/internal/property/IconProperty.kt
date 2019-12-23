@@ -61,15 +61,6 @@ class IconProperty(
      */
     val url: String
 ) {
-    /**
-     * Return the binary data.
-     *
-     * Make copies on the user side before changing the return value, as defensive copying may not be performed.
-     *
-     * @return binary data
-     */
-    val binary: ByteArray? = null
-
     class Builder {
         var mimeType: String? = null
         var height: Int = 0
