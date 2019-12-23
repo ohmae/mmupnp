@@ -29,7 +29,7 @@ import net.mm2d.upnp.cp.Service
 import net.mm2d.upnp.cp.StateVariable
 import net.mm2d.upnp.cp.internal.manager.DeviceHolder
 import net.mm2d.upnp.cp.internal.manager.SubscribeManagerImpl
-import net.mm2d.upnp.cp.internal.parser.DeviceParser
+import net.mm2d.upnp.cp.internal.parser.DeviceLoader
 import net.mm2d.upnp.cp.internal.server.*
 import net.mm2d.upnp.util.TestUtils
 import org.junit.After
@@ -1259,7 +1259,7 @@ class ControlPointTest {
             every { HttpClient.create(any()) } returns httpClient
             every { httpClient.localAddress } returns InetAddress.getByName("192.0.2.3")
             val builder = DeviceImpl.Builder(cp, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             cp.discoverDevice(device)
             assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdee")).isEqualTo(device)

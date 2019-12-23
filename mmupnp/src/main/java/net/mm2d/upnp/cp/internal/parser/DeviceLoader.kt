@@ -25,7 +25,7 @@ import javax.xml.parsers.ParserConfigurationException
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal object DeviceParser {
+internal object DeviceLoader {
     /**
      * load DeviceDescription.
      *
@@ -40,7 +40,7 @@ internal object DeviceParser {
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
-    fun loadDescription(client: HttpClient, builder: DeviceImpl.Builder) {
+    fun loadDevice(client: HttpClient, builder: DeviceImpl.Builder) {
         val url = Http.makeUrlWithScopeId(builder.getLocation(), builder.getSsdpMessage().scopeId)
         val description = client.downloadString(url)
         if (description.isEmpty()) {
@@ -54,7 +54,7 @@ internal object DeviceParser {
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
     private fun loadServices(client: HttpClient, builder: DeviceImpl.Builder, propertyBuilder: DeviceProperty.Builder) {
         propertyBuilder.serviceBuilderList.forEach {
-            loadDescription(client, builder, it)
+            loadService(client, builder, it)
         }
         propertyBuilder.deviceBuilderList.forEach {
             loadServices(client, builder, it)
@@ -73,8 +73,9 @@ internal object DeviceParser {
      * @throws IOException if an I/O error occurs.
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
+    // VisibleForTesting
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
-    fun loadDescription(client: HttpClient, deviceBuilder: DeviceImpl.Builder, builder: ServiceProperty.Builder) {
+    internal fun loadService(client: HttpClient, deviceBuilder: DeviceImpl.Builder, builder: ServiceProperty.Builder) {
         val scpdUrl = builder.scpdUrl ?: throw IOException("scpdUrl is null")
         // Treat as empty if "/ssdp/notfound". If try to download, "404 Not found" will be returned.
         // This may be Google's DIAL device.

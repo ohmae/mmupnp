@@ -78,16 +78,15 @@ class HttpHeadersTest {
     fun testEntry_equals() {
         val name = "name"
         val value = "value"
-        val entry1 = Entry(name, value)
-        val entry2 = Entry(entry1)
-        val entry3 = Entry(name + "1", value)
-        val entry4 = Entry(name, value + "1")
-
+        val entry1: Entry? = Entry(name, value)
         assertThat(entry1 == entry1).isTrue()
-        assertThat(entry1 == entry2).isTrue()
-        assertThat(entry1 == entry3).isFalse()
-        assertThat(entry1 == entry4).isFalse()
         assertThat(entry1 == null).isFalse()
+        val entry2 = Entry(entry1!!)
+        assertThat(entry1 == entry2).isTrue()
+        val entry3 = Entry(name + "1", value)
+        assertThat(entry1 == entry3).isFalse()
+        val entry4 = Entry(name, value + "1")
+        assertThat(entry1 == entry4).isFalse()
     }
 
     @Test

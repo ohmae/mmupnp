@@ -17,7 +17,7 @@ import net.mm2d.upnp.common.internal.property.ServiceProperty
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.cp.Device
 import net.mm2d.upnp.cp.internal.manager.SubscribeManagerImpl
-import net.mm2d.upnp.cp.internal.parser.DeviceParser
+import net.mm2d.upnp.cp.internal.parser.DeviceLoader
 import net.mm2d.upnp.util.TestUtils
 import org.junit.After
 import org.junit.Before
@@ -408,7 +408,7 @@ class ServiceTest {
             every { subscribeManager.getEventPort() } returns EVENT_PORT
             every { controlPoint.subscribeManager } returns subscribeManager
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             device = builder.build()
             cms = device.findServiceById("urn:upnp-org:serviceId:ConnectionManager") as ServiceImpl
             cds = spyk(device.findServiceById("urn:upnp-org:serviceId:ContentDirectory") as ServiceImpl)

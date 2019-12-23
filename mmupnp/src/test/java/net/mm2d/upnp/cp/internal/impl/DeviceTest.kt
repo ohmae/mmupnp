@@ -17,7 +17,7 @@ import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.internal.message.SsdpRequest
 import net.mm2d.upnp.cp.Adapter.iconFilter
 import net.mm2d.upnp.cp.internal.message.FakeSsdpMessage
-import net.mm2d.upnp.cp.internal.parser.DeviceParser
+import net.mm2d.upnp.cp.internal.parser.DeviceLoader
 import net.mm2d.upnp.util.TestUtils
 import org.junit.Before
 import org.junit.Test
@@ -68,7 +68,7 @@ class DeviceTest {
             ssdpMessage = SsdpRequest.create(mockk(relaxed = true), data, data.size)
             controlPoint = mockk(relaxed = true)
             builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
         }
 
         @Test
@@ -387,7 +387,7 @@ class DeviceTest {
 
         @Test
         fun equals_null比較可能() {
-            val device = builder.build()
+            val device: DeviceImpl? = builder.build()
             assertThat(device == null).isEqualTo(false)
         }
     }

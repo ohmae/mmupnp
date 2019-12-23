@@ -24,7 +24,7 @@ import net.mm2d.upnp.cp.internal.impl.DeviceImpl.Builder
 import net.mm2d.upnp.cp.internal.manager.DeviceHolder
 import net.mm2d.upnp.cp.internal.manager.SubscribeManager
 import net.mm2d.upnp.cp.internal.message.FakeSsdpMessage
-import net.mm2d.upnp.cp.internal.parser.DeviceParser
+import net.mm2d.upnp.cp.internal.parser.DeviceLoader
 import net.mm2d.upnp.cp.internal.server.DEFAULT_SSDP_MESSAGE_FILTER
 import net.mm2d.upnp.cp.internal.server.MulticastEventReceiverList
 import net.mm2d.upnp.cp.internal.server.SsdpNotifyServerList
@@ -155,7 +155,7 @@ internal class ControlPointImpl(
         val client = createHttpClient()
         val uuid = builder.getUuid()
         try {
-            DeviceParser.loadDescription(client, builder)
+            DeviceLoader.loadDevice(client, builder)
             val device = builder.build()
             device.loadIconBinary(client, iconFilter)
             synchronized(deviceHolder) {
@@ -346,7 +346,7 @@ internal class ControlPointImpl(
     private fun loadPinnedDevice(builder: Builder) {
         val client = createHttpClient()
         try {
-            DeviceParser.loadDescription(client, builder)
+            DeviceLoader.loadDevice(client, builder)
             val device = builder.build()
             device.loadIconBinary(client, iconFilter)
             synchronized(deviceHolder) {

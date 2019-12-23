@@ -27,7 +27,7 @@ import java.net.URL
 
 @Suppress("TestFunctionName", "NonAsciiCharacters", "ClassName")
 @RunWith(Enclosed::class)
-class DeviceParserTest {
+class DeviceLoaderTest {
     @RunWith(JUnit4::class)
     class 全行程のテスト {
         private lateinit var httpClient: HttpClient
@@ -71,7 +71,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
             assertThat(device.serviceList).hasSize(3)
@@ -86,7 +86,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-with-garbage.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
             assertThat(device.serviceList).hasSize(4)
@@ -102,7 +102,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("mmupnp-with-mistake.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
             assertThat(device.serviceList).hasSize(3)
@@ -118,7 +118,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("mmupnp-special.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
             assertThat(device.serviceList).hasSize(3)
@@ -134,7 +134,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("mmupnp-acid.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
         }
 
         @Test(expected = IllegalStateException::class)
@@ -144,7 +144,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-acid.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
         }
 
         @Test
@@ -154,7 +154,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-acid2.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
         }
 
 
@@ -165,7 +165,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-no-scpd-url.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
         }
 
         @Test
@@ -175,7 +175,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-google-dial.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
             assertThat(device.serviceList).hasSize(1)
@@ -188,7 +188,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-no-icon.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(0)
             assertThat(device.serviceList).hasSize(3)
@@ -201,7 +201,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-no-service.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             assertThat(device.iconList).hasSize(4)
             assertThat(device.serviceList).hasSize(0)
@@ -216,7 +216,7 @@ class DeviceParserTest {
             ssdpMessage = SsdpRequest.create(mockk(relaxed = true), data, data.size)
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
             assertThat(device.baseUrl).isEqualTo("http://192.0.2.2:12345/")
         }
@@ -228,7 +228,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-with-embedded-device.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
 
             assertThat(device.isEmbeddedDevice).isEqualTo(false)
@@ -263,7 +263,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-with-embedded-device.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
 
             assertThat(device.findDeviceByType("urn:schemas-upnp-org:device:WANDevice:11")).isNull()
@@ -277,7 +277,7 @@ class DeviceParserTest {
             } returns TestUtils.getResourceAsString("device-with-embedded-device.xml")
 
             val builder = DeviceImpl.Builder(controlPoint, ssdpMessage)
-            DeviceParser.loadDescription(httpClient, builder)
+            DeviceLoader.loadDevice(httpClient, builder)
             val device = builder.build()
 
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin")
@@ -296,12 +296,12 @@ class DeviceParserTest {
             val builder: DeviceImpl.Builder = mockk(relaxed = true)
             every { builder.getLocation() } returns "http://192.168.0.1/"
             every { builder.getSsdpMessage() } returns mockk(relaxed = true)
-            DeviceParser.loadDescription(mockk(relaxed = true), builder)
+            DeviceLoader.loadDevice(mockk(relaxed = true), builder)
         }
 
         @Test(expected = IOException::class)
         fun loadDescription_パラメータがとれないとException() {
-            DeviceParser.loadDescription(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
+            DeviceLoader.loadService(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
         }
     }
 }
