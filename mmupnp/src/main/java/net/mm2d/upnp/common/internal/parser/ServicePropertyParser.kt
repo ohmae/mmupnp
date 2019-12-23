@@ -38,7 +38,7 @@ object ServicePropertyParser {
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
-    fun parseDescription(builder: ServiceProperty.Builder, description: String) {
+    fun parse(builder: ServiceProperty.Builder, description: String) {
         if (description.isEmpty()) {
             // 空であっても必須パラメータはそろっているため正常として扱う。
             return

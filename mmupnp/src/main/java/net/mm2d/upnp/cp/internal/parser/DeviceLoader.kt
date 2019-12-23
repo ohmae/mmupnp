@@ -47,7 +47,7 @@ internal object DeviceLoader {
             throw IOException("download error: $url")
         }
         builder.setDownloadInfo(client)
-        DevicePropertyParser.parseDescription(builder.propertyBuilder, description)
+        DevicePropertyParser.parse(builder.propertyBuilder, description)
         loadServices(client, builder, builder.propertyBuilder)
     }
 
@@ -84,6 +84,6 @@ internal object DeviceLoader {
         val scopeId = deviceBuilder.getSsdpMessage().scopeId
         val url = Http.makeAbsoluteUrl(baseUrl, scpdUrl, scopeId)
         val description = client.downloadString(url)
-        ServicePropertyParser.parseDescription(builder, description)
+        ServicePropertyParser.parse(builder, description)
     }
 }

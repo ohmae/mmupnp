@@ -38,7 +38,7 @@ object DevicePropertyParser {
      * @throws ParserConfigurationException If there is a problem with instantiation
      */
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
-    fun parseDescription(builder: DeviceProperty.Builder, description: String) {
+    fun parse(builder: DeviceProperty.Builder, description: String) {
         builder.description = description
         val doc = XmlUtils.newDocument(true, description)
         val deviceNode = doc.documentElement.findChildElementByLocalName("device") ?: throw IOException()
