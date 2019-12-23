@@ -105,29 +105,17 @@ internal class DeviceImpl(
     override fun findServiceByType(type: String): Service? =
         serviceList.find { it.serviceType == type }
 
-    override fun findAction(name: String): Action? {
-        serviceList.forEach {
-            it.findAction(name)?.let { action ->
-                return action
-            }
-        }
-        return null
-    }
+    override fun findAction(name: String): Action? =
+        serviceList.asSequence()
+            .mapNotNull { it.findAction(name) }
+            .firstOrNull()
 
     override fun findDeviceByType(deviceType: String): Device? =
         deviceList.find { it.deviceType == deviceType }
 
-    override fun findDeviceByTypeRecursively(deviceType: String): Device? {
-        deviceList.forEach {
-            if (deviceType == it.deviceType) {
-                return it
-            }
-            it.findDeviceByTypeRecursively(deviceType)?.let { result ->
-                return result
-            }
-        }
-        return null
-    }
+    override fun findDeviceByTypeRecursively(deviceType: String): Device? =
+        deviceList.asSequence().filter { it.deviceType == deviceType }.firstOrNull()
+            ?: deviceList.asSequence().mapNotNull { it.findDeviceByTypeRecursively(deviceType) }.firstOrNull()
 
     override fun hashCode(): Int = udn.hashCode()
 

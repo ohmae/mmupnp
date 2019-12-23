@@ -9,7 +9,6 @@ package net.mm2d.upnp.cp.internal.impl
 
 import net.mm2d.upnp.common.internal.property.ArgumentProperty
 import net.mm2d.upnp.cp.Argument
-import net.mm2d.upnp.cp.StateVariable
 
 /**
  * Implements for [Argument].
