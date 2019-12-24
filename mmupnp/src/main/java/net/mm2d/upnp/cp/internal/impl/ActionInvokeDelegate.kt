@@ -31,11 +31,10 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 internal class ActionInvokeDelegate(
-    action: ActionImpl
+    private val action: ActionImpl
 ) {
     private val service: ServiceImpl = action.service
     private val name: String = action.name
-    private val argumentMap: Map<String, Argument> = action.argumentMap
     private fun createHttpClient(): HttpClient = HttpClient.create(false)
 
     @Throws(IOException::class)
@@ -45,7 +44,7 @@ internal class ActionInvokeDelegate(
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
-        val arguments = argumentMap.values
+        val arguments = action.argumentList
             .filter { it.isInputDirection }
             .map { it.name to selectArgumentValue(it, argumentValues) } +
             customArguments.toList()
@@ -223,7 +222,7 @@ internal class ActionInvokeDelegate(
         findResponseElement(xml).childElements().forEach {
             val tag = it.localName
             val text = it.textContent
-            if (argumentMap[tag] == null) {
+            if (action.findArgument(tag) == null) {
                 // Optionalな情報としてArgumentに記述されていないタグが含まれる可能性があるためログ出力に留める
                 Logger.i { "invalid argument:$tag->$text" }
             }

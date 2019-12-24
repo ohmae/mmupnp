@@ -148,10 +148,10 @@ internal class ServiceImpl(
         ): ServiceImpl {
             val stateVariableList = property.stateVariableList.map {
                 StateVariableImpl(it)
-            }
+            }.toList()
             val actionList = property.actionList.map {
                 ActionImpl.create(controlPoint, it, stateVariableList)
-            }
+            }.toList()
             return ServiceImpl(controlPoint, property, actionList, stateVariableList)
         }
     }

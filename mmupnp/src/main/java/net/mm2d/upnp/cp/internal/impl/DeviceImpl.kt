@@ -167,13 +167,13 @@ internal class DeviceImpl(
         }
 
         private fun build(property: DeviceProperty, udnSet: Set<String>): DeviceImpl {
-            val iconList = property.iconList.map { IconImpl(it) }
+            val iconList = property.iconList.map { IconImpl(it) }.toList()
             val serviceList = property.serviceList.map {
                 ServiceImpl.create(controlPoint, it)
-            }
+            }.toList()
             val deviceList: List<DeviceImpl> = property.deviceList.map {
                 build(it, udnSet)
-            }
+            }.toList()
             return DeviceImpl(
                 controlPoint = controlPoint,
                 property = property,
