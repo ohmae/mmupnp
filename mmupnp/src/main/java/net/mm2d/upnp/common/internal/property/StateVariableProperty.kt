@@ -170,7 +170,7 @@ class StateVariableProperty(
                 isMulticast = isMulticast,
                 name = name,
                 dataType = dataType,
-                allowedValueList = allowedValueList,
+                allowedValueList = allowedValueList.toList(),
                 defaultValue = defaultValue,
                 minimum = minimum,
                 maximum = maximum,

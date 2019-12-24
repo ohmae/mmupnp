@@ -282,8 +282,8 @@ class DeviceProperty(
                 urlBase = urlBase,
                 tagMap = tagMap,
                 iconList = iconList,
-                serviceList = serviceBuilderList.map { it.build() },
-                deviceBuilderList = deviceBuilderList
+                serviceList = serviceBuilderList.map { it.build() }.toList(),
+                deviceBuilderList = deviceBuilderList.toList()
             )
         }
     }

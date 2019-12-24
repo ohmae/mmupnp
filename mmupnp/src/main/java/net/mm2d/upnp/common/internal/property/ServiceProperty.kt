@@ -133,7 +133,7 @@ class ServiceProperty(
                 controlUrl = controlUrl,
                 eventSubUrl = eventSubUrl,
                 description = description,
-                actionList = actionBuilderList.map { it.build(stateVariableList) },
+                actionList = actionBuilderList.map { it.build(stateVariableList) }.toList(),
                 stateVariableList = stateVariableList.toList()
             )
         }
