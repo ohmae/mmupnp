@@ -8,7 +8,7 @@
 package net.mm2d.upnp.common.internal.property
 
 /**
- * Interface of UPnP StateVariable.
+ * Property of UPnP StateVariable.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -116,13 +116,6 @@ class StateVariableProperty(
     val dataType: String,
 
     /**
-     * Return the value of AllowedValueList.
-     *
-     * @return AllowedValueList
-     */
-    val allowedValueList: List<String> = emptyList(),
-
-    /**
      * Return the value of DefaultValue.
      *
      * @return DefaultValue
@@ -130,26 +123,45 @@ class StateVariableProperty(
     val defaultValue: String? = null,
 
     /**
-     * Return the value of Minimum.
+     * Return the value of AllowedValueList.
      *
-     * @return Minimum
+     * @return AllowedValueList
      */
-    val minimum: String? = null,
+    val allowedValueList: List<String> = emptyList(),
 
     /**
-     * Return the value of Maximum.
+     * Return the value of allowedValueRange
      *
-     * @return Maximum
+     * @return AllowedValueRange
      */
-    val maximum: String? = null,
-
-    /**
-     * Return the value of Step.
-     *
-     * @return Step
-     */
-    val step: String? = null
+    val allowedValueRange: AllowedValueRange? = null
 ) {
+    /**
+     * Property of allowedValueRange for StateVariable
+     */
+    class AllowedValueRange(
+        /**
+         * Return the value of Minimum.
+         *
+         * @return Minimum
+         */
+        val minimum: String,
+
+        /**
+         * Return the value of Maximum.
+         *
+         * @return Maximum
+         */
+        val maximum: String,
+
+        /**
+         * Return the value of Step.
+         *
+         * @return Step
+         */
+        val step: String? = null
+    )
+
     class Builder {
         var isSendEvents: Boolean = false
         var isMulticast: Boolean = false
@@ -164,6 +176,15 @@ class StateVariableProperty(
         fun build(): StateVariableProperty {
             val name = checkNotNull(name) { "name must be set." }
             val dataType = checkNotNull(dataType) { "dataType must be set." }
+            val minimum = minimum
+            val maximum = maximum
+            val allowedValueRange = if (minimum != null && maximum != null) {
+                AllowedValueRange(
+                    minimum = minimum,
+                    maximum = maximum,
+                    step = step
+                )
+            } else null
 
             return StateVariableProperty(
                 isSendEvents = isSendEvents,
@@ -172,9 +193,7 @@ class StateVariableProperty(
                 dataType = dataType,
                 allowedValueList = allowedValueList.toList(),
                 defaultValue = defaultValue,
-                minimum = minimum,
-                maximum = maximum,
-                step = step
+                allowedValueRange = allowedValueRange
             )
         }
     }

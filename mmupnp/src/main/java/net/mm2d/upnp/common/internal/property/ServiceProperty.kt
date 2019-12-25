@@ -8,7 +8,7 @@
 package net.mm2d.upnp.common.internal.property
 
 /**
- * Interface of UPnP Service.
+ * Property of UPnP Service.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

@@ -8,7 +8,7 @@
 package net.mm2d.upnp.common.internal.property
 
 /**
- * Interface of UPnP icon.
+ * Property of UPnP icon.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

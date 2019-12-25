@@ -99,13 +99,6 @@ interface StateVariable {
     val dataType: String
 
     /**
-     * Return the value of AllowedValueList.
-     *
-     * @return AllowedValueList
-     */
-    val allowedValueList: List<String>
-
-    /**
      * Return the value of DefaultValue.
      *
      * @return DefaultValue
@@ -113,23 +106,42 @@ interface StateVariable {
     val defaultValue: String?
 
     /**
-     * Return the value of Minimum.
+     * Return the value of AllowedValueList.
      *
-     * @return Minimum
+     * @return AllowedValueList
      */
-    val minimum: String?
+    val allowedValueList: List<String>
 
     /**
-     * Return the value of Maximum.
+     * Return the value of allowedValueRange
      *
-     * @return Maximum
+     * @return AllowedValueRange
      */
-    val maximum: String?
+    val allowedValueRange: AllowedValueRange?
 
     /**
-     * Return the value of Step.
-     *
-     * @return Step
+     * Property of allowedValueRange for StateVariable
      */
-    val step: String?
+    class AllowedValueRange(
+        /**
+         * Return the value of Minimum.
+         *
+         * @return Minimum
+         */
+        val minimum: String,
+
+        /**
+         * Return the value of Maximum.
+         *
+         * @return Maximum
+         */
+        val maximum: String,
+
+        /**
+         * Return the value of Step.
+         *
+         * @return Step
+         */
+        val step: String? = null
+    )
 }

@@ -10,7 +10,7 @@ package net.mm2d.upnp.common.internal.property
 import net.mm2d.log.Logger
 
 /**
- * Interface of UPnP Argument.
+ * Property of UPnP Argument.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */

@@ -9,6 +9,7 @@ package net.mm2d.upnp.cp.internal.impl
 
 import net.mm2d.upnp.common.internal.property.StateVariableProperty
 import net.mm2d.upnp.cp.StateVariable
+import net.mm2d.upnp.cp.StateVariable.AllowedValueRange
 
 /**
  * Implements for [StateVariable].
@@ -22,9 +23,13 @@ internal class StateVariableImpl(
     override val isMulticast: Boolean = property.isMulticast
     override val name: String = property.name
     override val dataType: String = property.dataType
-    override val allowedValueList: List<String> = property.allowedValueList
     override val defaultValue: String? = property.defaultValue
-    override val minimum: String? = property.minimum
-    override val maximum: String? = property.maximum
-    override val step: String? = property.step
+    override val allowedValueList: List<String> = property.allowedValueList
+    override val allowedValueRange: AllowedValueRange? = property.allowedValueRange?.let {
+        AllowedValueRange(
+            minimum = it.minimum,
+            maximum = it.maximum,
+            step = it.step
+        )
+    }
 }

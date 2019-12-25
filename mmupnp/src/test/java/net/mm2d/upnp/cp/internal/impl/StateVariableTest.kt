@@ -30,8 +30,8 @@ class StateVariableTest {
         assertThat(stateVariable.isMulticast).isEqualTo(property.isMulticast)
         assertThat(stateVariable.allowedValueList).isEqualTo(property.allowedValueList)
         assertThat(stateVariable.defaultValue).isEqualTo(property.defaultValue)
-        assertThat(stateVariable.minimum).isEqualTo(property.minimum)
-        assertThat(stateVariable.maximum).isEqualTo(property.maximum)
-        assertThat(stateVariable.step).isEqualTo(property.step)
+        assertThat(stateVariable.allowedValueRange?.minimum).isEqualTo(property.allowedValueRange?.minimum)
+        assertThat(stateVariable.allowedValueRange?.maximum).isEqualTo(property.allowedValueRange?.maximum)
+        assertThat(stateVariable.allowedValueRange?.step).isEqualTo(property.allowedValueRange?.step)
     }
 }

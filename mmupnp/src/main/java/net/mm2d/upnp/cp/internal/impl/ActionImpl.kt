@@ -33,7 +33,7 @@ internal class ActionImpl(
         createInvokeDelegate(this)
     }
     override val name: String = property.name
-    internal val argumentMap: Map<String, Argument> by lazy {
+    private val argumentMap: Map<String, Argument> by lazy {
         argumentList.map { it.name to it }.toMap()
     }
 

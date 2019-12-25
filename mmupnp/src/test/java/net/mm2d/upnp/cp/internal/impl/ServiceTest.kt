@@ -495,9 +495,9 @@ class ServiceTest {
             assertThat(value.isSendEvents).isTrue()
             assertThat(value.dataType).isEqualTo("i4")
             assertThat(value.defaultValue).isEqualTo("10")
-            assertThat(value.step).isEqualTo("1")
-            assertThat(value.minimum).isEqualTo("0")
-            assertThat(value.maximum).isEqualTo("100")
+            assertThat(value.allowedValueRange?.step).isEqualTo("1")
+            assertThat(value.allowedValueRange?.minimum).isEqualTo("0")
+            assertThat(value.allowedValueRange?.maximum).isEqualTo("100")
         }
 
         @Test

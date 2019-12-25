@@ -8,7 +8,7 @@
 package net.mm2d.upnp.common.internal.property
 
 /**
- * Interface of UPnP Device.
+ * Property of UPnP Device.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
@@ -176,7 +176,7 @@ class DeviceProperty(
      */
     val parent: DeviceProperty? = null,
 
-    private val tagMap: Map<String, Map<String, String>>,
+    val tagMap: Map<String, Map<String, String>>,
 
     deviceBuilderList: List<Builder> = emptyList()
 ) {
