@@ -24,15 +24,6 @@ class IconProperty(
     val mimeType: String,
 
     /**
-     * Return the value of Height.
-     *
-     * Required. Vertical dimension of icon in pixels. Integer.
-     *
-     * @return Height
-     */
-    val height: Int,
-
-    /**
      * Return the value of Width.
      *
      * Required. Horizontal dimension of icon in pixels. Integer.
@@ -40,6 +31,15 @@ class IconProperty(
      * @return Width
      */
     val width: Int,
+
+    /**
+     * Return the value of Height.
+     *
+     * Required. Vertical dimension of icon in pixels. Integer.
+     *
+     * @return Height
+     */
+    val height: Int,
 
     /**
      * Return the value of Depth.

@@ -22,8 +22,8 @@ internal class IconImpl(
     property: IconProperty
 ) : Icon {
     override val mimeType: String = property.mimeType
-    override val height: Int = property.height
     override val width: Int = property.width
+    override val height: Int = property.height
     override val depth: Int = property.depth
     override val url: String = property.url
     override var binary: ByteArray? = null
