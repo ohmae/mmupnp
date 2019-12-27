@@ -9,31 +9,23 @@ package net.mm2d.upnp.util
 
 import io.mockk.every
 import io.mockk.mockk
-import java.io.File
 import java.io.InputStream
 import java.net.InetAddress
 import java.net.InterfaceAddress
-import java.nio.file.Files
+import java.nio.charset.StandardCharsets
 
 object TestUtils {
     private val classLoader: ClassLoader
-        get() = TestUtils::class.java.classLoader
+        get() = javaClass.classLoader
 
-    private fun getResourceAsFile(name: String): File {
-        return File(classLoader.getResource(name)!!.file)
-    }
+    fun getResourceAsStream(name: String): InputStream =
+        classLoader.getResourceAsStream(name) ?: error("file not found")
 
-    fun getResourceAsStream(name: String): InputStream {
-        return classLoader.getResourceAsStream(name)
-    }
+    fun getResourceAsByteArray(name: String): ByteArray =
+        getResourceAsStream(name).readAllBytes()
 
-    fun getResourceAsByteArray(name: String): ByteArray {
-        return Files.readAllBytes(getResourceAsFile(name).toPath())
-    }
-
-    fun getResourceAsString(name: String): String {
-        return String(Files.readAllBytes(getResourceAsFile(name).toPath()))
-    }
+    fun getResourceAsString(name: String): String =
+        getResourceAsByteArray(name).toString(StandardCharsets.UTF_8)
 }
 
 fun createInterfaceAddress(address: String, broadcast: String, maskLength: Int): InterfaceAddress {
