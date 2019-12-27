@@ -20,15 +20,9 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.xml.sax.SAXException
 import java.io.IOException
-import java.io.StringWriter
 import java.net.MalformedURLException
 import java.net.URL
 import javax.xml.parsers.ParserConfigurationException
-import javax.xml.transform.OutputKeys
-import javax.xml.transform.TransformerException
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 
 internal class ActionInvokeDelegate(
     private val action: ActionImpl
@@ -188,24 +182,6 @@ internal class ActionInvokeDelegate(
             it.appendNewElementNs(SOAP_NS, "s:Body")
                 .appendNewElementNs(service.serviceType, "u:$name")
         }
-
-    /**
-     * Convert XML Document to String.
-     *
-     * @receiver document XML Document to convert
-     * @return Converted string
-     * @throws TransformerException If a conversion error occurs
-     */
-    // VisibleForTesting
-    @Throws(TransformerException::class)
-    internal fun Document.formatXmlString(): String {
-        val sw = StringWriter()
-        TransformerFactory.newInstance().newTransformer().also {
-            it.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-            it.transform(DOMSource(this), StreamResult(sw))
-        }
-        return sw.toString()
-    }
 
     /**
      * Parses the response of this Action.

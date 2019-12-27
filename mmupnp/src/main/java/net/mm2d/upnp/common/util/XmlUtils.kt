@@ -12,9 +12,14 @@ import org.xml.sax.InputSource
 import org.xml.sax.SAXException
 import java.io.IOException
 import java.io.StringReader
+import java.io.StringWriter
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
+import javax.xml.transform.TransformerException
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 
 /**
  * Provide XML utility methods.
@@ -160,31 +165,55 @@ fun NamedNodeMap.asIterable(): Iterable<Node> = Iterable { iterator() }
  * Create new element and add to receiver document.
  *
  * @receiver Document
- * @param namespaceUri The namespace URI of the element to create
- * @param qualifiedName The qualified name of the element type to instantiate.
+ * @param namespaceUri The namespace URI of the element to create.
+ * @param qualifiedName The qualified name of the element to create.
  * @return New element
  */
 @Throws(DOMException::class)
-fun Document.appendNewElementNs(namespaceUri: String, qualifiedName: String): Element =
+fun Document.appendNewElementNs(namespaceUri: String?, qualifiedName: String): Element =
     createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
 
 /**
  * Create new element with namespace and add to receiver node.
  *
  * @receiver Parent node
- * @param namespaceUri The namespace URI of the element to create
- * @param qualifiedName The qualified name of the element type to instantiate.
+ * @param namespaceUri The namespace URI of the element to create.
+ * @param qualifiedName The qualified name of the element to create.
  * @return New element
  */
 @Throws(DOMException::class)
-fun Node.appendNewElementNs(namespaceUri: String, qualifiedName: String): Element =
+fun Node.appendNewElementNs(namespaceUri: String?, qualifiedName: String): Element =
     ownerDocument.createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
+
+/**
+ * Create new element with namespace and add to receiver node.
+ *
+ * @receiver Parent node
+ * @param namespaceUri The namespace URI of the element to create.
+ * @param qualifiedName The qualified name of the element to create.
+ * @param textContent Text content the element to create.
+ * @return New element
+ */
+@Throws(DOMException::class)
+fun Node.appendNewElementNs(namespaceUri: String?, qualifiedName: String, textContent: String?): Element =
+    appendNewElementNs(namespaceUri, qualifiedName).also { it.textContent = textContent }
+
+/**
+ * Create new element and add to receiver node.
+ *
+ * @receiver Document
+ * @param tagName The name of the element to create.
+ * @return New element
+ */
+@Throws(DOMException::class)
+fun Document.appendNewElement(tagName: String): Element =
+    createElement(tagName).also { appendChild(it) }
 
 /**
  * Create new element and add to receiver node.
  *
  * @receiver Parent node
- * @param tagName The name of the element type to instantiate.
+ * @param tagName The name of the element to create.
  * @return New element
  */
 @Throws(DOMException::class)
@@ -195,9 +224,26 @@ fun Node.appendNewElement(tagName: String): Element =
  * Create new element with text content and add to receiver node.
  *
  * @receiver Parent node
- * @param tagName The name of the element type to instantiate.
+ * @param tagName The name of the element to create.
+ * @param textContent Text content the element to create.
  * @return New element
  */
 @Throws(DOMException::class)
 fun Node.appendNewElement(tagName: String, textContent: String?): Element =
     appendNewElement(tagName).also { it.textContent = textContent }
+
+/**
+ * Convert XML Document to String.
+ *
+ * @receiver document XML Document to convert
+ * @return Converted string
+ * @throws TransformerException If a conversion error occurs
+ */
+// VisibleForTesting
+@Throws(TransformerException::class)
+fun Document.formatXmlString(): String {
+    val sw = StringWriter()
+    TransformerFactory.newInstance().newTransformer()
+        .transform(DOMSource(this), StreamResult(sw))
+    return sw.toString()
+}
