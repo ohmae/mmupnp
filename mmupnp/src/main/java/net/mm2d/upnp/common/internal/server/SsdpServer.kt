@@ -14,19 +14,7 @@ import net.mm2d.upnp.common.SsdpMessage
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal interface SsdpServer {
-    /**
-     * Start a receiving thread.
-     */
-    fun start()
-
-    /**
-     * Stop a receiving thread.
-     *
-     * It only sends a request for a stop and does not wait.
-     */
-    fun stop()
-
+internal interface SsdpServer: Server {
     /**
      * Send a message using this socket.
      *

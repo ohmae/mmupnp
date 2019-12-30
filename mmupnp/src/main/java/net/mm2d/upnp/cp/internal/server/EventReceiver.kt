@@ -12,15 +12,12 @@ import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.HttpResponse
 import net.mm2d.upnp.common.Property
+import net.mm2d.upnp.common.internal.server.TcpServer
+import net.mm2d.upnp.common.internal.server.TcpServerDelegate
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
-import net.mm2d.upnp.common.internal.thread.ThreadCondition
-import net.mm2d.upnp.common.internal.util.closeQuietly
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.net.ServerSocket
-import java.net.Socket
-import java.util.*
 
 /**
  * Class to receive Event notified by event subscription.
@@ -32,56 +29,33 @@ import java.util.*
  */
 internal class EventReceiver(
     private val taskExecutors: TaskExecutors,
-    private val listener: (sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean
-) : Runnable {
-    private var serverSocket: ServerSocket? = null
-    private val clientList: MutableList<ClientTask> = Collections.synchronizedList(LinkedList())
-    private val threadCondition = ThreadCondition(taskExecutors.server)
-
-    fun start(): Unit = threadCondition.start(this)
-
-    fun stop() {
-        threadCondition.stop()
-        serverSocket.closeQuietly()
-        synchronized(clientList) {
-            clientList.forEach { it.stop() }
-            clientList.clear()
-        }
+    private val listener: (sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean,
+    private val delegate: TcpServerDelegate = TcpServerDelegate(taskExecutors, "-event-receiver")
+) : TcpServer by delegate {
+    init {
+        delegate.setClientProcess(::receiveAndReply)
     }
 
-    // VisibleForTesting
     @Throws(IOException::class)
-    internal fun createServerSocket(): ServerSocket = ServerSocket(0)
-
-    fun getLocalPort(): Int {
-        if (!threadCondition.waitReady()) return 0
-        return serverSocket?.localPort ?: 0
-    }
-
-    override fun run() {
-        ThreadCondition.setThreadNameSuffix("-event-receiver")
-        try {
-            val socket = createServerSocket()
-            serverSocket = socket
-            threadCondition.notifyReady()
-            while (!threadCondition.isCanceled()) {
-                val clientSocket = socket.accept().also {
-                    it.soTimeout = Property.DEFAULT_TIMEOUT
-                }
-                ClientTask(taskExecutors, this, clientSocket).let {
-                    clientList.add(it)
-                    it.start()
-                }
-            }
-        } catch (ignored: IOException) {
-        } finally {
-            serverSocket.closeQuietly()
-            serverSocket = null
+    private fun receiveAndReply(inputStream: InputStream, outputStream: OutputStream) {
+        val request = HttpRequest.create().apply {
+            readData(inputStream)
         }
-    }
-
-    fun notifyClientFinished(client: ClientTask) {
-        clientList.remove(client)
+        Logger.v { "receive event:\n$request" }
+        val nt = request.getHeader(Http.NT)
+        val nts = request.getHeader(Http.NTS)
+        val sid = request.getHeader(Http.SID)
+        if (nt.isNullOrEmpty() || nts.isNullOrEmpty()) {
+            RESPONSE_BAD.writeData(outputStream)
+        } else if (sid.isNullOrEmpty() || nt != Http.UPNP_EVENT || nts != Http.UPNP_PROPCHANGE) {
+            RESPONSE_FAIL.writeData(outputStream)
+        } else {
+            if (notifyEvent(sid, request)) {
+                RESPONSE_OK.writeData(outputStream)
+            } else {
+                RESPONSE_FAIL.writeData(outputStream)
+            }
+        }
     }
 
     // VisibleForTesting
@@ -92,74 +66,24 @@ internal class EventReceiver(
         return listener(sid, seq, properties)
     }
 
-    // VisibleForTesting
-    internal class ClientTask(
-        taskExecutors: TaskExecutors,
-        private val eventReceiver: EventReceiver,
-        private val socket: Socket
-    ) : Runnable {
-        private val condition = ThreadCondition(taskExecutors.io)
-
-        fun start(): Unit = condition.start(this)
-
-        fun stop() {
-            condition.stop()
-            socket.closeQuietly()
+    companion object {
+        private val RESPONSE_OK = HttpResponse.create().apply {
+            setStatus(Http.Status.HTTP_OK)
+            setHeader(Http.SERVER, Property.SERVER_VALUE)
+            setHeader(Http.CONNECTION, Http.CLOSE)
+            setHeader(Http.CONTENT_LENGTH, "0")
         }
-
-        override fun run() {
-            try {
-                receiveAndReply(socket.getInputStream(), socket.getOutputStream())
-            } catch (e: IOException) {
-                Logger.w(e)
-            } finally {
-                socket.closeQuietly()
-                eventReceiver.notifyClientFinished(this)
-            }
+        private val RESPONSE_BAD = HttpResponse.create().apply {
+            setStatus(Http.Status.HTTP_BAD_REQUEST)
+            setHeader(Http.SERVER, Property.SERVER_VALUE)
+            setHeader(Http.CONNECTION, Http.CLOSE)
+            setHeader(Http.CONTENT_LENGTH, "0")
         }
-
-        // VisibleForTesting
-        @Throws(IOException::class)
-        fun receiveAndReply(inputStream: InputStream, outputStream: OutputStream) {
-            val request = HttpRequest.create().apply {
-                readData(inputStream)
-            }
-            Logger.v { "receive event:\n$request" }
-            val nt = request.getHeader(Http.NT)
-            val nts = request.getHeader(Http.NTS)
-            val sid = request.getHeader(Http.SID)
-            if (nt.isNullOrEmpty() || nts.isNullOrEmpty()) {
-                RESPONSE_BAD.writeData(outputStream)
-            } else if (sid.isNullOrEmpty() || nt != Http.UPNP_EVENT || nts != Http.UPNP_PROPCHANGE) {
-                RESPONSE_FAIL.writeData(outputStream)
-            } else {
-                if (eventReceiver.notifyEvent(sid, request)) {
-                    RESPONSE_OK.writeData(outputStream)
-                } else {
-                    RESPONSE_FAIL.writeData(outputStream)
-                }
-            }
-        }
-
-        companion object {
-            private val RESPONSE_OK = HttpResponse.create().apply {
-                setStatus(Http.Status.HTTP_OK)
-                setHeader(Http.SERVER, Property.SERVER_VALUE)
-                setHeader(Http.CONNECTION, Http.CLOSE)
-                setHeader(Http.CONTENT_LENGTH, "0")
-            }
-            private val RESPONSE_BAD = HttpResponse.create().apply {
-                setStatus(Http.Status.HTTP_BAD_REQUEST)
-                setHeader(Http.SERVER, Property.SERVER_VALUE)
-                setHeader(Http.CONNECTION, Http.CLOSE)
-                setHeader(Http.CONTENT_LENGTH, "0")
-            }
-            private val RESPONSE_FAIL = HttpResponse.create().apply {
-                setStatus(Http.Status.HTTP_PRECON_FAILED)
-                setHeader(Http.SERVER, Property.SERVER_VALUE)
-                setHeader(Http.CONNECTION, Http.CLOSE)
-                setHeader(Http.CONTENT_LENGTH, "0")
-            }
+        private val RESPONSE_FAIL = HttpResponse.create().apply {
+            setStatus(Http.Status.HTTP_PRECON_FAILED)
+            setHeader(Http.SERVER, Property.SERVER_VALUE)
+            setHeader(Http.CONNECTION, Http.CLOSE)
+            setHeader(Http.CONTENT_LENGTH, "0")
         }
     }
 }

@@ -12,8 +12,8 @@ import io.mockk.*
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpRequest
 import net.mm2d.upnp.common.HttpResponse
+import net.mm2d.upnp.common.internal.server.TcpServerDelegate
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
-import net.mm2d.upnp.cp.internal.server.EventReceiver.ClientTask
 import net.mm2d.upnp.util.TestUtils
 import org.junit.After
 import org.junit.Before
@@ -84,8 +84,9 @@ class EventReceiverTest {
         val serverSocket: ServerSocket = mockk(relaxed = true)
         every { serverSocket.localPort } returns port
         every { serverSocket.accept() } throws IOException()
-        val receiver = spyk(EventReceiver(taskExecutors, mockk()))
-        every { receiver.createServerSocket() } returns serverSocket
+        val delegate = spyk(TcpServerDelegate(taskExecutors, ""))
+        every { delegate.createServerSocket() } returns serverSocket
+        val receiver = EventReceiver(taskExecutors, mockk(), delegate)
 
         receiver.start()
         assertThat(receiver.getLocalPort()).isEqualTo(port)
@@ -124,8 +125,9 @@ class EventReceiverTest {
         val thirdSlot = slot<List<Pair<String, String>>>()
         val listener: (String, Long, List<Pair<String, String>>) -> Boolean = mockk()
         every { listener.invoke(capture(firstSlot), capture(secondSlot), capture(thirdSlot)) } returns true
-        val receiver = spyk(EventReceiver(taskExecutors, listener))
-        every { receiver.createServerSocket() } returns serverSocket
+        val delegate = spyk(TcpServerDelegate(taskExecutors, ""))
+        every { delegate.createServerSocket() } returns serverSocket
+        val receiver = spyk(EventReceiver(taskExecutors, listener, delegate))
 
         receiver.start()
         Thread.sleep(100)
@@ -163,8 +165,9 @@ class EventReceiverTest {
                 throw IOException()
             }
         }
-        val receiver = spyk(EventReceiver(taskExecutors) { _, _, _ -> false })
-        every { receiver.createServerSocket() } returns serverSocket
+        val delegate = spyk(TcpServerDelegate(taskExecutors, ""))
+        every { delegate.createServerSocket() } returns serverSocket
+        val receiver = EventReceiver(taskExecutors, { _, _, _ -> false }, delegate)
 
         receiver.start()
         Thread.sleep(500)
@@ -197,8 +200,9 @@ class EventReceiverTest {
                 throw IOException()
             }
         }
-        val receiver = spyk(EventReceiver(taskExecutors, mockk()))
-        every { receiver.createServerSocket() } returns serverSocket
+        val delegate = spyk(TcpServerDelegate(taskExecutors, ""))
+        every { delegate.createServerSocket() } returns serverSocket
+        val receiver = EventReceiver(taskExecutors, mockk(), delegate)
         receiver.start()
         Thread.sleep(100)
         receiver.stop()
@@ -230,14 +234,15 @@ class EventReceiverTest {
                 throw IOException()
             }
         }
-        val receiver = spyk(EventReceiver(taskExecutors) { _, _, _ ->
+        val delegate = spyk(TcpServerDelegate(taskExecutors, ""))
+        every { delegate.createServerSocket() } returns serverSocket
+        val receiver = EventReceiver(taskExecutors, { _, _, _ ->
             try {
                 Thread.sleep(1000)
             } catch (e: InterruptedException) {
             }
             false
-        })
-        every { receiver.createServerSocket() } returns serverSocket
+        }, delegate)
 
         receiver.start()
         Thread.sleep(100)
@@ -279,20 +284,6 @@ class EventReceiverTest {
 
         assertThat(receiver.notifyEvent(sid, request)).isFalse()
         verify(exactly = 2) { listener.invoke(any(), any(), any()) }
-    }
-
-    @Test
-    fun ClientTask_run() {
-        val socket: Socket = mockk(relaxed = true)
-        every { socket.getInputStream() } returns mockk(relaxed = true)
-        every { socket.getOutputStream() } returns mockk(relaxed = true)
-        val receiver = spyk(EventReceiver(taskExecutors, mockk()))
-        val clientTask = spyk(ClientTask(taskExecutors, receiver, socket))
-        every { clientTask.receiveAndReply(any(), any()) } throws IOException()
-
-        clientTask.run()
-
-        verify(exactly = 1) { receiver.notifyClientFinished(clientTask) }
     }
 
     companion object {
