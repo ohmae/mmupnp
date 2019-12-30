@@ -55,7 +55,7 @@ internal class MulticastEventReceiver(
 
     override fun run() {
         val suffix = "-multicast-event-" + networkInterface.name + "-" + interfaceAddress.address.toSimpleString()
-        Thread.currentThread().let { it.name = it.name + suffix }
+        ThreadCondition.setThreadNameSuffix(suffix)
         if (threadCondition.isCanceled()) return
         try {
             val socket = createMulticastSocket(ServerConst.EVENT_PORT)

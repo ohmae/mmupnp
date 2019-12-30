@@ -59,9 +59,7 @@ internal class EventReceiver(
     }
 
     override fun run() {
-        Thread.currentThread().let {
-            it.name = it.name + "-event-receiver"
-        }
+        ThreadCondition.setThreadNameSuffix("-event-receiver")
         try {
             val socket = createServerSocket()
             serverSocket = socket

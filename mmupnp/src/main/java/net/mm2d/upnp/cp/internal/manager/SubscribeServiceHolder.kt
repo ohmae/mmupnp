@@ -69,9 +69,7 @@ internal class SubscribeServiceHolder(
     }
 
     override fun run() {
-        Thread.currentThread().let {
-            it.name = it.name + "-subscribe-holder"
-        }
+        ThreadCondition.setThreadNameSuffix("-subscribe-holder")
         try {
             while (!threadCondition.isCanceled()) {
                 renewSubscribe(waitEntry())

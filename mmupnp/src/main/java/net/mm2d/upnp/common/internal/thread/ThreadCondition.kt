@@ -54,5 +54,8 @@ internal class ThreadCondition(
 
     companion object {
         private val PREPARE_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(5)
+
+        fun setThreadNameSuffix(suffix: String): Unit =
+            Thread.currentThread().let { it.name = it.name + suffix }
     }
 }

@@ -75,9 +75,7 @@ internal class DeviceHolder(
     }
 
     override fun run() {
-        Thread.currentThread().let {
-            it.name = it.name + "-device-holder"
-        }
+        ThreadCondition.setThreadNameSuffix("-device-holder")
         lock.withLock {
             try {
                 while (!threadCondition.isCanceled()) {

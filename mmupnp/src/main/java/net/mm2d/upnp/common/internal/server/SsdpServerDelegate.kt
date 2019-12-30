@@ -97,9 +97,7 @@ internal class SsdpServerDelegate(
     override fun run() {
         val suffix = (if (bindPort == 0) "-ssdp-notify-" else "-ssdp-search-") +
             networkInterface.name + "-" + interfaceAddress.address.toSimpleString()
-        Thread.currentThread().let {
-            it.name = it.name + suffix
-        }
+        ThreadCondition.setThreadNameSuffix(suffix)
         if (threadCondition.isCanceled()) return
         try {
             val socket = createMulticastSocket(bindPort)
