@@ -10,6 +10,7 @@ package net.mm2d.upnp.cp.internal.server
 import net.mm2d.log.Logger
 import net.mm2d.upnp.common.Protocol
 import net.mm2d.upnp.common.SsdpMessage
+import net.mm2d.upnp.common.internal.server.Address
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import java.net.NetworkInterface
 

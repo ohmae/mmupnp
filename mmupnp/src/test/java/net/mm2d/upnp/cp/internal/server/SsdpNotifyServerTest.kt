@@ -12,6 +12,9 @@ import io.mockk.*
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.internal.message.SsdpRequest
+import net.mm2d.upnp.common.internal.server.Address
+import net.mm2d.upnp.common.internal.server.Address.IP_V4
+import net.mm2d.upnp.common.internal.server.SsdpServerDelegate
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.common.util.NetworkUtils
 import net.mm2d.upnp.util.TestUtils
@@ -42,7 +45,7 @@ class SsdpNotifyServerTest {
     @Test
     fun setNotifyListener_受信メッセージが通知されること() {
         val delegate =
-            spyk(SsdpServerDelegate(taskExecutors, Address.IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
+            spyk(SsdpServerDelegate(taskExecutors, IP_V4, NetworkUtils.getAvailableInet4Interfaces()[0]))
         delegate.setReceiver(mockk(relaxed = true))
         val interfaceAddress = createInterfaceAddress("192.0.2.2", "255.255.255.0", 16)
         every { delegate.interfaceAddress } returns interfaceAddress

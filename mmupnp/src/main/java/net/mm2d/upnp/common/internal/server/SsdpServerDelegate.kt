@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.cp.internal.server
+package net.mm2d.upnp.common.internal.server
 
 import net.mm2d.log.Logger
 import net.mm2d.upnp.common.SsdpMessage

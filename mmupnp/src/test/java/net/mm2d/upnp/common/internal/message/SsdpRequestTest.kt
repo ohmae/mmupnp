@@ -11,7 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.SsdpMessage
-import net.mm2d.upnp.cp.internal.server.Address
+import net.mm2d.upnp.common.internal.server.Address
 import net.mm2d.upnp.cp.internal.server.SsdpSearchServer
 import net.mm2d.upnp.util.TestUtils
 import org.junit.Test
