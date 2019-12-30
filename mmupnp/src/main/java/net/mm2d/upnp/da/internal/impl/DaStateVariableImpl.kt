@@ -8,7 +8,7 @@
 package net.mm2d.upnp.da.internal.impl
 
 import net.mm2d.upnp.common.internal.property.StateVariableProperty
-import net.mm2d.upnp.common.util.appendNewElement
+import net.mm2d.upnp.common.util.append
 import net.mm2d.upnp.da.DaStateVariable
 import net.mm2d.upnp.da.DaStateVariable.AllowedValueRange
 import org.w3c.dom.Element
@@ -31,29 +31,29 @@ class DaStateVariableImpl(
     }
 
     override fun appendDescriptionTo(parent: Element) {
-        parent.appendNewElement("stateVariable").apply {
+        parent.append("stateVariable").apply {
             setAttribute("sendEvents", if (isSendEvents) "yes" else "no")
             if (isMulticast) {
                 setAttribute("multicast", "yes")
             }
-            appendNewElement("name", name)
-            appendNewElement("dataType", dataType)
+            append("name", name)
+            append("dataType", dataType)
             if (defaultValue != null) {
-                appendNewElement("defaultValue", defaultValue)
+                append("defaultValue", defaultValue)
             }
             if (allowedValueList.isNotEmpty()) {
-                appendNewElement("allowedValueList").apply {
+                append("allowedValueList").apply {
                     allowedValueList.forEach {
-                        appendNewElement("allowedValue", it)
+                        append("allowedValue", it)
                     }
                 }
             }
             allowedValueRange?.let { allowedValueRange ->
-                appendNewElement("allowedValueRange").apply {
-                    appendNewElement("minimum", allowedValueRange.minimum)
-                    appendNewElement("maximum", allowedValueRange.maximum)
+                append("allowedValueRange").apply {
+                    append("minimum", allowedValueRange.minimum)
+                    append("maximum", allowedValueRange.maximum)
                     allowedValueRange.step?.let { step ->
-                        appendNewElement("step", step)
+                        append("step", step)
                     }
                 }
             }

@@ -20,7 +20,7 @@ import net.mm2d.upnp.common.internal.property.StateVariableProperty
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.common.util.XmlUtils
 import net.mm2d.upnp.common.util.findChildElementByLocalName
-import net.mm2d.upnp.common.util.formatXmlString
+import net.mm2d.upnp.common.util.toXml
 import net.mm2d.upnp.cp.Action
 import org.junit.After
 import org.junit.Before
@@ -526,7 +526,7 @@ class ActionInvokeTest {
         mockkStatic("net.mm2d.upnp.common.util.XmlUtilsKt")
         try {
             with(invokeDelegate) {
-                every { any<Document>().formatXmlString() } throws TransformerException("")
+                every { any<Document>().toXml() } throws TransformerException("")
                 emptyList<Pair<String, String?>>().makeSoap(emptyMap())
             }
         } finally {

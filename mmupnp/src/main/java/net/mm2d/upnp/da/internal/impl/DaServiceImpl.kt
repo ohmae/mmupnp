@@ -9,8 +9,8 @@ package net.mm2d.upnp.da.internal.impl
 
 import net.mm2d.upnp.common.internal.property.ServiceProperty
 import net.mm2d.upnp.common.util.XmlUtils
-import net.mm2d.upnp.common.util.appendNewElement
-import net.mm2d.upnp.common.util.formatXmlString
+import net.mm2d.upnp.common.util.append
+import net.mm2d.upnp.common.util.toXml
 import net.mm2d.upnp.da.DaAction
 import net.mm2d.upnp.da.DaDevice
 import net.mm2d.upnp.da.DaService
@@ -41,37 +41,37 @@ class DaServiceImpl(
         stateVariableList.find { it.name == name }
 
     override fun appendDescriptionTo(parent: Element) {
-        parent.appendNewElement("service").apply {
-            appendNewElement("serviceType", serviceType)
-            appendNewElement("serviceId", serviceId)
-            appendNewElement("SCPDURL", scpdUrl)
-            appendNewElement("controlURL", controlUrl)
-            appendNewElement("eventSubURL", eventSubUrl)
+        parent.append("service").apply {
+            append("serviceType", serviceType)
+            append("serviceId", serviceId)
+            append("SCPDURL", scpdUrl)
+            append("controlURL", controlUrl)
+            append("eventSubURL", eventSubUrl)
         }
     }
 
     fun createDescription(): String {
         val document = XmlUtils.newDocument(false)
-        document.appendNewElement("scpd").apply {
+        document.append("scpd").apply {
             setAttribute("xmlns", "urn:schemas-upnp-org:service-1-0")
-            appendNewElement("specVersion").apply {
-                appendNewElement("major", "1")
-                appendNewElement("minor", "0")
+            append("specVersion").apply {
+                append("major", "1")
+                append("minor", "0")
             }
             if (actionList.isNotEmpty()) {
-                appendNewElement("actionList").apply {
+                append("actionList").apply {
                     actionList.forEach {
                         it.appendDescriptionTo(this)
                     }
                 }
             }
-            appendNewElement("serviceStateTable").apply {
+            append("serviceStateTable").apply {
                 stateVariableList.forEach {
                     it.appendDescriptionTo(this)
                 }
             }
         }
-        return document.formatXmlString()
+        return document.toXml()
     }
 
     companion object {

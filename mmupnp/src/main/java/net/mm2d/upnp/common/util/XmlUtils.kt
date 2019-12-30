@@ -16,6 +16,7 @@ import java.io.StringWriter
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
+import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerException
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
@@ -170,7 +171,7 @@ fun NamedNodeMap.asIterable(): Iterable<Node> = Iterable { iterator() }
  * @return New element
  */
 @Throws(DOMException::class)
-fun Document.appendNewElementNs(namespaceUri: String?, qualifiedName: String): Element =
+fun Document.appendWithNs(namespaceUri: String?, qualifiedName: String): Element =
     createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
 
 /**
@@ -182,7 +183,7 @@ fun Document.appendNewElementNs(namespaceUri: String?, qualifiedName: String): E
  * @return New element
  */
 @Throws(DOMException::class)
-fun Node.appendNewElementNs(namespaceUri: String?, qualifiedName: String): Element =
+fun Node.appendWithNs(namespaceUri: String?, qualifiedName: String): Element =
     ownerDocument.createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
 
 /**
@@ -195,8 +196,8 @@ fun Node.appendNewElementNs(namespaceUri: String?, qualifiedName: String): Eleme
  * @return New element
  */
 @Throws(DOMException::class)
-fun Node.appendNewElementNs(namespaceUri: String?, qualifiedName: String, textContent: String?): Element =
-    appendNewElementNs(namespaceUri, qualifiedName).also { it.textContent = textContent }
+fun Node.appendWithNs(namespaceUri: String?, qualifiedName: String, textContent: String?): Element =
+    appendWithNs(namespaceUri, qualifiedName).also { it.textContent = textContent }
 
 /**
  * Create new element and add to receiver node.
@@ -206,7 +207,7 @@ fun Node.appendNewElementNs(namespaceUri: String?, qualifiedName: String, textCo
  * @return New element
  */
 @Throws(DOMException::class)
-fun Document.appendNewElement(tagName: String): Element =
+fun Document.append(tagName: String): Element =
     createElement(tagName).also { appendChild(it) }
 
 /**
@@ -217,7 +218,7 @@ fun Document.appendNewElement(tagName: String): Element =
  * @return New element
  */
 @Throws(DOMException::class)
-fun Node.appendNewElement(tagName: String): Element =
+fun Node.append(tagName: String): Element =
     ownerDocument.createElement(tagName).also { appendChild(it) }
 
 /**
@@ -229,8 +230,8 @@ fun Node.appendNewElement(tagName: String): Element =
  * @return New element
  */
 @Throws(DOMException::class)
-fun Node.appendNewElement(tagName: String, textContent: String?): Element =
-    appendNewElement(tagName).also { it.textContent = textContent }
+fun Node.append(tagName: String, textContent: String?): Element =
+    append(tagName).also { it.textContent = textContent }
 
 /**
  * Convert XML Document to String.
@@ -241,9 +242,13 @@ fun Node.appendNewElement(tagName: String, textContent: String?): Element =
  */
 // VisibleForTesting
 @Throws(TransformerException::class)
-fun Document.formatXmlString(): String {
+fun Document.toXml(): String {
     val sw = StringWriter()
-    TransformerFactory.newInstance().newTransformer()
-        .transform(DOMSource(this), StreamResult(sw))
+    TransformerFactory.newInstance().newTransformer().also {
+        //it.setOutputProperty(OutputKeys.METHOD, "xml")
+        it.setOutputProperty(OutputKeys.INDENT, "yes")
+        //it.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+        it.transform(DOMSource(this), StreamResult(sw))
+    }
     return sw.toString()
 }

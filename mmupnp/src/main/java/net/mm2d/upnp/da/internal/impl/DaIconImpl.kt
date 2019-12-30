@@ -8,7 +8,7 @@
 package net.mm2d.upnp.da.internal.impl
 
 import net.mm2d.upnp.common.internal.property.IconProperty
-import net.mm2d.upnp.common.util.appendNewElement
+import net.mm2d.upnp.common.util.append
 import net.mm2d.upnp.da.DaIcon
 import org.w3c.dom.Element
 
@@ -23,12 +23,12 @@ class DaIconImpl(
     override val binary: ByteArray? = null
 
     override fun appendDescriptionTo(parent: Element) {
-        parent.appendNewElement("icon").apply {
-            appendNewElement("mimeType", mimeType)
-            appendNewElement("width", width.toString())
-            appendNewElement("height", height.toString())
-            appendNewElement("depth", depth.toString())
-            appendNewElement("url", url)
+        parent.append("icon").apply {
+            append("mimeType", mimeType)
+            append("width", width.toString())
+            append("height", height.toString())
+            append("depth", depth.toString())
+            append("url", url)
         }
     }
 

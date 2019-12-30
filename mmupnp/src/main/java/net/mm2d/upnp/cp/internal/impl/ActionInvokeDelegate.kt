@@ -146,7 +146,7 @@ internal class ActionInvokeDelegate(
                 it.setNamespace(namespaces)
                 it.setArgument(this)
             }
-            return document.formatXmlString()
+            return document.toXml()
         } catch (e: Exception) {
             throw IOException(e)
         }
@@ -166,7 +166,7 @@ internal class ActionInvokeDelegate(
      */
     private fun Element.setArgument(arguments: List<Pair<String, String?>>) {
         arguments.forEach {
-            appendNewElement(it.first, it.second)
+            append(it.first, it.second)
         }
     }
 
@@ -177,10 +177,10 @@ internal class ActionInvokeDelegate(
      * @return ActionElement
      */
     private fun Document.makeUpToActionElement(): Element =
-        appendNewElementNs(SOAP_NS, "s:Envelope").let {
+        appendWithNs(SOAP_NS, "s:Envelope").let {
             it.setAttributeNS(SOAP_NS, "s:encodingStyle", SOAP_STYLE)
-            it.appendNewElementNs(SOAP_NS, "s:Body")
-                .appendNewElementNs(service.serviceType, "u:$name")
+            it.appendWithNs(SOAP_NS, "s:Body")
+                .appendWithNs(service.serviceType, "u:$name")
         }
 
     /**

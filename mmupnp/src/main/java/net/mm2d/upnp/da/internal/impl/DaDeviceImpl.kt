@@ -9,9 +9,9 @@ package net.mm2d.upnp.da.internal.impl
 
 import net.mm2d.upnp.common.internal.property.DeviceProperty
 import net.mm2d.upnp.common.util.XmlUtils
-import net.mm2d.upnp.common.util.appendNewElement
-import net.mm2d.upnp.common.util.appendNewElementNs
-import net.mm2d.upnp.common.util.formatXmlString
+import net.mm2d.upnp.common.util.append
+import net.mm2d.upnp.common.util.appendWithNs
+import net.mm2d.upnp.common.util.toXml
 import net.mm2d.upnp.da.DaAction
 import net.mm2d.upnp.da.DaDevice
 import net.mm2d.upnp.da.DaService
@@ -74,36 +74,36 @@ class DaDeviceImpl(
 
     fun createDescription(): String {
         val document = XmlUtils.newDocument(true)
-        document.appendNewElement("root").apply {
+        document.append("root").apply {
             setAttribute("xmlns", "urn:schemas-upnp-org:device-1-0")
-            appendNewElement("specVersion").apply {
-                appendNewElement("major", "1")
-                appendNewElement("minor", "0")
+            append("specVersion").apply {
+                append("major", "1")
+                append("minor", "0")
             }
             appendDescriptionTo(this)
         }
-        return document.formatXmlString()
+        return document.toXml()
     }
 
     override fun appendDescriptionTo(parent: Element) {
-        parent.appendNewElement("device").apply {
+        parent.append("device").apply {
             property.tagMap.forEach { namespaceEntry ->
                 namespaceEntry.value.forEach {
-                    appendNewElementNs(namespaceEntry.key, it.key, it.value)
+                    appendWithNs(namespaceEntry.key, it.key, it.value)
                 }
             }
             if (iconList.isNotEmpty()) {
-                appendNewElement("iconList").apply {
+                append("iconList").apply {
                     iconList.forEach { it.appendDescriptionTo(this) }
                 }
             }
             if (serviceList.isNotEmpty()) {
-                appendNewElement("serviceList").apply {
+                append("serviceList").apply {
                     serviceList.forEach { it.appendDescriptionTo(this) }
                 }
             }
             if (deviceList.isNotEmpty()) {
-                appendNewElement("deviceList").apply {
+                append("deviceList").apply {
                     deviceList.forEach { it.appendDescriptionTo(this) }
                 }
             }

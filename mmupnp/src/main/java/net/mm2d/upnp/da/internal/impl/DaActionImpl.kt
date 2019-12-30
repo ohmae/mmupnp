@@ -8,7 +8,7 @@
 package net.mm2d.upnp.da.internal.impl
 
 import net.mm2d.upnp.common.internal.property.ActionProperty
-import net.mm2d.upnp.common.util.appendNewElement
+import net.mm2d.upnp.common.util.append
 import net.mm2d.upnp.da.DaAction
 import net.mm2d.upnp.da.DaArgument
 import net.mm2d.upnp.da.DaService
@@ -26,10 +26,10 @@ class DaActionImpl(
         argumentList.find { it.name == name }
 
     override fun appendDescriptionTo(parent: Element) {
-        parent.appendNewElement("action").apply {
-            appendNewElement("name", name)
+        parent.append("action").apply {
+            append("name", name)
             if (argumentList.isEmpty()) return@apply
-            appendNewElement("argumentList").apply {
+            append("argumentList").apply {
                 argumentList.forEach {
                     it.appendDescriptionTo(this)
                 }

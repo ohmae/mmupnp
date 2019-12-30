@@ -8,7 +8,7 @@
 package net.mm2d.upnp.da.internal.impl
 
 import net.mm2d.upnp.common.internal.property.ArgumentProperty
-import net.mm2d.upnp.common.util.appendNewElement
+import net.mm2d.upnp.common.util.append
 import net.mm2d.upnp.da.DaArgument
 import net.mm2d.upnp.da.DaStateVariable
 import org.w3c.dom.Element
@@ -21,10 +21,10 @@ class DaArgumentImpl(
     override val isInputDirection: Boolean = property.isInputDirection
 
     override fun appendDescriptionTo(parent: Element) {
-        parent.appendNewElement("argument").apply {
-            appendNewElement("name", name)
-            appendNewElement("direction", if (isInputDirection) "in" else "out")
-            appendNewElement("relatedStateVariable", relatedStateVariable.name)
+        parent.append("argument").apply {
+            append("name", name)
+            append("direction", if (isInputDirection) "in" else "out")
+            append("relatedStateVariable", relatedStateVariable.name)
         }
     }
 
