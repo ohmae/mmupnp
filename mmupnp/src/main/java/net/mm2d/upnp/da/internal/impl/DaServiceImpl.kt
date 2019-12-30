@@ -21,7 +21,7 @@ class DaServiceImpl(
     property: ServiceProperty,
     override val actionList: List<DaActionImpl>,
     override val stateVariableList: List<DaStateVariableImpl>
-) : DaService, DescriptionAppendable {
+) : DaService, XmlAppendable {
     init {
         check(stateVariableList.isNotEmpty()) { "service shall have >= 1 state variable" }
     }
@@ -40,8 +40,8 @@ class DaServiceImpl(
     override fun findStateVariable(name: String?): DaStateVariable? =
         stateVariableList.find { it.name == name }
 
-    override fun appendDescriptionTo(parent: Element) {
-        parent.append("service").apply {
+    override fun appendTo(parent: Element) {
+        parent.append("service") {
             append("serviceType", serviceType)
             append("serviceId", serviceId)
             append("SCPDURL", scpdUrl)
@@ -50,29 +50,18 @@ class DaServiceImpl(
         }
     }
 
-    fun createDescription(): String {
-        val document = XmlUtils.newDocument(false)
-        document.append("scpd").apply {
-            setAttribute("xmlns", "urn:schemas-upnp-org:service-1-0")
-            append("specVersion").apply {
-                append("major", "1")
-                append("minor", "0")
-            }
-            if (actionList.isNotEmpty()) {
-                append("actionList").apply {
-                    actionList.forEach {
-                        it.appendDescriptionTo(this)
-                    }
+    fun createDescription(): String =
+        XmlUtils.newDocument(false).also {
+            it.append("scpd") {
+                setAttribute("xmlns", "urn:schemas-upnp-org:service-1-0")
+                append("specVersion") {
+                    append("major", "1")
+                    append("minor", "0")
                 }
+                append(actionList, "actionList")
+                append(stateVariableList, "serviceStateTable")
             }
-            append("serviceStateTable").apply {
-                stateVariableList.forEach {
-                    it.appendDescriptionTo(this)
-                }
-            }
-        }
-        return document.toXml()
-    }
+        }.toXml()
 
     companion object {
         fun create(

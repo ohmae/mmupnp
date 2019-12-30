@@ -164,11 +164,8 @@ internal class ActionInvokeDelegate(
      * @receiver Element of action
      * @param arguments Arguments
      */
-    private fun Element.setArgument(arguments: List<Pair<String, String?>>) {
-        arguments.forEach {
-            append(it.first, it.second)
-        }
-    }
+    private fun Element.setArgument(arguments: List<Pair<String, String?>>): Unit =
+        arguments.forEach { append(it.first, it.second ?: "") }
 
     /**
      * Create SOAP Action XML up to ActionElement.

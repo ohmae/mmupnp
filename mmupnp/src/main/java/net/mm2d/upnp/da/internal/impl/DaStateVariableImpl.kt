@@ -9,13 +9,14 @@ package net.mm2d.upnp.da.internal.impl
 
 import net.mm2d.upnp.common.internal.property.StateVariableProperty
 import net.mm2d.upnp.common.util.append
+import net.mm2d.upnp.common.util.appendIfNotNull
 import net.mm2d.upnp.da.DaStateVariable
 import net.mm2d.upnp.da.DaStateVariable.AllowedValueRange
 import org.w3c.dom.Element
 
 class DaStateVariableImpl(
     property: StateVariableProperty
-) : DaStateVariable, DescriptionAppendable {
+) : DaStateVariable, XmlAppendable {
     override val isSendEvents: Boolean = property.isSendEvents
     override val isMulticast: Boolean = property.isMulticast
     override val name: String = property.name
@@ -30,33 +31,25 @@ class DaStateVariableImpl(
         )
     }
 
-    override fun appendDescriptionTo(parent: Element) {
-        parent.append("stateVariable").apply {
+    override fun appendTo(parent: Element) {
+        parent.append("stateVariable") {
             setAttribute("sendEvents", if (isSendEvents) "yes" else "no")
             if (isMulticast) {
                 setAttribute("multicast", "yes")
             }
             append("name", name)
             append("dataType", dataType)
-            if (defaultValue != null) {
-                append("defaultValue", defaultValue)
-            }
-            if (allowedValueList.isNotEmpty()) {
-                append("allowedValueList").apply {
-                    allowedValueList.forEach {
-                        append("allowedValue", it)
-                    }
-                }
-            }
-            allowedValueRange?.let { allowedValueRange ->
-                append("allowedValueRange").apply {
-                    append("minimum", allowedValueRange.minimum)
-                    append("maximum", allowedValueRange.maximum)
-                    allowedValueRange.step?.let { step ->
-                        append("step", step)
-                    }
-                }
-            }
+            appendIfNotNull("defaultValue", defaultValue)
+            append(allowedValueList, "allowedValueList", "allowedValue")
+            allowedValueRange?.appendTo(this)
+        }
+    }
+
+    private fun AllowedValueRange.appendTo(parent: Element) {
+        parent.append("allowedValueRange") {
+            append("minimum", minimum)
+            append("maximum", maximum)
+            step?.let { append("step", it) }
         }
     }
 

@@ -16,12 +16,12 @@ import org.w3c.dom.Element
 class DaArgumentImpl(
     property: ArgumentProperty,
     override val relatedStateVariable: DaStateVariable
-) : DaArgument, DescriptionAppendable {
+) : DaArgument, XmlAppendable {
     override val name: String = property.name
     override val isInputDirection: Boolean = property.isInputDirection
 
-    override fun appendDescriptionTo(parent: Element) {
-        parent.append("argument").apply {
+    override fun appendTo(parent: Element) {
+        parent.append("argument") {
             append("name", name)
             append("direction", if (isInputDirection) "in" else "out")
             append("relatedStateVariable", relatedStateVariable.name)

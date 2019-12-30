@@ -162,18 +162,7 @@ inline fun NamedNodeMap.forEach(action: (Node) -> Unit): Unit = iterator().forEa
  */
 fun NamedNodeMap.asIterable(): Iterable<Node> = Iterable { iterator() }
 
-/**
- * Create new element and add to receiver document.
- *
- * @receiver Document
- * @param namespaceUri The namespace URI of the element to create.
- * @param qualifiedName The qualified name of the element to create.
- * @return New element
- */
-@Throws(DOMException::class)
-fun Document.appendWithNs(namespaceUri: String?, qualifiedName: String): Element =
-    createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
-
+private fun Node.asDocument(): Document = if (this is Document) this else ownerDocument
 /**
  * Create new element with namespace and add to receiver node.
  *
@@ -184,7 +173,7 @@ fun Document.appendWithNs(namespaceUri: String?, qualifiedName: String): Element
  */
 @Throws(DOMException::class)
 fun Node.appendWithNs(namespaceUri: String?, qualifiedName: String): Element =
-    ownerDocument.createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
+    asDocument().createElementNS(namespaceUri, qualifiedName).also { appendChild(it) }
 
 /**
  * Create new element with namespace and add to receiver node.
@@ -202,24 +191,25 @@ fun Node.appendWithNs(namespaceUri: String?, qualifiedName: String, textContent:
 /**
  * Create new element and add to receiver node.
  *
- * @receiver Document
- * @param tagName The name of the element to create.
- * @return New element
- */
-@Throws(DOMException::class)
-fun Document.append(tagName: String): Element =
-    createElement(tagName).also { appendChild(it) }
-
-/**
- * Create new element and add to receiver node.
- *
  * @receiver Parent node
  * @param tagName The name of the element to create.
  * @return New element
  */
 @Throws(DOMException::class)
 fun Node.append(tagName: String): Element =
-    ownerDocument.createElement(tagName).also { appendChild(it) }
+    asDocument().createElement(tagName).also { appendChild(it) }
+
+/**
+ * Create new element and add to receiver node.
+ *
+ * @receiver Parent node
+ * @param tagName The name of the element to create.
+ * @param block block for created element.
+ * @return New element
+ */
+@Throws(DOMException::class)
+fun Node.append(tagName: String, block: Element.() -> Unit): Element =
+    append(tagName).apply(block)
 
 /**
  * Create new element with text content and add to receiver node.
@@ -230,8 +220,22 @@ fun Node.append(tagName: String): Element =
  * @return New element
  */
 @Throws(DOMException::class)
-fun Node.append(tagName: String, textContent: String?): Element =
+fun Node.append(tagName: String, textContent: String): Element =
     append(tagName).also { it.textContent = textContent }
+
+/**
+ * Create new element with text content and add to receiver node, if text content is not null.
+ *
+ * @receiver Parent node
+ * @param tagName The name of the element to create.
+ * @param textContent Text content the element to create.
+ * @return New element
+ */
+@Throws(DOMException::class)
+fun Node.appendIfNotNull(tagName: String, textContent: String?): Element? {
+    textContent ?: return null
+    return append(tagName).also { it.textContent = textContent }
+}
 
 /**
  * Convert XML Document to String.

@@ -22,7 +22,7 @@ class DaDeviceImpl(
     override val iconList: List<DaIconImpl>,
     override val serviceList: List<DaServiceImpl>,
     override val deviceList: List<DaDeviceImpl>
-) : DaDevice, DescriptionAppendable {
+) : DaDevice, XmlAppendable {
     init {
         serviceList.forEach { it.device = this }
         deviceList.forEach { it.parent = this }
@@ -72,41 +72,28 @@ class DaDeviceImpl(
                 .mapNotNull { it.findDeviceByTypeRecursively(deviceType) }
                 .firstOrNull()
 
-    fun createDescription(): String {
-        val document = XmlUtils.newDocument(true)
-        document.append("root").apply {
-            setAttribute("xmlns", "urn:schemas-upnp-org:device-1-0")
-            append("specVersion").apply {
-                append("major", "1")
-                append("minor", "0")
+    fun createDescription(): String =
+        XmlUtils.newDocument(true).also {
+            it.append("root") {
+                setAttribute("xmlns", "urn:schemas-upnp-org:device-1-0")
+                append("specVersion") {
+                    append("major", "1")
+                    append("minor", "0")
+                }
+                appendTo(this)
             }
-            appendDescriptionTo(this)
-        }
-        return document.toXml()
-    }
+        }.toXml()
 
-    override fun appendDescriptionTo(parent: Element) {
-        parent.append("device").apply {
+    override fun appendTo(parent: Element) {
+        parent.append("device") {
             property.tagMap.forEach { namespaceEntry ->
                 namespaceEntry.value.forEach {
                     appendWithNs(namespaceEntry.key, it.key, it.value)
                 }
             }
-            if (iconList.isNotEmpty()) {
-                append("iconList").apply {
-                    iconList.forEach { it.appendDescriptionTo(this) }
-                }
-            }
-            if (serviceList.isNotEmpty()) {
-                append("serviceList").apply {
-                    serviceList.forEach { it.appendDescriptionTo(this) }
-                }
-            }
-            if (deviceList.isNotEmpty()) {
-                append("deviceList").apply {
-                    deviceList.forEach { it.appendDescriptionTo(this) }
-                }
-            }
+            append(iconList, "iconList")
+            append(serviceList, "serviceList")
+            append(deviceList, "deviceList")
         }
     }
 

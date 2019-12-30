@@ -14,7 +14,7 @@ import org.w3c.dom.Element
 
 class DaIconImpl(
     property: IconProperty
-) : DaIcon, DescriptionAppendable {
+) : DaIcon, XmlAppendable {
     override val mimeType: String = property.mimeType
     override val width: Int = property.width
     override val height: Int = property.height
@@ -22,8 +22,8 @@ class DaIconImpl(
     override val url: String = property.url
     override val binary: ByteArray? = null
 
-    override fun appendDescriptionTo(parent: Element) {
-        parent.append("icon").apply {
+    override fun appendTo(parent: Element) {
+        parent.append("icon") {
             append("mimeType", mimeType)
             append("width", width.toString())
             append("height", height.toString())

@@ -17,7 +17,7 @@ import org.w3c.dom.Element
 class DaActionImpl(
     property: ActionProperty,
     override val argumentList: List<DaArgumentImpl>
-) : DaAction, DescriptionAppendable {
+) : DaAction, XmlAppendable {
     override val name: String = property.name
     override lateinit var service: DaService
         internal set
@@ -25,15 +25,10 @@ class DaActionImpl(
     override fun findArgument(name: String): DaArgument? =
         argumentList.find { it.name == name }
 
-    override fun appendDescriptionTo(parent: Element) {
-        parent.append("action").apply {
+    override fun appendTo(parent: Element) {
+        parent.append("action") {
             append("name", name)
-            if (argumentList.isEmpty()) return@apply
-            append("argumentList").apply {
-                argumentList.forEach {
-                    it.appendDescriptionTo(this)
-                }
-            }
+            append(argumentList, "argumentList")
         }
     }
 
