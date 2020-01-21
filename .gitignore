@@ -1,14 +1,10 @@
-/.settings
-/bin
 *.iml
-*.class
-.classpath
-.project
-/target
-/.gradle
+.gradle
 /local.properties
 /.idea
 /build
+/captures
+.externalNativeBuild
 .DS_Store
 .DS_Store?
 ._*
