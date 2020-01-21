@@ -34,7 +34,7 @@ class SubscribeServiceHolderTest {
         taskExecutors.terminate()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun start_stop_でロックしない() {
         val subscribeHolder = SubscribeServiceHolder(taskExecutors)
         subscribeHolder.start()
@@ -106,7 +106,7 @@ class SubscribeServiceHolderTest {
         assertThat(subscribeHolder.getService(id2)).isNull()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun expire_時間経過で削除される() {
         val id1 = "id1"
         val service1: Service = mockk(relaxed = true)
@@ -136,7 +136,7 @@ class SubscribeServiceHolderTest {
         subscribeHolder.stop()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun renew_定期的にrenewが実行される() {
         val service1: Service = mockk(relaxed = true)
         every { service1.renewSubscribeSync() } returns true
@@ -159,7 +159,7 @@ class SubscribeServiceHolderTest {
         subscribeHolder.stop()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun renew_失敗したら削除される() {
         val id = "id"
         val service: Service = mockk(relaxed = true)

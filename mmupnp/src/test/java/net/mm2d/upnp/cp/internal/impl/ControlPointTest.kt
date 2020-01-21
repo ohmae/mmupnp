@@ -59,14 +59,14 @@ class ControlPointTest {
             )
         }
 
-        @Test(timeout = 10000L)
+        @Test(timeout = 60000L)
         fun initialize_terminate() {
             val cp = ControlPointFactory.create()
             cp.initialize()
             cp.terminate()
         }
 
-        @Test(timeout = 10000L)
+        @Test(timeout = 60000L)
         fun initialize_initialize_terminate() {
             val cp = ControlPointFactory.create()
             cp.initialize()
@@ -74,7 +74,7 @@ class ControlPointTest {
             cp.terminate()
         }
 
-        @Test(timeout = 10000L)
+        @Test(timeout = 60000L)
         fun initialize_terminate_intercept() {
             val thread = Thread {
                 val cp = ControlPointFactory.create()
@@ -87,13 +87,13 @@ class ControlPointTest {
             thread.join()
         }
 
-        @Test(timeout = 10000L)
+        @Test(timeout = 60000L)
         fun terminate() {
             val cp = ControlPointFactory.create()
             cp.terminate()
         }
 
-        @Test(timeout = 10000L)
+        @Test(timeout = 60000L)
         fun start_stop() {
             val cp = ControlPointFactory.create()
             cp.initialize()
@@ -102,7 +102,7 @@ class ControlPointTest {
             cp.terminate()
         }
 
-        @Test(timeout = 10000L)
+        @Test(timeout = 60000L)
         fun start_stop2() {
             val cp = ControlPointFactory.create()
             cp.initialize()
@@ -112,7 +112,7 @@ class ControlPointTest {
             cp.terminate()
         }
 
-        @Test(timeout = 10000L)
+        @Test(timeout = 60000L)
         fun start_stop_with_multicast_eventing() {
             val multicastEventReceiverList: MulticastEventReceiverList = mockk(relaxed = true)
             val factory: DiFactory = mockk(relaxed = true)
@@ -130,7 +130,7 @@ class ControlPointTest {
             verify(exactly = 1) { multicastEventReceiverList.stop() }
         }
 
-        @Test(timeout = 10000L)
+        @Test(timeout = 60000L)
         fun start_stop_illegal() {
             val cp = ControlPointFactory.create()
             cp.start()

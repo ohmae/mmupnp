@@ -65,14 +65,14 @@ class EventReceiverTest {
         taskExecutors.terminate()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun open_close_デッドロックしない() {
         val receiver = EventReceiver(mockk(relaxed = true), mockk())
         receiver.start()
         receiver.stop()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun close_open前なら即終了() {
         val receiver = EventReceiver(mockk(relaxed = true), mockk())
         receiver.stop()
@@ -99,7 +99,7 @@ class EventReceiverTest {
         assertThat(receiver.getLocalPort()).isEqualTo(0)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun onEventReceived_イベントの値が取得できること() {
         val baos = ByteArrayOutputStream()
         val bais = ByteArrayInputStream(notifyRequest)
@@ -144,7 +144,7 @@ class EventReceiverTest {
         assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun onEventReceived_Failedが返る1() {
         val baos = ByteArrayOutputStream()
         val bais = ByteArrayInputStream(failRequest)
@@ -179,7 +179,7 @@ class EventReceiverTest {
         assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_PRECON_FAILED)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun onEventReceived_BadRequestが返る() {
         val baos = ByteArrayOutputStream()
         val bais = ByteArrayInputStream(badRequest)
@@ -213,7 +213,7 @@ class EventReceiverTest {
         assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_BAD_REQUEST)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun stop() {
         val baos = ByteArrayOutputStream()
         val bais = ByteArrayInputStream(notifyRequest)

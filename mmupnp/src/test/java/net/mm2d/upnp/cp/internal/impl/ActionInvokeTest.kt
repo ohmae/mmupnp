@@ -606,7 +606,7 @@ class ActionInvokeTest {
         Thread.sleep(200)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun invokeAsync_success() {
         every { action.invokeSync(any(), any()) } returns emptyMap()
         runBlocking {
@@ -614,7 +614,7 @@ class ActionInvokeTest {
         }
     }
 
-    @Test(timeout = 10000L, expected = IOException::class)
+    @Test(timeout = 60000L, expected = IOException::class)
     fun invokeAsync_exception() {
         every { action.invokeSync(any(), any()) } throws IOException()
         runBlocking {
@@ -622,7 +622,7 @@ class ActionInvokeTest {
         }
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun invokeCustomAsync_success() {
         every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
         runBlocking {

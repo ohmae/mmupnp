@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
 class ThreadWorkQueueTest {
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun executeInParallel_プロセッサ数まで並列化が可能() {
         val processorsCount = NUMBER_OF_PROCESSORS
         val queue = ThreadWorkQueue()
@@ -47,7 +47,7 @@ class ThreadWorkQueueTest {
         assertThat(remain).hasSize(0)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun executeInParallel_プロセッサ数を超えるタスクを積むとあまりがQueueに積まれる() {
         val processorsCount = NUMBER_OF_PROCESSORS
         val queue = ThreadWorkQueue()
@@ -73,7 +73,7 @@ class ThreadWorkQueueTest {
         assertThat(remain).hasSize(1)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun executeInParallel_プロセッサ数未満のスレッドでアイドルスレッドが使用されスレッド数が増えないこと() {
         val queue = ThreadWorkQueue()
         val executor = ThreadPoolExecutor(
@@ -93,7 +93,7 @@ class ThreadWorkQueueTest {
         executor.shutdownNow()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun executeInParallel_プロセッサ数未満のスレッドでアイドルスレッドが使用されスレッド数が増えないこと2() {
         val queue = ThreadWorkQueue()
         val executor = ThreadPoolExecutor(
@@ -118,7 +118,7 @@ class ThreadWorkQueueTest {
         executor.shutdownNow()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun executeInParallel_スレッド増減の確認() {
         val queue = ThreadWorkQueue()
         val executor = ThreadPoolExecutor(
@@ -143,7 +143,7 @@ class ThreadWorkQueueTest {
         executor.shutdownNow()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun executeInParallel_プロセッサ数を大幅に超えるタスクを積んでも破綻しない() {
         val processorsCount = NUMBER_OF_PROCESSORS
         val queue = ThreadWorkQueue()
@@ -167,7 +167,7 @@ class ThreadWorkQueueTest {
         executor.shutdownNow()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun executeInParallel_shutdownNow後にexecuteしてもRejectedExecutionExceptionは発生しない() {
         val queue = ThreadWorkQueue()
         val executor = ThreadPoolExecutor(
@@ -181,7 +181,7 @@ class ThreadWorkQueueTest {
         verify(inverse = true) { runnable.run() }
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun executeInParallel_shutdown後にexecuteしてもRejectedExecutionExceptionは発生しない() {
         val queue = ThreadWorkQueue()
         val executor = ThreadPoolExecutor(
@@ -195,7 +195,7 @@ class ThreadWorkQueueTest {
         verify(inverse = true) { runnable.run() }
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun fixedThreadPool() {
         val processorsCount = NUMBER_OF_PROCESSORS
         val queue = ThreadWorkQueue()

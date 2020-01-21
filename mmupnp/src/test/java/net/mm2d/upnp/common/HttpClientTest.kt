@@ -265,7 +265,7 @@ class HttpClientTest {
         }
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun post_Redirectが無限ループしない() {
         val server = HttpServerMock()
         server.open()

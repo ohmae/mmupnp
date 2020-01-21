@@ -49,7 +49,7 @@ class SsdpServerDelegateTest {
         taskExecutors.terminate()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun start_stop_デッドロックしない() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpServerDelegate(taskExecutors, IP_V4, networkInterface)
@@ -58,7 +58,7 @@ class SsdpServerDelegateTest {
         server.stop()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun stop_デッドロックしない() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = SsdpServerDelegate(taskExecutors, IP_V4, networkInterface)
@@ -177,7 +177,7 @@ class SsdpServerDelegateTest {
         verify(exactly = 1) { receiver.invoke(address, packetData, data.size) }
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun ReceiveTask_スレッド内の処理_port0() {
         val socket = spyk(object : MulticastSocket() {
             @Throws(IOException::class)
@@ -214,7 +214,7 @@ class SsdpServerDelegateTest {
         verify(inverse = true) { socket.leaveGroup(any()) }
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun ReceiveTask_スレッド内の処理_port_non0() {
         val socket = spyk(object : MulticastSocket() {
             @Throws(IOException::class)
@@ -251,7 +251,7 @@ class SsdpServerDelegateTest {
         verify(exactly = 1) { socket.leaveGroup(any()) }
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun ReceiveTask_receiveLoop_exceptionが発生してもループを続ける() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, IP_V4, networkInterface))
@@ -277,7 +277,7 @@ class SsdpServerDelegateTest {
         verify(inverse = true) { receiver.invoke(any(), any(), any()) }
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 60000L)
     fun ReceiveTask_run_exceptionが発生したらループを抜ける() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, IP_V4, networkInterface))
