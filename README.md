@@ -11,6 +11,15 @@
 
 Universal Plug and Play (UPnP) ControlPoint library for Java / Kotlin.
 
+## Status
+
+The this branch is under development for 4.0.0.
+The next major update will change the structure significantly.
+Therefore, this branch may undergo repeated breaking changes and sometimes become inoperable.
+
+The latest release version is 3.1.1.
+If you want to see the 3.x.x source code, access to [support/3.x.x](https://github.com/ohmae/mmupnp/tree/support/3.x.x) branch.
+
 ## Feature
 
 - Pure Kotlin implementation.
