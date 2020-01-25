@@ -292,41 +292,6 @@ object Http {
     fun isHttpUrl(url: String?): Boolean = url?.startsWith(HTTP_SCHEME, true) == true
 
     /**
-     * Delete the query attached to the URL.
-     *
-     * @param url URL
-     * @return URL without query
-     */
-    private fun removeQuery(url: String): String = url.substringBefore('?')
-
-    /**
-     * Create URL from BaseURL and absolute path.
-     *
-     * @param baseUrl BaseURL
-     * @param path Absolute path
-     * @return Combined URL
-     */
-    private fun makeUrlWithAbsolutePath(baseUrl: String, path: String): String {
-        val pos = baseUrl.indexOf('/', HTTP_SCHEME.length)
-        return if (pos < 0) baseUrl + path else baseUrl.substring(0, pos) + path
-    }
-
-    /**
-     * Create URL from BaseURL and relative path.
-     *
-     * @param baseUrl BaseURL
-     * @param path Relative path
-     * @return Combined URL
-     */
-    private fun makeUrlWithRelativePath(baseUrl: String, path: String): String {
-        if (baseUrl.endsWith("/")) {
-            return baseUrl + path
-        }
-        val pos = baseUrl.lastIndexOf('/')
-        return if (pos > HTTP_SCHEME.length) baseUrl.substring(0, pos + 1) + path else "$baseUrl/$path"
-    }
-
-    /**
      * Add ScopeID to URL.
      *
      * @param urlString String URL
@@ -368,22 +333,12 @@ object Http {
         false
     }
 
-    private fun makeAbsoluteUrl(baseUrl: String, url: String): String {
-        if (url.isHttpUrl()) {
-            return url
-        }
-        val base = removeQuery(baseUrl)
-        return if (url.startsWith("/")) {
-            makeUrlWithAbsolutePath(base, url)
-        } else makeUrlWithRelativePath(base, url)
-    }
-
     /**
      * Normalize URL information.
      *
      * URL has the following variations
      *
-     * - Complete URL starting with "http: //"
+     * - Complete URL starting with "http://"
      * - Absolute path starting with "/"
      * - Relative path starting from other than "/"
      *
@@ -411,7 +366,7 @@ object Http {
      */
     @Throws(MalformedURLException::class)
     fun makeAbsoluteUrl(baseUrl: String, url: String, scopeId: Int): URL =
-        makeUrlWithScopeId(makeAbsoluteUrl(baseUrl, url), scopeId)
+        makeUrlWithScopeId(URL(URL(baseUrl), url).toString(), scopeId)
 }
 
 /**
