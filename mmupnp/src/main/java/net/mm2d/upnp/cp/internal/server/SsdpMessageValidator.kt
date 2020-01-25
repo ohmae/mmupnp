@@ -8,8 +8,8 @@
 package net.mm2d.upnp.cp.internal.server
 
 import net.mm2d.log.Logger
-import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.SsdpMessage
+import net.mm2d.upnp.common.isHttpUrl
 import java.io.IOException
 import java.net.InetAddress
 import java.net.URL
@@ -30,7 +30,7 @@ internal fun SsdpMessage.hasInvalidLocation(sourceAddress: InetAddress): Boolean
 
 private fun SsdpMessage.hasValidLocation(sourceAddress: InetAddress): Boolean {
     val location = location ?: return false
-    if (!Http.isHttpUrl(location)) return false
+    if (!location.isHttpUrl()) return false
     try {
         return sourceAddress == InetAddress.getByName(URL(location).host)
     } catch (ignored: IOException) {
