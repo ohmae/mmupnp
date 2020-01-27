@@ -17,13 +17,22 @@ import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.MalformedURLException
+import java.net.URL
 
 internal class DescriptionServer(
     private val taskExecutors: TaskExecutors,
     private val delegate: TcpServerDelegate = TcpServerDelegate(taskExecutors, "-description-server")
 ) : TcpServer by delegate {
+
+    private val methodMap: MutableMap<String, MutableMap<String, (HttpRequest) -> HttpResponse>> = mutableMapOf()
+
     init {
         delegate.setClientProcess(::process)
+    }
+
+    fun registerCallback(method: String, path: String, callback: (HttpRequest) -> HttpResponse) {
+        methodMap.getOrPut(method) { mutableMapOf() }[path] = callback
     }
 
     @Throws(IOException::class)
@@ -36,13 +45,25 @@ internal class DescriptionServer(
     }
 
     private fun makeResponse(request: HttpRequest): HttpResponse {
-        if (request.getMethod() != Http.GET) {
+        val uri = request.getUri()
+        if (!uri.startsWith(Http.HTTP_SCHEME) && uri[0] != '/') {
             return RESPONSE_BAD
+        }
+        try {
+            return onRequest(URL(LOCALHOST, uri).path, request)
+        } catch (e: MalformedURLException) {
         }
         return RESPONSE_BAD
     }
 
+    private fun onRequest(path: String, request: HttpRequest): HttpResponse {
+        val pathMap = methodMap[request.getMethod()] ?: return RESPONSE_BAD
+        val callback = pathMap[path] ?: return RESPONSE_NOT_FOUND
+        return callback(request)
+    }
+
     companion object {
+        private val LOCALHOST: URL = URL("http://localhost")
         private val RESPONSE_BAD = HttpResponse.create().apply {
             setStatus(Http.Status.HTTP_BAD_REQUEST)
             setHeader(Http.SERVER, Property.SERVER_VALUE)
