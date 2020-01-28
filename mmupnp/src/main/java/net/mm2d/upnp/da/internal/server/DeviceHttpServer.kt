@@ -20,7 +20,7 @@ import java.io.OutputStream
 import java.net.MalformedURLException
 import java.net.URL
 
-internal class DescriptionServer(
+internal class DeviceHttpServer(
     private val taskExecutors: TaskExecutors,
     private val delegate: TcpServerDelegate = TcpServerDelegate(taskExecutors, "-description-server")
 ) : TcpServer by delegate {
