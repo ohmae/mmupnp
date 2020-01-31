@@ -89,10 +89,19 @@ object Http {
     const val BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG"
     /** number used for caching description information */
     const val CONFIGID_UPNP_ORG = "CONFIGID.UPNP.ORG"
+    /** new BOOTID value that the device will use in subsequent announcements */
+    const val NEXTBOOTID_UPNP_ORG = "NEXTBOOTID.UPNP.ORG"
     /** number identifies port on which device responds to unicast M-SEARCH */
     const val SEARCHPORT_UPNP_ORG = "SEARCHPORT.UPNP.ORG"
     /** a base URL with "https:" */
     const val SECURELOCATION_UPNP_ORG = "SECURELOCATION.UPNP.ORG"
+    /** a device replies to a TCP port on the control point. */
+    const val TCPPORT_UPNP_ORG = "TCPPORT.UPNP.ORG"
+    /** friendly name of the control point */
+    const val CPFN_UPNP_ORG = "CPFN.UPNP.ORG"
+    /** uuid of the control point */
+    const val CPUUID_UPNP_ORG = "CPUUID.UPNP.ORG"
+
     /** SOAPACTION */
     const val SOAPACTION = "SOAPACTION"
     /** Notification Type: upnp:event */
