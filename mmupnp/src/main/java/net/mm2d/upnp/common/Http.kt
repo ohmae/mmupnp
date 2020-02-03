@@ -119,6 +119,8 @@ object Http {
     const val POST = "POST"
     /** Method name of NOTIFY */
     const val NOTIFY = "NOTIFY"
+    /** Method name of NOTIFY */
+    const val M_SEARCH = "M-SEARCH"
 
     /** Default Http port */
     const val DEFAULT_PORT = 80

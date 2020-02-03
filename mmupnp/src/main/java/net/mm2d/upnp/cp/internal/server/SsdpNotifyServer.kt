@@ -8,6 +8,7 @@
 package net.mm2d.upnp.cp.internal.server
 
 import net.mm2d.log.Logger
+import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.ServerConst
 import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.internal.message.SsdpRequest
@@ -66,7 +67,7 @@ internal class SsdpNotifyServer(
 
             if (message.shouldNotAccept()) return
             // ignore M-SEARCH packet
-            if (message.getMethod() == SsdpMessage.M_SEARCH) return
+            if (message.getMethod() == Http.M_SEARCH) return
             if (message.isNotUpnp()) return
             // ByeBye accepts it regardless of address problems because it does not communicate
             if (message.nts != SsdpMessage.SSDP_BYEBYE &&

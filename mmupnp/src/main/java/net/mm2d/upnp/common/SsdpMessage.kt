@@ -109,14 +109,6 @@ interface SsdpMessage {
 
     companion object {
         /**
-         * Request method of M-SEARCH
-         */
-        const val M_SEARCH = "M-SEARCH"
-        /**
-         * Request method of NOTIFY
-         */
-        const val NOTIFY = "NOTIFY"
-        /**
          * NTS: ssdp:alive
          */
         const val SSDP_ALIVE = "ssdp:alive"

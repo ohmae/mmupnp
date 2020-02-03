@@ -14,7 +14,7 @@ import net.mm2d.upnp.common.SsdpMessage
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal interface SsdpServer: Server {
+internal interface SsdpServer : Server {
     /**
      * Send a message using this socket.
      *

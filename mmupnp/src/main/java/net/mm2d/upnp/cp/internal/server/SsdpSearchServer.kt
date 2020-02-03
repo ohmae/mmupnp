@@ -52,7 +52,7 @@ internal class SsdpSearchServer(
 
     private fun makeSearchMessage(st: String): SsdpRequest =
         SsdpRequest.create().also {
-            it.setMethod(SsdpMessage.M_SEARCH)
+            it.setMethod(Http.M_SEARCH)
             it.setUri("*")
             it.setHeader(Http.HOST, delegate.getSsdpAddressString())
             it.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER)
