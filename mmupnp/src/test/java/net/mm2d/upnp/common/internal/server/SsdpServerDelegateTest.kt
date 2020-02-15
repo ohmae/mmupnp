@@ -91,7 +91,7 @@ class SsdpServerDelegateTest {
         every { server.createMulticastSocket(any()) } returns socket
 
         val message = SsdpRequest.create()
-        message.setMethod(SsdpMessage.M_SEARCH)
+        message.setMethod(Http.M_SEARCH)
         message.setUri("*")
         message.setHeader(Http.HOST, server.getSsdpAddressString())
         message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER)
@@ -113,7 +113,7 @@ class SsdpServerDelegateTest {
         every { server.createMulticastSocket(any()) } returns socket
 
         val message = SsdpRequest.create()
-        message.setMethod(SsdpMessage.M_SEARCH)
+        message.setMethod(Http.M_SEARCH)
         message.setUri("*")
         message.setHeader(Http.HOST, server.getSsdpAddressString())
         message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER)
@@ -143,7 +143,7 @@ class SsdpServerDelegateTest {
         every { socket.send(any()) } throws IOException()
 
         val message = SsdpRequest.create()
-        message.setMethod(SsdpMessage.M_SEARCH)
+        message.setMethod(Http.M_SEARCH)
         message.setUri("*")
         message.setHeader(Http.HOST, server.getSsdpAddressString())
         message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER)

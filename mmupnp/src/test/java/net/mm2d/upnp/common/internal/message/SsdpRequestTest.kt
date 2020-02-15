@@ -38,7 +38,7 @@ internal object SsdpRequestTest {
         @Test
         fun buildUp_所望のバイナリに変換できる() {
             val message = SsdpRequest.create()
-            message.setMethod(SsdpMessage.M_SEARCH)
+            message.setMethod(Http.M_SEARCH)
             message.setUri("*")
             message.setHeader(Http.HOST, Address.IP_V4.ssdpAddressString)
             message.setHeader(Http.MAN, SsdpMessage.SSDP_DISCOVER)
@@ -104,7 +104,7 @@ internal object SsdpRequestTest {
     class Notifyメッセージ {
         @Theory
         fun getMethod_NOTIFYであること(message: SsdpRequest) {
-            assertThat(message.getMethod()).isEqualTo(SsdpMessage.NOTIFY)
+            assertThat(message.getMethod()).isEqualTo(Http.NOTIFY)
         }
 
         @Theory
