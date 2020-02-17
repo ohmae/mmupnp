@@ -370,7 +370,7 @@ class ControlPointTest {
     class ネットワーク未使用 {
         private lateinit var cp: ControlPointImpl
         private val ssdpSearchServerList: SsdpSearchServerList = mockk(relaxed = true)
-        private val ssdpNotifyServerList: SsdpNotifyServerList = mockk(relaxed = true)
+        private val ssdpNotifyReceiverList: SsdpNotifyReceiverList = mockk(relaxed = true)
         private val taskExecutors: TaskExecutors = mockk(relaxed = true)
         private val diFactory = spyk(DiFactory())
         private val subscribeManager = spyk(SubscribeManagerImpl(taskExecutors, mockk(relaxed = true), diFactory))
@@ -379,7 +379,7 @@ class ControlPointTest {
         fun setUp() {
             val factory = spyk(DiFactory())
             every { factory.createSsdpSearchServerList(any(), any(), any()) } returns ssdpSearchServerList
-            every { factory.createSsdpNotifyServerList(any(), any(), any()) } returns ssdpNotifyServerList
+            every { factory.createSsdpNotifyReceiverList(any(), any(), any()) } returns ssdpNotifyReceiverList
             every { factory.createSubscribeManager(any(), any(), any()) } returns subscribeManager
             cp = spyk(
                 ControlPointImpl(
@@ -867,7 +867,7 @@ class ControlPointTest {
         private val loadingDeviceMap = spyk(HashMap<String, DeviceImpl.Builder>())
         private lateinit var deviceHolder: DeviceHolder
         private val ssdpSearchServerList: SsdpSearchServerList = mockk(relaxed = true)
-        private val ssdpNotifyServerList: SsdpNotifyServerList = mockk(relaxed = true)
+        private val ssdpNotifyReceiverList: SsdpNotifyReceiverList = mockk(relaxed = true)
         private lateinit var responseListener: (SsdpMessage) -> Unit
         private lateinit var notifyListener: (SsdpMessage) -> Unit
 
@@ -887,9 +887,9 @@ class ControlPointTest {
                 responseListener = arg(2)
                 ssdpSearchServerList
             }
-            every { factory.createSsdpNotifyServerList(any(), any(), any()) } answers {
+            every { factory.createSsdpNotifyReceiverList(any(), any(), any()) } answers {
                 notifyListener = arg(2)
-                ssdpNotifyServerList
+                ssdpNotifyReceiverList
             }
             every { factory.createSubscribeManager(any(), any(), any()) } answers {
                 spyk(SubscribeManagerImpl(arg(1), arg(2), factory)).also { subscribeManager = it }
@@ -952,7 +952,7 @@ class ControlPointTest {
         fun setUp() {
             val factory = spyk(DiFactory())
             every { factory.createSsdpSearchServerList(any(), any(), any()) } returns mockk(relaxed = true)
-            every { factory.createSsdpNotifyServerList(any(), any(), any()) } returns mockk(relaxed = true)
+            every { factory.createSsdpNotifyReceiverList(any(), any(), any()) } returns mockk(relaxed = true)
             every { factory.createSubscribeManager(any(), any(), any()) } answers {
                 spyk(SubscribeManagerImpl(arg(1), arg(2), factory)).also { subscribeManager = it }
             }
@@ -1082,15 +1082,15 @@ class ControlPointTest {
     class SsdpMessageFilterのテスト {
         private lateinit var cp: ControlPointImpl
         private lateinit var ssdpMessage: SsdpMessage
-        private val receiverList: MutableList<SsdpNotifyServer> = mutableListOf()
+        private val receiverList: MutableList<SsdpNotifyReceiver> = mutableListOf()
         private val serverList: MutableList<SsdpSearchServer> = mutableListOf()
 
         @Before
         fun setUp() {
-            mockkObject(SsdpNotifyServerList.Companion)
+            mockkObject(SsdpNotifyReceiverList.Companion)
             mockkObject(SsdpSearchServerList.Companion)
-            every { SsdpNotifyServerList.newServer(any(), any(), any(), any()) } answers {
-                mockk<SsdpNotifyServer>(relaxed = true).also { receiverList += it }
+            every { SsdpNotifyReceiverList.newServer(any(), any(), any(), any()) } answers {
+                mockk<SsdpNotifyReceiver>(relaxed = true).also { receiverList += it }
             }
             every { SsdpSearchServerList.newServer(any(), any(), any(), any()) } answers {
                 mockk<SsdpSearchServer>(relaxed = true).also { serverList += it }
@@ -1112,7 +1112,7 @@ class ControlPointTest {
 
         @After
         fun teardown() {
-            unmockkObject(SsdpNotifyServerList.Companion)
+            unmockkObject(SsdpNotifyReceiverList.Companion)
             unmockkObject(SsdpSearchServerList.Companion)
         }
 

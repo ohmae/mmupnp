@@ -15,17 +15,17 @@ import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import java.net.NetworkInterface
 
 /**
- * Class for putting together [SsdpNotifyServer] for all interfaces.
+ * Class for putting together [SsdpNotifyReceiver] for all interfaces.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal class SsdpNotifyServerList(
+internal class SsdpNotifyReceiverList(
     taskExecutors: TaskExecutors,
     protocol: Protocol,
     interfaces: Iterable<NetworkInterface>,
     listener: (SsdpMessage) -> Unit
 ) {
-    private val list: List<SsdpNotifyServer> = interfaces.createServerList(protocol,
+    private val list: List<SsdpNotifyReceiver> = interfaces.createServerList(protocol,
         { newServer(taskExecutors, Address.IP_V4, it, listener) },
         { newServer(taskExecutors, Address.IP_V6, it, listener) }
     )
@@ -46,8 +46,8 @@ internal class SsdpNotifyServerList(
             address: Address,
             nif: NetworkInterface,
             listener: (SsdpMessage) -> Unit
-        ): SsdpNotifyServer? = try {
-            SsdpNotifyServer(taskExecutors, address, nif).also {
+        ): SsdpNotifyReceiver? = try {
+            SsdpNotifyReceiver(taskExecutors, address, nif).also {
                 it.setNotifyListener(listener)
             }
         } catch (e: IllegalArgumentException) {

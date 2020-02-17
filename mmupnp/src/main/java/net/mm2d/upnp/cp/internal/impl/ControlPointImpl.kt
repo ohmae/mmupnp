@@ -27,7 +27,7 @@ import net.mm2d.upnp.cp.internal.message.FakeSsdpMessage
 import net.mm2d.upnp.cp.internal.parser.DeviceLoader
 import net.mm2d.upnp.cp.internal.server.DEFAULT_SSDP_MESSAGE_FILTER
 import net.mm2d.upnp.cp.internal.server.MulticastEventReceiverList
-import net.mm2d.upnp.cp.internal.server.SsdpNotifyServerList
+import net.mm2d.upnp.cp.internal.server.SsdpNotifyReceiverList
 import net.mm2d.upnp.cp.internal.server.SsdpSearchServerList
 import java.net.Inet4Address
 import java.net.Inet6Address
@@ -54,7 +54,7 @@ internal class ControlPointImpl(
     private val eventListenerSet: MutableSet<EventListener>
     private val multicastEventListenerSet: MutableSet<MulticastEventListener>
     private val searchServerList: SsdpSearchServerList
-    private val notifyServerList: SsdpNotifyServerList
+    private val notifyReceiverList: SsdpNotifyReceiverList
     private val deviceMap: MutableMap<String, Device>
     private val loadingDeviceMap: MutableMap<String, Builder>
     private val initialized = AtomicBoolean()
@@ -77,10 +77,10 @@ internal class ControlPointImpl(
         searchServerList = factory.createSsdpSearchServerList(taskExecutors, interfaces) { message ->
             taskExecutors.io { onReceiveSsdpMessage(message) }
         }
-        notifyServerList = factory.createSsdpNotifyServerList(taskExecutors, interfaces) { message ->
+        notifyReceiverList = factory.createSsdpNotifyReceiverList(taskExecutors, interfaces) { message ->
             taskExecutors.io { onReceiveSsdpMessage(message) }
         }
-        notifyServerList.setSegmentCheckEnabled(notifySegmentCheckEnabled)
+        notifyReceiverList.setSegmentCheckEnabled(notifySegmentCheckEnabled)
         deviceHolder = factory.createDeviceHolder(taskExecutors) { lostDevice(it) }
         subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, ::onReceiveEvent)
         multicastEventReceiverList = if (multicastEventingEnabled) {
@@ -232,7 +232,7 @@ internal class ControlPointImpl(
         multicastEventReceiverList?.start()
         subscribeManager.start()
         searchServerList.start()
-        notifyServerList.start()
+        notifyReceiverList.start()
     }
 
     override fun stop() {
@@ -242,7 +242,7 @@ internal class ControlPointImpl(
         multicastEventReceiverList?.stop()
         subscribeManager.stop()
         searchServerList.stop()
-        notifyServerList.stop()
+        notifyReceiverList.stop()
         deviceList.forEach { lostDevice(it) }
         deviceHolder.clear()
     }
@@ -261,7 +261,7 @@ internal class ControlPointImpl(
     override fun setSsdpMessageFilter(predicate: ((SsdpMessage) -> Boolean)?) {
         val predicateNonNull = predicate ?: DEFAULT_SSDP_MESSAGE_FILTER
         searchServerList.setFilter(predicateNonNull)
-        notifyServerList.setFilter(predicateNonNull)
+        notifyReceiverList.setFilter(predicateNonNull)
     }
 
     override fun setIconFilter(filter: IconFilter?) {

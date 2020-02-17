@@ -24,7 +24,7 @@ import java.net.*
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal class SsdpNotifyServer(
+internal class SsdpNotifyReceiver(
     private val delegate: SsdpServerDelegate
 ) : SsdpServer by delegate {
     private var notifyListener: ((SsdpMessage) -> Unit)? = null
@@ -66,13 +66,11 @@ internal class SsdpNotifyServer(
             Logger.v { "receive ssdp notify from $sourceAddress in ${delegate.getLocalAddress()}:\n$message" }
 
             if (message.shouldNotAccept()) return
-            // ignore M-SEARCH packet
-            if (message.getMethod() == Http.M_SEARCH) return
+            // receive only Notify method
+            if (message.getMethod() != Http.NOTIFY) return
             if (message.isNotUpnp()) return
             // ByeBye accepts it regardless of address problems because it does not communicate
-            if (message.nts != SsdpMessage.SSDP_BYEBYE &&
-                message.hasInvalidLocation(sourceAddress)
-            ) return
+            if (message.nts != SsdpMessage.SSDP_BYEBYE && message.hasInvalidLocation(sourceAddress)) return
 
             notifyListener?.invoke(message)
         } catch (ignored: IOException) {
