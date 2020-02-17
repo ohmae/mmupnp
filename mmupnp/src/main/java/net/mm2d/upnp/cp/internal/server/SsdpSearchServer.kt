@@ -36,7 +36,7 @@ internal class SsdpSearchServer(
         address: Address,
         ni: NetworkInterface
     ) : this(SsdpServerDelegate(taskExecutors, address, ni)) {
-        delegate.setReceiver { sourceAddress, data, length -> onReceive(sourceAddress, data, length) }
+        delegate.setReceiver(::onReceive)
     }
 
     fun setResponseListener(listener: ((SsdpMessage) -> Unit)?) {
