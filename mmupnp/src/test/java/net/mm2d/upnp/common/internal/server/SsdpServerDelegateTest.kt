@@ -108,7 +108,7 @@ class SsdpServerDelegateTest {
     fun send_socketから送信される() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, IP_V4, networkInterface))
-        server.setReceiver { _, _, _ -> }
+        server.setReceiver { _, _, _, _ -> }
         val socket = spyk(MockMulticastSocket())
         every { server.createMulticastSocket(any()) } returns socket
 
@@ -162,8 +162,8 @@ class SsdpServerDelegateTest {
         val address = InetAddress.getByName("192.0.2.2")
 
         val socket = MockMulticastSocket()
-        socket.setReceiveData(address, data, 0)
-        val receiver: (InetAddress, ByteArray, Int) -> Unit = mockk(relaxed = true)
+        socket.setReceiveData(address, 0, data, 0)
+        val receiver: (InetAddress, Int, ByteArray, Int) -> Unit = mockk(relaxed = true)
         val delegate = spyk(SsdpServerDelegate(taskExecutors, IP_V4, networkInterface))
         delegate.setReceiver(receiver)
         every { delegate.createMulticastSocket(any()) } returns socket
@@ -174,7 +174,7 @@ class SsdpServerDelegateTest {
 
         val packetData = ByteArray(1500)
         System.arraycopy(data, 0, packetData, 0, data.size)
-        verify(exactly = 1) { receiver.invoke(address, packetData, data.size) }
+        verify(exactly = 1) { receiver.invoke(address, 0, packetData, data.size) }
     }
 
     @Test(timeout = 60000L)
@@ -255,7 +255,7 @@ class SsdpServerDelegateTest {
     fun ReceiveTask_receiveLoop_exceptionが発生してもループを続ける() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val server = spyk(SsdpServerDelegate(taskExecutors, IP_V4, networkInterface))
-        val receiver: (InetAddress, ByteArray, Int) -> Unit = mockk(relaxed = true)
+        val receiver: (InetAddress, Int, ByteArray, Int) -> Unit = mockk(relaxed = true)
         server.setReceiver(receiver)
         val socket = spyk(object : MulticastSocket() {
             private var count: Int = 0
@@ -274,7 +274,7 @@ class SsdpServerDelegateTest {
         server.start()
         Thread.sleep(500)
         verify(exactly = 2) { socket.receive(any()) }
-        verify(inverse = true) { receiver.invoke(any(), any(), any()) }
+        verify(inverse = true) { receiver.invoke(any(), any(), any(), any()) }
     }
 
     @Test(timeout = 60000L)

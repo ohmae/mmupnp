@@ -59,7 +59,8 @@ internal class SsdpSearchServer(
         }
 
     // VisibleForTesting
-    internal fun onReceive(sourceAddress: InetAddress, data: ByteArray, length: Int) {
+    @Suppress("UNUSED_PARAMETER")
+    internal fun onReceive(sourceAddress: InetAddress, sourcePort: Int, data: ByteArray, length: Int) {
         try {
             val message = SsdpResponse.create(delegate.getLocalAddress(), data, length)
             Logger.v { "receive ssdp search response from $sourceAddress to ${delegate.getLocalAddress()}:\n$message" }

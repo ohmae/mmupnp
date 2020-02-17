@@ -58,7 +58,7 @@ class SsdpNotifyReceiverTest {
 
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
         val address = InetAddress.getByName("192.0.2.2")
-        receiver.onReceive(address, data, data.size)
+        receiver.onReceive(address, 0, data, data.size)
 
         assertThat(slot.captured.uuid).isEqualTo("uuid:01234567-89ab-cdef-0123-456789abcdef")
     }
@@ -73,7 +73,7 @@ class SsdpNotifyReceiverTest {
         receiver.setNotifyListener(listener)
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
 
-        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), 0, data, data.size)
 
         verify(exactly = 1) { listener.invoke(any()) }
     }
@@ -89,7 +89,7 @@ class SsdpNotifyReceiverTest {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
         receiver.setFilter { false }
 
-        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -102,7 +102,7 @@ class SsdpNotifyReceiverTest {
         every { receiver.interfaceAddress } returns address
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
 
-        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), 0, data, data.size)
     }
 
     @Test
@@ -116,7 +116,7 @@ class SsdpNotifyReceiverTest {
         receiver.setSegmentCheckEnabled(true)
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
 
-        receiver.onReceive(InetAddress.getByName("192.1.2.2"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.1.2.2"), 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -139,7 +139,7 @@ class SsdpNotifyReceiverTest {
         message.setHeader(Http.ST, SsdpSearchServer.ST_ALL)
         val data = message.message.getMessageString().toByteArray()
 
-        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -155,7 +155,7 @@ class SsdpNotifyReceiverTest {
 
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-byebye0.bin")
 
-        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), 0, data, data.size)
 
         verify(exactly = 1) { listener.invoke(any()) }
     }
@@ -170,7 +170,7 @@ class SsdpNotifyReceiverTest {
         receiver.setNotifyListener(listener)
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
 
-        receiver.onReceive(InetAddress.getByName("192.0.2.3"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.0.2.3"), 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -185,7 +185,7 @@ class SsdpNotifyReceiverTest {
         receiver.setNotifyListener(listener)
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive-telepathy.bin")
 
-        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -201,7 +201,7 @@ class SsdpNotifyReceiverTest {
         receiver.setNotifyListener(listener)
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
 
-        receiver.onReceive(InetAddress.getByName("192.0.2.2"), data, data.size)
+        receiver.onReceive(InetAddress.getByName("192.0.2.2"), 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }

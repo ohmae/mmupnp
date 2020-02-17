@@ -41,10 +41,10 @@ internal class SsdpServerDelegate(
         else
             networkInterface.findInet6Address()
     private var socket: MulticastSocket? = null
-    private var receiver: ((sourceAddress: InetAddress, data: ByteArray, length: Int) -> Unit)? = null
+    private var receiver: ((sourceAddress: InetAddress, sourcePort: Int, data: ByteArray, length: Int) -> Unit)? = null
     private val threadCondition = ThreadCondition(taskExecutors.server)
 
-    fun setReceiver(receiver: ((sourceAddress: InetAddress, data: ByteArray, length: Int) -> Unit)?) {
+    fun setReceiver(receiver: ((sourceAddress: InetAddress, sourcePort: Int, data: ByteArray, length: Int) -> Unit)?) {
         this.receiver = receiver
     }
 
@@ -126,7 +126,7 @@ internal class SsdpServerDelegate(
                 val dp = DatagramPacket(buf, buf.size)
                 socket.receive(dp)
                 if (threadCondition.isCanceled()) break
-                receiver?.invoke(dp.address, dp.data, dp.length)
+                receiver?.invoke(dp.address, dp.port, dp.data, dp.length)
             } catch (ignored: SocketTimeoutException) {
             }
         }

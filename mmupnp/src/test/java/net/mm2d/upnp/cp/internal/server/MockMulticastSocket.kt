@@ -14,6 +14,7 @@ class MockMulticastSocket : MulticastSocket() {
     var sendPacket: DatagramPacket? = null
         private set
     private var _inetAddress: InetAddress? = null
+    private var _port: Int = 0
     private var receiveData: ByteArray? = null
     private var wait: Long = 0
 
@@ -38,8 +39,9 @@ class MockMulticastSocket : MulticastSocket() {
         sendPacket = p
     }
 
-    fun setReceiveData(address: InetAddress, data: ByteArray, wait: Long) {
+    fun setReceiveData(address: InetAddress, port: Int, data: ByteArray, wait: Long) {
         _inetAddress = address
+        _port = port
         receiveData = data
         this.wait = wait
     }
@@ -63,6 +65,7 @@ class MockMulticastSocket : MulticastSocket() {
         System.arraycopy(receiveData, 0, p.data, 0, receiveData.size)
         p.length = receiveData.size
         p.address = _inetAddress
+        p.port = _port
         this.receiveData = null
     }
 }

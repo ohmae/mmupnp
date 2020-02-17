@@ -33,6 +33,10 @@ internal class SsdpResponse(
     override fun toString(): String = delegate.toString()
 
     companion object {
+        fun create(): SsdpResponse = HttpResponse.create().let {
+            SsdpResponse(it, SsdpMessageDelegate(it))
+        }
+
         @Throws(IOException::class)
         fun create(address: InetAddress, data: ByteArray, length: Int): SsdpResponse =
             HttpResponse.create().apply {

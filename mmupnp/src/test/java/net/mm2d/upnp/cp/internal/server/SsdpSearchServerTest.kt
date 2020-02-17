@@ -101,7 +101,7 @@ class SsdpSearchServerTest {
         val listener: (SsdpMessage) -> Unit = mockk(relaxed = true)
         every { listener.invoke(capture(slot)) } answers { nothing }
         server.setResponseListener(listener)
-        server.onReceive(address, data, data.size)
+        server.onReceive(address, 0, data, data.size)
 
         val response = slot.captured
         assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
@@ -117,7 +117,7 @@ class SsdpSearchServerTest {
         val address = InetAddress.getByName("192.0.2.2")
         val data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin")
 
-        server.onReceive(address, data, data.size)
+        server.onReceive(address, 0, data, data.size)
 
         verify(exactly = 1) { listener.invoke(any()) }
     }
@@ -132,7 +132,7 @@ class SsdpSearchServerTest {
         val data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin")
         server.setFilter { false }
 
-        server.onReceive(address, data, data.size)
+        server.onReceive(address, 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -146,7 +146,7 @@ class SsdpSearchServerTest {
         val address = InetAddress.getByName("192.0.2.3")
         val data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin")
 
-        server.onReceive(address, data, data.size)
+        server.onReceive(address, 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -160,7 +160,7 @@ class SsdpSearchServerTest {
         val address = InetAddress.getByName("192.0.2.2")
         val data = TestUtils.getResourceAsByteArray("ssdp-search-response-telepathy.bin")
 
-        server.onReceive(address, data, data.size)
+        server.onReceive(address, 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -174,7 +174,7 @@ class SsdpSearchServerTest {
         val address = InetAddress.getByName("192.0.2.2")
         val data = ByteArray(0)
 
-        server.onReceive(address, data, data.size)
+        server.onReceive(address, 0, data, data.size)
 
         verify(inverse = true) { listener.invoke(any()) }
     }
@@ -187,6 +187,6 @@ class SsdpSearchServerTest {
         val address = InetAddress.getByName("192.0.2.2")
         val data = TestUtils.getResourceAsByteArray("ssdp-search-response0.bin")
 
-        server.onReceive(address, data, data.size)
+        server.onReceive(address, 0, data, data.size)
     }
 }

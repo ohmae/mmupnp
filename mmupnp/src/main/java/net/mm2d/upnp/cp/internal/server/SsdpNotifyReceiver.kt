@@ -39,9 +39,7 @@ internal class SsdpNotifyReceiver(
         address: Address,
         ni: NetworkInterface
     ) : this(SsdpServerDelegate(taskExecutors, address, ni, ServerConst.SSDP_PORT)) {
-        delegate.setReceiver { sourceAddress, data, length ->
-            onReceive(sourceAddress, data, length)
-        }
+        delegate.setReceiver(::onReceive)
     }
 
     fun setSegmentCheckEnabled(enabled: Boolean) {
@@ -57,7 +55,8 @@ internal class SsdpNotifyReceiver(
     }
 
     // VisibleForTesting
-    internal fun onReceive(sourceAddress: InetAddress, data: ByteArray, length: Int) {
+    @Suppress("UNUSED_PARAMETER")
+    internal fun onReceive(sourceAddress: InetAddress, sourcePort: Int, data: ByteArray, length: Int) {
         if (sourceAddress.isInvalidAddress(delegate.address, interfaceAddress, segmentCheckEnabled)) {
             return
         }
