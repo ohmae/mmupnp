@@ -14,6 +14,7 @@ import net.mm2d.upnp.common.Protocol
 import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.internal.message.SsdpRequest
 import net.mm2d.upnp.common.internal.message.SsdpResponse
+import net.mm2d.upnp.common.internal.server.DEFAULT_SSDP_MESSAGE_FILTER
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.common.util.NetworkUtils
 import net.mm2d.upnp.cp.Adapter.discoveryListener
