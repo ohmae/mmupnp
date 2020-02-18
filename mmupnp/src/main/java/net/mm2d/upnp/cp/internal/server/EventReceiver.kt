@@ -38,9 +38,7 @@ internal class EventReceiver(
 
     @Throws(IOException::class)
     private fun receiveAndReply(inputStream: InputStream, outputStream: OutputStream) {
-        val request = HttpRequest.create().apply {
-            readData(inputStream)
-        }
+        val request = HttpRequest.create(inputStream)
         Logger.v { "receive event:\n$request" }
         val nt = request.getHeader(Http.NT)
         val nts = request.getHeader(Http.NTS)

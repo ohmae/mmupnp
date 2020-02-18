@@ -119,8 +119,7 @@ class HttpRequestTest {
         request.writeData(baos)
 
         val bais = ByteArrayInputStream(baos.toByteArray())
-        val readRequest = HttpRequest.create()
-        readRequest.readData(bais)
+        val readRequest = HttpRequest.create(bais)
 
         assertThat(readRequest.startLine).isEqualTo(request.startLine)
         assertThat(readRequest.getBody()).isEqualTo(request.getBody())

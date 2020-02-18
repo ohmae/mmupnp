@@ -88,9 +88,7 @@ internal class MulticastEventReceiver(
 
     // VisibleForTesting
     internal fun onReceive(data: ByteArray, length: Int) {
-        val request = HttpRequest.create().apply {
-            readData(ByteArrayInputStream(data, 0, length))
-        }
+        val request = HttpRequest.create(ByteArrayInputStream(data, 0, length))
         if (request.getHeader(Http.NT) != Http.UPNP_EVENT) return
         if (request.getHeader(Http.NTS) != Http.UPNP_PROPCHANGE) return
         val lvl = request.getHeader(Http.LVL)

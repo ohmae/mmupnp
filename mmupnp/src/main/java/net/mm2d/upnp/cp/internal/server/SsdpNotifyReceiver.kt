@@ -28,7 +28,7 @@ internal class SsdpNotifyReceiver(
     private val delegate: SsdpServerDelegate
 ) : SsdpServer by delegate {
     private var listener: ((SsdpMessage) -> Unit)? = null
-    private var segmentCheckEnabled: Boolean = false
+    private var segmentCheckEnabled: Boolean = true
     private var shouldNotAccept: SsdpMessage.() -> Boolean = { false }
     // VisibleForTesting
     internal val interfaceAddress: InterfaceAddress

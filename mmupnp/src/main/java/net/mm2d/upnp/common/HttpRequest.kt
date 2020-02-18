@@ -11,6 +11,7 @@ import net.mm2d.upnp.common.internal.message.HttpMessageDelegate
 import net.mm2d.upnp.common.internal.message.HttpMessageDelegate.StartLineDelegate
 import net.mm2d.upnp.common.util.toAddressString
 import java.io.IOException
+import java.io.InputStream
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.SocketAddress
@@ -148,6 +149,13 @@ class HttpRequest internal constructor(
             val delegate = HttpMessageDelegate(startLine)
             return HttpRequest(startLine, delegate)
         }
+
+        /**
+         * Create a new instance.
+         */
+        @JvmStatic
+        fun create(inputStream: InputStream): HttpRequest =
+            create().also { it.readData(inputStream) }
 
         /**
          * Create a new instance with the same contents as the argument.

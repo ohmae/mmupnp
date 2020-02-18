@@ -37,10 +37,7 @@ internal class DeviceHttpServer(
 
     @Throws(IOException::class)
     private fun process(inputStream: InputStream, outputStream: OutputStream) {
-        val request = HttpRequest.create().apply {
-            readData(inputStream)
-        }
-        makeResponse(request)
+        makeResponse(HttpRequest.create(inputStream))
             .writeData(outputStream)
     }
 

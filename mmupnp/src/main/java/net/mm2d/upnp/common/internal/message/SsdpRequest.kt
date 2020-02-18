@@ -36,8 +36,7 @@ internal class SsdpRequest(
 
         @Throws(IOException::class)
         fun create(address: InetAddress, data: ByteArray, length: Int): SsdpRequest =
-            HttpRequest.create().apply {
-                readData(ByteArrayInputStream(data, 0, length))
-            }.let { SsdpRequest(it, SsdpMessageDelegate(it, address)) }
+            HttpRequest.create(ByteArrayInputStream(data, 0, length))
+                .let { SsdpRequest(it, SsdpMessageDelegate(it, address)) }
     }
 }

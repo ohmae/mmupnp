@@ -28,8 +28,7 @@ class HttpClientTest {
         val responseBody = "responseBody"
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
-            request.readData(inputStream)
+            val request = HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, true)
@@ -64,8 +63,7 @@ class HttpClientTest {
         val responseBody = "responseBody".toByteArray(charset("utf-8"))
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
-            request.readData(inputStream)
+            val request = HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBodyBinary(responseBody, true)
@@ -101,8 +99,7 @@ class HttpClientTest {
         val responseBody = "responseBody"
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
-            request.readData(inputStream)
+            val request = HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, true)
@@ -139,7 +136,7 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
+            HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, true)
@@ -167,7 +164,7 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
+            HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, false)
@@ -195,7 +192,7 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
+            HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, false)
@@ -221,7 +218,7 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
+            HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, false)
@@ -248,7 +245,7 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
+            HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setStartLine("HTTP/1.1 204 No Content")
             response.setBody(responseBody, false)
@@ -271,7 +268,7 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
+            HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setHeader(Http.CONNECTION, Http.CLOSE)
             response.setStartLine("HTTP/1.1 301 Moved Permanently")
@@ -300,8 +297,7 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
-            request.readData(inputStream)
+            val request = HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setHeader(Http.CONNECTION, Http.CLOSE)
             if (request.getUri() == "/b") {
@@ -336,8 +332,7 @@ class HttpClientTest {
     fun post_Redirectのlocationがなければひとまずそのまま取得する() {
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
-            request.readData(inputStream)
+            val request = HttpRequest.create(inputStream)
             val response = HttpResponse.create()
             response.setHeader(Http.CONNECTION, Http.CLOSE)
             if (request.getUri() == "/b") {
@@ -374,7 +369,7 @@ class HttpClientTest {
     fun post_応答がなければException() {
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, _ ->
-            HttpRequest.create().readData(inputStream)
+            HttpRequest.create(inputStream)
             false
         }
         server.open()
@@ -398,7 +393,7 @@ class HttpClientTest {
     fun post_応答がなければcloseしてException() {
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, _ ->
-            HttpRequest.create().readData(inputStream)
+            HttpRequest.create(inputStream)
             false
         }
         server.open()

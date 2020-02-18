@@ -23,8 +23,7 @@ class SsdpMessageDelegateTest {
     @Test
     fun getScopeId_インターフェース指定がなければ0() {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val request = HttpRequest.create()
-        request.readData(ByteArrayInputStream(data, 0, data.size))
+        val request = HttpRequest.create(ByteArrayInputStream(data, 0, data.size))
         val delegate = SsdpMessageDelegate(request)
 
         assertThat(delegate.scopeId).isEqualTo(0)
@@ -33,8 +32,7 @@ class SsdpMessageDelegateTest {
     @Test
     fun getScopeId_インターフェースIPv4なら0() {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val request = HttpRequest.create()
-        request.readData(ByteArrayInputStream(data, 0, data.size))
+        val request = HttpRequest.create(ByteArrayInputStream(data, 0, data.size))
         val delegate =
             SsdpMessageDelegate(request, InetAddress.getByName("192.0.2.3"))
 
@@ -44,8 +42,7 @@ class SsdpMessageDelegateTest {
     @Test
     fun getScopeId_インターフェースに紐付かないIPv6なら0() {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val request = HttpRequest.create()
-        request.readData(ByteArrayInputStream(data, 0, data.size))
+        val request = HttpRequest.create(ByteArrayInputStream(data, 0, data.size))
         val delegate = SsdpMessageDelegate(
             request,
             InetAddress.getByName("fe80::a831:801b:8dc6:421f")
@@ -58,8 +55,7 @@ class SsdpMessageDelegateTest {
     fun getScopeId_インターフェースに紐付くIPv6ならその値() {
         val scopeId = 1
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val request = HttpRequest.create()
-        request.readData(ByteArrayInputStream(data, 0, data.size))
+        val request = HttpRequest.create(ByteArrayInputStream(data, 0, data.size))
         val address =
             Inet6Address.getByAddress(null, InetAddress.getByName("fe80::a831:801b:8dc6:421f").address, scopeId)
         val delegate = SsdpMessageDelegate(request, address)
