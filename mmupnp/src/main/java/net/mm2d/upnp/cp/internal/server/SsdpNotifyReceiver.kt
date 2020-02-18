@@ -27,7 +27,7 @@ import java.net.NetworkInterface
 internal class SsdpNotifyReceiver(
     private val delegate: SsdpServerDelegate
 ) : SsdpServer by delegate {
-    private var notifyListener: ((SsdpMessage) -> Unit)? = null
+    private var listener: ((SsdpMessage) -> Unit)? = null
     private var segmentCheckEnabled: Boolean = false
     private var shouldNotAccept: SsdpMessage.() -> Boolean = { false }
     // VisibleForTesting
@@ -47,7 +47,7 @@ internal class SsdpNotifyReceiver(
     }
 
     fun setNotifyListener(listener: ((SsdpMessage) -> Unit)?) {
-        notifyListener = listener
+        this.listener = listener
     }
 
     fun setFilter(predicate: (SsdpMessage) -> Boolean) {
@@ -57,6 +57,7 @@ internal class SsdpNotifyReceiver(
     // VisibleForTesting
     @Suppress("UNUSED_PARAMETER")
     internal fun onReceive(sourceAddress: InetAddress, sourcePort: Int, data: ByteArray, length: Int) {
+        val listener = listener ?: return
         if (sourceAddress.isInvalidAddress(delegate.address, interfaceAddress, segmentCheckEnabled)) {
             return
         }
@@ -71,7 +72,7 @@ internal class SsdpNotifyReceiver(
             // ByeBye accepts it regardless of address problems because it does not communicate
             if (message.nts != SsdpMessage.SSDP_BYEBYE && message.hasInvalidLocation(sourceAddress)) return
 
-            notifyListener?.invoke(message)
+            listener.invoke(message)
         } catch (ignored: IOException) {
         }
     }

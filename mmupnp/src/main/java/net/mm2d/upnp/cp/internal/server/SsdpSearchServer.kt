@@ -61,6 +61,7 @@ internal class SsdpSearchServer(
     // VisibleForTesting
     @Suppress("UNUSED_PARAMETER")
     internal fun onReceive(sourceAddress: InetAddress, sourcePort: Int, data: ByteArray, length: Int) {
+        val listener = listener ?: return
         try {
             val message = SsdpResponse.create(delegate.getLocalAddress(), data, length)
             Logger.v { "receive ssdp search response from $sourceAddress to ${delegate.getLocalAddress()}:\n$message" }
@@ -69,7 +70,7 @@ internal class SsdpSearchServer(
             if (message.isNotUpnp()) return
             if (message.hasInvalidLocation(sourceAddress)) return
 
-            listener?.invoke(message)
+            listener.invoke(message)
         } catch (ignored: IOException) {
         }
     }
