@@ -123,10 +123,11 @@ internal class SsdpServerDelegate(
         val buf = ByteArray(1500)
         while (!threadCondition.isCanceled()) {
             try {
-                val dp = DatagramPacket(buf, buf.size)
-                socket.receive(dp)
-                if (threadCondition.isCanceled()) break
-                receiver?.invoke(dp.address, dp.port, dp.data, dp.length)
+                DatagramPacket(buf, buf.size).also {
+                    socket.receive(it)
+                    if (threadCondition.isCanceled()) return
+                    receiver?.invoke(it.address, it.port, it.data, it.length)
+                }
             } catch (ignored: SocketTimeoutException) {
             }
         }
