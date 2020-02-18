@@ -21,34 +21,30 @@ internal class HttpHeaders {
      * name can only be updated if there is only a case difference
      */
     class Entry(
-        private var _name: String,
-        private var _value: String
+        _name: String,
+        _value: String
     ) {
-        constructor(original: Entry) : this(original._name, original._value)
+        constructor(original: Entry) : this(original.name, original.value)
 
-        var value: String
-            get(): String = _value
-            internal set(value) {
-                _value = value
-            }
+        var value: String = _value
+            internal set
 
-        var name: String
-            get() = _name
+        var name: String = _name
             internal set(name) {
-                require(_name.toKey() == name.toKey())
-                _name = name
+                require(field.toKey() == name.toKey())
+                field = name
             }
 
-        override fun hashCode(): Int = _name.hashCode() + _value.hashCode()
+        override fun hashCode(): Int = name.hashCode() + value.hashCode()
 
         override fun equals(other: Any?): Boolean {
             if (other == null) return false
             if (other === this) return true
             if (other !is Entry) return false
-            return _name == other._name && _value == other._value
+            return name == other.name && value == other.value
         }
 
-        override fun toString(): String = "$_name: $_value"
+        override fun toString(): String = "$name: $value"
     }
 
     private val map: MutableMap<String, Entry>
