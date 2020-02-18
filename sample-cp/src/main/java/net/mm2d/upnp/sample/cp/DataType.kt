@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.sample
+package net.mm2d.upnp.sample.cp
 
 /**
  * DataTypeを表現するenum。

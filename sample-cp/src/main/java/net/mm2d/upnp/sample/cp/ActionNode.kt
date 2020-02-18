@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.upnp.sample
+package net.mm2d.upnp.sample.cp
 
 import net.mm2d.upnp.cp.Action
 import java.awt.Component
