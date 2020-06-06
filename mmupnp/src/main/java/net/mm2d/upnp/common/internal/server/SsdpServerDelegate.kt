@@ -74,10 +74,14 @@ internal class SsdpServerDelegate(
     }
 
     override fun send(messageSupplier: () -> SsdpMessage) {
-        taskExecutors.io { sendInner(messageSupplier()) }
+        taskExecutors.io { sendInner(address.ssdpSocketAddress, messageSupplier()) }
     }
 
-    private fun sendInner(message: SsdpMessage) {
+    override fun send(destination: SocketAddress, messageSupplier: () -> SsdpMessage) {
+        taskExecutors.io { sendInner(destination, messageSupplier()) }
+    }
+
+    private fun sendInner(destination: SocketAddress, message: SsdpMessage) {
         if (!threadCondition.waitReady()) {
             Logger.w("socket is not ready")
             return
@@ -88,7 +92,7 @@ internal class SsdpServerDelegate(
             val data = ByteArrayOutputStream().also {
                 message.writeData(it)
             }.toByteArray()
-            socket.send(DatagramPacket(data, data.size, address.ssdpSocketAddress))
+            socket.send(DatagramPacket(data, data.size, destination))
         } catch (e: IOException) {
             Logger.w(e)
         }
