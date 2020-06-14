@@ -28,6 +28,13 @@ Universal Plug and Play (UPnP) ControlPoint library for Java / Kotlin.
 - This library only provides ControlPoint.
 There is no way to make Device. If you need it, please select another library.
 
+## About the next version
+
+Plan for the next version.
+- Full support for Kotlin coroutines
+- Support for ControlPoint and Device
+- Multi-module for selectable feature
+
 ## Example of use
 
 Android App
@@ -72,7 +79,7 @@ val cp = ControlPointFactory.create()
 
 `ControlPointFactory.create()` has many initialization parameters.
 
-In addition, Builder is also provided.
+In addition, Builder is also available.
 Please use them according to your preference. It is convenient when using from Java.
 
 ```kotlin
@@ -93,7 +100,7 @@ val cp = ControlPointFactory.create(
 )
 ```
 
-By default ControlPoint will work with dual stack of IPv4 and IPv6.
+By default, ControlPoint will work with the dual stack of IPv4 and IPv6.
 To operate with IPv4 only, specify the protocol,
 
 ```kotlin
