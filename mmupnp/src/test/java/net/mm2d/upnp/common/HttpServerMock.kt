@@ -125,6 +125,7 @@ class HttpServerMock {
                 socket.use {
                     val input = socket.getInputStream()
                     val output = socket.getOutputStream()
+                    @Suppress("ControlFlowWithEmptyBody")
                     while (server.receiveAndReply(socket, input, output)) {
                     }
                 }
