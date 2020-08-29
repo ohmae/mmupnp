@@ -3,7 +3,6 @@ buildscript {
     def versionMinor = 1
     def versionPatch = 1
     ext {
-        kotlin_version = "1.3.72"
         pj = [
                 versions : [
                         name: "${versionMajor}.${versionMinor}.${versionPatch}",
@@ -20,11 +19,11 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.10.1"
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:0.10.1")
 
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5"
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
+        classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
+        classpath("com.github.ben-manes:gradle-versions-plugin:0.28.0")
     }
 }
 
