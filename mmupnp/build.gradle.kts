@@ -32,18 +32,18 @@ tasks.test {
 }
 
 tasks.named<DokkaTask>("dokkaHtml") {
-    outputDirectory = "../docs"
+    outputDirectory.set(File(projectDir, "../docs"))
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.0")
-    api("net.mm2d:log:0.9.1")
+    implementation(kotlin("stdlib"))
+    api("net.mm2d:log:0.9.2")
 
     testImplementation("io.mockk:mockk:1.10.0")
     testImplementation("com.google.truth:truth:1.0.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-    testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.4.0")
-    testRuntimeOnly("net.bytebuddy:byte-buddy:1.10.10")
+    testRuntimeOnly(kotlin("reflect"))
+    testRuntimeOnly("net.bytebuddy:byte-buddy:1.10.16")
 }
 
 commonSettings()
