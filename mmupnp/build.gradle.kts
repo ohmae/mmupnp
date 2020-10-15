@@ -39,9 +39,10 @@ tasks.named<DokkaTask>("dokkaHtml") {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    api("net.mm2d:log:0.9.2")
+    api("net.mm2d:log:0.9.3")
 
-    testImplementation("io.mockk:mockk:1.10.0")
+    testImplementation("junit:junit:4.13.1")
+    testImplementation("io.mockk:mockk:1.10.2")
     testImplementation("com.google.truth:truth:1.0.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
 }
