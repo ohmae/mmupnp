@@ -11,8 +11,8 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import net.mm2d.log.DefaultSender
-import net.mm2d.log.Logger
+import net.mm2d.upnp.common.log.DefaultSender
+import net.mm2d.upnp.common.log.Logger
 import net.mm2d.upnp.common.Protocol
 import net.mm2d.upnp.cp.Adapter.discoveryListener
 import net.mm2d.upnp.cp.Adapter.eventListener

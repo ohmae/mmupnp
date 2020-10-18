@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.cp.internal.manager
 
-import net.mm2d.log.Logger
+import net.mm2d.upnp.common.log.Logger
 import net.mm2d.upnp.common.internal.thread.TaskExecutors
 import net.mm2d.upnp.cp.Service
 import net.mm2d.upnp.cp.internal.impl.DiFactory

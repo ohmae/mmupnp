@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.cp.internal.impl
 
-import net.mm2d.log.Logger
+import net.mm2d.upnp.common.log.Logger
 import net.mm2d.upnp.common.HttpClient
 import net.mm2d.upnp.common.Protocol
 import net.mm2d.upnp.common.SsdpMessage

@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.common.internal.server
 
-import net.mm2d.log.Logger
+import net.mm2d.upnp.common.log.Logger
 import net.mm2d.upnp.common.SsdpMessage
 import net.mm2d.upnp.common.isHttpUrl
 import java.io.IOException

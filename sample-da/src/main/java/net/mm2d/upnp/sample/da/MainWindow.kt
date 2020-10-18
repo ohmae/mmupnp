@@ -10,8 +10,8 @@ package net.mm2d.upnp.sample.da
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import net.mm2d.log.DefaultSender
-import net.mm2d.log.Logger
+import net.mm2d.upnp.common.log.DefaultSender
+import net.mm2d.upnp.common.log.Logger
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.JFrame

@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.common.internal.message
 
-import net.mm2d.log.Logger
+import net.mm2d.upnp.common.log.Logger
 import net.mm2d.upnp.common.Http
 import net.mm2d.upnp.common.HttpMessage
 import java.io.*
