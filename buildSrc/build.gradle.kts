@@ -1,11 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.4.10"
+    kotlin("jvm") version "1.4.21"
     `kotlin-dsl`
 }
 
 repositories {
     jcenter()
-    maven { setUrl("https://dl.bintray.com/kotlin/kotlin-eap") }
 }
 
 dependencies {
