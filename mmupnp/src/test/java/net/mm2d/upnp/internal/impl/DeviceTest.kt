@@ -116,9 +116,12 @@ class DeviceTest {
             val device = builder.build()
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive1.bin")
             val message = SsdpRequest.create(mockk(relaxed = true), data, data.size)
+
+            assertThat(device.expireTime).isEqualTo(ssdpMessage.expireTime)
             device.updateSsdpMessage(message)
 
             assertThat(device.ssdpMessage).isEqualTo(message)
+            assertThat(device.expireTime).isEqualTo(message.expireTime)
         }
 
         @Test
