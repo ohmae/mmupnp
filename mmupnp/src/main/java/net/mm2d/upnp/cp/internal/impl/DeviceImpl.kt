@@ -41,8 +41,10 @@ internal class DeviceImpl(
 
     override var ssdpMessage: SsdpMessage = ssdpMessage
         private set
-    override val expireTime: Long = ssdpMessage.expireTime
-    override val scopeId: Int = ssdpMessage.scopeId
+    override val expireTime: Long
+        get() = ssdpMessage.expireTime
+    override val scopeId: Int
+        get() = ssdpMessage.scopeId
     override var location: String = location
         private set
     override val baseUrl: String
