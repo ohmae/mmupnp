@@ -105,7 +105,7 @@ internal class DeviceHolder(
         if (deviceMap.isEmpty()) {
             return
         }
-        val mostRecentExpireTime = deviceMap.values.map { it.expireTime }.min() ?: 0L
+        val mostRecentExpireTime = deviceMap.values.map { it.expireTime }.minOrNull() ?: 0L
         val duration = mostRecentExpireTime - System.currentTimeMillis() + MARGIN_TIME
         val sleep = maxOf(duration, MARGIN_TIME) // avoid negative value
         condition.await(sleep, TimeUnit.MILLISECONDS)

@@ -150,7 +150,7 @@ internal class SubscribeServiceHolder(
      * @return Next time to scan
      */
     private fun findMostRecentTime(): Long =
-        subscriptionMap.values.minBy { it.getNextScanTime() }?.getNextScanTime() ?: 0L
+        subscriptionMap.values.minByOrNull { it.getNextScanTime() }?.getNextScanTime() ?: 0L
 
     companion object {
         private val MIN_INTERVAL = TimeUnit.SECONDS.toMillis(1)

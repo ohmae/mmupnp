@@ -49,7 +49,6 @@ class ArgumentProperty(
             }
             val relatedStateVariable = stateVariableList.find { it.name == relatedStateVariableName }
                 ?: repairInvalidFormatAndGet(relatedStateVariableName, stateVariableList)
-                ?: error("$relatedStateVariableName not found in serviceStateTable.")
             return ArgumentProperty(
                 name = name,
                 isInputDirection = isInputDirection,
