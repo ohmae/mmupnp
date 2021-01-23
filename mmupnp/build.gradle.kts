@@ -41,8 +41,8 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     testImplementation("junit:junit:4.13.1")
-    testImplementation("io.mockk:mockk:1.10.3")
-    testImplementation("com.google.truth:truth:1.1")
+    testImplementation("io.mockk:mockk:1.10.5")
+    testImplementation("com.google.truth:truth:1.1.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
 }
 
