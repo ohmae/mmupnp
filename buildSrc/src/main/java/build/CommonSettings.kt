@@ -7,7 +7,6 @@ fun Project.commonSettings() {
     sourcesJarSettings()
     uploadArchivesSettings()
     publishingSettings()
-    bintraySettings()
     jacocoSettings()
     dependencyUpdatesSettings()
 }
