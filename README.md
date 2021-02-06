@@ -57,6 +57,8 @@ I described Javadoc/KDoc comments. Please refer to it for more information.
 
 ## How to use
 
+*jCenter will close in May. I am currently considering migrating to another hosting service. Please wait.*
+
 Download from jCenter.
 Add dependencies, such as the following.
 
