@@ -310,7 +310,7 @@ Please see [log library](https://github.com/ohmae/log) for more details
 - [Kotlin](https://kotlinlang.org/)
   - org.jetbrains.kotlin:kotlin-stdlib-jdk7
 - [log](https://github.com/ohmae/log)
-  - net.mm2d:log
+  - net.mm2d.log:log
 
 ## Special thanks
 
