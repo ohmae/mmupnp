@@ -8,6 +8,6 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
     implementation("com.github.ben-manes:gradle-versions-plugin:0.36.0")
 }

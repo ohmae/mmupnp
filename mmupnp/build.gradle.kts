@@ -47,6 +47,16 @@ tasks.create("javadocJar", Jar::class) {
     from(File(buildDir, "docs/javadoc"))
 }
 
+tasks.create("sourcesJar", Jar::class) {
+    dependsOn("classes")
+    archiveClassifier.set("sources")
+    from(sourceSets["main"].allSource)
+}
+
+artifacts {
+    archives(tasks.named<Jar>("sourcesJar"))
+}
+
 dependencies {
     implementation(kotlin("stdlib"))
     api("net.mm2d.log:log:0.9.4")
@@ -57,4 +67,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
 }
 
-commonSettings()
+uploadArchivesSettings()
+publishingSettings()
+jacocoSettings()
+dependencyUpdatesSettings()

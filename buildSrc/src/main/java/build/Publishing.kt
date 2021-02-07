@@ -1,6 +1,5 @@
-package build.internal
+package build
 
-import build.ProjectProperties
 import groovy.util.Node
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.NamedDomainObjectProvider
@@ -36,7 +35,7 @@ fun Project.signing(configure: SigningExtension.() -> Unit): Unit =
 val Project.publishing: PublishingExtension
     get() = (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
 
-internal fun Project.publishingSettings() {
+fun Project.publishingSettings() {
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
