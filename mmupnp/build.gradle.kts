@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.dokka")
     maven
     `maven-publish`
-    id("com.jfrog.bintray")
+    signing
     jacoco
     id("com.github.ben-manes.versions")
 }
@@ -37,13 +37,37 @@ tasks.named<DokkaTask>("dokkaHtml") {
     outputDirectory.set(File(projectDir, "../docs"))
 }
 
+tasks.named<DokkaTask>("dokkaJavadoc") {
+    outputDirectory.set(File(buildDir, "docs/javadoc"))
+}
+
+tasks.create("javadocJar", Jar::class) {
+    dependsOn("dokkaJavadoc")
+    archiveClassifier.set("javadoc")
+    from(File(buildDir, "docs/javadoc"))
+}
+
+tasks.create("sourcesJar", Jar::class) {
+    dependsOn("classes")
+    archiveClassifier.set("sources")
+    from(sourceSets["main"].allSource)
+}
+
+artifacts {
+    archives(tasks.named<Jar>("sourcesJar"))
+}
+
 dependencies {
     implementation(kotlin("stdlib"))
+    api("net.mm2d.log:log:0.9.4")
 
-    testImplementation("junit:junit:4.13.1")
-    testImplementation("io.mockk:mockk:1.10.5")
-    testImplementation("com.google.truth:truth:1.1.1")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.10.6")
+    testImplementation("com.google.truth:truth:1.1.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
 }
 
-commonSettings()
+uploadArchivesSettings()
+publishingSettings()
+jacocoSettings()
+dependencyUpdatesSettings()

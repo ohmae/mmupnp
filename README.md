@@ -6,8 +6,7 @@
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/issues)
 [![Build Status](https://travis-ci.org/ohmae/mmupnp.svg?branch=develop)](https://travis-ci.org/ohmae/mmupnp)
 [![codecov](https://codecov.io/gh/ohmae/mmupnp/branch/develop/graph/badge.svg)](https://codecov.io/gh/ohmae/mmupnp)
-[![Maven Repository](https://img.shields.io/badge/maven-jcenter-brightgreen.svg)](https://bintray.com/ohmae/maven/net.mm2d.mmupnp)
-[![Maven metadata URI](https://img.shields.io/maven-metadata/v/https/jcenter.bintray.com/net/mm2d/mmupnp/maven-metadata.xml.svg)](https://bintray.com/ohmae/maven/net.mm2d.mmupnp)
+![Maven Central](https://img.shields.io/maven-central/v/net.mm2d.mmupnp/mmupnp)
 
 Universal Plug and Play (UPnP) ControlPoint library for Java / Kotlin.
 
@@ -66,17 +65,33 @@ I described Javadoc/KDoc comments. Please refer to it for more information.
 
 ## How to use
 
-Download from jCenter.
-Add dependencies, such as the following.
+jCenter will close in May. In 3.1.3 moved to mavenCentral from jcenter.  
+Please note that the **groupID has changed**
+
+Download from mavenCentral. ![Maven Central](https://img.shields.io/maven-central/v/net.mm2d.mmupnp/mmupnp)
+
+```gradle
+dependencies {
+    implementation 'net.mm2d.mmupnp:mmupnp:3.1.3'
+}
+```
+
+Versions below 3.1.3 were distributed with jCenter.
+However, jCenter will close and old versions are not migrated to mavenCentral.
+If you need an older version, please use the Github Pages repository.
 
 ```gradle
 repositories {
-    jcenter()
-}
-dependencies {
-    implementation 'net.mm2d:mmupnp:3.1.1'
+    maven { url = URI("https://ohmae.github.com/maven") }
 }
 ```
+
+```gradle
+dependencies {
+    implementation 'net.mm2d.mmupnp:mmupnp:3.1.2'
+}
+```
+
 
 ### Create instance
 
@@ -304,7 +319,7 @@ Please see [log library](https://github.com/ohmae/log) for more details
 - [Kotlin](https://kotlinlang.org/)
   - org.jetbrains.kotlin:kotlin-stdlib-jdk7
 - [log](https://github.com/ohmae/log)
-  - net.mm2d:log
+  - net.mm2d.log:log
 
 ## Special thanks
 
