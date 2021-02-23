@@ -18,7 +18,8 @@ fun Project.uploadArchivesSettings() {
                 "repository"("url" to "file:$buildDir/maven")
                 "pom" {
                     "project" {
-                        setProperty("name", base.archivesBaseName)
+                        setProperty("name", ProjectProperties.name)
+                        setProperty("description", ProjectProperties.description)
                         setProperty("url", ProjectProperties.Url.site)
                         setProperty("groupId", ProjectProperties.groupId)
                         setProperty("artifactId", base.archivesBaseName)
@@ -32,6 +33,7 @@ fun Project.uploadArchivesSettings() {
                         }
                         "scm" {
                             setProperty("connection", ProjectProperties.Url.scm)
+                            setProperty("developerConnection", ProjectProperties.Url.scm)
                             setProperty("url", ProjectProperties.Url.github)
                         }
                     }
