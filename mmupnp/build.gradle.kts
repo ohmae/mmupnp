@@ -5,7 +5,6 @@ plugins {
     `java-library`
     kotlin("jvm")
     id("org.jetbrains.dokka")
-    maven
     `maven-publish`
     signing
     jacoco
@@ -62,12 +61,11 @@ dependencies {
     api("net.mm2d.log:log:0.9.4")
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.10.6")
+    testImplementation("io.mockk:mockk:1.11.0")
     testImplementation("com.google.truth:truth:1.1.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
 }
 
-uploadArchivesSettings()
 publishingSettings()
 jacocoSettings()
 dependencyUpdatesSettings()
