@@ -115,7 +115,7 @@ class HttpHeadersTest {
         header.put(name1, value1)
 
         assertThat(header[name1]).isEqualTo(value1)
-        assertThat(header[name1.toUpperCase()]).isEqualTo(value1)
+        assertThat(header[name1.uppercase(Locale.US)]).isEqualTo(value1)
     }
 
     @Test
@@ -125,7 +125,7 @@ class HttpHeadersTest {
         val value2 = "value2"
         val header = HttpHeaders()
         header.put(name1, value1)
-        header.put(name1.toUpperCase(), value2)
+        header.put(name1.uppercase(Locale.US), value2)
 
         assertThat(header[name1]).isEqualTo(value2)
     }
@@ -141,18 +141,18 @@ class HttpHeadersTest {
         header.put(name2, value2)
 
         assertThat(header[name2]).isEqualTo(value2)
-        assertThat(header.remove(name2.toUpperCase())).isEqualTo(value2)
+        assertThat(header.remove(name2.uppercase(Locale.US))).isEqualTo(value2)
         assertThat(header[name2]).isNull()
 
         assertThat(header[name1]).isEqualTo(value1)
         assertThat(header.remove(name1)).isEqualTo(value1)
         assertThat(header[name1]).isNull()
 
-        header.put(name1.toUpperCase(), value1)
-        header.put(name2.toUpperCase(), value2)
+        header.put(name1.uppercase(Locale.US), value1)
+        header.put(name2.uppercase(Locale.US), value2)
 
         assertThat(header[name2]).isEqualTo(value2)
-        assertThat(header.remove(name2.toUpperCase())).isEqualTo(value2)
+        assertThat(header.remove(name2.uppercase(Locale.US))).isEqualTo(value2)
         assertThat(header[name2]).isNull()
 
         assertThat(header[name1]).isEqualTo(value1)
@@ -185,10 +185,10 @@ class HttpHeadersTest {
         header.put(name2, value2)
 
         assertThat(header.containsValue(name1, "value")).isTrue()
-        assertThat(header.containsValue(name1.toUpperCase(), "value")).isTrue()
+        assertThat(header.containsValue(name1.uppercase(Locale.US), "value")).isTrue()
 
         assertThat(header.containsValue(name2, value1)).isFalse()
-        assertThat(header.containsValue(name2.toUpperCase(), value1)).isFalse()
+        assertThat(header.containsValue(name2.uppercase(Locale.US), value1)).isFalse()
     }
 
     @Test

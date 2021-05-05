@@ -27,7 +27,7 @@ class ExecutorFactoryTest {
         val taskExecutor = DefaultTaskExecutor(executorService)
         val command: Runnable = mockk()
 
-        Truth.assertThat(taskExecutor.execute(command)).isTrue()
+        assertThat(taskExecutor.execute(command)).isTrue()
 
         verify(exactly = 1) { executorService.execute(any()) }
     }
@@ -39,7 +39,7 @@ class ExecutorFactoryTest {
         val command: Runnable = mockk()
         every { executorService.execute(any()) } throws RejectedExecutionException()
 
-        Truth.assertThat(taskExecutor.execute(command)).isFalse()
+        assertThat(taskExecutor.execute(command)).isFalse()
     }
 
     @Test
@@ -49,7 +49,7 @@ class ExecutorFactoryTest {
         val command: Runnable = mockk()
 
         taskExecutor.terminate()
-        Truth.assertThat(taskExecutor.execute(command)).isFalse()
+        assertThat(taskExecutor.execute(command)).isFalse()
     }
 
     @Test

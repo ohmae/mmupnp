@@ -12,7 +12,6 @@ import net.mm2d.upnp.Argument
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.FlowLayout
-import java.awt.Font
 import java.io.IOException
 import javax.swing.*
 import javax.swing.text.JTextComponent

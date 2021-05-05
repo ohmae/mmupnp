@@ -163,6 +163,6 @@ internal class HttpHeaders {
     }
 
     companion object {
-        private fun String.toKey(): String = toLowerCase(Locale.US)
+        private fun String.toKey(): String = lowercase(Locale.US)
     }
 }

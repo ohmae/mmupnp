@@ -42,7 +42,7 @@ internal fun String?.parseEventXml(): List<Pair<String, String>> {
 internal const val DEFAULT_MAX_AGE = 1800
 
 internal fun HttpMessage.parseCacheControl(): Int {
-    val age = getHeader(Http.CACHE_CONTROL)?.toLowerCase(Locale.US)
+    val age = getHeader(Http.CACHE_CONTROL)?.lowercase(Locale.US)
     if (age?.startsWith("max-age") != true) {
         return DEFAULT_MAX_AGE
     }

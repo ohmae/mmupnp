@@ -19,7 +19,7 @@ internal class DefaultTaskExecutor(
     executor: ExecutorService,
     private val awaitTermination: Boolean = false
 ) : TaskExecutor {
-    private val executorReference = AtomicReference<ExecutorService?>(executor)
+    private val executorReference = AtomicReference(executor)
 
     override fun execute(task: Runnable): Boolean {
         val executor = executorReference.get() ?: return false

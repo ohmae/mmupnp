@@ -168,7 +168,7 @@ internal class SubscribeDelegate(
 
         // VisibleForTesting
         internal fun parseTimeout(response: HttpResponse): Long {
-            val timeout = response.getHeader(Http.TIMEOUT)?.toLowerCase(Locale.ENGLISH)
+            val timeout = response.getHeader(Http.TIMEOUT)?.lowercase(Locale.ENGLISH)
             if (timeout.isNullOrEmpty() || timeout.contains("infinite")) {
                 // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。
                 return DEFAULT_SUBSCRIPTION_TIMEOUT

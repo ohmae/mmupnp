@@ -269,8 +269,8 @@ internal class HttpMessageDelegate(
     companion object {
         private const val DEFAULT_CHUNK_SIZE = 1024
         private const val BUFFER_SIZE = 1500
-        private const val CR: Int = '\r'.toInt()
-        private const val LF: Int = '\n'.toInt()
+        private const val CR: Int = '\r'.code
+        private const val LF: Int = '\n'.code
         private const val EOL: String = "\r\n"
         private val CRLF = EOL.toByteArray()
 

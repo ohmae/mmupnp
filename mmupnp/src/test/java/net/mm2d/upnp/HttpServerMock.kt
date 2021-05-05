@@ -58,13 +58,13 @@ class HttpServerMock {
             this.serverCore = serverCore
         }
 
-        internal fun start() {
+        fun start() {
             thread = Thread(this, "HttpServerMock::ServerTask").also {
                 it.start()
             }
         }
 
-        internal fun shutdownRequest() {
+        fun shutdownRequest() {
             shutdownRequest = true
             thread?.interrupt()
             thread = null
@@ -75,7 +75,7 @@ class HttpServerMock {
             }
         }
 
-        internal fun notifyClientFinished(client: ClientTask) {
+        fun notifyClientFinished(client: ClientTask) {
             clientList.remove(client)
         }
 
@@ -108,13 +108,13 @@ class HttpServerMock {
     ) : Runnable {
         private var thread: Thread? = null
 
-        internal fun start() {
+        fun start() {
             thread = Thread(this, "HttpServerMock::ClientTask").also {
                 it.start()
             }
         }
 
-        internal fun shutdownRequest() {
+        fun shutdownRequest() {
             thread?.interrupt()
             thread = null
             socket.closeQuietly()
