@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath(kotlin("gradle-plugin", version = "1.5.0"))
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.4.30")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.4.32")
 
         classpath("com.github.ben-manes:gradle-versions-plugin:0.38.0")
     }

@@ -63,7 +63,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.11.0")
     testImplementation("com.google.truth:truth:1.1.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
 }
 
 publishingSettings()
