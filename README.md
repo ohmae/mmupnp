@@ -4,9 +4,9 @@
 [![GitHub release](https://img.shields.io/github/release/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/releases)
 [![GitHub issues](https://img.shields.io/github/issues/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/ohmae/mmupnp.svg)](https://github.com/ohmae/mmupnp/issues)
-[![Build Status](https://travis-ci.org/ohmae/mmupnp.svg?branch=develop)](https://travis-ci.org/ohmae/mmupnp)
+[![GitHub Actions](https://github.com/ohmae/mmupnp/actions/workflows/ci.yml/badge.svg)](https://github.com/ohmae/mmupnp/actions)
 [![codecov](https://codecov.io/gh/ohmae/mmupnp/branch/develop/graph/badge.svg)](https://codecov.io/gh/ohmae/mmupnp)
-![Maven Central](https://img.shields.io/maven-central/v/net.mm2d.mmupnp/mmupnp)
+[![Maven Central](https://img.shields.io/maven-central/v/net.mm2d.mmupnp/mmupnp)](https://search.maven.org/artifact/net.mm2d.mmupnp/mmupnp)
 
 Universal Plug and Play (UPnP) ControlPoint library for Java / Kotlin.
 
