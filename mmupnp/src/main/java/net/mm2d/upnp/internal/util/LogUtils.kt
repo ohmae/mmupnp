@@ -7,6 +7,6 @@
 
 package net.mm2d.upnp.internal.util
 
-import net.mm2d.log.toSimpleStackTraceString
+import net.mm2d.upnp.log.toSimpleStackTraceString
 
 internal fun Throwable.toSimpleTrace() = toSimpleStackTraceString(setOf("net.mm2d.upnp."))

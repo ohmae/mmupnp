@@ -11,12 +11,11 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import net.mm2d.log.DefaultSender
-import net.mm2d.log.Logger
+import net.mm2d.upnp.log.DefaultSender
+import net.mm2d.upnp.log.Logger
 import net.mm2d.upnp.Adapter.discoveryListener
 import net.mm2d.upnp.Adapter.eventListener
 import net.mm2d.upnp.Adapter.iconFilter
-import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPointFactory
 import net.mm2d.upnp.Protocol

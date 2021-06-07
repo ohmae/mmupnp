@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp.internal.impl
 
-import net.mm2d.log.Logger
 import net.mm2d.upnp.*
+import net.mm2d.upnp.log.Logger
 import net.mm2d.upnp.util.*
 import org.w3c.dom.Document
 import org.w3c.dom.Element

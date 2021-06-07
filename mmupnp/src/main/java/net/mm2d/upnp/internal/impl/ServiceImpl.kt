@@ -7,12 +7,12 @@
 
 package net.mm2d.upnp.internal.impl
 
-import net.mm2d.log.Logger
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.StateVariable
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.internal.thread.TaskExecutors
+import net.mm2d.upnp.log.Logger
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -36,6 +36,7 @@ internal class ServiceImpl(
     private val taskExecutors: TaskExecutors = device.controlPoint.taskExecutors
     private val actionMap: Map<String, Action>
     private val stateVariableMap = stateVariables.map { it.name to it }.toMap()
+
     // VisibleForTesting
     internal val subscribeDelegate: SubscribeDelegate by lazy { createSubscribeDelegate(this) }
     override val subscriptionId: String?

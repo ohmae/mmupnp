@@ -18,7 +18,6 @@ import net.mm2d.upnp.util.forEachElement
 import org.w3c.dom.Node
 import org.xml.sax.SAXException
 import java.io.IOException
-import java.util.*
 import javax.xml.parsers.ParserConfigurationException
 
 /**

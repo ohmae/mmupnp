@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.internal.impl
 
-import net.mm2d.log.Logger
 import net.mm2d.upnp.*
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint.*
@@ -23,6 +22,7 @@ import net.mm2d.upnp.internal.server.SsdpNotifyServerList
 import net.mm2d.upnp.internal.server.SsdpSearchServerList
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.util.toSimpleTrace
+import net.mm2d.upnp.log.Logger
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.NetworkInterface
@@ -45,6 +45,7 @@ internal class ControlPointImpl(
 ) : ControlPoint {
     private var iconFilter: IconFilter = EMPTY_FILTER
     private val discoveryListenerSet: MutableSet<DiscoveryListener>
+
     @Suppress("DEPRECATION")
     private val notifyEventListenerSet: MutableSet<NotifyEventListener>
     private val eventListenerSet: MutableSet<EventListener>

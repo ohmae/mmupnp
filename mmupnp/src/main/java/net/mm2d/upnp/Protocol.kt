@@ -19,6 +19,7 @@ enum class Protocol {
     IP_V4_ONLY {
         override fun getAvailableInterfaces(): List<NetworkInterface> = NetworkUtils.getAvailableInet4Interfaces()
     },
+
     /**
      * Use only IPv6.
      *
@@ -30,6 +31,7 @@ enum class Protocol {
     IP_V6_ONLY {
         override fun getAvailableInterfaces(): List<NetworkInterface> = NetworkUtils.getAvailableInet6Interfaces()
     },
+
     /**
      * Use dual stack of IPv4 / IPv6.
      *

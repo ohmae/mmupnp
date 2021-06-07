@@ -112,22 +112,27 @@ interface SsdpMessage {
          * Request method of M-SEARCH
          */
         const val M_SEARCH = "M-SEARCH"
+
         /**
          * Request method of NOTIFY
          */
         const val NOTIFY = "NOTIFY"
+
         /**
          * NTS: ssdp:alive
          */
         const val SSDP_ALIVE = "ssdp:alive"
+
         /**
          * NTS: ssdp:byebye
          */
         const val SSDP_BYEBYE = "ssdp:byebye"
+
         /**
          * NTS: ssdp:update
          */
         const val SSDP_UPDATE = "ssdp:update"
+
         /**
          * MAN: ssdp:discover
          */

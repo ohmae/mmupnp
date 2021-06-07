@@ -17,7 +17,6 @@ import net.mm2d.upnp.Adapter.multicastEventListener
 import net.mm2d.upnp.Adapter.notifyEventListener
 import net.mm2d.upnp.Adapter.taskExecutor
 import net.mm2d.upnp.ControlPoint.*
-import net.mm2d.upnp.ControlPoint.EventListener
 import net.mm2d.upnp.internal.manager.DeviceHolder
 import net.mm2d.upnp.internal.manager.SubscribeManagerImpl
 import net.mm2d.upnp.internal.message.SsdpRequest
@@ -36,7 +35,6 @@ import org.junit.runners.JUnit4
 import java.io.IOException
 import java.net.InetAddress
 import java.net.URL
-import java.util.*
 
 @Suppress("TestFunctionName", "NonAsciiCharacters", "ClassName")
 @RunWith(Enclosed::class)
@@ -1152,6 +1150,7 @@ class ControlPointTest {
     @RunWith(JUnit4::class)
     class MulticastEventingのテスト {
         private lateinit var cp: ControlPointImpl
+
         @Before
         fun setUp() {
             cp = spyk(

@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.thread
 
-import net.mm2d.log.Logger
+import net.mm2d.upnp.log.Logger
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicInteger
 

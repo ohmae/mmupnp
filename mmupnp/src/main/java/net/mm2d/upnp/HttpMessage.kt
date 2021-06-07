@@ -28,14 +28,17 @@ interface HttpMessage {
      * Start Line.
      */
     val startLine: String?
+
     /**
      * HTTP Version.
      */
     val version: String
+
     /**
      * Whether this is chunked transmission from the header value.
      */
     val isChunked: Boolean
+
     /**
      * Content-Length. -1 if unknown
      */

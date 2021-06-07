@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.log
+package net.mm2d.upnp.log
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat

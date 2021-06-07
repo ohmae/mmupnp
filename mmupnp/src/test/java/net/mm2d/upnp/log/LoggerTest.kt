@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.log
+package net.mm2d.upnp.log
 
 import io.mockk.clearMocks
 import io.mockk.spyk

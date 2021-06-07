@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.internal.thread
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk

@@ -328,16 +328,19 @@ interface Action {
          * If it is a normal error response, "Client" with a namespace of SOAP is stored.
          */
         const val FAULT_CODE_KEY = "faultcode"
+
         /**
          * The key used to store the error response of `faultstring`.
          *
          * If it is a normal error response, "UPnPError" is stored.
          */
         const val FAULT_STRING_KEY = "faultstring"
+
         /**
          * The key used to store the error response of `detail/UPnPError/errorCode`.
          */
         const val ERROR_CODE_KEY = "UPnPError/errorCode"
+
         /**
          * The key used to store the error response of `detail/UPnPError/errorDescription`.
          */

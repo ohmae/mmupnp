@@ -23,7 +23,6 @@ import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.net.URL
 
 @Suppress("TestFunctionName", "NonAsciiCharacters", "ClassName")

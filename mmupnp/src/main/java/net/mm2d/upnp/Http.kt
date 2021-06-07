@@ -23,91 +23,133 @@ import kotlin.concurrent.withLock
 object Http {
     /** HTTP/1.0 */
     const val HTTP_1_0 = "HTTP/1.0"
+
     /** HTTP/1.1 */
     const val HTTP_1_1 = "HTTP/1.1"
+
     /** default Http version */
     const val DEFAULT_HTTP_VERSION = HTTP_1_1
+
     /** SERVER */
     const val SERVER = "SERVER"
+
     /** HOST */
     const val HOST = "HOST"
+
     /** Transfer-Encoding */
     const val TRANSFER_ENCODING = "Transfer-Encoding"
+
     /** CALLBACK */
     const val CALLBACK = "CALLBACK"
+
     /** chunked */
     const val CHUNKED = "chunked"
+
     /** Connection */
     const val CONNECTION = "Connection"
+
     /** close */
     const val CLOSE = "close"
+
     /** keep-alive */
     const val KEEP_ALIVE = "keep-alive"
+
     /** Cache-Control */
     const val CACHE_CONTROL = "Cache-Control"
+
     /** Content-Length */
     const val CONTENT_LENGTH = "Content-Length"
+
     /** Content-Type */
     const val CONTENT_TYPE = "Content-Type"
+
     /** default Content-Type */
     const val CONTENT_TYPE_DEFAULT = "text/xml; charset=\"utf-8\""
+
     /** User-Agent */
     const val USER_AGENT = "User-Agent"
+
     /** Mandatory request */
     const val MAN = "MAN"
+
     /** Maximum wait time in seconds 1-5 */
     const val MX = "MX"
+
     /** Notification Type */
     const val NT = "NT"
+
     /** Notification Sub Type */
     const val NTS = "NTS"
+
     /** Subscription Identifier */
     const val SID = "SID"
+
     /** Sequence number 32-bit unsigned */
     const val SEQ = "SEQ"
+
     /** Search Target */
     const val ST = "ST"
+
     /** Used in SUBSCRIBE. CSV of StateVariables */
     const val STATEVAR = "STATEVAR"
+
     /** Used in SUBSCRIBE response. CSV of StateVariables */
     const val ACCEPTED_STATEVAR = "ACCEPTED-STATEVAR"
+
     /** Used in SUBSCRIBE/response. duration until subscription expires. */
     const val TIMEOUT = "TIMEOUT"
+
     /** ServiceID from the SCPD */
     const val SVCID = "SVCID"
+
     /** event importance */
     const val LVL = "LVL"
+
     /** Date */
     const val DATE = "DATE"
+
     /** Required for backwards compatibility with UPnP 1.0. (Header field name only; no field value.) */
     const val EXT = "EXT"
+
     /** URL to the UPnP description */
     const val LOCATION = "LOCATION"
+
     /** Unique Service Name */
     const val USN = "USN"
+
     /** number increased each time device sends an initial announce or update message */
     const val BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG"
+
     /** number used for caching description information */
     const val CONFIGID_UPNP_ORG = "CONFIGID.UPNP.ORG"
+
     /** number identifies port on which device responds to unicast M-SEARCH */
     const val SEARCHPORT_UPNP_ORG = "SEARCHPORT.UPNP.ORG"
+
     /** a base URL with "https:" */
     const val SECURELOCATION_UPNP_ORG = "SECURELOCATION.UPNP.ORG"
+
     /** SOAPACTION */
     const val SOAPACTION = "SOAPACTION"
+
     /** Notification Type: upnp:event */
     const val UPNP_EVENT = "upnp:event"
+
     /** Notification Sub Type: upnp:propchange */
     const val UPNP_PROPCHANGE = "upnp:propchange"
 
     /** Method name of SUBSCRIBE */
     const val SUBSCRIBE = "SUBSCRIBE"
+
     /** Method name of UNSUBSCRIBE */
     const val UNSUBSCRIBE = "UNSUBSCRIBE"
+
     /** Method name of GET */
     const val GET = "GET"
+
     /** Method name of POST */
     const val POST = "POST"
+
     /** Method name of NOTIFY */
     const val NOTIFY = "NOTIFY"
 
@@ -143,84 +185,124 @@ object Http {
     ) {
         /** Invalid status */
         HTTP_INVALID(0, "Invalid"),
+
         /** HTTP 100 */
         HTTP_CONTINUE(100, "Continue"),
+
         /** HTTP 101 */
         HTTP_SWITCH_PROTOCOL(101, "Switching Protocols"),
+
         /** HTTP 200 */
         HTTP_OK(200, "OK"),
+
         /** HTTP 201 */
         HTTP_CREATED(201, "Created"),
+
         /** HTTP 202 */
         HTTP_ACCEPTED(202, "Accepted"),
+
         /** HTTP 203 */
         HTTP_NOT_AUTHORITATIVE(203, "Non-Authoritative Information"),
+
         /** HTTP 204 */
         HTTP_NO_CONTENT(204, "No Content"),
+
         /** HTTP 205 */
         HTTP_RESET(205, "Reset Content"),
+
         /** HTTP 206 */
         HTTP_PARTIAL(206, "Partial Content"),
+
         /** HTTP 300 */
         HTTP_MULT_CHOICE(300, "Multiple Choices"),
+
         /** HTTP 301 */
         HTTP_MOVED_PERM(301, "Moved Permanently"),
+
         /** HTTP 302 */
         HTTP_FOUND(302, "Found"),
+
         /** HTTP 303 */
         HTTP_SEE_OTHER(303, "See Other"),
+
         /** HTTP 304 */
         HTTP_NOT_MODIFIED(304, "Not Modified"),
+
         /** HTTP 305 */
         HTTP_USE_PROXY(305, "Use Proxy"),
+
         /** HTTP 307 */
         HTTP_TEMP_REDIRECT(307, "Temporary Redirect"),
+
         /** HTTP 400 */
         HTTP_BAD_REQUEST(400, "Bad Request"),
+
         /** HTTP 401 */
         HTTP_UNAUTHORIZED(401, "Unauthorized"),
+
         /** HTTP 402 */
         HTTP_PAYMENT_REQUIRED(402, "Payment Required"),
+
         /** HTTP 403 */
         HTTP_FORBIDDEN(403, "Forbidden"),
+
         /** HTTP 404 */
         HTTP_NOT_FOUND(404, "Not Found"),
+
         /** HTTP 405 */
         HTTP_BAD_METHOD(405, "Method Not Allowed"),
+
         /** HTTP 406 */
         HTTP_NOT_ACCEPTABLE(406, "Not Acceptable"),
+
         /** HTTP 407 */
         HTTP_PROXY_AUTH(407, "Proxy Authentication Required"),
+
         /** HTTP 408 */
         HTTP_REQUEST_TIMEOUT(408, "Request Time-out"),
+
         /** HTTP 409 */
         HTTP_CONFLICT(409, "Conflict"),
+
         /** HTTP 410 */
         HTTP_GONE(410, "Gone"),
+
         /** HTTP 411 */
         HTTP_LENGTH_REQUIRED(411, "Length Required"),
+
         /** HTTP 412 */
         HTTP_PRECON_FAILED(412, "Precondition Failed"),
+
         /** HTTP 413 */
         HTTP_ENTITY_TOO_LARGE(413, "Request Entity Too Large"),
+
         /** HTTP 414 */
         HTTP_URI_TOO_LONG(414, "Request-URI Too Large"),
+
         /** HTTP 415 */
         HTTP_UNSUPPORTED_TYPE(415, "Unsupported Media Type"),
+
         /** HTTP 416 */
         HTTP_RANGE_NOT_SATISFIABLE(416, "Requested range not satisfiable"),
+
         /** HTTP 417 */
         HTTP_EXPECTATION_FAILED(417, "Expectation Failed"),
+
         /** HTTP 500 */
         HTTP_INTERNAL_ERROR(500, "Internal Server Error"),
+
         /** HTTP 501 */
         HTTP_NOT_IMPLEMENTED(501, "Not Implemented"),
+
         /** HTTP 502 */
         HTTP_BAD_GATEWAY(502, "Bad Gateway"),
+
         /** HTTP 503 */
         HTTP_UNAVAILABLE(503, "Service Unavailable"),
+
         /** HTTP 504 */
         HTTP_GATEWAY_TIMEOUT(504, "Gateway Time-out"),
+
         /** HTTP 505 */
         HTTP_VERSION(505, "HTTP Version not supported");
 

@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.log
+package net.mm2d.upnp.log
 
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -92,8 +92,8 @@ private fun PrintWriter.printSimpleStackTrace(
     stackTrace: Array<StackTraceElement>
 ) {
     if (stackTrace.isEmpty()) return
-    val index = stackTrace.indexOfFirst {
-            element -> classPrefix.any { element.className.startsWith(it) }
+    val index = stackTrace.indexOfFirst { element ->
+        classPrefix.any { element.className.startsWith(it) }
     }.coerceAtLeast(0)
     if (index > 0) print("$index more ... ") else print("\t")
     print("at ${stackTrace[index]}")

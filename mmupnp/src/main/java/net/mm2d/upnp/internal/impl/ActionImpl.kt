@@ -25,6 +25,7 @@ internal class ActionImpl(
     internal val argumentMap: Map<String, Argument>
 ) : Action {
     private val taskExecutors = service.device.controlPoint.taskExecutors
+
     // VisibleForTesting
     internal val invokeDelegate: ActionInvokeDelegate by lazy { createInvokeDelegate(this) }
 

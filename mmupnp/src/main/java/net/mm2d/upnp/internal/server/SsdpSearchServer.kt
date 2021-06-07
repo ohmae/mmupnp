@@ -7,12 +7,12 @@
 
 package net.mm2d.upnp.internal.server
 
-import net.mm2d.log.Logger
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.message.SsdpRequest
 import net.mm2d.upnp.internal.message.SsdpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
+import net.mm2d.upnp.log.Logger
 import java.io.IOException
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -77,6 +77,7 @@ internal class SsdpSearchServer(
          * ST(SearchType) all.
          */
         const val ST_ALL = "ssdp:all"
+
         /**
          * ST(SearchType) rootdevice.
          */

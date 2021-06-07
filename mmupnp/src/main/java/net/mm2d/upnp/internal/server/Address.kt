@@ -25,6 +25,7 @@ internal enum class Address(
         ServerConst.SSDP_ADDRESS_V4,
         ServerConst.EVENT_ADDRESS_V4
     ),
+
     /**
      * Multicast address for IPv6 (link local)
      */

@@ -5,7 +5,7 @@
  * http://opensource.org/licenses/MIT
  */
 
-package net.mm2d.log
+package net.mm2d.upnp.log
 
 /**
  * Logger interface.
@@ -17,22 +17,27 @@ object Logger {
      * Log level VERBOSE
      */
     const val VERBOSE = 2
+
     /**
      * Log level DEBUG
      */
     const val DEBUG = 3
+
     /**
      * Log level INFO
      */
     const val INFO = 4
+
     /**
      * Log level WARN
      */
     const val WARN = 5
+
     /**
      * Log level ERROR
      */
     const val ERROR = 6
+
     /**
      * Log level ASSERT
      */

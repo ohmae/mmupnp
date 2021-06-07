@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp
 
-import net.mm2d.log.Logger
 import net.mm2d.upnp.internal.util.closeQuietly
+import net.mm2d.upnp.log.Logger
 import java.io.*
 import java.net.InetAddress
 import java.net.Socket
@@ -45,6 +45,7 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     private var socketHolder: SocketHolder? = null
+
     /**
      * Returns the local address used by the socket.
      *

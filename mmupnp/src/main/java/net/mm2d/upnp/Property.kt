@@ -19,24 +19,29 @@ object Property {
      * Library version
      */
     private const val LIB_VERSION = "mmupnp/3.0.0"
+
     /**
      * UPnP Version
      */
     private const val UPNP_VERSION = "UPnP/1.0"
+
     /**
      * OS Version
      */
     private val OS_VERSION = "${System.getProperty("os.name").split(" ")[0]}/${System.getProperty("os.version")}"
+
     /**
      * User-Agent
      */
     @JvmField
     val USER_AGENT_VALUE = "$OS_VERSION $UPNP_VERSION $LIB_VERSION"
+
     /**
      * Server name
      */
     @JvmField
     val SERVER_VALUE = "$OS_VERSION $UPNP_VERSION $LIB_VERSION"
+
     /**
      * Default timeout (ms)
      *
