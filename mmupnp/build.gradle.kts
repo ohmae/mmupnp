@@ -58,7 +58,6 @@ artifacts {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    api("net.mm2d.log:log:0.9.4")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.11.0")
