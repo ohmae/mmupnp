@@ -11,9 +11,9 @@ plugins {
     id("com.github.ben-manes.versions")
 }
 
-base.archivesBaseName = "xml"
-group = build.ProjectProperties.groupId
-version = build.ProjectProperties.versionName
+base.archivesName.set("xml")
+group = ProjectProperties.groupId
+version = ProjectProperties.versionName
 
 tasks {
     compileKotlin {

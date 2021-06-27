@@ -11,7 +11,7 @@ plugins {
     id("com.github.ben-manes.versions")
 }
 
-base.archivesBaseName = "mmupnp"
+base.archivesName.set("mmupnp")
 group = ProjectProperties.groupId
 version = ProjectProperties.versionName
 

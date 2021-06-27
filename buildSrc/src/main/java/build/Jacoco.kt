@@ -2,7 +2,6 @@ package build
 
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.kotlin.dsl.named
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
@@ -14,10 +13,10 @@ fun Project.jacocoSettings() {
         toolVersion = "0.8.7"
     }
 
-    tasks.named<JacocoReport>("jacocoTestReport") {
+    tasks.named("jacocoTestReport", JacocoReport::class.java) {
         reports {
-            xml.isEnabled = true
-            html.isEnabled = true
+            xml.required.set(true)
+            html.required.set(true)
         }
     }
 }

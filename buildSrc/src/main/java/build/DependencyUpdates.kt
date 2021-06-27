@@ -2,10 +2,9 @@ package build
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.named
 
 fun Project.dependencyUpdatesSettings() {
-    tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
+    tasks.named("dependencyUpdates", DependencyUpdatesTask::class.java) {
         rejectVersionIf { !isStable(candidate.version) }
     }
 }

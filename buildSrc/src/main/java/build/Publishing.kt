@@ -5,29 +5,24 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.internal.HasConvention
-import org.gradle.api.plugins.BasePluginConvention
+import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getPluginByName
-import org.gradle.kotlin.dsl.named
 import org.gradle.plugins.signing.SigningExtension
 import java.net.URI
 
 private fun Project.publishing(configure: PublishingExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("publishing", configure)
 
-private val Project.base: BasePluginConvention
-    get() = ((this as? Project)?.convention ?: (this as HasConvention).convention).getPluginByName("base")
+private val Project.base: BasePluginExtension
+    get() = (this as ExtensionAware).extensions.getByName("base") as BasePluginExtension
 
 private val NamedDomainObjectContainer<Configuration>.api: NamedDomainObjectProvider<Configuration>
-    get() = named<Configuration>("api")
+    get() = named("api", Configuration::class.java)
 
 private val NamedDomainObjectContainer<Configuration>.implementation: NamedDomainObjectProvider<Configuration>
-    get() = named<Configuration>("implementation")
+    get() = named("implementation", Configuration::class.java)
 
 fun Project.signing(configure: SigningExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("signing", configure)
@@ -38,12 +33,12 @@ val Project.publishing: PublishingExtension
 fun Project.publishingSettings() {
     publishing {
         publications {
-            create<MavenPublication>("mavenJava") {
-                artifact("$buildDir/libs/${base.archivesBaseName}-${version}.jar")
-                artifact(tasks["sourcesJar"])
-                artifact(tasks["javadocJar"])
+            create("mavenJava", MavenPublication::class.java) {
+                artifact("$buildDir/libs/${base.archivesName.get()}-${version}.jar")
+                artifact(tasks.getByName("sourcesJar"))
+                artifact(tasks.getByName("javadocJar"))
                 groupId = ProjectProperties.groupId
-                artifactId = base.archivesBaseName
+                artifactId = base.archivesName.get()
                 version = ProjectProperties.versionName
                 pom.withXml {
                     val node = asNode()
@@ -97,7 +92,7 @@ fun Project.publishingSettings() {
         }
     }
     signing {
-        sign(publishing.publications["mavenJava"])
+        sign(publishing.publications.getByName("mavenJava"))
     }
     tasks.named("publish") {
         dependsOn("assemble")
