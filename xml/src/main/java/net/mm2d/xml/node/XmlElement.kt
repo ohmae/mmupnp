@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2021 大前良介 (OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ *  http://opensource.org/licenses/MIT
+ */
+
 package net.mm2d.xml.node
 
 class XmlElement(
@@ -35,32 +42,48 @@ class XmlElement(
         attributes.forEach { it.parent = this }
     }
 
-    fun buildXml(indent: Boolean = false): String {
-        val sb = StringBuilder()
-        sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>")
-        toXmlString(indent, sb, 0)
-        return sb.toString()
-    }
+    fun buildXml(indent: Boolean = false, withDeclaration: Boolean = false): String =
+        buildString {
+            if (withDeclaration) {
+                append("<?xml version=\"1.0\" encoding=\"utf-8\"?>")
+                if (indent) newLine()
+            }
+            toXmlString(indent, this, 0)
+        }
 
     override fun toXmlString(indent: Boolean, sb: StringBuilder, depth: Int) {
-        if (indent) sb.indent(depth)
-        sb.append("<")
-        sb.append(qName)
-        attributes.forEach { it.toXmlString(indent, sb, depth) }
-        if (children.isEmpty()) {
-            sb.append("/>")
-        } else {
-            sb.append(">")
-            children.forEach { it.toXmlString(indent, sb, depth + 1) }
-            if (indent && (children.size != 1 || children[0] !is XmlTextNode)) sb.indent(depth)
-            sb.append("</")
-            sb.append(qName)
-            sb.append(">")
+        sb.apply {
+            if (indent) indent(depth)
+            append("<")
+            append(qName)
+            attributes.forEach { it.toXmlString(indent, this, depth) }
+            if (children.isEmpty()) {
+                append("/>")
+                if (indent) newLine()
+            } else {
+                append(">")
+                children.forEach { it.toXmlString(indent, this, depth + 1) }
+                if (indent && (children.size != 1 || children[0] !is XmlTextNode)) {
+                    newLine()
+                    indent(depth)
+                }
+                append("</")
+                append(qName)
+                append(">")
+                if (indent) newLine()
+            }
         }
     }
 
+    private operator fun StringBuilder.plusAssign(string: String) {
+        append(string)
+    }
+
     private fun StringBuilder.indent(depth: Int) {
+        repeat(depth) { append("    ") }
+    }
+
+    private fun StringBuilder.newLine() {
         append("\n")
-        repeat(depth) { append("\t") }
     }
 }

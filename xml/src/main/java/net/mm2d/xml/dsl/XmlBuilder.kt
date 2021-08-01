@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2021 大前良介 (OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ *  http://opensource.org/licenses/MIT
+ */
+
 package net.mm2d.xml.dsl
 
 import net.mm2d.xml.builder.XmlAttributeBuilder
@@ -5,7 +12,7 @@ import net.mm2d.xml.builder.XmlElementBuilder
 import net.mm2d.xml.node.XmlElement
 
 fun buildXml(block: XmlBuilder.() -> Unit): XmlElement {
-    val document = XmlElementBuilder("")
+    val document = XmlElementBuilder()
     XmlBuilder(document).also { it.block() }
     val children = document.children
     if (children.size != 1) {

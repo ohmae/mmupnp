@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2021 大前良介 (OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ *  http://opensource.org/licenses/MIT
+ */
+
 package net.mm2d.xml.builder
 
 import net.mm2d.xml.node.XmlAttribute
@@ -40,4 +47,18 @@ class XmlAttributeBuilder(
     }
 
     private fun findUri(): String = parent?.let { findUri(prefix, it) } ?: ""
+
+    internal fun preferNsValue(): Int =
+        when {
+            qName == XMLNS -> 0
+            prefix == XMLNS -> 1
+            else -> 2
+        }
+
+    companion object {
+        private const val XMLNS = "xmlns"
+
+        fun createNs(prefix: String, uri: String): XmlAttributeBuilder =
+            XmlAttributeBuilder(if (prefix.isEmpty()) XMLNS else "$XMLNS:$prefix", uri)
+    }
 }

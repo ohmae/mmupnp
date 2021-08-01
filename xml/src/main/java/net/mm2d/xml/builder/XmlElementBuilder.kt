@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2021 大前良介 (OHMAE Ryosuke)
+ *
+ * This software is released under the MIT License.
+ *  http://opensource.org/licenses/MIT
+ */
+
 package net.mm2d.xml.builder
 
 import net.mm2d.xml.node.XmlElement
 import net.mm2d.xml.node.XmlTextNode
 
 class XmlElementBuilder(
-    val qName: String
+    val qName: String = ""
 ) : XmlNodeBuilder {
     private var _prefixMap: Map<String, String>? = null
     private val _attributes: MutableList<XmlAttributeBuilder> = mutableListOf()
@@ -65,6 +72,7 @@ class XmlElementBuilder(
     fun appendAttribute(attribute: XmlAttributeBuilder) {
         attribute.parent = this
         _attributes.add(attribute)
+        _prefixMap = null
     }
 
     fun setUri(uri: String) {
@@ -78,13 +86,13 @@ class XmlElementBuilder(
     }
 
     fun appendNs(prefix: String, uri: String) {
-        val name = if (prefix.isEmpty()) "xmlns" else "xmlns:$prefix"
-        _attributes.removeIf { it.qName == name }
-        _attributes.add(XmlAttributeBuilder(name, uri))
+        val attribute = XmlAttributeBuilder.createNs(prefix, uri)
+        _attributes.removeIf { it.qName == attribute.qName }
+        appendAttribute(attribute)
     }
 
     fun findRoot(element: XmlElementBuilder): XmlElementBuilder =
-        element.parent.let { if (it == null) element else findRoot(it) }
+        element.parent.let { if (it == null || it.qName.isEmpty()) element else findRoot(it) }
 
     private fun findUri(): String = findUri(prefix, this)
 
@@ -98,7 +106,7 @@ class XmlElementBuilder(
         val value = if (childList.size == 1) {
             childList[0].let { if (it is XmlTextNode) it.value else "" }
         } else ""
-        val attributeList = attributes.map { it.build() }
+        val attributeList = attributes.sortedBy { it.preferNsValue() }.map { it.build() }
         return XmlElement(
             findUri(),
             qName,
