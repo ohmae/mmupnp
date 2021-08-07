@@ -20,7 +20,7 @@ object XmlParser {
         val parser = SAXParserFactory.newInstance().newSAXParser()
         parser.parse(xml.byteInputStream(), documentBuilder)
         val element = documentBuilder.result?.build() ?: return null
-        println(element.buildXml(true))
+        println(element.buildString(true))
         return element
     }
 

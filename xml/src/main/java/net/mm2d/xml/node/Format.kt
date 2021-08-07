@@ -19,14 +19,11 @@ internal fun escapeXmlString(s: String, forQuote: Boolean = false): String = bui
             c == '\'' -> if (forQuote) append("&apos;") else append(c)
             c.code in 0xd800..0xdc00 -> {
                 // UTF-16 surrogate
-                if (i + 1 >= length) throw IllegalArgumentException("Invalid UTF-16 surrogate: %x".format(c))
+                if (i + 1 >= s.length)
+                    throw IllegalArgumentException("Invalid UTF-16 surrogate: %x".format(c.code))
                 val n = s[++i]
-                if (n.code !in 0xdc00..0xe000) throw IllegalArgumentException(
-                    "Invalid UTF-16 surrogate: %x %x".format(
-                        c,
-                        n
-                    )
-                )
+                if (n.code !in 0xdc00..0xe000)
+                    throw IllegalArgumentException("Invalid UTF-16 surrogate: %x %x".format(c.code, n.code))
                 append("&#x")
                 append(Integer.toHexString((c.code - 0xd800 shl 10) + n.code - 0xdc00 + 0x00010000))
                 append(";")

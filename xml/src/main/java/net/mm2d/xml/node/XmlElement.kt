@@ -42,7 +42,7 @@ class XmlElement(
         attributes.forEach { it.parent = this }
     }
 
-    fun buildXml(indent: Boolean = false, withDeclaration: Boolean = false): String =
+    fun buildString(indent: Boolean = false, withDeclaration: Boolean = false): String =
         buildString {
             if (withDeclaration) {
                 append("<?xml version=\"1.0\" encoding=\"utf-8\"?>")
@@ -62,9 +62,11 @@ class XmlElement(
                 if (indent) newLine()
             } else {
                 append(">")
-                children.forEach { it.toXmlString(indent, this, depth + 1) }
                 if (indent && (children.size != 1 || children[0] !is XmlTextNode)) {
                     newLine()
+                }
+                children.forEach { it.toXmlString(indent, this, depth + 1) }
+                if (indent && (children.size != 1 || children[0] !is XmlTextNode)) {
                     indent(depth)
                 }
                 append("</")
@@ -73,10 +75,6 @@ class XmlElement(
                 if (indent) newLine()
             }
         }
-    }
-
-    private operator fun StringBuilder.plusAssign(string: String) {
-        append(string)
     }
 
     private fun StringBuilder.indent(depth: Int) {
