@@ -60,7 +60,7 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("io.mockk:mockk:1.12.2")
     testImplementation("com.google.truth:truth:1.1.3")
 }
 

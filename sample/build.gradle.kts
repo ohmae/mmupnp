@@ -16,9 +16,9 @@ tasks.withType<JavaCompile> {
 dependencies {
     implementation(project(":mmupnp"))
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.5.1")
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.0")
+    implementation("com.google.code.gson:gson:2.8.9")
     testImplementation("junit:junit:4.13.2")
 }
 
