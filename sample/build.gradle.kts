@@ -3,6 +3,7 @@ import build.dependencyUpdatesSettings
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     id("com.github.ben-manes.versions")
 }
 
@@ -18,7 +19,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.0")
-    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     testImplementation("junit:junit:4.13.2")
 }
 

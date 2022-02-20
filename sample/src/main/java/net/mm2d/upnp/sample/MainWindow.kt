@@ -7,10 +7,12 @@
 
 package net.mm2d.upnp.sample
 
-import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.mm2d.upnp.Adapter.discoveryListener
 import net.mm2d.upnp.Adapter.eventListener
 import net.mm2d.upnp.Adapter.iconFilter
@@ -182,12 +184,13 @@ class MainWindow private constructor() : JFrame() {
         val dir = selectSaveDirectory() ?: return
         val json = controlPoint.deviceList
             .map { Server(it.location, it.friendlyName) }
-            .let { Gson().toJson(it) }
+            .let { Json.encodeToString(it) }
         FileOutputStream(File(dir, "locations.json")).use {
             it.write(json.toByteArray())
         }
     }
 
+    @Serializable
     private data class Server(
         val location: String,
         val friendlyName: String

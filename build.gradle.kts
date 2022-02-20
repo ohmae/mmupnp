@@ -5,6 +5,7 @@ buildscript {
     }
     dependencies {
         classpath(kotlin("gradle-plugin", version = "1.6.10"))
+        classpath(kotlin("serialization", version = "1.6.10"))
         classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
 
         classpath("com.github.ben-manes:gradle-versions-plugin:0.42.0")
