@@ -17,9 +17,6 @@ import javax.swing.JFrame
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 
-/**
- * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- */
 class ServiceNode(service: Service) : UpnpNode(service) {
     var isSubscribing: Boolean = false
         private set
@@ -34,17 +31,9 @@ class ServiceNode(service: Service) : UpnpNode(service) {
         add(StateVariableListNode(service.stateVariableList))
     }
 
-    override fun getUserObject(): Service {
-        return super.getUserObject() as Service
-    }
-
-    override fun formatDescription(): String {
-        return Formatter.format(getUserObject())
-    }
-
-    override fun toString(): String {
-        return getUserObject().serviceType
-    }
+    override fun getUserObject(): Service = super.getUserObject() as Service
+    override fun formatDescription(): String = Formatter.format(getUserObject())
+    override fun toString(): String = getUserObject().serviceType
 
     override fun showContextMenu(frame: JFrame, invoker: Component, x: Int, y: Int) {
         val menu = JPopupMenu()

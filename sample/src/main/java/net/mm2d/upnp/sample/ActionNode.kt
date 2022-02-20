@@ -13,27 +13,14 @@ import javax.swing.JFrame
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 
-/**
- * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- */
 class ActionNode(action: Action) : UpnpNode(action) {
     init {
-        action.argumentList.forEach {
-            add(ArgumentNode(it))
-        }
+        action.argumentList.forEach { add(ArgumentNode(it)) }
     }
 
-    override fun getUserObject(): Action {
-        return super.getUserObject() as Action
-    }
-
-    override fun formatDescription(): String {
-        return Formatter.format(getUserObject())
-    }
-
-    override fun toString(): String {
-        return getUserObject().name
-    }
+    override fun getUserObject(): Action = super.getUserObject() as Action
+    override fun formatDescription(): String = Formatter.format(getUserObject())
+    override fun toString(): String = getUserObject().name
 
     override fun showContextMenu(frame: JFrame, invoker: Component, x: Int, y: Int) {
         JPopupMenu().also {

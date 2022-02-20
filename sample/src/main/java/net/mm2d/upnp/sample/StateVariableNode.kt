@@ -9,23 +9,12 @@ package net.mm2d.upnp.sample
 
 import net.mm2d.upnp.StateVariable
 
-/**
- * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- */
 class StateVariableNode(variable: StateVariable) : UpnpNode(variable) {
     init {
         setAllowsChildren(false)
     }
 
-    override fun getUserObject(): StateVariable {
-        return super.getUserObject() as StateVariable
-    }
-
-    override fun formatDescription(): String {
-        return Formatter.format(getUserObject())
-    }
-
-    override fun toString(): String {
-        return getUserObject().name
-    }
+    override fun getUserObject(): StateVariable = super.getUserObject() as StateVariable
+    override fun formatDescription(): String = Formatter.format(getUserObject())
+    override fun toString(): String = getUserObject().name
 }

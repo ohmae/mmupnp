@@ -26,9 +26,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-/**
- * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- */
 open class UpnpNode(
     userObject: Any,
     allowsChildren: Boolean = true

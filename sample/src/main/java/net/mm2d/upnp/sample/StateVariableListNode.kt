@@ -9,9 +9,6 @@ package net.mm2d.upnp.sample
 
 import net.mm2d.upnp.StateVariable
 
-/**
- * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- */
 class StateVariableListNode(variables: List<StateVariable>) : UpnpNode("StateVariable") {
     init {
         variables.forEach {

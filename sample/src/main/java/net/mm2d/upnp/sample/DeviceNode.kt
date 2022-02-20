@@ -17,32 +17,16 @@ import javax.swing.JFrame
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 
-/**
- * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- */
 class DeviceNode(device: Device) : UpnpNode(device) {
     init {
-        device.serviceList.forEach {
-            add(ServiceNode(it))
-        }
-        device.deviceList.forEach {
-            add(DeviceNode(it))
-        }
+        device.serviceList.forEach { add(ServiceNode(it)) }
+        device.deviceList.forEach { add(DeviceNode(it)) }
     }
 
     override fun getDetailXml(): String = formatXml(getUserObject().description)
-
-    override fun getUserObject(): Device {
-        return super.getUserObject() as Device
-    }
-
-    override fun toString(): String {
-        return getUserObject().friendlyName + " [" + getUserObject().ipAddress + "]"
-    }
-
-    override fun formatDescription(): String {
-        return Formatter.format(getUserObject())
-    }
+    override fun getUserObject(): Device = super.getUserObject() as Device
+    override fun toString(): String = getUserObject().friendlyName + " [" + getUserObject().ipAddress + "]"
+    override fun formatDescription(): String = Formatter.format(getUserObject())
 
     override fun showContextMenu(frame: JFrame, invoker: Component, x: Int, y: Int) {
         val menu = JPopupMenu()

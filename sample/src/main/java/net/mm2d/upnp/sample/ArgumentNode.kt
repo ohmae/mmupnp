@@ -9,23 +9,12 @@ package net.mm2d.upnp.sample
 
 import net.mm2d.upnp.Argument
 
-/**
- * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- */
 class ArgumentNode(argument: Argument) : UpnpNode(argument) {
     init {
         setAllowsChildren(false)
     }
 
-    override fun getUserObject(): Argument {
-        return super.getUserObject() as Argument
-    }
-
-    override fun formatDescription(): String {
-        return Formatter.format(getUserObject())
-    }
-
-    override fun toString(): String {
-        return getUserObject().name
-    }
+    override fun getUserObject(): Argument = super.getUserObject() as Argument
+    override fun formatDescription(): String = Formatter.format(getUserObject())
+    override fun toString(): String = getUserObject().name
 }

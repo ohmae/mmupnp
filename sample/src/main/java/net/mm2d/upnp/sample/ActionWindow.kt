@@ -16,9 +16,6 @@ import java.io.IOException
 import javax.swing.*
 import javax.swing.text.JTextComponent
 
-/**
- * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- */
 class ActionWindow(private val action: Action) : JFrame(action.name) {
     private val map = mutableMapOf<Argument, Container>()
     private val errorMessage: JLabel
@@ -113,13 +110,12 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
         }
     }
 
-    private fun makeArgumentPanel(argument: Argument): JPanel {
-        return JPanel().also {
+    private fun makeArgumentPanel(argument: Argument): JPanel =
+        JPanel().also {
             it.layout = BorderLayout()
             it.add(JLabel("(${argument.relatedStateVariable.dataType}) ${argument.name}"), BorderLayout.NORTH)
             it.add(makeComponent(argument), BorderLayout.CENTER)
         }
-    }
 
     private fun makeComponent(argument: Argument): JComponent {
         val variable = argument.relatedStateVariable
