@@ -2,7 +2,7 @@ import build.ProjectProperties
 import build.dependencyUpdatesSettings
 
 plugins {
-    id("kotlin")
+    kotlin("jvm")
     id("com.github.ben-manes.versions")
 }
 
@@ -18,7 +18,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.0")
-    implementation("com.google.code.gson:gson:2.8.9")
+    implementation("com.google.code.gson:gson:2.9.0")
     testImplementation("junit:junit:4.13.2")
 }
 

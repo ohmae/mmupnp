@@ -9,5 +9,5 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.github.ben-manes:gradle-versions-plugin:0.39.0")
+    implementation("com.github.ben-manes:gradle-versions-plugin:0.42.0")
 }
