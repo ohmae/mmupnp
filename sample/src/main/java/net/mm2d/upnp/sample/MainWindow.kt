@@ -281,7 +281,9 @@ class MainWindow private constructor() : JFrame() {
                 if (!enabledLogLevel[level]) return@create
                 GlobalScope.launch(Dispatchers.Main) {
                     val prefix = "$dateString ${level.toLogLevelString()} [$tag] "
-                    message.split("\n").dropLast(1).forEach { println(prefix + it) }
+                    message.split("\n")
+                        .let { if (message.endsWith("\n")) it.dropLast(1) else it }
+                        .forEach { println(prefix + it) }
                 }
             })
         }

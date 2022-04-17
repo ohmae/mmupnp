@@ -44,6 +44,9 @@ internal object DeviceParser {
     @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
     fun loadDescription(client: HttpClient, builder: DeviceImpl.Builder) {
         val url = Http.makeUrlWithScopeId(builder.getLocation(), builder.getSsdpMessage().scopeId)
+        // DIAL Application-URL
+        // val response = client.download(url)
+        // Logger.d { response.getHeader("Application-URL") }
         val description = client.downloadString(url)
         if (description.isEmpty()) {
             throw IOException("download error: $url")
