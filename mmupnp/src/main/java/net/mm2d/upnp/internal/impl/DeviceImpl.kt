@@ -281,6 +281,8 @@ internal class DeviceImpl private constructor(
             this.deviceType = deviceType
         }
 
+        fun getDeviceType(): String? = deviceType
+
         fun setFriendlyName(friendlyName: String): Builder = apply {
             this.friendlyName = friendlyName
         }
