@@ -121,7 +121,7 @@ class DeviceHolderTest {
         holder.run()
     }
 
-    @Test(timeout = 20000L)
+    @Test(timeout = 30000L)
     fun expireDevice_時間経過後に削除される() {
         val expireListener: (Device) -> Unit = mockk(relaxed = true)
         val holder = DeviceHolder(taskExecutors, expireListener)
