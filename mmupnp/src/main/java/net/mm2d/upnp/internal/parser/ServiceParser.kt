@@ -58,7 +58,7 @@ internal object ServiceParser {
         val description = try {
             client.downloadString(url)
         } catch (e: IOException) {
-            if (deviceTypesThatAllowIoException.contains(deviceBuilder.getDeviceType())) {
+            if (!deviceTypesThatAllowIoException.contains(deviceBuilder.getDeviceType())) {
                 throw e
             }
             // Allow certain "ill-behaved" devices
