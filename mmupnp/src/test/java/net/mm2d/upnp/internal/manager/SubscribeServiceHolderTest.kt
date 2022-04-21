@@ -159,7 +159,7 @@ class SubscribeServiceHolderTest {
         subscribeHolder.stop()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 30000L)
     fun renew_失敗したら削除される() {
         val id = "id"
         val service: Service = mockk(relaxed = true)

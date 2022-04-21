@@ -28,6 +28,15 @@ import javax.xml.parsers.ParserConfigurationException
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal object ServiceParser {
+    private val deviceTypesThatAllowIoException = setOf(
+        // Some DIAL devices return XML, so try the download.
+        // But some DIAL devices return 404, so allow it.
+        "urn:dial-multiscreen-org:device:dial:1",
+        // Basic devices are allowed to have no Service.
+        // However, some devices have a Service but return 404, so allow it.
+        "urn:schemas-upnp-org:device:Basic:1",
+    )
+
     /**
      * Download Description from SCPDURL and parse it.
      *
@@ -49,11 +58,10 @@ internal object ServiceParser {
         val description = try {
             client.downloadString(url)
         } catch (e: IOException) {
-            if (deviceBuilder.getDeviceType() != "urn:dial-multiscreen-org:device:dial:1") {
+            if (deviceTypesThatAllowIoException.contains(deviceBuilder.getDeviceType())) {
                 throw e
             }
-            // Some DIAL devices return XML, so try the download.
-            // But some DIAL devices return 404, so ignore them.
+            // Allow certain "ill-behaved" devices
             ""
         }
         if (description.isEmpty()) {
