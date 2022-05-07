@@ -10,9 +10,10 @@ package net.mm2d.upnp.internal.impl
 import net.mm2d.upnp.*
 import net.mm2d.upnp.log.Logger
 import net.mm2d.upnp.util.*
+import net.mm2d.xml.node.XmlElement
+import net.mm2d.xml.parser.XmlParser
 import org.w3c.dom.Document
 import org.w3c.dom.Element
-import org.w3c.dom.Node
 import org.xml.sax.SAXException
 import java.io.IOException
 import java.io.StringWriter
@@ -215,9 +216,9 @@ internal class ActionInvokeDelegate(
     @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
     private fun parseResponse(xml: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
-        findResponseElement(xml).firstChild?.forEachElement {
+        findResponseElement(xml).childElements.forEach {
             val tag = it.localName
-            val text = it.textContent
+            val text = it.value
             if (argumentMap[tag] == null) {
                 // Optionalな情報としてArgumentに記述されていないタグが含まれる可能性があるためログ出力に留める
                 Logger.i { "invalid argument:$tag->$text" }
@@ -235,31 +236,28 @@ internal class ActionInvokeDelegate(
      *
      * @param xml XML string that is the response of Action
      * @return Element of the Response tag
-     * @throws SAXException if an parse error occurs.
      * @throws IOException if an I/O error occurs.
-     * @throws ParserConfigurationException If there is a problem with instantiation
      */
-    @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
-    private fun findResponseElement(xml: String): Element = findElement(xml, responseTagName)
+    @Throws(IOException::class)
+    private fun findResponseElement(xml: String): XmlElement =
+        findElement(xml, responseTagName)
 
     /**
      * Parses the error response of this Action.
      *
      * @param xml XML string that is the response of Action
      * @return error response such as 'faultcode','faultstring','UPnPError/errorCode','UPnPError/errorDescription'
-     * @throws SAXException if an parse error occurs.
      * @throws IOException if an I/O error occurs.
-     * @throws ParserConfigurationException If there is a problem with instantiation
      */
-    @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
+    @Throws(IOException::class)
     private fun parseErrorResponse(xml: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
-        findFaultElement(xml).firstChild?.forEachElement {
+        findFaultElement(xml).childElements.forEach {
             val tag = it.localName
             if (tag == "detail") {
                 parseErrorDetail(result, it)
             } else {
-                result[tag] = it.textContent
+                result[tag] = it.value
             }
         }
         if (!result.containsKey(Action.ERROR_CODE_KEY)) {
@@ -276,11 +274,13 @@ internal class ActionInvokeDelegate(
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    private fun parseErrorDetail(result: MutableMap<String, String>, detailNode: Node) {
-        detailNode.findChildElementByLocalName("UPnPError")
-            ?.firstChild
-            ?.forEachElement {
-                result["UPnPError/${it.localName}"] = it.textContent
+    private fun parseErrorDetail(result: MutableMap<String, String>, detailNode: XmlElement) {
+        detailNode.childElements
+            .find { it.localName == "UPnPError" }
+            ?.let {
+                it.childElements.forEach { item ->
+                    result["UPnPError/${item.localName}"] = item.value
+                }
             } ?: throw IOException("no UPnPError tag")
     }
 
@@ -289,18 +289,21 @@ internal class ActionInvokeDelegate(
      *
      * @param xml XML string that is the response of Action
      * @return Element of the Fault tag
-     * @throws SAXException if an parse error occurs.
      * @throws IOException if an I/O error occurs.
-     * @throws ParserConfigurationException If there is a problem with instantiation
      */
-    @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
-    private fun findFaultElement(xml: String): Element = findElement(xml, "Fault")
+    @Throws(IOException::class)
+    private fun findFaultElement(xml: String): XmlElement =
+        findElement(xml, "Fault")
 
-    @Throws(IOException::class, ParserConfigurationException::class, SAXException::class)
-    private fun findElement(xml: String, tag: String): Element =
-        XmlUtils.newDocument(true, xml).documentElement
-            .findChildElementByLocalName("Body")
-            ?.findChildElementByLocalName(tag) ?: throw IOException("no response tag")
+    @Throws(IOException::class)
+    private fun findElement(xml: String, tag: String): XmlElement {
+        val root = XmlParser.parse(xml) ?: throw IOException("no response tag")
+        return root.childElements
+            .filter { it.localName == "Body" }
+            .flatMap { it.childElements }
+            .find { it.localName == tag }
+            ?: throw IOException("no response tag")
+    }
 
     companion object {
         private const val XMLNS_URI = "http://www.w3.org/2000/xmlns/"
