@@ -7,24 +7,19 @@
 
 package net.mm2d.upnp.internal.impl
 
-import net.mm2d.upnp.*
+import net.mm2d.upnp.Action
+import net.mm2d.upnp.Argument
+import net.mm2d.upnp.Http
+import net.mm2d.upnp.HttpClient
+import net.mm2d.upnp.HttpRequest
+import net.mm2d.upnp.Property
 import net.mm2d.upnp.log.Logger
-import net.mm2d.upnp.util.*
+import net.mm2d.xml.dsl.buildXml
 import net.mm2d.xml.node.XmlElement
 import net.mm2d.xml.parser.XmlParser
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-import org.xml.sax.SAXException
 import java.io.IOException
-import java.io.StringWriter
 import java.net.MalformedURLException
 import java.net.URL
-import javax.xml.parsers.ParserConfigurationException
-import javax.xml.transform.OutputKeys
-import javax.xml.transform.TransformerException
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 
 internal class ActionInvokeDelegate(
     action: ActionImpl
@@ -142,78 +137,38 @@ internal class ActionInvokeDelegate(
      */
     // VisibleForTesting
     @Throws(IOException::class)
-    internal fun List<Pair<String, String?>>.makeSoap(namespaces: Map<String, String>): String {
+    internal fun List<Pair<String, String?>>.makeSoap(namespaces: Map<String, String>): String =
         try {
-            val document = XmlUtils.newDocument(true)
-            document.makeUpToActionElement().also {
-                it.setNamespace(namespaces)
-                it.setArgument(this)
-            }
-            return document.formatXmlString()
+            buildXml {
+                ("s:Envelope" ns SOAP_NS)(
+                    "s:encodingStyle" ns SOAP_NS eq SOAP_STYLE
+                ) {
+                    ("s:Body" ns SOAP_NS) {
+                        ("u:$name" ns service.serviceType)(
+                            *namespaces.map {
+                                XMLNS_PREFIX + it.key ns XMLNS_URI eq it.value
+                            }.toTypedArray()
+                        ) {
+                            forEach {
+                                it.first { it.second }
+                            }
+                        }
+                    }
+                }
+            }.buildString()
         } catch (e: Exception) {
             throw IOException(e)
         }
-    }
 
-    private fun Element.setNamespace(namespace: Map<String, String>) {
-        namespace.forEach {
-            setAttributeNS(XMLNS_URI, XMLNS_PREFIX + it.key, it.value)
-        }
-    }
-
-    /**
-     * Include Action's arguments in XML
-     *
-     * @receiver Element of action
-     * @param arguments Arguments
-     */
-    private fun Element.setArgument(arguments: List<Pair<String, String?>>) {
-        arguments.forEach {
-            appendNewElement(it.first, it.second)
-        }
-    }
-
-    /**
-     * Create SOAP Action XML up to ActionElement.
-     *
-     * @receiver document XML Document
-     * @return ActionElement
-     */
-    private fun Document.makeUpToActionElement(): Element =
-        appendNewElementNs(SOAP_NS, "s:Envelope").let {
-            it.setAttributeNS(SOAP_NS, "s:encodingStyle", SOAP_STYLE)
-            it.appendNewElementNs(SOAP_NS, "s:Body")
-                .appendNewElementNs(service.serviceType, "u:$name")
-        }
-
-    /**
-     * Convert XML Document to String.
-     *
-     * @receiver XML Document to convert
-     * @return Converted string
-     * @throws TransformerException If a conversion error occurs
-     */
-    // VisibleForTesting
-    @Throws(TransformerException::class)
-    internal fun Document.formatXmlString(): String {
-        val sw = StringWriter()
-        TransformerFactory.newInstance().newTransformer().also {
-            it.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-            it.transform(DOMSource(this), StreamResult(sw))
-        }
-        return sw.toString()
-    }
 
     /**
      * Parses the response of this Action.
      *
      * @param xml XML string that is the response of Action
      * @return the response of this Action. Map with argument name as key and value as value
-     * @throws SAXException if an parse error occurs.
      * @throws IOException if an I/O error occurs.
-     * @throws ParserConfigurationException If there is a problem with instantiation
      */
-    @Throws(ParserConfigurationException::class, IOException::class, SAXException::class)
+    @Throws(IOException::class)
     private fun parseResponse(xml: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
         findResponseElement(xml).childElements.forEach {

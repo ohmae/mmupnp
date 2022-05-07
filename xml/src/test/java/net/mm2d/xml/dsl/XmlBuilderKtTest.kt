@@ -216,9 +216,8 @@ class XmlBuilderKtTest {
         assertThat(a.qName).isEqualTo("a")
         assertThat(a.prefix).isEqualTo("")
         assertThat(a.uri).isEqualTo("")
-        assertThat(a.attributes).hasSize(1)
-        assertThat(a.prefixMap).hasSize(1)
-        assertThat(a.prefixMap["a"]).isEqualTo("uri")
+        assertThat(a.attributes).hasSize(0)
+        assertThat(a.prefixMap).hasSize(0)
         val b = a.children.first() as XmlElement
         assertThat(b.localName).isEqualTo("b")
         assertThat(b.qName).isEqualTo("a:b")
@@ -226,8 +225,11 @@ class XmlBuilderKtTest {
         assertThat(b.uri).isEqualTo("uri")
         assertThat(b.value).isEqualTo("")
         assertThat(b.parent).isSameInstanceAs(a)
+        assertThat(b.attributes).hasSize(1)
+        assertThat(b.prefixMap).hasSize(1)
+        assertThat(b.prefixMap["a"]).isEqualTo("uri")
         assertThat(a.value).isEmpty()
-        val ns = a.attributes.find { it.prefix == "xmlns" }!!
+        val ns = b.attributes.find { it.prefix == "xmlns" }!!
         assertThat(ns.qName).isEqualTo("xmlns:a")
         assertThat(ns.localName).isEqualTo("a")
         assertThat(ns.prefix).isEqualTo("xmlns")
@@ -265,7 +267,7 @@ class XmlBuilderKtTest {
         assertThat(
             buildXml { "a" { ("a:b" ns "uri") {} } }.buildString()
         ).isEqualTo(
-            """<a xmlns:a="uri"><a:b/></a>"""
+            """<a><a:b xmlns:a="uri"/></a>"""
         )
     }
 

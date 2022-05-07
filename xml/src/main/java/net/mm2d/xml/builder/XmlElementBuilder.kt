@@ -78,11 +78,7 @@ class XmlElementBuilder(
     fun setUri(uri: String) {
         val current = findUri()
         if (current == uri) return
-        if (current.isEmpty()) {
-            findRoot(this).appendNs(prefix, uri)
-        } else {
-            appendNs(prefix, uri)
-        }
+        appendNs(prefix, uri)
     }
 
     fun appendNs(prefix: String, uri: String) {
@@ -90,9 +86,6 @@ class XmlElementBuilder(
         _attributes.removeIf { it.qName == attribute.qName }
         appendAttribute(attribute)
     }
-
-    fun findRoot(element: XmlElementBuilder): XmlElementBuilder =
-        element.parent.let { if (it == null || it.qName.isEmpty()) element else findRoot(it) }
 
     private fun findUri(): String = findUri(prefix, this)
 

@@ -36,14 +36,11 @@ class XmlAttributeBuilder(
         )
 
     fun setUri(uri: String) {
+        if (prefix == XMLNS) return
         val existingUri = findUri()
         if (existingUri == uri) return
         val parent = parent ?: throw IllegalStateException()
-        if (existingUri.isEmpty()) {
-            parent.findRoot(parent).appendNs(prefix, uri)
-        } else {
-            parent.appendNs(prefix, uri)
-        }
+        parent.appendNs(prefix, uri)
     }
 
     private fun findUri(): String = parent?.let { findUri(prefix, it) } ?: ""

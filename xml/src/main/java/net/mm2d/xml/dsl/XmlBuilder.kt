@@ -26,11 +26,11 @@ fun buildXml(block: XmlBuilder.() -> Unit): XmlElement {
 class XmlBuilder(
     private val node: XmlElementBuilder
 ) {
-    operator fun String.invoke(vararg attr: NamedValue, block: XmlBuilder.() -> Any = { }) {
+    operator fun String.invoke(vararg attr: NamedValue, block: XmlBuilder.() -> Any? = { }) {
         just().invoke(*attr, block = block)
     }
 
-    operator fun Name.invoke(vararg attr: NamedValue, block: XmlBuilder.() -> Any = { }) {
+    operator fun Name.invoke(vararg attr: NamedValue, block: XmlBuilder.() -> Any? = { }) {
         val child = createElement(node).also { node.appendChild(it) }
         attr.forEach { child.setAttribute(it) }
         XmlBuilder(child).block().let { if (it is String) child.appendTextNode(it) }

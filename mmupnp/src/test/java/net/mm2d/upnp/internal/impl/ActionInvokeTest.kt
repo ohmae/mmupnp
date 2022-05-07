@@ -517,14 +517,6 @@ class ActionInvokeTest {
         action.invokeSync(emptyMap(), true)
     }
 
-    @Test(expected = IOException::class)
-    fun makeSoap_xml作成でExceptionが発生したらIOException() {
-        with(invokeDelegate) {
-            every { any<Document>().formatXmlString() } throws TransformerException("")
-            emptyList<Pair<String, String?>>().makeSoap(emptyMap())
-        }
-    }
-
     @Test
     fun invoke_success() {
         every { action.invokeSync(any(), any()) } returns emptyMap()
