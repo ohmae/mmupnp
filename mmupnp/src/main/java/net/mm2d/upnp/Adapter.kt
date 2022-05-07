@@ -7,7 +7,10 @@
 
 package net.mm2d.upnp
 
-import net.mm2d.upnp.ControlPoint.*
+import net.mm2d.upnp.ControlPoint.DiscoveryListener
+import net.mm2d.upnp.ControlPoint.EventListener
+import net.mm2d.upnp.ControlPoint.MulticastEventListener
+import net.mm2d.upnp.ControlPoint.NotifyEventListener
 
 /**
  * Adapter to convert lambda to interface.

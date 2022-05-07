@@ -7,7 +7,11 @@
 
 package net.mm2d.upnp
 
-import java.net.*
+import java.net.Inet6Address
+import java.net.InetAddress
+import java.net.MalformedURLException
+import java.net.URL
+import java.net.UnknownHostException
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat

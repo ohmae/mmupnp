@@ -19,7 +19,11 @@ import net.mm2d.upnp.util.findInet6Address
 import net.mm2d.upnp.util.toSimpleString
 import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.net.*
+import java.net.DatagramPacket
+import java.net.InterfaceAddress
+import java.net.MulticastSocket
+import java.net.NetworkInterface
+import java.net.SocketTimeoutException
 
 internal class MulticastEventReceiver(
     taskExecutors: TaskExecutors,

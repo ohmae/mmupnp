@@ -7,7 +7,12 @@
 
 package net.mm2d.upnp.internal.server
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkConstructor
+import io.mockk.spyk
+import io.mockk.unmockkConstructor
+import io.mockk.verify
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpRequest
 import net.mm2d.upnp.internal.thread.TaskExecutors

@@ -17,7 +17,12 @@ import net.mm2d.upnp.util.findInet6Address
 import net.mm2d.upnp.util.toSimpleString
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.net.*
+import java.net.DatagramPacket
+import java.net.InetAddress
+import java.net.InterfaceAddress
+import java.net.MulticastSocket
+import java.net.NetworkInterface
+import java.net.SocketTimeoutException
 
 /**
  * A class that implements the common part of [SsdpServer].

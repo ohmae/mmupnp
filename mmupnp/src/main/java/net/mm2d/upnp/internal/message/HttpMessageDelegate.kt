@@ -10,7 +10,11 @@ package net.mm2d.upnp.internal.message
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpMessage
 import net.mm2d.upnp.log.Logger
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.io.UnsupportedEncodingException
 
 /**
  * Common implementation of [HttpMessage].

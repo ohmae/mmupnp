@@ -7,7 +7,11 @@
 
 package net.mm2d.upnp
 
-import net.mm2d.upnp.empty.*
+import net.mm2d.upnp.empty.EmptyAction
+import net.mm2d.upnp.empty.EmptyControlPoint
+import net.mm2d.upnp.empty.EmptyDevice
+import net.mm2d.upnp.empty.EmptyService
+import net.mm2d.upnp.empty.EmptySsdpMessage
 
 /**
  * Provide EmptyObject.

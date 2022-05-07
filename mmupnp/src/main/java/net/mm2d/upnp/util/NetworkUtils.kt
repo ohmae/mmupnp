@@ -8,7 +8,13 @@
 package net.mm2d.upnp.util
 
 import net.mm2d.upnp.Http
-import java.net.*
+import java.net.Inet4Address
+import java.net.Inet6Address
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.InterfaceAddress
+import java.net.NetworkInterface
+import java.net.SocketException
 import java.nio.ByteBuffer
 
 /**

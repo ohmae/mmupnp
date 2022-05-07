@@ -8,7 +8,11 @@
 package net.mm2d.upnp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.spyk
+import io.mockk.unmockkObject
 import net.mm2d.upnp.StateVariable
 import org.junit.Test
 import org.junit.runner.RunWith

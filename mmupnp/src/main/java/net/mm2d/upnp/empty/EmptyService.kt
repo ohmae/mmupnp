@@ -7,7 +7,11 @@
 
 package net.mm2d.upnp.empty
 
-import net.mm2d.upnp.*
+import net.mm2d.upnp.Action
+import net.mm2d.upnp.ControlPoints
+import net.mm2d.upnp.Device
+import net.mm2d.upnp.Service
+import net.mm2d.upnp.StateVariable
 
 /**
  * Empty implementation of [Service].

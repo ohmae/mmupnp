@@ -8,7 +8,11 @@
 package net.mm2d.upnp.internal.server
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.spyk
+import io.mockk.verify
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpRequest
 import net.mm2d.upnp.HttpResponse

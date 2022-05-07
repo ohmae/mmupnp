@@ -9,7 +9,11 @@ package net.mm2d.upnp
 
 import net.mm2d.upnp.internal.util.closeQuietly
 import net.mm2d.upnp.log.Logger
-import java.io.*
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.InetAddress
 import java.net.Socket
 import java.net.URL

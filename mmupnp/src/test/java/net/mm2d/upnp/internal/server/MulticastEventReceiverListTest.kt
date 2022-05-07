@@ -8,7 +8,13 @@
 package net.mm2d.upnp.internal.server
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.mockkStatic
+import io.mockk.unmockkObject
+import io.mockk.unmockkStatic
+import io.mockk.verify
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.util.isAvailableInet4Interface
 import org.junit.After

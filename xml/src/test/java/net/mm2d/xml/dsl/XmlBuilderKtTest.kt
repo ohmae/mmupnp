@@ -75,7 +75,7 @@ class XmlBuilderKtTest {
     @Test
     fun `buildXml 子ノード1つ`() {
         val a = buildXml {
-            "a"("b" eq "c") { "d"{} }
+            "a"("b" eq "c") { "d" {} }
         }
         assertThat(a.localName).isEqualTo("a")
         assertThat(a.qName).isEqualTo("a")
@@ -105,8 +105,8 @@ class XmlBuilderKtTest {
     fun `buildXml 子ノード2つ`() {
         val a = buildXml {
             "a"("b" eq "c") {
-                "d"{}
-                "d"{}
+                "d" {}
+                "d" {}
             }
         }
         assertThat(a.localName).isEqualTo("a")

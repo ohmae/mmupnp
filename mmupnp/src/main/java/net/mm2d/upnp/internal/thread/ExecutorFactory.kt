@@ -7,7 +7,11 @@
 
 package net.mm2d.upnp.internal.thread
 
-import java.util.concurrent.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 internal object ExecutorFactory {
     private const val PRIORITY_CALLBACK = Thread.NORM_PRIORITY

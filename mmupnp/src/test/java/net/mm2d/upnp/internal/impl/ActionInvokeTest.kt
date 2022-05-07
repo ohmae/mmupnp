@@ -8,9 +8,19 @@
 package net.mm2d.upnp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.slot
+import io.mockk.spyk
+import io.mockk.unmockkObject
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
-import net.mm2d.upnp.*
+import net.mm2d.upnp.Action
+import net.mm2d.upnp.Http
+import net.mm2d.upnp.HttpClient
+import net.mm2d.upnp.HttpRequest
+import net.mm2d.upnp.HttpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.XmlUtils
 import org.junit.After
@@ -18,13 +28,11 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.io.IOException
 import java.net.URL
 import java.util.*
-import javax.xml.transform.TransformerException
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)

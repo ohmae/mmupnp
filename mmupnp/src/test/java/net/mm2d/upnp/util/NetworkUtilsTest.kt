@@ -18,7 +18,12 @@ import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.net.*
+import java.net.Inet4Address
+import java.net.Inet6Address
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.NetworkInterface
+import java.net.SocketException
 import java.util.*
 
 @Suppress("TestFunctionName", "NonAsciiCharacters", "ClassName")

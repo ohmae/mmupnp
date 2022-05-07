@@ -7,7 +7,11 @@
 
 package net.mm2d.upnp.sample
 
-import net.mm2d.upnp.*
+import net.mm2d.upnp.Action
+import net.mm2d.upnp.Argument
+import net.mm2d.upnp.Device
+import net.mm2d.upnp.Service
+import net.mm2d.upnp.StateVariable
 
 object Formatter {
     fun format(device: Device): String {

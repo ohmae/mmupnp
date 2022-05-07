@@ -8,7 +8,11 @@
 package net.mm2d.upnp.internal.server
 
 import java.io.IOException
-import java.net.*
+import java.net.DatagramPacket
+import java.net.InetAddress
+import java.net.MulticastSocket
+import java.net.NetworkInterface
+import java.net.SocketException
 
 class MockMulticastSocket : MulticastSocket() {
     var sendPacket: DatagramPacket? = null
