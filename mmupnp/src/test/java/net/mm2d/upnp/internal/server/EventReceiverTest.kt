@@ -116,10 +116,7 @@ class EventReceiverTest {
                 latch = true
                 socket
             } else {
-                try {
-                    Thread.sleep(1000)
-                } catch (e: InterruptedException) {
-                }
+                runCatching { Thread.sleep(1000) }
                 throw IOException()
             }
         }
@@ -160,10 +157,7 @@ class EventReceiverTest {
                 latch = true
                 socket
             } else {
-                try {
-                    Thread.sleep(1000)
-                } catch (e: InterruptedException) {
-                }
+                runCatching { Thread.sleep(1000) }
                 throw IOException()
             }
         }
@@ -194,10 +188,7 @@ class EventReceiverTest {
                 latch = true
                 socket
             } else {
-                try {
-                    Thread.sleep(1000)
-                } catch (e: InterruptedException) {
-                }
+                runCatching { Thread.sleep(1000) }
                 throw IOException()
             }
         }
@@ -235,10 +226,7 @@ class EventReceiverTest {
             }
         }
         val receiver = spyk(EventReceiver(taskExecutors) { _, _, _ ->
-            try {
-                Thread.sleep(1000)
-            } catch (e: InterruptedException) {
-            }
+            runCatching { Thread.sleep(1000) }
             false
         })
         every { receiver.createServerSocket() } returns serverSocket
