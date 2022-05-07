@@ -69,24 +69,24 @@ internal object ServiceParser {
         val rootElement = XmlParser.parse(description) ?: return
 
         rootElement.childElements
-            .filter { it.qName == "actionList" }
+            .filter { it.localName == "actionList" }
             .flatMap { it.childElements }
-            .filter { it.qName == "action" }
+            .filter { it.localName == "action" }
             .forEach { builder.addActionBuilder(parseAction(it)) }
         rootElement.childElements
-            .filter { it.qName == "serviceStateTable" }
+            .filter { it.localName == "serviceStateTable" }
             .flatMap { it.childElements }
-            .filter { it.qName == "stateVariable" }
+            .filter { it.localName == "stateVariable" }
             .forEach { builder.addStateVariable(parseStateVariable(it)) }
     }
 
     private fun parseAction(element: XmlElement): ActionImpl.Builder {
         val builder = ActionImpl.Builder()
         element.childElements.forEach {
-            when (it.qName) {
+            when (it.localName) {
                 "name" -> builder.setName(it.value)
                 "argumentList" -> it.childElements.forEach { child ->
-                    if (child.qName == "argument") {
+                    if (child.localName == "argument") {
                         builder.addArgumentBuilder(parseArgument(child))
                     }
                 }
@@ -98,7 +98,7 @@ internal object ServiceParser {
     private fun parseArgument(element: XmlElement): ArgumentImpl.Builder {
         val builder = ArgumentImpl.Builder()
         element.childElements.forEach {
-            builder.setField(it.qName, it.value)
+            builder.setField(it.localName, it.value)
         }
         return builder
     }
@@ -119,7 +119,7 @@ internal object ServiceParser {
         builder.setSendEvents(element.getAttributeValue("sendEvents"))
         builder.setMulticast(element.getAttributeValue("multicast"))
         element.childElements.forEach {
-            when (it.qName) {
+            when (it.localName) {
                 "name" ->
                     builder.setName(it.value)
                 "dataType" ->
@@ -137,7 +137,7 @@ internal object ServiceParser {
 
     private fun parseAllowedValueList(builder: StateVariableImpl.Builder, element: XmlElement) {
         element.childElements.forEach {
-            if ("allowedValue" == it.qName) {
+            if ("allowedValue" == it.localName) {
                 builder.addAllowedValue(it.value)
             }
         }
@@ -145,7 +145,7 @@ internal object ServiceParser {
 
     private fun parseAllowedValueRange(builder: StateVariableImpl.Builder, element: XmlElement) {
         element.childElements.forEach {
-            builder.setField(it.qName, it.value)
+            builder.setField(it.localName, it.value)
         }
     }
 
