@@ -22,14 +22,12 @@ import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.HttpRequest
 import net.mm2d.upnp.HttpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
-import net.mm2d.upnp.util.XmlUtils
+import net.mm2d.xml.parser.XmlParser
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.w3c.dom.Element
-import org.w3c.dom.Node
 import java.io.IOException
 import java.net.URL
 import java.util.*
@@ -141,40 +139,26 @@ class ActionInvokeTest {
             .isEqualTo(request.getBodyBinary()?.size.toString())
     }
 
-    private fun createChildElementList(parent: Element): List<Element> {
-        val elements = ArrayList<Element>()
-        val children = parent.childNodes
-        for (i in 0 until children.length) {
-            val child = children.item(i)
-            if (child.nodeType == Node.ELEMENT_NODE) {
-                elements.add(child as Element)
-            }
-        }
-        return elements
-    }
-
     @Test
     fun invokeSync_リクエストSOAPフォーマットの確認() {
         val slot = slot<HttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         action.invokeSync(emptyMap())
         val request = slot.captured
-        val doc = XmlUtils.newDocument(true, request.getBody()!!)
-        val envelope = doc.documentElement
+
+        val envelope = XmlParser.parse(request.getBody()!!)!!
 
         assertThat(envelope.localName).isEqualTo("Envelope")
-        assertThat(envelope.namespaceURI).isEqualTo(SOAP_NS)
-        assertThat(envelope.getAttributeNS(SOAP_NS, "encodingStyle")).isEqualTo(SOAP_STYLE)
+        assertThat(envelope.uri).isEqualTo(SOAP_NS)
+        assertThat(envelope.getAttributeNSValue(SOAP_NS, "encodingStyle")).isEqualTo(SOAP_STYLE)
 
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
+        val body = envelope.childElements.find { it.localName == "Body" }!!
 
-        assertThat(body).isNotNull()
-        assertThat(body!!.namespaceURI).isEqualTo(SOAP_NS)
+        assertThat(body.uri).isEqualTo(SOAP_NS)
 
-        val action = XmlUtils.findChildElementByLocalName(body, ACTION_NAME)
+        val action = body.childElements.find { it.localName == ACTION_NAME }!!
 
-        assertThat(action).isNotNull()
-        assertThat(action!!.namespaceURI).isEqualTo(SERVICE_TYPE)
+        assertThat(action.uri).isEqualTo(SERVICE_TYPE)
     }
 
     @Test
@@ -184,18 +168,16 @@ class ActionInvokeTest {
         action.invokeSync(emptyMap())
         val request = slot.captured
 
-        val doc = XmlUtils.newDocument(true, request.getBody()!!)
-        val envelope = doc.documentElement
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
-        val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
+        val envelope = XmlParser.parse(request.getBody()!!)!!
+        val body = envelope.childElements.find { it.localName == "Body" }!!
+        val action = body.childElements.find { it.localName == ACTION_NAME }!!
 
-        val elements = createChildElementList(action!!)
-        assertThat(elements).hasSize(2)
-        assertThat(elements[0].localName).isEqualTo(IN_ARG_NAME_1)
-        assertThat(elements[0].textContent).isEqualTo("")
+        assertThat(action.childElements).hasSize(2)
+        assertThat(action.childElements[0].localName).isEqualTo(IN_ARG_NAME_1)
+        assertThat(action.childElements[0].value).isEqualTo("")
 
-        assertThat(elements[1].localName).isEqualTo(IN_ARG_NAME_2)
-        assertThat(elements[1].textContent).isEqualTo(IN_ARG_DEFAULT_VALUE)
+        assertThat(action.childElements[1].localName).isEqualTo(IN_ARG_NAME_2)
+        assertThat(action.childElements[1].value).isEqualTo(IN_ARG_DEFAULT_VALUE)
     }
 
     @Test
@@ -211,18 +193,16 @@ class ActionInvokeTest {
         action.invokeSync(argument)
         val request = slot.captured
 
-        val doc = XmlUtils.newDocument(true, request.getBody()!!)
-        val envelope = doc.documentElement
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
-        val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
+        val envelope = XmlParser.parse(request.getBody()!!)!!
+        val body = envelope.childElements.find { it.localName == "Body" }!!
+        val action = body.childElements.find { it.localName == ACTION_NAME }!!
 
-        val elements = createChildElementList(action!!)
-        assertThat(elements).hasSize(2)
-        assertThat(elements[0].localName).isEqualTo(IN_ARG_NAME_1)
-        assertThat(elements[0].textContent).isEqualTo(value1)
+        assertThat(action.childElements).hasSize(2)
+        assertThat(action.childElements[0].localName).isEqualTo(IN_ARG_NAME_1)
+        assertThat(action.childElements[0].value).isEqualTo(value1)
 
-        assertThat(elements[1].localName).isEqualTo(IN_ARG_NAME_2)
-        assertThat(elements[1].textContent).isEqualTo(value2)
+        assertThat(action.childElements[1].localName).isEqualTo(IN_ARG_NAME_2)
+        assertThat(action.childElements[1].value).isEqualTo(value2)
     }
 
     @Test
@@ -240,21 +220,19 @@ class ActionInvokeTest {
         action.invokeCustomSync(argument, customArguments = Collections.singletonMap(name, value))
         val request = slot.captured
 
-        val doc = XmlUtils.newDocument(true, request.getBody()!!)
-        val envelope = doc.documentElement
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
-        val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
+        val envelope = XmlParser.parse(request.getBody()!!)!!
+        val body = envelope.childElements.find { it.localName == "Body" }!!
+        val action = body.childElements.find { it.localName == ACTION_NAME }!!
 
-        val elements = createChildElementList(action!!)
-        assertThat(elements.size).isEqualTo(3)
-        assertThat(elements[0].localName).isEqualTo(IN_ARG_NAME_1)
-        assertThat(elements[0].textContent).isEqualTo(value1)
+        assertThat(action.childElements.size).isEqualTo(3)
+        assertThat(action.childElements[0].localName).isEqualTo(IN_ARG_NAME_1)
+        assertThat(action.childElements[0].value).isEqualTo(value1)
 
-        assertThat(elements[1].localName).isEqualTo(IN_ARG_NAME_2)
-        assertThat(elements[1].textContent).isEqualTo(value2)
+        assertThat(action.childElements[1].localName).isEqualTo(IN_ARG_NAME_2)
+        assertThat(action.childElements[1].value).isEqualTo(value2)
 
-        assertThat(elements[2].localName).isEqualTo(name)
-        assertThat(elements[2].textContent).isEqualTo(value)
+        assertThat(action.childElements[2].localName).isEqualTo(name)
+        assertThat(action.childElements[2].value).isEqualTo(value)
     }
 
     @Test
@@ -279,21 +257,19 @@ class ActionInvokeTest {
         )
         val request = slot.captured
 
-        val doc = XmlUtils.newDocument(true, request.getBody()!!)
-        val envelope = doc.documentElement
-        val body = XmlUtils.findChildElementByLocalName(envelope, "Body")
-        val action = XmlUtils.findChildElementByLocalName(body!!, ACTION_NAME)
+        val envelope = XmlParser.parse(request.getBody()!!)!!
+        val body = envelope.childElements.find { it.localName == "Body" }!!
+        val action = body.childElements.find { it.localName == ACTION_NAME }!!
 
-        val elements = createChildElementList(action!!)
-        assertThat(elements.size).isEqualTo(3)
-        assertThat(elements[0].localName).isEqualTo(IN_ARG_NAME_1)
-        assertThat(elements[0].textContent).isEqualTo(value1)
+        assertThat(action.childElements.size).isEqualTo(3)
+        assertThat(action.childElements[0].localName).isEqualTo(IN_ARG_NAME_1)
+        assertThat(action.childElements[0].value).isEqualTo(value1)
 
-        assertThat(elements[1].localName).isEqualTo(IN_ARG_NAME_2)
-        assertThat(elements[1].textContent).isEqualTo(value2)
+        assertThat(action.childElements[1].localName).isEqualTo(IN_ARG_NAME_2)
+        assertThat(action.childElements[1].value).isEqualTo(value2)
 
-        assertThat(elements[2].localName).isEqualTo(name)
-        assertThat(elements[2].textContent).isEqualTo(value)
+        assertThat(action.childElements[2].localName).isEqualTo(name)
+        assertThat(action.childElements[2].value).isEqualTo(value)
     }
 
     @Test

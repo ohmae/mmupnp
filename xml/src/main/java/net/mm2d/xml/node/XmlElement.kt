@@ -44,9 +44,17 @@ class XmlElement(
         attributes.forEach { it.parent = this }
     }
 
-    fun getAttribute(qName: String): XmlAttribute? = attributes.find { it.qName == qName }
+    fun getAttribute(qName: String): XmlAttribute? =
+        attributes.find { it.qName == qName }
 
-    fun getAttributeValue(qName: String): String = getAttribute(qName)?.value ?: ""
+    fun getAttributeValue(qName: String): String =
+        getAttribute(qName)?.value ?: ""
+
+    fun getAttributeNS(uri: String, localName: String): XmlAttribute? =
+        attributes.find { it.uri == uri && it.localName == localName }
+
+    fun getAttributeNSValue(uri: String, localName: String): String =
+        getAttributeNS(uri, localName)?.value ?: ""
 
     fun buildString(indent: Boolean = false, withDeclaration: Boolean = false): String =
         buildString {
