@@ -19,9 +19,7 @@ object XmlParser {
         val documentBuilder = DocumentBuilder()
         val parser = SAXParserFactory.newInstance().newSAXParser()
         parser.parse(xml.byteInputStream(), documentBuilder)
-        val element = documentBuilder.result?.build() ?: return null
-        println(element.buildString(true))
-        return element
+        return documentBuilder.result?.build()
     }
 
     class DocumentBuilder : DefaultHandler() {

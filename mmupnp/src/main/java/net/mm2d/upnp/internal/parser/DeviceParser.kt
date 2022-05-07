@@ -13,12 +13,9 @@ import net.mm2d.upnp.Icon
 import net.mm2d.upnp.internal.impl.DeviceImpl
 import net.mm2d.upnp.internal.impl.IconImpl
 import net.mm2d.upnp.internal.impl.ServiceImpl
-import net.mm2d.upnp.util.XmlUtils
-import net.mm2d.upnp.util.forEachElement
-import org.w3c.dom.Node
-import org.xml.sax.SAXException
+import net.mm2d.xml.node.XmlElement
+import net.mm2d.xml.parser.XmlParser
 import java.io.IOException
-import javax.xml.parsers.ParserConfigurationException
 
 /**
  * Parser for Device.
@@ -37,11 +34,9 @@ internal object DeviceParser {
      *
      * @param client HttpClient
      * @param builder DeviceのBuilder
-     * @throws SAXException if an parse error occurs.
      * @throws IOException if an I/O error occurs.
-     * @throws ParserConfigurationException If there is a problem with instantiation
      */
-    @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
+    @Throws(IOException::class)
     fun loadDescription(client: HttpClient, builder: DeviceImpl.Builder) {
         val url = Http.makeUrlWithScopeId(builder.getLocation(), builder.getSsdpMessage().scopeId)
         // DIAL Application-URL
@@ -56,7 +51,7 @@ internal object DeviceParser {
         loadServices(client, builder)
     }
 
-    @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
+    @Throws(IOException::class)
     private fun loadServices(client: HttpClient, builder: DeviceImpl.Builder) {
         builder.getServiceBuilderList().forEach {
             ServiceParser.loadDescription(client, builder, it)
@@ -66,17 +61,17 @@ internal object DeviceParser {
         }
     }
 
-    @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
+    @Throws(IOException::class)
     internal fun parseDescription(builder: DeviceImpl.Builder, description: String) {
         builder.setDescription(description)
-        val doc = XmlUtils.newDocument(true, description)
-        val deviceNode = XmlUtils.findChildElementByLocalName(doc.documentElement, "device") ?: throw IOException()
+        val rootNode = XmlParser.parse(description) ?: throw IOException()
+        val deviceNode = rootNode.childElements.find { it.qName == "device" } ?: throw IOException()
         parseDevice(builder, deviceNode)
     }
 
-    private fun parseDevice(builder: DeviceImpl.Builder, deviceNode: Node) {
-        deviceNode.firstChild?.forEachElement {
-            when (val tag = it.localName) {
+    private fun parseDevice(builder: DeviceImpl.Builder, deviceNode: XmlElement) {
+        deviceNode.childElements.forEach {
+            when (val tag = it.qName) {
                 "iconList" ->
                     parseIconList(builder, it)
                 "serviceList" ->
@@ -84,8 +79,8 @@ internal object DeviceParser {
                 "deviceList" ->
                     parseDeviceList(builder, it)
                 else -> {
-                    val namespace = it.namespaceURI
-                    val value = it.textContent
+                    val namespace = it.uri
+                    val value = it.value
                     builder.putTag(namespace, tag, value)
                     builder.setField(tag, value)
                 }
@@ -124,18 +119,18 @@ internal object DeviceParser {
         }
     }
 
-    private fun parseIconList(builder: DeviceImpl.Builder, listNode: Node) {
-        listNode.firstChild?.forEachElement {
-            if (it.localName == "icon") {
+    private fun parseIconList(builder: DeviceImpl.Builder, listNode: XmlElement) {
+        listNode.childElements.forEach {
+            if (it.qName == "icon") {
                 builder.addIcon(parseIcon(it))
             }
         }
     }
 
-    private fun parseIcon(iconNode: Node): Icon {
+    private fun parseIcon(iconNode: XmlElement): Icon {
         val builder = IconImpl.Builder()
-        iconNode.firstChild?.forEachElement {
-            builder.setField(it.localName, it.textContent)
+        iconNode.childElements.forEach {
+            builder.setField(it.qName, it.value)
         }
         return builder.build()
     }
@@ -155,18 +150,18 @@ internal object DeviceParser {
         }
     }
 
-    private fun parseServiceList(builder: DeviceImpl.Builder, listNode: Node) {
-        listNode.firstChild?.forEachElement {
-            if (it.localName == "service") {
+    private fun parseServiceList(builder: DeviceImpl.Builder, listNode: XmlElement) {
+        listNode.childElements.forEach {
+            if (it.qName == "service") {
                 builder.addServiceBuilder(parseService(it))
             }
         }
     }
 
-    private fun parseService(serviceNode: Node): ServiceImpl.Builder {
+    private fun parseService(serviceNode: XmlElement): ServiceImpl.Builder {
         val serviceBuilder = ServiceImpl.Builder()
-        serviceNode.firstChild?.forEachElement {
-            serviceBuilder.setField(it.localName, it.textContent)
+        serviceNode.childElements.forEach {
+            serviceBuilder.setField(it.qName, it.value)
         }
         return serviceBuilder
     }
@@ -186,10 +181,10 @@ internal object DeviceParser {
         }
     }
 
-    private fun parseDeviceList(builder: DeviceImpl.Builder, listNode: Node) {
+    private fun parseDeviceList(builder: DeviceImpl.Builder, listNode: XmlElement) {
         val builderList = ArrayList<DeviceImpl.Builder>()
-        listNode.firstChild?.forEachElement {
-            if (it.localName == "device") {
+        listNode.childElements.forEach {
+            if (it.qName == "device") {
                 val embeddedBuilder = builder.createEmbeddedDeviceBuilder()
                 parseDevice(embeddedBuilder, it)
                 builderList.add(embeddedBuilder)

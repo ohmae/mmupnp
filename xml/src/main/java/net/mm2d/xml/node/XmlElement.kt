@@ -18,6 +18,8 @@ class XmlElement(
     val prefix: String
     val localName: String
     val prefixMap: Map<String, String>
+    val childElements: List<XmlElement> =
+        children.mapNotNull { it as? XmlElement }
 
     init {
         val index = qName.indexOf(":")

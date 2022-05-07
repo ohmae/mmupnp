@@ -97,11 +97,12 @@ class XmlElementBuilder(
     private fun findUri(): String = findUri(prefix, this)
 
     override fun build(removeIgnorableWhitespace: Boolean): XmlElement {
-        val predicate: (XmlNodeBuilder) -> Boolean = if (removeIgnorableWhitespace && children.size > 1) {
-            { it !is XmlTextNodeBuilder || it.value.isNotBlank() }
-        } else {
-            { true }
-        }
+        val predicate: (XmlNodeBuilder) -> Boolean =
+            if (removeIgnorableWhitespace && children.size > 1) {
+                { it !is XmlTextNodeBuilder || it.value.isNotBlank() }
+            } else {
+                { true }
+            }
         val childList = children.filter(predicate).map { it.build(removeIgnorableWhitespace) }
         val value = if (childList.size == 1) {
             childList[0].let { if (it is XmlTextNode) it.value else "" }

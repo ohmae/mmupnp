@@ -57,6 +57,7 @@ artifacts {
 }
 
 dependencies {
+    api(project(":xml"))
     implementation(kotlin("stdlib"))
 
     testImplementation("junit:junit:4.13.2")
