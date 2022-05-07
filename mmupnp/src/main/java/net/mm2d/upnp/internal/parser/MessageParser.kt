@@ -9,8 +9,7 @@ package net.mm2d.upnp.internal.parser
 
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.HttpMessage
-import net.mm2d.upnp.util.XmlUtils
-import net.mm2d.upnp.util.siblingElements
+import net.mm2d.xml.parser.XmlParser
 import java.util.*
 
 internal fun String?.parseEventXml(): List<Pair<String, String>> {
@@ -18,22 +17,14 @@ internal fun String?.parseEventXml(): List<Pair<String, String>> {
         return emptyList()
     }
     try {
-        val propertySetNode = XmlUtils.newDocument(true, this).documentElement
-        if (propertySetNode.localName != "propertyset") {
+        val propertySetNode = XmlParser.parse(this)
+        if (propertySetNode?.localName != "propertyset") {
             return emptyList()
         }
-        val list = mutableListOf<Pair<String, String>>()
-        val firstChild = propertySetNode.firstChild ?: return list
-        firstChild.siblingElements()
+        return propertySetNode.childElements
             .filter { it.localName == "property" }
-            .flatMap { it.firstChild?.siblingElements() ?: emptyList() }
-            .forEach {
-                val name = it.localName
-                if (!name.isNullOrEmpty()) {
-                    list.add(name to it.textContent)
-                }
-            }
-        return list
+            .flatMap { it.childElements }
+            .map { it.localName to it.value }
     } catch (ignored: Exception) {
     }
     return emptyList()
