@@ -38,7 +38,7 @@ class MulticastEventReceiverTest {
         taskExecutors.terminate()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 20000L)
     fun `start stop デッドロックしない`() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val receiver = MulticastEventReceiver(taskExecutors, Address.IP_V4, networkInterface, mockk())
@@ -46,14 +46,14 @@ class MulticastEventReceiverTest {
         receiver.stop()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 20000L)
     fun `stop デッドロックしない`() {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val receiver = MulticastEventReceiver(taskExecutors, Address.IP_V4, networkInterface, mockk())
         receiver.stop()
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 20000L)
     fun `run 正常動作`() {
         mockkConstructor(ThreadCondition::class)
         every { anyConstructed<ThreadCondition>().isCanceled() } returns false
@@ -73,7 +73,7 @@ class MulticastEventReceiverTest {
         unmockkConstructor(ThreadCondition::class)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 20000L)
     fun `run すでにcancel`() {
         mockkConstructor(ThreadCondition::class)
         every { anyConstructed<ThreadCondition>().isCanceled() } returns true
@@ -93,7 +93,7 @@ class MulticastEventReceiverTest {
         unmockkConstructor(ThreadCondition::class)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 20000L)
     fun `receiveLoop 1ループ`() {
         mockkConstructor(ThreadCondition::class)
         every { anyConstructed<ThreadCondition>().isCanceled() } returns false
@@ -110,14 +110,14 @@ class MulticastEventReceiverTest {
         unmockkConstructor(ThreadCondition::class)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 20000L)
     fun `receiveLoop SocketTimeoutExceptionが発生しても次のループに入る`() {
         mockkConstructor(ThreadCondition::class)
         every { anyConstructed<ThreadCondition>().isCanceled() } returns false
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val receiver = spyk(MulticastEventReceiver(taskExecutors, Address.IP_V4, networkInterface, mockk()))
         val socket: MulticastSocket = mockk(relaxed = true)
-        every { receiver.onReceive(any(), any()) } throws (SocketTimeoutException()) andThen {
+        every { receiver.onReceive(any(), any()) } throws (SocketTimeoutException()) andThenAnswer {
             every { anyConstructed<ThreadCondition>().isCanceled() } returns true
         }
 
@@ -127,14 +127,14 @@ class MulticastEventReceiverTest {
         unmockkConstructor(ThreadCondition::class)
     }
 
-    @Test(timeout = 10000L)
+    @Test(timeout = 20000L)
     fun `receiveLoop receiveの時点でcancelされればonReceiveはコールされない`() {
         mockkConstructor(ThreadCondition::class)
         every { anyConstructed<ThreadCondition>().isCanceled() } returns false
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val receiver = spyk(MulticastEventReceiver(taskExecutors, Address.IP_V4, networkInterface, mockk()))
         val socket: MulticastSocket = mockk(relaxed = true)
-        every { socket.receive(any()) } throws (SocketTimeoutException()) andThen {
+        every { socket.receive(any()) } throws (SocketTimeoutException()) andThenAnswer {
             every { anyConstructed<ThreadCondition>().isCanceled() } returns true
         }
 

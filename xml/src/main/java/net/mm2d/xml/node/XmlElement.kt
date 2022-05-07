@@ -44,6 +44,10 @@ class XmlElement(
         attributes.forEach { it.parent = this }
     }
 
+    fun getAttribute(qName: String): XmlAttribute? = attributes.find { it.qName == qName }
+
+    fun getAttributeValue(qName: String): String = getAttribute(qName)?.value ?: ""
+
     fun buildString(indent: Boolean = false, withDeclaration: Boolean = false): String =
         buildString {
             if (withDeclaration) {
