@@ -82,24 +82,26 @@ internal object ServiceParser {
 
     private fun parseAction(element: XmlElement): ActionImpl.Builder {
         val builder = ActionImpl.Builder()
-        element.childElements.forEach {
-            when (it.localName) {
-                "name" -> builder.setName(it.value)
-                "argumentList" -> it.childElements.forEach { child ->
-                    if (child.localName == "argument") {
-                        builder.addArgumentBuilder(parseArgument(child))
-                    }
+        element.childElements
+            .forEach {
+                when (it.localName) {
+                    "name" -> builder.setName(it.value)
+                    "argumentList" -> parseArgumentList(builder, it)
                 }
             }
-        }
         return builder
+    }
+
+    private fun parseArgumentList(builder: ActionImpl.Builder, element: XmlElement) {
+        element.childElements
+            .filter { it.localName == "argument" }
+            .forEach { builder.addArgumentBuilder(parseArgument(it)) }
     }
 
     private fun parseArgument(element: XmlElement): ArgumentImpl.Builder {
         val builder = ArgumentImpl.Builder()
-        element.childElements.forEach {
-            builder.setField(it.localName, it.value)
-        }
+        element.childElements
+            .forEach { builder.setField(it.localName, it.value) }
         return builder
     }
 
@@ -136,17 +138,14 @@ internal object ServiceParser {
     }
 
     private fun parseAllowedValueList(builder: StateVariableImpl.Builder, element: XmlElement) {
-        element.childElements.forEach {
-            if ("allowedValue" == it.localName) {
-                builder.addAllowedValue(it.value)
-            }
-        }
+        element.childElements
+            .filter { it.localName == "allowedValue" }
+            .forEach { builder.addAllowedValue(it.value) }
     }
 
     private fun parseAllowedValueRange(builder: StateVariableImpl.Builder, element: XmlElement) {
-        element.childElements.forEach {
-            builder.setField(it.localName, it.value)
-        }
+        element.childElements
+            .forEach { builder.setField(it.localName, it.value) }
     }
 
     private fun StateVariableImpl.Builder.setField(tag: String, value: String) {
