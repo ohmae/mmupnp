@@ -8,9 +8,10 @@
 package net.mm2d.upnp.internal.manager
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Service
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,10 +56,11 @@ class SubscribeServiceTest {
         val service: Service = mockk(relaxed = true)
         val start = System.currentTimeMillis()
         val timeout = 1000L
-        every { service.renewSubscribeSync() } returns false
+        coEvery { service.renewSubscribe() } returns false
         val subscribeService = SubscribeService(service, timeout, true)
-
-        subscribeService.renewSubscribe(subscribeService.getNextScanTime())
+        runBlocking {
+            subscribeService.renewSubscribe(subscribeService.getNextScanTime())
+        }
         val time = subscribeService.getNextScanTime()
 
         assertThat(time).isGreaterThan(start)
@@ -69,11 +71,13 @@ class SubscribeServiceTest {
     fun getNextScanTime_keepである時failCountが0のときより1のほうが大きな値になる() {
         val timeout = 1000L
         val service: Service = mockk(relaxed = true)
-        every { service.renewSubscribeSync() } returns false
+        coEvery { service.renewSubscribe() } returns false
         val subscribeService = SubscribeService(service, timeout, true)
 
         val time1 = subscribeService.getNextScanTime()
-        subscribeService.renewSubscribe(time1)
+        runBlocking {
+            subscribeService.renewSubscribe(time1)
+        }
         val time2 = subscribeService.getNextScanTime()
 
         assertThat(time1).isLessThan(time2)
@@ -82,16 +86,20 @@ class SubscribeServiceTest {
     @Test
     fun isFailed_2回連続失敗でtrue() {
         val service: Service = mockk(relaxed = true)
-        every { service.renewSubscribeSync() } returns false
+        coEvery { service.renewSubscribe() } returns false
         val subscribeService = SubscribeService(service, 0L, true)
         val start = System.currentTimeMillis()
 
         assertThat(subscribeService.isFailed()).isFalse()
 
-        subscribeService.renewSubscribe(start)
+        runBlocking {
+            subscribeService.renewSubscribe(start)
+        }
         assertThat(subscribeService.isFailed()).isFalse()
 
-        subscribeService.renewSubscribe(start)
+        runBlocking {
+            subscribeService.renewSubscribe(start)
+        }
         assertThat(subscribeService.isFailed()).isTrue()
     }
 
@@ -102,16 +110,22 @@ class SubscribeServiceTest {
 
         assertThat(subscribeService.isFailed()).isFalse()
 
-        every { service.renewSubscribeSync() } returns false
-        subscribeService.renewSubscribe(0)
+        coEvery { service.renewSubscribe() } returns false
+        runBlocking {
+            subscribeService.renewSubscribe(0)
+        }
         assertThat(subscribeService.isFailed()).isFalse()
 
-        every { service.renewSubscribeSync() } returns true
-        subscribeService.renewSubscribe(0)
+        coEvery { service.renewSubscribe() } returns true
+        runBlocking {
+            subscribeService.renewSubscribe(0)
+        }
         assertThat(subscribeService.isFailed()).isFalse()
 
-        every { service.renewSubscribeSync() } returns false
-        subscribeService.renewSubscribe(0)
+        coEvery { service.renewSubscribe() } returns false
+        runBlocking {
+            subscribeService.renewSubscribe(0)
+        }
         assertThat(subscribeService.isFailed()).isFalse()
     }
 
@@ -131,36 +145,42 @@ class SubscribeServiceTest {
     fun renewSubscribe_keepがfalseならrenewSubscribeを呼ばない() {
         val timeout = 1000L
         val service: Service = mockk(relaxed = true)
-        every { service.renewSubscribeSync() } returns true
+        coEvery { service.renewSubscribe() } returns true
         val subscribeService = SubscribeService(service, timeout, false)
 
         val time = subscribeService.getNextScanTime()
-        assertThat(subscribeService.renewSubscribe(time)).isTrue()
-        verify(inverse = true) { service.renewSubscribeSync() }
+        runBlocking {
+            assertThat(subscribeService.renewSubscribe(time)).isTrue()
+        }
+        coVerify(inverse = true) { service.renewSubscribe() }
     }
 
     @Test
     fun renewSubscribe_keepがtrueでも時間の前ではrenewSubscribeを呼ばない() {
         val timeout = 1000L
         val service: Service = mockk(relaxed = true)
-        every { service.renewSubscribeSync() } returns true
+        coEvery { service.renewSubscribe() } returns true
         val subscribeService = SubscribeService(service, timeout, true)
 
         val time = subscribeService.getNextScanTime()
-        assertThat(subscribeService.renewSubscribe(time - 1)).isTrue()
-        verify(inverse = true) { service.renewSubscribeSync() }
+        runBlocking {
+            assertThat(subscribeService.renewSubscribe(time - 1)).isTrue()
+        }
+        coVerify(inverse = true) { service.renewSubscribe() }
     }
 
     @Test
     fun renewSubscribe_keepがtrueで時間を過ぎていたらrenewSubscribeを呼ぶ() {
         val timeout = 1000L
         val service: Service = mockk(relaxed = true)
-        every { service.renewSubscribeSync() } returns true
+        coEvery { service.renewSubscribe() } returns true
         val subscribeService = SubscribeService(service, timeout, true)
 
         val time = subscribeService.getNextScanTime()
-        assertThat(subscribeService.renewSubscribe(time)).isTrue()
-        verify(exactly = 1) { service.renewSubscribeSync() }
+        runBlocking {
+            assertThat(subscribeService.renewSubscribe(time)).isTrue()
+        }
+        coVerify(exactly = 1) { service.renewSubscribe() }
     }
 
     @Test
@@ -182,8 +202,10 @@ class SubscribeServiceTest {
         val subscribeService = SubscribeService(service, TimeUnit.SECONDS.toMillis(300), true)
         val start = System.currentTimeMillis()
 
-        subscribeService.renewSubscribe(TimeUnit.SECONDS.toMillis(300) + start)
-        subscribeService.renewSubscribe(TimeUnit.SECONDS.toMillis(300) + start)
+        runBlocking {
+            subscribeService.renewSubscribe(TimeUnit.SECONDS.toMillis(300) + start)
+            subscribeService.renewSubscribe(TimeUnit.SECONDS.toMillis(300) + start)
+        }
 
         assertThat(subscribeService.isFailed()).isTrue()
     }

@@ -92,11 +92,11 @@ internal class SubscribeService(
      * @param now Current time
      * @return false: failed, true: otherwise
      */
-    fun renewSubscribe(now: Long): Boolean {
+    suspend fun renewSubscribe(now: Long): Boolean {
         if (!keepRenew || calculateRenewTime() > now) {
             return true
         }
-        if (service.renewSubscribeSync()) {
+        if (service.renewSubscribe()) {
             resetFailCount()
             return true
         } else {

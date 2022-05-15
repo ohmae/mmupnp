@@ -8,6 +8,7 @@
 package net.mm2d.upnp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -572,7 +573,9 @@ class ServiceTest {
             every { client.post(capture(slot)) } returns createSubscribeResponse()
             mockkObject(HttpClient.Companion)
             every { HttpClient.create(any()) } returns client
-            cds.subscribeSync()
+            runBlocking {
+                cds.subscribe()
+            }
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
@@ -594,7 +597,9 @@ class ServiceTest {
             every { client.post(capture(slot)) } returns createSubscribeResponse()
             mockkObject(HttpClient.Companion)
             every { HttpClient.create(any()) } returns client
-            cds.subscribeSync(true)
+            runBlocking {
+                cds.subscribe(true)
+            }
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
@@ -609,8 +614,10 @@ class ServiceTest {
             every { client.post(capture(slot)) } returns createSubscribeResponse()
             mockkObject(HttpClient.Companion)
             every { HttpClient.create(any()) } returns client
-            cds.subscribeSync()
-            cds.renewSubscribeSync()
+            runBlocking {
+                cds.subscribe()
+                cds.renewSubscribe()
+            }
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
@@ -624,8 +631,10 @@ class ServiceTest {
             every { client.post(capture(slot)) } returns createSubscribeResponse()
             mockkObject(HttpClient.Companion)
             every { HttpClient.create(any()) } returns client
-            cds.subscribeSync()
-            cds.subscribeSync()
+            runBlocking {
+                cds.subscribe()
+                cds.subscribe()
+            }
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
@@ -639,8 +648,10 @@ class ServiceTest {
             every { client.post(capture(slot)) } returns createSubscribeResponse()
             mockkObject(HttpClient.Companion)
             every { HttpClient.create(any()) } returns client
-            cds.subscribeSync()
-            cds.unsubscribeSync()
+            runBlocking {
+                cds.subscribe()
+                cds.unsubscribe()
+            }
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
@@ -654,7 +665,9 @@ class ServiceTest {
             every { client.post(any()) } returns createSubscribeResponse()
             mockkObject(HttpClient.Companion)
             every { HttpClient.create(any()) } returns client
-            cds.subscribeSync()
+            runBlocking {
+                cds.subscribe()
+            }
 
             assertThat(cds.subscriptionId).isEqualTo(SID)
             unmockkObject(HttpClient.Companion)
@@ -762,7 +775,9 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.subscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.subscribe()).isTrue()
+            }
         }
 
         @Test
@@ -773,7 +788,9 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.subscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.subscribe()).isFalse()
+            }
         }
 
         @Test
@@ -784,7 +801,9 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-0")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.subscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.subscribe()).isFalse()
+            }
         }
 
         @Test
@@ -795,14 +814,18 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.subscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.subscribe()).isFalse()
+            }
         }
 
         @Test
         fun subscribeSync_Exception() {
             every { httpClient.post(any()) } throws IOException()
 
-            assertThat(service.subscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.subscribe()).isFalse()
+            }
         }
 
         @Test
@@ -813,11 +836,15 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.subscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.subscribe()).isTrue()
+            }
 
             every { subscribeDelegate["renewSubscribeActual"]("sid") } returns false
 
-            assertThat(service.subscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.subscribe()).isFalse()
+            }
 
             verify(exactly = 1) { subscribeDelegate.renewSubscribeActual("sid") }
         }
@@ -830,7 +857,9 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.renewSubscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isTrue()
+            }
 
             verify(exactly = 1) { subscribeDelegate.subscribeActual(any()) }
         }
@@ -843,10 +872,14 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.renewSubscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isTrue()
+            }
             verify(exactly = 1) { subscribeDelegate.subscribeActual(any()) }
 
-            assertThat(service.renewSubscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isTrue()
+            }
             verify(exactly = 1) { subscribeDelegate.renewSubscribeActual("sid") }
         }
 
@@ -858,10 +891,14 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.renewSubscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isTrue()
+            }
 
             response.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
-            assertThat(service.renewSubscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isFalse()
+            }
         }
 
         @Test
@@ -872,10 +909,14 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.renewSubscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isTrue()
+            }
 
             response.setHeader(Http.SID, "sid2")
-            assertThat(service.renewSubscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isFalse()
+            }
         }
 
         @Test
@@ -886,10 +927,14 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.renewSubscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isTrue()
+            }
 
             response.setHeader(Http.TIMEOUT, "second-0")
-            assertThat(service.renewSubscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isFalse()
+            }
         }
 
         @Test
@@ -900,16 +945,22 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.renewSubscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isTrue()
+            }
 
             every { httpClient.post(any()) } throws IOException()
 
-            assertThat(service.renewSubscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.renewSubscribe()).isFalse()
+            }
         }
 
         @Test
         fun unsubscribeSync_subscribeする前に実行すると失敗() {
-            assertThat(service.unsubscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.unsubscribe()).isFalse()
+            }
         }
 
         @Test
@@ -919,9 +970,14 @@ class ServiceTest {
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
-            assertThat(service.subscribeSync()).isTrue()
 
-            assertThat(service.unsubscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.subscribe()).isTrue()
+            }
+
+            runBlocking {
+                assertThat(service.unsubscribe()).isTrue()
+            }
         }
 
         @Test
@@ -931,11 +987,15 @@ class ServiceTest {
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
-            assertThat(service.subscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.subscribe()).isTrue()
+            }
 
             response.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
 
-            assertThat(service.unsubscribeSync()).isFalse()
+            runBlocking {
+                assertThat(service.unsubscribe()).isFalse()
+            }
         }
 
         @Test
@@ -946,82 +1006,38 @@ class ServiceTest {
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
 
-            assertThat(service.subscribeSync()).isTrue()
+            runBlocking {
+                assertThat(service.subscribe()).isTrue()
+            }
 
             every { httpClient.post(any()) } throws IOException()
 
-            assertThat(service.unsubscribeSync()).isFalse()
-        }
-
-        @Test
-        fun subscribe() {
-            every { subscribeDelegate.subscribe(any()) } returns true
-            val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
-            service.subscribe(false, callback)
-            Thread.sleep(200)
-            verify { callback(true) }
-        }
-
-        @Test
-        fun renewSubscribe() {
-            every { subscribeDelegate.renewSubscribe() } returns true
-            val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
-            service.renewSubscribe(callback)
-            Thread.sleep(200)
-            verify { callback(true) }
-        }
-
-        @Test
-        fun unsubscribe() {
-            every { subscribeDelegate.unsubscribe() } returns true
-            val callback: ((Boolean) -> Unit) = mockk(relaxed = true)
-            service.unsubscribe(callback)
-            Thread.sleep(200)
-            verify { callback(true) }
-        }
-
-        @Test
-        fun subscribe_no_callback() {
-            every { subscribeDelegate.subscribe(any()) } returns true
-            service.subscribe()
-            Thread.sleep(200)
-        }
-
-        @Test
-        fun renewSubscribe_no_callback() {
-            every { subscribeDelegate.renewSubscribe() } returns true
-            service.renewSubscribe()
-            Thread.sleep(200)
-        }
-
-        @Test
-        fun unsubscribe_no_callback() {
-            every { subscribeDelegate.unsubscribe() } returns true
-            service.unsubscribe()
-            Thread.sleep(200)
+            runBlocking {
+                assertThat(service.unsubscribe()).isFalse()
+            }
         }
 
         @Test
         fun subscribeAsync() {
-            every { subscribeDelegate.subscribe(any()) } returns true
+            coEvery { subscribeDelegate.subscribe(any()) } returns true
             runBlocking {
-                assertThat(service.subscribeAsync()).isTrue()
+                assertThat(service.subscribe()).isTrue()
             }
         }
 
         @Test
         fun renewSubscribeAsync() {
-            every { subscribeDelegate.renewSubscribe() } returns true
+            coEvery { subscribeDelegate.renewSubscribe() } returns true
             runBlocking {
-                assertThat(service.renewSubscribeAsync()).isTrue()
+                assertThat(service.renewSubscribe()).isTrue()
             }
         }
 
         @Test
         fun unsubscribeAsync() {
-            every { subscribeDelegate.unsubscribe() } returns true
+            coEvery { subscribeDelegate.unsubscribe() } returns true
             runBlocking {
-                assertThat(service.unsubscribeAsync()).isTrue()
+                assertThat(service.unsubscribe()).isTrue()
             }
         }
     }

@@ -30,22 +30,7 @@ object EmptyService : Service {
 
     override fun findAction(name: String): Action? = null
     override fun findStateVariable(name: String?): StateVariable? = null
-    override fun subscribeSync(keepRenew: Boolean): Boolean = false
-    override fun renewSubscribeSync(): Boolean = false
-    override fun unsubscribeSync(): Boolean = false
-    override suspend fun subscribeAsync(keepRenew: Boolean): Boolean = false
-    override suspend fun renewSubscribeAsync(): Boolean = false
-    override suspend fun unsubscribeAsync(): Boolean = false
-
-    override fun subscribe(keepRenew: Boolean, callback: ((Boolean) -> Unit)?) {
-        callback?.invoke(false)
-    }
-
-    override fun renewSubscribe(callback: ((Boolean) -> Unit)?) {
-        callback?.invoke(false)
-    }
-
-    override fun unsubscribe(callback: ((Boolean) -> Unit)?) {
-        callback?.invoke(false)
-    }
+    override suspend fun subscribe(keepRenew: Boolean): Boolean = false
+    override suspend fun renewSubscribe(): Boolean = false
+    override suspend fun unsubscribe(): Boolean = false
 }

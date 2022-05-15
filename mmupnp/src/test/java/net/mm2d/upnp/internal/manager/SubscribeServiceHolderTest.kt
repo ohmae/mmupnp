@@ -8,9 +8,10 @@
 package net.mm2d.upnp.internal.manager
 
 import com.google.common.truth.Truth.assertThat
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import org.junit.After
@@ -139,11 +140,11 @@ class SubscribeServiceHolderTest {
     @Test(timeout = 10000L)
     fun renew_定期的にrenewが実行される() {
         val service1: Service = mockk(relaxed = true)
-        every { service1.renewSubscribeSync() } returns true
+        coEvery { service1.renewSubscribe() } returns true
         every { service1.subscriptionId } returns "id1"
 
         val service2: Service = mockk(relaxed = true)
-        every { service2.renewSubscribeSync() } returns true
+        coEvery { service2.renewSubscribe() } returns true
         every { service2.subscriptionId } returns "id2"
 
         val subscribeHolder = SubscribeServiceHolder(taskExecutors)
@@ -151,10 +152,10 @@ class SubscribeServiceHolderTest {
 
         subscribeHolder.add(service1, 1000L, true)
         subscribeHolder.add(service2, 500L, true)
-        verify(inverse = true) { service1.renewSubscribeSync() }
+        coVerify(inverse = true) { service1.renewSubscribe() }
 
         Thread.sleep(2000L)
-        verify(atLeast = 1) { service1.renewSubscribeSync() }
+        coVerify(atLeast = 1) { service1.renewSubscribe() }
 
         subscribeHolder.stop()
     }
@@ -163,7 +164,7 @@ class SubscribeServiceHolderTest {
     fun renew_失敗したら削除される() {
         val id = "id"
         val service: Service = mockk(relaxed = true)
-        every { service.renewSubscribeSync() } returns false
+        coEvery { service.renewSubscribe() } returns false
         every { service.subscriptionId } returns id
         val subscribeHolder = SubscribeServiceHolder(taskExecutors)
         subscribeHolder.start()

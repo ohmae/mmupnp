@@ -139,71 +139,24 @@ interface Service {
     fun findStateVariable(name: String?): StateVariable?
 
     /**
-     * Invoke subscribe synchronously.
-     *
-     * @param keepRenew true: renew will be performed periodically before Expire.
-     * @return true: success, false: otherwise
-     */
-    fun subscribeSync(keepRenew: Boolean = false): Boolean
-
-    /**
-     * Invoke renew subscribe synchronously.
-     *
-     * @return true: success, false: otherwise
-     */
-    fun renewSubscribeSync(): Boolean
-
-    /**
-     * Invoke unsubscribe synchronously.
-     *
-     * @return true: success, false: otherwise
-     */
-    fun unsubscribeSync(): Boolean
-
-    /**
-     * Invoke subscribe asynchronously. The result is received by callback.
-     *
-     * @param keepRenew true: renew will be performed periodically before Expire.
-     * @param callback Callback to notify the result. Executed in callback thread.
-     * @see ControlPointFactory.create
-     */
-    fun subscribe(keepRenew: Boolean = false, callback: ((Boolean) -> Unit)? = null)
-
-    /**
-     * Invoke renew subscribe asynchronously. The result is received by callback.
-     *
-     * @param callback Callback to notify the result. Executed in callback thread.
-     * @see ControlPointFactory.create
-     */
-    fun renewSubscribe(callback: ((Boolean) -> Unit)? = null)
-
-    /**
-     * Invoke unsubscribe asynchronously. The result is received by callback.
-     *
-     * @param callback Callback to notify the result. Executed in callback thread.
-     * @see ControlPointFactory.create
-     */
-    fun unsubscribe(callback: ((Boolean) -> Unit)? = null)
-
-    /**
      * Invoke subscribe asynchronously. Suspends the invoking coroutine until the result is received.
      *
      * @param keepRenew true: renew will be performed periodically before Expire.
      * @see ControlPointFactory.create
      */
-    suspend fun subscribeAsync(keepRenew: Boolean = false): Boolean
+    suspend fun subscribe(keepRenew: Boolean = false): Boolean
 
     /**
      * Invoke renew subscribe asynchronously. Suspends the invoking coroutine until the result is received.
      *
      * @see ControlPointFactory.create
      */
-    suspend fun renewSubscribeAsync(): Boolean
+    suspend fun renewSubscribe(): Boolean
 
     /**
      * Invoke unsubscribe asynchronously. Suspends the invoking coroutine until the result is received.
      *
      * @see ControlPointFactory.create
      */
-    suspend fun unsubscribeAsync(): Boolean
+    suspend fun unsubscribe(): Boolean
 }

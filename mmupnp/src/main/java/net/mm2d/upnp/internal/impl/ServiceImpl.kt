@@ -11,10 +11,7 @@ import net.mm2d.upnp.Action
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.StateVariable
 import net.mm2d.upnp.internal.manager.SubscribeManager
-import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.log.Logger
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Implements for [Service].
@@ -33,7 +30,6 @@ internal class ServiceImpl(
     stateVariables: List<StateVariable>
 ) : Service {
     private val subscribeManager: SubscribeManager = device.controlPoint.subscribeManager
-    private val taskExecutors: TaskExecutors = device.controlPoint.taskExecutors
     private val actionMap: Map<String, Action>
     private val stateVariableMap = stateVariables.map { it.name to it }.toMap()
 
@@ -57,76 +53,19 @@ internal class ServiceImpl(
 
     override fun findStateVariable(name: String?): StateVariable? = stateVariableMap[name]
 
-    private fun subscribeInner(keepRenew: Boolean, callback: (Boolean) -> Unit) {
-        taskExecutors.io { callback(subscribeDelegate.subscribe(keepRenew)) }
-    }
-
-    private fun renewSubscribeInner(callback: (Boolean) -> Unit) {
-        taskExecutors.io { callback(subscribeDelegate.renewSubscribe()) }
-    }
-
-    private fun unsubscribeInner(callback: (Boolean) -> Unit) {
-        taskExecutors.io { callback(subscribeDelegate.unsubscribe()) }
-    }
-
-    override fun subscribeSync(keepRenew: Boolean): Boolean {
+    override suspend fun subscribe(keepRenew: Boolean): Boolean {
         subscribeManager.checkEnabled()
         return subscribeDelegate.subscribe(keepRenew)
     }
 
-    override fun renewSubscribeSync(): Boolean {
+    override suspend fun renewSubscribe(): Boolean {
         subscribeManager.checkEnabled()
         return subscribeDelegate.renewSubscribe()
     }
 
-    override fun unsubscribeSync(): Boolean {
+    override suspend fun unsubscribe(): Boolean {
         subscribeManager.checkEnabled()
         return subscribeDelegate.unsubscribe()
-    }
-
-    override fun subscribe(keepRenew: Boolean, callback: ((Boolean) -> Unit)?) {
-        subscribeManager.checkEnabled()
-        subscribeInner(keepRenew) {
-            callback ?: return@subscribeInner
-            taskExecutors.callback { callback(it) }
-        }
-    }
-
-    override fun renewSubscribe(callback: ((Boolean) -> Unit)?) {
-        subscribeManager.checkEnabled()
-        renewSubscribeInner {
-            callback ?: return@renewSubscribeInner
-            taskExecutors.callback { callback(it) }
-        }
-    }
-
-    override fun unsubscribe(callback: ((Boolean) -> Unit)?) {
-        subscribeManager.checkEnabled()
-        unsubscribeInner {
-            callback ?: return@unsubscribeInner
-            taskExecutors.callback { callback(it) }
-        }
-    }
-
-    override suspend fun subscribeAsync(keepRenew: Boolean): Boolean {
-        subscribeManager.checkEnabled()
-        return suspendCoroutine { continuation ->
-            subscribeInner(keepRenew) { continuation.resume(it) }
-        }
-    }
-
-    override suspend fun renewSubscribeAsync(): Boolean {
-        subscribeManager.checkEnabled()
-        return suspendCoroutine { continuation ->
-            renewSubscribeInner { continuation.resume(it) }
-        }
-    }
-
-    override suspend fun unsubscribeAsync(): Boolean {
-        subscribeManager.checkEnabled()
-        return suspendCoroutine { continuation ->
-            unsubscribeInner { continuation.resume(it) }
-        }
     }
 
     override fun hashCode(): Int = device.hashCode() + serviceId.hashCode()

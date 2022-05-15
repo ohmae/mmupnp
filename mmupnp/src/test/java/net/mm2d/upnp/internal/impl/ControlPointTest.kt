@@ -8,6 +8,7 @@
 package net.mm2d.upnp.internal.impl
 
 import com.google.common.truth.Truth.assertThat
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -927,7 +928,7 @@ class ControlPointTest {
             cp.stop()
             cp.terminate()
             Thread.sleep(100)
-            verify(exactly = 1) { service.unsubscribe() }
+            coVerify(exactly = 1) { service.unsubscribe() }
             verify(exactly = 1) { deviceHolder.remove(device) }
         }
 

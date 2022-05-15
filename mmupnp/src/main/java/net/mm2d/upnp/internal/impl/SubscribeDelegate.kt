@@ -41,7 +41,7 @@ internal class SubscribeDelegate(
     @Throws(MalformedURLException::class)
     internal fun makeAbsoluteUrl(url: String): URL = Http.makeAbsoluteUrl(device.baseUrl, url, device.scopeId)
 
-    fun subscribe(keepRenew: Boolean): Boolean {
+    suspend fun subscribe(keepRenew: Boolean): Boolean {
         try {
             val sId = subscriptionId
             if (!sId.isNullOrEmpty()) {
@@ -90,7 +90,7 @@ internal class SubscribeDelegate(
             setHeader(Http.CONTENT_LENGTH, "0")
         }
 
-    fun renewSubscribe(): Boolean {
+    suspend fun renewSubscribe(): Boolean {
         return try {
             val sId = subscriptionId
             if (sId.isNullOrEmpty()) subscribeActual(false)
@@ -131,7 +131,7 @@ internal class SubscribeDelegate(
             setHeader(Http.CONTENT_LENGTH, "0")
         }
 
-    fun unsubscribe(): Boolean {
+    suspend fun unsubscribe(): Boolean {
         val sId = subscriptionId
         if (sId.isNullOrEmpty()) {
             return false

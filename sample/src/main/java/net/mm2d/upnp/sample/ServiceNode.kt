@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp.sample
 
+import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.Service
 import java.awt.Component
@@ -66,14 +67,10 @@ class ServiceNode(service: Service) : UpnpNode(service) {
     }
 
     private fun subscribe() {
-        getUserObject().subscribe(true) {
-            isSubscribing = it
-        }
+        isSubscribing = runBlocking { getUserObject().subscribe(true) }
     }
 
     private fun unsubscribe() {
-        getUserObject().unsubscribe {
-            isSubscribing = !it
-        }
+        isSubscribing = !runBlocking { getUserObject().unsubscribe() }
     }
 }

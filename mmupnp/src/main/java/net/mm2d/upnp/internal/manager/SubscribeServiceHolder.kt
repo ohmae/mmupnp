@@ -10,6 +10,7 @@ package net.mm2d.upnp.internal.manager
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -63,7 +64,9 @@ internal class SubscribeServiceHolder(
 
     fun clear(): Unit = lock.withLock {
         subscriptionMap.values.forEach {
-            it.service.unsubscribe()
+            runBlocking {
+                it.service.unsubscribe()
+            }
         }
         subscriptionMap.clear()
     }
@@ -74,8 +77,10 @@ internal class SubscribeServiceHolder(
         }
         try {
             while (!threadCondition.isCanceled()) {
-                renewSubscribe(waitEntry())
-                removeExpiredService()
+                runBlocking {
+                    renewSubscribe(waitEntry())
+                    removeExpiredService()
+                }
                 waitNextRenewTime()
             }
         } catch (ignored: InterruptedException) {
@@ -109,7 +114,7 @@ internal class SubscribeServiceHolder(
      *
      * @param serviceList [Service] collection
      */
-    private fun renewSubscribe(serviceList: Collection<SubscribeService>) {
+    private suspend fun renewSubscribe(serviceList: Collection<SubscribeService>) {
         serviceList.forEach {
             if (!it.renewSubscribe(System.currentTimeMillis()) && it.isFailed()) {
                 remove(it.service)
@@ -120,14 +125,16 @@ internal class SubscribeServiceHolder(
     /**
      * Remove expired [Service].
      */
-    private fun removeExpiredService(): Unit = lock.withLock {
+    private suspend fun removeExpiredService(): Unit = lock.withLock {
         val now = System.currentTimeMillis()
         subscriptionMap.values
             .filter { it.isExpired(now) }
             .map { it.service }
             .forEach {
                 remove(it)
-                it.unsubscribeSync()
+                runBlocking {
+                    it.unsubscribe()
+                }
             }
     }
 
