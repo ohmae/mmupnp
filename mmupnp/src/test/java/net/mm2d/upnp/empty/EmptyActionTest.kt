@@ -8,9 +8,6 @@
 package net.mm2d.upnp.empty
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.mockk
-import io.mockk.spyk
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith

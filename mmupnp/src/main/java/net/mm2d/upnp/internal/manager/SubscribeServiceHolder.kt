@@ -7,10 +7,10 @@
 
 package net.mm2d.upnp.internal.manager
 
+import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
