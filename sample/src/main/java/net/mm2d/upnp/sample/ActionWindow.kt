@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp.sample
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Argument
 import java.awt.BorderLayout
@@ -77,11 +79,13 @@ class ActionWindow(private val action: Action) : JFrame(action.name) {
     }
 
     private fun invokeAction() {
-        try {
-            setResult(action.invokeSync(makeArgument(), true))
-        } catch (e: IOException) {
-            e.printStackTrace()
-            errorMessage.text = e.message
+        GlobalScope.launch {
+            try {
+                setResult(action.invoke(makeArgument(), true))
+            } catch (e: IOException) {
+                e.printStackTrace()
+                errorMessage.text = e.message
+            }
         }
     }
 

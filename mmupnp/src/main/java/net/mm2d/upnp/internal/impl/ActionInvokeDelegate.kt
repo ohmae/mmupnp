@@ -29,8 +29,7 @@ internal class ActionInvokeDelegate(
     private val argumentMap: Map<String, Argument> = action.argumentMap
     private fun createHttpClient(): HttpClient = HttpClient.create(false)
 
-    @Throws(IOException::class)
-    fun invoke(
+    suspend fun invoke(
         argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
@@ -57,7 +56,7 @@ internal class ActionInvokeDelegate(
         argumentValues[argument.name] ?: argument.relatedStateVariable.defaultValue
 
     @Throws(IOException::class)
-    private fun invoke(soap: String, returnErrorResponse: Boolean): Map<String, String> =
+    private suspend fun invoke(soap: String, returnErrorResponse: Boolean): Map<String, String> =
         invoke(soap).also {
             Logger.v { "action result:\n$it" }
             if (!returnErrorResponse && it.containsKey(Action.ERROR_CODE_KEY)) {
@@ -73,7 +72,7 @@ internal class ActionInvokeDelegate(
      * @throws IOException if an I/O error occurs or receive the error response.
      */
     @Throws(IOException::class)
-    private fun invoke(soap: String): Map<String, String> {
+    private suspend fun invoke(soap: String): Map<String, String> {
         val request = makeHttpRequest(makeAbsoluteControlUrl(), soap)
         Logger.d { "action invoke:\n$request" }
         val response = createHttpClient().post(request)

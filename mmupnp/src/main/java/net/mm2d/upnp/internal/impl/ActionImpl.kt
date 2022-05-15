@@ -9,10 +9,6 @@ package net.mm2d.upnp.internal.impl
 
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Argument
-import java.io.IOException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Implements for [Action].
@@ -24,8 +20,6 @@ internal class ActionImpl(
     override val name: String,
     internal val argumentMap: Map<String, Argument>
 ) : Action {
-    private val taskExecutors = service.device.controlPoint.taskExecutors
-
     // VisibleForTesting
     internal val invokeDelegate: ActionInvokeDelegate by lazy { createInvokeDelegate(this) }
 
@@ -35,77 +29,18 @@ internal class ActionImpl(
 
     override fun findArgument(name: String): Argument? = argumentMap[name]
 
-    @Throws(IOException::class)
-    override fun invokeSync(
+    override suspend fun invoke(
         argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
-    ): Map<String, String> = invokeCustomSync(argumentValues, emptyMap(), emptyMap(), returnErrorResponse)
+    ): Map<String, String> = invokeCustom(argumentValues, emptyMap(), emptyMap(), returnErrorResponse)
 
-    @Throws(IOException::class)
-    override fun invokeCustomSync(
+    override suspend fun invokeCustom(
         argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,
         returnErrorResponse: Boolean
-    ): Map<String, String> = invokeDelegate.invoke(
-        argumentValues, customNamespace, customArguments, returnErrorResponse
-    )
-
-    private fun invokeInner(
-        argumentValues: Map<String, String?>,
-        customNamespace: Map<String, String>,
-        customArguments: Map<String, String>,
-        returnErrorResponse: Boolean,
-        onResult: (Map<String, String>) -> Unit,
-        onError: (IOException) -> Unit
-    ) {
-        taskExecutors.io {
-            try {
-                onResult(invokeCustomSync(argumentValues, customNamespace, customArguments, returnErrorResponse))
-            } catch (e: IOException) {
-                onError(e)
-            }
-        }
-    }
-
-    override fun invoke(
-        argumentValues: Map<String, String?>,
-        returnErrorResponse: Boolean,
-        onResult: ((Map<String, String>) -> Unit)?,
-        onError: ((IOException) -> Unit)?
-    ) = invokeCustom(argumentValues, emptyMap(), emptyMap(), returnErrorResponse, onResult, onError)
-
-    override fun invokeCustom(
-        argumentValues: Map<String, String?>,
-        customNamespace: Map<String, String>,
-        customArguments: Map<String, String>,
-        returnErrorResponse: Boolean,
-        onResult: ((Map<String, String>) -> Unit)?,
-        onError: ((IOException) -> Unit)?
-    ) = invokeInner(argumentValues, customNamespace, customArguments, returnErrorResponse, {
-        onResult ?: return@invokeInner
-        taskExecutors.callback { onResult(it) }
-    }, {
-        onError ?: return@invokeInner
-        taskExecutors.callback { onError(it) }
-    })
-
-    override suspend fun invokeAsync(
-        argumentValues: Map<String, String?>,
-        returnErrorResponse: Boolean
-    ): Map<String, String> = invokeCustomAsync(argumentValues, emptyMap(), emptyMap(), returnErrorResponse)
-
-    override suspend fun invokeCustomAsync(
-        argumentValues: Map<String, String?>,
-        customNamespace: Map<String, String>,
-        customArguments: Map<String, String>,
-        returnErrorResponse: Boolean
-    ): Map<String, String> = suspendCoroutine { continuation ->
-        invokeInner(argumentValues, customNamespace, customArguments, returnErrorResponse,
-            { continuation.resume(it) },
-            { continuation.resumeWithException(it) }
-        )
-    }
+    ): Map<String, String> =
+        invokeDelegate.invoke(argumentValues, customNamespace, customArguments, returnErrorResponse)
 
     class Builder {
         private var service: ServiceImpl? = null

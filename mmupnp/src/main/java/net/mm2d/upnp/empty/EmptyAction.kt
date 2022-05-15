@@ -22,52 +22,14 @@ object EmptyAction : Action {
     override val argumentList: List<Argument> = emptyList()
     override fun findArgument(name: String): Argument? = null
 
-    @Throws(IOException::class)
-    override fun invokeSync(
+    override suspend fun invoke(
         argumentValues: Map<String, String?>,
         returnErrorResponse: Boolean
     ): Map<String, String> {
         throw IOException("empty object")
     }
 
-    @Throws(IOException::class)
-    override fun invokeCustomSync(
-        argumentValues: Map<String, String?>,
-        customNamespace: Map<String, String>,
-        customArguments: Map<String, String>,
-        returnErrorResponse: Boolean
-    ): Map<String, String> {
-        throw IOException("empty object")
-    }
-
-    override fun invoke(
-        argumentValues: Map<String, String?>,
-        returnErrorResponse: Boolean,
-        onResult: ((Map<String, String>) -> Unit)?,
-        onError: ((IOException) -> Unit)?
-    ) {
-        onError?.invoke(IOException("empty object"))
-    }
-
-    override fun invokeCustom(
-        argumentValues: Map<String, String?>,
-        customNamespace: Map<String, String>,
-        customArguments: Map<String, String>,
-        returnErrorResponse: Boolean,
-        onResult: ((Map<String, String>) -> Unit)?,
-        onError: ((IOException) -> Unit)?
-    ) {
-        onError?.invoke(IOException("empty object"))
-    }
-
-    override suspend fun invokeAsync(
-        argumentValues: Map<String, String?>,
-        returnErrorResponse: Boolean
-    ): Map<String, String> {
-        throw IOException("empty object")
-    }
-
-    override suspend fun invokeCustomAsync(
+    override suspend fun invokeCustom(
         argumentValues: Map<String, String?>,
         customNamespace: Map<String, String>,
         customArguments: Map<String, String>,

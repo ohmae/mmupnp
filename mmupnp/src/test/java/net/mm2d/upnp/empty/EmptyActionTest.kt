@@ -41,62 +41,16 @@ class EmptyActionTest {
     }
 
     @Test(expected = IOException::class)
-    fun invokeSync() {
-        EmptyAction.invokeSync(emptyMap())
-    }
-
-    @Test(expected = IOException::class)
-    fun invokeCustomSync() {
-        EmptyAction.invokeCustomSync(emptyMap())
-    }
-
-    @Test
-    fun invoke() {
-        EmptyAction.invoke(emptyMap())
-    }
-
-    @Test
-    fun invoke2() {
-        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
-        val onError: (IOException) -> Unit = spyk()
-        EmptyAction.invoke(
-            emptyMap(),
-            onResult = onResult,
-            onError = onError
-        )
-        verify(inverse = true) { onResult.invoke(any()) }
-        verify(exactly = 1) { onError.invoke(any()) }
-    }
-
-    @Test
-    fun invokeCustom() {
-        EmptyAction.invokeCustom(emptyMap())
-    }
-
-    @Test
-    fun invokeCustom2() {
-        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
-        val onError: (IOException) -> Unit = spyk()
-        EmptyAction.invokeCustom(
-            emptyMap(),
-            onResult = onResult,
-            onError = onError
-        )
-        verify(inverse = true) { onResult.invoke(any()) }
-        verify(exactly = 1) { onError.invoke(any()) }
-    }
-
-    @Test(expected = IOException::class)
     fun invokeAsync() {
         runBlocking {
-            EmptyAction.invokeAsync(emptyMap())
+            EmptyAction.invoke(emptyMap())
         }
     }
 
     @Test(expected = IOException::class)
     fun invokeCustomAsync() {
         runBlocking {
-            EmptyAction.invokeCustomAsync(emptyMap())
+            EmptyAction.invokeCustom(emptyMap())
         }
     }
 }

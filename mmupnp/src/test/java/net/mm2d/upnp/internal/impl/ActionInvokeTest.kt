@@ -14,7 +14,6 @@ import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.unmockkObject
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Http
@@ -121,14 +120,18 @@ class ActionInvokeTest {
         val client: HttpClient = mockk(relaxed = true)
         every { client.post(any()) } throws IOException()
         every { HttpClient.create(any()) } returns client
-        action.invokeSync(emptyMap())
+        runBlocking {
+            action.invoke(emptyMap())
+        }
     }
 
     @Test
     fun invokeSync_リクエストヘッダの確認() {
         val slot = slot<HttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
-        action.invokeSync(emptyMap())
+        runBlocking {
+            action.invoke(emptyMap())
+        }
 
         val request = slot.captured
         assertThat(request.getMethod()).isEqualTo("POST")
@@ -143,7 +146,10 @@ class ActionInvokeTest {
     fun invokeSync_リクエストSOAPフォーマットの確認() {
         val slot = slot<HttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
-        action.invokeSync(emptyMap())
+        runBlocking {
+            action.invoke(emptyMap())
+        }
+
         val request = slot.captured
 
         val envelope = XmlParser.parse(request.getBody()!!)!!
@@ -165,7 +171,9 @@ class ActionInvokeTest {
     fun invokeSync_リクエストSOAPの引数確認_指定なしでの実行() {
         val slot = slot<HttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
-        action.invokeSync(emptyMap())
+        runBlocking {
+            action.invoke(emptyMap())
+        }
         val request = slot.captured
 
         val envelope = XmlParser.parse(request.getBody()!!)!!
@@ -190,7 +198,9 @@ class ActionInvokeTest {
             IN_ARG_NAME_1 to value1,
             IN_ARG_NAME_2 to value2
         )
-        action.invokeSync(argument)
+        runBlocking {
+            action.invoke(argument)
+        }
         val request = slot.captured
 
         val envelope = XmlParser.parse(request.getBody()!!)!!
@@ -217,7 +227,9 @@ class ActionInvokeTest {
             IN_ARG_NAME_1 to value1,
             IN_ARG_NAME_2 to value2
         )
-        action.invokeCustomSync(argument, customArguments = Collections.singletonMap(name, value))
+        runBlocking {
+            action.invokeCustom(argument, customArguments = Collections.singletonMap(name, value))
+        }
         val request = slot.captured
 
         val envelope = XmlParser.parse(request.getBody()!!)!!
@@ -250,11 +262,13 @@ class ActionInvokeTest {
             IN_ARG_NAME_2 to value2
         )
 
-        action.invokeCustomSync(
-            argument,
-            customNamespace = Collections.singletonMap(prefix, urn),
-            customArguments = Collections.singletonMap("$prefix:$name", value)
-        )
+        runBlocking {
+            action.invokeCustom(
+                argument,
+                customNamespace = Collections.singletonMap(prefix, urn),
+                customArguments = Collections.singletonMap("$prefix:$name", value)
+            )
+        }
         val request = slot.captured
 
         val envelope = XmlParser.parse(request.getBody()!!)!!
@@ -280,12 +294,16 @@ class ActionInvokeTest {
             httpResponse.setStatus(status)
             every { mockHttpClient.post(any()) } returns httpResponse
             if (status === Http.Status.HTTP_OK) {
-                action.invokeSync(emptyMap())
+                runBlocking {
+                    action.invoke(emptyMap())
+                }
                 continue
             }
             try {
                 statusCount++
-                action.invokeSync(emptyMap())
+                runBlocking {
+                    action.invoke(emptyMap())
+                }
             } catch (ignored: IOException) {
                 exceptionCount++
             }
@@ -303,7 +321,9 @@ class ActionInvokeTest {
         )
         every { mockHttpClient.post(any()) } returns httpResponse
 
-        action.invokeSync(emptyMap(), false)
+        runBlocking {
+            action.invoke(emptyMap(), false)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -318,13 +338,17 @@ class ActionInvokeTest {
         )
         every { mockHttpClient.post(any()) } returns httpResponse
 
-        action.invokeSync(emptyMap(), false)
+        runBlocking {
+            action.invoke(emptyMap(), false)
+        }
     }
 
     @Test
     fun invokeSync_実行結果をパースしMapとして戻ること() {
         every { mockHttpClient.post(any()) } returns httpResponse
-        val result = action.invokeSync(emptyMap())
+        val result = runBlocking {
+            action.invoke(emptyMap())
+        }
         assertThat(result[OUT_ARG_NAME1]).isEqualTo(OUT_ARG_VALUE1)
     }
 
@@ -343,7 +367,9 @@ class ActionInvokeTest {
             """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
-        val result = action.invokeSync(emptyMap())
+        val result = runBlocking {
+            action.invoke(emptyMap())
+        }
         assertThat(result[OUT_ARG_NAME1]).isEqualTo(OUT_ARG_VALUE1)
         assertThat(result).containsKey(OUT_ARG_NAME2)
     }
@@ -353,7 +379,9 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(ERROR_RESPONSE)
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), false)
+        runBlocking {
+            action.invoke(emptyMap(), false)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -377,7 +405,9 @@ class ActionInvokeTest {
             """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
+        runBlocking {
+            action.invoke(emptyMap(), true)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -398,7 +428,9 @@ class ActionInvokeTest {
                 """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
+        runBlocking {
+            action.invoke(emptyMap(), true)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -411,7 +443,9 @@ class ActionInvokeTest {
             """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
+        runBlocking {
+            action.invoke(emptyMap(), true)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -426,7 +460,9 @@ class ActionInvokeTest {
             """.trimIndent()
         )
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
+        runBlocking {
+            action.invoke(emptyMap(), true)
+        }
     }
 
     @Test
@@ -434,7 +470,9 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(ERROR_RESPONSE)
         every { mockHttpClient.post(any()) } returns httpResponse
-        val result = action.invokeSync(emptyMap(), true)
+        val result = runBlocking {
+            action.invoke(emptyMap(), true)
+        }
         assertThat(result[Action.FAULT_CODE_KEY]).isEqualTo("s:Client")
         assertThat(result[Action.FAULT_STRING_KEY]).isEqualTo("UPnPError")
         assertThat(result[Action.ERROR_CODE_KEY]).isEqualTo("711")
@@ -446,7 +484,9 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(ERROR_RESPONSE)
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap())
+        runBlocking {
+            action.invoke(emptyMap())
+        }
     }
 
     @Test
@@ -454,7 +494,9 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody(ERROR_RESPONSE)
         every { mockHttpClient.post(any()) } returns httpResponse
-        val result = action.invokeSync(emptyMap(), true)
+        val result = runBlocking {
+            action.invoke(emptyMap(), true)
+        }
         assertThat(result[Action.FAULT_CODE_KEY]).isEqualTo("s:Client")
         assertThat(result[Action.FAULT_STRING_KEY]).isEqualTo("UPnPError")
         assertThat(result[Action.ERROR_CODE_KEY]).isEqualTo("711")
@@ -466,7 +508,9 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_OK)
         httpResponse.setBody("")
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
+        runBlocking {
+            action.invoke(emptyMap(), true)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -474,7 +518,9 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody("")
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
+        runBlocking {
+            action.invoke(emptyMap(), true)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -482,7 +528,9 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_NOT_FOUND)
         httpResponse.setBody("")
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
+        runBlocking {
+            action.invoke(emptyMap(), true)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -490,7 +538,9 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_OK)
         httpResponse.setBody("<>")
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
+        runBlocking {
+            action.invoke(emptyMap(), true)
+        }
     }
 
     @Test(expected = IOException::class)
@@ -498,110 +548,8 @@ class ActionInvokeTest {
         httpResponse.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
         httpResponse.setBody("<>")
         every { mockHttpClient.post(any()) } returns httpResponse
-        action.invokeSync(emptyMap(), true)
-    }
-
-    @Test
-    fun invoke_success() {
-        every { action.invokeSync(any(), any()) } returns emptyMap()
-        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
-        val onError: (IOException) -> Unit = mockk(relaxed = true)
-        action.invoke(emptyMap(), true, onResult, onError)
-        Thread.sleep(200)
-        verify(exactly = 1) { onResult.invoke(any()) }
-        verify(inverse = true) { onError.invoke(any()) }
-    }
-
-    @Test
-    fun invoke_exception() {
-        every { action.invokeSync(any(), any()) } throws IOException()
-        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
-        val onError: (IOException) -> Unit = mockk(relaxed = true)
-        action.invoke(emptyMap(), true, onResult, onError)
-        Thread.sleep(200)
-        verify(inverse = true) { onResult.invoke(any()) }
-        verify(exactly = 1) { onError.invoke(any()) }
-    }
-
-    @Test
-    fun invoke_no_callback_success() {
-        every { action.invokeSync(any(), any()) } returns emptyMap()
-        action.invoke(emptyMap())
-        Thread.sleep(200)
-    }
-
-    @Test
-    fun invoke_no_callback_exception() {
-        every { action.invokeSync(any(), any()) } throws IOException()
-        action.invoke(emptyMap())
-        Thread.sleep(100)
-    }
-
-    @Test
-    fun invokeCustom_success() {
-        every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
-        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
-        val onError: (IOException) -> Unit = mockk(relaxed = true)
-        action.invokeCustom(emptyMap(), emptyMap(), emptyMap(), true, onResult, onError)
-        Thread.sleep(200)
-        verify(exactly = 1) { onResult.invoke(any()) }
-        verify(inverse = true) { onError.invoke(any()) }
-    }
-
-    @Test
-    fun invokeCustom_exception() {
-        every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
-        val onResult: (Map<String, String>) -> Unit = mockk(relaxed = true)
-        val onError: (IOException) -> Unit = mockk(relaxed = true)
-        action.invokeCustom(emptyMap(), emptyMap(), emptyMap(), true, onResult, onError)
-        Thread.sleep(200)
-        verify(inverse = true) { onResult.invoke(any()) }
-        verify(exactly = 1) { onError.invoke(any()) }
-    }
-
-    @Test
-    fun invokeCustom_no_callback_success() {
-        every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
-        action.invokeCustom(emptyMap())
-        Thread.sleep(200)
-    }
-
-    @Test
-    fun invokeCustom_no_callback_exception() {
-        every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
-        action.invokeCustom(emptyMap())
-        Thread.sleep(200)
-    }
-
-    @Test
-    fun invokeAsync_success() {
-        every { action.invokeSync(any(), any()) } returns emptyMap()
         runBlocking {
-            assertThat(action.invokeAsync(emptyMap())).isNotNull()
-        }
-    }
-
-    @Test(expected = IOException::class)
-    fun invokeAsync_exception() {
-        every { action.invokeSync(any(), any()) } throws IOException()
-        runBlocking {
-            action.invokeAsync(emptyMap())
-        }
-    }
-
-    @Test
-    fun invokeCustomAsync_success() {
-        every { action.invokeCustomSync(any(), any(), any(), any()) } returns emptyMap()
-        runBlocking {
-            assertThat(action.invokeCustomAsync(emptyMap())).isNotNull()
-        }
-    }
-
-    @Test(expected = IOException::class)
-    fun invokeCustomAsync_exception() {
-        every { action.invokeCustomSync(any(), any(), any(), any()) } throws IOException()
-        runBlocking {
-            action.invokeCustomAsync(emptyMap())
+            action.invoke(emptyMap(), true)
         }
     }
 
