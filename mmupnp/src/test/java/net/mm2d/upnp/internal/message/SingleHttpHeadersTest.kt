@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.message
 
 import com.google.common.truth.Truth.assertThat
-import net.mm2d.upnp.internal.message.HttpHeaders.Entry
+import net.mm2d.upnp.internal.message.SingleHttpHeaders.Entry
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -16,7 +16,7 @@ import java.util.*
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class HttpHeadersTest {
+class SingleHttpHeadersTest {
     @Test
     fun testEntry_getName() {
         val name = "name"
@@ -92,7 +92,7 @@ class HttpHeadersTest {
 
     @Test
     fun size_個数が反映される() {
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
 
         assertThat(header.size()).isEqualTo(0)
         assertThat(header.isEmpty).isTrue()
@@ -111,7 +111,7 @@ class HttpHeadersTest {
     fun get_大文字小文字に関係なく値が取得できる() {
         val name1 = "name1"
         val value1 = "value1"
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
         header.put(name1, value1)
 
         assertThat(header[name1]).isEqualTo(value1)
@@ -123,7 +123,7 @@ class HttpHeadersTest {
         val name1 = "name1"
         val value1 = "value1"
         val value2 = "value2"
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
         header.put(name1, value1)
         header.put(name1.uppercase(Locale.US), value2)
 
@@ -136,7 +136,7 @@ class HttpHeadersTest {
         val name2 = "name2"
         val value1 = "value1"
         val value2 = "value2"
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
         header.put(name1, value1)
         header.put(name2, value2)
 
@@ -166,7 +166,7 @@ class HttpHeadersTest {
         val name2 = "name2"
         val value1 = "value1"
         val value2 = "value2"
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
         header.put(name1, value1)
         header.put(name2, value2)
 
@@ -180,7 +180,7 @@ class HttpHeadersTest {
         val name2 = "name2"
         val value1 = "value1"
         val value2 = "value2"
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
         header.put(name1, value1)
         header.put(name2, value2)
 
@@ -197,7 +197,7 @@ class HttpHeadersTest {
         val name2 = "name2"
         val value1 = "value1"
         val value2 = "value2"
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
         header.put(name1, value1)
         header.put(name2, value2)
 
@@ -214,7 +214,7 @@ class HttpHeadersTest {
         val name2 = "name2"
         val value1 = "value1"
         val value2 = "value2"
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
         header.put(name1, value1)
         header.put(name2, value2)
 
@@ -233,7 +233,7 @@ class HttpHeadersTest {
         val name2 = "name2"
         val value1 = "value1"
         val value2 = "value2"
-        val header = HttpHeaders()
+        val header = SingleHttpHeaders()
         header.put(name1, value1)
         header.put(name2, value2)
 
@@ -248,10 +248,10 @@ class HttpHeadersTest {
         val name2 = "name2"
         val value1 = "value1"
         val value2 = "value2"
-        val header1 = HttpHeaders()
+        val header1 = SingleHttpHeaders()
         header1.put(name1, value1)
         header1.put(name2, value2)
-        val header2 = HttpHeaders(header1)
+        val header2 = SingleHttpHeaders(header1)
         val list1 = ArrayList(header1.values())
         val list2 = ArrayList(header2.values())
 

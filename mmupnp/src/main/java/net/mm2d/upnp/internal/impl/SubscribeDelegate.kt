@@ -8,9 +8,9 @@
 package net.mm2d.upnp.internal.impl
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
-import net.mm2d.upnp.HttpRequest
-import net.mm2d.upnp.HttpResponse
+import net.mm2d.upnp.SingleHttpClient
+import net.mm2d.upnp.SingleHttpRequest
+import net.mm2d.upnp.SingleHttpResponse
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.log.Logger
 import net.mm2d.upnp.util.toAddressString
@@ -35,7 +35,7 @@ internal class SubscribeDelegate(
             return "<http://${address.toAddressString(port)}/>"
         }
 
-    private fun createHttpClient(): HttpClient = HttpClient.create(false)
+    private fun createHttpClient(): SingleHttpClient = SingleHttpClient.create(false)
 
     // VisibleForTesting
     @Throws(MalformedURLException::class)
@@ -80,8 +80,8 @@ internal class SubscribeDelegate(
     }
 
     @Throws(IOException::class)
-    private fun makeSubscribeRequest(): HttpRequest =
-        HttpRequest.create().apply {
+    private fun makeSubscribeRequest(): SingleHttpRequest =
+        SingleHttpRequest.create().apply {
             setMethod(Http.SUBSCRIBE)
             setUrl(makeAbsoluteUrl(service.eventSubUrl), true)
             setHeader(Http.NT, Http.UPNP_EVENT)
@@ -122,8 +122,8 @@ internal class SubscribeDelegate(
     }
 
     @Throws(IOException::class)
-    private fun makeRenewSubscribeRequest(subscriptionId: String): HttpRequest =
-        HttpRequest.create().apply {
+    private fun makeRenewSubscribeRequest(subscriptionId: String): SingleHttpRequest =
+        SingleHttpRequest.create().apply {
             setMethod(Http.SUBSCRIBE)
             setUrl(makeAbsoluteUrl(service.eventSubUrl), true)
             setHeader(Http.SID, subscriptionId)
@@ -154,8 +154,8 @@ internal class SubscribeDelegate(
     }
 
     @Throws(IOException::class)
-    private fun makeUnsubscribeRequest(subscriptionId: String): HttpRequest =
-        HttpRequest.create().apply {
+    private fun makeUnsubscribeRequest(subscriptionId: String): SingleHttpRequest =
+        SingleHttpRequest.create().apply {
             setMethod(Http.UNSUBSCRIBE)
             setUrl(makeAbsoluteUrl(service.eventSubUrl), true)
             setHeader(Http.SID, subscriptionId)
@@ -167,7 +167,7 @@ internal class SubscribeDelegate(
         private const val SECOND_PREFIX = "second-"
 
         // VisibleForTesting
-        internal fun parseTimeout(response: HttpResponse): Long {
+        internal fun parseTimeout(response: SingleHttpResponse): Long {
             val timeout = response.getHeader(Http.TIMEOUT)?.lowercase(Locale.ENGLISH)
             if (timeout.isNullOrEmpty() || timeout.contains("infinite")) {
                 // infiniteはUPnP2.0でdeprecated扱い、有限な値にする。

@@ -226,7 +226,7 @@ interface Device {
      * @param client HttpClient
      * @param filter Filter which selects Icon to load
      */
-    fun loadIconBinary(client: HttpClient, filter: IconFilter)
+    fun loadIconBinary(client: SingleHttpClient, filter: IconFilter)
 
     /**
      * update SSDP packet

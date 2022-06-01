@@ -8,9 +8,9 @@
 package net.mm2d.upnp.internal.server
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpRequest
-import net.mm2d.upnp.HttpResponse
 import net.mm2d.upnp.Property
+import net.mm2d.upnp.SingleHttpRequest
+import net.mm2d.upnp.SingleHttpResponse
 import net.mm2d.upnp.internal.parser.parseEventXml
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
@@ -88,7 +88,7 @@ internal class EventReceiver(
     }
 
     // VisibleForTesting
-    internal fun notifyEvent(sid: String, request: HttpRequest): Boolean {
+    internal fun notifyEvent(sid: String, request: SingleHttpRequest): Boolean {
         val seq = request.getHeader(Http.SEQ)?.toLongOrNull() ?: return false
         val properties = request.getBody().parseEventXml()
         if (properties.isEmpty()) return false
@@ -124,7 +124,7 @@ internal class EventReceiver(
         // VisibleForTesting
         @Throws(IOException::class)
         fun receiveAndReply(inputStream: InputStream, outputStream: OutputStream) {
-            val request = HttpRequest.create().apply {
+            val request = SingleHttpRequest.create().apply {
                 readData(inputStream)
             }
             Logger.v { "receive event:\n$request" }
@@ -145,19 +145,19 @@ internal class EventReceiver(
         }
 
         companion object {
-            private val RESPONSE_OK = HttpResponse.create().apply {
+            private val RESPONSE_OK = SingleHttpResponse.create().apply {
                 setStatus(Http.Status.HTTP_OK)
                 setHeader(Http.SERVER, Property.SERVER_VALUE)
                 setHeader(Http.CONNECTION, Http.CLOSE)
                 setHeader(Http.CONTENT_LENGTH, "0")
             }
-            private val RESPONSE_BAD = HttpResponse.create().apply {
+            private val RESPONSE_BAD = SingleHttpResponse.create().apply {
                 setStatus(Http.Status.HTTP_BAD_REQUEST)
                 setHeader(Http.SERVER, Property.SERVER_VALUE)
                 setHeader(Http.CONNECTION, Http.CLOSE)
                 setHeader(Http.CONTENT_LENGTH, "0")
             }
-            private val RESPONSE_FAIL = HttpResponse.create().apply {
+            private val RESPONSE_FAIL = SingleHttpResponse.create().apply {
                 setStatus(Http.Status.HTTP_PRECON_FAILED)
                 setHeader(Http.SERVER, Property.SERVER_VALUE)
                 setHeader(Http.CONNECTION, Http.CLOSE)

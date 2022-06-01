@@ -11,7 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import net.mm2d.upnp.HttpClient
+import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.Icon
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
@@ -357,7 +357,7 @@ class DeviceBuilderTest {
         val message: FakeSsdpMessage = mockk(relaxed = true)
         every { message.location } returns "location"
         val builder = DeviceImpl.Builder(mockk(relaxed = true), message)
-        val client: HttpClient = mockk(relaxed = true)
+        val client: SingleHttpClient = mockk(relaxed = true)
         val address = InetAddress.getByName("127.0.0.1")
         every { client.localAddress } returns address
         builder.setDownloadInfo(client)
@@ -371,7 +371,7 @@ class DeviceBuilderTest {
         val message: FakeSsdpMessage = mockk(relaxed = true)
         every { message.location } returns "location"
         val builder = DeviceImpl.Builder(mockk(relaxed = true), message)
-        val client = HttpClient()
+        val client = SingleHttpClient()
         builder.setDownloadInfo(client)
     }
 }

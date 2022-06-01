@@ -26,7 +26,7 @@ import net.mm2d.upnp.ControlPoint.EventListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.ControlPointFactory
 import net.mm2d.upnp.Device
-import net.mm2d.upnp.HttpClient
+import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.SsdpMessage
@@ -624,24 +624,24 @@ class ControlPointTest {
             val addr = InetAddress.getByName("192.0.2.3")
             val message = SsdpRequest.create(addr, data, data.size)
             val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"
-            val client: HttpClient = mockk(relaxed = true)
+            val client: SingleHttpClient = mockk(relaxed = true)
             every { client.downloadString(any()) } answers {
                 Thread.sleep(500L)
                 throw IOException()
             }
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns client
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns client
             cp.onReceiveSsdpMessage(message)
             assertThat(loadingDeviceMap).containsKey(udn)
             Thread.sleep(1000L) // Exception発生を待つ
             assertThat(loadingDeviceMap).doesNotContainKey(udn)
             assertThat(deviceHolder.size).isEqualTo(0)
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         @Test
         fun onReceiveSsdp_alive受信後成功() {
-            val httpClient: HttpClient = mockk(relaxed = true)
+            val httpClient: SingleHttpClient = mockk(relaxed = true)
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device.xml")
@@ -671,8 +671,8 @@ class ControlPointTest {
             val address = InetAddress.getByName("192.0.2.3")
             val message = SsdpRequest.create(address, data, data.size)
             val udn = "uuid:01234567-89ab-cdef-0123-456789abcdef"
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns httpClient
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns httpClient
             val iconFilter = spyk(iconFilter { listOf(it[0]) })
             cp.setIconFilter(iconFilter)
             cp.onReceiveSsdpMessage(message)
@@ -684,7 +684,7 @@ class ControlPointTest {
             assertThat(device.iconList[1].binary).isNull()
             assertThat(device.iconList[2].binary).isNull()
             assertThat(device.iconList[3].binary).isNull()
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         @Test
@@ -756,7 +756,7 @@ class ControlPointTest {
     @RunWith(JUnit4::class)
     class PinnedDevice {
         private lateinit var cp: ControlPointImpl
-        private lateinit var httpClient: HttpClient
+        private lateinit var httpClient: SingleHttpClient
 
         @Before
         fun setUp() {
@@ -783,14 +783,14 @@ class ControlPointTest {
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
             } returns TestUtils.getResourceAsString("mmupnp.xml")
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns httpClient
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns httpClient
             every { httpClient.localAddress } returns InetAddress.getByName("192.0.2.3")
         }
 
         @After
         fun teardown() {
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         @Test
@@ -1266,7 +1266,7 @@ class ControlPointTest {
                     factory = DiFactory(Protocol.DEFAULT)
                 )
             )
-            val httpClient: HttpClient = mockk(relaxed = true)
+            val httpClient: SingleHttpClient = mockk(relaxed = true)
             val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
             val ssdpMessage: SsdpMessage = SsdpRequest.create(mockk(relaxed = true), data, data.size)
             every {
@@ -1282,8 +1282,8 @@ class ControlPointTest {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/mmupnp.xml"))
             } returns TestUtils.getResourceAsString("mmupnp.xml")
 
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns httpClient
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns httpClient
             every { httpClient.localAddress } returns InetAddress.getByName("192.0.2.3")
             val builder = DeviceImpl.Builder(cp, ssdpMessage)
             DeviceParser.loadDescription(httpClient, builder)
@@ -1298,7 +1298,7 @@ class ControlPointTest {
             assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcded")).isNull()
             assertThat(cp.getDevice("uuid:01234567-89ab-cdef-0123-456789abcdef")).isNull()
 
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
     }
 }

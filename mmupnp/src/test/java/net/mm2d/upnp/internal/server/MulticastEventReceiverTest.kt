@@ -14,7 +14,7 @@ import io.mockk.spyk
 import io.mockk.unmockkConstructor
 import io.mockk.verify
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpRequest
+import net.mm2d.upnp.SingleHttpRequest
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.internal.thread.ThreadCondition
 import net.mm2d.upnp.internal.util.closeQuietly
@@ -157,7 +157,7 @@ class MulticastEventReceiverTest {
         val networkInterface = NetworkUtils.getAvailableInet4Interfaces()[0]
         val receiver = MulticastEventReceiver(taskExecutors, Address.IP_V4, networkInterface, listener)
 
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setStartLine("NOTIFY * HTTP/1.0")
 
         request.toByteArray().also {
@@ -236,5 +236,5 @@ class MulticastEventReceiverTest {
         verify(exactly = 1) { listener.invoke(any(), any(), any(), any(), any()) }
     }
 
-    private fun HttpRequest.toByteArray(): ByteArray = ByteArrayOutputStream().also { writeData(it) }.toByteArray()
+    private fun SingleHttpRequest.toByteArray(): ByteArray = ByteArrayOutputStream().also { writeData(it) }.toByteArray()
 }

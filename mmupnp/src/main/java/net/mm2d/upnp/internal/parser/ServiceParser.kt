@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.parser
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
+import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.StateVariable
 import net.mm2d.upnp.internal.impl.ActionImpl
 import net.mm2d.upnp.internal.impl.ArgumentImpl
@@ -47,7 +47,7 @@ internal object ServiceParser {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun loadDescription(client: HttpClient, deviceBuilder: DeviceImpl.Builder, builder: ServiceImpl.Builder) {
+    fun loadDescription(client: SingleHttpClient, deviceBuilder: DeviceImpl.Builder, builder: ServiceImpl.Builder) {
         val scpdUrl = builder.getScpdUrl() ?: throw IOException("scpdUrl is null")
         val baseUrl = deviceBuilder.getBaseUrl()
         val scopeId = deviceBuilder.getSsdpMessage().scopeId

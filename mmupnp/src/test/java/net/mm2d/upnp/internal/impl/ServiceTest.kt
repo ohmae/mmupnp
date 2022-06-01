@@ -19,9 +19,9 @@ import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Device
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
-import net.mm2d.upnp.HttpRequest
-import net.mm2d.upnp.HttpResponse
+import net.mm2d.upnp.SingleHttpClient
+import net.mm2d.upnp.SingleHttpRequest
+import net.mm2d.upnp.SingleHttpResponse
 import net.mm2d.upnp.Property
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.manager.SubscribeManagerImpl
@@ -422,7 +422,7 @@ class ServiceTest {
 
         @Before
         fun setUp() {
-            val httpClient: HttpClient = mockk(relaxed = true)
+            val httpClient: SingleHttpClient = mockk(relaxed = true)
             every {
                 httpClient.downloadString(URL("http://192.0.2.2:12345/device.xml"))
             } returns TestUtils.getResourceAsString("device.xml")
@@ -554,8 +554,8 @@ class ServiceTest {
             assertThat(variable!!.name).isEqualTo(name)
         }
 
-        private fun createSubscribeResponse(): HttpResponse {
-            return HttpResponse.create().apply {
+        private fun createSubscribeResponse(): SingleHttpResponse {
+            return SingleHttpResponse.create().apply {
                 setStatus(Http.Status.HTTP_OK)
                 setHeader(Http.SERVER, Property.SERVER_VALUE)
                 setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
@@ -568,11 +568,11 @@ class ServiceTest {
 
         @Test
         fun subscribe() {
-            val client = spyk(HttpClient())
-            val slot = slot<HttpRequest>()
+            val client = spyk(SingleHttpClient())
+            val slot = slot<SingleHttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns client
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns client
             runBlocking {
                 cds.subscribe()
             }
@@ -587,16 +587,16 @@ class ServiceTest {
             val url = URL(callback.substring(1, callback.length - 2))
             assertThat(url.host).isEqualTo(INTERFACE_ADDRESS)
             assertThat(url.port).isEqualTo(EVENT_PORT)
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         @Test
         fun subscribe_keep() {
-            val client = spyk(HttpClient())
-            val slot = slot<HttpRequest>()
+            val client = spyk(SingleHttpClient())
+            val slot = slot<SingleHttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns client
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns client
             runBlocking {
                 cds.subscribe(true)
             }
@@ -604,16 +604,16 @@ class ServiceTest {
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
             verify(exactly = 1) { subscribeManager.register(any(), TimeUnit.SECONDS.toMillis(300), true) }
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         @Test
         fun renewSubscribe1() {
-            val client = spyk(HttpClient())
-            val slot = slot<HttpRequest>()
+            val client = spyk(SingleHttpClient())
+            val slot = slot<SingleHttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns client
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns client
             runBlocking {
                 cds.subscribe()
                 cds.renewSubscribe()
@@ -621,16 +621,16 @@ class ServiceTest {
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         @Test
         fun renewSubscribe2() {
-            val client = spyk(HttpClient())
-            val slot = slot<HttpRequest>()
+            val client = spyk(SingleHttpClient())
+            val slot = slot<SingleHttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns client
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns client
             runBlocking {
                 cds.subscribe()
                 cds.subscribe()
@@ -638,16 +638,16 @@ class ServiceTest {
 
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         @Test
         fun unsubscribe() {
-            val client = spyk(HttpClient())
-            val slot = slot<HttpRequest>()
+            val client = spyk(SingleHttpClient())
+            val slot = slot<SingleHttpRequest>()
             every { client.post(capture(slot)) } returns createSubscribeResponse()
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns client
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns client
             runBlocking {
                 cds.subscribe()
                 cds.unsubscribe()
@@ -656,21 +656,21 @@ class ServiceTest {
             val request = slot.captured
             assertThat(request.getUri()).isEqualTo(cds.eventSubUrl)
             verify(exactly = 1) { subscribeManager.unregister(any()) }
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         @Test
         fun getSubscriptionId() {
-            val client = spyk(HttpClient())
+            val client = spyk(SingleHttpClient())
             every { client.post(any()) } returns createSubscribeResponse()
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(any()) } returns client
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(any()) } returns client
             runBlocking {
                 cds.subscribe()
             }
 
             assertThat(cds.subscriptionId).isEqualTo(SID)
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
         }
 
         companion object {
@@ -685,14 +685,14 @@ class ServiceTest {
 
         @Test
         fun parseTimeout_情報がない場合デフォルト() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             assertThat(SubscribeDelegate.parseTimeout(response)).isEqualTo(DEFAULT_SUBSCRIPTION_TIMEOUT)
         }
 
         @Test
         fun parseTimeout_infiniteの場合デフォルト() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setHeader(Http.TIMEOUT, "infinite")
             assertThat(SubscribeDelegate.parseTimeout(response)).isEqualTo(DEFAULT_SUBSCRIPTION_TIMEOUT)
@@ -700,7 +700,7 @@ class ServiceTest {
 
         @Test
         fun parseTimeout_secondの指定通り() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setHeader(Http.TIMEOUT, "second-100")
             assertThat(SubscribeDelegate.parseTimeout(response)).isEqualTo(TimeUnit.SECONDS.toMillis(100))
@@ -708,7 +708,7 @@ class ServiceTest {
 
         @Test
         fun parseTimeout_フォーマットエラーはデフォルト() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setHeader(Http.TIMEOUT, "seconds-100")
             assertThat(SubscribeDelegate.parseTimeout(response)).isEqualTo(DEFAULT_SUBSCRIPTION_TIMEOUT)
@@ -730,7 +730,7 @@ class ServiceTest {
         private lateinit var controlPoint: ControlPointImpl
         private lateinit var device: DeviceImpl
         private lateinit var service: ServiceImpl
-        private lateinit var httpClient: HttpClient
+        private lateinit var httpClient: SingleHttpClient
         private lateinit var subscribeDelegate: SubscribeDelegate
 
         @Before
@@ -757,19 +757,19 @@ class ServiceTest {
             every { subscribeDelegate.callback } returns ""
 
             httpClient = mockk(relaxed = true)
-            mockkObject(HttpClient.Companion)
-            every { HttpClient.create(false) } returns httpClient
+            mockkObject(SingleHttpClient.Companion)
+            every { SingleHttpClient.create(false) } returns httpClient
         }
 
         @After
         fun teardown() {
-            unmockkObject(HttpClient.Companion)
+            unmockkObject(SingleHttpClient.Companion)
             unmockkObject(ServiceImpl.Companion)
         }
 
         @Test
         fun subscribeSync_成功() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -783,7 +783,7 @@ class ServiceTest {
         @Test
         @Throws(Exception::class)
         fun subscribeSync_SIDなし() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.TIMEOUT, "second-300")
             every { httpClient.post(any()) } returns response
@@ -795,7 +795,7 @@ class ServiceTest {
 
         @Test
         fun subscribeSync_Timeout値異常() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-0")
@@ -808,7 +808,7 @@ class ServiceTest {
 
         @Test
         fun subscribeSync_Http応答異常() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_INTERNAL_ERROR)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -830,7 +830,7 @@ class ServiceTest {
 
         @Test
         fun subscribeSync_2回目はrenewがコールされfalseが返されると失敗() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -851,7 +851,7 @@ class ServiceTest {
 
         @Test
         fun renewSubscribeSync_subscribe前はsubscribeが実行される() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -866,7 +866,7 @@ class ServiceTest {
 
         @Test
         fun renewSubscribeSync_2回目はrenewが実行される() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -885,7 +885,7 @@ class ServiceTest {
 
         @Test
         fun renewSubscribeSync_renewの応答ステータス異常で失敗() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -903,7 +903,7 @@ class ServiceTest {
 
         @Test
         fun renewSubscribeSync_sid不一致() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -921,7 +921,7 @@ class ServiceTest {
 
         @Test
         fun renewSubscribeSync_Timeout値異常() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -939,7 +939,7 @@ class ServiceTest {
 
         @Test
         fun renewSubscribeSync_Exception() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -965,7 +965,7 @@ class ServiceTest {
 
         @Test
         fun unsubscribeSync_正常() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -982,7 +982,7 @@ class ServiceTest {
 
         @Test
         fun unsubscribeSync_OK以外は失敗() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")
@@ -1000,7 +1000,7 @@ class ServiceTest {
 
         @Test
         fun unsubscribeSync_Exception() {
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStatus(Http.Status.HTTP_OK)
             response.setHeader(Http.SID, "sid")
             response.setHeader(Http.TIMEOUT, "second-300")

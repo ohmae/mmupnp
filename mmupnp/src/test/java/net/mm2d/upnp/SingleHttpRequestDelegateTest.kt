@@ -11,8 +11,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
-import net.mm2d.upnp.HttpResponse.StartLine
-import net.mm2d.upnp.internal.message.HttpMessageDelegate
+import net.mm2d.upnp.SingleHttpRequest.StartLine
+import net.mm2d.upnp.internal.message.SingleHttpMessageDelegate
+import net.mm2d.upnp.internal.message.SingleHttpMessageDelegate.StartLineDelegate
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,18 +21,19 @@ import org.junit.runners.JUnit4
 import java.io.ByteArrayInputStream
 import java.io.OutputStream
 
+@Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class HttpResponseDelegateTest {
-    private lateinit var delegate: HttpMessageDelegate
-    private lateinit var message: HttpResponse
+class SingleHttpRequestDelegateTest {
+    private lateinit var delegate: SingleHttpMessageDelegate
+    private lateinit var message: SingleHttpRequest
 
     @Before
     fun setUp() {
-        val startLine: StartLine = mockk(relaxed = true)
+        val startLine: StartLineDelegate = mockk(relaxed = true)
         every { startLine.version } returns ""
         every { startLine.getStartLine() } returns ""
-        delegate = spyk(HttpMessageDelegate(startLine))
-        message = HttpResponse(startLine, delegate)
+        delegate = spyk(SingleHttpMessageDelegate(startLine))
+        message = SingleHttpRequest(StartLine(), delegate)
     }
 
     @Test
@@ -44,6 +46,7 @@ class HttpResponseDelegateTest {
     fun setVersion() {
         val version = Http.HTTP_1_1
         message.setVersion(version)
+
         verify(exactly = 1) { delegate.setVersion(version) }
     }
 

@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.message
 
 import com.google.common.truth.Truth.assertThat
-import net.mm2d.upnp.HttpRequest
+import net.mm2d.upnp.SingleHttpRequest
 import net.mm2d.upnp.util.TestUtils
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +23,7 @@ class SsdpMessageDelegateTest {
     @Test
     fun getScopeId_インターフェース指定がなければ0() {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.readData(ByteArrayInputStream(data, 0, data.size))
         val delegate = SsdpMessageDelegate(request)
 
@@ -33,7 +33,7 @@ class SsdpMessageDelegateTest {
     @Test
     fun getScopeId_インターフェースIPv4なら0() {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.readData(ByteArrayInputStream(data, 0, data.size))
         val delegate = SsdpMessageDelegate(request, InetAddress.getByName("192.0.2.3"))
 
@@ -43,7 +43,7 @@ class SsdpMessageDelegateTest {
     @Test
     fun getScopeId_インターフェースに紐付かないIPv6なら0() {
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.readData(ByteArrayInputStream(data, 0, data.size))
         val delegate = SsdpMessageDelegate(request, InetAddress.getByName("fe80::a831:801b:8dc6:421f"))
 
@@ -54,7 +54,7 @@ class SsdpMessageDelegateTest {
     fun getScopeId_インターフェースに紐付くIPv6ならその値() {
         val scopeId = 1
         val data = TestUtils.getResourceAsByteArray("ssdp-notify-alive0.bin")
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.readData(ByteArrayInputStream(data, 0, data.size))
         val address =
             Inet6Address.getByAddress(null, InetAddress.getByName("fe80::a831:801b:8dc6:421f").address, scopeId)

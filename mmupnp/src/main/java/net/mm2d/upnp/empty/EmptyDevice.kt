@@ -11,10 +11,10 @@ import net.mm2d.upnp.Action
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPoints
 import net.mm2d.upnp.Device
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
 import net.mm2d.upnp.IconFilter
 import net.mm2d.upnp.Service
+import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.SsdpMessage
 
 /**
@@ -74,7 +74,7 @@ object EmptyDevice : Device {
     override val isPinned: Boolean
         get() = false
 
-    override fun loadIconBinary(client: HttpClient, filter: IconFilter) = Unit
+    override fun loadIconBinary(client: SingleHttpClient, filter: IconFilter) = Unit
     override fun updateSsdpMessage(message: SsdpMessage) = Unit
     override fun getValue(name: String): String? = null
     override fun getValueWithNamespace(namespace: String, name: String): String? = null

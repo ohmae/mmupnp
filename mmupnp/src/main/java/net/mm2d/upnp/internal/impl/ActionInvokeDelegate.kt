@@ -10,9 +10,9 @@ package net.mm2d.upnp.internal.impl
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Argument
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
-import net.mm2d.upnp.HttpRequest
 import net.mm2d.upnp.Property
+import net.mm2d.upnp.SingleHttpClient
+import net.mm2d.upnp.SingleHttpRequest
 import net.mm2d.upnp.log.Logger
 import net.mm2d.xml.dsl.buildXml
 import net.mm2d.xml.node.XmlElement
@@ -27,7 +27,7 @@ internal class ActionInvokeDelegate(
     private val service: ServiceImpl = action.service
     private val name: String = action.name
     private val argumentMap: Map<String, Argument> = action.argumentMap
-    private fun createHttpClient(): HttpClient = HttpClient.create(false)
+    private fun createHttpClient(): SingleHttpClient = SingleHttpClient.create(false)
 
     suspend fun invoke(
         argumentValues: Map<String, String?>,
@@ -115,8 +115,8 @@ internal class ActionInvokeDelegate(
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    private fun makeHttpRequest(url: URL, soap: String): HttpRequest =
-        HttpRequest.create().apply {
+    private fun makeHttpRequest(url: URL, soap: String): SingleHttpRequest =
+        SingleHttpRequest.create().apply {
             setMethod(Http.POST)
             setUrl(url, true)
             setHeader(Http.SOAPACTION, soapActionName)

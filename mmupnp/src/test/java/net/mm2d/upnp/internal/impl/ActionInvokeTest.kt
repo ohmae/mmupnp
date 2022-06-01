@@ -17,9 +17,9 @@ import io.mockk.unmockkObject
 import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
-import net.mm2d.upnp.HttpRequest
-import net.mm2d.upnp.HttpResponse
+import net.mm2d.upnp.SingleHttpClient
+import net.mm2d.upnp.SingleHttpRequest
+import net.mm2d.upnp.SingleHttpResponse
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.xml.parser.XmlParser
 import org.junit.After
@@ -34,11 +34,11 @@ import java.util.*
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
 class ActionInvokeTest {
-    private lateinit var httpResponse: HttpResponse
+    private lateinit var httpResponse: SingleHttpResponse
     private lateinit var url: URL
     private lateinit var action: ActionImpl
     private lateinit var invokeDelegate: ActionInvokeDelegate
-    private lateinit var mockHttpClient: HttpClient
+    private lateinit var mockHttpClient: SingleHttpClient
 
     @Before
     fun setUp() {
@@ -92,8 +92,8 @@ class ActionInvokeTest {
             .build()
         invokeDelegate = action.invokeDelegate
         every { invokeDelegate.makeAbsoluteControlUrl() } returns url
-        mockHttpClient = spyk(HttpClient())
-        httpResponse = HttpResponse.create()
+        mockHttpClient = spyk(SingleHttpClient())
+        httpResponse = SingleHttpResponse.create()
         httpResponse.setStatus(Http.Status.HTTP_OK)
         httpResponse.setBody(
             """
@@ -105,21 +105,21 @@ class ActionInvokeTest {
             </s:Body>
             </s:Envelope>""".trimIndent()
         )
-        mockkObject(HttpClient.Companion)
-        every { HttpClient.create(false) } returns mockHttpClient
+        mockkObject(SingleHttpClient.Companion)
+        every { SingleHttpClient.create(false) } returns mockHttpClient
     }
 
     @After
     fun teardown() {
-        unmockkObject(HttpClient.Companion)
+        unmockkObject(SingleHttpClient.Companion)
         unmockkObject(ActionImpl.Companion)
     }
 
     @Test(expected = IOException::class)
     fun invokeSync_postでIOExceptionが発生() {
-        val client: HttpClient = mockk(relaxed = true)
+        val client: SingleHttpClient = mockk(relaxed = true)
         every { client.post(any()) } throws IOException()
-        every { HttpClient.create(any()) } returns client
+        every { SingleHttpClient.create(any()) } returns client
         runBlocking {
             action.invoke(emptyMap())
         }
@@ -127,7 +127,7 @@ class ActionInvokeTest {
 
     @Test
     fun invokeSync_リクエストヘッダの確認() {
-        val slot = slot<HttpRequest>()
+        val slot = slot<SingleHttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         runBlocking {
             action.invoke(emptyMap())
@@ -144,7 +144,7 @@ class ActionInvokeTest {
 
     @Test
     fun invokeSync_リクエストSOAPフォーマットの確認() {
-        val slot = slot<HttpRequest>()
+        val slot = slot<SingleHttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         runBlocking {
             action.invoke(emptyMap())
@@ -169,7 +169,7 @@ class ActionInvokeTest {
 
     @Test
     fun invokeSync_リクエストSOAPの引数確認_指定なしでの実行() {
-        val slot = slot<HttpRequest>()
+        val slot = slot<SingleHttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         runBlocking {
             action.invoke(emptyMap())
@@ -192,7 +192,7 @@ class ActionInvokeTest {
     fun invokeSync_リクエストSOAPの引数確認_指定ありでの実行() {
         val value1 = "value1"
         val value2 = "value2"
-        val slot = slot<HttpRequest>()
+        val slot = slot<SingleHttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         val argument = mapOf(
             IN_ARG_NAME_1 to value1,
@@ -221,7 +221,7 @@ class ActionInvokeTest {
         val value2 = "value2"
         val name = "name"
         val value = "value"
-        val slot = slot<HttpRequest>()
+        val slot = slot<SingleHttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         val argument = mapOf(
             IN_ARG_NAME_1 to value1,
@@ -255,7 +255,7 @@ class ActionInvokeTest {
         val urn = "urn:schemas-custom-com:custom"
         val name = "name"
         val value = "value"
-        val slot = slot<HttpRequest>()
+        val slot = slot<SingleHttpRequest>()
         every { mockHttpClient.post(capture(slot)) } returns httpResponse
         val argument = mapOf(
             IN_ARG_NAME_1 to value1,

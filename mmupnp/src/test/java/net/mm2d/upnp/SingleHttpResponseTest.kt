@@ -19,10 +19,10 @@ import java.util.*
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class HttpResponseTest {
+class SingleHttpResponseTest {
     @Test
     fun readData_読み出しができること() {
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.readData(TestUtils.getResourceAsStream("cds-length.bin"))
 
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
@@ -33,10 +33,10 @@ class HttpResponseTest {
 
     @Test
     fun HttpRequest_ディープコピーができる() {
-        val response1 = HttpResponse.create()
+        val response1 = SingleHttpResponse.create()
         response1.readData(TestUtils.getResourceAsStream("cds-length.bin"))
 
-        val response2 = HttpResponse.copy(response1)
+        val response2 = SingleHttpResponse.copy(response1)
         assertThat(response1.startLine).isEqualTo(response2.startLine)
         assertThat(response1.getStatus()).isEqualTo(response2.getStatus())
         assertThat(response1.getHeader(Http.DATE)).isEqualTo(response2.getHeader(Http.DATE))
@@ -49,7 +49,7 @@ class HttpResponseTest {
 
     @Test
     fun readData_Chunk読み出しができること() {
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.readData(TestUtils.getResourceAsStream("cds-chunked.bin"))
 
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
@@ -60,7 +60,7 @@ class HttpResponseTest {
 
     @Test
     fun readData_Chunk読み出しができること2() {
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.readData(TestUtils.getResourceAsStream("cds-chunked-large.bin"))
 
         assertThat(response.startLine).isEqualTo("HTTP/1.1 200 OK")
@@ -72,49 +72,49 @@ class HttpResponseTest {
     @Test(expected = IOException::class)
     fun readData_読み出せない場合IOException() {
         val data = "\n"
-        HttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
+        SingleHttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
     }
 
     @Test(expected = IOException::class)
     fun readData_status_line異常の場合IOException() {
         val data = "HTTP/1.1 200"
-        HttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
+        SingleHttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
     }
 
     @Test(expected = IOException::class)
     fun readData_size異常の場合IOException() {
         val data = "HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\n  "
-        HttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
+        SingleHttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
     }
 
     @Test(expected = IOException::class)
     fun readData_chunk_sizeなしの場合IOException() {
         val data = "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\r\n"
-        HttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
+        SingleHttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
     }
 
     @Test(expected = IOException::class)
     fun readData_chunk_sizeが16進数でない場合IOException() {
         val data = "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\ngg\r\n"
-        HttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
+        SingleHttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
     }
 
     @Test(expected = IOException::class)
     fun readData_chunk_sizeよりデータが少ない場合IOException() {
         val data = "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n10\r\n  \r\n"
-        HttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
+        SingleHttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
     }
 
     @Test(expected = IOException::class)
     fun readData_最後が0で終わっていない場合IOException2() {
         val data = "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n2\r\n  \r\n"
-        HttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
+        SingleHttpResponse.create().readData(ByteArrayInputStream(data.toByteArray()))
     }
 
     @Test
     fun writeData_書き出しができること() {
         val data = TestUtils.getResourceAsString("cds.xml")
-        val response = HttpResponse.create().apply {
+        val response = SingleHttpResponse.create().apply {
             setStatus(Http.Status.HTTP_OK)
             setHeader(Http.SERVER, Property.SERVER_VALUE)
             setHeader(Http.DATE, Http.formatDate(Date()))
@@ -126,7 +126,7 @@ class HttpResponseTest {
         response.writeData(baos)
 
         val bais = ByteArrayInputStream(baos.toByteArray())
-        val readResponse = HttpResponse.create()
+        val readResponse = SingleHttpResponse.create()
         readResponse.readData(bais)
 
         assertThat(readResponse.startLine).isEqualTo(response.startLine)
@@ -136,7 +136,7 @@ class HttpResponseTest {
     @Test
     fun writeData_Chunk書き出しができること() {
         val data = TestUtils.getResourceAsString("cds.xml")
-        val response = HttpResponse.create().apply {
+        val response = SingleHttpResponse.create().apply {
             setStatus(Http.Status.HTTP_OK)
             setHeader(Http.SERVER, Property.SERVER_VALUE)
             setHeader(Http.DATE, Http.formatDate(System.currentTimeMillis()))
@@ -148,7 +148,7 @@ class HttpResponseTest {
         response.writeData(baos)
 
         val bais = ByteArrayInputStream(baos.toByteArray())
-        val readResponse = HttpResponse.create()
+        val readResponse = SingleHttpResponse.create()
         readResponse.readData(bais)
 
         assertThat(readResponse.startLine).isEqualTo(response.startLine)
@@ -157,7 +157,7 @@ class HttpResponseTest {
 
     @Test
     fun setStatusLine_version_status_phraseに反映される() {
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.setStartLine("HTTP/1.1 200 OK")
 
         assertThat(response.version).isEqualTo(Http.HTTP_1_1)
@@ -168,7 +168,7 @@ class HttpResponseTest {
 
     @Test
     fun setStatusLine_version_status_phraseに反映される2() {
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.setStartLine("HTTP/1.1 404 Not Found")
 
         assertThat(response.version).isEqualTo(Http.HTTP_1_1)
@@ -179,13 +179,13 @@ class HttpResponseTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun setStatusLine_不足がある場合Exception() {
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.setStartLine("HTTP/1.1 404")
     }
 
     @Test
     fun setStatusCode_正常系() {
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.setStatusCode(200)
 
         assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
@@ -193,7 +193,7 @@ class HttpResponseTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun setStatusCode_不正なステータスコードはException() {
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.setStatusCode(0)
     }
 

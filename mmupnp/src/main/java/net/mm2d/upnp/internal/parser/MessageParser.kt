@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.parser
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpMessage
+import net.mm2d.upnp.SingleHttpMessage
 import net.mm2d.xml.parser.XmlParser
 import java.util.*
 
@@ -32,7 +32,7 @@ internal fun String?.parseEventXml(): List<Pair<String, String>> {
 
 internal const val DEFAULT_MAX_AGE = 1800
 
-internal fun HttpMessage.parseCacheControl(): Int {
+internal fun SingleHttpMessage.parseCacheControl(): Int {
     val age = getHeader(Http.CACHE_CONTROL)?.lowercase(Locale.US)
     if (age?.startsWith("max-age") != true) {
         return DEFAULT_MAX_AGE
@@ -40,7 +40,7 @@ internal fun HttpMessage.parseCacheControl(): Int {
     return age.substringAfter('=', "").toIntOrNull() ?: DEFAULT_MAX_AGE
 }
 
-internal fun HttpMessage.parseUsn(): Pair<String, String> {
+internal fun SingleHttpMessage.parseUsn(): Pair<String, String> {
     val usn = getHeader(Http.USN)
     if (usn.isNullOrEmpty() || !usn.startsWith("uuid")) {
         return "" to ""

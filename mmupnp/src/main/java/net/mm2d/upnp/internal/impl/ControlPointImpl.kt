@@ -14,10 +14,10 @@ import net.mm2d.upnp.ControlPoint.EventListener
 import net.mm2d.upnp.ControlPoint.MulticastEventListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
 import net.mm2d.upnp.Device
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.IconFilter
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.Service
+import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.impl.DeviceImpl.Builder
 import net.mm2d.upnp.internal.manager.DeviceHolder
@@ -94,7 +94,7 @@ internal class ControlPointImpl(
         } else null
     }
 
-    private fun createHttpClient(): HttpClient = HttpClient.create(true)
+    private fun createHttpClient(): SingleHttpClient = SingleHttpClient.create(true)
 
     // VisibleForTesting
     internal fun needToUpdateSsdpMessage(oldMessage: SsdpMessage, newMessage: SsdpMessage): Boolean {

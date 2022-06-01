@@ -14,7 +14,7 @@ import java.util.*
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal class HttpHeaders {
+internal class SingleHttpHeaders {
     /**
      * Entry of header
      *
@@ -62,7 +62,7 @@ internal class HttpHeaders {
      *
      * @param original original header
      */
-    constructor(original: HttpHeaders) {
+    constructor(original: SingleHttpHeaders) {
         // EntryはmutableなのでDeep copyが必要
         map = original.map.entries.map {
             it.key to Entry(it.value)

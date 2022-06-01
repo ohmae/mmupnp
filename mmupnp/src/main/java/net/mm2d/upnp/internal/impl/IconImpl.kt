@@ -8,8 +8,8 @@
 package net.mm2d.upnp.internal.impl
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
+import net.mm2d.upnp.SingleHttpClient
 import java.io.IOException
 
 /**
@@ -28,7 +28,7 @@ internal class IconImpl(
         private set
 
     @Throws(IOException::class)
-    fun loadBinary(client: HttpClient, baseUrl: String, scopeId: Int) {
+    fun loadBinary(client: SingleHttpClient, baseUrl: String, scopeId: Int) {
         val url = Http.makeAbsoluteUrl(baseUrl, url, scopeId)
         binary = client.downloadBinary(url)
     }

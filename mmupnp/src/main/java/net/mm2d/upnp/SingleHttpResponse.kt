@@ -8,8 +8,8 @@
 package net.mm2d.upnp
 
 import net.mm2d.upnp.Http.Status
-import net.mm2d.upnp.internal.message.HttpMessageDelegate
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate
+import net.mm2d.upnp.internal.message.SingleHttpMessageDelegate
+import net.mm2d.upnp.internal.message.SingleHttpMessageDelegate.StartLineDelegate
 import java.io.InputStream
 
 /**
@@ -17,11 +17,11 @@ import java.io.InputStream
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-class HttpResponse
+class SingleHttpResponse
 internal constructor(
     private val startLineDelegate: StartLine,
-    private val delegate: HttpMessageDelegate
-) : HttpMessage by delegate {
+    private val delegate: SingleHttpMessageDelegate
+) : SingleHttpMessage by delegate {
 
     internal data class StartLine(
         private var status: Status = Status.HTTP_INVALID,
@@ -125,15 +125,15 @@ internal constructor(
          * Create a new instance.
          */
         @JvmStatic
-        fun create(): HttpResponse = StartLine().let {
-            HttpResponse(it, HttpMessageDelegate(it))
+        fun create(): SingleHttpResponse = StartLine().let {
+            SingleHttpResponse(it, SingleHttpMessageDelegate(it))
         }
 
         /**
          * Create a new instance from InputStream
          */
         @JvmStatic
-        fun create(input: InputStream): HttpResponse = create().also { it.readData(input) }
+        fun create(input: InputStream): SingleHttpResponse = create().also { it.readData(input) }
 
         /**
          * Create a new instance with the same contents as the argument.
@@ -141,9 +141,9 @@ internal constructor(
          * @params original original message
          */
         @JvmStatic
-        fun copy(original: HttpResponse): HttpResponse =
+        fun copy(original: SingleHttpResponse): SingleHttpResponse =
             original.startLineDelegate.copy().let {
-                HttpResponse(it, HttpMessageDelegate(it, original.delegate))
+                SingleHttpResponse(it, SingleHttpMessageDelegate(it, original.delegate))
             }
     }
 }

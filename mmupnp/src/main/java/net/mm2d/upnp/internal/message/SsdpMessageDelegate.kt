@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.message
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpMessage
+import net.mm2d.upnp.SingleHttpMessage
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.parser.parseCacheControl
 import net.mm2d.upnp.internal.parser.parseUsn
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SsdpMessageDelegate(
-    val message: HttpMessage,
+    val message: SingleHttpMessage,
     override val localAddress: InetAddress? = null
 ) : SsdpMessage {
     override val maxAge: Int

@@ -10,7 +10,7 @@ package net.mm2d.upnp.internal.parser
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
-import net.mm2d.upnp.HttpClient
+import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.impl.ControlPointImpl
 import net.mm2d.upnp.internal.impl.DeviceImpl
@@ -30,7 +30,7 @@ import java.net.URL
 class DeviceParserTest {
     @RunWith(JUnit4::class)
     class 全行程のテスト {
-        private lateinit var httpClient: HttpClient
+        private lateinit var httpClient: SingleHttpClient
         private lateinit var ssdpMessage: SsdpMessage
         private lateinit var controlPoint: ControlPointImpl
 

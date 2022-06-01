@@ -7,8 +7,8 @@
 
 package net.mm2d.upnp
 
-import net.mm2d.upnp.internal.message.HttpMessageDelegate
-import net.mm2d.upnp.internal.message.HttpMessageDelegate.StartLineDelegate
+import net.mm2d.upnp.internal.message.SingleHttpMessageDelegate
+import net.mm2d.upnp.internal.message.SingleHttpMessageDelegate.StartLineDelegate
 import net.mm2d.upnp.util.toAddressString
 import java.io.IOException
 import java.net.InetAddress
@@ -21,10 +21,10 @@ import java.net.URL
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-class HttpRequest internal constructor(
+class SingleHttpRequest internal constructor(
     private val startLineDelegate: StartLine,
-    private val delegate: HttpMessageDelegate
-) : HttpMessage by delegate {
+    private val delegate: SingleHttpMessageDelegate
+) : SingleHttpMessage by delegate {
 
     internal data class StartLine(
         var method: String = Http.GET,
@@ -143,10 +143,10 @@ class HttpRequest internal constructor(
          * Create a new instance.
          */
         @JvmStatic
-        fun create(): HttpRequest {
+        fun create(): SingleHttpRequest {
             val startLine = StartLine()
-            val delegate = HttpMessageDelegate(startLine)
-            return HttpRequest(startLine, delegate)
+            val delegate = SingleHttpMessageDelegate(startLine)
+            return SingleHttpRequest(startLine, delegate)
         }
 
         /**
@@ -155,10 +155,10 @@ class HttpRequest internal constructor(
          * @param original original message
          */
         @JvmStatic
-        fun copy(original: HttpRequest): HttpRequest {
+        fun copy(original: SingleHttpRequest): SingleHttpRequest {
             val startLine = original.startLineDelegate.copy()
-            val delegate = HttpMessageDelegate(startLine, original.delegate)
-            return HttpRequest(startLine, delegate).also {
+            val delegate = SingleHttpMessageDelegate(startLine, original.delegate)
+            return SingleHttpRequest(startLine, delegate).also {
                 it.address = original.address
                 it.port = original.port
             }

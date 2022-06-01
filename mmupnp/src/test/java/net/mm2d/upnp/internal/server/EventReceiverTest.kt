@@ -14,8 +14,8 @@ import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpRequest
-import net.mm2d.upnp.HttpResponse
+import net.mm2d.upnp.SingleHttpRequest
+import net.mm2d.upnp.SingleHttpResponse
 import net.mm2d.upnp.internal.server.EventReceiver.ClientTask
 import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.util.TestUtils
@@ -40,7 +40,7 @@ class EventReceiverTest {
 
     @Before
     fun setUp() {
-        val notify = HttpRequest.create().apply {
+        val notify = SingleHttpRequest.create().apply {
             setMethod(Http.NOTIFY)
             setUri("/")
             setHeader(Http.CONNECTION, Http.CLOSE)
@@ -138,7 +138,7 @@ class EventReceiverTest {
         assertThat(thirdSlot.captured).contains("SystemUpdateID" to "0")
         assertThat(thirdSlot.captured).contains("ContainerUpdateIDs" to "")
 
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))
         assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_OK)
     }
@@ -169,7 +169,7 @@ class EventReceiverTest {
         receiver.stop()
         Thread.sleep(100)
 
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))
         assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_PRECON_FAILED)
     }
@@ -199,7 +199,7 @@ class EventReceiverTest {
         receiver.stop()
         Thread.sleep(100)
 
-        val response = HttpResponse.create()
+        val response = SingleHttpResponse.create()
         response.readData(ByteArrayInputStream(baos.toByteArray()))
         assertThat(response.getStatus()).isEqualTo(Http.Status.HTTP_BAD_REQUEST)
     }
@@ -243,7 +243,7 @@ class EventReceiverTest {
         val listener: (String, Long, List<Pair<String, String>>) -> Boolean = mockk(relaxed = true)
         val receiver = spyk(EventReceiver(taskExecutors, listener))
 
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         every { listener.invoke(any(), any(), any()) } returns true
 
         assertThat(receiver.notifyEvent(sid, request)).isFalse()
@@ -256,7 +256,7 @@ class EventReceiverTest {
         val listener: (String, Long, List<Pair<String, String>>) -> Boolean = mockk(relaxed = true)
         val receiver = spyk(EventReceiver(taskExecutors, listener))
 
-        val request = HttpRequest.create().apply {
+        val request = SingleHttpRequest.create().apply {
             setHeader(Http.SEQ, "0")
             setBody(TestUtils.getResourceAsString("propchange.xml"), true)
         }

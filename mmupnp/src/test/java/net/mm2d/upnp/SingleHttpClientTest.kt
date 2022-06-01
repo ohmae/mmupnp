@@ -22,15 +22,15 @@ import java.net.URL
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class HttpClientTest {
+class SingleHttpClientTest {
     @Test
     fun downloadString_KeepAlive有効() {
         val responseBody = "responseBody"
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
+            val request = SingleHttpRequest.create()
             request.readData(inputStream)
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, true)
             if (request.isKeepAlive()) {
@@ -47,7 +47,7 @@ class HttpClientTest {
         val port = server.localPort
 
         try {
-            val client = HttpClient(true)
+            val client = SingleHttpClient(true)
             assertThat(client.downloadString(URL("http://127.0.0.1:$port/"))).isEqualTo(responseBody)
             assertThat(client.isClosed).isFalse()
 
@@ -64,9 +64,9 @@ class HttpClientTest {
         val responseBody = "responseBody".toByteArray(charset("utf-8"))
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
+            val request = SingleHttpRequest.create()
             request.readData(inputStream)
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBodyBinary(responseBody, true)
             if (request.isKeepAlive()) {
@@ -83,7 +83,7 @@ class HttpClientTest {
         val port = server.localPort
 
         try {
-            val client = HttpClient(true)
+            val client = SingleHttpClient(true)
             assertThat(client.downloadBinary(URL("http://127.0.0.1:$port/"))).isEqualTo(responseBody)
             assertThat(client.isClosed).isFalse()
             assertThat(client.localAddress).isEqualTo(InetAddress.getByName("127.0.0.1"))
@@ -101,9 +101,9 @@ class HttpClientTest {
         val responseBody = "responseBody"
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
+            val request = SingleHttpRequest.create()
             request.readData(inputStream)
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, true)
             if (request.isKeepAlive()) {
@@ -120,7 +120,7 @@ class HttpClientTest {
         val port = server.localPort
 
         try {
-            val client = HttpClient(true)
+            val client = SingleHttpClient(true)
             var response = client.download(URL("http://127.0.0.1:$port/"))
             assertThat(response.getBody()).isEqualTo(responseBody)
             assertThat(client.isKeepAlive).isTrue()
@@ -139,8 +139,8 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
-            val response = HttpResponse.create()
+            SingleHttpRequest.create().readData(inputStream)
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, true)
             response.setHeader(Http.CONNECTION, Http.CLOSE)
@@ -150,7 +150,7 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         try {
-            val client = HttpClient(true)
+            val client = SingleHttpClient(true)
             val response = client.download(URL("http://127.0.0.1:$port/"))
             assertThat(response.getBody()).isEqualTo(responseBody)
             assertThat(client.isKeepAlive).isTrue()
@@ -167,8 +167,8 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
-            val response = HttpResponse.create()
+            SingleHttpRequest.create().readData(inputStream)
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, false)
             response.setHeader(Http.CONNECTION, Http.CLOSE)
@@ -178,7 +178,7 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         try {
-            val client = HttpClient(true)
+            val client = SingleHttpClient(true)
             val response = client.download(URL("http://127.0.0.1:$port/"))
             assertThat(response.getBody()).isEqualTo(responseBody)
             assertThat(client.isKeepAlive).isTrue()
@@ -195,8 +195,8 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
-            val response = HttpResponse.create()
+            SingleHttpRequest.create().readData(inputStream)
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, false)
             response.setHeader(Http.CONNECTION, Http.KEEP_ALIVE)
@@ -206,7 +206,7 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         try {
-            val client = HttpClient(true)
+            val client = SingleHttpClient(true)
             val response = client.download(URL("http://127.0.0.1:$port/"))
             assertThat(response.getBody()).isEmpty()
             client.close()
@@ -221,8 +221,8 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
-            val response = HttpResponse.create()
+            SingleHttpRequest.create().readData(inputStream)
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 200 OK")
             response.setBody(responseBody, false)
             response.setHeader(Http.CONTENT_LENGTH, "0")
@@ -233,7 +233,7 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         try {
-            val client = HttpClient(true)
+            val client = SingleHttpClient(true)
             val response = client.download(URL("http://127.0.0.1:$port/"))
             assertThat(response.getBody()).isEmpty()
             client.close()
@@ -248,8 +248,8 @@ class HttpClientTest {
 
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
-            val response = HttpResponse.create()
+            SingleHttpRequest.create().readData(inputStream)
+            val response = SingleHttpResponse.create()
             response.setStartLine("HTTP/1.1 204 No Content")
             response.setBody(responseBody, false)
             response.setHeader(Http.CONNECTION, Http.CLOSE)
@@ -259,7 +259,7 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         try {
-            HttpClient(false).download(URL("http://127.0.0.1:$port/"))
+            SingleHttpClient(false).download(URL("http://127.0.0.1:$port/"))
         } finally {
             server.close()
         }
@@ -271,8 +271,8 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         server.setServerCore { _, inputStream, outputStream ->
-            HttpRequest.create().readData(inputStream)
-            val response = HttpResponse.create()
+            SingleHttpRequest.create().readData(inputStream)
+            val response = SingleHttpResponse.create()
             response.setHeader(Http.CONNECTION, Http.CLOSE)
             response.setStartLine("HTTP/1.1 301 Moved Permanently")
             response.setHeader(Http.LOCATION, "http://127.0.0.1:$port/b")
@@ -281,8 +281,8 @@ class HttpClientTest {
             false
         }
         try {
-            val client = HttpClient(false)
-            client.post(HttpRequest.create().apply {
+            val client = SingleHttpClient(false)
+            client.post(SingleHttpRequest.create().apply {
                 setMethod(Http.GET)
                 setUrl(URL("http://127.0.0.1:$port/a"), true)
                 setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
@@ -300,9 +300,9 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
+            val request = SingleHttpRequest.create()
             request.readData(inputStream)
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setHeader(Http.CONNECTION, Http.CLOSE)
             if (request.getUri() == "/b") {
                 response.setStartLine("HTTP/1.1 200 OK")
@@ -318,8 +318,8 @@ class HttpClientTest {
             }
         }
         try {
-            val client = HttpClient(false)
-            val response = client.post(HttpRequest.create().apply {
+            val client = SingleHttpClient(false)
+            val response = client.post(SingleHttpRequest.create().apply {
                 setMethod(Http.GET)
                 setUrl(URL("http://127.0.0.1:$port/a"), true)
                 setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
@@ -336,9 +336,9 @@ class HttpClientTest {
     fun post_Redirectのlocationがなければひとまずそのまま取得する() {
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, outputStream ->
-            val request = HttpRequest.create()
+            val request = SingleHttpRequest.create()
             request.readData(inputStream)
-            val response = HttpResponse.create()
+            val response = SingleHttpResponse.create()
             response.setHeader(Http.CONNECTION, Http.CLOSE)
             if (request.getUri() == "/b") {
                 response.setStartLine("HTTP/1.1 200 OK")
@@ -355,8 +355,8 @@ class HttpClientTest {
         server.open()
         val port = server.localPort
         try {
-            val client = HttpClient(false)
-            val response = client.post(HttpRequest.create().apply {
+            val client = SingleHttpClient(false)
+            val response = client.post(SingleHttpRequest.create().apply {
                 setMethod(Http.GET)
                 setUrl(URL("http://127.0.0.1:$port/a"), true)
                 setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
@@ -374,14 +374,14 @@ class HttpClientTest {
     fun post_応答がなければException() {
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, _ ->
-            HttpRequest.create().readData(inputStream)
+            SingleHttpRequest.create().readData(inputStream)
             false
         }
         server.open()
         val port = server.localPort
         try {
-            val client = HttpClient(false)
-            client.post(HttpRequest.create().apply {
+            val client = SingleHttpClient(false)
+            client.post(SingleHttpRequest.create().apply {
                 setMethod(Http.GET)
                 setUrl(URL("http://127.0.0.1:$port/a"), true)
                 setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
@@ -398,15 +398,15 @@ class HttpClientTest {
     fun post_応答がなければcloseしてException() {
         val server = HttpServerMock()
         server.setServerCore { _, inputStream, _ ->
-            HttpRequest.create().readData(inputStream)
+            SingleHttpRequest.create().readData(inputStream)
             false
         }
         server.open()
         val port = server.localPort
         try {
-            val client = HttpClient(false)
+            val client = SingleHttpClient(false)
             try {
-                client.post(HttpRequest.create().apply {
+                client.post(SingleHttpRequest.create().apply {
                     setMethod(Http.GET)
                     setUrl(URL("http://127.0.0.1:$port/a"), true)
                     setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
@@ -423,8 +423,8 @@ class HttpClientTest {
 
     @Test(expected = IOException::class)
     fun download_HTTP_OKでなければException() {
-        val client = spyk(HttpClient())
-        val response = HttpResponse.create()
+        val client = spyk(SingleHttpClient())
+        val response = SingleHttpResponse.create()
         response.setStartLine("HTTP/1.1 404 Not Found")
         every { client.post(any()) } returns response
         client.download(URL("http://www.example.com/index.html"))
@@ -432,8 +432,8 @@ class HttpClientTest {
 
     @Test(expected = IOException::class)
     fun download_bodyがnullならException() {
-        val client = spyk(HttpClient())
-        val response = HttpResponse.create()
+        val client = spyk(SingleHttpClient())
+        val response = SingleHttpResponse.create()
         response.setStartLine("HTTP/1.1 200 OK")
         every { client.post(any()) } returns response
         client.download(URL("http://www.example.com/index.html"))
@@ -441,56 +441,56 @@ class HttpClientTest {
 
     @Test
     fun canReuse_初期状態ではfalse() {
-        val client = HttpClient()
-        val request = HttpRequest.create()
+        val client = SingleHttpClient()
+        val request = SingleHttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
         assertThat(client.canReuse(request)).isFalse()
     }
 
     @Test
     fun canReuse_接続状態かつアドレスとポートが一致すればtrue() {
-        val client = HttpClient()
+        val client = SingleHttpClient()
         val socket: Socket = mockk(relaxed = true)
         every { socket.isConnected } returns true
         every { socket.inetAddress } returns InetAddress.getByName("192.168.0.1")
         every { socket.port } returns 80
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
         assertThat(with(client) { socket.canReuse(request) }).isTrue()
     }
 
     @Test
     fun canReuse_ポートが不一致ならfalse() {
-        val client = HttpClient()
+        val client = SingleHttpClient()
         val socket: Socket = mockk(relaxed = true)
         every { socket.isConnected } returns true
         every { socket.inetAddress } returns InetAddress.getByName("192.168.0.1")
         every { socket.port } returns 80
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setUrl(URL("http://192.168.0.1:8080/index.html"))
         assertThat(with(client) { socket.canReuse(request) }).isFalse()
     }
 
     @Test
     fun canReuse_アドレスが不一致ならfalse() {
-        val client = HttpClient()
+        val client = SingleHttpClient()
         val socket: Socket = mockk(relaxed = true)
         every { socket.isConnected } returns true
         every { socket.inetAddress } returns InetAddress.getByName("192.168.0.2")
         every { socket.port } returns 80
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
         assertThat(with(client) { socket.canReuse(request) }).isFalse()
     }
 
     @Test
     fun canReuse_接続状態でなければfalse() {
-        val client = HttpClient()
+        val client = SingleHttpClient()
         val socket: Socket = mockk(relaxed = true)
         every { socket.isConnected } returns false
         every { socket.inetAddress } returns InetAddress.getByName("192.168.0.1")
         every { socket.port } returns 80
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setUrl(URL("http://192.168.0.1/index.html"))
         assertThat(with(client) { socket.canReuse(request) }).isFalse()
     }

@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.message
 
 import net.mm2d.upnp.Http.Status
-import net.mm2d.upnp.HttpResponse
+import net.mm2d.upnp.SingleHttpResponse
 import net.mm2d.upnp.SsdpMessage
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -21,7 +21,7 @@ import java.net.InetAddress
  */
 internal class SsdpResponse(
 // VisibleForTesting
-    internal val message: HttpResponse,
+    internal val message: SingleHttpResponse,
     private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
     fun getStatusCode(): Int = message.getStatusCode()
@@ -35,7 +35,7 @@ internal class SsdpResponse(
     companion object {
         @Throws(IOException::class)
         fun create(address: InetAddress, data: ByteArray, length: Int): SsdpResponse =
-            HttpResponse.create().apply {
+            SingleHttpResponse.create().apply {
                 readData(ByteArrayInputStream(data, 0, length))
             }.let { SsdpResponse(it, SsdpMessageDelegate(it, address)) }
     }

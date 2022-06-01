@@ -36,7 +36,7 @@ import java.net.URL
  *
  * @param keepAlive true: keep-alive
  */
-class HttpClient(keepAlive: Boolean = true) {
+class SingleHttpClient(keepAlive: Boolean = true) {
     private class SocketHolder(
         val socket: Socket
     ) {
@@ -67,10 +67,10 @@ class HttpClient(keepAlive: Boolean = true) {
      * If false, the connection is disconnected regardless of the response.
      *
      * Also, even if true or false,
-     * the contents of [HttpRequest] passed in the post argument will not be changed.
+     * the contents of [SingleHttpRequest] passed in the post argument will not be changed.
      *
      * If you need to describe keep-alive in the header,
-     * you need to set it in [HttpRequest] before calling post.
+     * you need to set it in [SingleHttpRequest] before calling post.
      */
     var isKeepAlive: Boolean = keepAlive
 
@@ -90,7 +90,7 @@ class HttpClient(keepAlive: Boolean = true) {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun post(request: HttpRequest): HttpResponse = post(request, 0)
+    fun post(request: SingleHttpRequest): SingleHttpResponse = post(request, 0)
 
     /**
      * Send a request and receive a response.
@@ -103,9 +103,9 @@ class HttpClient(keepAlive: Boolean = true) {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    private fun post(request: HttpRequest, redirectDepth: Int): HttpResponse {
+    private fun post(request: SingleHttpRequest, redirectDepth: Int): SingleHttpResponse {
         confirmReuseSocket(request)
-        val response: HttpResponse = try {
+        val response: SingleHttpResponse = try {
             doRequest(request)
         } catch (e: IOException) {
             closeSocket()
@@ -117,14 +117,14 @@ class HttpClient(keepAlive: Boolean = true) {
         return redirectIfNeeded(request, response, redirectDepth)
     }
 
-    private fun confirmReuseSocket(request: HttpRequest) {
+    private fun confirmReuseSocket(request: SingleHttpRequest) {
         if (!canReuse(request)) {
             closeSocket()
         }
     }
 
     @Throws(IOException::class)
-    private fun doRequest(request: HttpRequest): HttpResponse {
+    private fun doRequest(request: SingleHttpRequest): SingleHttpResponse {
         val socketHolder = socketHolder
         return if (socketHolder == null) {
             writeAndRead(openSocket(request), request)
@@ -144,13 +144,17 @@ class HttpClient(keepAlive: Boolean = true) {
 
     // open状態でのみコールする
     @Throws(IOException::class)
-    private fun writeAndRead(socketHolder: SocketHolder, request: HttpRequest): HttpResponse {
+    private fun writeAndRead(socketHolder: SocketHolder, request: SingleHttpRequest): SingleHttpResponse {
         request.writeData(socketHolder.output)
-        return HttpResponse.create(socketHolder.input)
+        return SingleHttpResponse.create(socketHolder.input)
     }
 
     @Throws(IOException::class)
-    private fun redirectIfNeeded(request: HttpRequest, response: HttpResponse, redirectDepth: Int): HttpResponse {
+    private fun redirectIfNeeded(
+        request: SingleHttpRequest,
+        response: SingleHttpResponse,
+        redirectDepth: Int
+    ): SingleHttpResponse {
         if (needToRedirect(response) && redirectDepth < REDIRECT_MAX) {
             val location = response.getHeader(Http.LOCATION)
             if (!location.isNullOrEmpty()) {
@@ -160,7 +164,7 @@ class HttpClient(keepAlive: Boolean = true) {
         return response
     }
 
-    private fun needToRedirect(response: HttpResponse): Boolean =
+    private fun needToRedirect(response: SingleHttpResponse): Boolean =
         when (response.getStatus()) {
             Http.Status.HTTP_MOVED_PERM,
             Http.Status.HTTP_FOUND,
@@ -170,25 +174,25 @@ class HttpClient(keepAlive: Boolean = true) {
         }
 
     @Throws(IOException::class)
-    private fun redirect(request: HttpRequest, location: String, redirectDepth: Int): HttpResponse {
-        val newRequest = HttpRequest.copy(request).apply {
+    private fun redirect(request: SingleHttpRequest, location: String, redirectDepth: Int): SingleHttpResponse {
+        val newRequest = SingleHttpRequest.copy(request).apply {
             setUrl(URL(location), true)
             setHeader(Http.CONNECTION, Http.CLOSE)
         }
-        return HttpClient(false)
+        return SingleHttpClient(false)
             .post(newRequest, redirectDepth + 1)
     }
 
     // VisibleForTesting
-    internal fun canReuse(request: HttpRequest): Boolean =
+    internal fun canReuse(request: SingleHttpRequest): Boolean =
         socketHolder?.socket?.canReuse(request) ?: false
 
     // VisibleForTesting
-    internal fun Socket.canReuse(request: HttpRequest): Boolean =
+    internal fun Socket.canReuse(request: SingleHttpRequest): Boolean =
         isConnected && inetAddress == request.address && port == request.port
 
     @Throws(IOException::class)
-    private fun openSocket(request: HttpRequest): SocketHolder {
+    private fun openSocket(request: SingleHttpRequest): SocketHolder {
         val socket = Socket().also {
             it.connect(request.getSocketAddress(), Property.DEFAULT_TIMEOUT)
             it.soTimeout = Property.DEFAULT_TIMEOUT
@@ -237,7 +241,7 @@ class HttpClient(keepAlive: Boolean = true) {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun download(url: URL): HttpResponse {
+    fun download(url: URL): SingleHttpResponse {
         val request = makeHttpRequest(url)
         return post(request).also {
             // response bodyがemptyであることは正常
@@ -249,8 +253,8 @@ class HttpClient(keepAlive: Boolean = true) {
     }
 
     @Throws(IOException::class)
-    private fun makeHttpRequest(url: URL): HttpRequest =
-        HttpRequest.create().apply {
+    private fun makeHttpRequest(url: URL): SingleHttpRequest =
+        SingleHttpRequest.create().apply {
             setMethod(Http.GET)
             setUrl(url, true)
             setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
@@ -260,6 +264,6 @@ class HttpClient(keepAlive: Boolean = true) {
     companion object {
         private const val REDIRECT_MAX = 2
 
-        internal fun create(keepAlive: Boolean = true) = HttpClient(keepAlive)
+        internal fun create(keepAlive: Boolean = true) = SingleHttpClient(keepAlive)
     }
 }

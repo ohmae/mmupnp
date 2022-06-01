@@ -20,10 +20,10 @@ import java.io.OutputStream
  * and does not assume the exchange of large data.
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
- * @see HttpResponse
- * @see HttpRequest
+ * @see SingleHttpResponse
+ * @see SingleHttpRequest
  */
-interface HttpMessage {
+interface SingleHttpMessage {
     /**
      * Start Line.
      */

@@ -9,10 +9,10 @@ package net.mm2d.upnp.internal.impl
 
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Device
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
 import net.mm2d.upnp.IconFilter
 import net.mm2d.upnp.Service
+import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import java.io.IOException
@@ -76,7 +76,7 @@ internal class DeviceImpl private constructor(
     override val isPinned: Boolean
         get() = ssdpMessage.isPinned
 
-    override fun loadIconBinary(client: HttpClient, filter: IconFilter) {
+    override fun loadIconBinary(client: SingleHttpClient, filter: IconFilter) {
         if (iconList.isEmpty()) return
         filter(iconList).mapNotNull { it as? IconImpl }.forEach {
             try {
@@ -251,11 +251,11 @@ internal class DeviceImpl private constructor(
         }
 
         /**
-         * Descriptionのダウンロード完了時にダウンロードに使用した[HttpClient]を渡す。
+         * Descriptionのダウンロード完了時にダウンロードに使用した[SingleHttpClient]を渡す。
          *
-         * @param client Descriptionのダウンロードに使用した[HttpClient]
+         * @param client Descriptionのダウンロードに使用した[SingleHttpClient]
          */
-        fun setDownloadInfo(client: HttpClient) {
+        fun setDownloadInfo(client: SingleHttpClient) {
             val ssdpMessage = ssdpMessage as? FakeSsdpMessage ?: return
             client.localAddress?.let {
                 ssdpMessage.localAddress = it

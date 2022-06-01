@@ -8,8 +8,8 @@
 package net.mm2d.upnp.internal.parser
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpClient
 import net.mm2d.upnp.Icon
+import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.internal.impl.DeviceImpl
 import net.mm2d.upnp.internal.impl.IconImpl
 import net.mm2d.upnp.internal.impl.ServiceImpl
@@ -37,7 +37,7 @@ internal object DeviceParser {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun loadDescription(client: HttpClient, builder: DeviceImpl.Builder) {
+    fun loadDescription(client: SingleHttpClient, builder: DeviceImpl.Builder) {
         val url = Http.makeUrlWithScopeId(builder.getLocation(), builder.getSsdpMessage().scopeId)
         // DIAL Application-URL
         // val response = client.download(url)
@@ -52,7 +52,7 @@ internal object DeviceParser {
     }
 
     @Throws(IOException::class)
-    private fun loadServices(client: HttpClient, builder: DeviceImpl.Builder) {
+    private fun loadServices(client: SingleHttpClient, builder: DeviceImpl.Builder) {
         builder.getServiceBuilderList().forEach {
             ServiceParser.loadDescription(client, builder, it)
         }

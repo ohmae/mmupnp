@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.server
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpRequest
+import net.mm2d.upnp.SingleHttpRequest
 import net.mm2d.upnp.internal.parser.parseEventXml
 import net.mm2d.upnp.internal.parser.parseUsn
 import net.mm2d.upnp.internal.thread.TaskExecutors
@@ -91,7 +91,7 @@ internal class MulticastEventReceiver(
 
     // VisibleForTesting
     internal fun onReceive(data: ByteArray, length: Int) {
-        val request = HttpRequest.create().apply {
+        val request = SingleHttpRequest.create().apply {
             readData(ByteArrayInputStream(data, 0, length))
         }
         if (request.getHeader(Http.NT) != Http.UPNP_EVENT) return

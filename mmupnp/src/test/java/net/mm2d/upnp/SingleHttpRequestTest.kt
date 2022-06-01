@@ -21,17 +21,17 @@ import java.net.URL
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class HttpRequestTest {
+class SingleHttpRequestTest {
     @Test
     fun setMethod_getMethodに反映される() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setMethod(Http.GET)
         assertThat(request.getMethod()).isEqualTo(Http.GET)
     }
 
     @Test
     fun setUrl_getAddress_getPort_getUriに反映される() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setUrl(URL("http://192.0.2.2:12345/cds/control"), true)
         val port = 12345
         val address = InetAddress.getByName("192.0.2.2")
@@ -46,7 +46,7 @@ class HttpRequestTest {
 
     @Test
     fun setUrl_getAddress_getPort_getUriに反映される1() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setUrl(URL("http://[2001:db8::1]:12345/cds/control"), true)
         val port = 12345
         val address = InetAddress.getByName("2001:db8::1")
@@ -61,17 +61,17 @@ class HttpRequestTest {
 
     @Test(expected = IOException::class)
     fun setUrl_http以外はException() {
-        HttpRequest.create().setUrl(URL("https://192.0.2.2:12345/cds/control"), true)
+        SingleHttpRequest.create().setUrl(URL("https://192.0.2.2:12345/cds/control"), true)
     }
 
     @Test(expected = IOException::class)
     fun setUrl_portがUnsignedShortMax以上ならException() {
-        HttpRequest.create().setUrl(URL("http://192.0.2.2:65536/cds/control"), true)
+        SingleHttpRequest.create().setUrl(URL("http://192.0.2.2:65536/cds/control"), true)
     }
 
     @Test
     fun setUrl_falseではHOSTに反映されない() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setUrl(URL("http://192.0.2.2:12345/cds/control"))
         assertThat(request.getHeader(Http.HOST)).isNull()
     }
@@ -79,7 +79,7 @@ class HttpRequestTest {
     @Test
     fun readData_読み込めること() {
         val inputStream = TestUtils.getResourceAsStream("browse-request-length.bin")
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.readData(inputStream)
         assertThat(request.getMethod()).isEqualTo(Http.POST)
         assertThat(request.getUri()).isEqualTo("/cds/control")
@@ -92,7 +92,7 @@ class HttpRequestTest {
     @Test
     fun readData_Chunk読み込めること() {
         val inputStream = TestUtils.getResourceAsStream("browse-request-chunked.bin")
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.readData(inputStream)
         assertThat(request.getMethod()).isEqualTo(Http.POST)
         assertThat(request.getUri()).isEqualTo("/cds/control")
@@ -106,7 +106,7 @@ class HttpRequestTest {
     @Test
     fun writeData_書き出しができること() {
         val soap = TestUtils.getResourceAsString("browse-request.xml")
-        val request = HttpRequest.create().apply {
+        val request = SingleHttpRequest.create().apply {
             setMethod(Http.POST)
             setUrl(URL("http://192.0.2.2:12345/cds/control"), true)
             setHeader(Http.SOAPACTION, ACTION)
@@ -119,7 +119,7 @@ class HttpRequestTest {
         request.writeData(baos)
 
         val bais = ByteArrayInputStream(baos.toByteArray())
-        val readRequest = HttpRequest.create()
+        val readRequest = SingleHttpRequest.create()
         readRequest.readData(bais)
 
         assertThat(readRequest.startLine).isEqualTo(request.startLine)
@@ -129,7 +129,7 @@ class HttpRequestTest {
     @Test
     fun writeData_Chunk書き出しができること() {
         val soap = TestUtils.getResourceAsString("browse-request.xml")
-        val request = HttpRequest.create().apply {
+        val request = SingleHttpRequest.create().apply {
             setMethod(Http.POST)
             setUrl(URL("http://192.0.2.2:12345/cds/control"), true)
             setHeader(Http.SOAPACTION, ACTION)
@@ -143,7 +143,7 @@ class HttpRequestTest {
         request.writeData(baos)
 
         val bais = ByteArrayInputStream(baos.toByteArray())
-        val readRequest = HttpRequest.create()
+        val readRequest = SingleHttpRequest.create()
         readRequest.readData(bais)
 
         assertThat(readRequest.startLine).isEqualTo(request.startLine)
@@ -152,7 +152,7 @@ class HttpRequestTest {
 
     @Test
     fun setVersion_getVersionで取得できる() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setVersion(Http.HTTP_1_0)
 
         assertThat(request.version).isEqualTo(Http.HTTP_1_0)
@@ -160,7 +160,7 @@ class HttpRequestTest {
 
     @Test
     fun setRequestLine_method_uri_versionに反映される() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setStartLine("GET /cds/control HTTP/1.1")
 
         assertThat(request.getMethod()).isEqualTo(Http.GET)
@@ -170,17 +170,17 @@ class HttpRequestTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun setRequestLine_不足があればException() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setStartLine("GET /cds/control")
     }
 
     @Test
     fun HttpRequest_ディープコピーができる() {
         val inputStream = TestUtils.getResourceAsStream("browse-request-length.bin")
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.readData(inputStream)
 
-        val readRequest = HttpRequest.copy(request)
+        val readRequest = SingleHttpRequest.copy(request)
         assertThat(readRequest.getMethod()).isEqualTo(request.getMethod())
         assertThat(readRequest.getUri()).isEqualTo(request.getUri())
         assertThat(readRequest.getHeader(Http.SOAPACTION)).isEqualTo(request.getHeader(Http.SOAPACTION))
@@ -195,7 +195,7 @@ class HttpRequestTest {
 
     @Test(expected = IllegalStateException::class)
     fun getAddressString_未設定ならException() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.getAddressString()
     }
 
@@ -203,7 +203,7 @@ class HttpRequestTest {
     fun getAddressString_IPv4() {
         val address = "192.168.0.1"
         val port = 8080
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.address = InetAddress.getByName(address)
         assertThat(request.getAddressString()).isEqualTo(address)
         request.port = Http.DEFAULT_PORT
@@ -216,7 +216,7 @@ class HttpRequestTest {
     fun getAddressString_IPv6() {
         val address = "::1"
         val port = 8080
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.address = InetAddress.getByName(address)
         assertThat(request.getAddressString()).isEqualTo("[$address]")
         request.port = Http.DEFAULT_PORT
@@ -227,27 +227,27 @@ class HttpRequestTest {
 
     @Test(expected = IllegalStateException::class)
     fun getSocketAddress_未設定ならException() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.getSocketAddress()
     }
 
     @Test
     fun setHeaderLine_設定できる() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setHeaderLine("SOAPACTION: $ACTION")
         assertThat(request.getHeader(Http.SOAPACTION)).isEqualTo(ACTION)
     }
 
     @Test
     fun setHeaderLine_フォーマットエラーでもExceptionは発生しない() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setHeaderLine("SOAPACTION")
         assertThat(request.getHeader(Http.SOAPACTION)).isNull()
     }
 
     @Test
     fun isKeepAlive() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setVersion(Http.HTTP_1_0)
         assertThat(request.isKeepAlive()).isFalse()
         request.setVersion(Http.HTTP_1_1)
@@ -268,14 +268,14 @@ class HttpRequestTest {
 
     @Test
     fun getContentLength_正常系() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setHeader(Http.CONTENT_LENGTH, "10")
         assertThat(request.contentLength).isEqualTo(10)
     }
 
     @Test
     fun getContentLength_異常系() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setHeader(Http.CONTENT_LENGTH, "length")
         assertThat(request.contentLength).isEqualTo(-1)
     }
@@ -283,7 +283,7 @@ class HttpRequestTest {
     @Test
     fun setBody_getBodyで取得できる() {
         val body = "body"
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setBody(body)
         assertThat(request.getBody()).isEqualTo(body)
     }
@@ -291,7 +291,7 @@ class HttpRequestTest {
     @Test
     fun setBody_長さ0() {
         val body = ""
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setBody(body, true)
         assertThat(request.getBody()).isEqualTo(body)
         assertThat(request.getBodyBinary()!!.size).isEqualTo(0)
@@ -300,7 +300,7 @@ class HttpRequestTest {
 
     @Test
     fun setBodyBinary_長さ0() {
-        val request = HttpRequest.create()
+        val request = SingleHttpRequest.create()
         request.setBodyBinary(ByteArray(0))
         assertThat(request.getBody()!!.length).isEqualTo(0)
         assertThat(request.getBodyBinary()!!.size).isEqualTo(0)

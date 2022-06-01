@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.message
 
-import net.mm2d.upnp.HttpRequest
+import net.mm2d.upnp.SingleHttpRequest
 import net.mm2d.upnp.SsdpMessage
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -19,7 +19,7 @@ import java.net.InetAddress
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SsdpRequest(
-    val message: HttpRequest,
+    val message: SingleHttpRequest,
     private val delegate: SsdpMessageDelegate
 ) : SsdpMessage by delegate {
     fun getMethod(): String = message.getMethod()
@@ -30,13 +30,13 @@ internal class SsdpRequest(
     override fun toString(): String = delegate.toString()
 
     companion object {
-        fun create(): SsdpRequest = HttpRequest.create().let {
+        fun create(): SsdpRequest = SingleHttpRequest.create().let {
             SsdpRequest(it, SsdpMessageDelegate(it))
         }
 
         @Throws(IOException::class)
         fun create(address: InetAddress, data: ByteArray, length: Int): SsdpRequest =
-            HttpRequest.create().apply {
+            SingleHttpRequest.create().apply {
                 readData(ByteArrayInputStream(data, 0, length))
             }.let { SsdpRequest(it, SsdpMessageDelegate(it, address)) }
     }

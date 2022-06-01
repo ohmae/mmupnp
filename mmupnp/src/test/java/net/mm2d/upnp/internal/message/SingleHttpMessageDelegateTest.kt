@@ -19,11 +19,11 @@ import java.io.UnsupportedEncodingException
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
-class HttpMessageDelegateTest {
+class SingleHttpMessageDelegateTest {
     @Test
     fun setBody_エンコード不可でもExceptionは発生しない() {
         val body = "body"
-        val message = spyk(HttpMessageDelegate(mockk(relaxed = true)))
+        val message = spyk(SingleHttpMessageDelegate(mockk(relaxed = true)))
         every { message.getBytes(any()) } throws UnsupportedEncodingException()
         message.setBody(body, true)
         assertThat(message.getBody()).isEqualTo(body)
@@ -31,7 +31,7 @@ class HttpMessageDelegateTest {
 
     @Test
     fun getBody_デコード不可ならnullが返る() {
-        val message = spyk(HttpMessageDelegate(mockk(relaxed = true)))
+        val message = spyk(SingleHttpMessageDelegate(mockk(relaxed = true)))
         val byteArray = "body".toByteArray(charset("utf-8"))
         message.setBodyBinary(byteArray)
         with(message) {
@@ -42,7 +42,7 @@ class HttpMessageDelegateTest {
 
     @Test
     fun getHeaderBytes_エンコード不可でもnullが返らない() {
-        val message = spyk(HttpMessageDelegate(mockk(relaxed = true)))
+        val message = spyk(SingleHttpMessageDelegate(mockk(relaxed = true)))
         every { message.getBytes(any()) } throws UnsupportedEncodingException()
         assertThat(message.getHeaderBytes()).hasLength(0)
     }

@@ -8,7 +8,7 @@
 package net.mm2d.upnp.internal.message
 
 import net.mm2d.upnp.Http
-import net.mm2d.upnp.HttpMessage
+import net.mm2d.upnp.SingleHttpMessage
 import net.mm2d.upnp.log.Logger
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -17,14 +17,14 @@ import java.io.OutputStream
 import java.io.UnsupportedEncodingException
 
 /**
- * Common implementation of [HttpMessage].
+ * Common implementation of [SingleHttpMessage].
  *
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
-internal class HttpMessageDelegate(
+internal class SingleHttpMessageDelegate(
     private val startLineDelegate: StartLineDelegate,
-    original: HttpMessageDelegate? = null
-) : HttpMessage {
+    original: SingleHttpMessageDelegate? = null
+) : SingleHttpMessage {
     internal interface StartLineDelegate {
         var version: String
         val shouldStriveToReadBody: Boolean
@@ -32,15 +32,15 @@ internal class HttpMessageDelegate(
         fun setStartLine(startLine: String)
     }
 
-    private val headers: HttpHeaders
+    private val headers: SingleHttpHeaders
     private var body: String? = null
     private var bodyBinary: ByteArray? = null
 
     init {
         if (original == null) {
-            headers = HttpHeaders()
+            headers = SingleHttpHeaders()
         } else {
-            headers = HttpHeaders(original.headers)
+            headers = SingleHttpHeaders(original.headers)
             body = original.body
             bodyBinary = original.bodyBinary?.copyOf()
         }
