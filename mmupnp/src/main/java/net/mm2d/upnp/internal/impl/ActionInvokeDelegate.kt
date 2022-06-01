@@ -7,12 +7,22 @@
 
 package net.mm2d.upnp.internal.impl
 
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
+import io.ktor.client.request.request
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.TextContent
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Argument
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.Property
-import net.mm2d.upnp.SingleHttpClient
-import net.mm2d.upnp.SingleHttpRequest
 import net.mm2d.upnp.log.Logger
 import net.mm2d.xml.dsl.buildXml
 import net.mm2d.xml.node.XmlElement
@@ -27,7 +37,7 @@ internal class ActionInvokeDelegate(
     private val service: ServiceImpl = action.service
     private val name: String = action.name
     private val argumentMap: Map<String, Argument> = action.argumentMap
-    private fun createHttpClient(): SingleHttpClient = SingleHttpClient.create(false)
+    private fun createHttpClient(): HttpClient = HttpClient(CIO)
 
     suspend fun invoke(
         argumentValues: Map<String, String?>,
@@ -75,19 +85,19 @@ internal class ActionInvokeDelegate(
     private suspend fun invoke(soap: String): Map<String, String> {
         val request = makeHttpRequest(makeAbsoluteControlUrl(), soap)
         Logger.d { "action invoke:\n$request" }
-        val response = createHttpClient().post(request)
-        val body = response.getBody()
+        val response = createHttpClient().request(request)
+        val body = response.body<String>()
         Logger.d { "action receive:\n$body" }
-        if (response.getStatus() == Http.Status.HTTP_INTERNAL_ERROR && !body.isNullOrEmpty()) {
+        if (response.status == HttpStatusCode.InternalServerError && body.isNotEmpty()) {
             try {
                 return parseErrorResponse(body)
             } catch (e: Exception) {
                 throw IOException(body, e)
             }
         }
-        if (response.getStatus() != Http.Status.HTTP_OK || body.isNullOrEmpty()) {
+        if (response.status != HttpStatusCode.OK || body.isEmpty()) {
             Logger.w { "action invoke error\n$response" }
-            throw IOException(response.startLine)
+            throw IOException(response.toString())
         }
         try {
             return parseResponse(body)
@@ -114,16 +124,14 @@ internal class ActionInvokeDelegate(
      * @return SOAP送信用HttpRequest
      * @throws IOException if an I/O error occurs.
      */
-    @Throws(IOException::class)
-    private fun makeHttpRequest(url: URL, soap: String): SingleHttpRequest =
-        SingleHttpRequest.create().apply {
-            setMethod(Http.POST)
-            setUrl(url, true)
-            setHeader(Http.SOAPACTION, soapActionName)
-            setHeader(Http.USER_AGENT, Property.USER_AGENT_VALUE)
-            setHeader(Http.CONNECTION, Http.CLOSE)
-            setHeader(Http.CONTENT_TYPE, Http.CONTENT_TYPE_DEFAULT)
-            setBody(soap, true)
+    private fun makeHttpRequest(url: URL, soap: String): HttpRequestBuilder =
+        HttpRequestBuilder().apply {
+            method = HttpMethod.Post
+            url(url)
+            header(Http.SOAPACTION, soapActionName)
+            header(Http.USER_AGENT, Property.USER_AGENT_VALUE)
+            header(Http.CONNECTION, Http.CLOSE)
+            setBody(TextContent(soap, ContentType.Text.Xml))
         }
 
     /**
