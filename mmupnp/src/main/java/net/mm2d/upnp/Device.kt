@@ -7,6 +7,8 @@
 
 package net.mm2d.upnp
 
+import io.ktor.client.HttpClient
+
 /**
  * Interface of UPnP Device.
  *
@@ -226,7 +228,7 @@ interface Device {
      * @param client HttpClient
      * @param filter Filter which selects Icon to load
      */
-    fun loadIconBinary(client: SingleHttpClient, filter: IconFilter)
+    suspend fun loadIconBinary(client: HttpClient, filter: IconFilter)
 
     /**
      * update SSDP packet

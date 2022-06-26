@@ -7,6 +7,9 @@
 
 package net.mm2d.upnp.internal.impl
 
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPoint.DiscoveryListener
@@ -17,7 +20,6 @@ import net.mm2d.upnp.Device
 import net.mm2d.upnp.IconFilter
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.Service
-import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.impl.DeviceImpl.Builder
 import net.mm2d.upnp.internal.manager.DeviceHolder
@@ -94,7 +96,7 @@ internal class ControlPointImpl(
         } else null
     }
 
-    private fun createHttpClient(): SingleHttpClient = SingleHttpClient.create(true)
+    private fun createHttpClient(): HttpClient = HttpClient(CIO)
 
     // VisibleForTesting
     internal fun needToUpdateSsdpMessage(oldMessage: SsdpMessage, newMessage: SsdpMessage): Boolean {
@@ -152,12 +154,12 @@ internal class ControlPointImpl(
     // VisibleForTesting
     internal fun loadDevice(uuid: String, builder: Builder) {
         loadingDeviceMap[uuid] = builder
-        if (!taskExecutors.io { loadDevice(builder) }) {
+        if (!taskExecutors.io { runBlocking { loadDevice(builder) } }) {
             loadingDeviceMap.remove(uuid)
         }
     }
 
-    private fun loadDevice(builder: Builder) {
+    private suspend fun loadDevice(builder: Builder) {
         val client = createHttpClient()
         val uuid = builder.getUuid()
         try {
@@ -371,10 +373,10 @@ internal class ControlPointImpl(
         }
         val builder = Builder(this, FakeSsdpMessage(location))
         loadingPinnedDevices.add(builder)
-        taskExecutors.io { loadPinnedDevice(builder) }
+        taskExecutors.io { runBlocking { loadPinnedDevice(builder) } }
     }
 
-    private fun loadPinnedDevice(builder: Builder) {
+    private suspend fun loadPinnedDevice(builder: Builder) {
         val client = createHttpClient()
         try {
             DeviceParser.loadDescription(client, builder)

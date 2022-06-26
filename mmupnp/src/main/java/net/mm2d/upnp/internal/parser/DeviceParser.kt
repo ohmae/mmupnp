@@ -7,9 +7,11 @@
 
 package net.mm2d.upnp.internal.parser
 
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.Icon
-import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.internal.impl.DeviceImpl
 import net.mm2d.upnp.internal.impl.IconImpl
 import net.mm2d.upnp.internal.impl.ServiceImpl
@@ -37,22 +39,21 @@ internal object DeviceParser {
      * @throws IOException if an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun loadDescription(client: SingleHttpClient, builder: DeviceImpl.Builder) {
+    suspend fun loadDescription(client: HttpClient, builder: DeviceImpl.Builder) {
         val url = Http.makeUrlWithScopeId(builder.getLocation(), builder.getSsdpMessage().scopeId)
         // DIAL Application-URL
         // val response = client.download(url)
         // Logger.d { response.getHeader("Application-URL") }
-        val description = client.downloadString(url)
+        val description = client.get(url.toString()).bodyAsText()
         if (description.isEmpty()) {
             throw IOException("download error: $url")
         }
-        builder.setDownloadInfo(client)
         parseDescription(builder, description)
         loadServices(client, builder)
     }
 
     @Throws(IOException::class)
-    private fun loadServices(client: SingleHttpClient, builder: DeviceImpl.Builder) {
+    private suspend fun loadServices(client: HttpClient, builder: DeviceImpl.Builder) {
         builder.getServiceBuilderList().forEach {
             ServiceParser.loadDescription(client, builder, it)
         }

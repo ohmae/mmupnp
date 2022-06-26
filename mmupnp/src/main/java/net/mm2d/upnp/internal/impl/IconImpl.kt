@@ -7,9 +7,11 @@
 
 package net.mm2d.upnp.internal.impl
 
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.readBytes
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.Icon
-import net.mm2d.upnp.SingleHttpClient
 import java.io.IOException
 
 /**
@@ -28,9 +30,9 @@ internal class IconImpl(
         private set
 
     @Throws(IOException::class)
-    fun loadBinary(client: SingleHttpClient, baseUrl: String, scopeId: Int) {
+    suspend fun loadBinary(client: HttpClient, baseUrl: String, scopeId: Int) {
         val url = Http.makeAbsoluteUrl(baseUrl, url, scopeId)
-        binary = client.downloadBinary(url)
+        binary = client.get(url.toString()).readBytes()
     }
 
     internal class Builder {

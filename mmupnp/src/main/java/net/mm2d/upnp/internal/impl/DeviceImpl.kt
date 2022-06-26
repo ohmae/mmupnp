@@ -7,12 +7,12 @@
 
 package net.mm2d.upnp.internal.impl
 
+import io.ktor.client.HttpClient
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Device
 import net.mm2d.upnp.Icon
 import net.mm2d.upnp.IconFilter
 import net.mm2d.upnp.Service
-import net.mm2d.upnp.SingleHttpClient
 import net.mm2d.upnp.SsdpMessage
 import net.mm2d.upnp.internal.message.FakeSsdpMessage
 import java.io.IOException
@@ -76,7 +76,7 @@ internal class DeviceImpl private constructor(
     override val isPinned: Boolean
         get() = ssdpMessage.isPinned
 
-    override fun loadIconBinary(client: SingleHttpClient, filter: IconFilter) {
+    override suspend fun loadIconBinary(client: HttpClient, filter: IconFilter) {
         if (iconList.isEmpty()) return
         filter(iconList).mapNotNull { it as? IconImpl }.forEach {
             try {
@@ -248,18 +248,6 @@ internal class DeviceImpl private constructor(
             builder.setDescription(description!!)
             builder.setUrlBase(urlBase)
             return builder
-        }
-
-        /**
-         * Descriptionのダウンロード完了時にダウンロードに使用した[SingleHttpClient]を渡す。
-         *
-         * @param client Descriptionのダウンロードに使用した[SingleHttpClient]
-         */
-        fun setDownloadInfo(client: SingleHttpClient) {
-            val ssdpMessage = ssdpMessage as? FakeSsdpMessage ?: return
-            client.localAddress?.let {
-                ssdpMessage.localAddress = it
-            } ?: throw IllegalStateException("HttpClient is not connected yet.")
         }
 
         internal fun updateSsdpMessage(message: SsdpMessage) {
