@@ -29,7 +29,8 @@ internal class ServiceImpl(
     actionBuilderList: List<ActionImpl.Builder>,
     stateVariables: List<StateVariable>
 ) : Service {
-    private val subscribeManager: SubscribeManager = device.controlPoint.subscribeManager
+    internal val controlPoint: ControlPointImpl = device.controlPoint
+    private val subscribeManager: SubscribeManager = controlPoint.subscribeManager
     private val actionMap: Map<String, Action>
     private val stateVariableMap = stateVariables.map { it.name to it }.toMap()
 

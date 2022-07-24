@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp.internal.impl
 
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint
@@ -16,6 +14,7 @@ import net.mm2d.upnp.ControlPoint.DiscoveryListener
 import net.mm2d.upnp.ControlPoint.EventListener
 import net.mm2d.upnp.ControlPoint.MulticastEventListener
 import net.mm2d.upnp.ControlPoint.NotifyEventListener
+import net.mm2d.upnp.ControlPointConfig
 import net.mm2d.upnp.Device
 import net.mm2d.upnp.IconFilter
 import net.mm2d.upnp.Protocol
@@ -51,7 +50,8 @@ internal class ControlPointImpl(
     notifySegmentCheckEnabled: Boolean,
     subscriptionEnabled: Boolean,
     multicastEventingEnabled: Boolean,
-    factory: DiFactory
+    factory: DiFactory,
+    internal val config: ControlPointConfig = ControlPointConfigImpl()
 ) : ControlPoint {
     private var iconFilter: IconFilter = EMPTY_FILTER
     private val discoveryListenerSet: MutableSet<DiscoveryListener>
@@ -95,8 +95,6 @@ internal class ControlPointImpl(
             factory.createMulticastEventReceiverList(taskExecutors, interfaces, ::onReceiveMulticastEvent)
         } else null
     }
-
-    private fun createHttpClient(): HttpClient = HttpClient(CIO)
 
     // VisibleForTesting
     internal fun needToUpdateSsdpMessage(oldMessage: SsdpMessage, newMessage: SsdpMessage): Boolean {
@@ -160,7 +158,7 @@ internal class ControlPointImpl(
     }
 
     private suspend fun loadDevice(builder: Builder) {
-        val client = createHttpClient()
+        val client = config.createHttpClient()
         val uuid = builder.getUuid()
         try {
             DeviceParser.loadDescription(client, builder)
@@ -377,7 +375,7 @@ internal class ControlPointImpl(
     }
 
     private suspend fun loadPinnedDevice(builder: Builder) {
-        val client = createHttpClient()
+        val client = config.createHttpClient()
         try {
             DeviceParser.loadDescription(client, builder)
             val device = builder.build()

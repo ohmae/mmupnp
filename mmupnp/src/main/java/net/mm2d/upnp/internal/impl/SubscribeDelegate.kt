@@ -7,8 +7,6 @@
 
 package net.mm2d.upnp.internal.impl
 
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.request
@@ -16,6 +14,7 @@ import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import net.mm2d.upnp.ControlPointConfig
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.log.Logger
@@ -29,6 +28,7 @@ import java.util.concurrent.TimeUnit
 internal class SubscribeDelegate(
     private val service: ServiceImpl
 ) {
+    private val config: ControlPointConfig = service.controlPoint.config
     private val device: DeviceImpl = service.device
     private val subscribeManager: SubscribeManager = device.controlPoint.subscribeManager
     var subscriptionId: String? = null
@@ -40,8 +40,6 @@ internal class SubscribeDelegate(
             val port = subscribeManager.getEventPort()
             return "<http://${address.toAddressString(port)}/>"
         }
-
-    private fun createHttpClient(): HttpClient = HttpClient(CIO)
 
     // VisibleForTesting
     @Throws(MalformedURLException::class)
@@ -68,7 +66,7 @@ internal class SubscribeDelegate(
     @Throws(IOException::class)
     internal suspend fun subscribeActual(keepRenew: Boolean): Boolean {
         val request = makeSubscribeRequest()
-        val response = createHttpClient().request(request)
+        val response = config.createHttpClient().request(request)
         if (response.status != HttpStatusCode.OK) {
             Logger.w { "error subscribe request:\n$request\nresponse:\n$response" }
             return false
@@ -110,7 +108,7 @@ internal class SubscribeDelegate(
     @Throws(IOException::class)
     internal suspend fun renewSubscribeActual(subscriptionId: String): Boolean {
         val request = makeRenewSubscribeRequest(subscriptionId)
-        val response = createHttpClient().request(request)
+        val response = config.createHttpClient().request(request)
         if (response.status != HttpStatusCode.OK) {
             Logger.w { "renewSubscribe request:\n$request\nresponse:\n$response" }
             return false
@@ -142,7 +140,7 @@ internal class SubscribeDelegate(
         }
         try {
             val request = makeUnsubscribeRequest(sId)
-            val response = createHttpClient().request(request)
+            val response = config.createHttpClient().request(request)
             subscribeManager.unregister(service)
             subscriptionId = null
             if (response.status != HttpStatusCode.OK) {

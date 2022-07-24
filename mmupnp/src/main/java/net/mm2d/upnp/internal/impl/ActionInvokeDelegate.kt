@@ -7,9 +7,7 @@
 
 package net.mm2d.upnp.internal.impl
 
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.request
@@ -21,6 +19,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.TextContent
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Argument
+import net.mm2d.upnp.ControlPointConfig
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.Property
 import net.mm2d.upnp.log.Logger
@@ -35,9 +34,9 @@ internal class ActionInvokeDelegate(
     action: ActionImpl
 ) {
     private val service: ServiceImpl = action.service
+    private val config: ControlPointConfig = service.controlPoint.config
     private val name: String = action.name
     private val argumentMap: Map<String, Argument> = action.argumentMap
-    private fun createHttpClient(): HttpClient = HttpClient(CIO)
 
     suspend fun invoke(
         argumentValues: Map<String, String?>,
@@ -85,7 +84,7 @@ internal class ActionInvokeDelegate(
     private suspend fun invoke(soap: String): Map<String, String> {
         val request = makeHttpRequest(makeAbsoluteControlUrl(), soap)
         Logger.d { "action invoke:\n$request" }
-        val response = createHttpClient().request(request)
+        val response = config.createHttpClient().request(request)
         val body = response.body<String>()
         Logger.d { "action receive:\n$body" }
         if (response.status == HttpStatusCode.InternalServerError && body.isNotEmpty()) {
