@@ -4,9 +4,9 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath(kotlin("gradle-plugin", version = "1.6.21"))
-        classpath(kotlin("serialization", version = "1.6.21"))
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.6.21")
+        classpath(kotlin("gradle-plugin", version = "1.7.10"))
+        classpath(kotlin("serialization", version = "1.7.10"))
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.7.10")
 
         classpath("com.github.ben-manes:gradle-versions-plugin:0.42.0")
     }
