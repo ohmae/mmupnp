@@ -7,6 +7,7 @@
 
 package net.mm2d.upnp.internal.impl
 
+import net.mm2d.upnp.ControlPointConfig
 import net.mm2d.upnp.Device
 import net.mm2d.upnp.Protocol
 import net.mm2d.upnp.Service
@@ -54,22 +55,22 @@ internal class DiFactory(
 
     fun createSubscribeManager(
         subscriptionEnabled: Boolean,
-        taskExecutors: TaskExecutors,
+        config: ControlPointConfig,
         listener: (service: Service, seq: Long, properties: List<Pair<String, String>>) -> Unit
     ): SubscribeManager = if (subscriptionEnabled) {
-        SubscribeManagerImpl(taskExecutors, listener, this)
+        SubscribeManagerImpl(config, listener, this)
     } else {
         EmptySubscribeManager()
     }
 
     fun createSubscribeServiceHolder(
-        taskExecutors: TaskExecutors
-    ): SubscribeServiceHolder = SubscribeServiceHolder(taskExecutors)
+        config: ControlPointConfig
+    ): SubscribeServiceHolder = SubscribeServiceHolder(config)
 
     fun createEventReceiver(
-        taskExecutors: TaskExecutors,
-        listener: (sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean
-    ): EventReceiver = EventReceiver(taskExecutors, listener)
+        config: ControlPointConfig,
+        listener: suspend (sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean
+    ): EventReceiver = EventReceiver(config, listener)
 
     fun createMulticastEventReceiverList(
         taskExecutors: TaskExecutors,

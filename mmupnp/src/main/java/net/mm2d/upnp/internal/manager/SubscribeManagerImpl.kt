@@ -7,22 +7,23 @@
 
 package net.mm2d.upnp.internal.manager
 
+import net.mm2d.upnp.ControlPointConfig
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.internal.impl.DiFactory
+import net.mm2d.upnp.internal.impl.launchClient
 import net.mm2d.upnp.internal.server.EventReceiver
-import net.mm2d.upnp.internal.thread.TaskExecutors
 import net.mm2d.upnp.log.Logger
 
 internal class SubscribeManagerImpl(
-    taskExecutors: TaskExecutors,
+    private val config: ControlPointConfig,
     private val listener: (service: Service, seq: Long, properties: List<Pair<String, String>>) -> Unit,
     factory: DiFactory
 ) : SubscribeManager {
-    private val serviceHolder: SubscribeServiceHolder = factory.createSubscribeServiceHolder(taskExecutors)
-    private val eventReceiver: EventReceiver = factory.createEventReceiver(taskExecutors, this::onEventReceived)
+    private val serviceHolder: SubscribeServiceHolder = factory.createSubscribeServiceHolder(config)
+    private val eventReceiver: EventReceiver = factory.createEventReceiver(config, this::onEventReceived)
 
     // VisibleForTesting
-    internal fun onEventReceived(sid: String, seq: Long, properties: List<Pair<String, String>>): Boolean {
+    internal suspend fun onEventReceived(sid: String, seq: Long, properties: List<Pair<String, String>>): Boolean {
         Logger.d { "$sid $seq $properties" }
         val service = serviceHolder.getService(sid) ?: run {
             Logger.w { "no service to receive: $sid" }
@@ -32,11 +33,6 @@ internal class SubscribeManagerImpl(
         return true
     }
 
-    override fun checkEnabled() = Unit
-
-    override fun getEventPort(): Int =
-        eventReceiver.getLocalPort()
-
     override fun initialize(): Unit =
         serviceHolder.start()
 
@@ -44,25 +40,30 @@ internal class SubscribeManagerImpl(
         eventReceiver.start()
 
     override fun stop() {
-        serviceHolder.clear()
+        config.launchClient {
+            serviceHolder.clear()
+        }
         eventReceiver.stop()
     }
 
     override fun terminate(): Unit =
         serviceHolder.stop()
 
-    override fun getSubscribeService(subscriptionId: String): Service? =
+    override suspend fun getEventPort(): Int =
+        eventReceiver.getLocalPort()
+
+    override suspend fun getSubscribeService(subscriptionId: String): Service? =
         serviceHolder.getService(subscriptionId)
 
-    override fun register(service: Service, timeout: Long, keep: Boolean): Unit =
+    override suspend fun register(service: Service, timeout: Long, keep: Boolean): Unit =
         serviceHolder.add(service, timeout, keep)
 
-    override fun renew(service: Service, timeout: Long): Unit =
+    override suspend fun renew(service: Service, timeout: Long): Unit =
         serviceHolder.renew(service, timeout)
 
-    override fun setKeepRenew(service: Service, keep: Boolean): Unit =
+    override suspend fun setKeepRenew(service: Service, keep: Boolean): Unit =
         serviceHolder.setKeepRenew(service, keep)
 
-    override fun unregister(service: Service): Unit =
+    override suspend fun unregister(service: Service): Unit =
         serviceHolder.remove(service)
 }

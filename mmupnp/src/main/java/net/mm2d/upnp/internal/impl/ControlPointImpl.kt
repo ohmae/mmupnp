@@ -7,7 +7,6 @@
 
 package net.mm2d.upnp.internal.impl
 
-import kotlinx.coroutines.runBlocking
 import net.mm2d.upnp.Adapter.iconFilter
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPoint.DiscoveryListener
@@ -90,7 +89,7 @@ internal class ControlPointImpl(
         }
         notifyServerList.setSegmentCheckEnabled(notifySegmentCheckEnabled)
         deviceHolder = factory.createDeviceHolder(taskExecutors) { lostDevice(it) }
-        subscribeManager = factory.createSubscribeManager(subscriptionEnabled, taskExecutors, ::onReceiveEvent)
+        subscribeManager = factory.createSubscribeManager(subscriptionEnabled, config, ::onReceiveEvent)
         multicastEventReceiverList = if (multicastEventingEnabled) {
             factory.createMulticastEventReceiverList(taskExecutors, interfaces, ::onReceiveMulticastEvent)
         } else null
@@ -152,8 +151,8 @@ internal class ControlPointImpl(
     // VisibleForTesting
     internal fun loadDevice(uuid: String, builder: Builder) {
         loadingDeviceMap[uuid] = builder
-        if (!taskExecutors.io { runBlocking { loadDevice(builder) } }) {
-            loadingDeviceMap.remove(uuid)
+        config.launchClient {
+            loadDevice(builder)
         }
     }
 
@@ -227,6 +226,7 @@ internal class ControlPointImpl(
         if (initialized.getAndSet(true)) {
             return
         }
+        config.initialize()
         deviceHolder.start()
         subscribeManager.initialize()
     }
@@ -241,6 +241,7 @@ internal class ControlPointImpl(
         taskExecutors.terminate()
         subscribeManager.terminate()
         deviceHolder.stop()
+        config.terminate()
     }
 
     override fun start() {
@@ -261,7 +262,9 @@ internal class ControlPointImpl(
             return
         }
         multicastEventReceiverList?.stop()
-        subscribeManager.stop()
+        config.launchClient {
+            subscribeManager.stop()
+        }
         searchServerList.stop()
         notifyServerList.stop()
         deviceList.forEach { lostDevice(it) }
@@ -340,7 +343,11 @@ internal class ControlPointImpl(
     internal fun lostDevice(device: Device) {
         Logger.d { "lostDevice:[${device.friendlyName}](${device.ipAddress})" }
         synchronized(deviceHolder) {
-            device.serviceList.forEach { subscribeManager.unregister(it) }
+            device.serviceList.forEach {
+                config.launchClient {
+                    subscribeManager.unregister(it)
+                }
+            }
             collectUdn(device).forEach { deviceMap.remove(it) }
             deviceHolder.remove(device)
         }
@@ -371,7 +378,9 @@ internal class ControlPointImpl(
         }
         val builder = Builder(this, FakeSsdpMessage(location))
         loadingPinnedDevices.add(builder)
-        taskExecutors.io { runBlocking { loadPinnedDevice(builder) } }
+        config.launchClient {
+            loadPinnedDevice(builder)
+        }
     }
 
     private suspend fun loadPinnedDevice(builder: Builder) {

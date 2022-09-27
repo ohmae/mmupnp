@@ -7,9 +7,9 @@
 
 package net.mm2d.upnp.internal.parser
 
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.Icon
 import net.mm2d.upnp.internal.impl.DeviceImpl
@@ -76,10 +76,13 @@ internal object DeviceParser {
             when (val tag = it.localName) {
                 "iconList" ->
                     parseIconList(builder, it)
+
                 "serviceList" ->
                     parseServiceList(builder, it)
+
                 "deviceList" ->
                     parseDeviceList(builder, it)
+
                 else -> {
                     val namespace = it.uri
                     val value = it.value
@@ -94,28 +97,40 @@ internal object DeviceParser {
         when (tag) {
             "UDN" ->
                 setUdn(value)
+
             "UPC" ->
                 setUpc(value)
+
             "deviceType" ->
                 setDeviceType(value)
+
             "friendlyName" ->
                 setFriendlyName(value)
+
             "manufacturer" ->
                 setManufacture(value)
+
             "manufacturerURL" ->
                 setManufactureUrl(value)
+
             "modelName" ->
                 setModelName(value)
+
             "modelURL" ->
                 setModelUrl(value)
+
             "modelDescription" ->
                 setModelDescription(value)
+
             "modelNumber" ->
                 setModelNumber(value)
+
             "serialNumber" ->
                 setSerialNumber(value)
+
             "presentationURL" ->
                 setPresentationUrl(value)
+
             "URLBase" ->
                 setUrlBase(value)
         }
@@ -138,12 +153,16 @@ internal object DeviceParser {
         when (tag) {
             "mimetype" ->
                 setMimeType(value)
+
             "height" ->
                 setHeight(value)
+
             "width" ->
                 setWidth(value)
+
             "depth" ->
                 setDepth(value)
+
             "url" ->
                 setUrl(value)
         }
@@ -166,12 +185,16 @@ internal object DeviceParser {
         when (tag) {
             "serviceType" ->
                 setServiceType(value)
+
             "serviceId" ->
                 setServiceId(value)
+
             "SCPDURL" ->
                 setScpdUrl(value)
+
             "eventSubURL" ->
                 setEventSubUrl(value)
+
             "controlURL" ->
                 setControlUrl(value)
         }

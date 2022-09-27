@@ -7,13 +7,9 @@
 
 package net.mm2d.upnp.internal.impl
 
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.header
-import io.ktor.client.request.request
-import io.ktor.client.request.url
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import net.mm2d.upnp.ControlPointConfig
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.internal.manager.SubscribeManager
@@ -34,12 +30,11 @@ internal class SubscribeDelegate(
     var subscriptionId: String? = null
         private set
 
-    internal val callback: String
-        get() {
-            val address = device.ssdpMessage.localAddress ?: return ""
-            val port = subscribeManager.getEventPort()
-            return "<http://${address.toAddressString(port)}/>"
-        }
+    internal suspend fun callback(): String {
+        val address = device.ssdpMessage.localAddress ?: return ""
+        val port = subscribeManager.getEventPort()
+        return "<http://${address.toAddressString(port)}/>"
+    }
 
     // VisibleForTesting
     @Throws(MalformedURLException::class)
@@ -84,12 +79,12 @@ internal class SubscribeDelegate(
     }
 
     @Throws(IOException::class)
-    private fun makeSubscribeRequest(): HttpRequestBuilder =
+    private suspend fun makeSubscribeRequest(): HttpRequestBuilder =
         HttpRequestBuilder().apply {
             method = HttpMethod(Http.SUBSCRIBE)
             url(makeAbsoluteUrl(service.eventSubUrl))
             header(Http.NT, Http.UPNP_EVENT)
-            header(Http.CALLBACK, callback)
+            header(Http.CALLBACK, callback())
             header(Http.TIMEOUT, "Second-300")
         }
 

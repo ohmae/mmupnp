@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.empty
 
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.ControlPoint
 import net.mm2d.upnp.ControlPoints

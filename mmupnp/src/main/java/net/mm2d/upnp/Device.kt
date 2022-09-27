@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp
 
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 
 /**
  * Interface of UPnP Device.

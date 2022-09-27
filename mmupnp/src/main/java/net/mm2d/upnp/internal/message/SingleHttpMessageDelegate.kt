@@ -143,8 +143,10 @@ internal class SingleHttpMessageDelegate(
         when {
             string == null ->
                 bodyBinary = binary
+
             string.isEmpty() ->
                 bodyBinary = ByteArray(0)
+
             else -> try {
                 bodyBinary = getBytes(string)
             } catch (e: UnsupportedEncodingException) {

@@ -294,12 +294,10 @@ class MainWindow private constructor() : JFrame() {
             Logger.setLogLevel(Logger.VERBOSE)
             Logger.setSender(DefaultSender.create { level, tag, message ->
                 if (!enabledLogLevel[level]) return@create
-                GlobalScope.launch(Dispatchers.Main) {
-                    val prefix = "$dateString ${level.toLogLevelString()} [$tag] "
-                    message.split("\n")
-                        .let { if (message.endsWith("\n")) it.dropLast(1) else it }
-                        .forEach { println(prefix + it) }
-                }
+                val prefix = "$dateString ${level.toLogLevelString()} [$tag] "
+                message.split("\n")
+                    .let { if (message.endsWith("\n")) it.dropLast(1) else it }
+                    .forEach { println(prefix + it) }
             })
         }
 

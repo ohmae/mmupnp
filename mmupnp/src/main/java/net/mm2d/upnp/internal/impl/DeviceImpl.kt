@@ -7,7 +7,7 @@
 
 package net.mm2d.upnp.internal.impl
 
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Device
 import net.mm2d.upnp.Icon

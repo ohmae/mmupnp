@@ -62,6 +62,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("io.ktor:ktor-client-core:2.1.1")
     implementation("io.ktor:ktor-client-cio:2.1.1")
+    implementation("io.ktor:ktor-client-okhttp:2.1.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.4")

@@ -113,8 +113,10 @@ class SingleHttpRequest internal constructor(
         port = when {
             url.port > 65535 ->
                 throw IOException("port number is too large. port=${url.port}")
+
             url.port < 0 ->
                 Http.DEFAULT_PORT
+
             else ->
                 url.port
         }

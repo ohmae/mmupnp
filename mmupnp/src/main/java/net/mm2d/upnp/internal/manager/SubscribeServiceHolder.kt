@@ -7,13 +7,19 @@
 
 package net.mm2d.upnp.internal.manager
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.yield
+import net.mm2d.upnp.ControlPointConfig
 import net.mm2d.upnp.Service
-import net.mm2d.upnp.internal.thread.TaskExecutors
-import net.mm2d.upnp.internal.thread.ThreadCondition
+import net.mm2d.upnp.internal.impl.launchServer
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 /**
  * Class to manage the Service that became subscribed state.
@@ -24,63 +30,64 @@ import kotlin.concurrent.withLock
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class SubscribeServiceHolder(
-    taskExecutors: TaskExecutors
-) : Runnable {
-    private val threadCondition = ThreadCondition(taskExecutors.manager)
-    private val lock = ReentrantLock()
-    private val condition = lock.newCondition()
+    private val config: ControlPointConfig,
+) {
+    private val mutex = Mutex()
+    private val flow: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1)
     private val subscriptionMap = mutableMapOf<String, SubscribeService>()
+    private var job: Job? = null
 
-    fun start(): Unit = threadCondition.start(this)
-    fun stop(): Unit = threadCondition.stop()
+    fun start() {
+        job?.cancel()
+        job = config.launchServer { block() }
+    }
 
-    fun add(service: Service, timeout: Long, keepRenew: Boolean): Unit = lock.withLock {
+    fun stop() {
+        job?.cancel()
+        job = null
+    }
+
+    suspend fun add(service: Service, timeout: Long, keepRenew: Boolean): Unit = mutex.withLock {
         val id = service.subscriptionId
         if (id.isNullOrEmpty()) {
             return
         }
         subscriptionMap[id] = SubscribeService(service, timeout, keepRenew)
-        condition.signalAll()
+        flow.tryEmit(Unit)
     }
 
-    fun renew(service: Service, timeout: Long): Unit = lock.withLock {
+    suspend fun renew(service: Service, timeout: Long): Unit = mutex.withLock {
         subscriptionMap[service.subscriptionId]?.renew(timeout)
     }
 
-    fun setKeepRenew(service: Service, keep: Boolean): Unit = lock.withLock {
+    suspend fun setKeepRenew(service: Service, keep: Boolean): Unit = mutex.withLock {
         subscriptionMap[service.subscriptionId]?.setKeepRenew(keep)
-        condition.signalAll()
+        flow.tryEmit(Unit)
     }
 
-    fun remove(service: Service): Unit = lock.withLock {
+    suspend fun remove(service: Service): Unit = mutex.withLock {
         subscriptionMap.remove(service.subscriptionId)?.let {
-            condition.signalAll()
+            flow.tryEmit(Unit)
         }
     }
 
-    fun getService(subscriptionId: String): Service? = lock.withLock {
+    suspend fun getService(subscriptionId: String): Service? = mutex.withLock {
         subscriptionMap[subscriptionId]?.service
     }
 
-    fun clear(): Unit = lock.withLock {
+    suspend fun clear(): Unit = mutex.withLock {
         subscriptionMap.values.forEach {
-            runBlocking {
-                it.service.unsubscribe()
-            }
+            it.service.unsubscribe()
         }
         subscriptionMap.clear()
     }
 
-    override fun run() {
-        Thread.currentThread().let {
-            it.name = it.name + "-subscribe-holder"
-        }
+    private suspend fun CoroutineScope.block() {
         try {
-            while (!threadCondition.isCanceled()) {
-                runBlocking {
-                    renewSubscribe(waitEntry())
-                    removeExpiredService()
-                }
+            while (isActive) {
+                renewSubscribe(waitEntry())
+                removeExpiredService()
+                yield()
                 waitNextRenewTime()
             }
         } catch (ignored: InterruptedException) {
@@ -98,12 +105,12 @@ internal class SubscribeServiceHolder(
      * @throws InterruptedException An interrupt occurred
      */
     @Throws(InterruptedException::class)
-    private fun waitEntry(): Collection<SubscribeService> = lock.withLock {
-        while (subscriptionMap.isEmpty()) {
-            condition.await()
+    private suspend fun waitEntry(): Collection<SubscribeService> {
+        while (mutex.withLock { subscriptionMap.isEmpty() }) {
+            flow.first()
         }
         // 操作をロックしないようにコピーに対して処理を行う。
-        ArrayList(subscriptionMap.values)
+        return mutex.withLock { ArrayList(subscriptionMap.values) }
     }
 
     /**
@@ -125,16 +132,14 @@ internal class SubscribeServiceHolder(
     /**
      * Remove expired [Service].
      */
-    private suspend fun removeExpiredService(): Unit = lock.withLock {
+    private suspend fun removeExpiredService(): Unit = mutex.withLock {
         val now = System.currentTimeMillis()
         subscriptionMap.values
             .filter { it.isExpired(now) }
             .map { it.service }
             .forEach {
                 remove(it)
-                runBlocking {
-                    it.unsubscribe()
-                }
+                it.unsubscribe()
             }
     }
 
@@ -144,13 +149,17 @@ internal class SubscribeServiceHolder(
      * @throws InterruptedException An interrupt occurred
      */
     @Throws(InterruptedException::class)
-    private fun waitNextRenewTime(): Unit = lock.withLock {
-        if (subscriptionMap.isEmpty()) {
-            return
+    private suspend fun waitNextRenewTime() {
+        mutex.withLock {
+            if (subscriptionMap.isEmpty()) {
+                return
+            }
         }
         val sleep = maxOf(findMostRecentTime() - System.currentTimeMillis(), MIN_INTERVAL)
         // ビジーループを回避するため最小値を設ける
-        condition.await(sleep, TimeUnit.MILLISECONDS)
+        withTimeout(sleep) {
+            flow.first()
+        }
     }
 
     /**

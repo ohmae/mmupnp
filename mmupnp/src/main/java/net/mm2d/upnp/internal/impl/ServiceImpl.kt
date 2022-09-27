@@ -10,7 +10,6 @@ package net.mm2d.upnp.internal.impl
 import net.mm2d.upnp.Action
 import net.mm2d.upnp.Service
 import net.mm2d.upnp.StateVariable
-import net.mm2d.upnp.internal.manager.SubscribeManager
 import net.mm2d.upnp.log.Logger
 
 /**
@@ -30,7 +29,6 @@ internal class ServiceImpl(
     stateVariables: List<StateVariable>
 ) : Service {
     internal val controlPoint: ControlPointImpl = device.controlPoint
-    private val subscribeManager: SubscribeManager = controlPoint.subscribeManager
     private val actionMap: Map<String, Action>
     private val stateVariableMap = stateVariables.map { it.name to it }.toMap()
 
@@ -54,20 +52,14 @@ internal class ServiceImpl(
 
     override fun findStateVariable(name: String?): StateVariable? = stateVariableMap[name]
 
-    override suspend fun subscribe(keepRenew: Boolean): Boolean {
-        subscribeManager.checkEnabled()
-        return subscribeDelegate.subscribe(keepRenew)
-    }
+    override suspend fun subscribe(keepRenew: Boolean): Boolean =
+        subscribeDelegate.subscribe(keepRenew)
 
-    override suspend fun renewSubscribe(): Boolean {
-        subscribeManager.checkEnabled()
-        return subscribeDelegate.renewSubscribe()
-    }
+    override suspend fun renewSubscribe(): Boolean =
+        subscribeDelegate.renewSubscribe()
 
-    override suspend fun unsubscribe(): Boolean {
-        subscribeManager.checkEnabled()
-        return subscribeDelegate.unsubscribe()
-    }
+    override suspend fun unsubscribe(): Boolean =
+        subscribeDelegate.unsubscribe()
 
     override fun hashCode(): Int = device.hashCode() + serviceId.hashCode()
 

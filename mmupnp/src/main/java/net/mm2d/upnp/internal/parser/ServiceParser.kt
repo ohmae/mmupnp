@@ -7,9 +7,9 @@
 
 package net.mm2d.upnp.internal.parser
 
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.StateVariable
 import net.mm2d.upnp.internal.impl.ActionImpl
@@ -111,8 +111,10 @@ internal object ServiceParser {
         when (tag) {
             "name" ->
                 setName(value)
+
             "direction" ->
                 setDirection(value)
+
             "relatedStateVariable" ->
                 setRelatedStateVariableName(value)
         }
@@ -126,12 +128,16 @@ internal object ServiceParser {
             when (it.localName) {
                 "name" ->
                     builder.setName(it.value)
+
                 "dataType" ->
                     builder.setDataType(it.value)
+
                 "defaultValue" ->
                     builder.setDefaultValue(it.value)
+
                 "allowedValueList" ->
                     parseAllowedValueList(builder, it)
+
                 "allowedValueRange" ->
                     parseAllowedValueRange(builder, it)
             }
@@ -154,8 +160,10 @@ internal object ServiceParser {
         when (tag) {
             "step" ->
                 setStep(value)
+
             "minimum" ->
                 setMinimum(value)
+
             "maximum" ->
                 setMaximum(value)
         }

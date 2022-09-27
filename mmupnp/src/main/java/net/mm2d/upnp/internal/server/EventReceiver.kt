@@ -7,13 +7,18 @@
 
 package net.mm2d.upnp.internal.server
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
+import net.mm2d.upnp.ControlPointConfig
 import net.mm2d.upnp.Http
 import net.mm2d.upnp.Property
 import net.mm2d.upnp.SingleHttpRequest
 import net.mm2d.upnp.SingleHttpResponse
+import net.mm2d.upnp.internal.impl.launchServer
 import net.mm2d.upnp.internal.parser.parseEventXml
-import net.mm2d.upnp.internal.thread.TaskExecutors
-import net.mm2d.upnp.internal.thread.ThreadCondition
 import net.mm2d.upnp.internal.util.closeQuietly
 import net.mm2d.upnp.log.Logger
 import java.io.IOException
@@ -32,17 +37,22 @@ import java.util.*
  * @author [大前良介 (OHMAE Ryosuke)](mailto:ryo@mm2d.net)
  */
 internal class EventReceiver(
-    private val taskExecutors: TaskExecutors,
-    private val listener: (sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean
-) : Runnable {
+    private val config: ControlPointConfig,
+    private val listener: suspend (sid: String, seq: Long, properties: List<Pair<String, String>>) -> Boolean
+) {
     private var serverSocket: ServerSocket? = null
+    private val localPortFlow: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
     private val clientList: MutableList<ClientTask> = Collections.synchronizedList(LinkedList())
-    private val threadCondition = ThreadCondition(taskExecutors.server)
+    private var job: Job? = null
 
-    fun start(): Unit = threadCondition.start(this)
+    fun start() {
+        job?.cancel()
+        job = config.launchServer { block() }
+    }
 
     fun stop() {
-        threadCondition.stop()
+        job?.cancel()
+        job = null
         serverSocket.closeQuietly()
         synchronized(clientList) {
             clientList.forEach { it.stop() }
@@ -54,24 +64,18 @@ internal class EventReceiver(
     @Throws(IOException::class)
     internal fun createServerSocket(): ServerSocket = ServerSocket(0)
 
-    fun getLocalPort(): Int {
-        if (!threadCondition.waitReady()) return 0
-        return serverSocket?.localPort ?: 0
-    }
+    suspend fun getLocalPort(): Int = localPortFlow.first()
 
-    override fun run() {
-        Thread.currentThread().let {
-            it.name = it.name + "-event-receiver"
-        }
+    private suspend fun CoroutineScope.block() {
         try {
             val socket = createServerSocket()
             serverSocket = socket
-            threadCondition.notifyReady()
-            while (!threadCondition.isCanceled()) {
+            localPortFlow.emit(socket.localPort)
+            while (isActive) {
                 val clientSocket = socket.accept().also {
                     it.soTimeout = Property.DEFAULT_TIMEOUT
                 }
-                ClientTask(taskExecutors, this, clientSocket).let {
+                ClientTask(config, this@EventReceiver, clientSocket).let {
                     clientList.add(it)
                     it.start()
                 }
@@ -88,7 +92,7 @@ internal class EventReceiver(
     }
 
     // VisibleForTesting
-    internal fun notifyEvent(sid: String, request: SingleHttpRequest): Boolean {
+    internal suspend fun notifyEvent(sid: String, request: SingleHttpRequest): Boolean {
         val seq = request.getHeader(Http.SEQ)?.toLongOrNull() ?: return false
         val properties = request.getBody().parseEventXml()
         if (properties.isEmpty()) return false
@@ -97,33 +101,37 @@ internal class EventReceiver(
 
     // VisibleForTesting
     internal class ClientTask(
-        taskExecutors: TaskExecutors,
+        private val config: ControlPointConfig,
         private val eventReceiver: EventReceiver,
         private val socket: Socket
-    ) : Runnable {
-        private val condition = ThreadCondition(taskExecutors.io)
+    ) {
+        private var job: Job? = null
 
-        fun start(): Unit = condition.start(this)
+        fun start() {
+            job?.cancel()
+            job = config.launchServer { block() }
+        }
 
         fun stop() {
-            condition.stop()
+            job?.cancel()
+            job = null
             socket.closeQuietly()
         }
 
-        override fun run() {
+        private suspend fun CoroutineScope.block() {
             try {
                 receiveAndReply(socket.getInputStream(), socket.getOutputStream())
             } catch (e: IOException) {
                 Logger.w(e)
             } finally {
                 socket.closeQuietly()
-                eventReceiver.notifyClientFinished(this)
+                eventReceiver.notifyClientFinished(this@ClientTask)
             }
         }
 
         // VisibleForTesting
         @Throws(IOException::class)
-        fun receiveAndReply(inputStream: InputStream, outputStream: OutputStream) {
+        suspend fun receiveAndReply(inputStream: InputStream, outputStream: OutputStream) {
             val request = SingleHttpRequest.create().apply {
                 readData(inputStream)
             }
