@@ -63,6 +63,8 @@ dependencies {
     implementation("io.ktor:ktor-client-core:2.1.1")
     implementation("io.ktor:ktor-client-cio:2.1.1")
     implementation("io.ktor:ktor-client-okhttp:2.1.1")
+    implementation("io.ktor:ktor-server-core-jvm:2.1.1")
+    implementation("io.ktor:ktor-server-cio-jvm:2.1.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.4")
