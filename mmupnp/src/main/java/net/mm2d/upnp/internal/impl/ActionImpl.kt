@@ -58,8 +58,7 @@ internal class ActionImpl(
                 name = name,
                 argumentMap = argumentList
                     .map { it.build() }
-                    .map { it.name to it }
-                    .toMap()
+                    .associateBy { it.name }
             )
         }
 
