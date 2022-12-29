@@ -4,6 +4,7 @@ import org.jetbrains.dokka.gradle.DokkaTask
 plugins {
     `java-library`
     kotlin("jvm")
+    id("kotlinx-atomicfu")
     id("org.jetbrains.dokka")
     `maven-publish`
     signing
@@ -60,11 +61,11 @@ dependencies {
     api(project(":xml"))
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("io.ktor:ktor-client-core:2.1.1")
-    implementation("io.ktor:ktor-client-cio:2.1.1")
-    implementation("io.ktor:ktor-client-okhttp:2.1.1")
-    implementation("io.ktor:ktor-server-core-jvm:2.1.1")
-    implementation("io.ktor:ktor-server-cio-jvm:2.1.1")
+    implementation("io.ktor:ktor-client-core:2.1.2")
+    implementation("io.ktor:ktor-client-cio:2.1.2")
+    implementation("io.ktor:ktor-client-okhttp:2.1.2")
+    implementation("io.ktor:ktor-server-core-jvm:2.1.2")
+    implementation("io.ktor:ktor-server-cio-jvm:2.1.2")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.4")
