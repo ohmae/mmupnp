@@ -15,12 +15,16 @@ base.archivesName.set("xml")
 group = ProjectProperties.groupId
 version = ProjectProperties.versionName
 
+kotlin {
+    jvmToolchain(11)
+}
+
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 }
 
@@ -60,7 +64,7 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.13.4")
+    testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("com.google.truth:truth:1.1.3")
 }
 

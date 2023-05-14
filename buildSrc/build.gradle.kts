@@ -7,5 +7,5 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.ben-manes:gradle-versions-plugin:0.45.0")
+    implementation("com.github.ben-manes:gradle-versions-plugin:0.46.0")
 }

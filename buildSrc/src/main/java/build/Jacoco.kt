@@ -10,7 +10,7 @@ private fun Project.jacoco(configure: JacocoPluginExtension.() -> Unit): Unit =
 
 fun Project.jacocoSettings() {
     jacoco {
-        toolVersion = "0.8.8"
+        toolVersion = "0.8.10"
     }
 
     tasks.named("jacocoTestReport", JacocoReport::class.java) {
