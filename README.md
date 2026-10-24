@@ -19,8 +19,8 @@ Universal Plug and Play (UPnP) ControlPoint library for Java / Kotlin.
 
 ## Requirements
 
-- kotlin 1.3 or later
-- Java 7 or later
+- Kotlin 2.4.21
+- Java 11 or later
 
 ## Restrictions
 

@@ -1,24 +1,16 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath(kotlin("gradle-plugin", version = "1.8.21"))
-        classpath(kotlin("serialization", version = "1.8.21"))
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.8.10")
-
-        classpath("com.github.ben-manes:gradle-versions-plugin:0.46.0")
-    }
+plugins {
+    kotlin("jvm") version "2.4.21" apply false
+    kotlin("plugin.serialization") version "2.4.21" apply false
+    id("org.jetbrains.dokka") version "2.2.0" apply false
+    id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
 }
 
 allprojects {
     repositories {
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
     }
 }
 
-tasks.create("clean", Delete::class) {
-    delete(rootProject.buildDir)
+tasks.register<Delete>("clean") {
+    delete(layout.buildDirectory)
 }

@@ -1,10 +1,6 @@
 package build
 
-import groovy.util.Node
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.publish.PublishingExtension
@@ -18,12 +14,6 @@ private fun Project.publishing(configure: PublishingExtension.() -> Unit): Unit 
 private val Project.base: BasePluginExtension
     get() = (this as ExtensionAware).extensions.getByName("base") as BasePluginExtension
 
-private val NamedDomainObjectContainer<Configuration>.api: NamedDomainObjectProvider<Configuration>
-    get() = named("api", Configuration::class.java)
-
-private val NamedDomainObjectContainer<Configuration>.implementation: NamedDomainObjectProvider<Configuration>
-    get() = named("implementation", Configuration::class.java)
-
 fun Project.signing(configure: SigningExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("signing", configure)
 
@@ -34,8 +24,12 @@ fun Project.publishingSettings() {
     publishing {
         publications {
             create("mavenJava", MavenPublication::class.java) {
-                artifact("$buildDir/libs/${base.archivesName.get()}-${version}.jar")
-                artifact(tasks.getByName("sourcesJar"))
+                from(components.getByName("java"))
+                versionMapping {
+                    allVariants {
+                        fromResolutionResult()
+                    }
+                }
                 artifact(tasks.getByName("javadocJar"))
                 groupId = ProjectProperties.groupId
                 artifactId = base.archivesName.get()
@@ -59,25 +53,6 @@ fun Project.publishingSettings() {
                         appendNode("developerConnection", ProjectProperties.Url.scm)
                         appendNode("url", ProjectProperties.Url.github)
                     }
-                    val dependencies = node.appendNode("dependencies")
-                    configurations.api.get().dependencies.forEach {
-                        appendDependency(
-                            dependencies,
-                            groupId = it.group ?: "",
-                            artifactId = it.name,
-                            version = it.version ?: "",
-                            scope = "compile"
-                        )
-                    }
-                    configurations.implementation.get().dependencies.forEach {
-                        appendDependency(
-                            dependencies,
-                            groupId = it.group ?: "",
-                            artifactId = it.name,
-                            version = it.version ?: "",
-                            scope = "runtime"
-                        )
-                    }
                 }
             }
         }
@@ -96,14 +71,5 @@ fun Project.publishingSettings() {
     }
     tasks.named("publish") {
         dependsOn("assemble")
-    }
-}
-
-private fun appendDependency(parentNode: Node, groupId: String, artifactId: String, version: String, scope: String) {
-    parentNode.appendNode("dependency").apply {
-        appendNode("groupId", groupId)
-        appendNode("artifactId", artifactId)
-        appendNode("version", version)
-        appendNode("scope", scope)
     }
 }

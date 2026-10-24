@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.concurrent.CountDownLatch
 
 @Suppress("TestFunctionName", "NonAsciiCharacters")
 @RunWith(JUnit4::class)
@@ -82,18 +83,26 @@ class EventReceiverTest {
         receiver.stop()
     }
 
-    @Test
+    @Test(timeout = 10000L)
     fun getLocalPort() {
         val port = 12345
         val serverSocket: ServerSocket = mockk(relaxed = true)
         every { serverSocket.localPort } returns port
-        every { serverSocket.accept() } throws IOException()
+        val stopped = CountDownLatch(1)
+        every { serverSocket.accept() } answers {
+            stopped.await()
+            throw IOException()
+        }
         val receiver = spyk(EventReceiver(taskExecutors, mockk()))
         every { receiver.createServerSocket() } returns serverSocket
 
         receiver.start()
-        assertThat(receiver.getLocalPort()).isEqualTo(port)
-        receiver.stop()
+        try {
+            assertThat(receiver.getLocalPort()).isEqualTo(port)
+        } finally {
+            stopped.countDown()
+            receiver.stop()
+        }
     }
 
     @Test

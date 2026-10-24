@@ -1,14 +1,13 @@
 import build.*
-import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
     `java-library`
     kotlin("jvm")
     id("org.jetbrains.dokka")
+    id("org.jetbrains.dokka-javadoc")
     `maven-publish`
     signing
     jacoco
-    id("com.github.ben-manes.versions")
 }
 
 base.archivesName.set("xml")
@@ -19,15 +18,6 @@ kotlin {
     jvmToolchain(11)
 }
 
-tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "11"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "11"
-    }
-}
-
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
@@ -36,38 +26,32 @@ tasks.test {
     maxParallelForks = Runtime.getRuntime().availableProcessors()
 }
 
-tasks.named<DokkaTask>("dokkaHtml") {
-    outputDirectory.set(File(projectDir, "../docs"))
+dokka {
+    dokkaPublications.html {
+        outputDirectory.set(rootProject.layout.projectDirectory.dir("docs/${project.name}"))
+    }
+    dokkaPublications.named("javadoc") {
+        outputDirectory.set(layout.buildDirectory.dir("docs/javadoc"))
+    }
 }
 
-tasks.named<DokkaTask>("dokkaJavadoc") {
-    outputDirectory.set(File(buildDir, "docs/javadoc"))
-}
-
-tasks.create("javadocJar", Jar::class) {
-    dependsOn("dokkaJavadoc")
+tasks.register<Jar>("javadocJar") {
+    dependsOn("dokkaGeneratePublicationJavadoc")
     archiveClassifier.set("javadoc")
-    from(File(buildDir, "docs/javadoc"))
+    from(layout.buildDirectory.dir("docs/javadoc"))
 }
 
-tasks.create("sourcesJar", Jar::class) {
-    dependsOn("classes")
-    archiveClassifier.set("sources")
-    from(sourceSets["main"].allSource)
-}
-
-artifacts {
-    archives(tasks.named<Jar>("sourcesJar"))
+java {
+    withSourcesJar()
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.13.5")
-    testImplementation("com.google.truth:truth:1.1.3")
+    testImplementation("io.mockk:mockk:1.14.11")
+    testImplementation("com.google.truth:truth:1.4.5")
 }
 
 publishingSettings()
 jacocoSettings()
-dependencyUpdatesSettings()
