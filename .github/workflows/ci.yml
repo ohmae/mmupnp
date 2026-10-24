@@ -20,8 +20,10 @@ jobs:
         java-version: 21
     - name: run unit test and send report
       run: |
-        ./gradlew build jacocoTestReport
+        ./gradlew build :koverXmlReport :koverHtmlReport
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v7.1.1
       with:
+        files: build/reports/kover/report.xml
+        disable_search: true
         token: ${{ secrets.CODECOV_TOKEN }}

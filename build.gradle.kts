@@ -1,14 +1,11 @@
 plugins {
-    kotlin("jvm") version "2.4.21" apply false
-    kotlin("plugin.serialization") version "2.4.21" apply false
-    id("org.jetbrains.dokka") version "2.2.0" apply false
-    id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.kover)
 }
 
-allprojects {
-    repositories {
-        mavenCentral()
-    }
+dependencies {
+    kover(project(":mmupnp"))
+    kover(project(":xml"))
 }
 
 tasks.register<Delete>("clean") {
